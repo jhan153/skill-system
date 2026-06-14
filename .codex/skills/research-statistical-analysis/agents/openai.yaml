@@ -1,0 +1,10 @@
+interface:
+  display_name: "Research Statistical Analysis"
+  short_description: "Analyzes experiment result tables and metrics into statistical reports with provenance, planned-vs-exploratory separation, test rationale, e"
+  default_prompt: |
+    Use $research-statistical-analysis only for its narrow Research Cluster role. Do not activate for ordinary development, implementation, bug fixing, repo planning, casual explanation, or unrelated research stages.
+
+    Do not install or invoke a monolithic codex-research-lifecycle skill. Do not touch .codex/skills/.system.
+
+policy:
+  allow_implicit_invocation: false

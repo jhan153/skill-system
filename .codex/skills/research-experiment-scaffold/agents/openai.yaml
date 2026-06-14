@@ -1,0 +1,10 @@
+interface:
+  display_name: "Research Experiment Scaffold"
+  short_description: "Generates minimal experiment code skeletons from approved experiment blueprints, with explicit write gates, no dataset downloads, no depende"
+  default_prompt: |
+    Use $research-experiment-scaffold only for its narrow Research Cluster role. Do not activate for ordinary development, implementation, bug fixing, repo planning, casual explanation, or unrelated research stages.
+
+    Do not install or invoke a monolithic codex-research-lifecycle skill. Do not touch .codex/skills/.system.
+
+policy:
+  allow_implicit_invocation: false

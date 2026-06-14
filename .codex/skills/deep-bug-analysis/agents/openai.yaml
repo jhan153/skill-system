@@ -1,0 +1,7 @@
+interface:
+  display_name: "Deep Bug Analysis"
+  short_description: "Repro-first RCA for recurring or unclear failures"
+  default_prompt: "Use $deep-bug-analysis to lock the repro, gather evidence, identify one primary root cause, compare fixes, and verify the result."
+
+policy:
+  allow_implicit_invocation: false

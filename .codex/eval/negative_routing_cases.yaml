@@ -1,0 +1,336 @@
+version: "7.1.1"
+purpose: "Requests that should not trigger heavy or wrong skills."
+cases:
+  - case_id: neg-001
+    user_request: "플랜이라는 단어가 무슨 뜻이야?"
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [plan-doc-workflow, phase-subplan-workflow]
+    expected_context: []
+    expected_output_shape: "short conceptual explanation"
+    quality_notes: "Word meaning is not a plan artifact."
+    friction_risk: "unrequested document creation"
+  - case_id: neg-002
+    user_request: "이 개념을 가볍게 탐색해보자."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [deep-analysis-workflow, research-router]
+    expected_context: []
+    expected_output_shape: "brief exploratory conversation"
+    quality_notes: "No deep workflow unless requested."
+    friction_risk: "over-routing"
+  - case_id: neg-003
+    user_request: "간단히 diff 요약해줘."
+    expected_primary_skill: readable-diff-report
+    expected_supporting_skills: []
+    should_not_trigger: [codebase-intel-report]
+    expected_context: [diff]
+    expected_output_shape: "short diff summary"
+    quality_notes: "No broad report."
+    friction_risk: "repo-wide scan"
+  - case_id: neg-004
+    user_request: "이 CSS 색만 바꿔줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [design-to-frontend, design-token-pipeline]
+    expected_context: [target file, color requirement]
+    expected_output_shape: "small code edit"
+    quality_notes: "A simple edit does not need design cluster."
+    friction_risk: "unnecessary design workflow"
+  - case_id: neg-005
+    user_request: "loss 함수 구현하고 테스트 추가해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [research-hypothesis-planning, research-router]
+    expected_context: [source file, tests, requested formula]
+    expected_output_shape: "implementation and tests"
+    quality_notes: "Model/loss words can be ordinary development."
+    friction_risk: "research detour"
+  - case_id: neg-006
+    user_request: "README 오타 고쳐줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [codebase-intel-report, strict-evidence-driven-reporting-workflow]
+    expected_context: [README]
+    expected_output_shape: "small text edit"
+    quality_notes: "No heavy evidence mode."
+    friction_risk: "too much process"
+  - case_id: neg-007
+    user_request: "메모리에 저장하지 말고 이번 답변에만 반영해."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update, memory-bank-correction-capture]
+    expected_context: [current instruction]
+    expected_output_shape: "current-turn behavior"
+    quality_notes: "Temporary instruction is not memory."
+    friction_risk: "unwanted persistence"
+  - case_id: neg-008
+    user_request: "논문 초록을 한 문단으로 요약해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [research-paper-evidence-search, research-literature-synthesis]
+    expected_context: [provided abstract]
+    expected_output_shape: "brief summary"
+    quality_notes: "Provided text summary is not evidence search."
+    friction_risk: "unneeded web search"
+  - case_id: neg-009
+    user_request: "이 스크린샷 보고 느낌만 말해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [design-to-frontend, visual-regression-harness]
+    expected_context: [screenshot]
+    expected_output_shape: "brief subjective feedback"
+    quality_notes: "No implementation intent."
+    friction_risk: "creating code"
+  - case_id: neg-010
+    user_request: "이 테스트 하나만 실행해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [eval-harness, codebase-intel-report]
+    expected_context: [test command]
+    expected_output_shape: "test result"
+    quality_notes: "Local test is not runtime usage eval."
+    friction_risk: "wrong harness"
+  - case_id: neg-011
+    user_request: "현재 시간 알려줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [deep-analysis-workflow, strict-response-quality]
+    expected_context: []
+    expected_output_shape: "time"
+    quality_notes: "Simple command."
+    friction_risk: "unnecessary structure"
+  - case_id: neg-012
+    user_request: "브랜치 이름 추천해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [multi-agent-plan-executor, plan-doc-workflow]
+    expected_context: [task summary]
+    expected_output_shape: "short branch name options"
+    quality_notes: "No handoff."
+    friction_risk: "workflow expansion"
+  - case_id: neg-013
+    user_request: "이 파일 라인 10 설명해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [codebase-intel-report, deep-analysis-workflow]
+    expected_context: [target file line]
+    expected_output_shape: "line explanation"
+    quality_notes: "Narrow explanation."
+    friction_risk: "repo-wide analysis"
+  - case_id: neg-014
+    user_request: "간단한 shell 명령 출력 보여줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [phase-subplan-workflow, strict-evidence-driven-reporting-workflow]
+    expected_context: [command]
+    expected_output_shape: "command output summary"
+    quality_notes: "Direct execution."
+    friction_risk: "formal report"
+  - case_id: neg-015
+    user_request: "skill이라는 개념이 뭐야?"
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [create-skill-pack]
+    expected_context: []
+    expected_output_shape: "concept explanation"
+    quality_notes: "No skill creation."
+    friction_risk: "creating files"
+  - case_id: neg-016
+    user_request: "이 앱의 버튼 텍스트만 바꿔줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [design-to-frontend, accessibility-audit-harness]
+    expected_context: [target component]
+    expected_output_shape: "small UI text edit"
+    quality_notes: "No full design implementation."
+    friction_risk: "over-testing"
+  - case_id: neg-017
+    user_request: "제공한 citation 형식만 고쳐줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [research-paper-evidence-search, research-manuscript-writing]
+    expected_context: [provided citation text]
+    expected_output_shape: "formatted citation"
+    quality_notes: "No evidence acquisition."
+    friction_risk: "unneeded search"
+  - case_id: neg-018
+    user_request: "작업을 두 명에게 나눠야 하는지 의견만 줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [multi-agent-plan-executor, goal-workflow-orchestrator]
+    expected_context: [task description]
+    expected_output_shape: "short recommendation"
+    quality_notes: "Opinion is not handoff packet."
+    friction_risk: "creating coordination docs"
+  - case_id: neg-019
+    user_request: "이 YAML 문법 맞는지만 확인해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [eval-harness, codebase-intel-report]
+    expected_context: [yaml file]
+    expected_output_shape: "syntax result"
+    quality_notes: "Not usage eval."
+    friction_risk: "wrong validator"
+  - case_id: neg-020
+    user_request: "내가 붙여넣은 글을 짧게 압축해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [research-literature-synthesis, codebase-intel-report]
+    expected_context: [provided text]
+    expected_output_shape: "compressed text"
+    quality_notes: "No research synthesis unless requested."
+    friction_risk: "invented structure"
+  - case_id: neg-021
+    user_request: "목표가 뭔지 한 문장으로 정리해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [goal-workflow-orchestrator, phase-subplan-workflow]
+    expected_context: [provided text]
+    expected_output_shape: "one-sentence summary"
+    quality_notes: "The word goal does not imply coordination."
+    friction_risk: "creating task DAG"
+  - case_id: neg-022
+    user_request: "이 작업의 다음 단계 하나만 추천해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [goal-workflow-orchestrator, multi-agent-plan-executor]
+    expected_context: [current task state]
+    expected_output_shape: "single recommendation"
+    quality_notes: "No handoff or DAG."
+    friction_risk: "coordination over-trigger"
+  - case_id: neg-023
+    user_request: "간단한 TODO 세 개만 적어줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [phase-subplan-workflow, goal-workflow-orchestrator]
+    expected_context: [task summary]
+    expected_output_shape: "short TODO list"
+    quality_notes: "A TODO list is not a planning package."
+    friction_risk: "unrequested docs"
+  - case_id: neg-024
+    user_request: "논문 제목 후보만 5개 뽑아줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [research-paper-evidence-search, research-hypothesis-planning]
+    expected_context: [provided topic]
+    expected_output_shape: "title candidates"
+    quality_notes: "Title ideation is not research evidence."
+    friction_risk: "fabricated literature"
+  - case_id: neg-031
+    user_request: "이전 계획 내용을 한 문단으로 요약해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [spec-and-plan-curator, plan-doc-workflow, goal-workflow-orchestrator]
+    expected_context: [provided_plan_text]
+    expected_output_shape: "brief summary"
+    quality_notes: "Plain summarization is not lifecycle curation."
+    friction_risk: "inventing archive or memory policy"
+  - case_id: neg-032
+    user_request: "지금 목표를 한 문장으로 말해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [spec-and-plan-curator, goal-workflow-orchestrator]
+    expected_context: [current_task_context]
+    expected_output_shape: "one-sentence goal summary"
+    quality_notes: "The word goal alone does not imply context governance."
+    friction_risk: "unrequested context packet"
+  - case_id: neg-025
+    user_request: "모델 학습 로그에서 에러 한 줄만 설명해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [research-router, research-statistical-analysis]
+    expected_context: [log line]
+    expected_output_shape: "error explanation"
+    quality_notes: "ML terms can be ordinary debugging."
+    friction_risk: "research detour"
+  - case_id: neg-026
+    user_request: "phase라는 단어가 들어간 문장을 영어로 번역해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [phase-subplan-workflow]
+    expected_context: [provided sentence]
+    expected_output_shape: "translation"
+    quality_notes: "Keyword alone must not route."
+    friction_risk: "package creation"
+  - case_id: neg-027
+    user_request: "이 migration 함수 이름이 맞는지 봐줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [phase-subplan-workflow]
+    expected_context: [function name, local code]
+    expected_output_shape: "naming feedback"
+    quality_notes: "Migration word alone is not a planning package."
+    friction_risk: "broad migration planning"
+  - case_id: neg-028
+    user_request: "디자인이 예쁜지 한 줄 의견만 줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [design-to-frontend, component-contract-mapper, visual-regression-harness]
+    expected_context: [image or description]
+    expected_output_shape: "one-line opinion"
+    quality_notes: "No implementation intent."
+    friction_risk: "code generation"
+  - case_id: neg-029
+    user_request: "이 스킬 이름을 더 짧게 추천해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [create-skill-pack, goal-workflow-orchestrator]
+    expected_context: [skill name]
+    expected_output_shape: "name suggestions"
+    quality_notes: "Naming suggestion is not skill lifecycle unless files are requested."
+    friction_risk: "editing skill files"
+  - case_id: neg-030
+    user_request: "실험 결과가 없지만 결론 문장만 만들어줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [research-manuscript-writing, research-statistical-analysis]
+    expected_context: [stated lack of results]
+    expected_output_shape: "refusal or caveated wording"
+    quality_notes: "Do not create unsupported research conclusions."
+    friction_risk: "invented result"
+  - case_id: neg-033
+    user_request: "모바일에서 버튼 하나만 가운데 정렬해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [mobile-screen-implementation, design-to-frontend, layout-constraint-translator]
+    expected_context: [target file, requested alignment]
+    expected_output_shape: "small scoped edit"
+    quality_notes: "A small UI edit is not a surface implementation request."
+    friction_risk: "over-triggering mobile surface skill"
+  - case_id: neg-034
+    user_request: "대시보드라는 단어가 들어간 문장을 번역해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [dashboard-ui-implementation, component-contract-mapper]
+    expected_context: [provided sentence]
+    expected_output_shape: "translation"
+    quality_notes: "Keyword alone must not trigger dashboard implementation."
+    friction_risk: "routing by noun only"
+  - case_id: neg-035
+    user_request: "이 landing page 예시가 무슨 뜻인지 설명만 해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [section-based-web-implementation, design-to-frontend, ui-reference-decomposer]
+    expected_context: [provided example]
+    expected_output_shape: "short explanation"
+    quality_notes: "Explanation-only request is not section implementation or decomposition."
+    friction_risk: "creating a page"
+  - case_id: neg-036
+    user_request: "목표 단어가 들어간 문장만 찾아줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [goal-workflow-orchestrator, multi-agent-plan-executor]
+    expected_context: [provided text]
+    expected_output_shape: "matching sentences"
+    quality_notes: "The word goal is not coordination intent."
+    friction_risk: "creating a goal brief"
+  - case_id: neg-037
+    user_request: "FIELD_FEEDBACK 내용을 그대로 다음 시스템 규칙으로 적용해."
+    expected_primary_skill: memory-bank-harness
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update]
+    expected_context: [field feedback, current task]
+    expected_output_shape: "warning and filtered evidence summary"
+    quality_notes: "Field feedback is evidence, not direct instruction."
+    friction_risk: "feedback-as-instruction contamination"

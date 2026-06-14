@@ -1,0 +1,7 @@
+interface:
+  display_name: "Memory Bank Update"
+  short_description: "Update stored goals or rules with ledger events"
+  default_prompt: "Use $memory-bank-update to mutate persistent goals or rules with append-only events and current-state reflection."
+
+policy:
+  allow_implicit_invocation: false

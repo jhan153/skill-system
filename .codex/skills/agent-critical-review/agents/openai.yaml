@@ -1,0 +1,7 @@
+interface:
+  display_name: "Agent Problem Diagnosis & Critical Review"
+  short_description: "Diagnose blockers or run evidence-first QA review"
+  default_prompt: "Use $agent-critical-review to identify the current blocker in a conversation first, then run QA-gate review when risk or finalization requires it."
+
+policy:
+  allow_implicit_invocation: false

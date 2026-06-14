@@ -1,0 +1,93 @@
+version: "7.1.1"
+purpose: "Research cluster regression cases."
+cases:
+  - case_id: research-001
+    user_request: "최신 논문 찾아서 evidence ledger 만들어줘."
+    expected_primary_skill: research-paper-evidence-search
+    expected_supporting_skills: [research-router]
+    should_not_trigger: [research-experiment-scaffold]
+    expected_context: [topic, date range, source constraints]
+    expected_output_shape: "evidence ledger"
+    quality_notes: "No fabricated citations."
+    friction_risk: "network unavailable"
+  - case_id: research-002
+    user_request: "evidence ledger 기반으로 literature review 써줘."
+    expected_primary_skill: research-literature-synthesis
+    expected_supporting_skills: []
+    should_not_trigger: [research-paper-evidence-search]
+    expected_context: [evidence ledger]
+    expected_output_shape: "thematic synthesis"
+    quality_notes: "Use provided evidence."
+    friction_risk: "invented papers"
+  - case_id: research-003
+    user_request: "이 literature review에서 gap과 active hypothesis 하나 뽑아줘."
+    expected_primary_skill: research-literature-ideation
+    expected_supporting_skills: []
+    should_not_trigger: [research-experiment-scaffold]
+    expected_context: [literature review]
+    expected_output_shape: "candidate hypotheses and one selected hypothesis"
+    quality_notes: "One active hypothesis."
+    friction_risk: "too many claims"
+  - case_id: research-004
+    user_request: "이 selected hypothesis로 experiment blueprint 만들어줘."
+    expected_primary_skill: research-experiment-blueprint
+    expected_supporting_skills: []
+    should_not_trigger: [research-experiment-scaffold]
+    expected_context: [selected hypothesis, constraints]
+    expected_output_shape: "checkpoint-first blueprint"
+    quality_notes: "No code generation yet."
+    friction_risk: "skipping baseline"
+  - case_id: research-005
+    user_request: "approved blueprint 기준으로 experiment scaffold 만들어줘."
+    expected_primary_skill: research-experiment-scaffold
+    expected_supporting_skills: []
+    should_not_trigger: [research-literature-ideation]
+    expected_context: [approved blueprint, write boundary]
+    expected_output_shape: "minimal code skeleton"
+    quality_notes: "No dataset download or training."
+    friction_risk: "missing approval"
+  - case_id: research-006
+    user_request: "결과 CSV를 통계 분석해줘."
+    expected_primary_skill: research-statistical-analysis
+    expected_supporting_skills: []
+    should_not_trigger: [research-paper-evidence-search]
+    expected_context: [result table, metric definitions]
+    expected_output_shape: "statistical analysis with limits"
+    quality_notes: "Data provenance matters."
+    friction_risk: "unsupported conclusions"
+  - case_id: research-007
+    user_request: "분석 결과와 evidence ledger로 논문 초안 작성해줘."
+    expected_primary_skill: research-manuscript-writing
+    expected_supporting_skills: []
+    should_not_trigger: [research-experiment-scaffold]
+    expected_context: [analysis, evidence ledger]
+    expected_output_shape: "manuscript section with citation status"
+    quality_notes: "Mark missing citations."
+    friction_risk: "invented results"
+  - case_id: research-008
+    user_request: "이 논문 초안 peer review 해줘."
+    expected_primary_skill: research-peer-review
+    expected_supporting_skills: []
+    should_not_trigger: [research-manuscript-writing]
+    expected_context: [manuscript draft]
+    expected_output_shape: "major/minor concerns"
+    quality_notes: "Review, do not rewrite unless asked."
+    friction_risk: "overwriting draft"
+  - case_id: research-009
+    user_request: "이 loss 설계를 어떻게 검증할지 연구 계획을 세워줘."
+    expected_primary_skill: research-hypothesis-planning
+    expected_supporting_skills: []
+    should_not_trigger: [research-experiment-scaffold]
+    expected_context: [claim, metrics, baseline]
+    expected_output_shape: "hypothesis plan and ablation ladder"
+    quality_notes: "Checkpoint-first."
+    friction_risk: "multi-loss overload"
+  - case_id: research-010
+    user_request: "이건 연구가 아니라 이미 정한 수식을 코드로 구현하는 일이야."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [research-router, research-hypothesis-planning]
+    expected_context: [source files, tests]
+    expected_output_shape: "implementation"
+    quality_notes: "Respect development mode."
+    friction_risk: "research over-routing"

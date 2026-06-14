@@ -1,0 +1,6 @@
+interface:
+  display_name: "Layout Constraint Translator"
+  short_description: "Translate design constraints into implementable layout rules."
+  default_prompt: "Use $layout-constraint-translator to translate Auto Layout, flex/grid, sizing, overflow, and breakpoint constraints into implementation-ready layout rules."
+policy:
+  allow_implicit_invocation: false

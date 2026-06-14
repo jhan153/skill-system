@@ -1,0 +1,6 @@
+interface:
+  display_name: "Section-Based Web Implementation"
+  short_description: "Guide section-based web implementation."
+  default_prompt: "Use $section-based-web-implementation to apply section-based web constraints for hero, semantic sections, CTA flow, responsive order, and accessibility."
+policy:
+  allow_implicit_invocation: false

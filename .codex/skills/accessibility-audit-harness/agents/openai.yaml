@@ -1,0 +1,6 @@
+interface:
+  display_name: "Accessibility Audit Harness"
+  short_description: "Collect accessibility evidence for implemented UI work."
+  default_prompt: "Use $accessibility-audit-harness to check keyboard, focus, semantics, contrast, target size, and responsive readability evidence."
+policy:
+  allow_implicit_invocation: false

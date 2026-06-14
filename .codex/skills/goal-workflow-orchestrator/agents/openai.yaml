@@ -1,0 +1,5 @@
+interface:
+  display_name: "Goal Workflow Orchestrator"
+  short_description: "Create lightweight response-first goal briefs or task DAGs only on explicit coordination requests."
+policy:
+  allow_implicit_invocation: false

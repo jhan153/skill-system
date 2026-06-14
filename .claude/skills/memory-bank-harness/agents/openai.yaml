@@ -1,0 +1,5 @@
+interface:
+  display_name: "Memory Bank Harness"
+  short_description: "Select task-specific accepted memory only when memory use is explicit."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design To Frontend"
+  short_description: "Implement design artifacts as production UI source code"
+  default_prompt: "Use $design-to-frontend to implement the supplied design artifact as real source code in this repository, reuse existing project patterns, integrate it into the correct screen/route/component/view, and validate visually when possible."

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Component Contract Mapper"
+  short_description: "Map design components to implementation contracts and states."
+  default_prompt: "Use $component-contract-mapper to map design components, variants, and states to existing repo components and report unresolved gaps."
+policy:
+  allow_implicit_invocation: false

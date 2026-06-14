@@ -1,0 +1,102 @@
+version: "7.1.1"
+purpose: "Positive routing examples for common requests."
+cases:
+  - case_id: route-001
+    user_request: "deep-bug-analysis로 이 장애를 분석해줘."
+    expected_primary_skill: deep-bug-analysis
+    expected_supporting_skills: []
+    should_not_trigger: [codebase-intel-report]
+    expected_context: [symptom, repro, logs]
+    expected_output_shape: "root cause analysis"
+    quality_notes: "Explicit skill invocation wins."
+    friction_risk: "missing repro"
+  - case_id: route-002
+    user_request: "srq로 검증 결과를 보고해줘."
+    expected_primary_skill: strict-response-quality
+    expected_supporting_skills: []
+    should_not_trigger: [strict-evidence-driven-reporting-workflow]
+    expected_context: [verified work, command outputs]
+    expected_output_shape: "formal evidence-first response"
+    quality_notes: "Output modifier only."
+    friction_risk: "too verbose for simple work"
+  - case_id: route-003
+    user_request: "새 custom Codex skill pack 만들어줘."
+    expected_primary_skill: create-skill-pack
+    expected_supporting_skills: []
+    should_not_trigger: [research-router]
+    expected_context: [skill name, use case, target directory]
+    expected_output_shape: "skill files and routing metadata"
+    quality_notes: "Skill lifecycle work."
+    friction_risk: "touching .system skills"
+  - case_id: route-004
+    user_request: "논문 관련 evidence search 해줘."
+    expected_primary_skill: research-paper-evidence-search
+    expected_supporting_skills: [research-router]
+    should_not_trigger: [research-manuscript-writing]
+    expected_context: [topic, source constraints, date range]
+    expected_output_shape: "evidence ledger"
+    quality_notes: "Search before synthesis."
+    friction_risk: "unsupported citations"
+  - case_id: route-005
+    user_request: "Figma spec을 Next.js 화면으로 구현해줘."
+    expected_primary_skill: design-to-frontend
+    expected_supporting_skills: []
+    should_not_trigger: [design-token-pipeline]
+    expected_context: [design spec, repo stack]
+    expected_output_shape: "implemented route/component"
+    quality_notes: "Concrete implementation."
+    friction_risk: "standalone demo instead of repo integration"
+  - case_id: route-006
+    user_request: "memory bank 상태를 점검해줘."
+    expected_primary_skill: memory-bank-maintenance
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update]
+    expected_context: [memory files]
+    expected_output_shape: "state inspection"
+    quality_notes: "Inspect does not imply update."
+    friction_risk: "unrequested mutation"
+  - case_id: route-007
+    user_request: "결과 CSV 통계 분석 계획을 세워줘."
+    expected_primary_skill: research-statistical-analysis
+    expected_supporting_skills: []
+    should_not_trigger: [research-paper-evidence-search]
+    expected_context: [metrics, table schema, planned comparisons]
+    expected_output_shape: "analysis plan or report depending on data"
+    quality_notes: "No data means no conclusions."
+    friction_risk: "invented p-values"
+  - case_id: route-008
+    user_request: "이 PR 코멘트들을 비판적으로 검토해줘."
+    expected_primary_skill: agent-critical-review
+    expected_supporting_skills: []
+    should_not_trigger: [readable-diff-report]
+    expected_context: [comments, patch, tests]
+    expected_output_shape: "findings first"
+    quality_notes: "Review stance."
+    friction_risk: "summary before findings"
+  - case_id: route-009
+    user_request: "visual regression evidence를 확인해줘."
+    expected_primary_skill: visual-regression-harness
+    expected_supporting_skills: [design-to-frontend]
+    should_not_trigger: [codebase-intel-report]
+    expected_context: [local app URL, viewport list, screenshots]
+    expected_output_shape: "visual gaps and verification notes"
+    quality_notes: "Experimental support skill."
+    friction_risk: "no rendered target"
+  - case_id: route-010
+    user_request: "component contract mapper로 variant/state 매핑해줘."
+    expected_primary_skill: component-contract-mapper
+    expected_supporting_skills: []
+    should_not_trigger: [design-to-frontend]
+    expected_context: [design components, repo components]
+    expected_output_shape: "component-state mapping"
+    quality_notes: "Experimental evidence gate; ask for source if missing."
+    friction_risk: "mapping without design source"
+  - case_id: route-011
+    user_request: "old plan들이 context를 오염시키는 것 같아. active plan만 남기고 load policy를 정리해줘."
+    expected_primary_skill: spec-and-plan-curator
+    expected_supporting_skills: []
+    should_not_trigger: [plan-doc-workflow, goal-workflow-orchestrator, memory-bank-maintenance]
+    expected_context: [current_goal, candidate_plan_index]
+    expected_output_shape: "active context decision and archive/load policy"
+    quality_notes: "Context lifecycle curation is separate from plan artifact writing and memory maintenance."
+    friction_risk: "opening every old plan before admission"

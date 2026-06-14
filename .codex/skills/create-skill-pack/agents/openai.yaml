@@ -1,0 +1,10 @@
+interface:
+  display_name: "Create Skill Pack"
+  short_description: "Create, harden, migrate, deprecate, or register user-managed Codex custom skill packs"
+  default_prompt: |
+    Use $create-skill-pack only when the user explicitly asks to create, update, harden, migrate, deprecate, or register a user-managed Codex custom skill or reference pack.
+
+    Do not activate for `.codex/skills/.system`, system-managed skills, ordinary execution of an existing skill, casual discussion about skills, ordinary code review, bug analysis, planning, memory updates, repo AGENTS.md-only rules, or one-turn formatting preferences.
+
+policy:
+  allow_implicit_invocation: false
