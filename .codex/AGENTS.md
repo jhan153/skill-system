@@ -65,6 +65,9 @@
 - For bug fixes, try to reproduce the failure with a test, log, command, or clear observation first.
 - For refactoring, define how behavior preservation will be checked.
 - Split large work into short `change -> validation` units.
+- For implementation, bug fix, refactoring, UI implementation, or test repair requests, Markdown-only or plan-only edits are not implementation completion unless the user explicitly requested documentation only.
+- When a user asks to implement an active plan, treat the plan as input and status context; do not treat plan synchronization as the implementation deliverable.
+- Implementation completion requires a source, test, runtime config/build, or executable scaffold change directly tied to the request, or a `blocked`/analysis-only report explaining why no such change is possible.
 - Do not claim completion when the success condition is unclear or unverified.
 
 ## Execution Policy

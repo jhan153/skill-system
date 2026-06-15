@@ -149,6 +149,17 @@ description: Mode-based execution control for evidence-first implementation, sco
 - Never treat assumptions as a passed validation result.
 - If GUI, credentials, or environment limits block a check, mark that item `Unverified`.
 
+## Implementation Completion Gate
+- For implementation, bug fix, refactor, UI implementation, or test repair requests, completion requires at least one non-documentation implementation artifact:
+  - source code diff
+  - test diff
+  - runtime config or build diff directly required for behavior
+  - generated executable scaffold or entry point
+- Markdown-only, plan-only, spec-only, report-only, memory-only, or planning-manifest-only diffs do not satisfy implementation completion unless the user explicitly requested documentation/spec work only.
+- Active plans are task input and optional status trackers; they are not implementation output.
+- If target source files, test locations, or validation commands cannot be identified, continue targeted discovery first.
+- If no non-documentation implementation diff is possible after targeted discovery, report `blocked` or analysis-only with the exact blocker and next action.
+
 ## Review Contract
 - `standard` and `strict` mode require a self-review or review pass before completion whenever feasible.
 - Review should focus on regression risk, behavior drift, missing tests, data-loss/security exposure, and scope creep.
@@ -199,6 +210,7 @@ description: Mode-based execution control for evidence-first implementation, sco
 
 ## Completion Criteria
 - Do not report completion unless the selected mode's required fields are present.
+- For implementation-class requests, do not report completion unless the Implementation Completion Gate is satisfied or the result is explicitly reported as `blocked`/analysis-only.
 - A passed test alone is insufficient.
 - If required proof or validation is missing, keep the gap explicit as `Unverified`, or report `blocked` when the next step is external.
 

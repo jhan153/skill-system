@@ -12,6 +12,10 @@ Development / Implementation Mode:
 - Do not perform broad premise skepticism by default.
 - Do not route to `research-hypothesis-planning` just because the user mentions "experiment", "approach", "model", "loss", or "metric" in a development context.
 - Prefer concrete execution, verification, and repo validation.
+- Direct implementation commands such as `구현해`, `작업해`, `플랜대로 구현`, `fix`, `add tests`, or `refactor` stay in Development / Implementation Mode even when an active plan document exists.
+- Active plans may be read as task input and updated as secondary status tracking, but they must not replace source, test, runtime config/build, or executable scaffold changes for implementation requests.
+- Markdown-only, plan-only, spec-only, report-only, memory-only, or planning-manifest-only diffs are not implementation completion unless the user explicitly requested documentation/spec work only.
+- If a requested implementation cannot produce a non-documentation implementation diff, report `blocked` or analysis-only with the exact blocker instead of claiming completion.
 
 Research Hypothesis Planning Mode:
 - Use only when the user explicitly asks for research plan, paper idea, novel method, experiment design, ablation design, loss design, training plan, hypothesis planning, or scientific claim development.
@@ -58,7 +62,7 @@ Build this bundle before multi-step work, writes, broad scans, reports, automati
 | bug diagnosis | `deep-analysis-workflow` -> `deep-bug-analysis` | `strict-evidence-driven-reporting-workflow` only if implementation/risk is active | symptom, repro, relevant files, logs | full repo report |
 | algorithm proposal | `deep-analysis-workflow` -> `deep-algorithm-proposal` | `strict-response-quality` only for formal output | constraints, metrics, candidates | full repo or memory |
 | research / scientific workflow | `research-router` | selected narrow research cluster skill; `plan-doc-workflow` only for explicit persisted `docs/plan` artifact | research request, stage hints, provided artifacts, `.codex/research-routing.md` when needed | full repo, full memory bank, `codebase-intel-report`, `phase-subplan-workflow`, experiment scaffold unless explicitly requested |
-| implementation | task-specific primary | `strict-evidence-driven-reporting-workflow` for medium/high-risk changes | repo `AGENTS.md`, relevant files, validation | unrelated docs |
+| implementation | task-specific primary | `strict-evidence-driven-reporting-workflow` for medium/high-risk changes; `plan-doc-workflow` only as secondary status sync when an active plan is explicitly in scope | repo `AGENTS.md`, relevant files, active plan as input when explicitly referenced, validation | unrelated docs, plan-only completion |
 | plan document | `plan-doc-workflow` | `agent-critical-review` only for QA/review | active plan, plan template | phase package |
 | context/spec lifecycle curation | `spec-and-plan-curator` | `agent-critical-review` only for QA/review | current goal or task, candidate plan/spec slice, lifecycle state when available | full memory bank, all old plans, archived raw plans, full chat history |
 | phase package | `phase-subplan-workflow` | `strict-evidence-driven-reporting-workflow` if execution risk is active | prior reports, templates | lightweight plan only |
@@ -350,6 +354,23 @@ route_smoke_tests:
     must_not_route_to:
       - "research-hypothesis-planning"
     notes: "Implementation of a chosen loss is a development task, not research hypothesis planning."
+  - request: "이 플랜대로 구현해줘."
+    expected_primary_skill: null
+    expected_route_class: "development_implementation"
+    expected_attachments:
+      - "plan-doc-workflow only as secondary status sync when an active plan exists"
+      - "strict-evidence-driven-reporting-workflow for medium/high-risk implementation"
+    must_read:
+      - "active plan as task input"
+      - "target source/test/config files"
+      - "validation contract"
+    must_not_route_to:
+      - "phase-subplan-workflow"
+      - "spec-and-plan-curator"
+    must_not_complete_with:
+      - "docs/plan-only diff"
+      - "Markdown-only plan/status update"
+    notes: "A plan implementation command consumes the plan and executes the code work; plan synchronization is bookkeeping, not completion evidence."
   - request: "이 모델 학습 파이프라인 구현 플랜을 짜줘."
     expected_primary_skill: null
     expected_route_class: "development_implementation_plan"

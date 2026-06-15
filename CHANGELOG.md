@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added an implementation completion gate so implementation, bug fix, refactor, UI, and test-repair requests cannot be completed with Markdown-only or plan-only edits unless documentation-only work was explicitly requested.
+- Clarified that active plans are implementation input and optional status trackers, not substitutes for source/test/config/build changes.
+- Added a runtime eval case for `이 플랜대로 구현해줘` to catch plan-edit-only regressions.
+
 ## 7.1.1
 
 - Recut the bundle as a manual drop-in skill bundle.

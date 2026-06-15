@@ -154,3 +154,12 @@ cases:
     expected_output_shape: "filtered task-specific context pack"
     quality_notes: "Old plans and raw transcript do not become active instructions."
     friction_risk: "context contamination"
+  - case_id: runtime-018
+    user_request: "이 플랜대로 구현해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: [plan-doc-workflow, strict-evidence-driven-reporting-workflow]
+    should_not_trigger: [phase-subplan-workflow, spec-and-plan-curator]
+    expected_context: [active plan as input, target source files, validation command]
+    expected_output_shape: "source/test/config/build diff plus validation; plan status update is optional bookkeeping"
+    quality_notes: "Markdown-only docs/plan updates are incomplete unless documentation-only work was explicitly requested."
+    friction_risk: "editing the plan instead of implementing the planned change"
