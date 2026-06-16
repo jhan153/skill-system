@@ -10,7 +10,7 @@
 - Design the smallest core experiment first.
 - Add one ablation factor at a time.
 - Prevent multi-loss soup by separating training losses from evaluation and analysis metrics.
-- Keep `plan-doc-workflow` as artifact writer only when persisted `docs/plan` output is explicitly requested.
+- Keep `plan-short-term-docs` as artifact writer only when persisted `docs/plan` output is explicitly requested.
 
 ## Boundary With Development
 Development and implementation tasks should remain direct and keyword-grounded. If the user asks to implement a chosen method, use concrete requirements, file names, APIs, and metrics as task specifications unless unsafe, contradictory, impossible, or repo-conflicting. Do not run broad research premise skepticism in that mode.

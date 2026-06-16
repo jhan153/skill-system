@@ -20,7 +20,7 @@ description: Turns an evidence ledger or provided papers into literature review 
   - provided papers or an evidence ledger need to be synthesized into a review.
 - do_not_use_when:
   - hypothesis generation or active hypothesis selection; use research-literature-ideation.
-  - paper search when no evidence exists; use research-paper-evidence-search first.
+  - paper search when no evidence exists; use search-paper-evidence first.
   - final manuscript claims without verified citations.
 - expected_inputs:
   - evidence_ledger.json
@@ -60,7 +60,7 @@ description: Turns an evidence ledger or provided papers into literature review 
   tools:
     - none by default
   network:
-    - none by default; return to `research-paper-evidence-search` if more evidence is needed
+    - none by default; return to `search-paper-evidence` if more evidence is needed
   credentials:
     - none
   generated_artifacts:
@@ -79,7 +79,7 @@ Turns an evidence ledger or provided papers into literature review and related w
 
 ## When Not To Apply
 - hypothesis generation or active hypothesis selection; use research-literature-ideation.
-- paper search when no evidence exists; use research-paper-evidence-search first.
+- paper search when no evidence exists; use search-paper-evidence first.
 - final manuscript claims without verified citations.
 
 ## Workflow
@@ -93,7 +93,7 @@ Turns an evidence ledger or provided papers into literature review and related w
 Summary:
 - Reads evidence ledgers, provided papers, search strategy, and inclusion/exclusion criteria.
 - Writes `papers/literature_review.md` only when explicitly requested.
-- Uses no tools or network by default; return to `research-paper-evidence-search` if more evidence is needed.
+- Uses no tools or network by default; return to `search-paper-evidence` if more evidence is needed.
 - Uses no credentials and performs no destructive actions.
 - Required checkpoints: evidence availability, citation status, verification limitations, and artifact intent.
 

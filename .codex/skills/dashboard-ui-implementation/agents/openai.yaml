@@ -1,6 +1,0 @@
-interface:
-  display_name: "Dashboard UI Implementation"
-  short_description: "Guide dense dashboard implementation."
-  default_prompt: "Use $dashboard-ui-implementation to apply dashboard UI constraints for KPIs, filters, charts, tables, density, async states, and accessibility."
-policy:
-  allow_implicit_invocation: false

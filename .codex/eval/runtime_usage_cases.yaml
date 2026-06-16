@@ -1,63 +1,63 @@
-version: "7.1.1"
+version: "7.2.0"
 purpose: "Real-use quality observation cases, not package approval."
 cases:
   - case_id: runtime-001
     user_request: "이 버그가 왜 반복되는지 원인 분석해줘."
-    expected_primary_skill: deep-bug-analysis
+    expected_primary_skill: analysis-bug
     expected_supporting_skills: []
-    should_not_trigger: [codebase-intel-report, phase-subplan-workflow, research-router]
+    should_not_trigger: [analysis-codebase, plan-long-term-package, research-router]
     expected_context: [symptom, reproduction, relevant files, logs]
     expected_output_shape: "one primary cause, evidence, fix options, validation"
     quality_notes: "Must not broaden into repo-wide reporting."
     friction_risk: "over-analysis without reproduction"
   - case_id: runtime-002
     user_request: "이 문제는 어떤 알고리즘 접근이 제일 맞아?"
-    expected_primary_skill: deep-algorithm-proposal
+    expected_primary_skill: analysis-algorithm
     expected_supporting_skills: []
-    should_not_trigger: [deep-bug-analysis, codebase-intel-report]
+    should_not_trigger: [analysis-bug, analysis-codebase]
     expected_context: [constraints, candidates, metrics]
     expected_output_shape: "candidate comparison and selected approach"
     quality_notes: "Separate recommendation from implementation."
     friction_risk: "choosing before constraints are known"
   - case_id: runtime-003
     user_request: "이 작업을 docs/plan 플랜 문서로 만들어줘."
-    expected_primary_skill: plan-doc-workflow
-    expected_supporting_skills: [agent-critical-review]
-    should_not_trigger: [phase-subplan-workflow]
+    expected_primary_skill: plan-short-term-docs
+    expected_supporting_skills: [report-critical]
+    should_not_trigger: [plan-long-term-package]
     expected_context: [active request, plan template, target path]
     expected_output_shape: "persisted plan document with questions, risks, validation, TODO"
     quality_notes: "Persisted artifact intent is explicit."
     friction_risk: "creating a package when one plan is enough"
   - case_id: runtime-004
     user_request: "이 migration을 phase별 서브플랜 패키지로 만들어줘."
-    expected_primary_skill: phase-subplan-workflow
+    expected_primary_skill: plan-long-term-package
     expected_supporting_skills: []
-    should_not_trigger: [plan-doc-workflow]
+    should_not_trigger: [plan-short-term-docs]
     expected_context: [scope, archetype, constraints, target docs path]
     expected_output_shape: "multi-document planning package"
     quality_notes: "Heavy artifact intent is explicit."
     friction_risk: "using it for small plans"
   - case_id: runtime-005
     user_request: "Figma 화면 기준으로 이 React route를 구현해줘."
-    expected_primary_skill: design-to-frontend
-    expected_supporting_skills: [visual-regression-harness, accessibility-audit-harness]
-    should_not_trigger: [research-router, codebase-intel-report]
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-visual-regression, design-a11y-audit]
+    should_not_trigger: [research-router, analysis-codebase]
     expected_context: [design source, repo framework, assets, validation command]
     expected_output_shape: "implemented UI with visual verification"
     quality_notes: "Design-to-frontend remains the generic implementation primary."
     friction_risk: "over-triggering analysis or explicit-only surface skills"
   - case_id: runtime-006
     user_request: "design token JSON을 플랫폼별 token으로 정리하는 스킬을 써줘."
-    expected_primary_skill: design-token-pipeline
+    expected_primary_skill: design-tokens
     expected_supporting_skills: []
-    should_not_trigger: [design-to-frontend]
+    should_not_trigger: [design-frontend]
     expected_context: [token source, target platform, naming rules]
     expected_output_shape: "normalized token plan or artifacts when explicitly requested"
     quality_notes: "Experimental evidence gate; keep scope narrow."
     friction_risk: "inventing tokens without source"
   - case_id: runtime-007
     user_request: "speech enhancement 최신 논문 근거를 찾아서 evidence ledger로 정리해줘."
-    expected_primary_skill: research-paper-evidence-search
+    expected_primary_skill: search-paper-evidence
     expected_supporting_skills: [research-router]
     should_not_trigger: [research-experiment-scaffold, research-manuscript-writing]
     expected_context: [query, date range, source requirements]
@@ -66,7 +66,7 @@ cases:
     friction_risk: "jumping from search to experiment design"
   - case_id: runtime-008
     user_request: "이 research plan을 비판적으로 검토해줘."
-    expected_primary_skill: agent-critical-review
+    expected_primary_skill: report-critical
     expected_supporting_skills: [research-peer-review]
     should_not_trigger: [research-experiment-scaffold]
     expected_context: [plan, claims, evidence, validation]
@@ -77,16 +77,16 @@ cases:
     user_request: "프로젝트 메모리에 이 규칙을 저장해줘."
     expected_primary_skill: memory-bank-update
     expected_supporting_skills: []
-    should_not_trigger: [memory-bank-maintenance, codebase-intel-report]
+    should_not_trigger: [memory-bank-maintenance, analysis-codebase]
     expected_context: [requested rule, memory file target, append-only history]
     expected_output_shape: "memory update with validation or blocked reason"
     quality_notes: "Memory mutation must be explicit."
     friction_risk: "treating temporary instruction as persistent"
   - case_id: runtime-010
     user_request: "방금 변경한 diff를 읽기 좋게 보여줘."
-    expected_primary_skill: readable-diff-report
+    expected_primary_skill: report-diff
     expected_supporting_skills: []
-    should_not_trigger: [codebase-intel-report]
+    should_not_trigger: [analysis-codebase]
     expected_context: [actual diff]
     expected_output_shape: "grouped changed lines with concise Korean summaries"
     quality_notes: "Only show actual changed lines."
@@ -95,7 +95,7 @@ cases:
     user_request: "스킬 maturity 기준과 improvement track을 정리해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [goal-workflow-orchestrator, eval-harness]
+    should_not_trigger: [coordination-brief, evaluation-harness]
     expected_context: [.codex/docs/skill_maturity.md, .codex/docs/skill_registry.md]
     expected_output_shape: "direct explanation or scoped doc update if requested"
     quality_notes: "Conceptual explanation does not need orchestration."
@@ -104,43 +104,43 @@ cases:
     user_request: "7.1 bundle hygiene만 읽기 전용으로 확인해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [eval-harness, artifact-librarian]
+    should_not_trigger: [evaluation-harness, report-artifact-inventory]
     expected_context: [bundle root, .codex/tools/check_bundle_hygiene.py]
     expected_output_shape: "command result and concrete findings"
     quality_notes: "Checker is sanity-only."
     friction_risk: "treating hygiene as quality approval"
   - case_id: runtime-013
     user_request: "완료된 plan은 핵심 결정만 memory 후보로 남기고 raw plan은 다음부터 active context에서 빼줘."
-    expected_primary_skill: spec-and-plan-curator
+    expected_primary_skill: plan-spec-curator
     expected_supporting_skills: []
-    should_not_trigger: [plan-doc-workflow, memory-bank-update, goal-workflow-orchestrator]
+    should_not_trigger: [plan-short-term-docs, memory-bank-update, coordination-brief]
     expected_context: [current_goal, target_plan_slice, lifecycle_state]
     expected_output_shape: "closeout summary, memory proposal candidates, archive load policy, one next action"
     quality_notes: "Do not mutate memory directly and do not keep closed raw plans as active instructions."
     friction_risk: "turning closeout into memory mutation or a new planning package"
   - case_id: runtime-014
     user_request: "지침이 너무 길어졌어. runtime에 남길 것과 reference/archive로 뺄 것을 정리해줘."
-    expected_primary_skill: spec-and-plan-curator
+    expected_primary_skill: plan-spec-curator
     expected_supporting_skills: []
-    should_not_trigger: [codebase-intel-report, phase-subplan-workflow, strict-response-quality]
+    should_not_trigger: [analysis-codebase, plan-long-term-package, report-qualitative]
     expected_context: [current_instruction_packet, current_goal]
     expected_output_shape: "compact active context packet with excluded items and load policy"
     quality_notes: "Shrink context without treating old artifacts, field feedback, or tool output as instructions."
     friction_risk: "loading full history to solve instruction bloat"
   - case_id: runtime-015
     user_request: "이 구현 계획을 세 agent가 동시에 작업할 수 있게 lock scope와 task card로 나눠줘."
-    expected_primary_skill: multi-agent-plan-executor
-    expected_supporting_skills: [goal-workflow-orchestrator]
-    should_not_trigger: [phase-subplan-workflow]
+    expected_primary_skill: coordination-multi-agent
+    expected_supporting_skills: [coordination-brief]
+    should_not_trigger: [plan-long-term-package]
     expected_context: [active plan, file scopes, validation requirements]
     expected_output_shape: "response-first task cards with validation owners"
     quality_notes: "No persistent workflow state."
     friction_risk: "unclear file ownership"
   - case_id: runtime-016
     user_request: "runtime usage eval 5개를 돌려본 결과를 수동 capture 형식으로 정리해줘."
-    expected_primary_skill: eval-harness
+    expected_primary_skill: evaluation-harness
     expected_supporting_skills: []
-    should_not_trigger: [artifact-librarian]
+    should_not_trigger: [report-artifact-inventory]
     expected_context: [.codex/eval cases, observed behavior]
     expected_output_shape: "manual result capture and improvement candidates"
     quality_notes: "Eval output is improvement evidence, not package approval."
@@ -148,8 +148,8 @@ cases:
   - case_id: runtime-017
     user_request: "이전 계획과 메모리가 섞였어. 지금 작업에 필요한 context pack만 다시 골라줘."
     expected_primary_skill: memory-bank-harness
-    expected_supporting_skills: [spec-and-plan-curator]
-    should_not_trigger: [memory-bank-update, goal-workflow-orchestrator]
+    expected_supporting_skills: [plan-spec-curator]
+    should_not_trigger: [memory-bank-update, coordination-brief]
     expected_context: [active task, accepted memory, old plan summaries]
     expected_output_shape: "filtered task-specific context pack"
     quality_notes: "Old plans and raw transcript do not become active instructions."
@@ -157,8 +157,8 @@ cases:
   - case_id: runtime-018
     user_request: "이 플랜대로 구현해줘."
     expected_primary_skill: null
-    expected_supporting_skills: [plan-doc-workflow, strict-evidence-driven-reporting-workflow]
-    should_not_trigger: [phase-subplan-workflow, spec-and-plan-curator]
+    expected_supporting_skills: [plan-short-term-docs, workflow-rigor]
+    should_not_trigger: [plan-long-term-package, plan-spec-curator]
     expected_context: [active plan as input, target source files, validation command]
     expected_output_shape: "source/test/config/build diff plus validation; plan status update is optional bookkeeping"
     quality_notes: "Markdown-only docs/plan updates are incomplete unless documentation-only work was explicitly requested."

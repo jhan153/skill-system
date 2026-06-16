@@ -8,9 +8,9 @@ Use this reference to keep research plans claim-first, checkpoint-first, and abl
 | --- | --- | --- |
 | Paper idea, novel method, hypothesis, experiment, ablation, loss, training plan | Research Hypothesis Planning | `research-hypothesis-planning` |
 | Implement chosen method, edit code, add tests, build pipeline | Development / Implementation | task-specific implementation skill |
-| Generic algorithm recommendation | Algorithm Proposal | `deep-algorithm-proposal` |
-| Persist research plan under `docs/plan` | Research content + artifact writer | `research-hypothesis-planning` + `plan-doc-workflow` |
-| Critique existing research plan | Review gate | `agent-critical-review` with `review_goal=research_validation` |
+| Generic algorithm recommendation | Algorithm Proposal | `analysis-algorithm` |
+| Persist research plan under `docs/plan` | Research content + artifact writer | `research-hypothesis-planning` + `plan-short-term-docs` |
+| Critique existing research plan | Review gate | `report-critical` with `review_goal=research_validation` |
 
 ## Premise Triage Labels
 - `confirmed_fact`: supported by provided reliable evidence.

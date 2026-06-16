@@ -12,7 +12,7 @@ In short:
 
 > A skill system is not just a longer prompt. It is a way to make repeated AI work run through clear capability units, explicit state, verifiable outputs, and human-controlled boundaries.
 
-## Timeline To 7.0
+## Timeline
 
 The version history is presented as a design timeline, not as a complete feature checklist.
 
@@ -26,10 +26,12 @@ The version history is presented as a design timeline, not as a complete feature
 | 5.6.x | Stabilization | Trigger conflicts, cross-skill ownership, validation states, and drift audits became first-class concerns. |
 | 6.0 | Research lifecycle | Literature review, hypothesis, experiment planning, analysis, writing, and review were organized as a research pipeline. |
 | 7.0 | Public specification | The private system was reframed as a public timeline, design philosophy, and manifest/profile structure. |
+| 7.1 | Drop-in bundle | The system was repackaged as a manual drop-in bundle with read-only hygiene checks and conservative, explicit-first routing. |
+| 7.2 | Skill families | A user-facing family grouping layer, family-stem skill renames, new search/coordination/evaluation families, and `search-router` / `memory-bank-ingestion` / `evaluation-usage-tracker` skills. |
 
-## 7.1.1 Drop-in Bundle
+## 7.2.0 Drop-in Bundle
 
-This repository includes the 7.1.1 manual drop-in skill bundle payload:
+This repository includes the 7.2.0 manual drop-in skill bundle payload:
 
 - `.codex/skills`: Codex skill packages
 - `.codex/docs`: runtime guidance and registry documents

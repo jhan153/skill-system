@@ -1,7 +1,0 @@
-interface:
-  display_name: "Deep Algorithm Proposal"
-  short_description: "Constraint-first algorithm and approach selection"
-  default_prompt: "Use $deep-algorithm-proposal to frame the problem, compare credible approaches, recommend the best-fit option, and define validation."
-
-policy:
-  allow_implicit_invocation: false

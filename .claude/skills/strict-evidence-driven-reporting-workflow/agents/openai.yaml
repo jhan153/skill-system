@@ -1,7 +1,0 @@
-interface:
-  display_name: "Strict Evidence-Driven Reporting Workflow"
-  short_description: "Mode-based evidence-first execution control"
-  default_prompt: "Use $strict-evidence-driven-reporting-workflow to enforce evidence-first execution, split validation, and review on higher-risk changes."
-
-policy:
-  allow_implicit_invocation: false

@@ -1,6 +1,0 @@
-interface:
-  display_name: "Visual Regression Harness"
-  short_description: "Capture and compare visual evidence across target viewports."
-  default_prompt: "Use $visual-regression-harness to inspect rendered screenshots, check nonblank/framing evidence, and report viewport-specific visual gaps."
-policy:
-  allow_implicit_invocation: false

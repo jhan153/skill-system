@@ -19,7 +19,7 @@ description: Produces peer-review-style critique for manuscripts, proposals, or 
   - the user asks for peer-review-style critique of a manuscript, proposal, or research plan.
   - major/minor/reproducibility/ethics/reporting concerns should be separated.
 - do_not_use_when:
-  - general QA gate outside research; use agent-critical-review.
+  - general QA gate outside research; use report-critical.
   - write the manuscript as primary task.
   - fabricate reviewer identity or venue authority.
 - expected_inputs:
@@ -79,7 +79,7 @@ Produces peer-review-style critique for manuscripts, proposals, or research plan
 - major/minor/reproducibility/ethics/reporting concerns should be separated.
 
 ## When Not To Apply
-- general QA gate outside research; use agent-critical-review.
+- general QA gate outside research; use report-critical.
 - write the manuscript as primary task.
 - fabricate reviewer identity or venue authority.
 

@@ -1,6 +1,6 @@
 # Claude Runtime Notes
 
-This folder mirrors the 7.1 manual drop-in skill bundle for Claude-side use.
+This folder mirrors the 7.2.0 manual drop-in skill bundle for Claude-side use.
 
 ## Boundary
 

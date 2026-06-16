@@ -48,8 +48,8 @@ Use this reference for user-managed Codex custom skill lifecycle work: creation,
 - Good: `새 Codex 스킬 팩 만들어줘`, `기존 스킬 Routing Card 보강해줘`, `이 스킬 deprecated 처리해줘`.
 - Guard: `.system 스킬도 보강해줘` is out of custom lifecycle scope.
 - Guard: `스킬이란 뭐야?` is conceptual explanation, not lifecycle work.
-- Guard: `deep-bug-analysis로 분석해줘` executes that skill; it does not update the skill pack.
-- Guard: `기존 deep-bug-analysis 스킬 보강해줘` reads `deep-bug-analysis` as `target_skill`; it does not execute it as `primary_skill`.
+- Guard: `analysis-bug로 분석해줘` executes that skill; it does not update the skill pack.
+- Guard: `기존 analysis-bug 스킬 보강해줘` reads `analysis-bug` as `target_skill`; it does not execute it as `primary_skill`.
 - Guard: `이번 답변만 짧게 해줘` is one-turn preference, not memory or skill creation.
 
 ## Routing Registration Decision

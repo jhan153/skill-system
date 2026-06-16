@@ -61,8 +61,8 @@ description: Claim-first research planning skill for paper ideas, hypotheses, ex
   do_not_load_by_default:
     - full repo
     - full memory bank
-    - codebase-intel-report
-    - phase-subplan-workflow
+    - analysis-codebase
+    - plan-long-term-package
     - implementation files unless user asks for implementation
 - risk_profile:
   reads:
@@ -89,9 +89,9 @@ Produce skeptical, claim-first research plans that treat user research claims as
 
 ## When Not To Apply
 - Coding, refactoring, tests, scripts, APIs, build/lint/test work, bug fixing, or implementation of an already chosen method.
-- Generic algorithm recommendation without a research claim; use `deep-algorithm-proposal`.
-- Persisted docs/plan writing without research content ownership; use `plan-doc-workflow` only when artifact intent is explicit.
-- Multi-document phase packages or handoff packages; use `phase-subplan-workflow` only when explicitly requested.
+- Generic algorithm recommendation without a research claim; use `analysis-algorithm`.
+- Persisted docs/plan writing without research content ownership; use `plan-short-term-docs` only when artifact intent is explicit.
+- Multi-document phase packages or handoff packages; use `plan-long-term-package` only when explicitly requested.
 - Casual concept explanation or one-turn formatting preferences.
 
 ## Input Priority
@@ -99,7 +99,7 @@ Produce skeptical, claim-first research plans that treat user research claims as
 2. `papers/ideation_output.json` selected hypothesis
 3. User-provided claim
 
-If the user asks for current/latest literature-backed claim planning and no evidence is available, recommend or route to `research-paper-evidence-search` first. Do not weaken the development boundary: implementation requests stay in Development / Implementation Mode even when they mention model, metric, experiment, loss, or training.
+If the user asks for current/latest literature-backed claim planning and no evidence is available, recommend or route to `search-paper-evidence` first. Do not weaken the development boundary: implementation requests stay in Development / Implementation Mode even when they mention model, metric, experiment, loss, or training.
 
 ## Workflow
 1. PREPARE - Confirm research-planning intent
@@ -181,7 +181,7 @@ Default ladder:
 
 ## Resource and Risk Boundary
 - Reads: current request, user premise, provided evidence, and targeted paper/baseline/checkpoint/dataset/metric notes when needed.
-- Writes: none by default; persisted `docs/plan` artifacts only when explicitly requested and routed with `plan-doc-workflow` as writer.
+- Writes: none by default; persisted `docs/plan` artifacts only when explicitly requested and routed with `plan-short-term-docs` as writer.
 - Tool/process calls: none by default; literature search, repo inspection, or experiments require explicit request and context.
 - Network access: none by default; browsing papers requires explicit request or current literature verification need.
 - Credential access: default deny.

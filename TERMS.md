@@ -1,4 +1,4 @@
-# 7.1 Terms
+# 7.2.0 Terms
 
 ## version_cut
 
@@ -20,7 +20,7 @@ The location that an agent should treat as the source of runtime guidance.
 
 The bundle intentionally excludes `.codex/config.toml` so a manual copy does not overwrite the user's existing runtime config.
 
-`automations/` are also excluded from 7.1 core because this bundle is not an automatic runtime loop.
+`automations/` are also excluded from 7.2.0 core because this bundle is not an automatic runtime loop.
 
 ## app_managed_system_skills
 
@@ -54,6 +54,6 @@ Human notes from real use. Feedback can update maturity, routing examples, negat
 
 A small read-only sanity check for structure and obvious packaging mistakes. It must not install, fix, generate reports, mutate live settings, or score real skill quality.
 
-## Removed From 7.1 Core
+## Removed From 7.2.0 Core
 
-7.1 core excludes automatic install flow, promotion flow, release flow, signoff workflow, rollback flow, evidence intake flow, evidence closure flow, package-cut scoring, runtime config replacement, automations, default `.system` payload, and skill-system finality modeling.
+7.2.0 core excludes automatic install flow, promotion flow, release flow, signoff workflow, rollback flow, evidence intake flow, evidence closure flow, package-cut scoring, runtime config replacement, automations, default `.system` payload, and skill-system finality modeling.

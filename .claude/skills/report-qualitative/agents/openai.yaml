@@ -1,0 +1,7 @@
+interface:
+  display_name: "Strict Response Quality"
+  short_description: "Explicit evidence-first reporting mode"
+  default_prompt: "Use $report-qualitative to produce a concise evidence-first review or completion report with verified vs unverified separation."
+
+policy:
+  allow_implicit_invocation: false

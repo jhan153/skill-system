@@ -1,55 +1,55 @@
-version: "7.1.1"
+version: "7.2.0"
 purpose: "Design cluster usage-quality cases."
 cases:
   - case_id: design-001
     user_request: "Figma frame을 React 화면으로 구현해줘."
-    expected_primary_skill: design-to-frontend
+    expected_primary_skill: design-frontend
     expected_supporting_skills: []
-    should_not_trigger: [design-token-pipeline]
+    should_not_trigger: [design-tokens]
     expected_context: [design frame, repo stack]
     expected_output_shape: "implemented screen"
     quality_notes: "Primary design implementation path."
     friction_risk: "standalone demo"
   - case_id: design-002
     user_request: "디자인 토큰 JSON을 CSS variables로 변환 계획 세워줘."
-    expected_primary_skill: design-token-pipeline
+    expected_primary_skill: design-tokens
     expected_supporting_skills: []
-    should_not_trigger: [design-to-frontend]
+    should_not_trigger: [design-frontend]
     expected_context: [token JSON, CSS target]
     expected_output_shape: "token mapping"
     quality_notes: "Experimental evidence gate."
     friction_risk: "inventing missing tokens"
   - case_id: design-003
     user_request: "버튼 컴포넌트의 variants와 states를 코드 컴포넌트에 매핑해줘."
-    expected_primary_skill: component-contract-mapper
+    expected_primary_skill: design-component-mapper
     expected_supporting_skills: []
-    should_not_trigger: [visual-regression-harness]
+    should_not_trigger: [design-visual-regression]
     expected_context: [design variants, component source]
     expected_output_shape: "contract map"
     quality_notes: "Experimental evidence gate."
     friction_risk: "no design source"
   - case_id: design-004
     user_request: "구현 후 desktop/mobile screenshot 비교해줘."
-    expected_primary_skill: visual-regression-harness
-    expected_supporting_skills: [design-to-frontend]
-    should_not_trigger: [component-contract-mapper]
+    expected_primary_skill: design-visual-regression
+    expected_supporting_skills: [design-frontend]
+    should_not_trigger: [design-component-mapper]
     expected_context: [local URL, viewports, reference]
     expected_output_shape: "visual differences"
     quality_notes: "Experimental support."
     friction_risk: "no reference image"
   - case_id: design-005
     user_request: "이 UI 접근성 evidence를 점검해줘."
-    expected_primary_skill: accessibility-audit-harness
+    expected_primary_skill: design-a11y-audit
     expected_supporting_skills: []
-    should_not_trigger: [visual-regression-harness]
+    should_not_trigger: [design-visual-regression]
     expected_context: [DOM, keyboard behavior, colors]
     expected_output_shape: "accessibility findings"
     quality_notes: "Experimental support."
     friction_risk: "no rendered target"
   - case_id: design-006
     user_request: "스크린샷을 보고 동일한 HTML/CSS 페이지를 만들어줘."
-    expected_primary_skill: design-to-frontend
-    expected_supporting_skills: [visual-regression-harness]
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-visual-regression]
     should_not_trigger: [research-router]
     expected_context: [screenshot, target files]
     expected_output_shape: "implemented page and screenshot check"
@@ -57,25 +57,25 @@ cases:
     friction_risk: "not verifying"
   - case_id: design-007
     user_request: "디자인 시스템의 spacing token 사용이 코드와 맞는지 확인해줘."
-    expected_primary_skill: design-token-pipeline
-    expected_supporting_skills: [component-contract-mapper]
-    should_not_trigger: [design-to-frontend]
+    expected_primary_skill: design-tokens
+    expected_supporting_skills: [design-component-mapper]
+    should_not_trigger: [design-frontend]
     expected_context: [tokens, component styles]
     expected_output_shape: "token mismatch list"
     quality_notes: "May remain analysis-only."
     friction_risk: "modifying code without request"
   - case_id: design-008
     user_request: "interactive states hover/focus/disabled를 디자인과 맞춰줘."
-    expected_primary_skill: design-to-frontend
-    expected_supporting_skills: [component-contract-mapper, accessibility-audit-harness]
-    should_not_trigger: [codebase-intel-report]
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-component-mapper, design-a11y-audit]
+    should_not_trigger: [analysis-codebase]
     expected_context: [state spec, component source]
     expected_output_shape: "implemented states"
     quality_notes: "Design implementation with state mapping."
     friction_risk: "missing keyboard focus"
   - case_id: design-009
     user_request: "landing page 말고 실제 usable app 첫 화면을 만들어줘."
-    expected_primary_skill: design-to-frontend
+    expected_primary_skill: design-frontend
     expected_supporting_skills: []
     should_not_trigger: [research-router]
     expected_context: [app purpose, repo stack]
@@ -84,180 +84,180 @@ cases:
     friction_risk: "marketing layout"
   - case_id: design-010
     user_request: "색 대비와 모바일 텍스트 overflow만 확인해줘."
-    expected_primary_skill: accessibility-audit-harness
-    expected_supporting_skills: [visual-regression-harness]
-    should_not_trigger: [design-token-pipeline]
+    expected_primary_skill: design-a11y-audit
+    expected_supporting_skills: [design-visual-regression]
+    should_not_trigger: [design-tokens]
     expected_context: [rendered UI, viewport list]
     expected_output_shape: "specific audit notes"
     quality_notes: "Scoped visual/accessibility check."
     friction_risk: "broad redesign"
   - case_id: design-011
     user_request: "Figma token 이름은 있는데 실제 값이 비어 있어. 구현 전에 gap만 정리해줘."
-    expected_primary_skill: design-token-pipeline
+    expected_primary_skill: design-tokens
     expected_supporting_skills: []
-    should_not_trigger: [design-to-frontend]
+    should_not_trigger: [design-frontend]
     expected_context: [token names, missing values, target platform]
     expected_output_shape: "token gap list"
     quality_notes: "Do not invent token values."
     friction_risk: "fabricated design tokens"
   - case_id: design-012
     user_request: "모달 컴포넌트의 open, loading, error, empty state를 디자인 spec과 코드에 맞춰 매핑해줘."
-    expected_primary_skill: component-contract-mapper
-    expected_supporting_skills: [design-to-frontend]
-    should_not_trigger: [visual-regression-harness]
+    expected_primary_skill: design-component-mapper
+    expected_supporting_skills: [design-frontend]
+    should_not_trigger: [design-visual-regression]
     expected_context: [state spec, component source, current behavior]
     expected_output_shape: "state contract map"
     quality_notes: "Mapping first; implementation only if requested."
     friction_risk: "changing code during mapping-only request"
   - case_id: design-013
     user_request: "디자인 구현 후 screenshot이 비어 있지 않은지 desktop/mobile에서 확인해줘."
-    expected_primary_skill: visual-regression-harness
+    expected_primary_skill: design-visual-regression
     expected_supporting_skills: []
-    should_not_trigger: [component-contract-mapper]
+    should_not_trigger: [design-component-mapper]
     expected_context: [local URL, viewport list, screenshot outputs]
     expected_output_shape: "render verification notes"
     quality_notes: "Check nonblank and framing."
     friction_risk: "checking only one viewport"
   - case_id: design-014
     user_request: "키보드 tab 순서와 focus ring만 접근성 관점에서 확인해줘."
-    expected_primary_skill: accessibility-audit-harness
+    expected_primary_skill: design-a11y-audit
     expected_supporting_skills: []
-    should_not_trigger: [design-to-frontend]
+    should_not_trigger: [design-frontend]
     expected_context: [rendered UI, interactive elements]
     expected_output_shape: "keyboard/focus findings"
     quality_notes: "Narrow accessibility audit."
     friction_risk: "full redesign"
   - case_id: design-015
     user_request: "디자인 critique 말고 실제 화면 코드를 repo 스타일에 맞게 구현해줘."
-    expected_primary_skill: design-to-frontend
+    expected_primary_skill: design-frontend
     expected_supporting_skills: []
-    should_not_trigger: [agent-critical-review]
+    should_not_trigger: [report-critical]
     expected_context: [design input, repo components, style system]
     expected_output_shape: "repo-integrated implementation"
     quality_notes: "Implementation intent beats critique."
     friction_risk: "responding with advice only"
   - case_id: design-016
     user_request: "storybook variant 이름과 Figma variant 이름이 다른지 표로 비교해줘."
-    expected_primary_skill: component-contract-mapper
+    expected_primary_skill: design-component-mapper
     expected_supporting_skills: []
-    should_not_trigger: [design-to-frontend]
+    should_not_trigger: [design-frontend]
     expected_context: [storybook variants, Figma variants]
     expected_output_shape: "variant name comparison"
     quality_notes: "Analysis-only unless edits are requested."
     friction_risk: "unrequested rename"
   - case_id: design-017
     user_request: "브랜드 컬러 팔레트가 한 색 계열로 치우쳤는지 확인하고 대안 방향만 제안해줘."
-    expected_primary_skill: design-token-pipeline
+    expected_primary_skill: design-tokens
     expected_supporting_skills: []
-    should_not_trigger: [design-to-frontend]
+    should_not_trigger: [design-frontend]
     expected_context: [palette tokens, product context]
     expected_output_shape: "palette risk and token-level suggestions"
     quality_notes: "No UI implementation."
     friction_risk: "rewriting design system"
   - case_id: design-018
     user_request: "구현된 화면에서 버튼 텍스트가 모바일 폭에서 넘치는지만 확인해줘."
-    expected_primary_skill: visual-regression-harness
-    expected_supporting_skills: [accessibility-audit-harness]
-    should_not_trigger: [design-to-frontend]
+    expected_primary_skill: design-visual-regression
+    expected_supporting_skills: [design-a11y-audit]
+    should_not_trigger: [design-frontend]
     expected_context: [local URL, mobile viewport, screenshots]
     expected_output_shape: "overflow findings"
     quality_notes: "Scoped verification, no redesign."
     friction_risk: "changing layout without request"
   - case_id: design-019
     user_request: "이 UI 스크린샷을 구현하기 전에 정보 계층, 레이아웃 영역, 컴포넌트 후보로 분해해줘."
-    expected_primary_skill: ui-reference-decomposer
+    expected_primary_skill: design-ui-decomposer
     expected_supporting_skills: []
-    should_not_trigger: [design-to-frontend, design-token-pipeline, visual-regression-harness]
+    should_not_trigger: [design-frontend, design-tokens, design-visual-regression]
     expected_context: [screenshot, surface type]
     expected_output_shape: "decomposition report"
     quality_notes: "Experimental analysis skill; no code edits."
     friction_risk: "starting implementation too early"
   - case_id: design-020
     user_request: "Figma Auto Layout의 hug/fill, gap, padding을 CSS flex/grid 규칙으로 번역해줘."
-    expected_primary_skill: layout-constraint-translator
+    expected_primary_skill: design-layout-translator
     expected_supporting_skills: []
-    should_not_trigger: [design-to-frontend, component-contract-mapper, visual-regression-harness]
+    should_not_trigger: [design-frontend, design-component-mapper, design-visual-regression]
     expected_context: [layout spec, target CSS]
     expected_output_shape: "layout rule map"
     quality_notes: "Experimental analysis/modifier skill; not full implementation."
     friction_risk: "writing code before target surface is known"
   - case_id: design-021
     user_request: "이 디자인 이미지를 보고 바로 React 컴포넌트로 구현해줘."
-    expected_primary_skill: design-to-frontend
-    expected_supporting_skills: [visual-regression-harness]
-    should_not_trigger: [ui-reference-decomposer, layout-constraint-translator]
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-visual-regression]
+    should_not_trigger: [design-ui-decomposer, design-layout-translator]
     expected_context: [design image, repo UI files]
     expected_output_shape: "repo-integrated implementation"
     quality_notes: "Implementation intent beats analysis-only skills."
     friction_risk: "answering with decomposition only"
   - case_id: design-022
-    user_request: "모바일 화면 구현해줘. safe area와 keyboard overlay는 design-to-frontend reference로 반영해."
-    expected_primary_skill: design-to-frontend
-    expected_supporting_skills: [accessibility-audit-harness, visual-regression-harness]
-    should_not_trigger: [mobile-screen-implementation, ui-reference-decomposer]
+    user_request: "모바일 화면 구현해줘. safe area와 keyboard overlay는 design-frontend reference로 반영해."
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-a11y-audit, design-visual-regression]
+    should_not_trigger: [design-mobile-screen, design-ui-decomposer]
     expected_context: [mobile design, repo screen]
     expected_output_shape: "implemented mobile screen"
     quality_notes: "Surface-specific implementation skill stays explicit-only unless directly invoked."
     friction_risk: "routing to planned skill"
   - case_id: design-023
     user_request: "대시보드 화면을 구현하되 KPI, filters, table 상태는 기존 스킬 참조로 처리해."
-    expected_primary_skill: design-to-frontend
-    expected_supporting_skills: [component-contract-mapper, visual-regression-harness, accessibility-audit-harness]
-    should_not_trigger: [dashboard-ui-implementation, ui-reference-decomposer]
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-component-mapper, design-visual-regression, design-a11y-audit]
+    should_not_trigger: [design-dashboard, design-ui-decomposer]
     expected_context: [dashboard design, repo components]
     expected_output_shape: "implemented dashboard"
     quality_notes: "Dashboard surface skill stays explicit-only unless directly invoked."
     friction_risk: "planned skill over-trigger"
   - case_id: design-024
     user_request: "이 landing page 섹션 구조만 분석해줘. 코드는 아직 만들지 마."
-    expected_primary_skill: ui-reference-decomposer
-    expected_supporting_skills: [layout-constraint-translator]
-    should_not_trigger: [design-to-frontend, section-based-web-implementation]
+    expected_primary_skill: design-ui-decomposer
+    expected_supporting_skills: [design-layout-translator]
+    should_not_trigger: [design-frontend, design-section-web]
     expected_context: [landing screenshot, section intent]
     expected_output_shape: "section decomposition"
     quality_notes: "Analysis-only even though section candidate exists."
     friction_risk: "creating a marketing page without request"
   - case_id: design-025
     user_request: "grid가 모바일에서 1열, 태블릿 2열, 데스크톱 4열이 되도록 breakpoint 규칙만 정리해줘."
-    expected_primary_skill: layout-constraint-translator
+    expected_primary_skill: design-layout-translator
     expected_supporting_skills: []
-    should_not_trigger: [design-to-frontend, visual-regression-harness]
+    should_not_trigger: [design-frontend, design-visual-regression]
     expected_context: [grid constraints, breakpoints]
     expected_output_shape: "breakpoint layout rules"
     quality_notes: "Layout-only request."
     friction_risk: "running visual diff without rendered target"
   - case_id: design-026
     user_request: "색상 token gap만 정리해줘. UI 구조 분석은 필요 없어."
-    expected_primary_skill: design-token-pipeline
+    expected_primary_skill: design-tokens
     expected_supporting_skills: []
-    should_not_trigger: [ui-reference-decomposer, design-to-frontend]
+    should_not_trigger: [design-ui-decomposer, design-frontend]
     expected_context: [token names, missing values]
     expected_output_shape: "token gap report"
     quality_notes: "Token-only request should not trigger decomposition."
     friction_risk: "broadening into design analysis"
   - case_id: design-027
-    user_request: "$mobile-screen-implementation으로 이 React Native 로그인 화면의 safe area, keyboard overlay, bottom action, touch target까지 반영해서 구현해줘."
-    expected_primary_skill: mobile-screen-implementation
-    expected_supporting_skills: [design-to-frontend, visual-regression-harness, accessibility-audit-harness]
-    should_not_trigger: [dashboard-ui-implementation, section-based-web-implementation]
+    user_request: "$design-mobile-screen으로 이 React Native 로그인 화면의 safe area, keyboard overlay, bottom action, touch target까지 반영해서 구현해줘."
+    expected_primary_skill: design-mobile-screen
+    expected_supporting_skills: [design-frontend, design-visual-regression, design-a11y-audit]
+    should_not_trigger: [design-dashboard, design-section-web]
     expected_context: [mobile design, target native screen, keyboard behavior]
     expected_output_shape: "mobile screen implementation plan or scoped implementation"
     quality_notes: "Explicit invocation selects the operational surface skill."
     friction_risk: "falling back to generic desktop layout"
   - case_id: design-028
-    user_request: "$dashboard-ui-implementation으로 KPI, filters, chart, table, loading/empty/error 상태가 있는 admin dashboard 화면을 구현해줘."
-    expected_primary_skill: dashboard-ui-implementation
-    expected_supporting_skills: [design-to-frontend, component-contract-mapper, visual-regression-harness, accessibility-audit-harness]
-    should_not_trigger: [mobile-screen-implementation, section-based-web-implementation]
+    user_request: "$design-dashboard으로 KPI, filters, chart, table, loading/empty/error 상태가 있는 admin dashboard 화면을 구현해줘."
+    expected_primary_skill: design-dashboard
+    expected_supporting_skills: [design-frontend, design-component-mapper, design-visual-regression, design-a11y-audit]
+    should_not_trigger: [design-mobile-screen, design-section-web]
     expected_context: [dashboard design, repo dashboard components, async states]
     expected_output_shape: "dashboard implementation plan or scoped implementation"
     quality_notes: "Explicit invocation selects the dashboard surface skill."
     friction_risk: "marketing-style dashboard or invented metrics"
   - case_id: design-029
-    user_request: "$section-based-web-implementation으로 hero, product reveal, feature sections, CTA flow가 있는 제품 페이지를 구현해줘."
-    expected_primary_skill: section-based-web-implementation
-    expected_supporting_skills: [design-to-frontend, visual-regression-harness, accessibility-audit-harness]
-    should_not_trigger: [mobile-screen-implementation, dashboard-ui-implementation]
+    user_request: "$design-section-web으로 hero, product reveal, feature sections, CTA flow가 있는 제품 페이지를 구현해줘."
+    expected_primary_skill: design-section-web
+    expected_supporting_skills: [design-frontend, design-visual-regression, design-a11y-audit]
+    should_not_trigger: [design-mobile-screen, design-dashboard]
     expected_context: [section page design, copy, assets, target route]
     expected_output_shape: "section-page implementation plan or scoped implementation"
     quality_notes: "Explicit invocation selects the section-page surface skill."

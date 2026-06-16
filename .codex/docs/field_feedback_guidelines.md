@@ -48,12 +48,12 @@ field_feedback:
 
 ## Current 7.1 Watchlist
 
-- `goal-workflow-orchestrator`: watch for trigger ambiguity around goal/목표.
-- `phase-subplan-workflow`: watch for keyword-only over-trigger from phase, migration, rewrite, or handoff.
-- `design-token-pipeline`: collect real token-source cases before raising maturity.
-- `component-contract-mapper`: collect real Figma-to-code mapping cases before raising maturity.
-- `visual-regression-harness`: collect browser/screenshot verification cases before raising maturity.
-- `accessibility-audit-harness`: collect keyboard, focus, contrast, and overflow cases before raising maturity.
+- `coordination-brief`: watch for trigger ambiguity around goal/목표.
+- `plan-long-term-package`: watch for keyword-only over-trigger from phase, migration, rewrite, or handoff.
+- `design-tokens`: collect real token-source cases before raising maturity.
+- `design-component-mapper`: collect real Figma-to-code mapping cases before raising maturity.
+- `design-visual-regression`: collect browser/screenshot verification cases before raising maturity.
+- `design-a11y-audit`: collect keyboard, focus, contrast, and overflow cases before raising maturity.
 
 ## Boundaries
 

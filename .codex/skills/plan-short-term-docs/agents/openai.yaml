@@ -1,0 +1,10 @@
+interface:
+  display_name: "Plan Doc Workflow"
+  short_description: "Persisted docs/plan artifact workflow"
+  default_prompt: |
+    Use $plan-short-term-docs only when the user wants a persisted plan artifact, active plan document, or docs/plan synchronization.
+
+    Do not activate from a casual `플랜` mention alone. Preserve active-plan continuation behavior when an existing plan artifact owns the current task.
+
+policy:
+  allow_implicit_invocation: false

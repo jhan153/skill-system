@@ -48,13 +48,13 @@ Read `reference.md` for the maintenance schema and consolidation rules and `docs
 - `memory-bank-init`: 메모리뱅크가 없으면 먼저 실행되어야 합니다.
 - `memory-bank-update`: 유지보수 중 드러난 goal/rule 변경 요청은 이 스킬이 아니라 update 단계로 넘깁니다.
 - `memory-bank-correction-capture`: 새 recurring correction을 기록하는 일은 유지보수 자체가 아니라 correction-capture 단계가 담당합니다.
-- `strict-response-quality`: 사용자가 형식적 상태 보고를 원할 때 채팅 응답을 정리할 수 있지만, 메모리뱅크 상태 머신은 이 스킬이 소유합니다.
+- `report-qualitative`: 사용자가 형식적 상태 보고를 원할 때 채팅 응답을 정리할 수 있지만, 메모리뱅크 상태 머신은 이 스킬이 소유합니다.
 
 ## Cross-Skill Routing
 - 메모리뱅크가 없으면 `memory-bank-init`으로 되돌립니다.
 - goal/rule의 생성·변경·폐기는 `memory-bank-update`로 넘깁니다.
 - 새로운 recurring correction 기록은 `memory-bank-correction-capture`로 넘기고, 이 스킬은 이미 존재하는 ledger의 validate/report/consolidate만 담당합니다.
-- `strict-response-quality`가 함께 활성화되어도 유지보수 연산과 상태 판정은 이 스킬의 Output Format과 Validation Checks를 우선합니다.
+- `report-qualitative`가 함께 활성화되어도 유지보수 연산과 상태 판정은 이 스킬의 Output Format과 Validation Checks를 우선합니다.
 
 ## What This Skill Does
 - Reports current memory-bank state without unnecessary writes.

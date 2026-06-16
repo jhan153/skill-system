@@ -20,7 +20,7 @@ description: Writes or revises scientific manuscript sections from verified evid
   - the user asks to write or revise scientific manuscript sections.
   - evidence ledger, literature review, blueprint, analysis report, or user manuscript should be converted into prose.
 - do_not_use_when:
-  - paper evidence search; use research-paper-evidence-search.
+  - paper evidence search; use search-paper-evidence.
   - peer-review critique; use research-peer-review.
   - present planned experiments as completed results.
 - expected_inputs:
@@ -81,7 +81,7 @@ Writes or revises scientific manuscript sections from verified evidence and rese
 - evidence ledger, literature review, blueprint, analysis report, or user manuscript should be converted into prose.
 
 ## When Not To Apply
-- paper evidence search; use research-paper-evidence-search.
+- paper evidence search; use search-paper-evidence.
 - peer-review critique; use research-peer-review.
 - present planned experiments as completed results.
 

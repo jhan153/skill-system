@@ -1,9 +1,9 @@
-version: "7.1.1"
+version: "7.2.0"
 purpose: "Research cluster regression cases."
 cases:
   - case_id: research-001
     user_request: "최신 논문 찾아서 evidence ledger 만들어줘."
-    expected_primary_skill: research-paper-evidence-search
+    expected_primary_skill: search-paper-evidence
     expected_supporting_skills: [research-router]
     should_not_trigger: [research-experiment-scaffold]
     expected_context: [topic, date range, source constraints]
@@ -14,7 +14,7 @@ cases:
     user_request: "evidence ledger 기반으로 literature review 써줘."
     expected_primary_skill: research-literature-synthesis
     expected_supporting_skills: []
-    should_not_trigger: [research-paper-evidence-search]
+    should_not_trigger: [search-paper-evidence]
     expected_context: [evidence ledger]
     expected_output_shape: "thematic synthesis"
     quality_notes: "Use provided evidence."
@@ -50,7 +50,7 @@ cases:
     user_request: "결과 CSV를 통계 분석해줘."
     expected_primary_skill: research-statistical-analysis
     expected_supporting_skills: []
-    should_not_trigger: [research-paper-evidence-search]
+    should_not_trigger: [search-paper-evidence]
     expected_context: [result table, metric definitions]
     expected_output_shape: "statistical analysis with limits"
     quality_notes: "Data provenance matters."

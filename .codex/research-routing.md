@@ -16,7 +16,7 @@ Detailed routing for the 6.0 Research Cluster. Keep `.codex/context-routing.md` 
 | Request | Primary skill | Next skill(s) | Default exclude |
 | --- | --- | --- | --- |
 | research stage unclear | `research-router` | selected narrow skill | monolithic lifecycle, `.system` |
-| latest papers/evidence/citations | `research-paper-evidence-search` | synthesis or ideation if requested | scaffold, manuscript, statistics |
+| latest papers/evidence/citations | `search-paper-evidence` | synthesis or ideation if requested | scaffold, manuscript, statistics |
 | literature review / related work | `research-literature-synthesis` | ideation if requested | scaffold, blueprint |
 | gap / hypothesis ideation | `research-literature-ideation` | hypothesis planning | scaffold, manuscript |
 | claim-first research plan | `research-hypothesis-planning` | blueprint | scaffold unless explicitly requested |
@@ -29,7 +29,7 @@ Detailed routing for the 6.0 Research Cluster. Keep `.codex/context-routing.md` 
 ## Artifact Ownership
 | Artifact | Owning skill |
 | --- | --- |
-| `papers/evidence_ledger.json` | `research-paper-evidence-search` |
+| `papers/evidence_ledger.json` | `search-paper-evidence` |
 | `papers/literature_review.md` | `research-literature-synthesis` |
 | `papers/ideation_output.json` | `research-literature-ideation` |
 | `papers/research_plan.json` | `research-hypothesis-planning` |
@@ -53,7 +53,7 @@ research_route_smoke_tests:
   - request: "음성 향상 최신연구를 하고싶어. 다만 clean label이 clean하지 못하고 기존 discriminative 모델들이 over-denoising을 하면서 PESQ를 맞추고 있다는게 내 주장이야."
     expected_primary_skill: "research-router"
     expected_next_skills:
-      - "research-paper-evidence-search"
+      - "search-paper-evidence"
       - "research-hypothesis-planning"
     expected_reference:
       - "speech-enhancement-research"
@@ -76,7 +76,7 @@ research_route_smoke_tests:
       - "training loss vs evaluation metric separation"
       - "progressive ablation rather than multi-loss soup"
   - request: "이 연구 계획을 비판적으로 검토해줘."
-    expected_primary_skill: "agent-critical-review"
+    expected_primary_skill: "report-critical"
     review_goal: "research_validation"
     must_include:
       - "premise validity check"
@@ -86,12 +86,12 @@ research_route_smoke_tests:
   - request: "이 연구 계획을 docs/plan으로 저장해줘."
     expected_primary_skill: "research-hypothesis-planning"
     expected_attachments:
-      - "plan-doc-workflow only for persisted artifact"
+      - "plan-short-term-docs only for persisted artifact"
     notes: "Research skill owns content; plan-doc writes artifact only when explicitly requested."
   - request: "speech enhancement 최신 논문을 찾아서 gap과 연구 가설을 뽑아줘"
     expected_primary_skill: "research-router"
     expected_next_skills:
-      - "research-paper-evidence-search"
+      - "search-paper-evidence"
       - "research-literature-ideation"
     expected_reference:
       - "speech-enhancement-research"
@@ -102,7 +102,7 @@ research_route_smoke_tests:
     must_not_route_to:
       - "research-experiment-scaffold"
   - request: "arXiv에서 논문 찾아서 hypothesis 만들어줘"
-    expected_primary_skill: "research-paper-evidence-search"
+    expected_primary_skill: "search-paper-evidence"
     if_search_tools_unavailable:
       - "do not hallucinate citations"
       - "produce query plan"

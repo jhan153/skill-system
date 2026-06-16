@@ -1,0 +1,10 @@
+interface:
+  display_name: "Spec and Plan Curator"
+  short_description: "Curate active spec, goal, plan, and memory context"
+  default_prompt: |
+    Use $plan-spec-curator only when instructions, plans, goals, or memory/archive material need active-context pruning, plan closeout, memory proposal distillation, or archive load-policy decisions.
+
+    Do not activate for ordinary implementation, normal docs/plan creation, direct memory mutation, code review, bug diagnosis, algorithm recommendation, or research evidence search.
+
+policy:
+  allow_implicit_invocation: false

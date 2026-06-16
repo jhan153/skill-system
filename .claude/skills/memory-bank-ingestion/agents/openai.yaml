@@ -1,0 +1,7 @@
+interface:
+  display_name: "Memory Bank Ingestion"
+  short_description: "Promote approved closeout packets into durable memory with archive linkage"
+  default_prompt: "Use $memory-bank-ingestion to promote an approved closeout packet and proposal candidates into durable long-term memory with append-only ingestion events and archive pointers, only after explicit memory-mutation approval."
+
+policy:
+  allow_implicit_invocation: false

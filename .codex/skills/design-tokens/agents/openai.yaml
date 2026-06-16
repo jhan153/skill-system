@@ -1,0 +1,6 @@
+interface:
+  display_name: "Design Token Pipeline"
+  short_description: "Normalize and validate design token evidence."
+  default_prompt: "Use $design-tokens to inspect token sources, map them to the target platform, and report gaps without inventing missing values."
+policy:
+  allow_implicit_invocation: false

@@ -19,7 +19,7 @@ description: Generates candidate research hypotheses from evidence and literatur
   - the user asks to derive gaps, candidate hypotheses, or an active hypothesis from literature evidence.
   - an evidence ledger or literature review exists and needs ideation.
 - do_not_use_when:
-  - paper search; use research-paper-evidence-search.
+  - paper search; use search-paper-evidence.
   - literature review prose; use research-literature-synthesis.
   - claim-first planning from a raw user premise when no literature evidence is needed; use research-hypothesis-planning.
 - expected_inputs:
@@ -72,7 +72,7 @@ Generates candidate research hypotheses from evidence and literature synthesis, 
 - an evidence ledger or literature review exists and needs ideation.
 
 ## When Not To Apply
-- paper search; use research-paper-evidence-search.
+- paper search; use search-paper-evidence.
 - literature review prose; use research-literature-synthesis.
 - claim-first planning from a raw user premise when no literature evidence is needed; use research-hypothesis-planning.
 
