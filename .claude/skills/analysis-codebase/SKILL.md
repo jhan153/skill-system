@@ -3,7 +3,7 @@ name: analysis-codebase
 description: "Repo-wide integrated analysis report from static/dynamic/security/git evidence with design diagrams, an actionable finding backlog, and explicit Unverified handling. Only when the user explicitly wants a codebase-wide report (정적분석/런타임분석/메트릭/Git 변화/설계 문서화 리포트 등)."
 ---
 
-# Codebase Intel Report
+# Analysis Codebase
 
 ## Routing Card
 - role: heavy_artifact_generator

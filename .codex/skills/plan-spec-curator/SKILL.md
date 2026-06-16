@@ -3,7 +3,7 @@ name: plan-spec-curator
 description: "Curate skill-system specs, goals, plans, and memory boundaries when instructions/plans grow too large or stale/superseded/archived plans pollute context — active-context pruning, plan closeout, goal compaction, memory-distillation proposals, archive load-policy. Not for executing the user's substantive task."
 ---
 
-# Spec and Plan Curator
+# Plan Spec Curator
 
 ## Routing Card
 - role: support

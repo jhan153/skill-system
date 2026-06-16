@@ -1,4 +1,4 @@
-# Mobile Screen Implementation Reference
+# Design Mobile Screen Reference
 
 Use this reference from `design-frontend` when the requested UI is a mobile or native screen. For explicit mobile surface work, use `$design-mobile-screen`; generic design-to-code remains owned by `design-frontend`.
 

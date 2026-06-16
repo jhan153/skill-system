@@ -3,7 +3,7 @@ name: analysis-algorithm
 description: "Constraint-first workflow for recommending algorithms, modeling approaches, or technical solution patterns: frame the problem, compare candidates, choose one, explain why it fits, and define validation."
 ---
 
-# Deep Algorithm Proposal
+# Analysis Algorithm
 
 ## Routing Card
 - role: primary

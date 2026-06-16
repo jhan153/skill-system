@@ -3,7 +3,7 @@ name: design-frontend
 description: "Implement Figma/screenshot/mockup/spec/UI-reference designs as high-fidelity source code in the current repo (React/Next/Vue/Svelte/HTML/Flutter/SwiftUI/Compose/native), reusing repo framework, components, tokens, and assets. Not for backend-only work, refactors, design critique, ideation, or throwaway demos unless requested."
 ---
 
-# Design To Frontend
+# Design Frontend
 
 ## Routing Card
 - role: primary

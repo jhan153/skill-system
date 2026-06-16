@@ -1,4 +1,4 @@
-# Dashboard UI Implementation Reference
+# Design Dashboard Reference
 
 Use this reference from `design-frontend` when the requested UI is an admin, SaaS, analytics, monitoring, reporting, or dense operational dashboard. For explicit dashboard surface work, use `$design-dashboard`; generic design-to-code remains owned by `design-frontend`.
 

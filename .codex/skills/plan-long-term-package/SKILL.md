@@ -3,7 +3,7 @@ name: plan-long-term-package
 description: Create a heavy multi-document planning package only when the user explicitly asks for phase/subplan/package-style planning that future sessions must continue from docs alone.
 ---
 
-# Phase Subplan Workflow
+# Plan Long Term Package
 
 ## Routing Card
 - role: heavy_artifact_generator

@@ -1,4 +1,4 @@
-# Codebase Intel Report Reference
+# Analysis Codebase Reference
 
 ## 1) Operating Principle
 이 스킬은 단일 통합 보고서를 생성하는 코드베이스 분석 파이프라인입니다.

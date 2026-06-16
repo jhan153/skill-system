@@ -3,7 +3,7 @@ name: report-critical
 description: Diagnoses blockers or runs evidence-first critical review/QA gates for artifacts, plans, and research. Use when the user asks for blockers, risks, critical review, QA gate, plan validation, deep research validation, or failure analysis.
 ---
 
-# Agent Problem Diagnosis & Critical Review
+# Report Critical
 
 ## Routing Card
 - role: review_gate

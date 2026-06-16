@@ -3,7 +3,7 @@ name: analysis-bug
 description: "Repro-and-evidence-first workflow for recurring, unclear, or high-risk failures: lock repro, collect evidence, choose one primary root cause, compare fixes, and verify."
 ---
 
-# Deep Bug Analysis
+# Analysis Bug
 
 ## Routing Card
 - role: primary

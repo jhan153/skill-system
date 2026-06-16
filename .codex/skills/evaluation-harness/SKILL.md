@@ -3,7 +3,7 @@ name: evaluation-harness
 description: Reviews 7.1 runtime usage eval cases as field-quality examples; it does not produce package-cut reports or readiness decisions.
 ---
 
-# Eval Harness
+# Evaluation Harness
 
 ## Routing Card
 - role: support

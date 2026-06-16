@@ -3,7 +3,7 @@ name: report-diff
 description: Presents only actual changed lines in grouped diff blocks with short Korean summaries for each change unit.
 ---
 
-# Readable Diff Report
+# Report Diff
 
 ## Routing Card
 - role: output_modifier

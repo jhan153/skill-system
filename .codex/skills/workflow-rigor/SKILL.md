@@ -3,7 +3,7 @@ name: workflow-rigor
 description: Mode-based execution control for evidence-first implementation, scoped reporting, split validation, and review on medium/high-risk changes.
 ---
 
-# Strict Evidence-Driven Reporting Workflow
+# Workflow Rigor
 
 ## Routing Card
 - role: execution_modifier

@@ -1,4 +1,4 @@
-# Research Paper Evidence Search Reference
+# Search Paper Evidence Reference
 
 ## Source Material Note
 This skill is part of the 6.0 Research Cluster. It may reuse contracts and guardrails extracted from `codex-research-lifecycle.zip`, but the source archive must not be installed as a monolithic skill.

@@ -9,7 +9,7 @@ closeout_packet:
     - "skill families are the user-facing grouping; family is the registry source of truth"
     - "routers declare no writes"
   transient_excluded:
-    - entry: "interim Phase A entry was research-paper-evidence-search"
+    - entry: "interim Phase A entry was search-paper-evidence"
       reason: superseded by search-router in Phase B
   sensitivity_check: "no secrets/PII present"
   target_memory_path: memory/project/skill-system.md

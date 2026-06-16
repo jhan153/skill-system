@@ -1,4 +1,4 @@
-# Research Paper Evidence Search Design Document
+# Search Paper Evidence Design Document
 
 ## Overview
 `search-paper-evidence` is a narrow Research Cluster skill. It exists to keep scientific workflows evidence-grounded while preventing a broad all-in-one research lifecycle skill from stealing unrelated tasks.

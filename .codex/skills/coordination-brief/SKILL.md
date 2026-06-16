@@ -3,7 +3,7 @@ name: coordination-brief
 description: Frames explicit task DAGs and handoff notes only when the user asks for lightweight coordination; it does not trigger from the word goal alone.
 ---
 
-# Goal Workflow Orchestrator
+# Coordination Brief
 
 ## Routing Card
 - role: support

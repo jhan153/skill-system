@@ -3,7 +3,7 @@ name: search-paper-evidence
 description: Searches or plans searches for paper/reference evidence and builds evidence ledgers without hallucinating citations, papers, datasets, metrics, DOIs, or results.
 ---
 
-# Research Paper Evidence Search
+# Search Paper Evidence
 
 ## Routing Card
 - role: primary

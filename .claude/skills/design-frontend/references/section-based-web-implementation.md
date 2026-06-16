@@ -1,4 +1,4 @@
-# Section-Based Web Implementation Reference
+# Design Section Web Reference
 
 Use this reference from `design-frontend` when the requested UI is a landing, product, docs, portfolio, venue, or marketing-like web page. For explicit section-page surface work, use `$design-section-web`; generic design-to-code remains owned by `design-frontend`.
 

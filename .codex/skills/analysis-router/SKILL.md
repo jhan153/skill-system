@@ -3,7 +3,7 @@ name: analysis-router
 description: "Routing workflow for deep technical analysis: choose bug diagnosis, algorithm recommendation, or a hybrid sequence based on the user's actual question."
 ---
 
-# Deep Analysis Workflow
+# Analysis Router
 
 ## Routing Card
 - role: router
