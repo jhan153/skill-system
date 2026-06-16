@@ -1,5 +1,13 @@
 # Changelog
 
+## 7.2.2
+
+- Made `check_bundle_hygiene.py` treat git-ignored OS noise (`.DS_Store`, `._*`, `__MACOSX`, `Thumbs.db`) as non-payload: mirror parity and the root `docs/` stray check now ignore those files instead of hard-failing, while real stray files and real mirror content drift still fail (D5).
+- Adopted a plan-doc tracking convention (D6): each plan ends with a `Remaining / Next` forward link, and each item is tracked in a single active plan (reconciled the duplicate skill TODOs across the 7.2.0/7.2.1 plans).
+- Audited external/user-level alias maps (D7): the live global config still targets pre-rename IDs (e.g., `srq -> /strict-response-quality`); recorded that these update to the renamed IDs after the 7.2.x bundle is installed. No out-of-bundle files were edited.
+- Hardened the five lowest-scoring skills (`report-artifact-inventory`, `memory-bank-harness`, `search-router`, `evaluation-usage-tracker`, `memory-bank-ingestion`): added Workflow/Output Contract/decision-tree/schema sections, one `references/*.md` each (output schema, admission decision tree, evidence-lane matrix, usage-summary template, ingestion-packet schema), and positive/negative routing eval cases — on both mirrors. Maturity stays `experimental` (no auto-promotion).
+- Bumped the bundle version label to `7.2.2` across `README.md`, `TERMS.md`, `.codex/AGENTS.md`, `.claude/CLAUDE.md`, and eval case files; updated the version-label hygiene check to flag stale `7.2.1` labels.
+
 ## 7.2.1
 
 - Added three experimental, explicit-only workflow draft skills on both `.codex` and `.claude`: `workflow-plan-runner` for approved plan/spec/package execution, `workflow-validation` for validation matrices and validation-only runs, and `workflow-recovery` for repeated failure-loop recovery.

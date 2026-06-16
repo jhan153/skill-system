@@ -67,6 +67,41 @@ description: "Promote approved plan/goal/phase-plan closeout packets and proposa
 4. Link the raw artifact into archive pointers.
 5. Hand validation/consolidation to `memory-bank-maintenance`.
 
+## Approved Packet Schema
+```yaml
+closeout_packet:
+  source_artifact:        # plan/goal/phase-plan pointer
+  approval_evidence:      # explicit user approval for memory mutation
+  durable_candidates: []  # entries proposed for long-term memory
+  transient_excluded: []  # entries to drop, with reason
+  sensitivity_check:      # secrets/PII screened before ingestion
+  target_memory_path:
+  maintenance_handoff:    # what memory-bank-maintenance should validate next
+```
+
+## Append-only Event Schema
+```yaml
+ingestion_event:
+  timestamp:
+  source_artifact:
+  accepted_entries: []
+  excluded_entries: []
+  approval_pointer:
+  validation_status: agent-verified | user-verification-needed | unverified | blocked
+```
+- Events are append-only; never rewrite or delete prior entries.
+
+## Blocked Cases
+Report `blocked` (do not mutate memory) when any holds:
+- no explicit user approval for persistent memory mutation
+- no approved closeout packet
+- raw secrets/credentials/PII present and not yet redacted
+- target memory path unknown
+- a conflict requires `memory-bank-maintenance` to resolve first
+
+## Reference
+- Read `references/ingestion-packet-schema.md` for a closeout-packet example, an ingestion-event example, and a blocked-output example.
+
 ## Output Contract
 1. Approval and packet check
 2. Accepted memory entries

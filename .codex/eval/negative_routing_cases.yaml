@@ -1,4 +1,4 @@
-version: "7.2.1"
+version: "7.2.2"
 purpose: "Requests that should not trigger heavy or wrong skills."
 cases:
   - case_id: neg-001
@@ -465,3 +465,93 @@ cases:
     expected_output_shape: "first-observation root-cause analysis"
     quality_notes: "First-observation failure RCA is analysis-bug; workflow-recovery is only for repeated loops after attempted fixes (F6)."
     friction_risk: "workflow-recovery over-trigger on a first failure"
+  - case_id: hs-neg-001
+    user_request: "변경된 diff만 보여줘."
+    expected_primary_skill: report-diff
+    expected_supporting_skills: []
+    should_not_trigger: [report-artifact-inventory]
+    expected_family: report
+    expected_context: [diff]
+    expected_output_shape: "readable diff"
+    quality_notes: "Changed-line presentation is report-diff, not artifact inventory."
+    friction_risk: "inventory instead of diff"
+  - case_id: hs-neg-002
+    user_request: "이 작업을 비판적으로 리뷰해줘."
+    expected_primary_skill: report-critical
+    expected_supporting_skills: []
+    should_not_trigger: [report-artifact-inventory]
+    expected_family: report
+    expected_context: [artifact, risk boundary]
+    expected_output_shape: "critical review verdict"
+    quality_notes: "Blocker/QA verdict is report-critical, not artifact inventory."
+    friction_risk: "inventory instead of verdict"
+  - case_id: hs-neg-003
+    user_request: "이 규칙을 메모리에 업데이트해줘."
+    expected_primary_skill: memory-bank-update
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-harness]
+    expected_family: memory
+    expected_context: [rule]
+    expected_output_shape: "direct goal/rule memory update"
+    quality_notes: "Direct mutation is memory-bank-update; harness only reads/filters."
+    friction_risk: "harness over-trigger on a mutation request"
+  - case_id: hs-neg-004
+    user_request: "승인된 closeout을 장기 기억으로 승격해줘."
+    expected_primary_skill: memory-bank-ingestion
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-harness]
+    expected_family: memory
+    expected_context: [approved closeout packet]
+    expected_output_shape: "append-only ingestion event"
+    quality_notes: "Promotion is ingestion; harness is read-only compilation."
+    friction_risk: "harness over-trigger on a promotion request"
+  - case_id: hs-neg-005
+    user_request: "이 대화 원문을 분석해서 사용량 통계 내줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [evaluation-usage-tracker]
+    expected_family: none
+    expected_context: [privacy boundary]
+    expected_output_shape: "refuse raw-transcript ingestion; metadata-only"
+    quality_notes: "evaluation-usage-tracker is metadata-only; raw transcript ingestion is refused (privacy)."
+    friction_risk: "ingesting raw transcript"
+  - case_id: hs-neg-006
+    user_request: "이 번들이 릴리스 가능한지 평가해줘."
+    expected_primary_skill: report-critical
+    expected_supporting_skills: []
+    should_not_trigger: [evaluation-usage-tracker]
+    expected_family: report
+    expected_context: [artifact, readiness criteria]
+    expected_output_shape: "readiness/critical verdict"
+    quality_notes: "Readiness judgment is report-critical/evaluation-harness, not usage telemetry."
+    friction_risk: "usage tracker treated as readiness gate"
+  - case_id: hs-neg-007
+    user_request: "이 closeout은 아직 proposal인데 그냥 기억에 넣어줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-ingestion]
+    expected_family: memory
+    expected_context: [proposal-only closeout, no approval]
+    expected_output_shape: "blocked (needs approval/approved packet)"
+    quality_notes: "Proposal-only without approval is blocked; plan-spec-curator owns proposals. Ingestion needs explicit approval."
+    friction_risk: "ingesting without approval"
+  - case_id: hs-neg-008
+    user_request: "코드베이스 분석 보고서 만들어줘."
+    expected_primary_skill: analysis-codebase
+    expected_supporting_skills: []
+    should_not_trigger: [search-router]
+    expected_family: analysis
+    expected_context: [repo]
+    expected_output_shape: "codebase analysis report"
+    quality_notes: "Codebase analysis is analysis-codebase; search-router only opens an evidence lane."
+    friction_risk: "router owning the report"
+  - case_id: hs-neg-009
+    user_request: "연구 가설 세워줘."
+    expected_primary_skill: research-router
+    expected_supporting_skills: []
+    should_not_trigger: [search-router]
+    expected_family: research
+    expected_context: [research claim]
+    expected_output_shape: "research routing"
+    quality_notes: "Scientific hypothesis is research-router, not the evidence lane router."
+    friction_risk: "search-router owning research lifecycle"

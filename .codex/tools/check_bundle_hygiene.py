@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only sanity checks for the 7.2.1 manual drop-in skill bundle."""
+"""Read-only sanity checks for the 7.2.2 manual drop-in skill bundle."""
 
 from __future__ import annotations
 
@@ -47,6 +47,14 @@ SENSITIVE_SUFFIXES = {".sqlite", ".db", ".pem", ".key"}
 EXCLUDED_CORE_DIRS = {"harness", ".agent-workflow", "docs", "eval", "tools", "shared"}
 ALLOWED_MATURITY = {"skeleton", "usable", "field_tuned", "experimental", "deprecated"}
 POLICY_DOCS = ["README.md", "TERMS.md", ".codex/AGENTS.md"]
+OS_NOISE_NAMES = {".DS_Store", "Thumbs.db"}
+
+
+def is_os_noise(rel_posix: str) -> bool:
+    """OS/editor noise that is git-ignored and excluded from packaging; not bundle payload."""
+    parts = rel_posix.split("/")
+    name = parts[-1]
+    return name in OS_NOISE_NAMES or name.startswith("._") or "__MACOSX" in parts
 
 
 def add_missing_path_errors(root: Path, paths: list[str], errors: list[str]) -> None:
@@ -68,7 +76,9 @@ def check_root_shape(root: Path, errors: list[str]) -> None:
             stray = [
                 p
                 for p in path.rglob("*")
-                if p.is_file() and not p.relative_to(root).as_posix().startswith("docs/plan/")
+                if p.is_file()
+                and not p.relative_to(root).as_posix().startswith("docs/plan/")
+                and not is_os_noise(p.relative_to(root).as_posix())
             ]
             if stray:
                 errors.append(
@@ -210,7 +220,11 @@ SKILL_REF_IGNORE = {"", "null", "none", "~", "[]"}
 
 
 def relative_files(base: Path) -> set:
-    return {path.relative_to(base) for path in base.rglob("*") if path.is_file()}
+    return {
+        path.relative_to(base)
+        for path in base.rglob("*")
+        if path.is_file() and not is_os_noise(path.relative_to(base).as_posix())
+    }
 
 
 def check_mirror_parity(root: Path, errors: list[str]) -> None:
@@ -294,6 +308,11 @@ STALE_VERSION_LABELS = [
     "7.2.0 Bundle Policy",
     "7.2.0 manual drop-in",
     "7.2.0 is a manual drop-in",
+    "7.2.1 Terms",
+    "7.2.1 core",
+    "7.2.1 Bundle Policy",
+    "7.2.1 manual drop-in",
+    "7.2.1 is a manual drop-in",
 ]
 VERSION_LABEL_DOCS = ["README.md", "CHANGELOG.md", "TERMS.md", ".codex/AGENTS.md", ".claude/CLAUDE.md"]
 
@@ -411,7 +430,7 @@ def check_version_labels(root: Path, errors: list[str]) -> None:
         text = read_text(path)
         for label in STALE_VERSION_LABELS:
             if label in text:
-                errors.append(f"stale version label '{label}' in {rel}; use 7.2.1")
+                errors.append(f"stale version label '{label}' in {rel}; use 7.2.2")
 
 
 def main() -> int:

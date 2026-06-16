@@ -68,6 +68,21 @@ notes:
 ```
 - Raw usage logs stay private/local. The public bundle includes schema, summary template, and guidance only.
 
+## Aggregation Workflow
+1. Confirm a local invocation ledger (or summarized records) exists; if not, report "no data" and stop.
+2. Confirm the records are metadata-only; if a source contains raw prompts/transcripts, refuse that source rather than ingest it.
+3. Aggregate counts by `primary_skill`, `family`, `trigger_type`, and `outcome`.
+4. Separate over-trigger candidates (frequent `rerouted`/`skipped` or wrong-family hits) from under-trigger candidates (near-zero use).
+5. Propose review-gated improvement candidates only; never change maturity automatically.
+
+## Over/Under Trigger Rule
+- A raw count alone never changes maturity or routing.
+- Treat a skill as an improvement candidate only when counts combine with field feedback or an eval case showing a real over/under-trigger pattern.
+- Low use may mean a missing alias/routing gap, not low value; flag for review rather than deprecation.
+
+## Reference
+- Read `references/usage-summary-template.md` for an input ledger sample, output summary sample, redaction checklist, and the no-data output shape.
+
 ## Output Contract
 1. Usage count summary (by skill and family)
 2. Low-use and high-use skills

@@ -98,3 +98,20 @@ Allowed `status` values:
 - Completed or superseded plan documents are not default instructions.
 - Use old plans only as summarized background or explicit evidence when the current user asks for them.
 - If an old plan conflicts with the active request, current user instruction and current files win.
+
+## Conflict Handling
+- Resolution priority (highest first): current user instruction > current files/repo state > active plan doc > accepted memory > archive summary.
+- When an entry conflicts with anything higher, do not admit it; record it under `conflicts` with the losing and winning source.
+- Never let a lower-priority memory entry silently override current user instruction or current files.
+
+## Context Budget Rule
+- Default to a short, source-traced summary per admitted entry, not raw memory text.
+- Use raw/full memory text only when the user explicitly needs it and it is task-relevant.
+- Prefer excluding marginal entries over inflating the pack; a smaller, trustworthy pack beats a large noisy one.
+
+## Reference
+- Read `references/admission-decision-tree.md` for the full admission decision tree, a compact context-pack example, and rejected-entry examples.
+
+## Known Limits
+- The harness compiles and filters memory; it does not mutate the memory bank (init/update/maintenance/ingestion own that).
+- Admission decisions depend on trustworthy source labels; unlabeled or untrusted sources default to excluded or summary-only.

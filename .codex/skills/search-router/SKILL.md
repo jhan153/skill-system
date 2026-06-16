@@ -67,6 +67,15 @@ description: "Route cross-domain evidence-search requests (papers, code, runtime
 - visual evidence -> `design-visual-regression` / `design-a11y-audit`
 - memory evidence -> `memory-bank-harness` / `memory-bank-maintenance`
 
+## Router Decision Steps
+1. Confirm explicit evidence intent (evidence/source/proof/근거/조사/ledger). If absent, defer to the normal Route Matrix — do not trigger.
+2. Identify the final owner of the task (implementation, planning, analysis, research, design). The owner stays primary; this router only opens an evidence lane.
+3. Select exactly one evidence lane from Evidence Lanes and hand off; do not own synthesis, implementation, reporting, or the research lifecycle.
+4. For paper evidence used in implementation/planning, attach `search-paper-evidence` as support and keep the implementation/planning skill primary; route the whole task to `research-router` only for a scientific claim/experiment/manuscript/publishability decision.
+
+## Reference
+- Read `references/evidence-lane-matrix.md` for the full lane matrix, ambiguous and router-vs-router examples, and paper-evidence-for-implementation examples.
+
 ## Output Contract
 1. Detected evidence intent and domain
 2. Selected lane and owning skill

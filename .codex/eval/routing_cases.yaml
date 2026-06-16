@@ -1,4 +1,4 @@
-version: "7.2.1"
+version: "7.2.2"
 purpose: "Positive routing examples for common requests."
 cases:
   - case_id: route-001
@@ -240,3 +240,33 @@ cases:
     expected_output_shape: "failure_loop, active_hypothesis, diagnostic_or_fix, rollback_or_fallback"
     quality_notes: "Same failure after a fix plus anti-fake-fix wording selects recovery."
     friction_risk: "broad repo analysis or weakening validation"
+  - case_id: hs-pos-001
+    user_request: "이번 작업 산출물과 검증 내역 정리해줘."
+    expected_primary_skill: report-artifact-inventory
+    expected_supporting_skills: []
+    should_not_trigger: [report-diff, report-critical]
+    expected_family: report
+    expected_context: [changed files, validation evidence]
+    expected_output_shape: "artifact inventory (changed/generated/validation/followups)"
+    quality_notes: "Task-local artifact inventory, not a diff or a critical verdict."
+    friction_risk: "building a persistent registry"
+  - case_id: hs-pos-002
+    user_request: "accepted memory에서 이 작업용 context pack 만들어줘."
+    expected_primary_skill: memory-bank-harness
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update, memory-bank-ingestion]
+    expected_family: memory
+    expected_context: [accepted memory, task request]
+    expected_output_shape: "filtered context pack with admitted/excluded/conflicts"
+    quality_notes: "Read-only context compilation; no memory mutation."
+    friction_risk: "admitting stale/conflicting memory"
+  - case_id: hs-pos-003
+    user_request: "이 논문 근거를 찾아서 구현 플랜에 반영해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: [search-paper-evidence]
+    should_not_trigger: [research-router]
+    expected_family: none
+    expected_context: [implementation goal, paper topic]
+    expected_output_shape: "implementation/planning primary with paper evidence as support"
+    quality_notes: "Paper evidence supports implementation; the research cluster is not primary (search-router opens the lane)."
+    friction_risk: "routing the whole task to research"
