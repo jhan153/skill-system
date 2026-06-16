@@ -1,219 +1,218 @@
-# Personal Skill System
+# AI Skill System
 
-[Korean translation](README.ko.md)
+[Korean README](README.ko.md)
 
-Personal Skill System is a public-facing summary of a personal AI work system that evolved from local prompt files into a more inspectable skill operating model.
+AI Skill System is a work system for organizing repetitive AI tasks into reusable skills that can be selected, executed, validated, and improved. It started as a set of local prompt files, but gradually expanded into a structure that covers task routing, state management, planning, artifact validation, result reporting, and research workflow coordination.
 
-The goal is not to publish every private rule, backup, or workflow detail. This repository focuses on the shareable parts: the timeline, design perspective, operating model, and public-safe structure behind the system.
+This repository is not intended to expose every internal rule or private workflow. It documents the system’s evolution, operating model, skill structure, and example patterns within a publicly shareable scope.
 
 ## Summary
 
-This system started as a way to avoid repeating the same instructions to AI tools. Over time, it became a layered workflow for routing tasks, keeping project state, planning work, validating outputs, reporting results, and orchestrating research.
+The purpose of this system is to avoid repeatedly entering the same instructions into AI tools by separating recurring AI tasks into reusable skills.
 
-In short:
-
-> A skill system is not just a longer prompt. It is a way to make repeated AI work run through clear capability units, explicit state, verifiable outputs, and human-controlled boundaries.
-
-## Timeline
-
-The version history is presented as a design timeline, not as a complete feature checklist.
-
-| Version | Focus | Design Shift |
-|---:|---|---|
-| 1.0 | Prompt bootstrap | Basic working rules were captured in local instruction files. |
-| 2.0 | AGENT subskills | Large instruction blocks were split into reusable skill-like modules. |
-| 3.0 | Design and reporting | HLD, LLD, interaction, reporting, and skill authoring patterns became repeatable workflows. |
-| 4.0 | Memory bank | Long-running project context moved from chat memory into explicit state files and event history. |
-| 5.0 | Agentic workflow | Planning, execution, validation, reporting, and review became separate responsibilities. |
-| 5.6.x | Stabilization | Trigger conflicts, cross-skill ownership, validation states, and drift audits became first-class concerns. |
-| 6.0 | Research lifecycle | Literature review, hypothesis, experiment planning, analysis, writing, and review were organized as a research pipeline. |
-| 7.0 | Public specification | The private system was reframed as a public timeline, design philosophy, and manifest/profile structure. |
-| 7.1 | Drop-in bundle | The system was repackaged as a manual drop-in bundle with read-only hygiene checks and conservative, explicit-first routing. |
-| 7.2 | Skill families | A user-facing family grouping layer, family-stem skill renames, new search/coordination/evaluation families, and `search-router` / `memory-bank-ingestion` / `evaluation-usage-tracker` skills. 7.2.1 adds a workflow execution sub-family (`workflow-plan-runner` / `workflow-validation` / `workflow-recovery`) and a redefined `report-qualitative` evaluation report skill. 7.2.5 adds a family-grouped skill catalog for users. |
+A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
 ## 7.2.5 Drop-in Bundle
 
-This repository includes the 7.2.5 manual drop-in skill bundle payload:
+This repository includes the skill bundle organized for version 7.2.5. Its main components are:
 
-- `.codex/skills`: Codex skill packages
-- `.codex/docs`: runtime guidance and registry documents
-- `.codex/eval`: routing and usage evaluation cases
-- `.codex/tools`: read-only bundle hygiene tooling
-- `.claude`: Claude-side runtime guidance, docs, and eval cases
-- `CHANGELOG.md`, `TERMS.md`, and `FIELD_FEEDBACK.md`: packaging notes and field feedback template
+* `skills`: skill packages intended for actual use
+* `docs`: skill lists, usage criteria, and operational reference documents
+* `eval`: example cases for checking skill selection and usage quality
+* `tools`: helper tools for inspecting the bundle structure
+* `CHANGELOG.md`, `TERMS.md`, `FIELD_FEEDBACK.md`: change history, terminology notes, and field feedback template
 
-The bundle intentionally does not include `.codex/config.toml`, `automations/`, or the default `.codex/skills/.system` payload. App-managed system skills are treated as optional review material, not as part of the default repository payload.
+## Core Principles
+
+This system is designed to treat repetitive AI work as skills that can be selected, executed, and inspected, rather than as one-off prompts.
+
+* **A skill is a work unit.** Each skill defines when it should be used, what inputs it receives, what result it should produce, and how that result should be validated.
+* **Routing and execution guidance are separated.** Routing information is kept lightweight, while detailed procedures and reference materials live inside each skill package.
+* **State and evidence are preserved.** Important context, reasoning evidence, and validation results should be managed as inspectable artifacts, not only as hidden conversation state.
+* **Human control must remain explicit.** Risky operations such as destructive changes, credential handling, network access, or private data access require clear boundaries and confirmation steps.
+
+## Operating Model
+
+This system does not handle every task through one large prompt. It interprets the request, selects an appropriate skill based on the task type, validates the execution result, and uses evaluation and feedback to improve the skill system when needed.
+
+```mermaid
+flowchart TB
+  A[User Request] --> B[Request Interpretation]
+
+  B --> C[Routing]
+  C --> D[Skill Selection]
+  D --> E[Work Plan]
+
+  subgraph S[Skill Execution]
+    E --> F[Execution]
+    F --> G[Validation]
+    G -- Needs revision --> E
+  end
+
+  G -- Complete --> H[Result Report]
+
+  subgraph K[Operational Assets]
+    R[Skill Registry]
+    V[Evaluation Cases]
+    L[Change History / Feedback]
+  end
+
+  R -. Reference .-> C
+  R -. Reference .-> D
+  G -. Quality Check .-> V
+  H -. Preserve only needed records .-> L
+  V -. Improvement Evidence .-> R
+  L -. Improvement Evidence .-> R
+```
+
+The key idea is to treat skills not as prompt fragments, but as operational units that can be selected, executed, validated, and improved. A request is first interpreted, then routed to an appropriate skill using the registry. During execution, planning and validation may repeat as needed. After completion, the result is reported and only the necessary records are preserved.
+
+This structure keeps skills from becoming disposable instructions. Instead, they remain reusable work units that can be inspected and improved over time.
 
 ## Skill Catalog
 
-The skills are grouped by family so users can start from intent instead of memorizing every skill name. Skill names use the family-stem convention introduced in 7.2.
+Skills are organized by family. Instead of memorizing every skill name, users can start from the intent of the task and find the appropriate family and skill.
 
 ### Analysis
 
-Analysis skills diagnose failures, compare approaches, or build codebase-level understanding.
+Analysis skills are used to diagnose failures, compare approaches, or build codebase-level understanding.
 
-| Skill | What it means |
-| --- | --- |
-| `analysis-router` | Chooses the right analysis path for deep technical questions. It routes to bug diagnosis, algorithm recommendation, or a hybrid flow without doing broad repo reporting by default. |
-| `analysis-bug` | Reproduces and diagnoses failures, especially recurring or high-risk issues. It focuses on evidence, root cause, and regression-safe validation rather than quick guesses. |
-| `analysis-algorithm` | Compares algorithms, architectures, models, retrieval strategies, or implementation approaches under explicit constraints and success metrics. |
-| `analysis-codebase` | Produces broad codebase intelligence reports when the user explicitly wants a repo-wide artifact, architecture map, dependency view, or quality-gate report. |
+| Skill                | Role                                                                                                                                           |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `analysis-router`    | Selects the appropriate analysis path for complex technical requests, such as bug diagnosis, algorithm comparison, or codebase analysis.       |
+| `analysis-bug`       | Reproduces and diagnoses recurring, unclear, or high-risk failures, then summarizes the primary cause and regression validation path.          |
+| `analysis-algorithm` | Compares algorithms, architectures, models, search strategies, or implementation approaches against explicit constraints and success criteria. |
+| `analysis-codebase`  | Performs codebase-level analysis when repository-wide artifacts, architecture maps, dependency views, or quality-gate reports are needed.      |
 
 ### Design
 
-Design skills turn visual intent into implementable UI work or evidence.
+Design skills turn visual intent into implementable UI work or verifiable evidence.
 
-| Skill | What it means |
-| --- | --- |
-| `design-frontend` | Implements a concrete visual design as real frontend code, using the target repo's existing patterns and validating the rendered result when possible. |
-| `design-ui-decomposer` | Breaks a UI reference into hierarchy, layout regions, component candidates, token candidates, states, and validation needs before implementation. |
-| `design-layout-translator` | Converts Auto Layout, flex/grid, sizing, overflow, and breakpoint constraints into implementation-ready layout rules. |
-| `design-tokens` | Normalizes design tokens, maps them to platform values, and reports missing or conflicting tokens without inventing values. |
-| `design-component-mapper` | Maps design components, variants, states, slots, and events to existing repo components and identifies unresolved gaps. |
-| `design-visual-regression` | Captures or inspects rendered screenshots, checks nonblank/framing evidence, and reports visual differences across viewports. |
-| `design-a11y-audit` | Reviews accessibility evidence for implemented UI, including keyboard flow, focus visibility, semantics, contrast, target size, and responsive readability. |
-| `design-mobile-screen` | Applies mobile or native screen constraints such as safe areas, navigation, keyboard overlays, touch targets, scrolling, states, and mobile accessibility. |
-| `design-dashboard` | Applies dashboard-specific constraints for KPIs, filters, charts, tables, data density, async states, and operational accessibility. |
-| `design-section-web` | Applies section-page constraints for heroes, semantic sections, CTA flow, responsive order, media placement, first-viewport signal, and text fitting. |
+| Skill                      | Role                                                                                                                                                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `design-frontend`          | Implements a concrete visual design as frontend code. It reuses the target repository’s existing framework, components, tokens, and assets, and validates the rendered result when possible.                        |
+| `design-ui-decomposer`     | Breaks down UI references such as screenshots, Figma exports, mockups, or AI-generated images into hierarchy, layout, repeated patterns, component/token candidates, states, and validation items.                  |
+| `design-layout-translator` | Translates Auto Layout, flex/grid, resizing, overflow, and breakpoint constraints into layout rules that can be implemented in code.                                                                                |
+| `design-tokens`            | Normalizes design token sources and maps them to platform values. It does not invent values, and reports missing, conflicting, or drifting tokens with evidence.                                                    |
+| `design-component-mapper`  | Maps design components, variants, states, slots, and events to existing repository components and identifies unresolved implementation gaps.                                                                        |
+| `design-visual-regression` | Captures or reviews rendered UI screenshots and reports blank states, framing issues, overflow, and visual differences across screen sizes.                                                                         |
+| `design-a11y-audit`        | Reviews accessibility evidence for implemented UI, including keyboard reachability, focus visibility, semantic structure, contrast, target size, and responsive readability.                                        |
+| `design-mobile-screen`     | Applies mobile and native screen constraints such as safe areas, navigation/tab bars, keyboard overlays, touch targets, scroll/fixed regions, platform states, and mobile accessibility.                            |
+| `design-dashboard`         | Applies dashboard-specific constraints such as KPI hierarchy, filters, search, date ranges, charts, tables, information density, async/empty/error/loading states, and operational accessibility.                   |
+| `design-section-web`       | Checks section-based web pages such as landing, product, documentation, portfolio, or marketing pages for hero structure, section hierarchy, CTA flow, responsive order, media placement, and first-screen signals. |
 
 ### Report
 
-Report skills shape evidence, review, diffs, and task artifacts into readable user-facing outputs.
+Report skills organize evidence, reviews, changes, and work artifacts into results that are easy for users to read.
 
-| Skill | What it means |
-| --- | --- |
-| `report-qualitative` | Produces structured qualitative evaluation reports with explicit criteria, evidence, interpretation, judgment, and recommendations. It also preserves compact `srq`-style evidence reporting as an explicit compatibility path. |
-| `report-critical` | Runs blocker-first critical review, risk review, and QA-style verdicts for artifacts, plans, outputs, or conversations. |
-| `report-diff` | Presents actual changed lines or verified before/after snapshots in a readable grouped diff format. |
-| `report-artifact-inventory` | Summarizes the artifacts, commands, verification notes, and remaining checks from a task without creating a persistent registry. |
+| Skill                       | Role                                                                                                                       |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `report-qualitative`        | Produces qualitative evaluation reports with explicit criteria, evidence, interpretation, judgment, and recommendations.   |
+| `report-critical`           | Performs blocker-first critical review, risk review, and QA-style judgment on artifacts, plans, outputs, or conversations. |
+| `report-diff`               | Presents only actual changed lines or verified before/after snapshots in a readable grouped diff format.                   |
+| `report-artifact-inventory` | Summarizes artifacts, executed commands, validation records, and remaining checks produced during a single task.           |
 
 ### Workflow
 
-Workflow skills control execution discipline, validation, and recovery for implementation work.
+Workflow skills control implementation discipline, validation, and failure recovery.
 
-| Skill | What it means |
-| --- | --- |
-| `workflow-rigor` | Enforces evidence-first execution, scoped changes, validation separation, and higher-risk review discipline. |
-| `workflow-plan-runner` | Executes an approved plan, spec, or package into implementation batches with scoped validation and rollback or fallback decisions. |
-| `workflow-validation` | Designs or runs focused validation plans for changed or planned artifacts, separating agent-run checks from user/manual checks. |
-| `workflow-recovery` | Recovers repeated implementation or validation failure loops using one-hypothesis diagnostics, narrowed repros, and rollback/fallback decisions. |
+| Skill                  | Role                                                                                                                                                                    |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `workflow-rigor`       | Applies evidence-first execution, scoped changes, separated validation results, and review discipline for medium- and high-risk changes.                                |
+| `workflow-plan-runner` | Executes approved plans, specifications, or packages as implementation batches, while managing scoped validation, rollback, or alternative choices.                     |
+| `workflow-validation`  | Plans or performs focused validation for completed or planned changes. It separates validation performed by the agent from validation that must be checked by the user. |
+| `workflow-recovery`    | Breaks repeated implementation or validation retry loops through single-hypothesis diagnosis, narrowed reproduction steps, rollback, or alternative decisions.          |
 
 ### Planning
 
-Planning skills create or curate plan/spec artifacts without replacing actual implementation.
+Planning skills create or organize planning and specification artifacts without performing the actual implementation.
 
-| Skill | What it means |
-| --- | --- |
-| `plan-short-term-docs` | Creates or updates persisted `docs/plan` task plans for near-term work, status, and implementation transitions. |
-| `plan-long-term-package` | Builds larger multi-document planning packages for phases, migrations, rewrites, or long-term work when explicitly requested. |
-| `plan-spec-curator` | Curates active context and stale specs or plans, proposes archive/load policy, and keeps planning context from becoming bloated. |
+| Skill                    | Role                                                                                                                                                                       |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plan-short-term-docs`   | Creates or updates persistent `docs/plan` work plans for near-term tasks, state, and implementation transitions.                                                           |
+| `plan-long-term-package` | Creates large multi-document planning packages for bulk work, migrations, rewrites, or milestone plans that future sessions must be able to continue from documents alone. |
+| `plan-spec-curator`      | Organizes active context and outdated or superseded specifications/plans, and proposes archive/reload policies to prevent planning context from becoming overloaded.       |
 
 ### Coordination
 
-Coordination skills help split or hand off work without creating persistent workflow machinery.
+Coordination skills provide lightweight structures for task splitting and handoff without creating permanent workflow machinery.
 
-| Skill | What it means |
-| --- | --- |
-| `coordination-brief` | Produces lightweight goal briefs, task DAG slices, handoff notes, or lock-scope outlines from an existing plan or task list. |
-| `coordination-multi-agent` | Splits explicit multi-agent work into task cards, ownership notes, lock scopes, and handoff boundaries. |
+| Skill                      | Role                                                                                                               |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `coordination-brief`       | Creates goal briefs, task DAG fragments, handoff notes, and lock-scope outlines from existing plans or task lists. |
+| `coordination-multi-agent` | Splits explicitly multi-agent work into task cards, ownership notes, lock scopes, and handoff boundaries.          |
 
 ### Research
 
-Research skills organize scientific or paper-oriented work from routing through review.
+Research skills organize scientific or paper-centered work from request routing through review.
 
-| Skill | What it means |
-| --- | --- |
-| `research-router` | Routes research requests to the right research-stage skill while avoiding accidental activation for ordinary implementation work. |
-| `research-literature-ideation` | Turns acquired evidence into candidate hypotheses and selects a focused active hypothesis. |
-| `research-literature-synthesis` | Synthesizes evidence ledgers or papers into literature review structure, contradictions, limitations, and claim boundaries. |
-| `research-hypothesis-planning` | Plans hypotheses, ablations, loss design, training plans, and claim-development paths. |
-| `research-experiment-blueprint` | Creates experiment blueprints from selected hypotheses, including baselines, metrics, ablations, and falsification checks. |
-| `research-experiment-scaffold` | Generates minimal experiment scaffolds from approved blueprints within explicit write boundaries. |
-| `research-statistical-analysis` | Analyzes result tables, metrics, and uncertainty with statistical rationale and planned-vs-exploratory separation. |
-| `research-manuscript-writing` | Drafts or revises manuscript sections from verified research artifacts, citation status, and results. |
-| `research-peer-review` | Critiques manuscripts, proposals, and research plans for novelty, evidence, reproducibility, limitations, and reporting quality. |
+| Skill                           | Role                                                                                                                                                              |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `research-router`               | Routes research requests to the appropriate research-stage skill and prevents research skills from being triggered accidentally for ordinary implementation work. |
+| `research-literature-ideation`  | Converts gathered evidence into candidate research hypotheses and selects one active hypothesis to validate.                                                      |
+| `research-literature-synthesis` | Synthesizes a literature review structure, consensus, disagreements, contradictions, limitations, and claim boundaries from evidence lists or provided papers.    |
+| `research-hypothesis-planning`  | Plans hypotheses, ablations, loss-function design, training plans, and claim-development paths.                                                                   |
+| `research-experiment-blueprint` | Produces an experiment blueprint from a selected hypothesis, including baseline experiments, metrics, ablations, and falsification checks.                        |
+| `research-experiment-scaffold`  | Generates a minimal experiment code scaffold from an approved experiment blueprint within explicit write boundaries.                                              |
+| `research-statistical-analysis` | Analyzes result tables, metrics, and uncertainty with statistical evidence, while separating pre-planned analysis from exploratory analysis.                      |
+| `research-manuscript-writing`   | Writes or revises scientific manuscript sections based on validated research artifacts, citation status, and results.                                             |
+| `research-peer-review`          | Critiques manuscripts, proposals, or research plans in peer-review format across novelty, evidence, reproducibility, limitations, and reporting quality.          |
 
 ### Search
 
-Search skills route or collect evidence while keeping synthesis and implementation separate.
+Search skills find evidence or define evidence-gathering paths while keeping synthesis and implementation responsibilities separate.
 
-| Skill | What it means |
-| --- | --- |
-| `search-router` | Detects evidence-search intent and routes to the right evidence lane, such as paper, code, runtime, visual, or memory evidence. |
-| `search-paper-evidence` | Searches or plans paper/source evidence collection and builds citation-aware evidence ledgers without fabricated citations. |
+| Skill                   | Role                                                                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `search-router`         | Detects search intent for papers, code, runtime evidence, visual references, or memory evidence, and routes it to the appropriate evidence lane. |
+| `search-paper-evidence` | Searches for paper/source evidence or plans a search path, while tracking citation status in an evidence ledger without fabricating citations.   |
 
 ### Memory
 
-Memory skills manage persistent project context only when memory use or mutation is explicit.
+Memory skills manage long-term project context. They are used only when memory use or memory changes are explicitly intended.
 
-| Skill | What it means |
-| --- | --- |
-| `memory-bank-harness` | Compiles task-specific context from accepted memory while filtering stale, conflicting, or risky entries. |
-| `memory-bank-ingestion` | Promotes approved closeout packets and proposal candidates into durable memory with append-only events and archive links. |
-| `memory-bank-init` | Initializes project-scoped persistent memory after identity and write-boundary checks. |
-| `memory-bank-update` | Updates persistent goals or rules with append-only history when the user wants durable memory mutation. |
-| `memory-bank-maintenance` | Inspects, validates, consolidates, or repairs existing memory state. |
-| `memory-bank-correction-capture` | Captures explicit user corrections as candidate memory while preserving approval and sensitivity boundaries. |
+| Skill                            | Role                                                                                                                             |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `memory-bank-harness`            | Builds a context pack from approved memory for the current task while filtering out stale, conflicting, or risky entries.        |
+| `memory-bank-ingestion`          | Promotes approved closeout packets and proposed candidates into long-term memory with append-only events and archive links.      |
+| `memory-bank-init`               | Initializes a project-scoped persistent memory bank after confirming project identity and write boundaries.                      |
+| `memory-bank-update`             | Updates persistent goals or rules as append-only history when the user wants long-term memory changes.                           |
+| `memory-bank-maintenance`        | Inspects, validates, consolidates, or repairs existing memory state.                                                             |
+| `memory-bank-correction-capture` | Captures an explicit user correction as a memory candidate while preserving approval steps and sensitive-information boundaries. |
 
 ### Evaluation
 
 Evaluation skills improve the skill system itself through cases and usage observations.
 
-| Skill | What it means |
-| --- | --- |
-| `evaluation-harness` | Reviews `.codex/eval` usage cases, routing expectations, and schema consistency without acting as package approval. |
-| `evaluation-usage-tracker` | Aggregates metadata-only skill invocation records into usage summaries, low/high-use signals, and improvement candidates. |
+| Skill                      | Role                                                                                                                                                           |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `evaluation-harness`       | Reviews `.codex/eval` usage cases, routing expectations, and schema consistency. It is treated as a usage-quality review tool, not as a package approval tool. |
+| `evaluation-usage-tracker` | Aggregates skill-call metadata into usage summaries, low/high-usage signals, and improvement candidates without storing original prompts or conversation logs. |
 
 ### Skill System
 
-Skill-system skills create and maintain the skill bundle itself.
+Skill System skills create and maintain the skill bundle itself.
 
-| Skill | What it means |
-| --- | --- |
-| `create-skill-pack` | Creates, hardens, migrates, deprecates, or registers custom skills and their metadata. |
+| Skill               | Role                                                                               |
+| ------------------- | ---------------------------------------------------------------------------------- |
+| `create-skill-pack` | Creates, strengthens, migrates, retires, and registers custom skills and metadata. |
 
-## Design Perspective
+## Design Timeline
 
-The system is built around a few practical principles:
+The version history is not a complete feature checklist. It is a timeline showing how the system’s design direction has changed over time.
 
-- **Skill as capability package**: a skill should describe when it runs, what it receives, what it produces, and how it is validated.
-- **Progressive disclosure**: routing stays lightweight, while detailed instructions, references, and scripts live deeper in the skill package.
-- **Explicit state**: important project context should be stored as inspectable artifacts rather than hidden conversation memory.
-- **Plan before implementation**: non-trivial work should have an explicit plan, scope, risk, and validation path.
-- **Evidence before assertion**: reports should distinguish verified results, unverified claims, blocked work, and user checks.
-- **Human boundaries**: destructive actions, credentials, network access, and private data need clear approval and redaction rules.
-
-## Operating Model
-
-At a high level, the workflow looks like this:
-
-```mermaid
-flowchart LR
-  A[Request] --> B[Route]
-  B --> C[Select Skill]
-  C --> D[Plan]
-  D --> E[Execute]
-  E --> F[Validate]
-  F --> G[Report]
-  G --> H{Persist?}
-  H -- yes --> I[Memory / History]
-  H -- no --> J[Handoff]
-```
-
-The important part is the separation of responsibilities. A request should not become one large prompt. It should move through routing, skill selection, planning, execution, validation, and reporting with the right amount of context at each step.
-
-## Public Scope
-
-This repository is intended to share the public-safe shape of the system:
-
-- the evolution from prompt files to skill packages
-- the design principles behind the workflow
-- the role of memory, planning, validation, and reporting
-- the idea of source-adjacent skill metadata such as manifests or profiles
-- examples and schemas that do not expose private project data
-
-It is not intended to publish private memories, credentials, raw backups, unreduced logs, or project-specific operating details.
+| Version | Focus                              | Design Change                                                                                                                                                                                                                                                                     |
+| ------: | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|     1.x | Prompt bootstrap                   | Recorded basic working rules in local instruction files.                                                                                                                                                                                                                          |
+|     2.x | AGENT subskills                    | Split large instruction blocks into reusable skill-like modules.                                                                                                                                                                                                                  |
+|     3.x | Design and reporting               | HLD, LLD, interaction, reporting, and skill-authoring patterns became repeatable workflows.                                                                                                                                                                                       |
+|     4.x | Memory bank                        | Moved long-term project context from conversation memory into explicit state files and event history.                                                                                                                                                                             |
+|     5.x | Agentic workflow and stabilization | Separated planning, execution, validation, reporting, and review into distinct responsibilities, and began treating trigger conflicts, cross-skill ownership, validation state, and drift audits as managed concerns.                                                             |
+|     6.x | Research lifecycle                 | Organized literature review, hypothesis generation, experiment planning, analysis, manuscript writing, and review into a single research pipeline.                                                                                                                                |
+|     7.x | Public specification               | Reworked the private system into a publicly shareable timeline, design philosophy, and manifest/profile structure.                                                                                                                                                                |
+|   7.1.x | Drop-in bundle                     | Repackaged the system as a drop-in bundle with read-only structure checks and conservative explicit-first routing.                                                                                                                                                                |
+|   7.2.x | Skill families                     | Added user-facing family groups, family-prefixed skill names, and the search/coordination/evaluation families. Version 7.2.1 added workflow execution subfamilies and `report-qualitative`; version 7.2.5 added a skill catalog that helps users understand each skill by family. |
 
 ## License
 
-MIT
+MIT License.
