@@ -1,5 +1,5 @@
 interface:
-  display_name: "Readable Diff Report"
+  display_name: "Report Diff"
   short_description: "Show only changed lines with clear summaries"
   default_prompt: |
     Use $report-diff only when the user wants readability-first diff presentation.

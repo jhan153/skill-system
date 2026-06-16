@@ -1,6 +1,6 @@
 ---
 name: design-mobile-screen
-description: Apply mobile and native screen implementation constraints as an explicit-only surface specialist. Use when Codex is explicitly asked to use this skill, or when a design-frontend task needs mobile-specific guidance for safe areas, navigation bars, tab bars, keyboard overlays, touch targets, scroll/fixed regions, mobile responsive behavior, platform states, and mobile accessibility in React Native, Flutter, SwiftUI, Jetpack Compose, or mobile web screens.
+description: "Explicit-only mobile/native screen specialist for design-frontend tasks — safe areas, nav/tab bars, keyboard overlays, touch targets, scroll/fixed regions, responsive behavior, platform states, and mobile accessibility (React Native, Flutter, SwiftUI, Compose, mobile web)."
 ---
 
 # design-mobile-screen

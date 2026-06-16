@@ -1,6 +1,6 @@
 ---
 name: design-a11y-audit
-description: Produce accessibility evidence for implemented UI surfaces. Use when Codex must check keyboard reachability, focus visibility, selected-vs-focused distinction, semantic roles, accessible names, labels, landmarks, status messages, color contrast, target size, responsive readability, or WCAG/APG-backed accessibility gaps for design-to-production work.
+description: "Accessibility evidence for implemented UI — keyboard reachability, focus visibility, selected-vs-focused distinction, roles, accessible names, labels, landmarks, status messages, color contrast, target size, responsive readability, and WCAG/APG-backed gaps."
 ---
 
 # design-a11y-audit

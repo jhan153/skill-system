@@ -1,6 +1,6 @@
 ---
 name: report-qualitative
-description: Produce evidence-based qualitative evaluation reports for artifacts, documents, skills, workflows, product specs, implementations, research plans, designs, or operating processes. Use for qualitative assessment, strengths/weaknesses, readiness review, rubric-based evaluation, risk interpretation, and prioritized improvement recommendations. Use compact evidence mode only for explicit `srq` or formal completion-report requests. Not for blocker-first QA gates, readable diffs, artifact inventories, implementation, debugging, telemetry, or purely quantitative benchmarking without qualitative interpretation.
+description: "Evidence-based qualitative evaluation reports for artifacts, docs, skills, workflows, specs, implementations, research plans, or designs — strengths/weaknesses, readiness, rubric scoring, risk, prioritized improvements. Compact mode only for `srq` or formal completion reports. Not for blocker-first QA gates, diffs, inventories, or implementation."
 ---
 
 # Qualitative Evaluation Report

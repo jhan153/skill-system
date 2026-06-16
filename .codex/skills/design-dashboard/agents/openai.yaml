@@ -1,5 +1,5 @@
 interface:
-  display_name: "Dashboard UI Implementation"
+  display_name: "Design Dashboard"
   short_description: "Guide dense dashboard implementation."
   default_prompt: "Use $design-dashboard to apply dashboard UI constraints for KPIs, filters, charts, tables, density, async states, and accessibility."
 policy:

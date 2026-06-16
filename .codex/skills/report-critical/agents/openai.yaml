@@ -1,5 +1,5 @@
 interface:
-  display_name: "Agent Problem Diagnosis & Critical Review"
+  display_name: "Report Critical"
   short_description: "Diagnose blockers or run evidence-first QA review"
   default_prompt: "Use $report-critical to identify the current blocker in a conversation first, then run QA-gate review when risk or finalization requires it."
 

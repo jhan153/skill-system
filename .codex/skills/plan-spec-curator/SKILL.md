@@ -1,6 +1,6 @@
 ---
 name: plan-spec-curator
-description: Curates evolving skill-system specs, goals, plans, and memory boundaries. Use when instructions, plans, goals, or spec documents have grown too large; when stale, completed, abandoned, superseded, or archived plans may be polluting current context; or when a long-running workflow needs active-context pruning, plan closeout, goal compaction, memory distillation proposals, or archive load-policy decisions. Do not use to execute the user's substantive task.
+description: "Curate skill-system specs, goals, plans, and memory boundaries when instructions/plans grow too large or stale/superseded/archived plans pollute context — active-context pruning, plan closeout, goal compaction, memory-distillation proposals, archive load-policy. Not for executing the user's substantive task."
 ---
 
 # Spec and Plan Curator

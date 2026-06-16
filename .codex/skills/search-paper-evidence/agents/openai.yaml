@@ -1,5 +1,5 @@
 interface:
-  display_name: "Research Paper Evidence Search"
+  display_name: "Search Paper Evidence"
   short_description: "Searches or plans searches for paper/reference evidence and builds evidence ledgers without hallucinating citations, papers, datasets, metri"
   default_prompt: |
     Use $search-paper-evidence only for its narrow Research Cluster role. Do not activate for ordinary development, implementation, bug fixing, repo planning, casual explanation, or unrelated research stages.

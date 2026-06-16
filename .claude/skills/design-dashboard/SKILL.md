@@ -1,6 +1,6 @@
 ---
 name: design-dashboard
-description: Apply SaaS/admin/analytics dashboard implementation constraints as an explicit-only surface specialist. Use when Codex is explicitly asked to use this skill, or when a design-frontend task needs dashboard-specific guidance for KPI hierarchy, filters, search, date ranges, charts, tables, dense layouts, async states, pagination, empty/error/loading states, data readability, and operational UI accessibility.
+description: "Explicit-only SaaS/admin/analytics dashboard specialist — KPI hierarchy, filters, search, date ranges, charts, tables, dense layouts, async/empty/error/loading states, pagination, data readability, and operational accessibility."
 ---
 
 # design-dashboard

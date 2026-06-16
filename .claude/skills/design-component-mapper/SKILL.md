@@ -1,6 +1,6 @@
 ---
 name: design-component-mapper
-description: Map design components, variants, states, slots, events, responsive behavior, and accessibility contracts to existing repository components. Use when Codex must audit Figma/spec components against code components, state coverage, Storybook variants, design-system contracts, unmapped UI states, or component implementation gaps before UI implementation or review.
+description: "Map design components, variants, states, slots, events, responsive behavior, and accessibility contracts to existing repo components — audit Figma/spec components vs code, state coverage, Storybook variants, design-system contracts, and component gaps before UI implementation or review."
 ---
 
 # design-component-mapper

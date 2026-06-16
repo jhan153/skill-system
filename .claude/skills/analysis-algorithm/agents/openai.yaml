@@ -1,5 +1,5 @@
 interface:
-  display_name: "Deep Algorithm Proposal"
+  display_name: "Analysis Algorithm"
   short_description: "Constraint-first algorithm and approach selection"
   default_prompt: "Use $analysis-algorithm to frame the problem, compare credible approaches, recommend the best-fit option, and define validation."
 

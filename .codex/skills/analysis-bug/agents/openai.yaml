@@ -1,5 +1,5 @@
 interface:
-  display_name: "Deep Bug Analysis"
+  display_name: "Analysis Bug"
   short_description: "Repro-first RCA for recurring or unclear failures"
   default_prompt: "Use $analysis-bug to lock the repro, gather evidence, identify one primary root cause, compare fixes, and verify the result."
 

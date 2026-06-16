@@ -1,4 +1,4 @@
-version: "7.2.2"
+version: "7.2.3"
 purpose: "Positive routing examples for common requests."
 cases:
   - case_id: route-001

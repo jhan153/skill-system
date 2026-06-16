@@ -1,5 +1,5 @@
 interface:
-  display_name: "Component Contract Mapper"
+  display_name: "Design Component Mapper"
   short_description: "Map design components to implementation contracts and states."
   default_prompt: "Use $design-component-mapper to map design components, variants, and states to existing repo components and report unresolved gaps."
 policy:

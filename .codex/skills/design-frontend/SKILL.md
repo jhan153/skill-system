@@ -1,6 +1,6 @@
 ---
 name: design-frontend
-description: Implement concrete visual design artifacts as high-fidelity source code in the current repository. Use for Figma-to-code, screenshot-to-code, mockup-to-code, exported design specs, style guides, UI references, or AI-generated UI docs when the user wants a real React, Next.js, Vue, Svelte, HTML/CSS, Flutter, SwiftUI, Jetpack Compose, or native screen/route/component/view. Reuse repo framework, routing, components, tokens, styling, icons, assets, and validation tools. Do not use for backend-only work, generic refactors, design critique, product ideation, UX writing, explanation without implementation, or throwaway standalone demos unless explicitly requested.
+description: "Implement Figma/screenshot/mockup/spec/UI-reference designs as high-fidelity source code in the current repo (React/Next/Vue/Svelte/HTML/Flutter/SwiftUI/Compose/native), reusing repo framework, components, tokens, and assets. Not for backend-only work, refactors, design critique, ideation, or throwaway demos unless requested."
 ---
 
 # Design To Frontend

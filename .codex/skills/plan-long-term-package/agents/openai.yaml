@@ -1,5 +1,5 @@
 interface:
-  display_name: "Phase Subplan Workflow"
+  display_name: "Plan Long Term Package"
   short_description: "Build evidence-ingested phase planning packages"
   brand_color: "#2563EB"
   default_prompt: "Use $plan-long-term-package to ingest existing reports and create a validated phase/group planning package for this task."

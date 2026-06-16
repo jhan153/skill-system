@@ -1,4 +1,4 @@
-version: "7.2.2"
+version: "7.2.3"
 purpose: "Memory usage observation cases."
 cases:
   - case_id: memory-001

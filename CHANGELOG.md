@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.2.3
+
+- Trimmed the 13 longest skill `description:` fields (`design-frontend`, `report-qualitative`, `plan-spec-curator`, `analysis-codebase`, and the `design-*` surface/gate skills) so the combined skill-listing text fits Claude Code's description budget. Total skill-description text dropped from ~11,862 to ~9,946 chars; all 47 skills now surface for model auto-invocation instead of ~34. Applied on both mirrors and both live installs (`~/.claude/skills`, `~/.codex/skills`); long descriptions are now wrapped in quotes to keep frontmatter YAML valid when they contain punctuation.
+- Companion guidance: keep each skill description concise (lead with core use-case plus the do-not-use boundary), consistent with the bundle's progressive-disclosure principle.
+- Bumped the bundle version label to `7.2.3` across `README.md`, `TERMS.md`, `.codex/AGENTS.md`, `.claude/CLAUDE.md`, and eval case files; added stale-label detection for `7.2.2`.
+
 ## 7.2.2
 
 - Made `check_bundle_hygiene.py` treat git-ignored OS noise (`.DS_Store`, `._*`, `__MACOSX`, `Thumbs.db`) as non-payload: mirror parity and the root `docs/` stray check now ignore those files instead of hard-failing, while real stray files and real mirror content drift still fail (D5).

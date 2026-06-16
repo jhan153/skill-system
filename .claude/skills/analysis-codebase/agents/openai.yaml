@@ -1,5 +1,5 @@
 interface:
-  display_name: "Codebase Intel Report"
+  display_name: "Analysis Codebase"
   short_description: "Repo-wide evidence report artifact generator"
   default_prompt: |
     Use $analysis-codebase only when the user explicitly wants a repo-wide codebase analysis, architecture, metrics, security, Git-evidence, or design documentation report artifact.

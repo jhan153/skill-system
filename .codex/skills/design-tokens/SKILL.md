@@ -1,6 +1,6 @@
 ---
 name: design-tokens
-description: Normalize and audit design token sources for design-to-production work. Use when Codex must inspect token JSON, CSS variables, Tailwind/theme config, Figma-exported token tables, palette/typography/spacing/radius/shadow/motion/breakpoint tokens, token gaps, token drift, platform mapping, or no-fabrication token evidence before UI implementation or review.
+description: "Normalize and audit design token sources for design-to-production — token JSON, CSS variables, Tailwind/theme config, Figma-exported tables, palette/typography/spacing/radius/shadow/motion/breakpoint tokens, token gaps/drift, platform mapping, and no-fabrication token evidence."
 ---
 
 # design-tokens

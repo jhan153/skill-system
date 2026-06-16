@@ -1,6 +1,6 @@
 ---
 name: design-section-web
-description: Apply section-based web page implementation constraints as an explicit-only surface specialist. Use when Codex is explicitly asked to use this skill, or when a design-frontend task needs guidance for landing, product, docs, portfolio, venue, brand, or marketing-style pages with hero sections, semantic section trees, CTA flow, responsive order, media placement, first-viewport signal, accessibility, and text-fitting checks.
+description: "Explicit-only section-based web page specialist (landing, product, docs, portfolio, marketing) — hero sections, semantic section trees, CTA flow, responsive order, media placement, first-viewport signal, accessibility, and text-fitting checks."
 ---
 
 # design-section-web

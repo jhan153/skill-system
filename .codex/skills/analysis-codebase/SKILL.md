@@ -1,6 +1,6 @@
 ---
 name: analysis-codebase
-description: Builds a repo-wide integrated analysis report artifact from static/dynamic/security/git evidence with design diagrams, actionable finding backlog, and explicit Unverified handling. Use only when the user explicitly wants a codebase-wide report such as 코드베이스 분석 리포트, 정적분석 리포트, 런타임분석 리포트, 메트릭 리포트, Git 변화 분석 리포트, or 설계 문서화 보고서.
+description: "Repo-wide integrated analysis report from static/dynamic/security/git evidence with design diagrams, an actionable finding backlog, and explicit Unverified handling. Only when the user explicitly wants a codebase-wide report (정적분석/런타임분석/메트릭/Git 변화/설계 문서화 리포트 등)."
 ---
 
 # Codebase Intel Report

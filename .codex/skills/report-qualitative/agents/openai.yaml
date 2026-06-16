@@ -1,5 +1,5 @@
 interface:
-  display_name: "Qualitative Evaluation Report"
+  display_name: "Report Qualitative"
   short_description: "Produce evidence-based qualitative evaluation reports"
   default_prompt: |
     Use $report-qualitative when the user wants a structured qualitative evaluation report.

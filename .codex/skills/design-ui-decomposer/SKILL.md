@@ -1,6 +1,6 @@
 ---
 name: design-ui-decomposer
-description: Decompose UI references into implementation-ready structure without writing code. Use for screenshots, Figma exports, mockups, AI-generated UI images, existing app screens, sketches, or design docs when Codex must identify surface type, screen purpose, information hierarchy, layout regions, repeated patterns, component candidates, token candidates, state requirements, and validation needs before implementation.
+description: "Decompose UI references (screenshots, Figma exports, mockups, AI images, app screens, sketches) into implementation-ready structure without writing code — surface type, hierarchy, layout regions, repeated patterns, component/token candidates, state and validation needs."
 ---
 
 # design-ui-decomposer

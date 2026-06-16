@@ -1,5 +1,5 @@
 interface:
-  display_name: "Plan Doc Workflow"
+  display_name: "Plan Short Term Docs"
   short_description: "Persisted docs/plan artifact workflow"
   default_prompt: |
     Use $plan-short-term-docs only when the user wants a persisted plan artifact, active plan document, or docs/plan synchronization.

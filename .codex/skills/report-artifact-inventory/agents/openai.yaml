@@ -1,5 +1,5 @@
 interface:
-  display_name: "Artifact Librarian"
+  display_name: "Report Artifact Inventory"
   short_description: "Summarize current task artifacts; no persistent registry."
 policy:
   allow_implicit_invocation: false

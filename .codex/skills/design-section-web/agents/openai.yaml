@@ -1,5 +1,5 @@
 interface:
-  display_name: "Section-Based Web Implementation"
+  display_name: "Design Section Web"
   short_description: "Guide section-based web implementation."
   default_prompt: "Use $design-section-web to apply section-based web constraints for hero, semantic sections, CTA flow, responsive order, and accessibility."
 policy:

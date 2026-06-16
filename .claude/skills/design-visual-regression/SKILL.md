@@ -1,6 +1,6 @@
 ---
 name: design-visual-regression
-description: Capture, verify, and compare rendered UI screenshots for design-to-production evidence. Use when Codex must inspect desktop/mobile viewport screenshots, nonblank rendering, framing, overflow, clipping, screenshot-to-reference differences, visual regression notes, or unavailable visual evidence after UI implementation or review.
+description: "Capture, verify, and compare rendered UI screenshots for design evidence — desktop/mobile viewports, nonblank rendering, framing, overflow/clipping, screenshot-vs-reference diffs, visual regression notes, and unavailable-evidence handling after UI work."
 ---
 
 # design-visual-regression

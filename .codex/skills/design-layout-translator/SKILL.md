@@ -1,6 +1,6 @@
 ---
 name: design-layout-translator
-description: Translate design layout constraints into implementable layout rules without owning full UI implementation. Use when Codex must convert Figma Auto Layout, flex/grid decisions, fill/hug/intrinsic sizing, fixed vs flexible regions, min/max constraints, padding/gap, scroll and overflow behavior, breakpoint behavior, responsive order, or CSS/native layout mapping into code-ready guidance.
+description: "Translate design layout constraints into code-ready rules without owning full UI implementation — Figma Auto Layout, flex/grid, fill/hug/intrinsic sizing, fixed vs flexible regions, min/max constraints, padding/gap, scroll/overflow, breakpoints, responsive order, CSS/native mapping."
 ---
 
 # design-layout-translator

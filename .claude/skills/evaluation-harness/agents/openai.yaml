@@ -1,5 +1,5 @@
 interface:
-  display_name: "Eval Harness"
+  display_name: "Evaluation Harness"
   short_description: "Review runtime usage eval cases; not a package validator."
 policy:
   allow_implicit_invocation: false
