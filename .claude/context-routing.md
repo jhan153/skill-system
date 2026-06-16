@@ -63,10 +63,14 @@ Build this bundle before multi-step work, writes, broad scans, reports, automati
 | algorithm proposal | `analysis-router` -> `analysis-algorithm` | `report-qualitative` only for formal output | constraints, metrics, candidates | full repo or memory |
 | research / scientific workflow | `research-router` | selected narrow research cluster skill; `plan-short-term-docs` only for explicit persisted `docs/plan` artifact | research request, stage hints, provided artifacts, `.codex/research-routing.md` when needed | full repo, full memory bank, `analysis-codebase`, `plan-long-term-package`, experiment scaffold unless explicitly requested |
 | implementation | task-specific primary | `workflow-rigor` for medium/high-risk changes; `plan-short-term-docs` only as secondary status sync when an active plan is explicitly in scope | repo `AGENTS.md`, relevant files, active plan as input when explicitly referenced, validation | unrelated docs, plan-only completion |
+| approved plan/spec execution | `workflow-plan-runner` | `workflow-rigor` for execution discipline; `workflow-validation` for check selection; `coordination-*` only for explicit handoff or multi-agent ownership | approved plan/spec/package slice, target phase or batch, execution-source sufficiency, source/test/config files, validation contract | plan/spec creation, plan-only completion, all plan packages |
+| validation-only work | `workflow-validation` | `workflow-rigor` only when validation itself has medium/high risk | changed artifact or plan/spec slice, success criteria, risk tier, available checks | `evaluation-harness`, broad repo audit, critical verdicts |
+| repeated failure recovery | `workflow-recovery` | `analysis-bug` for deeper RCA; `workflow-validation` for check redesign; `workflow-rigor` for risky fixes | repeated failure signature, failing command/log, latest attempted fix, narrowed repro, target files | broad redesign, plan package, simple rerun |
 | plan document | `plan-short-term-docs` | `report-critical` only for QA/review | active plan, plan template | phase package |
 | context/spec lifecycle curation | `plan-spec-curator` | `report-critical` only for QA/review | current goal or task, candidate plan/spec slice, lifecycle state when available | full memory bank, all old plans, archived raw plans, full chat history |
 | phase package | `plan-long-term-package` | `workflow-rigor` if execution risk is active | prior reports, templates | lightweight plan only |
 | codebase report | `analysis-codebase` | `report-critical` after report if requested | repo root, scripts, tracked files | single-bug workflow |
+| qualitative evaluation report | `report-qualitative` | `report-critical` only if blocker/QA verdict is also requested | artifact slice, evaluation goal, audience, criteria, evidence anchors, redaction boundary | readable changed-line diffs, artifact inventory, eval telemetry, implementation, debugging |
 | diff presentation | `report-diff` | `report-critical` only if verdict requested | verified diff or snapshot | root-cause workflow |
 | critical review | `report-critical` | `report-qualitative` if formal report requested | artifact slice, goal, evidence anchors | full history |
 | memory operation | `memory-bank-init`, `memory-bank-update`, `memory-bank-correction-capture`, or `memory-bank-maintenance` | none by default | matching active memory cards and target memory files | unrelated memory |
@@ -302,7 +306,31 @@ route_smoke_tests:
       - "report-qualitative"
     must_not_route_to:
       - "analysis-codebase"
-    notes: "Formal output modifier attaches to the final report shape."
+    notes: "Legacy srq uses report-qualitative compact evidence report mode, not the full qualitative evaluation report."
+  - request: "이 SKILL.md 초안을 정성평가 리포트로 작성해줘."
+    expected_primary_skill: "report-qualitative"
+    expected_route_class: "qualitative_evaluation_report"
+    expected_attachments: []
+    must_read:
+      - "target artifact or artifact slice"
+      - "evaluation goal"
+      - "criteria or default qualitative criteria"
+    must_not_route_to:
+      - "report-critical"
+      - "evaluation-harness"
+      - "report-diff"
+    notes: "Qualitative assessment/report intent routes to report-qualitative; it is not a critical QA gate or eval-case review."
+  - request: "이 diff를 품질, 리스크, 개선안 중심으로 정성평가해줘."
+    expected_primary_skill: "report-qualitative"
+    expected_route_class: "qualitative_diff_evaluation"
+    expected_attachments: []
+    must_read:
+      - "diff or change snapshot as artifact"
+      - "evaluation goal"
+      - "risk and improvement criteria"
+    must_not_route_to:
+      - "report-diff"
+    notes: "Qualitative diff evaluation judges the diff as an artifact; it must not present changed-line diff blocks unless explicitly requested."
   - request: "이 프로젝트 룰을 메모리뱅크에 저장해줘"
     expected_primary_skill: "memory-bank-update"
     expected_attachments: []
@@ -355,22 +383,59 @@ route_smoke_tests:
       - "research-hypothesis-planning"
     notes: "Implementation of a chosen loss is a development task, not research hypothesis planning."
   - request: "이 플랜대로 구현해줘."
-    expected_primary_skill: null
-    expected_route_class: "development_implementation"
+    expected_primary_skill: "workflow-plan-runner"
+    expected_route_class: "approved_plan_execution"
     expected_attachments:
-      - "plan-short-term-docs only as secondary status sync when an active plan exists"
       - "workflow-rigor for medium/high-risk implementation"
+      - "plan-short-term-docs only as secondary status sync when an active plan exists"
     must_read:
       - "active plan as task input"
       - "target source/test/config files"
       - "validation contract"
+      - "execution-source sufficiency"
     must_not_route_to:
       - "plan-long-term-package"
       - "plan-spec-curator"
     must_not_complete_with:
       - "docs/plan-only diff"
       - "Markdown-only plan/status update"
-    notes: "A plan implementation command consumes the plan and executes the code work; plan synchronization is bookkeeping, not completion evidence."
+    notes: "A plan implementation command consumes the plan through workflow-plan-runner and executes code work; plan synchronization is bookkeeping, not completion evidence. Output should include execution scope, batch plan, changed artifacts, validation per batch, and rollback/fallback if needed."
+  - request: "이 스펙대로 Phase 1 초기 구현을 진행해줘."
+    expected_primary_skill: "workflow-plan-runner"
+    expected_attachments:
+      - "workflow-rigor"
+      - "workflow-validation as needed"
+    must_read:
+      - "approved spec or package slice"
+      - "target source/test/config files"
+    must_not_route_to:
+      - "plan-long-term-package"
+      - "coordination-brief as primary"
+    notes: "Spec-driven waterfall-style implementation is execution, not plan/package creation."
+  - request: "이 변경을 어떻게 검증할지 validation matrix만 짜줘."
+    expected_primary_skill: "workflow-validation"
+    expected_attachments: []
+    must_read:
+      - "changed artifact or planned change"
+      - "success criteria"
+      - "risk tier and available checks"
+    must_not_route_to:
+      - "evaluation-harness"
+      - "report-critical"
+    notes: "Product validation planning is workflow-validation, not skill-system eval or QA verdicting. Output should select the smallest meaningful risk-tiered check set."
+  - request: "같은 테스트가 계속 실패해. fake fix 말고 원인 하나씩 격리하자."
+    expected_primary_skill: "workflow-recovery"
+    expected_attachments:
+      - "analysis-bug optional for RCA"
+      - "workflow-validation optional for revised checks"
+    must_read:
+      - "failing command or log"
+      - "latest attempted fix"
+      - "same or materially similar failure signature"
+    must_not_route_to:
+      - "plan-long-term-package"
+      - "report-qualitative"
+    notes: "Repeated failure loop selects recovery as primary only when a similar failure repeats after a fix/rerun or the user explicitly asks to stop fake fixes."
   - request: "이 모델 학습 파이프라인 구현 플랜을 짜줘."
     expected_primary_skill: null
     expected_route_class: "development_implementation_plan"
@@ -416,10 +481,10 @@ Family entry routing (Phase A):
 | --- | --- |
 | `search` | `search-router` |
 | `design` | `design-frontend` |
-| `report` | `report-qualitative` (보고/형식) or `report-critical` (검토/QA/blocker) by intent |
+| `report` | `report-qualitative` (정성평가/보고) or `report-critical` (검토/QA/blocker) by intent |
 | `research` | `research-router` |
 | `analysis` | `analysis-router` |
-| `workflow` | `workflow-rigor` |
+| `workflow` | `workflow-rigor` / `workflow-plan-runner` / `workflow-validation` / `workflow-recovery` by intent |
 | `coordination` | `coordination-brief` |
 | `planning` | `plan-short-term-docs` |
 | `memory` | `memory-bank-harness` (read), `memory-bank-ingestion` (promotion), or explicit memory-mutation skills by intent |

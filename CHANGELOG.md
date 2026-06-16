@@ -1,5 +1,18 @@
 # Changelog
 
+## 7.2.1
+
+- Added three experimental, explicit-only workflow draft skills on both `.codex` and `.claude`: `workflow-plan-runner` for approved plan/spec/package execution, `workflow-validation` for validation matrices and validation-only runs, and `workflow-recovery` for repeated failure-loop recovery.
+- Registered the new workflow skills in both registries, expanded workflow family routing, and added positive/negative routing eval cases for plan/spec execution, validation-only work, and recovery over-trigger prevention.
+- Hardened the workflow draft skills after qualitative review: added plan-runner output and fallback contracts, validation risk-tier/check heuristics, recovery repeated-failure thresholds, diagnostic examples, rollback/fallback output alignment, and workflow confusion eval cases.
+- Upgraded `report-qualitative` from the old strict-response-quality wrapper into an operational qualitative evaluation report skill, with rubric/template/evidence-mapping/example references, routing/eval cases, and a compact `srq` compatibility mode.
+- Hardened `report-qualitative` after qualitative review: compressed trigger metadata, made `srq` compact mode explicit-only, added sensitive-evidence redaction and external-evidence separation, clarified fallback behavior when sibling report skills are unavailable, and added qualitative-diff/negative routing eval cases.
+- Set `report-qualitative` to explicit-only (`allow_implicit_invocation: false`) and `experimental` maturity, matching the other report skills' conservative posture until field feedback (F1).
+- Added negative routing eval cases: ordinary implementation with no approved plan/spec must not trigger `workflow-plan-runner` (F3); a first-observation failure routes to `analysis-bug`, not `workflow-recovery` (F6).
+- Kept the `report_primary` role as-is; it fits the report family's descriptive role convention (`review_gate`/`output_modifier`/`support`) (F5).
+- Removed stray `.DS_Store` files so bundle hygiene passes; `.gitignore` already excludes them, and packaging/hygiene runs strip any macOS-regenerated copies (F2).
+- Bumped the bundle version label to `7.2.1` across `README.md`, `TERMS.md`, `.codex/AGENTS.md`, `.claude/CLAUDE.md`, and eval case files; updated the version-label hygiene check to flag stale `7.2.0` labels.
+
 ## 7.2.0
 
 - Added a `family` grouping layer (Phase A): appended a `family` column to `skill_registry.md` (last column; maturity stays column 3) and a Group Alias Map (display names, interim entries, aliases, cross-family tags) for the 11 families; mirrored to both `.codex`/`.claude`.

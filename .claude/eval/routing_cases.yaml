@@ -1,4 +1,4 @@
-version: "7.2.0"
+version: "7.2.1"
 purpose: "Positive routing examples for common requests."
 cases:
   - case_id: route-001
@@ -16,9 +16,29 @@ cases:
     expected_supporting_skills: []
     should_not_trigger: [workflow-rigor]
     expected_context: [verified work, command outputs]
-    expected_output_shape: "formal evidence-first response"
-    quality_notes: "Output modifier only."
+    expected_output_shape: "compact evidence-first report"
+    quality_notes: "Legacy srq uses report-qualitative compact evidence report mode."
     friction_risk: "too verbose for simple work"
+  - case_id: route-report-qualitative-001
+    user_request: "이 SKILL.md 초안을 실사용성, 근거성, 리스크, 개선 우선순위 관점에서 정성평가 리포트로 작성해줘."
+    expected_primary_skill: report-qualitative
+    expected_supporting_skills: []
+    should_not_trigger: [report-critical, report-diff, evaluation-harness]
+    expected_family: report
+    expected_context: [artifact, evaluation_goal, criteria, evidence_anchors]
+    expected_output_shape: "qualitative evaluation report"
+    quality_notes: "Qualitative report intent routes to report-qualitative, not critical QA verdicting or eval-case review."
+    friction_risk: "turning ordinary assessment into blocker-first critique"
+  - case_id: route-report-qualitative-002
+    user_request: "이 diff를 품질, 리스크, 개선안 중심으로 정성평가해줘."
+    expected_primary_skill: report-qualitative
+    expected_supporting_skills: []
+    should_not_trigger: [report-diff, report-critical]
+    expected_family: report
+    expected_context: [diff_or_change_snapshot, evaluation_goal, risk_criteria, evidence_anchors]
+    expected_output_shape: "qualitative diff evaluation without changed-line diff blocks"
+    quality_notes: "A diff can be the evaluated artifact; changed-line presentation still belongs to report-diff unless explicitly requested."
+    friction_risk: "confusing qualitative judgment with readable diff output"
   - case_id: route-003
     user_request: "새 custom Codex skill pack 만들어줘."
     expected_primary_skill: create-skill-pack
@@ -160,3 +180,63 @@ cases:
     expected_output_shape: "usage summary and improvement candidates"
     quality_notes: "Invocation telemetry is evaluation-usage-tracker; eval-case review is evaluation-harness."
     friction_risk: "reading raw prompts instead of metadata"
+  - case_id: route-workflow-001
+    user_request: "이 승인된 스펙대로 Phase 1 초기 구현을 진행해줘."
+    expected_primary_skill: workflow-plan-runner
+    expected_supporting_skills: [workflow-rigor, workflow-validation]
+    should_not_trigger: [plan-long-term-package, coordination-brief]
+    expected_family: workflow
+    expected_context: [approved spec, target phase, source files, validation contract]
+    expected_output_shape: "implementation batches with validation"
+    quality_notes: "Approved plan/spec execution is workflow-plan-runner; planning package creation must not take over."
+    friction_risk: "plan-only edits instead of implementation"
+  - case_id: route-workflow-002
+    user_request: "이 변경을 어떻게 검증할지 validation matrix만 짜줘."
+    expected_primary_skill: workflow-validation
+    expected_supporting_skills: []
+    should_not_trigger: [evaluation-harness, report-critical]
+    expected_family: workflow
+    expected_context: [changed artifact, success criteria, available checks]
+    expected_output_shape: "validation matrix"
+    quality_notes: "Product validation planning is workflow-validation, not skill-system eval or QA verdicting."
+    friction_risk: "turning validation planning into implementation"
+  - case_id: route-workflow-003
+    user_request: "같은 테스트가 계속 실패해. fake fix 말고 원인 하나씩 격리하자."
+    expected_primary_skill: workflow-recovery
+    expected_supporting_skills: [analysis-bug, workflow-validation]
+    should_not_trigger: [plan-long-term-package, report-qualitative]
+    expected_family: workflow
+    expected_context: [failing command, latest attempted fix, target files]
+    expected_output_shape: "failure loop isolation and next recovery action"
+    quality_notes: "Repeated failure loop selects recovery as primary."
+    friction_risk: "stacking speculative fixes"
+  - case_id: route-workflow-004
+    user_request: "이 승인된 plan package의 Batch 2를 실제 코드 변경으로 실행하고 검증까지 해줘."
+    expected_primary_skill: workflow-plan-runner
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [plan-long-term-package, coordination-brief]
+    expected_family: workflow
+    expected_context: [approved package, batch id, executable scope, validation expectation]
+    expected_output_shape: "execution_scope, batch_plan, changed_artifacts, validation_per_batch"
+    quality_notes: "Approved package batch execution routes to plan-runner; package creation must not take over."
+    friction_risk: "status-only or docs-only completion"
+  - case_id: route-workflow-005
+    user_request: "이 UI 변경은 어떤 smoke/manual check가 필요한지 risk tier별로 검증 계획만 짜줘."
+    expected_primary_skill: workflow-validation
+    expected_supporting_skills: []
+    should_not_trigger: [design-visual-regression, report-critical]
+    expected_family: workflow
+    expected_context: [changed UI artifact, risk boundary, available checks]
+    expected_output_shape: "risk-tiered validation matrix"
+    quality_notes: "Validation strategy is workflow-validation; design visual regression may be a later concrete check, not primary routing."
+    friction_risk: "running broad UI audits instead of planning targeted checks"
+  - case_id: route-workflow-006
+    user_request: "방금 수정했는데 같은 build error가 또 나와. 테스트를 약화하지 말고 recovery mode로 원인 하나만 격리해줘."
+    expected_primary_skill: workflow-recovery
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [analysis-codebase, report-critical]
+    expected_family: workflow
+    expected_context: [same failure signature, attempted fix, failing command, latest diff]
+    expected_output_shape: "failure_loop, active_hypothesis, diagnostic_or_fix, rollback_or_fallback"
+    quality_notes: "Same failure after a fix plus anti-fake-fix wording selects recovery."
+    friction_risk: "broad repo analysis or weakening validation"

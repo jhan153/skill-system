@@ -1,0 +1,7 @@
+interface:
+  display_name: "Workflow Validation"
+  short_description: "Design or run focused validation plans for changed artifacts"
+  default_prompt: "Use $workflow-validation to select targeted checks, split agent-run versus user/manual validation, and report unverified gaps. Choose low/medium/high risk-tier checks from the change type, avoid broad validation by default, and return validation_target/risk_tier/checks_to_run/agent_verified/user_verification_needed/unverified_gaps."
+
+policy:
+  allow_implicit_invocation: false

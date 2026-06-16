@@ -1,205 +1,241 @@
 ---
 name: report-qualitative
-description: Explicit reporting mode for evidence-first review, completion, and handoff replies when the user wants a formal report with verified vs unverified separation. Use when the user says `srq`, `srq로`, `제대로 보고해`, `formal report`, or otherwise explicitly asks for a formal evidence-first report.
+description: Produce evidence-based qualitative evaluation reports for artifacts, documents, skills, workflows, product specs, implementations, research plans, designs, or operating processes. Use for qualitative assessment, strengths/weaknesses, readiness review, rubric-based evaluation, risk interpretation, and prioritized improvement recommendations. Use compact evidence mode only for explicit `srq` or formal completion-report requests. Not for blocker-first QA gates, readable diffs, artifact inventories, implementation, debugging, telemetry, or purely quantitative benchmarking without qualitative interpretation.
 ---
 
-# Strict Response Quality Process
+# Qualitative Evaluation Report
 
 ## Routing Card
-- role: output_modifier
+- role: report_primary
 - intent_signature:
-  - `srq`, `srq로`, `제대로 보고해`, `formal report`, evidence-first report requests
+  - qualitative evaluation report
+  - 정성 평가 리포트
+  - evidence-based assessment
+  - strengths and weaknesses
+  - readiness review
+  - rubric-based review
+  - improvement recommendations
+  - explicit-only `srq` or formal evidence-first report requests
 - use_when:
-  - the user explicitly asks for formal evidence-first reporting, completion reporting, review reporting, or handoff formatting.
+  - the user wants a human-readable qualitative report about an artifact's quality, usefulness, readiness, risks, or improvement path.
+  - the user asks to evaluate a skill, workflow, plan, document, design, implementation, research artifact, proposal, or operating process.
+  - the user explicitly asks for `srq`, `srq로`, `formal report`, or evidence-first completion reporting.
 - do_not_use_when:
-  - `제대로` appears alone without report-quality intent.
-  - execution rigor, root-cause analysis, or diff presentation is the actual primary task.
+  - the user wants blocker-first critical review, QA gate verdicts, or failure diagnosis; use `report-critical`.
+  - the user wants actual changed lines or before/after diff presentation; use `report-diff`.
+  - the user wants a file/artifact inventory or handoff list; use `report-artifact-inventory`.
+  - the user wants skill-system eval case review or usage telemetry; use `evaluation-harness` or `evaluation-usage-tracker`.
+  - the task is implementation, debugging, or validation execution rather than a report.
 - expected_inputs:
-  - verified facts, uncertainty, action, and validation evidence from the primary workflow
+  - artifact or artifact slice
+  - evaluation goal and intended audience
+  - user-provided rubric or default criteria
+  - evidence anchors, validation results, or source references when available
 - expected_outputs:
-  - concise conclusion, evidence, action, and verification sections when relevant
+  - qualitative report with scope, method, evidence map, criterion findings, risks, recommendations, final judgment, and limitations
+  - compact evidence-first report only when legacy `srq`/completion-report mode is explicitly requested
 - context_targets:
   must_read:
-    - primary workflow result or artifact slice to report
+    - target artifact or the smallest relevant slice
+    - user goal, constraints, and requested output shape
   read_if_needed:
-    - validation output
-    - changed file list
-    - review findings
+    - `references/rubric.md` for score definitions or domain criteria
+    - `references/evidence_mapping.md` for evidence map discipline, confidence, and judgment traceability
+    - `references/report_template.md` for full report structure
+    - `references/examples.md` for prompt/output examples and over-trigger guards
+    - validation output, changed file list, or evidence pack
   do_not_load_by_default:
     - full repo
     - full memory bank
-    - unrelated plans or reports
+    - unrelated plans, reports, or historical artifacts
 - risk_profile:
   reads:
-    - final evidence bundle only
+    - provided or referenced artifact slices and evidence anchors
   writes:
-    - none unless producing an explicitly requested report artifact
+    - none unless the user explicitly requests a report artifact file
   tools:
-    - none by default
+    - focused read-only inspection only when evidence is missing and local context is available
   sensitive_resources:
-    - credentials default deny
+    - credentials default deny; redact secrets, tokens, private keys, passwords, cookies, and sensitive personal data in quoted evidence
 - entry_scene:
-  - FINALIZE
-
-## Related Skills
-- `workflow-rigor`: owns execution rigor, review, and completion criteria for implementation work.
-- `analysis-router`: owns root-cause-first analysis flow for recurring or complex issues.
+  - PREPARE
 
 ## Purpose
-- This skill is an explicit reporting mode for formal review, completion, and handoff replies.
-- It improves report consistency by separating verified facts, uncertainty, and next actions without forcing a global response format.
-- Execution rigor for implementation tasks is controlled by `workflow-rigor` when that skill is active.
+Use this skill to create a structured, evidence-based qualitative evaluation report.
 
-## When To Apply
-- Apply immediately when the user invokes `srq`, `srq로`, `제대로 보고해`, or another explicit report-mode alias.
-- Apply only when the user explicitly invokes this skill or clearly asks for a formal evidence-first report.
-- Typical fits: code review findings, implementation completion reports, audit-style summaries, and handoff notes.
-- Do not use as a default response wrapper for ordinary chat, routine coding updates, or short answers.
+The report must not be a vague opinion. It should:
+1. define the evaluation scope,
+2. select or adapt evaluation criteria,
+3. inspect the artifact,
+4. map observable evidence to each criterion,
+5. separate observation, inference, judgment, and recommendation,
+6. identify strengths, weaknesses, risks, uncertainty, and readiness,
+7. provide prioritized, actionable improvements.
+
+## Modes
+### A. Qualitative Evaluation Report
+Default mode. Use for quality/readiness/risk/usefulness assessment of an artifact.
+
+### B. Compact Evidence Report
+Use only for explicit legacy aliases such as `srq`, `srq로`, `formal report`, or completion/handoff reporting where the user wants verified vs unverified separation but not a full qualitative evaluation.
+
+Do not enter compact evidence mode from vague requests such as "검토해줘", "요약해줘", or "보고해줘". Those requests need normal task routing or explicit qualitative-report intent.
 
 ## Trigger Shortcuts
+- `report-qualitative`
+- `정성 평가 리포트`
+- `정성평가`
+- `qualitative evaluation`
+- `rubric-based review`
+- `readiness review`
 - `srq`
 - `srq로`
-- `srq 형식으로`
-- `srq 모드로`
-- `response-quality`
-- `evidence-first`
-- `report-mode`
-- `제대로 보고해`
-- `제대로 정리해`
+- `formal report`
+- `evidence-first report`
 
-## Explicit Trigger Rule
-- Treat the shortcuts above as explicit invocation aliases or repo-level wrappers, not free-form keyword auto-triggers.
-- Do not auto-activate execution-control skills from wording alone.
-- Do not treat `제대로` alone as sufficient activation.
-- Treat `srq`, `srq로`, and similar forms as this skill's invocation aliases, not as shell commands or local executables to look up.
+## Required Framing
+Before evaluating, identify or infer:
+- `artifact`: content, file, code, plan, document, skill, workflow, design, or process to evaluate
+- `evaluation_goal`: what the user wants to decide or learn
+- `audience`: who will use the report
+- `context`: intended use, domain, constraints, and known requirements
+- `criteria`: user rubric or default criteria
+- `output_preference`: concise report, full report, table-heavy report, executive summary, or compact evidence report
 
-## Trigger Guard (Do Not Trigger)
-- Pure greeting or chit-chat with no decision, no evidence demand, and no delivery requirement.
-- Translation-only requests.
-- Rewrite/polish-only requests where verification and uncertainty handling are not required.
-- User explicitly asks for short informal chat response.
-- Normal implementation turns where execution matters more than a rigid report shape.
-- If intent is unclear, mark `Unclear` and do not activate unless an explicit trigger or clear report request is present.
+If critical information is missing, ask at most two focused clarification questions. If the evaluation can proceed with assumptions, proceed and list the assumptions explicitly.
 
-## Reporting Contract
-Use this structure when the user asks for a formal report or this skill is explicitly invoked:
-1. Conclusion: one-line first sentence.
-2. Evidence: up to 3 points (code/log/observation + location proof).
-3. Action: one concrete next action or one completed change.
+## Default Criteria
+Use these unless the user provides a custom rubric.
+
+1. Purpose Fit: whether the artifact clearly serves its intended purpose.
+2. Structural Clarity: whether the artifact is organized for understanding and use.
+3. Evidence and Grounding: whether claims and judgments are traceable to evidence.
+4. Practical Usability: whether the artifact can be used in a realistic setting.
+5. Risk and Failure Modes: what may reduce quality, reliability, safety, correctness, or adoption.
+6. Improvement Leverage: which changes would produce the largest quality gain.
+
+Optional domain criteria:
+- Skills or agent workflows: invocation clarity, input/output contract, progressive disclosure, tool/resource boundaries, safety checks, fallback behavior.
+- Documents or reports: executive summary quality, argument structure, evidence synthesis, audience fit, completeness, limitations, recommendation traceability.
+- Code or implementation: maintainability, correctness risk, readability, error handling, dependency risk, testability, operational safety.
+- Research artifacts: research question clarity, methodological validity, evidence quality, novelty, reproducibility, ethical or safety considerations.
+
+Read `references/rubric.md` when a scored or detailed rubric-based report is needed.
+
+## Evidence Rules
+Every major judgment must be traceable to evidence.
+
+Core chain:
+`Criterion -> Evidence -> Interpretation -> Judgment -> Recommendation`
+
+Required discipline:
+- Quote or reference specific sections, files, lines, logs, examples, or source text when possible.
+- Separate `Observed`, `Inferred`, `Risk`, and `Recommendation`.
+- Mark missing support as `Not evidenced`.
+- Do not quote secrets, credentials, tokens, private keys, passwords, session cookies, or sensitive personal data verbatim. Cite the location and redact the value.
+- If sensitive evidence is relevant, describe the evidence category rather than reproducing the sensitive content.
+- When external evidence is used, label it as `External evidence` and do not mix it with artifact-grounded evidence.
+- Do not infer hidden behavior, hidden intent, or unstated constraints.
+- Do not over-penalize missing information if it is outside the artifact's stated scope.
+- Do not make a recommendation unless it is traceable to evidence, clearly labeled expert judgment, or a stated user goal.
+- If evidence is ambiguous, state the ambiguity and how it affects confidence.
+
+Confidence values:
+- High: directly supported by artifact evidence.
+- Medium: supported but incomplete or partly inferred.
+- Low: weak, ambiguous, or missing evidence.
+- Not assessable: evidence is missing or outside provided scope.
+
+Read `references/evidence_mapping.md` when the artifact is large, ambiguous, multi-source, or likely to produce unsupported judgments.
+
+## Workflow
+1. Frame: identify artifact type, goal, audience, scope, assumptions, constraints, criteria, and exclusions.
+2. Inspect: read the relevant artifact slice and capture strengths, gaps, contradictions, unsupported claims, readiness evidence, and incompleteness evidence.
+3. Map Evidence: build a compact evidence map before final judgments.
+4. Judge: for each criterion, provide rating or qualitative level, evidence, interpretation, implication, risk/gap, and recommendation.
+5. Prioritize: distinguish P0/P1/P2/P3 recommendations and Critical/Major/Minor risks.
+6. Report: use the requested output shape or the default qualitative report structure.
+
+## Rating Guidance
+Use a 1-5 scale only when useful or requested:
+- 1 = Poor: major issues block use.
+- 2 = Weak: usable only with substantial revision.
+- 3 = Adequate: meets baseline expectations but has clear gaps.
+- 4 = Strong: mostly ready, with manageable improvements.
+- 5 = Excellent: clear, well-grounded, actionable, and low-risk.
+
+Avoid decimal scores unless explicitly requested. Do not use false precision.
+
+Readiness levels:
+- Not ready
+- Needs major revision
+- Usable with revisions
+- Ready for limited use
+- Ready for production or publication
+
+## Default Output Contract
+For a full qualitative report, use:
+1. Executive Summary
+2. Evaluation Scope
+3. Method
+4. Evidence Map
+5. Findings by Criterion
+6. Strengths
+7. Weaknesses and Risks
+8. Recommendations
+9. Final Judgment
+10. Limitations
+
+For concise reports, preserve the same logic but collapse sections:
+- Conclusion
+- Evidence Map
+- Criterion Findings
+- Recommendations
+- Limitations
+
+Read `references/report_template.md` when the user asks for a full, table-heavy, or reusable report structure.
+Read `references/examples.md` when writing or validating prompts for this skill, or when routing ambiguity needs examples.
+
+## Compact Evidence Report Mode
+Use this only for explicit `srq`/formal completion-report intent.
+
+Structure:
+1. Conclusion: one-line result.
+2. Evidence: up to three verified facts with locations.
+3. Action: one concrete completed action or next action.
 4. Verification: include only for code, workflow, or delivery tasks.
-- When explicitly invoked, prefer visible section labels (`Conclusion`, `Evidence`, `Action`, and when relevant `Verification`) rather than collapsing the report into unlabeled prose.
-- Do not replace this contract with a generic short summary when an explicit alias such as `srq` or `제대로 보고해` triggered the skill.
+
+This mode is a compatibility path. Do not let it replace qualitative evaluation when the user asks for assessment, readiness, strengths/weaknesses, or recommendations.
+Do not enter this mode from vague requests such as "검토해줘", "요약해줘", or "보고해줘".
+Enter this mode only when the user explicitly says `srq`, `srq로`, `formal report`, or asks for a verified completion/evidence report.
 
 ## Cross-Skill Resolution
-- If `workflow-rigor` is active, execution rigor and completion gates follow it.
-- If `analysis-router` is active, root-cause analysis steps follow it.
-- If this skill is active, final response should prefer this skill's reporting structure unless the user explicitly asks for a different shape.
-- Other skill templates are treated as internal checklists unless the user requested their output format directly.
-- If all three are active, fixed order is: DAW procedure -> evidence-driven execution -> SRQ final formatting.
-
-## Uncertainty Rule
-- Mark unconfirmed content as `Unverified` or `Unclear`.
-- Separate assumptions from verified facts.
-
-## Tone Rule
-- Default polite professional tone.
-- No filler, hype, emotional overstatements, or vague padding.
-- Keep context concise unless detail is explicitly requested.
-
-## Implementation Request Handling
-- If runtime approval policy is active, verify approval first.
-- If `workflow-rigor` is active, follow its selected mode before deciding report depth.
-- After approval, execute without unnecessary delay and use this skill only for the reporting layer.
-- Keep extra confirmation for destructive/high-risk actions.
-- Avoid repeated approval loops on the same item.
+- `report-critical` owns blocker diagnosis, QA gates, severe-risk verdicts, and critical review findings.
+- `report-diff` owns changed-line and before/after presentation.
+- `report-artifact-inventory` owns artifact lists, verification notes, and handoff inventories.
+- `evaluation-harness` owns eval-case review; `evaluation-usage-tracker` owns invocation telemetry.
+- `workflow-validation` owns validation matrix design and validation execution. This skill may report validation meaning, but it does not run validation by default.
+- `workflow-rigor` owns implementation discipline and completion gates. This skill can report the result only after evidence exists.
+- If another named skill is unavailable, do not fail. Handle only the qualitative reporting portion and state that specialized diff, blocker, artifact-inventory, telemetry, or validation handling is out of scope.
+- If the user asks to qualitatively evaluate a diff, use this skill for judgment and recommendations, but do not present changed-line diffs unless explicitly requested.
 
 ## Resource and Risk Boundary
-- Reads: final evidence, validation output, review findings, and artifact slices needed for the report.
+- Reads: target artifact, explicit evidence pack, validation output, and narrow supporting context.
 - Writes: none unless the user explicitly requests a report artifact.
-- Tool/process calls: none by default; reporting should not trigger validation commands by itself.
-- Network access: none by default.
-- Credential access: default deny.
-- Generated artifacts: explicit report or handoff artifact only.
+- Tool/process calls: read-only inspection only; no broad validation runs by default.
+- Network: none by default. Browse only when the user asks for current/external evidence or high-stakes factual verification requires it.
+- Credentials: default deny.
+- Evidence quoting: redact sensitive values and cite only the location or evidence category.
+- External evidence: label separately from artifact-grounded evidence.
 - Destructive actions: out of scope.
-- Required checkpoints: confirm report-quality intent before applying this output wrapper.
 
-## Recovery and Context Expansion
-- If evidence is insufficient, ask the primary workflow for the missing evidence or mark it `Unverified`.
-- If validation is missing, read validation output only when already available; do not run broad checks just for formatting.
-- If the user wanted diff blocks, return to scheduling and use `report-diff`.
-- If the user wanted critical verdicts, return to scheduling and use `report-critical`.
-- Never recover by loading all memory, all repo docs, or all skills at once.
-
-## Output Templates
-### Standard Report Template
-```markdown
-Conclusion: <one-line result>
-
-Evidence:
-- [type + location] <fact 1>
-- [type + location] <fact 2>
-- [type + location] <fact 3 or omit>
-
-Action:
-- <one concrete next action OR one completed change>
-
-Verification:
-- Include only when code/workflow validation is relevant.
-- User-impact check: <result>
-- Code/static check: <result>
-```
-
-### Completion Report Template
-```markdown
-changed files
-- <path>
-
-behavior changes
-- <what changed for users/system>
-
-verification results
-- <what was run + outcome>
-
-remaining risks
-- None
-```
-
-## Completion Report Contract
-If the user asks for a completion report, prefer only these 4 sections unless they request a different format:
-- changed files
-- behavior changes
-- verification results
-- remaining risks (or `None`)
-
-## Self-check
-- [ ] Is the first sentence the conclusion?
-- [ ] Is evidence limited to <=3 points with location references?
-- [ ] Are `Unverified`/`Unclear` items explicitly separated?
-- [ ] Is there exactly one concrete action item?
-- [ ] If verification is needed, are both user-impact and code/static checks present?
-- [ ] Is there no conflict with approval policy?
-
-## Minimal Sequence
-```mermaid
-sequenceDiagram
-participant U as User
-participant A as Agent
-participant E as Evidence
-participant X as Execute
-participant V as Verify
-participant R as Report
-
-U->>A: Request
-A->>E: Gather evidence
-E-->>A: Split verified vs unclear
-A->>X: Execute after approval policy check
-X->>V: User + code verification
-V-->>R: Summarize results
-R-->>U: Conclusion-Evidence-Action-Verification report
-```
-
-## Known Limits
-- This output modifier improves presentation but does not validate the underlying work.
-- It can separate verified from unverified claims, but cannot fill evidence gaps.
-- Formal report shape can obscure missing task completion unless validation context is supplied.
-- Return to scheduling if content ownership conflicts with a primary skill.
+## Quality Checklist
+Before returning the report, verify:
+- Every major judgment has evidence.
+- Every criterion has either a finding or a stated reason for insufficient evidence.
+- Recommendations are traceable to findings.
+- Assumptions and limitations are explicit.
+- Scores are not more precise than evidence supports.
+- Observations, inferences, risks, and recommendations are separated.
+- The final verdict is decision-useful.
+- The report does not fail as an opinion piece, score-only output, or abstract recommendation list.

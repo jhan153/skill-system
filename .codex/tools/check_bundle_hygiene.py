@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only sanity checks for the 7.2.0 manual drop-in skill bundle."""
+"""Read-only sanity checks for the 7.2.1 manual drop-in skill bundle."""
 
 from __future__ import annotations
 
@@ -289,6 +289,11 @@ STALE_VERSION_LABELS = [
     "7.1.1 manual drop-in",
     "7.1 is a manual drop-in",
     "7.1.1 is a manual drop-in",
+    "7.2.0 Terms",
+    "7.2.0 core",
+    "7.2.0 Bundle Policy",
+    "7.2.0 manual drop-in",
+    "7.2.0 is a manual drop-in",
 ]
 VERSION_LABEL_DOCS = ["README.md", "CHANGELOG.md", "TERMS.md", ".codex/AGENTS.md", ".claude/CLAUDE.md"]
 
@@ -406,7 +411,7 @@ def check_version_labels(root: Path, errors: list[str]) -> None:
         text = read_text(path)
         for label in STALE_VERSION_LABELS:
             if label in text:
-                errors.append(f"stale version label '{label}' in {rel}; use 7.2.0")
+                errors.append(f"stale version label '{label}' in {rel}; use 7.2.1")
 
 
 def main() -> int:

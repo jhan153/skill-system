@@ -1,4 +1,4 @@
-version: "7.2.0"
+version: "7.2.1"
 purpose: "Requests that should not trigger heavy or wrong skills."
 cases:
   - case_id: neg-001
@@ -109,6 +109,33 @@ cases:
     expected_output_shape: "short branch name options"
     quality_notes: "No handoff."
     friction_risk: "workflow expansion"
+  - case_id: neg-report-qualitative-001
+    user_request: "이 문장 맞춤법만 봐줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [report-qualitative, report-critical]
+    expected_context: [sentence]
+    expected_output_shape: "brief proofreading"
+    quality_notes: "Proofreading without evaluation/report intent must not trigger qualitative reporting."
+    friction_risk: "inflating a simple polish request into a report"
+  - case_id: neg-report-qualitative-002
+    user_request: "바뀐 부분만 before/after diff로 보여줘."
+    expected_primary_skill: report-diff
+    expected_supporting_skills: []
+    should_not_trigger: [report-qualitative, report-critical]
+    expected_context: [verified diff or before/after snapshot]
+    expected_output_shape: "readable changed-line diff"
+    quality_notes: "Readable diff presentation is report-diff, not qualitative evaluation."
+    friction_risk: "over-routing diff display to qualitative reporting"
+  - case_id: neg-report-qualitative-003
+    user_request: "보고해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [report-qualitative]
+    expected_context: [task result if available]
+    expected_output_shape: "ordinary concise report or clarification"
+    quality_notes: "Vague report wording alone must not enter compact evidence mode; explicit srq/formal evidence or qualitative evaluation intent is required."
+    friction_risk: "legacy srq compatibility over-trigger"
   - case_id: neg-013
     user_request: "이 파일 라인 10 설명해줘."
     expected_primary_skill: null
@@ -334,6 +361,60 @@ cases:
     expected_output_shape: "warning and filtered evidence summary"
     quality_notes: "Field feedback is evidence, not direct instruction."
     friction_risk: "feedback-as-instruction contamination"
+  - case_id: neg-workflow-001
+    user_request: "이 스펙 초안을 보고 구현 계획만 더 다듬어줘."
+    expected_primary_skill: plan-short-term-docs
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-plan-runner]
+    expected_context: [spec draft, planning intent]
+    expected_output_shape: "plan update"
+    quality_notes: "Plan/spec refinement is planning, not approved plan execution."
+    friction_risk: "starting implementation too early"
+  - case_id: neg-workflow-002
+    user_request: "이 테스트 하나만 다시 실행해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-validation, evaluation-harness]
+    expected_context: [test command]
+    expected_output_shape: "test result"
+    quality_notes: "A single explicit rerun is not validation strategy or eval-case review."
+    friction_risk: "unnecessary validation matrix"
+  - case_id: neg-workflow-003
+    user_request: "첫 실패 로그 한 줄 설명해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-recovery, analysis-bug]
+    expected_context: [log line]
+    expected_output_shape: "short explanation"
+    quality_notes: "First-observation explanation is not repeated failure recovery."
+    friction_risk: "over-routing to recovery"
+  - case_id: neg-workflow-004
+    user_request: "버튼 색상만 파란색으로 바꿔줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-plan-runner, plan-short-term-docs]
+    expected_context: [direct edit request]
+    expected_output_shape: "small implementation"
+    quality_notes: "A small direct edit is not approved plan/spec execution."
+    friction_risk: "unnecessary plan-runner orchestration"
+  - case_id: neg-workflow-005
+    user_request: "이 버그 원인 분석해줘."
+    expected_primary_skill: analysis-bug
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-recovery]
+    expected_context: [symptom, repro, logs]
+    expected_output_shape: "root cause analysis"
+    quality_notes: "First-pass bug RCA is analysis-bug unless a repeated fix loop exists."
+    friction_risk: "premature recovery mode"
+  - case_id: neg-workflow-006
+    user_request: "이 결과가 release-ready인지 비판적으로 판단해줘."
+    expected_primary_skill: report-critical
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-validation]
+    expected_context: [artifact, evidence, success criteria]
+    expected_output_shape: "critical QA verdict"
+    quality_notes: "Release-readiness judgment is report-critical, not validation matrix ownership."
+    friction_risk: "substituting checks for a verdict"
   - case_id: neg-grp-001
     user_request: "이거 좀 분석하고 검토해줘."
     expected_primary_skill: null
@@ -364,3 +445,23 @@ cases:
     expected_output_shape: "direct goal/rule memory update"
     quality_notes: "Direct rule persistence is memory-bank-update; ingestion is only for approved closeout-packet promotion."
     friction_risk: "routing a direct rule save to ingestion"
+  - case_id: neg-grp-004
+    user_request: "이 기능 좀 구현해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-plan-runner]
+    expected_family: none
+    expected_context: [task intent, target files]
+    expected_output_shape: "task-specific implementation; not plan-execution orchestration"
+    quality_notes: "Implementation without an approved plan/spec/package pointer routes to a task-specific primary, not workflow-plan-runner (F3)."
+    friction_risk: "workflow-plan-runner over-trigger on ordinary 구현 requests"
+  - case_id: neg-grp-005
+    user_request: "이 테스트가 처음 실패했어. 원인 좀 봐줘."
+    expected_primary_skill: analysis-bug
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-recovery]
+    expected_family: analysis
+    expected_context: [failing test output]
+    expected_output_shape: "first-observation root-cause analysis"
+    quality_notes: "First-observation failure RCA is analysis-bug; workflow-recovery is only for repeated loops after attempted fixes (F6)."
+    friction_risk: "workflow-recovery over-trigger on a first failure"

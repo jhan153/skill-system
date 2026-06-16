@@ -49,7 +49,10 @@ Maturity values must be one of `skeleton`, `usable`, `field_tuned`, `experimenta
 | `design-section-web` | design | `experimental` | Apply section-page constraints for hero, semantic sections, CTA flow, responsive order, media placement, first-viewport signal, and text fitting. | App/tool first screens, dense dashboards, mobile-native screens, or evidence-only requests. | Keep explicit-only until repeated section-page field feedback is available. | `design` |
 | `plan-spec-curator` | coordination | `experimental` | Curate active context, close stale plans, and propose memory/archive load policy. | Substantive task execution, normal plan docs, direct memory mutation, or ordinary summaries. | Add field cases for stale-plan pruning, instruction-bloat reduction, and closeout distillation. | `planning` |
 | `workflow-rigor` | execution_control | `usable` | Control evidence-first implementation and split validation for risky changes. | The task is simple and no formal evidence mode is needed. | Add smaller mode examples to avoid heavy output. | `workflow` |
-| `report-qualitative` | output | `usable` | Produce formal evidence-first replies when explicitly requested. | The user did not ask for formal reporting. | Add examples for concise formal responses. | `report` |
+| `workflow-plan-runner` | execution_control | `experimental` | Execute approved plans, specs, or packages into implementation batches with scoped validation and rollback/fallback decisions. | Plan/spec creation, small direct edits, missing executable scope, or handoff-only requests. | Collect field cases for execution-source sufficiency, batch validation, and recovery handoff. | `workflow` |
+| `workflow-validation` | execution_control | `experimental` | Design or run focused risk-tiered validation plans for changed or planned artifacts. | Implementation ownership, skill-system eval case review, critical verdicts, or one obvious command with no strategy need. | Collect field cases for change-type check heuristics and agent/manual split accuracy. | `workflow` |
+| `workflow-recovery` | execution_control | `experimental` | Recover repeated implementation or validation failure loops with one-hypothesis diagnostics and rollback/fallback decisions. | First-observation bug RCA, broad redesign, solved issues, or simple command reruns. | Collect field cases for same-signature threshold, diagnostic selection, and anti-fake-fix outcomes. | `workflow` |
+| `report-qualitative` | output | `experimental` | Produce evidence-based qualitative evaluation reports and explicit-only compact evidence-first reports. | Critical QA verdicts, readable diffs, artifact inventories, eval-case review, telemetry, implementation, debugging, validation execution, or vague report requests without evaluation/evidence intent. | Add field cases for readiness reviews, qualitative diff evaluation, redaction, and legacy `srq` compact mode. | `report` |
 | `design-ui-decomposer` | design | `experimental` | Decompose UI references into hierarchy, layout regions, component candidates, token candidates, states, and validation needs. | Direct implementation, token-only, screenshot-diff-only, or product strategy requests. | Keep implicit invocation disabled; collect field cases before broader routing. | `design` |
 | `design-visual-regression` | design | `experimental` | Inspect rendered screenshots, nonblank/framing evidence, viewport behavior, and visual differences. | There is no rendered UI, screenshot target, or visual reference/acceptance criteria. | Add Playwright/browser examples and threshold guidance. | `design` |
 
@@ -61,10 +64,10 @@ Family is the user-facing grouping field. The `family` column above is the singl
 | --- | --- | --- | --- |
 | `search` | Search & Evidence | `search-router` | 검색, 근거, 증거, evidence, search |
 | `design` | Design | `design-frontend` | 디자인, design, ui |
-| `report` | Report & Review | `report-qualitative` / `report-critical` by intent | 보고, 리포트, 리뷰, report, review |
+| `report` | Report & Review | `report-qualitative` / `report-critical` by intent | 보고, 리포트, 리뷰, 정성평가, report, review |
 | `research` | Research | `research-router` | 연구, 리서치, research |
 | `analysis` | Analysis | `analysis-router` | 분석, analysis, rca |
-| `workflow` | Execution Workflow | `workflow-rigor` | 실행, 검증, workflow |
+| `workflow` | Execution Workflow | `workflow-rigor` / `workflow-plan-runner` / `workflow-validation` / `workflow-recovery` by intent | 실행, 검증, workflow, recovery |
 | `coordination` | Coordination | `coordination-brief` | 조율, 핸드오프, coordination, handoff |
 | `planning` | Planning | `plan-short-term-docs` | 플랜, 계획, planning, plan |
 | `memory` | Memory | `memory-bank-harness` (read) / `memory-bank-ingestion` (promotion) / `memory-bank-init/update/maintenance/correction-capture` by intent | 메모리, memory |
