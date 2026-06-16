@@ -76,9 +76,9 @@
 - For risky or destructive commands, follow the configured approval policy and the user's explicit request.
 - When command results are relevant, prefer direct CLI verification.
 
-### 7.2.3 Bundle Policy
+### 7.2.5 Bundle Policy
 - This bundle intentionally excludes `.codex/config.toml` to preserve the user's existing runtime config.
-- This bundle intentionally excludes `automations/` because 7.2.3 is a manual drop-in skill bundle, not an automatic runtime loop.
+- This bundle intentionally excludes `automations/` because 7.2.5 is a manual drop-in skill bundle, not an automatic runtime loop.
 - Review `.codex/rules/default.rules` against local policy before copying it.
 - `.codex/skills/.system` is app-managed and is not part of the default copy payload.
 

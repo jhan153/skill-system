@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only sanity checks for the 7.2.3 manual drop-in skill bundle."""
+"""Read-only sanity checks for the 7.2.5 manual drop-in skill bundle."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 
-ROOT_DOCS = ["README.md", "TERMS.md", "CHANGELOG.md", "FIELD_FEEDBACK.md"]
+ROOT_DOCS = ["README.md", "README.ko.md", "TERMS.md", "CHANGELOG.md", "FIELD_FEEDBACK.md"]
 CODEX_DIRS = [".codex/docs", ".codex/eval", ".codex/tools", ".codex/skills", ".codex/rules"]
 CODEX_FILES = [".codex/AGENTS.md", ".codex/context-routing.md", ".codex/research-routing.md"]
 CLAUDE_DIRS = [".claude/docs", ".claude/eval", ".claude/skills"]
@@ -318,8 +318,18 @@ STALE_VERSION_LABELS = [
     "7.2.2 Bundle Policy",
     "7.2.2 manual drop-in",
     "7.2.2 is a manual drop-in",
+    "7.2.3 Terms",
+    "7.2.3 core",
+    "7.2.3 Bundle Policy",
+    "7.2.3 manual drop-in",
+    "7.2.3 is a manual drop-in",
+    "7.2.4 Terms",
+    "7.2.4 core",
+    "7.2.4 Bundle Policy",
+    "7.2.4 manual drop-in",
+    "7.2.4 is a manual drop-in",
 ]
-VERSION_LABEL_DOCS = ["README.md", "CHANGELOG.md", "TERMS.md", ".codex/AGENTS.md", ".claude/CLAUDE.md"]
+VERSION_LABEL_DOCS = ["README.md", "README.ko.md", "CHANGELOG.md", "TERMS.md", ".codex/AGENTS.md", ".claude/CLAUDE.md"]
 
 
 def routing_card_role(text: str):
@@ -435,7 +445,7 @@ def check_version_labels(root: Path, errors: list[str]) -> None:
         text = read_text(path)
         for label in STALE_VERSION_LABELS:
             if label in text:
-                errors.append(f"stale version label '{label}' in {rel}; use 7.2.3")
+                errors.append(f"stale version label '{label}' in {rel}; use 7.2.5")
 
 
 def main() -> int:

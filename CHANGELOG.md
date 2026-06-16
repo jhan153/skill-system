@@ -1,5 +1,12 @@
 # Changelog
 
+## 7.2.5
+
+- Added a user-facing, family-grouped Skill Catalog to `README.md` so people can understand the renamed skills by intent without reading the runtime registry first.
+- Added `README.ko.md`, a Korean translation of the public README, and linked it from the English README.
+- Documented every current skill with a short practical explanation under its family (`analysis`, `design`, `report`, `workflow`, `planning`, `coordination`, `research`, `search`, `memory`, `evaluation`, and `skill_system`).
+- Bumped the bundle version label to `7.2.5` across package-facing docs, runtime notes, eval case files, and version-label hygiene checks.
+
 ## 7.2.3
 
 - Trimmed the 13 longest skill `description:` fields (`design-frontend`, `report-qualitative`, `plan-spec-curator`, `analysis-codebase`, and the `design-*` surface/gate skills) so the combined skill-listing text fits Claude Code's description budget. Total skill-description text dropped from ~11,862 to ~9,946 chars; all 47 skills now surface for model auto-invocation instead of ~34. Applied on both mirrors and both live installs (`~/.claude/skills`, `~/.codex/skills`); long descriptions are now wrapped in quotes to keep frontmatter YAML valid when they contain punctuation.
