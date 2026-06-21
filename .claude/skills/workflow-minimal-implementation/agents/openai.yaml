@@ -1,0 +1,7 @@
+interface:
+  display_name: "Workflow Minimal Implementation"
+  short_description: "Conditional YAGNI implementation policy"
+  default_prompt: "Use $workflow-minimal-implementation to keep this implementation minimal, dependency-light, and guarded by one focused check."
+
+policy:
+  allow_implicit_invocation: false

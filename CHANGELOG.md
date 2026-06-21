@@ -1,5 +1,48 @@
 # Changelog
 
+## Unreleased
+
+- Started the execution-loop layer: added an opt-in hook event recorder, optional Codex `PreToolUse` hook example, automatic verification pipeline runner, GitHub Actions workflow, and a research ledger validator/profile.
+- Added `.codex/tools/requirements.txt` with `PyYAML` and `jsonschema`; validators use Draft 2020-12 `jsonschema` when installed and retain the local subset fallback for offline/local use.
+- Added the research evidence ledger schema and initial ledger instance under `.codex/research/`.
+- Added agent output validation for recorded Codex agent run artifacts, including claim-to-evidence checks, hook event hash/order checks, an `agent-output` verification profile, and valid/invalid fixtures.
+- Wired repo-local Codex lifecycle hooks for `PreToolUse`, `PermissionRequest`, `PostToolUse`, and `Stop` through a live hook adapter; `Stop` now gates finalization on agent-run artifact validation once hooks are trusted.
+- Hardened the live hook prototype after review: `Stop` validates only the current `session_id`/`turn_id` run, missing current-run evidence is `UNVERIFIED` rather than pass, repeated tool calls validate per `tool_use_id`, failed `PostToolUse` exits record `fail`, hook evidence defaults to metadata hashes with redaction, and release CI installs `pytest`.
+- Hardened the P0 completion gate after execution feedback: failed/unverified `Stop` checks now record `turn_finalize_attempt` so repair work remains valid, Codex `PermissionRequest` without `tool_use_id` is accepted as approximate, dangling tool calls fail validation, `Stop.last_assistant_message` is hash-bound to the run manifest, unknown tool responses record `warn`, runtime traces are excluded from packaged evidence, and package verification uses synthetic fixtures.
+- Registered `workflow-minimal-implementation` in user-facing README catalogs and added routing/negative eval cases for minimal-implementation modifier behavior.
+
+## 7.3.1
+
+- Hardened validation integrity after the 7.3.0 release-candidate review: eval, field feedback, source registry, behavior replay, generated mirrors, and execution-assurance schemas now reject invalid sentinel data instead of only checking field names or headers.
+- Restored `integrations/kanboard-plan-sync/README.md` and added a static reference-target checker so skill context targets cannot silently point at missing files.
+- Added `unittest` coverage for new validators using valid/invalid fixtures, and wired those tests into `verify_bundle.py --profile core`.
+- Promoted representative production eval cases to schema v2 and moved the observed behavior replay fixture from a test-only case id to a production eval case.
+- Reframed field feedback gate output as `unmeasured + waived` rather than measured field-test success.
+
+## 7.3.0
+
+- Added 7.3.0 execution-assurance artifacts: host-neutral lifecycle hook guidance, capability-based tool hardening guidance, lifecycle-event schema, and tool-policy schema.
+- Added `run_behavior_evals.py` as a replay-first behavior eval runner with an observed-run pilot fixture.
+- Added `verify_bundle.py --profile execution` to validate execution-assurance artifacts and replay behavior evals without live host/model calls.
+- Treated field feedback evidence as a user-accepted release gate for this cut without fabricating measured entries.
+- Bumped active bundle labels to `7.3.0` while preserving 7.2.7 as the stabilization baseline.
+
+## 7.2.7
+
+- Added `verify_bundle.py` as the profile-based verification entry point with text/json output and explicit `PASS`/`FAIL`/`SKIP`/`ERROR` status handling.
+- Added machine-readable field feedback scaffolding under `.codex/field-feedback/`, plus validators, fixtures, and a generated `FIELD_FEEDBACK.md` human-readable view.
+- Added eval case schema validation, source registry validation, generated mirror checksum validation, and active document freshness checks.
+- Added canonical `.codex/docs/source_registry.yaml` and generated Claude-side mirrors for source registry and eval schema.
+- Bumped active bundle labels to `7.2.7` while preserving `7.2.6` as the previous baseline.
+
+## 7.2.6
+
+- Added the Kanboard plan-sync integration bundle under `integrations/kanboard-plan-sync`: a plan-centric MCP server + Python core/CLI that projects Markdown `docs/plan` onto a local Kanboard via JSON-RPC (repo=Project, plan=Swimlane, item=Task; Markdown stays source of truth).
+- Added two Agent skills, `kanboard-plan-rollout` (onboard a repo's plans + bulk register/sync) and `kanboard-plan-ops` (push/pull/validate/curate an already-registered board), mirrored across `.codex/skills` and `.claude/skills` with registry rows (family `workflow`) and routing/negative eval cases.
+- Included MCP registration examples (`examples/mcp.claude.json`, `examples/mcp.codex.toml`) and a Kanboard local-host setup methodology doc. Excluded the Kanboard application, DB/logs/API token, and the ThemeRevision/UI plugin — those remain local third-party runtime.
+- Renamed the integration's `secrets.py` to `token_guard.py` so no bundled filename trips sensitive-name hygiene; the API token resolves from an env var or the local Kanboard DB and is never stored in the bundle.
+- Bumped the bundle version label to `7.2.6` across package-facing docs, runtime notes, eval case files, and version-label hygiene checks; added stale-label detection for `7.2.5`.
+
 ## 7.2.5
 
 - Added a user-facing, family-grouped Skill Catalog to `README.md` so people can understand the renamed skills by intent without reading the runtime registry first.

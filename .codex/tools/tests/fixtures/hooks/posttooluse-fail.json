@@ -1,0 +1,13 @@
+{
+  "hook_event_name": "PostToolUse",
+  "session_id": "session-test",
+  "turn_id": "turn-fail",
+  "cwd": "/Users/master/repo/software/Skill-System",
+  "permission_mode": "workspace-write",
+  "tool_name": "Bash",
+  "tool_use_id": "tool-fail-001",
+  "tool_response": {
+    "exit_code": 1,
+    "stderr": "command failed"
+  }
+}

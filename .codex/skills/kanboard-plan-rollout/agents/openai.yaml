@@ -1,0 +1,7 @@
+interface:
+  display_name: "Kanboard Plan Rollout"
+  short_description: "Onboard repo docs/plan to Kanboard and bulk register/sync workspaces"
+  default_prompt: "Use $kanboard-plan-rollout to adopt a repo's docs/plan onto the local Kanboard and bulk register/sync across workspaces. Inspect first, register_workspace (init + registry), sync_all dry-run, then sync_all apply only after approval. Markdown stays source of truth; token comes from env/local DB; never write Kanboard SQLite."
+
+policy:
+  allow_implicit_invocation: false

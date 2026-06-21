@@ -76,9 +76,10 @@
 - For risky or destructive commands, follow the configured approval policy and the user's explicit request.
 - When command results are relevant, prefer direct CLI verification.
 
-### 7.2.5 Bundle Policy
+### 7.3.1 Bundle Policy
 - This bundle intentionally excludes `.codex/config.toml` to preserve the user's existing runtime config.
-- This bundle intentionally excludes `automations/` because 7.2.5 is a manual drop-in skill bundle, not an automatic runtime loop.
+- This bundle intentionally excludes `automations/` because 7.3.1 is a manual drop-in skill bundle, not a scheduled autonomous runtime loop.
+- Project-local lifecycle hooks may run after project trust and `/hooks` trust. They are evidence/control surfaces and do not replace sandboxing, approval policy, or rules.
 - Review `.codex/rules/default.rules` against local policy before copying it.
 - `.codex/skills/.system` is app-managed and is not part of the default copy payload.
 

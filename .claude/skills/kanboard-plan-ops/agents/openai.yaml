@@ -1,0 +1,7 @@
+interface:
+  display_name: "Kanboard Plan Ops"
+  short_description: "Push/pull/validate/curate an already-registered Kanboard plan board"
+  default_prompt: "Use $kanboard-plan-ops to operate an already-registered Kanboard plan board: sync_plan_to_board (markdown-primary push), pull_board_status (board→plan candidates, never edits Markdown), record_validation, curate_plan_board. Write tools default to dry-run; promote completion to Markdown only with evidence."
+
+policy:
+  allow_implicit_invocation: false

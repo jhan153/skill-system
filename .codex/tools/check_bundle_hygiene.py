@@ -1,21 +1,33 @@
 #!/usr/bin/env python3
-"""Read-only sanity checks for the 7.2.5 manual drop-in skill bundle."""
+"""Read-only sanity checks for the 7.3.1 manual drop-in skill bundle."""
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 import sys
 from pathlib import Path
 
 
 ROOT_DOCS = ["README.md", "README.ko.md", "TERMS.md", "CHANGELOG.md", "FIELD_FEEDBACK.md"]
-CODEX_DIRS = [".codex/docs", ".codex/eval", ".codex/tools", ".codex/skills", ".codex/rules"]
-CODEX_FILES = [".codex/AGENTS.md", ".codex/context-routing.md", ".codex/research-routing.md"]
+CODEX_DIRS = [
+    ".codex/docs",
+    ".codex/eval",
+    ".codex/tools",
+    ".codex/skills",
+    ".codex/rules",
+    ".codex/research",
+    ".codex/harness",
+    ".codex/hooks",
+]
+CODEX_FILES = [".codex/AGENTS.md", ".codex/context-routing.md", ".codex/research-routing.md", ".codex/hooks.json"]
 CLAUDE_DIRS = [".claude/docs", ".claude/eval", ".claude/skills"]
 CLAUDE_FILES = [".claude/CLAUDE.md"]
 DOCS = [
     ".codex/docs/runtime_terms.md",
     ".codex/docs/skill_registry.md",
+    ".codex/docs/agent_output_validation.md",
     ".codex/docs/skill_maturity.md",
     ".codex/docs/team_patterns.md",
     ".codex/docs/context_pack_guidelines.md",
@@ -45,9 +57,11 @@ SENSITIVE_NAMES = {
 }
 SENSITIVE_SUFFIXES = {".sqlite", ".db", ".pem", ".key"}
 EXCLUDED_CORE_DIRS = {"harness", ".agent-workflow", "docs", "eval", "tools", "shared"}
+ALLOWED_ROOT_DOC_PREFIXES = ("docs/plan/", "docs/reference/context-assurance/")
 ALLOWED_MATURITY = {"skeleton", "usable", "field_tuned", "experimental", "deprecated"}
 POLICY_DOCS = ["README.md", "TERMS.md", ".codex/AGENTS.md"]
 OS_NOISE_NAMES = {".DS_Store", "Thumbs.db"}
+UUID_LIKE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I)
 
 
 def is_os_noise(rel_posix: str) -> bool:
@@ -71,18 +85,19 @@ def check_root_shape(root: Path, errors: list[str]) -> None:
         if not path.exists():
             continue
         if name == "docs":
-            # Planning artifacts under docs/plan/ are allowed; any other root docs/ content
-            # is still a forbidden runtime dependency.
+            # Planning artifacts and reference-only Context Assurance notes are allowed;
+            # other root docs/ content is still a forbidden runtime dependency.
             stray = [
                 p
                 for p in path.rglob("*")
                 if p.is_file()
-                and not p.relative_to(root).as_posix().startswith("docs/plan/")
+                and not p.relative_to(root).as_posix().startswith(ALLOWED_ROOT_DOC_PREFIXES)
                 and not is_os_noise(p.relative_to(root).as_posix())
             ]
             if stray:
                 errors.append(
-                    f"root runtime dependency not allowed: docs (only docs/plan/ is allowed; stray: {stray[0].relative_to(root)})"
+                    "root runtime dependency not allowed: docs "
+                    f"(only {', '.join(ALLOWED_ROOT_DOC_PREFIXES)} is allowed; stray: {stray[0].relative_to(root)})"
                 )
             continue
         errors.append(f"root runtime dependency not allowed: {name}")
@@ -95,6 +110,23 @@ def check_sensitive_files(root: Path, errors: list[str]) -> None:
             errors.append(f"sensitive-looking file: {path.relative_to(root)}")
         if "secret" in name or "api_key" in name or "private_key" in name:
             errors.append(f"sensitive-looking name: {path.relative_to(root)}")
+
+
+def check_runtime_trace_artifacts(root: Path, errors: list[str]) -> None:
+    runs_root = root / ".codex" / "harness" / "agent-runs"
+    if not runs_root.exists():
+        return
+    for ledger in sorted(runs_root.rglob("hook-events.jsonl")):
+        run_dir = ledger.parent
+        rel = ledger.relative_to(root)
+        if not (run_dir / "run.yaml").exists():
+            errors.append(f"orphan hook ledger without run.yaml: {rel}")
+        parts = run_dir.relative_to(runs_root).parts
+        if any(UUID_LIKE.fullmatch(part) for part in parts):
+            errors.append(f"runtime-looking UUID agent run directory is not distributable: {run_dir.relative_to(root)}")
+        text = read_text(ledger)
+        if str(Path.home()) in text or "/Users/" in text:
+            errors.append(f"runtime trace contains absolute local path: {rel}")
 
 
 def read_text(path: Path) -> str:
@@ -215,6 +247,10 @@ MIRROR_DIR_PAIRS = [
 MIRROR_FILE_PAIRS = [
     (".codex/context-routing.md", ".claude/context-routing.md"),
 ]
+GENERATED_MIRRORS = {
+    ("docs", Path("source_registry.yaml")): "yaml",
+    ("eval", Path("eval-case.schema.json")): "json",
+}
 SKILL_REF_FIELDS = ("expected_primary_skill", "expected_supporting_skills", "should_not_trigger")
 SKILL_REF_IGNORE = {"", "null", "none", "~", "[]"}
 
@@ -225,6 +261,45 @@ def relative_files(base: Path) -> set:
         for path in base.rglob("*")
         if path.is_file() and not is_os_noise(path.relative_to(base).as_posix())
     }
+
+
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def check_generated_mirror(canonical: Path, mirror: Path, kind: str, errors: list[str]) -> None:
+    expected_checksum = sha256_file(canonical)
+    if kind == "yaml":
+        text = read_text(mirror)
+        expected = {
+            "generated_from": canonical.relative_to(canonical.parents[2]).as_posix(),
+            "source_checksum": expected_checksum,
+            "do_not_edit": "true",
+        }
+        for key, value in expected.items():
+            if f"{key}: {value}" not in text:
+                errors.append(f"generated mirror stale or missing marker: {mirror.relative_to(canonical.parents[2])} {key}")
+        return
+    if kind == "json":
+        try:
+            data = json.loads(read_text(mirror))
+        except json.JSONDecodeError as exc:
+            errors.append(f"generated mirror invalid json: {mirror.relative_to(canonical.parents[2])}: {exc}")
+            return
+        if data.get("x_generated_from") != canonical.relative_to(canonical.parents[2]).as_posix():
+            errors.append(f"generated mirror x_generated_from mismatch: {mirror.relative_to(canonical.parents[2])}")
+        if data.get("x_source_checksum") != expected_checksum:
+            errors.append(f"generated mirror checksum mismatch: {mirror.relative_to(canonical.parents[2])}")
+        if data.get("x_do_not_edit") is not True:
+            errors.append(f"generated mirror missing x_do_not_edit: {mirror.relative_to(canonical.parents[2])}")
+
+
+def generated_kind(codex_rel: str, shared: Path) -> str | None:
+    if codex_rel == ".codex/docs":
+        return GENERATED_MIRRORS.get(("docs", shared))
+    if codex_rel == ".codex/eval":
+        return GENERATED_MIRRORS.get(("eval", shared))
+    return None
 
 
 def check_mirror_parity(root: Path, errors: list[str]) -> None:
@@ -241,7 +316,10 @@ def check_mirror_parity(root: Path, errors: list[str]) -> None:
         for rel in sorted(str(p) for p in claude_files - codex_files):
             errors.append(f"mirror parity: {codex_rel}/{rel} missing (present in {claude_rel})")
         for shared in sorted(codex_files & claude_files, key=str):
-            if (codex_dir / shared).read_bytes() != (claude_dir / shared).read_bytes():
+            kind = generated_kind(codex_rel, shared)
+            if kind:
+                check_generated_mirror(codex_dir / shared, claude_dir / shared, kind, errors)
+            elif (codex_dir / shared).read_bytes() != (claude_dir / shared).read_bytes():
                 errors.append(f"mirror parity: content differs for {shared} between {codex_rel} and {claude_rel}")
     for codex_rel, claude_rel in MIRROR_FILE_PAIRS:
         codex_file = root / codex_rel
@@ -328,6 +406,26 @@ STALE_VERSION_LABELS = [
     "7.2.4 Bundle Policy",
     "7.2.4 manual drop-in",
     "7.2.4 is a manual drop-in",
+    "7.2.5 Terms",
+    "7.2.5 core",
+    "7.2.5 Bundle Policy",
+    "7.2.5 manual drop-in",
+    "7.2.5 is a manual drop-in",
+    "7.2.6 Terms",
+    "7.2.6 core",
+    "7.2.6 Bundle Policy",
+    "7.2.6 manual drop-in",
+    "7.2.6 is a manual drop-in",
+    "7.2.7 Terms",
+    "7.2.7 core",
+    "7.2.7 Bundle Policy",
+    "7.2.7 manual drop-in",
+    "7.2.7 is a manual drop-in",
+    "7.3.0 Terms",
+    "7.3.0 core",
+    "7.3.0 Bundle Policy",
+    "7.3.0 manual drop-in",
+    "7.3.0 is a manual drop-in",
 ]
 VERSION_LABEL_DOCS = ["README.md", "README.ko.md", "CHANGELOG.md", "TERMS.md", ".codex/AGENTS.md", ".claude/CLAUDE.md"]
 
@@ -445,7 +543,7 @@ def check_version_labels(root: Path, errors: list[str]) -> None:
         text = read_text(path)
         for label in STALE_VERSION_LABELS:
             if label in text:
-                errors.append(f"stale version label '{label}' in {rel}; use 7.2.5")
+                errors.append(f"stale version label '{label}' in {rel}; use 7.3.1")
 
 
 def main() -> int:
@@ -457,6 +555,7 @@ def main() -> int:
         return 2
     check_root_shape(root, errors)
     check_sensitive_files(root, errors)
+    check_runtime_trace_artifacts(root, errors)
     check_skill_frontmatter(root, errors)
     check_registry(root, errors)
     check_eval_shape(root, errors)

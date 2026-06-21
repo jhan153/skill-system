@@ -12,14 +12,15 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 7.2.5 Drop-in Bundle
+## 7.3.1 Drop-in Bundle
 
-This repository includes the skill bundle organized for version 7.2.5. Its main components are:
+This repository includes the skill bundle organized for version 7.3.1. Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
 * `eval`: example cases for checking skill selection and usage quality
 * `tools`: helper tools for inspecting the bundle structure
+* `integrations`: optional integration payloads — includes `integrations/kanboard-plan-sync`, a plan-centric MCP/CLI that projects Markdown plans onto a local Kanboard. The Kanboard app, DB, themes, and plugins are NOT bundled; only the integration code, two Agent skills (`kanboard-plan-rollout`, `kanboard-plan-ops`), MCP registration examples, and a local-host setup methodology are included.
 * `CHANGELOG.md`, `TERMS.md`, `FIELD_FEEDBACK.md`: change history, terminology notes, and field feedback template
 
 ## Core Principles
@@ -119,6 +120,7 @@ Workflow skills control implementation discipline, validation, and failure recov
 | Skill                  | Role                                                                                                                                                                    |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `workflow-rigor`       | Applies evidence-first execution, scoped changes, separated validation results, and review discipline for medium- and high-risk changes.                                |
+| `workflow-minimal-implementation` | Applies conditional YAGNI pressure to implementation and refactoring work to avoid unnecessary dependencies, abstractions, files, and boilerplate. |
 | `workflow-plan-runner` | Executes approved plans, specifications, or packages as implementation batches, while managing scoped validation, rollback, or alternative choices.                     |
 | `workflow-validation`  | Plans or performs focused validation for completed or planned changes. It separates validation performed by the agent from validation that must be checked by the user. |
 | `workflow-recovery`    | Breaks repeated implementation or validation retry loops through single-hypothesis diagnosis, narrowed reproduction steps, rollback, or alternative decisions.          |
@@ -207,8 +209,8 @@ The version history is not a complete feature checklist. It is a timeline showin
 |     2.x | AGENT subskills                    | Split large instruction blocks into reusable skill-like modules.                                                                                                                                                                                                                  |
 |     3.x | Design and reporting               | HLD, LLD, interaction, reporting, and skill-authoring patterns became repeatable workflows.                                                                                                                                                                                       |
 |     4.x | Memory bank                        | Moved long-term project context from conversation memory into explicit state files and event history.                                                                                                                                                                             |
-|     5.x | Agentic workflow and stabilization | Separated planning, execution, validation, reporting, and review into distinct responsibilities, and began treating trigger conflicts, cross-skill ownership, validation state, and drift audits as managed concerns.                                                             |
-|     6.x | Research lifecycle                 | Organized literature review, hypothesis generation, experiment planning, analysis, manuscript writing, and review into a single research pipeline.                                                                                                                                |
+|     5.x | Agentic workflow and stabilization | Separated planning, execution, validation, reporting, and review into distinct responsibilities. The workflow also matured around explicit routing contracts, smoke-testable trigger rules, drift checks, lightweight automation, and phase-level planning packages. |
+|     6.x | Research lifecycle                 | Expanded the early research-planning branch into a routed research lifecycle, separating evidence search, literature synthesis, hypothesis planning, experiment design, analysis, manuscript writing, and peer review into distinct stages. |
 |     7.x | Public specification               | Reworked the private system into a publicly shareable timeline, design philosophy, and manifest/profile structure.                                                                                                                                                                |
 |   7.1.x | Drop-in bundle                     | Repackaged the system as a drop-in bundle with read-only structure checks and conservative explicit-first routing.                                                                                                                                                                |
 |   7.2.x | Skill families                     | Added user-facing family groups, family-prefixed skill names, and the search/coordination/evaluation families. Version 7.2.1 added workflow execution subfamilies and `report-qualitative`; version 7.2.5 added a skill catalog that helps users understand each skill by family. |

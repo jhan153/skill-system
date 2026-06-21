@@ -15,22 +15,26 @@ Field feedback converts real use into the next version cut.
 ## Entry Shape
 
 ```yaml
-field_feedback:
-  date:
-  request:
-  expected_primary_skill:
-  actual_primary_skill:
-  supporting_skills:
-  friction:
-  useful_behavior:
-  risky_behavior:
-  suggested_maturity_change:
-  suggested_eval_case:
-  suggested_skill_text_change:
-  verification: unverified
+feedback_id: FF-YYYYMMDD-001
+bundle_version: "7.3.1"
+bundle_hash_or_commit: "uncommitted"
+date: "YYYY-MM-DD"
+host: "codex"
+host_version: "unknown"
+model: "unknown"
+request_class: "routing"
+expected_primary_skill: "skill-name"
+actual_primary_skill: "skill-name"
+artifact_refs:
+  - "path/to/changed-or-validated-artifact"
+validation_evidence:
+  - "command or user-visible validation result"
+outcome: pass
+friction: "none recorded"
+privacy_redactions: []
 ```
 
-## Routing Back Into 7.1
+## Routing Back Into The Next Cut
 
 - Routing miss: update `skill_registry.md` and routing/negative cases.
 - Context issue: update `context_pack_guidelines.md` or relevant `SKILL.md`.
@@ -46,7 +50,7 @@ field_feedback:
 - Downgrade immediately when a skill repeatedly triggers without explicit intent or pushes the agent toward broad context loading.
 - Do not change maturity from bundle hygiene results alone.
 
-## Current 7.1 Watchlist
+## Current Field-Tuning Watchlist
 
 - `coordination-brief`: watch for trigger ambiguity around goal/목표.
 - `plan-long-term-package`: watch for keyword-only over-trigger from phase, migration, rewrite, or handoff.

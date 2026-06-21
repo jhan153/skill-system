@@ -1,4 +1,4 @@
-# 7.2.5 Terms
+# 7.3.1 Terms
 
 ## version_cut
 
@@ -6,7 +6,7 @@ A version cut is a new manual bundle snapshot. It does not mean the skill system
 
 ## manual_drop_in_skill_bundle
 
-A manual drop-in skill bundle is copied by the user. It does not mutate live settings, install itself, or manage the user's runtime.
+A manual drop-in skill bundle is copied by the user. It does not mutate live settings, install itself, or manage the user's runtime config. Project-local lifecycle hooks may run only after project trust and hook trust.
 
 ## runtime_canonical
 
@@ -20,7 +20,9 @@ The location that an agent should treat as the source of runtime guidance.
 
 The bundle intentionally excludes `.codex/config.toml` so a manual copy does not overwrite the user's existing runtime config.
 
-`automations/` are also excluded from 7.2.5 core because this bundle is not an automatic runtime loop.
+`automations/` are also excluded from 7.3.1 core because this bundle is not a scheduled autonomous runtime loop.
+
+The Codex hook files are project-local evidence/control surfaces. They can run inside a trusted project after `/hooks` approval, but they do not replace sandboxing, approval policy, or rules.
 
 ## app_managed_system_skills
 
@@ -54,6 +56,6 @@ Human notes from real use. Feedback can update maturity, routing examples, negat
 
 A small read-only sanity check for structure and obvious packaging mistakes. It must not install, fix, generate reports, mutate live settings, or score real skill quality.
 
-## Removed From 7.2.5 Core
+## Removed From 7.3.1 Core
 
-7.2.5 core excludes automatic install flow, promotion flow, release flow, signoff workflow, rollback flow, evidence intake flow, evidence closure flow, package-cut scoring, runtime config replacement, automations, default `.system` payload, and skill-system finality modeling.
+7.3.1 core excludes automatic install flow, promotion flow, release flow, signoff workflow, rollback flow, evidence intake flow, evidence closure flow, package-cut scoring, runtime config replacement, automations, default `.system` payload, and skill-system finality modeling.

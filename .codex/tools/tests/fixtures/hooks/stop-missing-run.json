@@ -1,0 +1,9 @@
+{
+  "hook_event_name": "Stop",
+  "session_id": "session-missing",
+  "turn_id": "turn-missing",
+  "cwd": "/Users/master/repo/software/Skill-System",
+  "permission_mode": "workspace-write",
+  "stop_hook_active": false,
+  "last_assistant_message": "agent-verified"
+}

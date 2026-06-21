@@ -1,0 +1,10 @@
+# Codex MCP registration. Add to ~/.codex/config.toml.
+# The API token is inherited from the environment (export KANBOARD_API_TOKEN
+# in the shell that launches Codex); it is never stored here.
+
+[mcp_servers.kanboard-plan-sync]
+command = "python"
+args = ["-m", "kanboard_plan_sync_mcp"]
+
+[mcp_servers.kanboard-plan-sync.env]
+PYTHONPATH = "${HOME}/.ai/infra/kanboard-plan-sync/src"

@@ -20,7 +20,7 @@ Root files explain the bundle to a human. Root files are not runtime dependencie
 
 ## runtime config policy
 
-This bundle intentionally excludes `.codex/config.toml` to preserve the user's existing runtime config. It also excludes `automations/` because 7.1 core is a manual drop-in skill bundle, not an automatic runtime loop.
+This bundle intentionally excludes `.codex/config.toml` to preserve the user's existing runtime config. It also excludes `automations/` because 7.3.1 core is a manual drop-in skill bundle, not an automatic runtime loop.
 
 Review `.codex/rules/default.rules` against local policy before copying it.
 
@@ -48,8 +48,14 @@ Field feedback is real-use observation collected for future skill text, routing,
 
 Bundle hygiene checks only structure and obvious packaging mistakes. It is read-only and does not make quality decisions.
 
-## 7.1 Core Boundary
+## 7.3.1 Core Boundary
 
-7.1 core keeps skills, routing docs, maturity docs, usage cases, feedback guidance, and a small sanity checker.
+7.3.1 core keeps skills, routing docs, maturity docs, usage cases, feedback guidance, source registry, generated mirror checks, and small sanity checkers.
 
-7.1 core excludes install automation, live runtime mutation, deployment/signoff workflows, rollback flow, evidence intake/finality workflows, package scoring, runtime config replacement, automations, default `.system` payload, and skill-system finality modeling.
+7.3.1 core excludes install automation, live runtime mutation, deployment/signoff workflows, rollback flow, evidence finality workflows, package scoring, runtime config replacement, automations, default `.system` payload, and skill-system finality modeling.
+
+## MCP integration vs local runtime (7.3.1)
+
+The Kanboard plan-sync MCP/core under `integrations/kanboard-plan-sync` is **integration payload**: a plan-centric MCP facade + CLI that projects Markdown plans onto a local Kanboard via JSON-RPC. It is in-bundle.
+
+The Kanboard application itself — runtime, SQLite DB, logs, API token, and the ThemeRevision/UI plugin — is **local third-party runtime** and is NOT bundled. The bundle ships only a setup methodology doc (`integrations/kanboard-plan-sync/docs/kanboard-localhost-setup.md`); MCP registration is provided as example files, never live config. The token is resolved from an env var or the local Kanboard DB at call time and is never stored in the bundle.

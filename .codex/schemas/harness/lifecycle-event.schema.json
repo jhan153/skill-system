@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-lifecycle-event.schema.json",
+  "title": "Harness Lifecycle Event Mapping",
+  "type": "object",
+  "required": [
+    "mapping"
+  ],
+  "properties": {
+    "mapping": {
+      "type": "object",
+      "required": [
+        "neutral_event",
+        "host",
+        "host_event",
+        "support_level"
+      ],
+      "properties": {
+        "neutral_event": {
+          "enum": [
+            "request_received",
+            "context_loaded",
+            "tool_preflight",
+            "permission_requested",
+            "tool_result",
+            "tool_batch_completed",
+            "turn_finalize_attempt",
+            "turn_finalize",
+            "compact_before",
+            "compact_after"
+          ]
+        },
+        "host": {
+          "enum": [
+            "codex",
+            "claude"
+          ]
+        },
+        "host_event": {
+          "type": "string"
+        },
+        "support_level": {
+          "enum": [
+            "native",
+            "approximate",
+            "unsupported"
+          ]
+        },
+        "fallback_strategy": {
+          "type": "string"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

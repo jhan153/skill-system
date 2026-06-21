@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-agent-run.schema.json",
+  "title": "Skill System Agent Run Artifact",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "bundle_version",
+    "task",
+    "assistant_message",
+    "outputs",
+    "validations",
+    "hook_events"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^AR-[0-9]{8}-[0-9]{3}$"
+    },
+    "bundle_version": {
+      "type": "string"
+    },
+    "task": {
+      "type": "object",
+      "required": [
+        "user_request_summary",
+        "result_label"
+      ],
+      "properties": {
+        "user_request_summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result_label": {
+          "enum": [
+            "agent-verified",
+            "user-verification-needed",
+            "unverified",
+            "blocked"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "outputs": {
+      "type": "object",
+      "required": [
+        "final_report",
+        "artifact_refs",
+        "claims"
+      ],
+      "properties": {
+        "final_report": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "claims": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "claim_id",
+              "text",
+              "support"
+            ],
+            "properties": {
+              "claim_id": {
+                "type": "string",
+                "pattern": "^C-[0-9]{3}$"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "support": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "evidence_ref"
+                ],
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "command_exit",
+                      "artifact_exists",
+                      "manual_check"
+                    ]
+                  },
+                  "command": {
+                    "type": "string"
+                  },
+                  "exit_code": {
+                    "type": "integer"
+                  },
+                  "evidence_ref": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "assistant_message": {
+      "type": "object",
+      "required": [
+        "sha256",
+        "result_label",
+        "claim_ids"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "result_label": {
+          "enum": [
+            "agent-verified",
+            "user-verification-needed",
+            "unverified",
+            "blocked"
+          ]
+        },
+        "claim_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^C-[0-9]{3}$"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "validations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "evidence_ref"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "command_exit",
+              "manual_check"
+            ]
+          },
+          "command": {
+            "type": "string"
+          },
+          "exit_code": {
+            "type": "integer"
+          },
+          "evidence_ref": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "hook_events": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

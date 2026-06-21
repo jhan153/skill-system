@@ -1,4 +1,4 @@
-version: "7.2.5"
+version: "7.3.1"
 purpose: "Requests that should not trigger heavy or wrong skills."
 cases:
   - case_id: neg-001
@@ -109,6 +109,15 @@ cases:
     expected_output_shape: "short branch name options"
     quality_notes: "No handoff."
     friction_risk: "workflow expansion"
+  - case_id: neg-workflow-minimal-001
+    user_request: "YAGNI가 무슨 뜻인지 한 문장으로 알려줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-minimal-implementation, workflow-rigor]
+    expected_context: []
+    expected_output_shape: "short conceptual explanation"
+    quality_notes: "Concept explanation does not attach implementation modifiers."
+    friction_risk: "turning a simple explanation into implementation policy"
   - case_id: neg-report-qualitative-001
     user_request: "이 문장 맞춤법만 봐줘."
     expected_primary_skill: null
@@ -555,3 +564,21 @@ cases:
     expected_output_shape: "research routing"
     quality_notes: "Scientific hypothesis is research-router, not the evidence lane router."
     friction_risk: "search-router owning research lifecycle"
+  - case_id: neg-kanboard-001
+    user_request: "칸보드가 뭔지, 어떻게 쓰는 건지 개념만 설명해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [kanboard-plan-rollout, kanboard-plan-ops]
+    expected_context: []
+    expected_output_shape: "short conceptual explanation"
+    quality_notes: "Explaining Kanboard is not a sync/onboarding action."
+    friction_risk: "running sync tools on a concept question"
+  - case_id: neg-kanboard-002
+    user_request: "이미 등록된 보드에 plan 상태만 반영해줘. 새로 등록하지 말고."
+    expected_primary_skill: kanboard-plan-ops
+    expected_supporting_skills: []
+    should_not_trigger: [kanboard-plan-rollout]
+    expected_context: [registered workspace, plan path]
+    expected_output_shape: "markdown-primary push only"
+    quality_notes: "Ops vs rollout boundary: no onboarding when already registered."
+    friction_risk: "re-onboarding an already registered repo"

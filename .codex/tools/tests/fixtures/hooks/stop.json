@@ -1,0 +1,9 @@
+{
+  "hook_event_name": "Stop",
+  "session_id": "session-test",
+  "turn_id": "turn-test",
+  "cwd": "/Users/master/repo/software/Skill-System",
+  "permission_mode": "workspace-write",
+  "stop_hook_active": false,
+  "last_assistant_message": "# Agent Run Final Report\n\nresult_label: agent-verified\n\n## Claims\n\n- C-001: current session/turn agent output validation passed.\n\n## Evidence\n\n- artifacts/verification.txt\n\n## Verification\n\n- `python3 .codex/tools/verify_bundle.py --profile agent-output --format text` returned exit code 0.\n"
+}

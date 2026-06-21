@@ -1,0 +1,114 @@
+{
+  "x_generated_from": ".codex/eval/eval-case.schema.json",
+  "x_generated_at": "2026-06-21T03:08:30Z",
+  "x_source_checksum": "f5ecff2ea246ccfd90702bf700aac070e1a625d00d40de47fcea40c250c93946",
+  "x_do_not_edit": true,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-eval-case.schema.json",
+  "title": "Skill System Eval Case",
+  "type": "object",
+  "required": [
+    "case_id",
+    "user_request",
+    "expected_primary_skill",
+    "expected_supporting_skills",
+    "should_not_trigger",
+    "expected_context",
+    "expected_output_shape",
+    "quality_notes",
+    "friction_risk"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "user_request": {
+      "type": "string"
+    },
+    "expected_primary_skill": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "expected_supporting_skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "should_not_trigger": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "expected_family": {
+      "type": "string"
+    },
+    "expected_context": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "expected_output_shape": {
+      "type": "string"
+    },
+    "quality_notes": {
+      "type": "string"
+    },
+    "friction_risk": {
+      "type": "string"
+    },
+    "expected_behaviors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_behaviors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "source_feedback_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": 2
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "required": [
+          "expected_behaviors",
+          "forbidden_behaviors",
+          "required_evidence"
+        ]
+      }
+    }
+  ]
+}

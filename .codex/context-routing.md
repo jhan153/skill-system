@@ -62,7 +62,7 @@ Build this bundle before multi-step work, writes, broad scans, reports, automati
 | bug diagnosis | `analysis-router` -> `analysis-bug` | `workflow-rigor` only if implementation/risk is active | symptom, repro, relevant files, logs | full repo report |
 | algorithm proposal | `analysis-router` -> `analysis-algorithm` | `report-qualitative` only for formal output | constraints, metrics, candidates | full repo or memory |
 | research / scientific workflow | `research-router` | selected narrow research cluster skill; `plan-short-term-docs` only for explicit persisted `docs/plan` artifact | research request, stage hints, provided artifacts, `.codex/research-routing.md` when needed | full repo, full memory bank, `analysis-codebase`, `plan-long-term-package`, experiment scaffold unless explicitly requested |
-| implementation | task-specific primary | `workflow-rigor` for medium/high-risk changes; `plan-short-term-docs` only as secondary status sync when an active plan is explicitly in scope | repo `AGENTS.md`, relevant files, active plan as input when explicitly referenced, validation | unrelated docs, plan-only completion |
+| implementation | task-specific primary | `workflow-minimal-implementation` only for explicit YAGNI/minimality requests or credible over-engineering pressure; `workflow-rigor` for medium/high-risk changes; `plan-short-term-docs` only as secondary status sync when an active plan is explicitly in scope | repo `AGENTS.md`, relevant files, active plan as input when explicitly referenced, validation | unrelated docs, plan-only completion |
 | approved plan/spec execution | `workflow-plan-runner` | `workflow-rigor` for execution discipline; `workflow-validation` for check selection; `coordination-*` only for explicit handoff or multi-agent ownership | approved plan/spec/package slice, target phase or batch, execution-source sufficiency, source/test/config files, validation contract | plan/spec creation, plan-only completion, all plan packages |
 | validation-only work | `workflow-validation` | `workflow-rigor` only when validation itself has medium/high risk | changed artifact or plan/spec slice, success criteria, risk tier, available checks | `evaluation-harness`, broad repo audit, critical verdicts |
 | repeated failure recovery | `workflow-recovery` | `analysis-bug` for deeper RCA; `workflow-validation` for check redesign; `workflow-rigor` for risky fixes | repeated failure signature, failing command/log, latest attempted fix, narrowed repro, target files | broad redesign, plan package, simple rerun |
@@ -183,6 +183,14 @@ route_smoke_tests:
     must_not_route_to:
       - "create-skill-pack"
     notes: "Executing a skill is not creating or hardening a skill."
+  - request: "최소 구현으로 이 기능 추가해줘. 새 의존성은 가능하면 피하고 과잉 추상화도 막아줘"
+    expected_primary_skill: "task-specific primary"
+    expected_attachments:
+      - "workflow-minimal-implementation"
+    must_not_route_to:
+      - "create-skill-pack"
+      - "analysis-codebase"
+    notes: "Explicit minimal implementation pressure attaches the execution modifier; it is not a lifecycle or broad codebase analysis request."
   - request: "이 오래된 스킬을 deprecated 처리하고 새 스킬로 이동 경로를 정리해줘"
     expected_primary_skill: "create-skill-pack"
     expected_mode: "deprecate_skill"
@@ -484,7 +492,7 @@ Family entry routing (Phase A):
 | `report` | `report-qualitative` (정성평가/보고) or `report-critical` (검토/QA/blocker) by intent |
 | `research` | `research-router` |
 | `analysis` | `analysis-router` |
-| `workflow` | `workflow-rigor` / `workflow-plan-runner` / `workflow-validation` / `workflow-recovery` by intent |
+| `workflow` | `workflow-rigor` / `workflow-minimal-implementation` / `workflow-plan-runner` / `workflow-validation` / `workflow-recovery` by intent |
 | `coordination` | `coordination-brief` |
 | `planning` | `plan-short-term-docs` |
 | `memory` | `memory-bank-harness` (read), `memory-bank-ingestion` (promotion), or explicit memory-mutation skills by intent |

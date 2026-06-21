@@ -1,6 +1,6 @@
 ---
 name: evaluation-harness
-description: Reviews 7.1 runtime usage eval cases as field-quality examples; it does not produce package-cut reports or readiness decisions.
+description: Reviews runtime usage eval cases as field-quality examples; it does not produce package-cut reports or readiness decisions.
 ---
 
 # Evaluation Harness
@@ -52,7 +52,7 @@ description: Reviews 7.1 runtime usage eval cases as field-quality examples; it 
   - PREPARE
 
 ## Boundary
-- Runtime usage eval in 7.1 is for observing skill quality in real use.
+- Runtime usage eval is for observing skill quality in real use.
 - It is not a package-cut validator and must not produce bundle approval state.
 
 ## Workflow

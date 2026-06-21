@@ -1,0 +1,13 @@
+run_id: BR-20260620-INVALID
+case_id: fixture-eval-valid-001
+host: codex
+host_version: unknown
+model: unknown
+model_version: unknown
+bundle_version: "7.3.0"
+started_at: "2026-06-20T00:00:00Z"
+observed_route: workflow-rigor
+observed_behaviors: []
+artifacts: []
+verification:
+result: pass

@@ -1,0 +1,29 @@
+feedback_id: FF-20260621-001
+bundle_version: "7.3.1"
+bundle_hash_or_commit: "24d996d+workspace"
+date: "2026-06-21"
+host: codex
+host_version: "codex-cli 0.140.0-alpha.19"
+model: "gpt-5.5"
+request_class: "agent-output-validation-hardening"
+expected_primary_skill: "workflow-minimal-implementation"
+actual_primary_skill: "workflow-minimal-implementation"
+artifact_refs:
+  - .codex/hooks/codex_hook_adapter.py
+  - .codex/tools/validate_agent_run_artifact.py
+  - .codex/tools/verify_bundle.py
+  - .codex/tools/tests/test_validation_tools.py
+  - .codex/tools/tests/fixtures/agent-runs/repeated-tools/run.yaml
+  - .codex/tools/tests/fixtures/agent-runs/current-run/run.yaml
+  - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
+validation_evidence:
+  - "PYTHONPATH=/private/tmp/skill-system-python-deps python3 .codex/tools/run_verification_pipeline.py --release: PASS for core, execution, agent-output, research, integrations."
+  - "python3 -c ast.parse over .codex/tools and .codex/hooks Python files: parsed 18 files."
+  - "python3 -m json.tool .codex/tools/tests/fixtures/hooks/pretooluse-redaction.json: PASS."
+  - "Stop validation now binds to current session_id/turn_id and reports UNVERIFIED instead of passing missing current run evidence."
+  - "Per-tool lifecycle validation accepts repeated PreToolUse/PostToolUse pairs by tool_use_id."
+  - "Failed PostToolUse is recorded as fail and hook evidence defaults to metadata/hash/redaction."
+outcome: pass
+friction: "Release integration proof requires a local pytest dependency path when pytest is not globally installed."
+privacy_redactions:
+  - "Hook fixture uses synthetic secret text and validator asserts raw credential-like strings are absent from the ledger."

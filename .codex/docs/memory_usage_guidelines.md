@@ -41,6 +41,6 @@ Exclude by default:
 - completed plan bodies unless explicitly requested
 - field feedback entries unrelated to the current task
 
-## 7.1 Boundary
+## Boundary
 
-Memory support in 7.1 is context selection guidance. It is not a global task state system and not a bundle scoring mechanism.
+Memory support is context selection guidance. It is not a global task state system and not a bundle scoring mechanism.

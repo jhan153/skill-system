@@ -1,6 +1,6 @@
 # Improvement Tracks
 
-This document records active 7.1 improvement tracks. It is a field-quality backlog, not a package gate.
+This document records active improvement tracks for the next version cut. It is a field-quality backlog, not a package gate.
 
 ## Active Tracks
 
