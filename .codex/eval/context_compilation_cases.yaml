@@ -1,0 +1,51 @@
+version: "8.0.0-alpha"
+purpose: "Context Pack compilation cases for plan and Kanboard source admission."
+cases:
+  - case_id: context-compile-plan-kanboard-001
+    schema_version: 2
+    user_request: "다음 8.0 구현 페이즈용 Context Pack을 만들어줘."
+    expected_primary_skill: knowledge-context-harness
+    expected_supporting_skills: [workflow-plan-runner]
+    should_not_trigger: [knowledge-base-maintenance, memory-bank-update]
+    expected_family: knowledge
+    expected_context: [active_plan_source, active_kanboard_card, runtime_projection_index]
+    expected_output_shape: "context_pack with active plan file and Kanboard card anchors"
+    quality_notes: "Active Kanboard state is admitted as operational context only when the source is current and active."
+    friction_risk: "dropping Kanboard status from the runtime card and losing task-state provenance"
+    expected_behaviors:
+      - include_active_plan_anchor
+      - include_active_kanboard_anchor
+      - record_source_states_in_runtime_card
+    forbidden_behaviors:
+      - treat_kanboard_card_as_canonical_wiki_page
+      - mutate_accepted_knowledge
+      - mutate_memory_bank
+    required_evidence:
+      - type: context_pack_anchor
+        expected: "kanboard://card/KB-20260621-001"
+      - type: runtime_source_state
+        expected: "SRC-20260621-102=kanboard:active"
+  - case_id: context-compile-plan-kanboard-002
+    schema_version: 2
+    user_request: "완료된 plan closeout도 현재 실행 컨텍스트에 같이 넣어줘."
+    expected_primary_skill: knowledge-context-harness
+    expected_supporting_skills: [knowledge-base-maintenance]
+    should_not_trigger: [memory-bank-update]
+    expected_family: knowledge
+    expected_context: [source_lifecycle_metadata, feedback_packet, admission_policy]
+    expected_output_shape: "rejected runtime admission with knowledge proposal route"
+    quality_notes: "Completed or stale plan sources can support review candidates, but not accepted current runtime claims."
+    friction_risk: "letting closed plans override active 8.0 implementation context"
+    expected_behaviors:
+      - reject_completed_plan_runtime_admission
+      - route_closed_plan_to_feedback_packet
+      - preserve_source_provenance
+    forbidden_behaviors:
+      - admit_stale_plan_as_current_claim
+      - add_closed_plan_to_context_pack_files
+      - promote_candidate_without_review
+    required_evidence:
+      - type: validation_rule
+        expected: "current claim references non-admissible source"
+      - type: feedback_packet
+        expected: "KFP-002"

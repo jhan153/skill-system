@@ -15,12 +15,14 @@ from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
 
+sys.dont_write_bytecode = True
+
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / ".codex" / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-from hook_runtime import event_hash, utc_now  # noqa: E402
+from hook_runtime import utc_now, write_event  # noqa: E402
 from _validation import load_yaml_file  # noqa: E402
 
 
@@ -228,6 +230,22 @@ def hook_ledger_path(args: argparse.Namespace, data: dict[str, Any]) -> Path:
     return default_ledger()
 
 
+def run_id_for_event(args: argparse.Namespace, data: dict[str, Any]) -> str:
+    run_dir = current_run_dir(args, data)
+    if run_dir is not None and (run_dir / "run.yaml").exists():
+        try:
+            manifest = load_yaml_file(run_dir / "run.yaml")
+        except Exception:  # noqa: BLE001 - fallback below preserves recording.
+            manifest = {}
+        if isinstance(manifest, dict) and isinstance(manifest.get("run_id"), str):
+            return manifest["run_id"]
+    if isinstance(data.get("run_id"), str):
+        return data["run_id"]
+    session_id = sanitize_id(data.get("session_id"), "unknown-session")
+    turn_id = sanitize_id(data.get("turn_id"), "unknown-turn")
+    return f"{session_id}:{turn_id}"
+
+
 def read_input(args: argparse.Namespace) -> dict[str, Any]:
     if args.input_file:
         raw = args.input_file.read_text(encoding="utf-8")
@@ -270,7 +288,6 @@ def record_event(
     if isinstance(extra, dict):
         evidence.update(extra)
     payload = {
-        "schema_version": 1,
         "recorded_at": utc_now(),
         "neutral_event": neutral_event,
         "host": "codex",
@@ -283,15 +300,13 @@ def record_event(
         "status": status,
         "evidence": evidence,
     }
-    payload["event_hash"] = event_hash(payload)
     ledger = hook_ledger_path(args, data)
-    ledger.parent.mkdir(parents=True, exist_ok=True)
     try:
+        ledger.parent.mkdir(parents=True, exist_ok=True)
         ledger.parent.chmod(0o700)
     except OSError:
         pass
-    with ledger.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(payload, sort_keys=True, ensure_ascii=True) + "\n")
+    write_event(payload, ledger, run_id_for_event(args, data))
     try:
         ledger.chmod(0o600)
     except OSError:
@@ -324,7 +339,7 @@ def validate_last_assistant_message(run_dir: Path, data: dict[str, Any]) -> tupl
     return 0, "PASS: last_assistant_message matches run manifest assistant_message binding."
 
 
-def run_agent_output_validation(args: argparse.Namespace, data: dict[str, Any]) -> tuple[int, str]:
+def run_agent_output_validation(args: argparse.Namespace, data: dict[str, Any], phase: str) -> tuple[int, str]:
     run_dir = current_run_dir(args, data)
     if run_dir is None:
         return 4, "UNVERIFIED: hook input did not include session_id and turn_id for current run binding."
@@ -336,6 +351,10 @@ def run_agent_output_validation(args: argparse.Namespace, data: dict[str, Any]) 
         str(run_dir),
         "--schema",
         str(ROOT / ".codex" / "schemas" / "harness" / "agent-run.schema.json"),
+        "--context-pack-schema",
+        str(ROOT / ".codex" / "schemas" / "knowledge" / "context-pack.schema.json"),
+        "--phase",
+        phase,
     ]
     completed = subprocess.run(
         cmd,
@@ -385,10 +404,15 @@ def handle(args: argparse.Namespace) -> int:
         return 2
     hook_event = str(data.get("hook_event_name") or "")
     if hook_event == "Stop":
-        validation_code, validation_output = run_agent_output_validation(args, data)
+        validation_code, validation_output = run_agent_output_validation(args, data, "pre-finalize")
         status = "pass" if validation_code == 0 else "warn" if validation_code == 4 else "fail"
-        neutral_event = "turn_finalize" if validation_code == 0 else "turn_finalize_attempt"
-        record_event(args, data, status, {"agent_output_validation": validation_output}, neutral_event)
+        record_event(args, data, status, {"agent_output_validation": validation_output}, "turn_finalize_attempt")
+        if validation_code == 0:
+            record_event(args, data, "pass", {"agent_output_validation": validation_output}, "turn_finalize")
+            post_code, post_output = run_agent_output_validation(args, data, "post-finalize")
+            if post_code != 0:
+                validation_code = post_code
+                validation_output = post_output
         print(json.dumps(stop_output(data, validation_code, validation_output), sort_keys=True))
         return 0
     record_event(args, data, classify_status(data))

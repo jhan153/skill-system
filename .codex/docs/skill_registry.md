@@ -55,6 +55,8 @@ Maturity values must be one of `skeleton`, `usable`, `field_tuned`, `experimenta
 | `workflow-recovery` | execution_control | `experimental` | Recover repeated implementation or validation failure loops with one-hypothesis diagnostics and rollback/fallback decisions. | First-observation bug RCA, broad redesign, solved issues, or simple command reruns. | Collect field cases for same-signature threshold, diagnostic selection, and anti-fake-fix outcomes. | `workflow` |
 | `kanboard-plan-rollout` | kanboard_sync | `experimental` | Onboard a repo's docs/plan to the local Kanboard and bulk register/sync workspaces (init-workspace, register, sync-all dry-run→apply). | Ongoing push/pull/validation on an already-registered board, or Kanboard runtime/theme/plugin work. | Add field cases for multi-workspace onboarding and dry-run→apply approval flow. | `workflow` |
 | `kanboard-plan-ops` | kanboard_sync | `experimental` | Operate an already-registered Kanboard plan board: markdown-primary push, pull candidates, record validation, curate. | New-repo onboarding/bulk registration, or Kanboard runtime/theme/plugin work. | Add field cases for pull candidate handling and validation evidence capture. | `workflow` |
+| `knowledge-context-harness` | knowledge | `experimental` | Compile low-context Context Packs from generated Wiki Bank Runtime Projection artifacts. | Accepted knowledge must be reviewed, promoted, superseded, or mutated. | Add routing and context-compilation field cases before allowing implicit invocation. | `knowledge` |
+| `knowledge-base-maintenance` | knowledge | `experimental` | Validate and maintain Wiki Bank source, claim, edge, projection, and feedback packet state. | The task only needs read-only Context Pack consumption. | Add proposal-review, conflict, supersession, and trust-policy cases. | `knowledge` |
 | `report-qualitative` | output | `experimental` | Produce evidence-based qualitative evaluation reports and explicit-only compact evidence-first reports. | Critical QA verdicts, readable diffs, artifact inventories, eval-case review, telemetry, implementation, debugging, validation execution, or vague report requests without evaluation/evidence intent. | Add field cases for readiness reviews, qualitative diff evaluation, redaction, and legacy `srq` compact mode. | `report` |
 | `design-ui-decomposer` | design | `experimental` | Decompose UI references into hierarchy, layout regions, component candidates, token candidates, states, and validation needs. | Direct implementation, token-only, screenshot-diff-only, or product strategy requests. | Keep implicit invocation disabled; collect field cases before broader routing. | `design` |
 | `design-visual-regression` | design | `experimental` | Inspect rendered screenshots, nonblank/framing evidence, viewport behavior, and visual differences. | There is no rendered UI, screenshot target, or visual reference/acceptance criteria. | Add Playwright/browser examples and threshold guidance. | `design` |
@@ -74,6 +76,7 @@ Family is the user-facing grouping field. The `family` column above is the singl
 | `coordination` | Coordination | `coordination-brief` | 조율, 핸드오프, coordination, handoff |
 | `planning` | Planning | `plan-short-term-docs` | 플랜, 계획, planning, plan |
 | `memory` | Memory | `memory-bank-harness` (read) / `memory-bank-ingestion` (promotion) / `memory-bank-init/update/maintenance/correction-capture` by intent | 메모리, memory |
+| `knowledge` | Knowledge | `knowledge-context-harness` (read) / `knowledge-base-maintenance` (maintenance) by intent | 지식, knowledge, Wiki Bank, Runtime Projection |
 | `evaluation` | Evaluation | `evaluation-harness` (case review) / `evaluation-usage-tracker` (usage telemetry) by intent | 평가, 사용량, evaluation, usage |
 | `skill_system` | Skill System | `create-skill-pack` | 스킬, skill, pack |
 
@@ -83,6 +86,8 @@ Phase B added `search-router`, `memory-bank-ingestion`, and `evaluation-usage-tr
 - `search-paper-evidence`: primary `search`; tags `research`, `paper`, `citation`, `implementation_evidence`.
 - `evaluation-harness`: primary `evaluation`; tag `skill_system`.
 - `search` secondary-tag (evidence lane) candidates: `analysis-codebase`, `analysis-bug`, `workflow-rigor`, `design-visual-regression`, `design-a11y-audit`, `memory-bank-harness`.
+- `knowledge-context-harness`: primary `knowledge`; tags `context`, `runtime_projection`, `wiki_bank`, `memory_compatible`.
+- `knowledge-base-maintenance`: primary `knowledge`; tags `wiki_bank`, `proposal_review`, `conflict`, `supersession`.
 
 ## Cluster Notes
 
@@ -90,6 +95,7 @@ Phase B added `search-router`, `memory-bank-ingestion`, and `evaluation-usage-tr
 - Design cluster is expected to grow like the research cluster, but only through narrow specialist skills.
 - 7.0 coordination concepts remain only as lightweight support skills.
 - `plan-spec-curator` is a context-governance support skill, not a task executor or memory mutator.
+- Knowledge skills are distinct from Memory Bank skills: read-only context compilation uses `knowledge-context-harness`; accepted knowledge mutation/review uses `knowledge-base-maintenance`; persistent Memory Bank mutation still requires explicit memory-bank workflows.
 - Heavy artifact-producing skills require explicit artifact intent.
 
 ## Maturity Review Rules

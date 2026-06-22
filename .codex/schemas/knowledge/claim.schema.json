@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-knowledge-claim.schema.json",
+  "title": "Skill System Knowledge Claim Store",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "store_id",
+    "claims"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "store_id": {
+      "type": "string",
+      "pattern": "^KS-[0-9]{8}-[0-9]{3}$"
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "claim_id",
+          "claim_type",
+          "statement",
+          "authority_class",
+          "context_density",
+          "verification_state",
+          "freshness",
+          "source_refs"
+        ],
+        "properties": {
+          "claim_id": {
+            "type": "string",
+            "pattern": "^KC-[0-9]{8}-[0-9]{3}$"
+          },
+          "claim_type": {
+            "enum": [
+              "decision",
+              "constraint",
+              "source_fact",
+              "operational_rule",
+              "failure_pattern",
+              "plan_state",
+              "compatibility_contract"
+            ]
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "authority_class": {
+            "enum": [
+              "normative",
+              "empirical",
+              "interpretive",
+              "operational"
+            ]
+          },
+          "context_density": {
+            "enum": [
+              "high",
+              "low",
+              "mixed"
+            ]
+          },
+          "verification_state": {
+            "enum": [
+              "agent-verified",
+              "user-verification-needed",
+              "unverified"
+            ]
+          },
+          "freshness": {
+            "enum": [
+              "current",
+              "stale",
+              "superseded"
+            ]
+          },
+          "source_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "source_id",
+                "span"
+              ],
+              "properties": {
+                "source_id": {
+                  "type": "string",
+                  "pattern": "^SRC-[0-9]{8}-[0-9]{3}$"
+                },
+                "span": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "supersedes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^KC-[0-9]{8}-[0-9]{3}$"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

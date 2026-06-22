@@ -1,6 +1,6 @@
 ---
 name: search-router
-description: "Route cross-domain evidence-search requests (papers, code, runtime, visual, memory) to the right evidence lane without owning final synthesis, implementation, or reporting."
+description: "Route cross-domain evidence-search requests (papers, code, runtime, visual, memory, project knowledge) to the right evidence lane without owning final synthesis, implementation, or reporting."
 ---
 
 # Search Router
@@ -17,7 +17,7 @@ description: "Route cross-domain evidence-search requests (papers, code, runtime
   - the user wants final synthesis, implementation, design changes, or a research-lifecycle decision.
 - expected_inputs:
   - topic or claim
-  - evidence domain hints (paper, code, runtime, visual, memory)
+  - evidence domain hints (paper, code, runtime, visual, memory, project knowledge)
   - existing artifacts when available
 - expected_outputs:
   - selected evidence lane and handoff to the owning skill; no writes of its own
@@ -48,6 +48,7 @@ description: "Route cross-domain evidence-search requests (papers, code, runtime
 - `analysis-codebase`, `analysis-bug`: codebase evidence lanes.
 - `design-visual-regression`, `design-a11y-audit`: visual evidence lanes.
 - `memory-bank-harness`, `memory-bank-maintenance`: memory evidence lanes.
+- `knowledge-context-harness`, `knowledge-base-maintenance`: project knowledge evidence lanes.
 
 ## Trigger
 - `검색 스킬군`, `evidence search`, `근거/소스/증거 찾아줘`, `evidence ledger`
@@ -66,6 +67,7 @@ description: "Route cross-domain evidence-search requests (papers, code, runtime
 - runtime evidence -> `workflow-rigor` evidence phase
 - visual evidence -> `design-visual-regression` / `design-a11y-audit`
 - memory evidence -> `memory-bank-harness` / `memory-bank-maintenance`
+- project knowledge evidence -> `knowledge-context-harness` for read-only Runtime Projection context, `knowledge-base-maintenance` for explicit Knowledge Store review
 
 ## Router Decision Steps
 1. Confirm explicit evidence intent (evidence/source/proof/근거/조사/ledger). If absent, defer to the normal Route Matrix — do not trigger.

@@ -1,0 +1,90 @@
+version: "8.0.0-alpha"
+purpose: "Knowledge context routing and maintenance cases for Wiki Bank / Runtime Projection."
+cases:
+  - case_id: knowledge-route-001
+    schema_version: 2
+    user_request: "Wiki Bank Runtime Projection에서 이 작업용 Context Pack 만들어줘."
+    expected_primary_skill: knowledge-context-harness
+    expected_supporting_skills: []
+    should_not_trigger: [knowledge-base-maintenance, memory-bank-update]
+    expected_family: knowledge
+    expected_context: [runtime_projection_index, runtime_cards, context_pack_validation]
+    expected_output_shape: "read-only knowledge_context packet"
+    quality_notes: "Read-only project knowledge context consumption must not mutate accepted knowledge or Memory Bank state."
+    friction_risk: "treating generated projection as Source of Truth"
+    expected_behaviors:
+      - consume_generated_runtime_projection
+      - validate_context_pack_before_use
+      - exclude_accepted_knowledge_mutation
+    forbidden_behaviors:
+      - mutate_accepted_knowledge
+      - mutate_memory_bank
+      - load_full_wiki_by_default
+    required_evidence:
+      - type: route_match
+        expected: knowledge-context-harness
+      - type: command_available
+        expected: ".codex/tools/build_context_pack.py --check"
+  - case_id: knowledge-route-002
+    schema_version: 2
+    user_request: "이 feedback packet을 검토해서 Knowledge Store에 승격할지 판단해줘."
+    expected_primary_skill: knowledge-base-maintenance
+    expected_supporting_skills: [workflow-rigor]
+    should_not_trigger: [knowledge-context-harness, memory-bank-ingestion]
+    expected_family: knowledge
+    expected_context: [feedback_packet, source_records, claim_records, edge_records]
+    expected_output_shape: "knowledge maintenance review result"
+    quality_notes: "Accepted knowledge promotion requires explicit maintenance/review, not context-pack consumption."
+    friction_risk: "promoting agent output without source review"
+    expected_behaviors:
+      - validate_knowledge_store
+      - review_feedback_packet
+      - preserve_source_provenance
+    forbidden_behaviors:
+      - auto_promote_hook_output
+      - rewrite_memory_bank
+    required_evidence:
+      - type: route_match
+        expected: knowledge-base-maintenance
+      - type: command_available
+        expected: ".codex/tools/validate_knowledge_store.py"
+  - case_id: knowledge-neg-001
+    schema_version: 2
+    user_request: "간단히 이 파일 오타만 고쳐줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [knowledge-context-harness, knowledge-base-maintenance, memory-bank-update]
+    expected_family: none
+    expected_context: [target_file]
+    expected_output_shape: "small direct edit"
+    quality_notes: "Simple local edits should not load Wiki Bank context or mutate memory."
+    friction_risk: "overloading a local edit with project knowledge retrieval"
+    expected_behaviors:
+      - keep_knowledge_context_mode_none
+    forbidden_behaviors:
+      - load_runtime_projection
+      - open_knowledge_maintenance_flow
+      - mutate_memory_bank
+    required_evidence:
+      - type: negative_route
+        expected: knowledge-context-harness
+  - case_id: knowledge-memory-001
+    schema_version: 2
+    user_request: "Knowledge Context Pack을 만들되 Memory Bank에는 저장하지 마."
+    expected_primary_skill: knowledge-context-harness
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update, memory-bank-ingestion, memory-bank-correction-capture]
+    expected_family: knowledge
+    expected_context: [runtime_projection_index, runtime_cards, memory_exclusion_instruction]
+    expected_output_shape: "knowledge_context packet with memory mutation excluded"
+    quality_notes: "Knowledge context compilation and Memory Bank persistence remain separate explicit workflows."
+    friction_risk: "confusing Wiki Bank Context Pack generation with persistent Memory Bank mutation"
+    expected_behaviors:
+      - compile_context_without_memory_mutation
+      - preserve_memory_explicit_only_contract
+    forbidden_behaviors:
+      - create_memory_event
+      - call_memory_ingestion
+    required_evidence:
+      - type: route_match
+        expected: knowledge-context-harness

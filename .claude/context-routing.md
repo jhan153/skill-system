@@ -34,6 +34,18 @@ context_bundle:
   review_gate: null
   output_modifier: null
   memory_operation: null
+  knowledge_context:
+    mode: none
+    anchors:
+      files: []
+      components: []
+      topics: []
+      decisions: []
+      kanboard_cards: []
+    claim_types: []
+    relation_types: []
+    max_hops: 1
+    raw_verify: on_conflict
   must_read: []
   read_if_needed: []
   do_not_load_by_default: []
@@ -68,6 +80,8 @@ Build this bundle before multi-step work, writes, broad scans, reports, automati
 | repeated failure recovery | `workflow-recovery` | `analysis-bug` for deeper RCA; `workflow-validation` for check redesign; `workflow-rigor` for risky fixes | repeated failure signature, failing command/log, latest attempted fix, narrowed repro, target files | broad redesign, plan package, simple rerun |
 | plan document | `plan-short-term-docs` | `report-critical` only for QA/review | active plan, plan template | phase package |
 | context/spec lifecycle curation | `plan-spec-curator` | `report-critical` only for QA/review | current goal or task, candidate plan/spec slice, lifecycle state when available | full memory bank, all old plans, archived raw plans, full chat history |
+| knowledge context consumption | owning task primary | `knowledge-context-harness` only when `knowledge_context.mode` is `optional` or `required` | generated Runtime Projection index/cards, selected Context Pack, validation command | full Wiki Bank, raw chat, all plans, accepted knowledge mutation |
+| knowledge maintenance | `knowledge-base-maintenance` | `workflow-rigor` for write validation | target Knowledge Store files, feedback packet or claim IDs, projection validation | Memory Bank mutation, hooks as accepted knowledge, unrelated projections |
 | phase package | `plan-long-term-package` | `workflow-rigor` if execution risk is active | prior reports, templates | lightweight plan only |
 | codebase report | `analysis-codebase` | `report-critical` after report if requested | repo root, scripts, tracked files | single-bug workflow |
 | qualitative evaluation report | `report-qualitative` | `report-critical` only if blocker/QA verdict is also requested | artifact slice, evaluation goal, audience, criteria, evidence anchors, redaction boundary | readable changed-line diffs, artifact inventory, eval telemetry, implementation, debugging |
@@ -77,6 +91,8 @@ Build this bundle before multi-step work, writes, broad scans, reports, automati
 | skill lifecycle | `create-skill-pack` for user-managed custom skills under `.codex/skills/*` excluding `.system` | `report-critical` optional after draft | lifecycle request, target custom skill, one or two adjacent examples | `.system`, unrelated repo files, full skill library |
 
 Development/implementation requests keep the existing implementation, bug, algorithm, or plan skills as primary and follow concrete user requirements as task specifications. Do not route to the research cluster merely because a development request mentions model, metric, experiment, loss, or training. Detailed Research Cluster routing lives in `.codex/research-routing.md`.
+
+Knowledge context compilation does not imply Memory Bank mutation. Persistent Memory Bank mutation still requires explicit memory-bank workflows, and generated Wiki Bank / Runtime Projection artifacts must not be treated as editable memory state.
 
 Aliases may remain in user-facing language, but routing docs should show actual skill IDs. Use system-provided `skill-creator` only when the runtime explicitly exposes it and the user asks for that platform-specific path; otherwise `create-skill-pack` owns user-managed custom `.codex` skill lifecycle work, including reference packs, hardening, migration, metadata, routing registration, smoke tests, and deprecation notes. `.system` skills are outside this lifecycle.
 
@@ -346,6 +362,45 @@ route_smoke_tests:
       - "memory-bank-init"
       - "memory-bank-maintenance"
     notes: "Explicit persistent rule memory mutation."
+  - request: "Wiki Bank Runtime Projection에서 이 작업용 Context Pack 만들어줘."
+    expected_primary_skill: "knowledge-context-harness"
+    expected_route_class: "knowledge_context_read"
+    expected_attachments: []
+    must_read:
+      - "generated runtime projection index/cards"
+      - "Context Pack validation command"
+    expected_default_exclude:
+      - "full Wiki Bank"
+      - "accepted knowledge mutation"
+      - "raw chat transcripts"
+    must_not_route_to:
+      - "memory-bank-update"
+      - "knowledge-base-maintenance"
+    notes: "Read-only Wiki Bank context supply; generated projection is consumed, not edited."
+  - request: "이 feedback packet을 검토해서 Knowledge Store에 승격할지 판단해줘."
+    expected_primary_skill: "knowledge-base-maintenance"
+    expected_route_class: "knowledge_maintenance"
+    expected_attachments:
+      - "workflow-rigor optional for writes"
+    must_read:
+      - "feedback packet"
+      - "source/claim/edge records under review"
+    must_not_route_to:
+      - "knowledge-context-harness"
+      - "memory-bank-ingestion"
+    notes: "Accepted knowledge mutation requires explicit maintenance/review, not context consumption or Memory Bank ingestion."
+  - request: "간단히 이 파일 오타만 고쳐줘."
+    expected_primary_skill: null
+    expected_route_class: "ordinary_small_edit"
+    expected_attachments: []
+    expected_default_exclude:
+      - "knowledge-context-harness"
+      - "knowledge-base-maintenance"
+      - "Memory Bank mutation"
+    must_not_route_to:
+      - "knowledge-context-harness"
+      - "knowledge-base-maintenance"
+    notes: "Simple local edits do not trigger Wiki Bank context supply."
   - request: "이번 답변만 짧게 해줘"
     expected_primary_skill: null
     expected_route_class: "one_turn_preference"

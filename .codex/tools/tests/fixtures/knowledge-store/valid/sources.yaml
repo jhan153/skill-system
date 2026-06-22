@@ -1,0 +1,52 @@
+schema_version: 1
+store_id: KS-20260621-101
+sources:
+  - source_id: SRC-20260621-101
+    source_kind: plan_document
+    locator_type: repo_path
+    locator: repo://docs/plan/2026-06-21-context-assurance-llm-wiki-kanboard.md
+    content_digest:
+      algorithm: sha256
+      value: b7a029a897634fc162fc795512063c66b2e737eab7fa665dca3f261adec3c235
+    retrieved_at: "2026-06-21T00:00:00Z"
+    authority_tier: user_decision
+    verification_status: agent-verified
+    freshness: current
+    lifecycle_state: active
+    metadata:
+      plan_lifecycle: active
+      source_role: active_anchor
+    notes: "Active 8.0 Context Compounding plan fixture source."
+  - source_id: SRC-20260621-102
+    source_kind: kanboard_card
+    locator_type: kanboard_card
+    locator: kanboard://card/KB-20260621-001
+    content_digest:
+      algorithm: sha256
+      value: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+    retrieved_at: "2026-06-21T00:00:00Z"
+    authority_tier: operational_state
+    verification_status: agent-verified
+    freshness: current
+    lifecycle_state: active
+    metadata:
+      kanboard_status: active
+      kanboard_card_id: KB-20260621-001
+      source_role: active_anchor
+    notes: "Active Kanboard card fixture source for Context Pack anchoring."
+  - source_id: SRC-20260621-103
+    source_kind: plan_document
+    locator_type: repo_path
+    locator: repo://docs/plan/2026-06-21-context-assurance-llm-wiki-kanboard.md
+    content_digest:
+      algorithm: sha256
+      value: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    retrieved_at: "2026-06-21T00:00:00Z"
+    authority_tier: evidence
+    verification_status: user-verification-needed
+    freshness: stale
+    lifecycle_state: archived
+    metadata:
+      plan_lifecycle: completed
+      source_role: closeout_candidate
+    notes: "Closed plan closeout fixture source; proposal candidate only, not accepted runtime context."

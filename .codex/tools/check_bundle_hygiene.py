@@ -62,6 +62,8 @@ ALLOWED_MATURITY = {"skeleton", "usable", "field_tuned", "experimental", "deprec
 POLICY_DOCS = ["README.md", "TERMS.md", ".codex/AGENTS.md"]
 OS_NOISE_NAMES = {".DS_Store", "Thumbs.db"}
 UUID_LIKE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.I)
+CACHE_DIR_NAMES = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
+CACHE_SUFFIXES = {".pyc", ".pyo"}
 
 
 def is_os_noise(rel_posix: str) -> bool:
@@ -127,6 +129,17 @@ def check_runtime_trace_artifacts(root: Path, errors: list[str]) -> None:
         text = read_text(ledger)
         if str(Path.home()) in text or "/Users/" in text:
             errors.append(f"runtime trace contains absolute local path: {rel}")
+
+
+def check_cache_artifacts(root: Path, errors: list[str]) -> None:
+    for path in root.rglob("*"):
+        rel = path.relative_to(root).as_posix()
+        if is_os_noise(rel):
+            continue
+        if any(part in CACHE_DIR_NAMES for part in path.relative_to(root).parts):
+            errors.append(f"cache artifact not allowed: {rel}")
+        elif path.is_file() and path.suffix in CACHE_SUFFIXES:
+            errors.append(f"cache artifact not allowed: {rel}")
 
 
 def read_text(path: Path) -> str:
@@ -500,6 +513,7 @@ ALLOWED_FAMILIES = {
     "coordination",
     "planning",
     "memory",
+    "knowledge",
     "evaluation",
     "skill_system",
 }
@@ -555,6 +569,7 @@ def main() -> int:
         return 2
     check_root_shape(root, errors)
     check_sensitive_files(root, errors)
+    check_cache_artifacts(root, errors)
     check_runtime_trace_artifacts(root, errors)
     check_skill_frontmatter(root, errors)
     check_registry(root, errors)

@@ -1,5 +1,29 @@
 {
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/codex_hook_adapter.py\"",
+            "timeout": 30,
+            "statusMessage": "Recording request receipt"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/codex_hook_adapter.py\"",
+            "timeout": 30,
+            "statusMessage": "Recording context load"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash|apply_patch|Edit|Write|mcp__.*",
@@ -47,6 +71,30 @@
             "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/codex_hook_adapter.py\"",
             "timeout": 30,
             "statusMessage": "Checking agent output evidence"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/codex_hook_adapter.py\"",
+            "timeout": 30,
+            "statusMessage": "Recording context compaction start"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/codex_hook_adapter.py\"",
+            "timeout": 30,
+            "statusMessage": "Recording context compaction end"
           }
         ]
       }

@@ -9,10 +9,12 @@
 | visual (screenshot, diff, framing) | `design-visual-regression` | lane selection only |
 | accessibility (focus, contrast, semantics) | `design-a11y-audit` | lane selection only |
 | memory (accepted/stale/conflict signals) | `memory-bank-harness` / `memory-bank-maintenance` | lane selection only |
+| project knowledge (Wiki Bank, Runtime Projection, Context Pack) | `knowledge-context-harness` / `knowledge-base-maintenance` | lane selection only; no accepted knowledge mutation |
 
 ## Ambiguous examples
 - "근거 자료 찾아서 ledger 만들어줘" -> evidence intent + no final owner stated -> `search-router` opens the paper/source lane (`search-paper-evidence`).
 - "이 결과가 맞는지 근거랑 같이 평가해줘" -> the goal is a report, not evidence discovery -> `report-qualitative` primary; evidence lane only if it asks to go find new sources.
+- "Wiki Bank 근거를 찾아서 이 구현에 붙여줘" -> implementation/planning remains primary; `knowledge-context-harness` supplies read-only Runtime Projection context.
 
 ## Router-vs-router examples
 - "연구 가설 세워줘 / ablation 설계해줘" -> `research-router` (research lifecycle), NOT `search-router`.

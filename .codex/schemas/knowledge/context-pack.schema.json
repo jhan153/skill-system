@@ -1,0 +1,318 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-context-pack.schema.json",
+  "title": "Skill System Context Pack",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "pack_id",
+    "task",
+    "primary_skill",
+    "anchors",
+    "admitted_claims",
+    "relation_paths",
+    "raw_source_handles",
+    "expansion_handles",
+    "retrieval_trace",
+    "compilation",
+    "pack_hash"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "pack_id": {
+      "type": "string",
+      "pattern": "^CP-[0-9]{8}-[0-9]{3}$"
+    },
+    "task": {
+      "type": "string",
+      "minLength": 1
+    },
+    "primary_skill": {
+      "type": "string",
+      "minLength": 1
+    },
+    "anchors": {
+      "type": "object",
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "kanboard_cards": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "admitted_claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "claim_id",
+          "statement",
+          "authority_class",
+          "verification_state",
+          "freshness",
+          "operational_effect",
+          "evidence_refs"
+        ],
+        "properties": {
+          "claim_id": {
+            "type": "string",
+            "pattern": "^KC-[0-9]{8}-[0-9]{3}$"
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "authority_class": {
+            "enum": [
+              "normative",
+              "empirical",
+              "interpretive",
+              "operational"
+            ]
+          },
+          "verification_state": {
+            "enum": [
+              "agent-verified",
+              "user-verification-needed",
+              "unverified"
+            ]
+          },
+          "freshness": {
+            "enum": [
+              "current",
+              "stale",
+              "superseded"
+            ]
+          },
+          "operational_effect": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "relation_paths": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path_id",
+          "edge_ids",
+          "relation_summary"
+        ],
+        "properties": {
+          "path_id": {
+            "type": "string",
+            "pattern": "^RP-[0-9]{8}-[0-9]{3}$"
+          },
+          "edge_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^KE-[0-9]{8}-[0-9]{3}$"
+            }
+          },
+          "relation_summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "raw_source_handles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "locator",
+          "revision",
+          "load_when"
+        ],
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "pattern": "^SRC-[0-9]{8}-[0-9]{3}$"
+          },
+          "locator": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "load_when": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "expansion_handles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "handle_id",
+          "claim_id",
+          "source_ids",
+          "expand_when"
+        ],
+        "properties": {
+          "handle_id": {
+            "type": "string",
+            "pattern": "^EH-[0-9]{8}-[0-9]{3}$"
+          },
+          "claim_id": {
+            "type": "string",
+            "pattern": "^KC-[0-9]{8}-[0-9]{3}$"
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^SRC-[0-9]{8}-[0-9]{3}$"
+            }
+          },
+          "expand_when": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "retrieval_trace": {
+      "type": "object",
+      "required": [
+        "query_type",
+        "lexical_hits",
+        "vector_hits",
+        "graph_expansions",
+        "reranked"
+      ],
+      "properties": {
+        "query_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lexical_hits": {
+          "type": "array"
+        },
+        "vector_hits": {
+          "type": "array"
+        },
+        "graph_expansions": {
+          "type": "array"
+        },
+        "reranked": {
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    },
+    "compilation": {
+      "type": "object",
+      "required": [
+        "knowledge_graph_version",
+        "index_version",
+        "source_snapshot",
+        "max_hops",
+        "token_budget",
+        "generated_at",
+        "compiler_version"
+      ],
+      "properties": {
+        "knowledge_graph_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "index_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_snapshot": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^SRC-[0-9]{8}-[0-9]{3}$"
+          }
+        },
+        "max_hops": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "token_budget": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "compiler_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "pack_hash": {
+      "type": "object",
+      "required": [
+        "algorithm",
+        "value"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "sha256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Knowledge Context Harness"
+  short_description: "Compile task-scoped Context Packs from generated Wiki Bank Runtime Projection."
+policy:
+  allow_implicit_invocation: false
