@@ -789,6 +789,30 @@ class ValidationToolTests(unittest.TestCase):
             ".codex/schemas/harness/agent-run.schema.json",
         )
 
+    def test_hooks_json_command_launches_from_non_repo_cwd(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            ledger = Path(tmp) / "hook-events.jsonl"
+            hooks_config = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))
+            command = hooks_config["hooks"]["UserPromptSubmit"][0]["hooks"][0]["command"]
+            fixture = (FIXTURES / "hooks" / "userpromptsubmit.json").read_text(encoding="utf-8")
+            result = subprocess.run(
+                command,
+                cwd="/",
+                env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "SKILL_SYSTEM_HOOK_LEDGER": str(ledger)},
+                input=fixture,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                shell=True,
+                check=False,
+                timeout=30,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertTrue(ledger.exists(), result.stdout + result.stderr)
+            self.assertNotIn("/.codex/hooks/codex_hook_adapter.py", result.stdout + result.stderr)
+            event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[0])
+            self.assertEqual(event["neutral_event"], "request_received")
+
     def test_codex_hook_adapter_records_pretooluse(self) -> None:
         ledger = self.temp_ledger("live-hook-pretooluse")
         if ledger.exists():
