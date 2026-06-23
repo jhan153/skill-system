@@ -380,7 +380,7 @@ class ValidationToolTests(unittest.TestCase):
             pack_file = store_dir / "context-packs" / "CP-20260621-101.yaml"
             pack_file.write_text(
                 pack_file.read_text(encoding="utf-8").replace(
-                    "revision: b7a029a897634fc162fc795512063c66b2e737eab7fa665dca3f261adec3c235",
+                    "revision: 879be1b06a4b5a91ba969964f998e300b6ebdbedccc00d78a3ec96a8a5c75197",
                     "revision: 0000000000000000000000000000000000000000000000000000000000000000",
                     1,
                 ),
@@ -456,8 +456,8 @@ class ValidationToolTests(unittest.TestCase):
             readme = Path(tmp) / "README.md"
             readme.write_text(
                 (ROOT / "README.md").read_text(encoding="utf-8").replace(
-                    "8.0.0 — Context Compounding / Wiki Bank Architecture",
-                    "8.0.0 Context Compounding",
+                    "8.x — Context Compounding / Wiki Bank Architecture",
+                    "8.x Context Compounding",
                 ),
                 encoding="utf-8",
             )

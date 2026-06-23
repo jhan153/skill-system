@@ -25,7 +25,7 @@ This repository includes the skill bundle organized for version 7.3.1. Its main 
 
 ## 8.0 Direction: Context Compounding
 
-The current architecture target is `8.0.0 — Context Compounding / Wiki Bank Architecture`. The current implementation package is best read as `8.0.0-alpha — Context Compounding`: a development baseline for the context-compounding model, not a final 8.0 release or default context operating layer.
+The current architecture line is `8.x — Context Compounding / Wiki Bank Architecture`. The current implementation package is `8.0.2 — Context Compounding Field Hardening`: the field package for the context-compounding model after hook/runtime validation, analysis-codebase hardening, and home-install path cleanup.
 
 `7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 drop-in bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
 
@@ -223,7 +223,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 |   7.1.x | Drop-in bundle                     | Repackaged the system as a drop-in bundle with read-only structure checks and conservative explicit-first routing.                                                                                                                                                                |
 |   7.2.x | Skill families                     | Added user-facing family groups, family-prefixed skill names, and the search/coordination/evaluation families. Version 7.2.1 added workflow execution subfamilies and `report-qualitative`; version 7.2.5 added a skill catalog that helps users understand each skill by family. |
 |   7.3.x | Execution assurance                | Stabilized agent output validation, release verification profiles, and run evidence fixtures as the compatibility baseline before the context-layer transition. |
-| 8.0.0-alpha | Context compounding            | Establishes the alpha baseline for Wiki Bank, Runtime Projection, Context Packs, source-grounded claims, and review-gated knowledge feedback. `7.4.x Context Assurance` is treated as a legacy transition label; full 8.0/default-layer readiness remains gated. |
+| 8.0.2 | Context compounding            | Promotes the Context Compounding package to the 8.0.2 field line, including Wiki Bank, Runtime Projection, Context Packs, source-grounded claims, review-gated knowledge feedback, hook/runtime validation hardening, analysis-codebase hardening, and home-install path cleanup. `7.4.x Context Assurance` is treated as a legacy transition label. |
 
 ## License
 

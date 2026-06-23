@@ -1,6 +1,6 @@
 schema_version: 2
 run_id: AR-20260621-004
-bundle_version: "8.0.0-alpha"
+bundle_version: "8.0.2"
 task:
   user_request_summary: "Validate the current session/turn agent output gate."
   result_label: agent-verified

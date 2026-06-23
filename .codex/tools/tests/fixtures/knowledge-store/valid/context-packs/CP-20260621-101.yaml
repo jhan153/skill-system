@@ -59,7 +59,7 @@ relation_paths:
 raw_source_handles:
 - source_id: SRC-20260621-101
   locator: repo://docs/plan/2026-06-21-context-assurance-llm-wiki-kanboard.md
-  revision: b7a029a897634fc162fc795512063c66b2e737eab7fa665dca3f261adec3c235
+  revision: 879be1b06a4b5a91ba969964f998e300b6ebdbedccc00d78a3ec96a8a5c75197
   load_when: Need raw evidence for source SRC-20260621-101.
 - source_id: SRC-20260621-102
   locator: kanboard://card/KB-20260621-001
@@ -107,4 +107,4 @@ compilation:
   compiler_version: context-pack-builder-v1
 pack_hash:
   algorithm: sha256
-  value: c9b042b92ead57c671a0a3f6b6915191d23f83252c9d970214d49fd4bcce3f75
+  value: 345ecf7de99e413ec81d87e33f7793cbebac8836340c38b816ab631842f086b5

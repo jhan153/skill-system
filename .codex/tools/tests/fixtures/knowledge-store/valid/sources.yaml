@@ -7,7 +7,7 @@ sources:
     locator: repo://docs/plan/2026-06-21-context-assurance-llm-wiki-kanboard.md
     content_digest:
       algorithm: sha256
-      value: b7a029a897634fc162fc795512063c66b2e737eab7fa665dca3f261adec3c235
+      value: 879be1b06a4b5a91ba969964f998e300b6ebdbedccc00d78a3ec96a8a5c75197
     retrieved_at: "2026-06-21T00:00:00Z"
     authority_tier: user_decision
     verification_status: agent-verified

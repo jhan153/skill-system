@@ -56,22 +56,20 @@ QUALITATIVE_CRITERIA = [
 
 README_REQUIRED = {
     "README.md": [
-        "8.0.0 — Context Compounding / Wiki Bank Architecture",
-        "8.0.0-alpha — Context Compounding",
+        "8.x — Context Compounding / Wiki Bank Architecture",
+        "8.0.2 — Context Compounding Field Hardening",
         "7.4.x Context Assurance",
         "legacy label",
-        "development baseline",
-        "not a final 8.0 release or default context operating layer",
+        "field package",
         "Wiki Bank",
         "Runtime Projection",
     ],
     "README.ko.md": [
-        "8.0.0 — Context Compounding / Wiki Bank Architecture",
-        "8.0.0-alpha — Context Compounding",
+        "8.x — Context Compounding / Wiki Bank Architecture",
+        "8.0.2 — Context Compounding Field Hardening",
         "7.4.x Context Assurance",
         "legacy label",
-        "development baseline",
-        "정식 8.0 릴리스",
+        "field package",
         "Wiki Bank",
         "Runtime Projection",
     ],

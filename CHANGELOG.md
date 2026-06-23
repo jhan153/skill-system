@@ -11,6 +11,13 @@
 - Hardened the P0 completion gate after execution feedback: failed/unverified `Stop` checks now record `turn_finalize_attempt` so repair work remains valid, Codex `PermissionRequest` without `tool_use_id` is accepted as approximate, dangling tool calls fail validation, `Stop.last_assistant_message` is hash-bound to the run manifest, unknown tool responses record `warn`, runtime traces are excluded from packaged evidence, and package verification uses synthetic fixtures.
 - Registered `workflow-minimal-implementation` in user-facing README catalogs and added routing/negative eval cases for minimal-implementation modifier behavior.
 
+## 8.0.2
+
+- Promoted the Context Compounding package to the 8.0.2 field line.
+- Hardened `analysis-codebase` for C++/CMake/lizard discovery and safer fallback behavior.
+- Expanded Codex hook launchers to work from repo and home install paths.
+- Deferred optional validation imports in the hook adapter so runtime hooks can start without eager dependency failures.
+
 ## 7.3.1
 
 - Hardened validation integrity after the 7.3.0 release-candidate review: eval, field feedback, source registry, behavior replay, generated mirrors, and execution-assurance schemas now reject invalid sentinel data instead of only checking field names or headers.

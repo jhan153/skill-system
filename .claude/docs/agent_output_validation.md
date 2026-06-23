@@ -25,7 +25,7 @@ Live Codex hooks bind evidence to the current session and turn only when that ru
 ```yaml
 schema_version: 2
 run_id: AR-20260620-001
-bundle_version: "8.0.0-alpha"
+bundle_version: "8.0.2"
 task:
   user_request_summary: "Validate execution-loop outputs."
   result_label: agent-verified
