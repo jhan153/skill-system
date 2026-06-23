@@ -30,6 +30,8 @@ sequenceDiagram
   - complexity/architecture/class-hierarchy/call-graph 생성
   - architecture model 생성(`architecture/*.json`)
   - manifest-aware entrypoint 보강(`package.json`, `pyproject.toml`, `Procfile`, `Makefile`)
+  - C/C++ entrypoint 보강(`main()` 및 `CMakeLists.txt add_executable()`)
+  - optional `lizard` C/C++ 함수/CCN 보강 산출물(`artifacts/static/lizard-complexity.txt`)
   - command path 기반 component/container 연결
   - env/DSN 기반 external system 추론
   - deployment evidence 확장(`Docker/Compose/K8s/Terraform/GitHub Actions/Vercel/Render/Fly/Serverless/Skaffold`)
@@ -84,6 +86,7 @@ python3 "$SKILL_ROOT/scripts/report.py" \
    - `architecture/*.json` 핵심 모델 존재
    - runtime 시나리오가 entrypoint 또는 trace와 연결되는지 확인
    - 정적 분석 그래프(최소 4개) 존재
+   - C/C++ repo에서 `lizard`가 설치된 경우 `artifacts/static/lizard-complexity.txt` 존재
    - `quadrantChart` 라벨이 무따옴표 정규화 규칙을 따르고 렌더 오류가 없는지 확인
 3. 백로그 검증
    - 컬럼이 `파인딩/액션/Severity/Priority/구체적인 개선 내용/관련 파일`인지 확인

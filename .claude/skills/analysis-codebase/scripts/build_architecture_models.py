@@ -706,6 +706,9 @@ def detect_regex_entrypoints(rel_path: str, text: str, ext: str) -> list[dict[st
     elif ext == ".php":
         if re.search(r"\$argv\b|\bSymfony\\Component\\Console\\", text):
             append("cli-command", Path(rel_path).stem, "php-cli")
+    elif ext in {".c", ".cc", ".cpp"}:
+        if re.search(r"\b(?:int|auto)\s+main\s*\(", text):
+            append("cli-startup", f"{Path(rel_path).stem} main", "cpp-main", "main")
 
     return items
 
@@ -935,7 +938,7 @@ def infer_container_kind_from_path(path: str) -> str | None:
 
 def extract_command_paths(command: str) -> list[str]:
     paths: list[str] = []
-    for match in re.finditer(r"([A-Za-z0-9_./-]+\.(?:py|js|jsx|ts|tsx|go|java|rb|php|sh))", command or ""):
+    for match in re.finditer(r"([A-Za-z0-9_./-]+\.(?:py|js|jsx|ts|tsx|go|java|rb|php|sh|c|cc|cpp|h|hpp))", command or ""):
         paths.append(match.group(1))
     return paths
 
@@ -1040,7 +1043,22 @@ def detect_manifest_entrypoints(files: dict[str, dict[str, Any]], repo_path: Pat
                     label=f"make {target}",
                     command=target,
                     provenance="make-target",
-                    container_hint=infer_container_kind_from_command(target),
+                        container_hint=infer_container_kind_from_command(target),
+                    )
+        elif file_name == "cmakelists.txt":
+            text = load_file_text(abs_path)
+            for match in re.finditer(r"add_executable\s*\(\s*([A-Za-z0-9_.:-]+)\s+([^)]*)\)", text, re.I | re.S):
+                target = match.group(1)
+                body = re.sub(r"#.*", "", match.group(2))
+                sources = re.findall(r"([A-Za-z0-9_./+-]+\.(?:c|cc|cpp|cxx|m|mm))", body)
+                command = sources[0] if sources else target
+                append(
+                    rel_path=rel_path,
+                    kind="cli-startup",
+                    label=f"cmake {target}",
+                    command=command,
+                    provenance="cmake-add-executable",
+                    container_hint=infer_container_kind_from_path(command) or "cli",
                 )
 
     return items

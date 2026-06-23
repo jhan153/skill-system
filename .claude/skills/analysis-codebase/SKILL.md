@@ -92,6 +92,9 @@ description: "Repo-wide integrated analysis report from static/dynamic/security/
 ## Architecture Model Contract
 - 내부 구조는 `evidence -> architecture model -> report views` 순서여야 합니다.
 - `call-graph.json`, `class-hierarchy.json`은 보조 증거이며 HLD/LLD의 단일 소스가 아닙니다.
+- 기본 정책은 repo-wide 수집을 허용하고, binary/resource 확장자는 `exclude_extensions`로 제외합니다.
+- C/C++ repo에서는 regex 기반 `main()`/`#include`/CMake `add_executable()` 신호와 optional `lizard` 산출물을 보조 근거로 사용합니다.
+- C/C++ `lizard` 산출물은 함수/CCN 보강 근거이며, clang AST나 `compile_commands.json` 기반 semantic graph를 대체하지 않습니다.
 - interface/crosscutting은 단순 text grep보다 import/reference/env-access 신호를 우선 사용합니다.
 - entrypoint는 코드 엔트리포인트 우선, 필요 시 manifest(`package.json`, `pyproject.toml`, `Procfile`, `Makefile`)에서 보강합니다.
 - manifest entrypoint는 command path를 이용해 실제 컴포넌트/API/Worker 컨테이너에 연결합니다.
@@ -231,5 +234,6 @@ python3 "$SKILL_ROOT/scripts/report.py" \
 ## Known Limits
 - Static architecture models can miss runtime behavior, generated-code semantics, and deployment conditions.
 - Dynamic, security, or Git evidence remains `Unverified` when tools or permissions are unavailable.
+- C/C++ support is shallow unless external tools are available: default collection detects files, `main()`, `#include`, CMake executable declarations, and optional `lizard` complexity, but does not build a clang semantic call graph.
 - Repo-wide collection requires explicit artifact intent, output scope, and side-effect risk gates.
 - If `$CODEX_HOME` and `$HOME/.codex` do not resolve the skill root, require `SKILL_ROOT` instead of assuming an empty path.

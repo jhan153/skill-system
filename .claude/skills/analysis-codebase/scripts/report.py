@@ -87,6 +87,20 @@ def read_tsv(path: Path, has_header: bool = False) -> list[list[str]]:
     return rows
 
 
+def summarize_lizard(path: Path) -> dict[str, str]:
+    if not path.exists() or not path.is_file():
+        return {"status": "missing", "artifact": ""}
+    text = path.read_text(encoding="utf-8", errors="replace")
+    result = {
+        "status": "ok" if text.strip() else "empty",
+        "artifact": "artifacts/static/lizard-complexity.txt",
+    }
+    file_match = re.search(r"(\d+)\s+file(?:s)?\s+analyzed", text, re.I)
+    if file_match:
+        result["files"] = file_match.group(1)
+    return result
+
+
 def sanitize_id(value: str) -> str:
     cleaned = re.sub(r"[^A-Za-z0-9_]", "_", value)
     cleaned = re.sub(r"_+", "_", cleaned).strip("_")
@@ -2113,6 +2127,7 @@ def build_report(
     complexity: dict[str, Any],
     architecture: dict[str, Any],
     coverage: dict[str, Any],
+    lizard_summary: dict[str, str],
     runtime: dict[str, Any],
     trace: dict[str, Any],
     branch_summary: dict[str, Any],
@@ -2156,6 +2171,7 @@ def build_report(
         ["컨테이너/컴포넌트", f"{architecture_counts.get('containers', 'Unverified')} / {architecture_counts.get('components', 'Unverified')}"],
         ["대표 시나리오 수", str(architecture_counts.get("scenarios", "Unverified"))],
         ["콜그래프 노드/엣지", f"{call_graph.get('summary', {}).get('nodes', 'Unverified')} / {call_graph.get('summary', {}).get('edges', 'Unverified')}"],
+        ["C/C++ lizard 보강", str(lizard_summary.get("status", "missing"))],
     ]
 
     metric_rows = [
@@ -2411,6 +2427,9 @@ def build_report(
     lines.append(f"- avg_complexity_score: {complexity.get('summary', {}).get('avg_complexity_score', 'Unverified')}")
     lines.append(f"- line_coverage(%): {coverage.get('line_coverage', 'Unverified')}")
     lines.append(f"- branch_coverage(%): {coverage.get('branch_coverage', 'Unverified')}")
+    lines.append(f"- c_cpp_lizard_status: {lizard_summary.get('status', 'missing')}")
+    if lizard_summary.get("artifact"):
+        lines.append(f"- c_cpp_lizard_artifact: {lizard_summary.get('artifact')}")
     lines.append("")
     for chart in static_metric_charts:
         lines.append(f"### {chart.get('title', 'Unverified')}")
@@ -2426,6 +2445,7 @@ def build_report(
         ["평균 복잡도 점수", str(complexity.get("summary", {}).get("avg_complexity_score", "Unverified"))],
         ["분석 파일 수", str(complexity.get("summary", {}).get("files_analyzed", "Unverified"))],
         ["Coverage(Line/Branch)", f"{coverage.get('line_coverage', 'Unverified')} / {coverage.get('branch_coverage', 'Unverified')}"],
+        ["C/C++ lizard 보강", f"{lizard_summary.get('status', 'missing')} ({lizard_summary.get('artifact', '') or 'no artifact'})"],
     ]
     lines.append(to_markdown_table(["지표", "값"], static_summary_rows))
     lines.append("")
@@ -2543,6 +2563,7 @@ def main() -> int:
     class_hierarchy = load_json(artifacts_dir / "static" / "class-hierarchy.json", {})
     call_graph = load_json(artifacts_dir / "static" / "call-graph.json", {})
     coverage = load_json(artifacts_dir / "static" / "coverage-summary.json", {})
+    lizard_summary = summarize_lizard(artifacts_dir / "static" / "lizard-complexity.txt")
     runtime = load_json(artifacts_dir / "dynamic" / "runtime.json", {})
     trace = load_json(artifacts_dir / "dynamic" / "trace-artifacts.json", {})
     architecture_summary = load_json(artifacts_dir / "architecture" / "architecture-summary.json", {})
@@ -2659,6 +2680,7 @@ def main() -> int:
         complexity=complexity if isinstance(complexity, dict) else {},
         architecture=architecture if isinstance(architecture, dict) else {},
         coverage=coverage if isinstance(coverage, dict) else {},
+        lizard_summary=lizard_summary,
         runtime=runtime if isinstance(runtime, dict) else {},
         trace=trace if isinstance(trace, dict) else {},
         branch_summary=branch_summary,

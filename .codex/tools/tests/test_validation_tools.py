@@ -39,6 +39,10 @@ class ValidationToolTests(unittest.TestCase):
         self.addCleanup(lambda: ledger.unlink(missing_ok=True))
         return ledger
 
+    def hooks_json_command(self, event_name: str = "UserPromptSubmit") -> str:
+        hooks_config = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))
+        return hooks_config["hooks"][event_name][0]["hooks"][0]["command"]
+
     def assert_passes(self, *args: str) -> None:
         result = self.run_tool(*args)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -209,6 +213,83 @@ class ValidationToolTests(unittest.TestCase):
         self.assertIn("kanboard://card/KB-20260621-001", pack_text)
         self.assertIn('"source_states":{"SRC-20260621-102":"kanboard:active"}', index_text)
         self.assertIn("SRC-20260621-102=kanboard:active", card_text)
+
+    def test_analysis_codebase_default_policy_collects_cpp_repo(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            repo = Path(tmp) / "cpp-repo"
+            output = Path(tmp) / "analysis"
+            (repo / "src").mkdir(parents=True)
+            (repo / "assets").mkdir()
+            (repo / "src" / "main.cpp").write_text(
+                (
+                    '#include "app.h"\n'
+                    "int helper() { return 1; }\n"
+                    "int main(int argc, char **argv) {\n"
+                    "  if (argc > 1) { return helper(); }\n"
+                    "  return 0;\n"
+                    "}\n"
+                ),
+                encoding="utf-8",
+            )
+            (repo / "src" / "app.h").write_text("struct AppState { int value; };\n", encoding="utf-8")
+            (repo / "assets" / "mesh.stl").write_text("solid mesh\nendsolid mesh\n", encoding="utf-8")
+            (repo / "CMakeLists.txt").write_text(
+                "cmake_minimum_required(VERSION 3.20)\nadd_executable(sample src/main.cpp)\n",
+                encoding="utf-8",
+            )
+            subprocess.run(["git", "init"], cwd=repo, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+            subprocess.run(["git", "add", "."], cwd=repo, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+
+            result = subprocess.run(
+                [
+                    "bash",
+                    str(ROOT / ".codex/skills/analysis-codebase/scripts/collect.sh"),
+                    "--repo-path",
+                    str(repo),
+                    "--mode",
+                    "static",
+                    "--output-dir",
+                    str(output),
+                    "--policy",
+                    str(ROOT / ".codex/skills/analysis-codebase/references/policy-default.json"),
+                ],
+                cwd=ROOT,
+                env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False,
+                timeout=30,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            classification = (output / "artifacts" / "static" / "path-classification.tsv").read_text(encoding="utf-8")
+            self.assertIn("src/main.cpp\tcode\ttrue\tfallback:code_ext\t.cpp", classification)
+            self.assertIn("assets/mesh.stl\texcluded\tfalse\texclude_extension:.stl\t.stl", classification)
+            self.assertNotIn("outside_include_prefix", classification)
+
+            complexity = json.loads((output / "artifacts" / "static" / "complexity.json").read_text(encoding="utf-8"))
+            main_row = next(row for row in complexity["top_files"] if row["file"] == "src/main.cpp")
+            self.assertGreaterEqual(main_row["functions"], 1)
+
+            entrypoints = json.loads((output / "artifacts" / "architecture" / "entrypoints.json").read_text(encoding="utf-8"))
+            provenances = {item.get("provenance") for item in entrypoints.get("items", [])}
+            self.assertIn("cpp-main", provenances)
+            self.assertIn("cmake-add-executable", provenances)
+
+            report = output / "codebase-analysis-report.md"
+            result = self.run_tool(
+                ".codex/skills/analysis-codebase/scripts/report.py",
+                "--input-dir",
+                str(output),
+                "--output",
+                str(report),
+                "--policy",
+                ".codex/skills/analysis-codebase/references/policy-default.json",
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            report_text = report.read_text(encoding="utf-8")
+            self.assertIn("c_cpp_lizard_status", report_text)
 
     def test_knowledge_store_missing_source_ref_fails(self) -> None:
         with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
@@ -792,13 +873,19 @@ class ValidationToolTests(unittest.TestCase):
     def test_hooks_json_command_launches_from_non_repo_cwd(self) -> None:
         with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
             ledger = Path(tmp) / "hook-events.jsonl"
-            hooks_config = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))
-            command = hooks_config["hooks"]["UserPromptSubmit"][0]["hooks"][0]["command"]
+            command = self.hooks_json_command()
             fixture = (FIXTURES / "hooks" / "userpromptsubmit.json").read_text(encoding="utf-8")
             result = subprocess.run(
                 command,
                 cwd="/",
-                env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1", "SKILL_SYSTEM_HOOK_LEDGER": str(ledger)},
+                env={
+                    **os.environ,
+                    "HOME": str(Path(tmp) / "empty-home"),
+                    "PWD": "/",
+                    "PYTHONDONTWRITEBYTECODE": "1",
+                    "SKILL_SYSTEM_HOOK_LEDGER": str(ledger),
+                    "SKILL_SYSTEM_ROOT": str(ROOT),
+                },
                 input=fixture,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -809,6 +896,55 @@ class ValidationToolTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertTrue(ledger.exists(), result.stdout + result.stderr)
+            self.assertNotIn("/.codex/hooks/codex_hook_adapter.py", result.stdout + result.stderr)
+            event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[0])
+            self.assertEqual(event["neutral_event"], "request_received")
+
+    def test_hooks_json_command_launches_from_home_codex_without_repo_env(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            home = Path(tmp) / "home"
+            codex_home = home / ".codex"
+            for rel in [
+                Path("hooks/codex_hook_adapter.py"),
+                Path("tools/hook_runtime.py"),
+                Path("tools/_validation.py"),
+            ]:
+                target = codex_home / rel
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(ROOT / ".codex" / rel, target)
+
+            ledger = Path(tmp) / "hook-events.jsonl"
+            payload = json.dumps(
+                {
+                    "hook_event_name": "UserPromptSubmit",
+                    "session_id": "session-home",
+                    "turn_id": "turn-home",
+                    "cwd": "/",
+                    "permission_mode": "workspace-write",
+                    "prompt": "home hook",
+                }
+            )
+            result = subprocess.run(
+                self.hooks_json_command(),
+                cwd="/",
+                env={
+                    "HOME": str(home),
+                    "PATH": os.environ.get("PATH", ""),
+                    "PWD": "/",
+                    "PYTHONDONTWRITEBYTECODE": "1",
+                    "SKILL_SYSTEM_HOOK_LEDGER": str(ledger),
+                },
+                input=payload,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                shell=True,
+                check=False,
+                timeout=30,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertTrue(ledger.exists(), result.stdout + result.stderr)
+            self.assertNotIn("fatal: not a git repository", result.stdout + result.stderr)
             self.assertNotIn("/.codex/hooks/codex_hook_adapter.py", result.stdout + result.stderr)
             event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[0])
             self.assertEqual(event["neutral_event"], "request_received")

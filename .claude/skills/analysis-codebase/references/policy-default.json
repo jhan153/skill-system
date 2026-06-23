@@ -6,7 +6,7 @@
     "mode_default": "full",
     "analysis_categories": ["code", "config", "test"],
     "code_extensions": [".py", ".js", ".ts", ".tsx", ".jsx", ".java", ".go", ".rb", ".php", ".cs", ".cpp", ".cc", ".c", ".h", ".hpp"],
-    "include_prefixes": ["scripts/", "tests/", "config/", "data/", "docs/"],
+    "include_prefixes": [],
     "exclude_prefixes": [
       ".venv/",
       "venv/",
@@ -20,6 +20,28 @@
       "artifacts/",
       "docs/report/artifacts/",
       "__pycache__/"
+    ],
+    "exclude_extensions": [
+      ".3mf",
+      ".7z",
+      ".bmp",
+      ".dae",
+      ".db",
+      ".dmg",
+      ".fbx",
+      ".gif",
+      ".ico",
+      ".jpeg",
+      ".jpg",
+      ".obj",
+      ".pdf",
+      ".png",
+      ".sqlite",
+      ".stl",
+      ".tar",
+      ".tiff",
+      ".webp",
+      ".zip"
     ],
     "category_rules": [
       {"prefix": "scripts/", "category": "code"},

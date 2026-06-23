@@ -264,6 +264,7 @@ collection = policy.get("collection", {})
 code_ext = {e.lower() for e in collection.get("code_extensions", [])}
 include_prefixes = collection.get("include_prefixes", [])
 exclude_prefixes = collection.get("exclude_prefixes", [])
+exclude_extensions = {e.lower() for e in collection.get("exclude_extensions", [])}
 category_rules = collection.get("category_rules", [])
 analysis_categories = set(collection.get("analysis_categories", ["code", "config", "test"]))
 max_sequence_steps = int(policy.get("diagram", {}).get("max_sequence_steps", 7))
@@ -304,6 +305,9 @@ def classify(path_str: str):
     for prefix in exclude_prefixes:
         if path_str.startswith(prefix):
             return {"category": "excluded", "included": False, "reason": f"exclude_prefix:{prefix}", "ext": ext}
+
+    if ext in exclude_extensions:
+        return {"category": "excluded", "included": False, "reason": f"exclude_extension:{ext}", "ext": ext}
 
     if include_prefixes and not any(path_str.startswith(prefix) for prefix in include_prefixes):
         return {"category": "excluded", "included": False, "reason": "outside_include_prefix", "ext": ext}
@@ -452,6 +456,17 @@ for rel, meta in classified.items():
                             continue
                         candidate = f"{resolved}.{alias.name}".strip(".") if resolved else alias.name
                         imports_by_file[rel].add(candidate)
+    elif ext in {".c", ".cc", ".cpp", ".h", ".hpp"}:
+        branches = len(re.findall(r"\b(if|elif|for|while|case|catch|switch|except)\b|\?|&&|\|\|", text))
+        functions = len(
+            re.findall(
+                r"(?m)^\s*(?:template\s*<[^>]+>\s*)?(?:[A-Za-z_~][\w:<>~,&*\s]+\s+)?([A-Za-z_~][\w:~]*)\s*\([^;{}]*\)\s*(?:const\s*)?(?:noexcept\s*)?(?:override\s*)?(?:final\s*)?(?:->\s*[A-Za-z_][\w:<>~,&*\s]+\s*)?\{",
+                text,
+            )
+        )
+        classes = re.findall(r"\b(?:class|struct)\s+([A-Za-z_][A-Za-z0-9_]*)", text)
+        for c in classes:
+            all_class_nodes.append({"name": c, "file": rel, "bases": [], "method_count": 0})
     else:
         branches = len(re.findall(r"\\b(if|elif|for|while|case|catch|switch|except)\\b|\\?|&&|\\|\\|", text))
         functions = len(re.findall(r"\\b(def|function|func|fn|void|int|bool|String|public|private|protected)\\b", text))
@@ -653,6 +668,40 @@ PY
   else
     record_tool "static-core" "static" "failed" "" "failed to generate static core artifacts"
     mark_unverified "static.core" "Failed to generate complexity/architecture artifacts"
+  fi
+}
+
+collect_lizard_complexity() {
+  local lizard_out="$ARTIFACT_DIR/static/lizard-complexity.txt"
+
+  if ! has_cmd lizard; then
+    record_tool "lizard" "static" "missing" "" "lizard command not found; C/C++ function-level complexity supplement skipped"
+    return
+  fi
+
+  set +e
+  (
+    cd "$REPO_PATH" &&
+    lizard . \
+      -l cpp \
+      --exclude "*/.git/*" \
+      --exclude "*/build/*" \
+      --exclude "*/dist/*" \
+      --exclude "*/node_modules/*" \
+      --exclude "*/Resources/*" \
+      --exclude "*/resources/*" \
+      --exclude "*/third_party/*" \
+      --exclude "*/vendor/*" \
+      > "$lizard_out"
+  ) 2> "$LOG_DIR/lizard.err"
+  local lizard_rc=$?
+  set -e
+
+  if [[ $lizard_rc -eq 0 || -s "$lizard_out" ]]; then
+    record_tool "lizard" "static" "ok" "artifacts/static/lizard-complexity.txt" "C/C++ function-level complexity supplement generated"
+  else
+    record_tool "lizard" "static" "failed" "" "lizard execution failed"
+    mark_unverified "static.lizard" "lizard execution failed"
   fi
 }
 
@@ -1196,6 +1245,7 @@ collect_git_artifacts
 
 if [[ "$MODE" == "static" || "$MODE" == "full" ]]; then
   collect_static_core
+  collect_lizard_complexity
   collect_coverage
   collect_static_security
 else

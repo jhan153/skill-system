@@ -23,7 +23,6 @@ if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
 from hook_runtime import utc_now, write_event  # noqa: E402
-from _validation import load_yaml_file  # noqa: E402
 
 
 EVENT_MAP = {
@@ -230,11 +229,21 @@ def hook_ledger_path(args: argparse.Namespace, data: dict[str, Any]) -> Path:
     return default_ledger()
 
 
+def load_run_manifest(path: Path) -> Any:
+    try:
+        from _validation import load_yaml_file  # noqa: PLC0415
+    except SystemExit as exc:
+        raise RuntimeError(str(exc)) from exc
+    except Exception as exc:  # noqa: BLE001
+        raise RuntimeError(f"manifest loader unavailable: {exc}") from exc
+    return load_yaml_file(path)
+
+
 def run_id_for_event(args: argparse.Namespace, data: dict[str, Any]) -> str:
     run_dir = current_run_dir(args, data)
     if run_dir is not None and (run_dir / "run.yaml").exists():
         try:
-            manifest = load_yaml_file(run_dir / "run.yaml")
+            manifest = load_run_manifest(run_dir / "run.yaml")
         except Exception:  # noqa: BLE001 - fallback below preserves recording.
             manifest = {}
         if isinstance(manifest, dict) and isinstance(manifest.get("run_id"), str):
@@ -316,7 +325,7 @@ def record_event(
 def validate_last_assistant_message(run_dir: Path, data: dict[str, Any]) -> tuple[int, str]:
     manifest_path = run_dir / "run.yaml"
     try:
-        manifest = load_yaml_file(manifest_path)
+        manifest = load_run_manifest(manifest_path)
     except Exception as exc:  # noqa: BLE001
         return 1, f"FAIL: current run manifest is not readable for assistant message validation: {exc}"
     if not isinstance(manifest, dict):
