@@ -23,9 +23,9 @@ This repository includes the skill bundle organized for version 7.3.1. Its main 
 * `integrations`: optional integration payloads — includes `integrations/kanboard-plan-sync`, a plan-centric MCP/CLI that projects Markdown plans onto a local Kanboard. The Kanboard app, DB, themes, and plugins are NOT bundled; only the integration code, two Agent skills (`kanboard-plan-rollout`, `kanboard-plan-ops`), MCP registration examples, and a local-host setup methodology are included.
 * `CHANGELOG.md`, `TERMS.md`, `FIELD_FEEDBACK.md`: change history, terminology notes, and field feedback template
 
-## 8.0 Direction: Context Compounding
+## 8.x Direction: Context Compounding
 
-The current architecture line is `8.x — Context Compounding / Wiki Bank Architecture`. The current implementation package is `8.0.2 — Context Compounding Field Hardening`: the field package for the context-compounding model after hook/runtime validation, analysis-codebase hardening, and home-install path cleanup.
+The current architecture line is `8.x — Context Compounding / Wiki Bank Architecture`. The current implementation target is `8.1.0 — Loop Engineering Planning`: it keeps `8.0.2 — Context Compounding Field Hardening` as the context-compounding field baseline and adds loop readiness, loop contract, verifier mapping, and accepted loop execution support for `/goal` and repeated agent work.
 
 `7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 drop-in bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
 
@@ -133,6 +133,16 @@ Workflow skills control implementation discipline, validation, and failure recov
 | `workflow-validation`  | Plans or performs focused validation for completed or planned changes. It separates validation performed by the agent from validation that must be checked by the user. |
 | `workflow-recovery`    | Breaks repeated implementation or validation retry loops through single-hypothesis diagnosis, narrowed reproduction steps, rollback, or alternative decisions.          |
 
+### Loop Engineering
+
+Loop Engineering skills decide when repeated execution is justified, turn success conditions into verifier ownership, and run accepted loop contracts without over-looping simple work. The 8.1.0 layer also records governance gates for progress, trusted termination, non-idempotent retry, context poisoning, reward hacking, comprehension debt, and Wiki Bank feedback candidates.
+
+| Skill                    | Role                                                                                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `loop-readiness-router`  | Classifies an initial request as `one_shot`, `contract_needed`, or `loop_worthy` before execution, including governance prerequisites.                    |
+| `loop-verifier-registry` | Maps loop success conditions and governance metrics to verifier skills, commands, evidence targets, pass/fail signals, fallback checks, and labels.       |
+| `workflow-loop-runner`   | Executes accepted loop contracts through observe/decide/act/verify/checkpoint batches, governance gates, verifier evidence, retry/recovery, and stops.   |
+
 ### Planning
 
 Planning skills create or organize planning and specification artifacts without performing the actual implementation.
@@ -141,6 +151,7 @@ Planning skills create or organize planning and specification artifacts without 
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `plan-short-term-docs`   | Creates or updates persistent `docs/plan` work plans for near-term tasks, state, and implementation transitions.                                                           |
 | `plan-long-term-package` | Creates large multi-document planning packages for bulk work, migrations, rewrites, or milestone plans that future sessions must be able to continue from documents alone. |
+| `plan-loop-term`         | Creates goal/loop completion contracts with success conditions, verifier evidence, progress signals, retry terms, stop policy, checkpoints, and handoff text.             |
 | `plan-spec-curator`      | Organizes active context and outdated or superseded specifications/plans, and proposes archive/reload policies to prevent planning context from becoming overloaded.       |
 
 ### Coordination
@@ -224,6 +235,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 |   7.2.x | Skill families                     | Added user-facing family groups, family-prefixed skill names, and the search/coordination/evaluation families. Version 7.2.1 added workflow execution subfamilies and `report-qualitative`; version 7.2.5 added a skill catalog that helps users understand each skill by family. |
 |   7.3.x | Execution assurance                | Stabilized agent output validation, release verification profiles, and run evidence fixtures as the compatibility baseline before the context-layer transition. |
 | 8.0.2 | Context compounding            | Promotes the Context Compounding package to the 8.0.2 field line, including Wiki Bank, Runtime Projection, Context Packs, source-grounded claims, review-gated knowledge feedback, hook/runtime validation hardening, analysis-codebase hardening, and home-install path cleanup. `7.4.x Context Assurance` is treated as a legacy transition label. |
+| 8.1.0 | Loop engineering planning            | Adds loop readiness classification, `plan-loop-term` contracts, verifier mapping, and accepted loop execution support for `/goal` and repeated agent work: success conditions, verifier evidence, progress/stall signals, retry and stop policies, checkpoints, idempotency notes, loop governance metrics, Wiki feedback candidates, and execution handoff text. |
 
 ## License
 

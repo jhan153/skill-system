@@ -85,6 +85,8 @@ Status values:
 - Do not treat hook checks as a complete security boundary.
 - Do not bypass sandbox, approval, or rule policy because a hook record exists.
 - Do not use `Stop` to run bundle hygiene, behavior evals, release profiles, plan synchronization, or repository-wide repair.
+- A Kanboard post-session reflection is allowed only as an explicit opt-in (`KANBOARD_PLAN_POST_SESSION=dry-run|apply`) with an exact task mapping (`KANBOARD_PLAN_TASK_REFERENCE` or `KANBOARD_PLAN_ID` + `KANBOARD_PLAN_TASK_KEY`). It records a session comment through `record_session_update`; it must not infer tasks, promote Markdown completion, or run broad board sync.
 - Keep repair/sync workflows explicit and separate from read-only hook observation.
 - Project-local hooks may run automatically only after project trust and hook trust. They still do not install themselves or mutate user config.
 - Use hook records as structured evidence for behavior evals and final report consistency checks.
+- Loop-specific progress, trusted termination, Wiki feedback, reward-hacking, context-poisoning, idempotency, oscillation, and over-orchestration checks belong in loop governance artifacts unless a dedicated loop-aware validator is explicitly implemented and wired.

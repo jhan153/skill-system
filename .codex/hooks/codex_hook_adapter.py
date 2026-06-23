@@ -51,6 +51,7 @@ SENSITIVE_PATTERN = re.compile(
 )
 SECRET_VALUE_PATTERN = re.compile(r"(?i)(sk-[A-Za-z0-9_-]{12,}|[A-Za-z0-9_./+-]{24,})")
 EXIT_CODE_PATTERN = re.compile(r"(?i)(?:exit(?:ed)?(?:\s+with)?\s+code|exit_code|returncode|status)\D{0,20}(-?\d+)")
+KANBOARD_POST_SESSION_MODES = {"dry-run", "apply"}
 
 
 def sanitize_id(value: object, fallback: str) -> str:
@@ -427,6 +428,101 @@ def stop_output(data: dict[str, Any], validation_code: int, validation_output: s
     }
 
 
+def _env_list(name: str) -> list[str]:
+    raw = os.environ.get(name, "")
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
+
+def _kanboard_task_reference_from_env() -> str | None:
+    reference = os.environ.get("KANBOARD_PLAN_TASK_REFERENCE")
+    if reference:
+        return reference.strip()
+    plan_id = os.environ.get("KANBOARD_PLAN_ID")
+    task_key = os.environ.get("KANBOARD_PLAN_TASK_KEY")
+    if plan_id and task_key:
+        return f"{plan_id.strip()}:{task_key.strip()}"
+    return None
+
+
+def _load_kanboard_run_tool():
+    candidates = [
+        ROOT / "integrations" / "kanboard-plan-sync" / "src",
+        Path.home() / ".ai" / "infra" / "kanboard-plan-sync" / "src",
+    ]
+    for candidate in candidates:
+        if candidate.is_dir() and str(candidate) not in sys.path:
+            sys.path.insert(0, str(candidate))
+    from kanboard_plan_sync_mcp.tools import run_tool  # noqa: PLC0415
+
+    return run_tool
+
+
+def maybe_record_kanboard_post_session(
+    data: dict[str, Any], validation_code: int
+) -> dict[str, Any] | None:
+    """Optionally reflect the completed session on a mapped Kanboard task.
+
+    Disabled by default. Set ``KANBOARD_PLAN_POST_SESSION=dry-run`` or
+    ``apply`` and provide ``KANBOARD_PLAN_TASK_REFERENCE`` (or plan id + task
+    key). The hook never guesses the task from conversation text.
+    """
+    mode = os.environ.get("KANBOARD_PLAN_POST_SESSION", "").strip().lower()
+    if not mode:
+        return None
+    if mode not in KANBOARD_POST_SESSION_MODES:
+        return {"status": "skipped", "reason": "invalid KANBOARD_PLAN_POST_SESSION mode"}
+
+    reference = _kanboard_task_reference_from_env()
+    if not reference:
+        return {
+            "status": "needs_task_reference",
+            "reason": "set KANBOARD_PLAN_TASK_REFERENCE or KANBOARD_PLAN_ID + KANBOARD_PLAN_TASK_KEY",
+        }
+    if mode == "apply" and validation_code != 0 and os.environ.get("KANBOARD_PLAN_POST_SESSION_ALLOW_UNVERIFIED") != "1":
+        return {
+            "status": "skipped_unverified",
+            "task_reference": reference,
+            "reason": "agent output validation did not pass; set KANBOARD_PLAN_POST_SESSION_ALLOW_UNVERIFIED=1 to override",
+        }
+
+    message = data.get("last_assistant_message")
+    if not isinstance(message, str) or not message.strip():
+        return {
+            "status": "unverified",
+            "task_reference": reference,
+            "reason": "Stop hook input did not include last_assistant_message",
+        }
+
+    workspace = os.environ.get("KANBOARD_PLAN_WORKSPACE") or data.get("cwd")
+    args: dict[str, Any] = {
+        "task_reference": reference,
+        "session_summary": redact_text(message),
+        "result_label": os.environ.get("KANBOARD_PLAN_RESULT_LABEL")
+        or ("agent-verified" if validation_code == 0 else "unverified"),
+        "validation_evidence": os.environ.get("KANBOARD_PLAN_VALIDATION_EVIDENCE") or None,
+        "changed_files": _env_list("KANBOARD_PLAN_CHANGED_FILES"),
+        "dry_run": mode != "apply",
+    }
+    if workspace:
+        args["workspace"] = str(workspace)
+    try:
+        result = _load_kanboard_run_tool()("record_session_update", args)
+    except Exception as exc:  # noqa: BLE001 - hook must stay non-blocking.
+        return {
+            "status": "error",
+            "task_reference": reference,
+            "mode": mode,
+            "reason": truncate(str(exc), 500),
+        }
+    return {
+        "status": result.get("status"),
+        "applied": result.get("applied"),
+        "mode": mode,
+        "task_reference": reference,
+        "tool": result.get("tool"),
+    }
+
+
 def handle(args: argparse.Namespace) -> int:
     try:
         data = read_input(args)
@@ -439,11 +535,18 @@ def handle(args: argparse.Namespace) -> int:
         status = "pass" if validation_code == 0 else "warn" if validation_code == 4 else "fail"
         record_event(args, data, status, {"agent_output_validation": validation_output}, "turn_finalize_attempt")
         if validation_code == 0:
-            record_event(args, data, "pass", {"agent_output_validation": validation_output}, "turn_finalize")
             post_code, post_output = run_agent_output_validation(args, data, "post-finalize")
             if post_code != 0:
                 validation_code = post_code
                 validation_output = post_output
+        finalize_extra: dict[str, Any] = {"agent_output_validation": validation_output}
+        kanboard_post_session = maybe_record_kanboard_post_session(data, validation_code)
+        if kanboard_post_session is not None:
+            finalize_extra["kanboard_post_session"] = kanboard_post_session
+        if validation_code == 0:
+            record_event(args, data, "pass", finalize_extra, "turn_finalize")
+        elif kanboard_post_session is not None:
+            record_event(args, data, "warn", finalize_extra, "turn_finalize_attempt")
         print(json.dumps(stop_output(data, validation_code, validation_output), sort_keys=True))
         return 0
     record_event(args, data, classify_status(data))

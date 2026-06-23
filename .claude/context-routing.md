@@ -74,11 +74,16 @@ Build this bundle before multi-step work, writes, broad scans, reports, automati
 | bug diagnosis | `analysis-router` -> `analysis-bug` | `workflow-rigor` only if implementation/risk is active | symptom, repro, relevant files, logs | full repo report |
 | algorithm proposal | `analysis-router` -> `analysis-algorithm` | `report-qualitative` only for formal output | constraints, metrics, candidates | full repo or memory |
 | research / scientific workflow | `research-router` | selected narrow research cluster skill; `plan-short-term-docs` only for explicit persisted `docs/plan` artifact | research request, stage hints, provided artifacts, `.codex/research-routing.md` when needed | full repo, full memory bank, `analysis-codebase`, `plan-long-term-package`, experiment scaffold unless explicitly requested |
+| cross-domain evidence search | `search-router` | selected evidence lane such as `search-paper-evidence`, `analysis-bug`, `design-visual-regression`, `memory-bank-harness`, or `knowledge-context-harness` | evidence intent, domain hint, claim/topic, final task owner | final synthesis, implementation, broad research lifecycle |
+| loop readiness classification | `loop-readiness-router` | `plan-loop-term` only after `contract_needed` or `loop_worthy`; `workflow-loop-runner` only after accepted contract | prompt draft, target domain, verifier hints, side-effect, approval, durability, event-runtime, Wiki feedback, parallelism, and idempotency signals | direct execution, contract drafting, verifier execution, broad planning |
+| loop verifier mapping | `loop-verifier-registry` | `plan-loop-term` when embedding map into a contract; verifier skills only as owners, not executors | loop term or success conditions, verifier catalog, target domain, governance metrics | running checks, implementation, readiness classification |
+| accepted loop contract execution | `workflow-loop-runner` | task-specific primary skill; `workflow-recovery` for repeated failures; `workflow-validation` for verifier strategy; `knowledge-base-maintenance` only for explicit Wiki feedback review | accepted loop term, verifier map, governance gates, loop budget, checkpoint state, approval gates | contract creation, readiness classification, one-shot work, accepted Wiki mutation |
 | implementation | task-specific primary | `workflow-minimal-implementation` only for explicit YAGNI/minimality requests or credible over-engineering pressure; `workflow-rigor` for medium/high-risk changes; `plan-short-term-docs` only as secondary status sync when an active plan is explicitly in scope | repo `AGENTS.md`, relevant files, active plan as input when explicitly referenced, validation | unrelated docs, plan-only completion |
 | approved plan/spec execution | `workflow-plan-runner` | `workflow-rigor` for execution discipline; `workflow-validation` for check selection; `coordination-*` only for explicit handoff or multi-agent ownership | approved plan/spec/package slice, target phase or batch, execution-source sufficiency, source/test/config files, validation contract | plan/spec creation, plan-only completion, all plan packages |
 | validation-only work | `workflow-validation` | `workflow-rigor` only when validation itself has medium/high risk | changed artifact or plan/spec slice, success criteria, risk tier, available checks | `evaluation-harness`, broad repo audit, critical verdicts |
 | repeated failure recovery | `workflow-recovery` | `analysis-bug` for deeper RCA; `workflow-validation` for check redesign; `workflow-rigor` for risky fixes | repeated failure signature, failing command/log, latest attempted fix, narrowed repro, target files | broad redesign, plan package, simple rerun |
 | plan document | `plan-short-term-docs` | `report-critical` only for QA/review | active plan, plan template | phase package |
+| goal/loop term contract | `plan-loop-term` | `loop-readiness-router` if readiness is unknown; `loop-verifier-registry` if verifier ownership is unclear; `plan-short-term-docs` only when persisting into `docs/plan`; `plan-long-term-package` only when this is one artifact in a broad phase package | goal or loop intent, target plan/spec, success criteria, verifier evidence, governance coverage, budgets, stop/retry boundaries | implementation, loop execution, broad package ownership, generic validation-only work |
 | context/spec lifecycle curation | `plan-spec-curator` | `report-critical` only for QA/review | current goal or task, candidate plan/spec slice, lifecycle state when available | full memory bank, all old plans, archived raw plans, full chat history |
 | knowledge context consumption | owning task primary | `knowledge-context-harness` only when `knowledge_context.mode` is `optional` or `required` | generated Runtime Projection index/cards, selected Context Pack, validation command | full Wiki Bank, raw chat, all plans, accepted knowledge mutation |
 | knowledge maintenance | `knowledge-base-maintenance` | `workflow-rigor` for write validation | target Knowledge Store files, feedback packet or claim IDs, projection validation | Memory Bank mutation, hooks as accepted knowledge, unrelated projections |
@@ -249,6 +254,21 @@ route_smoke_tests:
       - "memory-bank-correction-capture"
       - "memory-bank-maintenance"
     notes: "Recommendation intent selects the algorithm primary, not bug RCA."
+  - request: "이 주장에 대한 논문, 코드, 런타임 근거 중 어떤 evidence lane을 타야 할지 먼저 골라줘"
+    expected_primary_skill: "search-router"
+    expected_route_class: "cross_domain_evidence_lane_selection"
+    expected_attachments: []
+    must_not_route_to:
+      - "research-router"
+      - "report-qualitative"
+    notes: "Explicit evidence-lane selection belongs to search-router; it should not synthesize or report."
+  - request: "이 구현을 검토하고 개선점 알려줘"
+    expected_primary_skill: null
+    expected_route_class: "ordinary_review_or_task_specific_primary"
+    expected_attachments: []
+    must_not_route_to:
+      - "search-router"
+    notes: "Bare review without evidence/source/proof intent must not use the evidence router."
   - request: "이 개념을 탐색해보자"
     expected_primary_skill: null
     expected_route_class: "casual_exploration"
@@ -262,6 +282,62 @@ route_smoke_tests:
     must_not_route_to:
       - "plan-long-term-package"
     notes: "Persisted docs/plan artifact intent is explicit."
+  - request: "/goal로 돌리기 전에 완료 조건, 검증 기준, 중단 조건 계약서만 만들어줘"
+    expected_primary_skill: "plan-loop-term"
+    expected_attachments: []
+    must_not_route_to:
+      - "workflow-plan-runner"
+      - "workflow-validation"
+      - "plan-long-term-package"
+    notes: "Planning-stage goal/loop completion terms, not execution, post-change validation, or a broad phase package."
+  - request: "버튼 색만 바꾸는 작업인데 루프로 돌릴 필요가 있는지 판단해줘"
+    expected_primary_skill: "loop-readiness-router"
+    expected_route_class: "loop_readiness_one_shot"
+    expected_attachments: []
+    must_not_route_to:
+      - "plan-loop-term"
+      - "workflow-loop-runner"
+    notes: "Explicit readiness request, but simple deterministic UI tweak should classify one-shot with anti-loop signals and minimum sufficient path."
+  - request: "이 Figma 화면을 맞을 때까지 구현하려고 해. 먼저 루프 준비 상태를 판정해줘"
+    expected_primary_skill: "loop-readiness-router"
+    expected_route_class: "loop_readiness_loop_worthy"
+    expected_attachments:
+      - "plan-loop-term if user proceeds"
+      - "loop-verifier-registry if contract is drafted"
+    must_not_route_to:
+      - "workflow-loop-runner"
+    notes: "Design fidelity plus repeated verifier feedback is loop-worthy, but execution waits for an accepted contract and verifier map."
+  - request: "이 loop_term의 SC-DESIGN 조건들을 어떤 verifier skill이 봐야 하는지 매핑해줘"
+    expected_primary_skill: "loop-verifier-registry"
+    expected_attachments:
+      - "plan-loop-term optional for embedding"
+    must_not_route_to:
+      - "workflow-loop-runner"
+      - "design-frontend"
+    notes: "Verifier mapping does not run implementation or checks; it names owner, independence, evidence, pass/fail signals, and unavailable labels."
+  - request: "승인된 loop_term과 verifier_map 기준으로 반복 실행해줘"
+    expected_primary_skill: "workflow-loop-runner"
+    expected_attachments:
+      - "task-specific primary"
+      - "workflow-recovery on repeated failure"
+    must_not_route_to:
+      - "plan-loop-term"
+      - "loop-readiness-router"
+    notes: "Accepted loop contract execution belongs to workflow-loop-runner with observe-decide-act-verify-checkpoint state."
+  - request: "이 루프는 배포 retry가 필요할 수도 있어. 비멱등 재시도와 stop hook 평가까지 계약에 넣어줘"
+    expected_primary_skill: "plan-loop-term"
+    expected_attachments:
+      - "loop-verifier-registry if verifier ownership is unclear"
+    must_not_route_to:
+      - "workflow-loop-runner"
+    notes: "Non-idempotent retry and Stop-hook loop evaluation are governance contract concerns before execution."
+  - request: "loop 실행 결과에서 Wiki Bank에 남길 개선 후보만 정리하고 accepted knowledge로는 올리지 마"
+    expected_primary_skill: "workflow-loop-runner"
+    expected_attachments:
+      - "knowledge-base-maintenance only if user asks to review/promote candidates"
+    must_not_route_to:
+      - "knowledge-context-harness"
+    notes: "Loop runner may emit feedback candidates but must not mutate accepted Wiki Bank knowledge."
   - request: "완료된 plan은 핵심 결정만 memory 후보로 남기고 다음부터 raw plan은 active context에서 빼줘"
     expected_primary_skill: "plan-spec-curator"
     expected_attachments: []
@@ -302,6 +378,13 @@ route_smoke_tests:
     must_not_route_to:
       - "plan-short-term-docs"
     notes: "Package/phase artifact intent selects the heavy planning package."
+  - request: "이 마이그레이션을 phase별 서브플랜 패키지로 만들고 각 phase의 loop term도 포함해줘"
+    expected_primary_skill: "plan-long-term-package"
+    expected_attachments:
+      - "plan-loop-term"
+    must_not_route_to:
+      - "plan-short-term-docs"
+    notes: "Broad multi-document package owns the work; loop terms are package sub-artifacts."
   - request: "이 repo 전체 코드베이스 분석 리포트를 만들어줘"
     expected_primary_skill: "analysis-codebase"
     expected_attachments: []
@@ -528,7 +611,7 @@ route_smoke_tests:
 ```
 
 ## Agent Metadata Tradeoff
-Current `agents/openai.yaml` metadata is conservative: most custom skills use `allow_implicit_invocation: false` to prevent broad-trigger overactivation. Explicit aliases, Routing Cards, and this routing contract remain the primary activation path. If real usage shows under-activation, enable implicit invocation only for narrow router or primary skills after smoke-test validation. Heavy artifact generators must stay non-implicit.
+Current `agents/openai.yaml` metadata is conservative: specialist skills and heavy artifact generators use `allow_implicit_invocation: false` to prevent broad-trigger overactivation. The only current implicit exceptions are `analysis-router`, `research-router`, and `search-router`, backed by smoke/eval negative cases. Explicit aliases, Routing Cards, and this routing contract remain the primary activation path for all other skills.
 
 
 ## Group Alias Routing
@@ -549,7 +632,8 @@ Family entry routing (Phase A):
 | `analysis` | `analysis-router` |
 | `workflow` | `workflow-rigor` / `workflow-minimal-implementation` / `workflow-plan-runner` / `workflow-validation` / `workflow-recovery` by intent |
 | `coordination` | `coordination-brief` |
-| `planning` | `plan-short-term-docs` |
+| `planning` | `plan-short-term-docs` / `plan-loop-term` / `plan-long-term-package` by intent |
+| `loop` | `loop-readiness-router` / `loop-verifier-registry` / `workflow-loop-runner` by intent |
 | `memory` | `memory-bank-harness` (read), `memory-bank-ingestion` (promotion), or explicit memory-mutation skills by intent |
 | `evaluation` | `evaluation-harness` (case review) or `evaluation-usage-tracker` (usage telemetry) by intent |
 | `skill_system` | `create-skill-pack` |
@@ -560,4 +644,6 @@ Evidence vs research boundary (mirrored rule; `research-routing.md` is Codex-onl
 - Implementation/plan/algorithm requests that merely mention paper/loss/model/experiment keep their implementation/planning/analysis primary; research attaches only as a support evidence lane.
 
 Phase B note:
-- `search-router`, `evaluation-usage-tracker`, and `memory-bank-ingestion` now exist (experimental, explicit-only); the entries above are final.
+- `analysis-router`, `research-router`, and `search-router` are the only selectively implicit entry routers. Specialist skills remain explicit-only unless future field feedback justifies another exception.
+- `evaluation-usage-tracker` and `memory-bank-ingestion` remain experimental explicit-only skills.
+- Loop engineering skills remain explicit/routing-controlled: readiness classification, verifier mapping, and loop execution are separate to avoid accidental long-running loops.

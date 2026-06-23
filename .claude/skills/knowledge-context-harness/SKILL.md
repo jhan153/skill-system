@@ -11,12 +11,14 @@ description: Compile task-specific low-context Context Packs from the generated 
   - Wiki Bank context
   - Runtime Projection context
   - Context Pack compilation
+  - loop context refresh
   - high-context expansion
   - knowledge_context
 - use_when:
   - an implementation, planning, analysis, or review task explicitly needs project knowledge compiled from the Wiki Bank.
   - a task must consume an existing generated Runtime Projection card or Context Pack.
   - the active route sets `knowledge_context.mode` to `optional` or `required`.
+  - a later loop iteration needs a refreshed Context Pack after accepted knowledge changed through maintenance.
 - do_not_use_when:
   - the task is simple, local, and needs no project knowledge.
   - accepted knowledge must be created, reviewed, promoted, superseded, or reconciled; use `knowledge-base-maintenance`.
@@ -26,6 +28,7 @@ description: Compile task-specific low-context Context Packs from the generated 
   - relevant anchors: files, topics, decisions, components, or Kanboard cards
   - generated Runtime Projection cards or `runtime/index.jsonl`
   - Context Pack validation command
+  - loop checkpoint or feedback candidate ids only when the owning loop requests Wiki-context refresh
 - expected_outputs:
   - selected Runtime Projection card refs
   - Context Pack ref or generated pack path
@@ -65,6 +68,7 @@ description: Compile task-specific low-context Context Packs from the generated 
 - Context Pack admission must be source-grounded, freshness-aware, and task-scoped.
 - Load low-context cards first; expand to high-context Wiki/raw source only on conflict, ambiguity, or explicit need.
 - Do not promote, edit, or delete accepted knowledge from this skill.
+- Loop checkpoints and feedback candidates are context inputs only; accepted Wiki updates require `knowledge-base-maintenance` first.
 
 ## Workflow
 1. Confirm the owning primary skill and task anchors.
@@ -72,8 +76,9 @@ description: Compile task-specific low-context Context Packs from the generated 
 3. Read only the Runtime Projection rows/cards matching the anchors.
 4. Admit current claims with clear operational effect; exclude stale, superseded, unrelated, or unsupported claims.
 5. Attach relation paths and expansion handles when they affect execution.
-6. Validate the Context Pack or projection with `validate_knowledge_store.py --require-projections`.
-7. Return a low-context packet or references to generated artifacts.
+6. If a loop produced feedback candidates, include only accepted/promoted claim ids; exclude unreviewed loop observations by default.
+7. Validate the Context Pack or projection with `validate_knowledge_store.py --require-projections`.
+8. Return a low-context packet or references to generated artifacts.
 
 ## Output Contract
 ```yaml
@@ -84,6 +89,7 @@ knowledge_context:
   excluded_claim_ids: []
   runtime_card_refs: []
   expansion_handles: []
+  excluded_loop_feedback_candidates: []
   validation:
     command:
     result:

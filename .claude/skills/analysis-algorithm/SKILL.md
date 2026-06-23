@@ -98,16 +98,17 @@ description: "Constraint-first workflow for recommending algorithms, modeling ap
 - When the problem class is ambiguous or candidate families are broad, load [problem-class-map.md](references/problem-class-map.md).
 - Use the reference as a candidate discovery aid, not as an automatic answer.
 
-## Mandatory Sequence
-1. Frame the problem.
+## Outcome-First Decision Loop
+Success means the recommendation identifies the decision being made, states constraints and success metrics, compares credible candidates, selects one primary approach plus fallback when useful, explains the causal mechanism, and defines validation thresholds or rollback triggers. Use the shortest decision path that proves those outcomes.
+
+Recommended loop:
+1. Frame the problem and decision.
 2. Extract constraints and success metrics.
-3. Classify the problem type.
-4. Generate 2-4 credible candidates.
-5. Compare candidates.
-6. Select one primary recommendation and, when useful, one fallback.
-7. Explain how the recommendation solves the problem.
-8. Outline implementation stages.
-9. Define validation thresholds.
+3. Classify the problem type only as far as it changes candidate choice.
+4. Generate 2-4 credible candidates, including the current baseline when it exists.
+5. Compare candidates on fit, cost, risk, and validation.
+6. Select one primary recommendation and explain why the alternatives lose.
+7. Define implementation stages and validation thresholds.
 
 ## Step 1) Problem Framing
 - Rewrite the request in one tight sentence.

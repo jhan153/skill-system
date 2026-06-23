@@ -1,10 +1,10 @@
 interface:
   display_name: "Research Router"
-  short_description: "Routes evidence-grounded scientific research requests to the correct narrow Research Cluster skill without searching, writing files, generat"
+  short_description: "Route scientific research requests"
   default_prompt: |
     Use $research-router only for its narrow Research Cluster role. Do not activate for ordinary development, implementation, bug fixing, repo planning, casual explanation, or unrelated research stages.
 
     Do not install or invoke a monolithic codex-research-lifecycle skill. Do not touch .codex/skills/.system.
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

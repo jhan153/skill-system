@@ -105,6 +105,15 @@ unverified: []
 - Do not claim pixel-perfect equivalence without side-by-side evidence or image diff evidence.
 - If a script is used, include the command and mark it as a nonblank/framing aid only.
 
+## Loop Contract Consumption
+When invoked as a loop verifier:
+- Read the accepted `loop_term` and verifier map.
+- Verify only the visual success conditions assigned to `design-visual-regression`.
+- Return status per success condition id: `pass`, `fail`, `unverified`, or `blocked`.
+- Include screenshot paths, viewport dimensions, nonblank/framing result, visual gaps, and unavailable-evidence reasons.
+- Treat unchanged screenshot failures as no-progress signals for `workflow-loop-runner`.
+- Do not verify accessibility, source-code correctness, or build readiness from screenshots alone.
+
 ## Recovery
 - If browser tooling is unavailable, use provided screenshots and mark capture unavailable.
 - If source reference is unavailable, compare against user acceptance criteria and mark fidelity as `user-verification-needed`.

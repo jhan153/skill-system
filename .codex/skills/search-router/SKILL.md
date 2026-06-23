@@ -75,6 +75,14 @@ description: "Route cross-domain evidence-search requests (papers, code, runtime
 3. Select exactly one evidence lane from Evidence Lanes and hand off; do not own synthesis, implementation, reporting, or the research lifecycle.
 4. For paper evidence used in implementation/planning, attach `search-paper-evidence` as support and keep the implementation/planning skill primary; route the whole task to `research-router` only for a scientific claim/experiment/manuscript/publishability decision.
 
+## Validation
+- Confirm the request has explicit evidence/source/proof/search/ledger intent.
+- Confirm the selected lane matches the evidence domain: paper, codebase, runtime, visual, memory, or project knowledge.
+- Confirm the final task owner remains separate from the evidence lane owner.
+- Confirm this router did not produce final synthesis, implementation, report, or research lifecycle decisions.
+- Negative check: bare `분석`, `검토`, `보고`, `설명`, or implementation requests without evidence intent must not route here.
+- Negative check: scientific claim, experiment, manuscript, or publishability decisions must route to `research-router`, with search as support only when evidence acquisition is needed.
+
 ## Reference
 - Read `references/evidence-lane-matrix.md` for the full lane matrix, ambiguous and router-vs-router examples, and paper-evidence-for-implementation examples.
 

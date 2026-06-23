@@ -103,6 +103,26 @@ class LiveRoundTripTest(unittest.TestCase):
         self.assertEqual(len(self.fake.subtasks), 1)
         self.assertEqual(self.fake.subtasks[0]["status"], 2)  # done
 
+        # 5) record post-session update (live) -> comment, plus evidence subtask
+        out5 = run_tool(
+            "record_session_update",
+            self._args(
+                plan_id="2026-02-02-ws",
+                task_key="A1",
+                session_summary="implemented A1 and refreshed tests",
+                result_label="agent-verified",
+                validation_evidence="unittest green",
+                changed_files=["src/example.py"],
+                dry_run=False,
+            ),
+        )
+        self.assertEqual(out5["status"], "ok")
+        self.assertTrue(out5["applied"])
+        self.assertEqual(len(self.fake.comments), 2)
+        self.assertEqual(len(self.fake.subtasks), 2)
+        self.assertIn("implemented A1", self.fake.comments[-1]["content"])
+        self.assertEqual(self.fake.subtasks[-1]["status"], 2)
+
     def test_pull_reports_completion_candidate_after_manual_move(self):
         run_tool("create_board_from_plan", self._args(plan_path=str(self.plan), dry_run=False))
         run_tool("sync_plan_to_board", self._args(plan_path=str(self.plan), dry_run=False))

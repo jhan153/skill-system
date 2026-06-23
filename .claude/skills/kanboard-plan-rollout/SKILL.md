@@ -25,7 +25,8 @@ description: "Onboard a repo's docs/plan to the local Kanboard and bulk register
   - approval boundary for live writes (dry-run first)
   - which plans to sync (per-plan `sync` flag)
 - expected_outputs:
-  - workspace config + registry entry, dry-run op summary, applied projection report, per-repo failure isolation
+  - workspace config + registry entry, dry-run op summary, applied Kanban-facing projection report, per-repo failure isolation
+  - stop reason when onboarding, secret hygiene, idempotency, or live-write approval requirements are not satisfied
 - context_targets:
   must_read:
     - target workspace `docs/plan/*.md` and `.kanboard-plan.yml`
@@ -60,6 +61,24 @@ description: "Onboard a repo's docs/plan to the local Kanboard and bulk register
 3. `sync_all()` — DRY-RUN first; review planned ops per repo with the user.
 4. On explicit approval: `sync_all(apply=true)` — repo=Project, plan=Swimlane, item=Task, members/assignee auto-set.
 5. Hand ongoing status work to `kanboard-plan-ops`.
+
+## Projection Quality
+- Treat Kanboard as an execution board for end users, not a raw Markdown clone.
+- Generated cards should use concise action-oriented titles and descriptions with source metadata.
+- If a plan item is too broad or ambiguous to become a card, report it as a plan-authoring issue before live apply.
+
+## Stop Policy
+- `success`: all requested workspaces are registered or dry-run/applied reports identify isolated per-repo failures.
+- `blocked`: target workspace is unavailable, no eligible `docs/plan` exists, Kanboard is unreachable, or token/config discovery fails.
+- `approval`: `sync_all(apply=true)` is requested without a reviewed dry-run summary and explicit approval.
+- `idempotency`: workspace identity, plan identity, or generated task keys are unstable or would duplicate existing board objects.
+- `unsafe`: the next action would store secrets, overwrite hand-authored config without confirmation, write SQLite directly, or apply a bulk sync with unresolved dry-run errors.
+- `fatal`: global registry or local state is corrupted enough that workspace mapping cannot be trusted.
+
+## Idempotency
+- `register_workspace(path)` must be treated as idempotent and must not clobber hand-authored config.
+- Bulk sync retries must start with a fresh dry-run and compare repo/project/plan/task keys before apply.
+- Isolate failures by workspace; do not apply unrelated workspaces when one workspace has ambiguous identity or unsafe state.
 
 ## Safety
 - Dry-run before any apply; get approval for live writes.

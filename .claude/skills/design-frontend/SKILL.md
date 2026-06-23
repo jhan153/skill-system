@@ -1,6 +1,6 @@
 ---
 name: design-frontend
-description: "Implement Figma/screenshot/mockup/spec/UI-reference designs as high-fidelity source code in the current repo (React/Next/Vue/Svelte/HTML/Flutter/SwiftUI/Compose/native), reusing repo framework, components, tokens, and assets. Not for backend-only work, refactors, design critique, ideation, or throwaway demos unless requested."
+description: "Implement concrete Figma, screenshot, mockup, spec, or UI-reference designs as repo-integrated frontend/native code, reusing existing framework, components, tokens, and assets. Not for backend-only work, critique, ideation, refactors, or throwaway demos."
 ---
 
 # Design Frontend
@@ -87,7 +87,9 @@ Do not use this skill for:
 - "Fix a database migration."
 - "Rename components without a design target."
 
-## Workflow
+## Outcome-First Workflow
+
+Success means the target repo surface renders, follows the source design within available evidence, uses existing components/tokens/assets where appropriate, handles relevant responsive states, and reports visual/accessibility/build validation or explicit `unverified` gaps. Choose the shortest path that proves those outcomes.
 
 1. Inspect the host project:
    - Identify framework, package manager, source layout, app/router entry points, route or screen structure, component library, styling system, design tokens, icon system, asset pipeline, state/data-fetching patterns, preview/story/simulator commands, build/typecheck/lint/test commands, and similar existing UI patterns.
@@ -167,6 +169,15 @@ Gate handoff order:
    - Handoff fields: `accessibility_gaps`, `manual_checks_needed`, `keyboard_result`, `focus_result`, `contrast_result`.
 
 Do not let a gate replace implementation ownership. Gates produce design verification evidence and task result evidence; this skill remains the owner for code changes from concrete visual artifacts.
+
+## Loop Contract Consumption
+When invoked from `workflow-loop-runner` or a `plan-loop-term` design loop:
+- Read the accepted `loop_term` success conditions and verifier map before editing.
+- Treat `SC-DESIGN-*` ids as the implementation acceptance surface, not as optional notes.
+- Implement the smallest batch that can change at least one failed or unverified success condition.
+- Return changed files, rendered target, and which success conditions are now ready for `design-visual-regression` or `design-a11y-audit`.
+- Do not mark the loop successful from implementation alone. Visual and accessibility success conditions must be verified by their owning gates or marked with an unavailable-evidence label.
+- If source reference, asset, font, route, or preview access blocks a required condition, return `blocked` or `user-verification-needed` instead of broad redesign.
 
 ## Surface Reference Routing
 

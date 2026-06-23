@@ -173,6 +173,7 @@ def apply_diff(
     single-user ``assignee:me`` board filter never hides it.
     """
     applied: list[dict] = []
+    refreshed: list[dict] = []
     project_name = project_name or manifest.plan_title or manifest.plan_id
     project_id = resolve_project(client, project_name)
     columns = ensure_columns(client, project_id)
@@ -188,7 +189,7 @@ def apply_diff(
     task_by_ref = {t.task_reference: t for t in manifest.tasks}
 
     for op in ops:
-        if op.op in (OP_CREATE_PROJECT, OP_NOOP):
+        if op.op == OP_CREATE_PROJECT:
             continue
 
         ref = op.task_reference
@@ -197,6 +198,11 @@ def apply_diff(
             continue
         proj = task_projection(manifest, task)
         column_id = columns.get(task.kanboard_column)
+        projection_fields = {
+            "title": proj["title"],
+            "description": proj["description"],
+            "color_id": proj["color_id"],
+        }
 
         if op.op == OP_CREATE_TASK:
             task_id = client.create_task(
@@ -232,8 +238,8 @@ def apply_diff(
                 column_id=column_id,
                 swimlane_id=swimlane_id or 0,
             )
-            # Keep the card's color aligned with status, and keep it assigned.
-            update_fields = {"color_id": proj["color_id"]}
+            # Keep board-facing card text aligned with the Markdown projection.
+            update_fields = dict(projection_fields)
             if assignee_id is not None:
                 update_fields["owner_id"] = assignee_id
             client.update_task(task_id=ts.kanboard_task_id, **update_fields)
@@ -243,11 +249,23 @@ def apply_diff(
                 {"op": op.op, "task_reference": ref, "to": task.kanboard_column}
             )
 
+        elif op.op == OP_NOOP:
+            ts = state.get(ref)
+            if ts is None or ts.kanboard_task_id is None:
+                continue
+            update_fields = dict(projection_fields)
+            if assignee_id is not None:
+                update_fields["owner_id"] = assignee_id
+            client.update_task(task_id=ts.kanboard_task_id, **update_fields)
+            refreshed.append({"op": "refresh_task", "task_reference": ref})
+
     return {
         "project_id": project_id,
         "project_name": project_name,
         "swimlane_id": swimlane_id,
         "applied": applied,
         "applied_count": len(applied),
+        "refreshed": refreshed,
+        "refreshed_count": len(refreshed),
         "added_members": added_members,
     }

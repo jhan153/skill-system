@@ -57,7 +57,7 @@ SENSITIVE_NAMES = {
 }
 SENSITIVE_SUFFIXES = {".sqlite", ".db", ".pem", ".key"}
 EXCLUDED_CORE_DIRS = {"harness", ".agent-workflow", "docs", "eval", "tools", "shared"}
-ALLOWED_ROOT_DOC_PREFIXES = ("docs/plan/", "docs/reference/context-assurance/")
+ALLOWED_ROOT_DOC_PREFIXES = ("docs/plan/", "docs/reference/")
 ALLOWED_MATURITY = {"skeleton", "usable", "field_tuned", "experimental", "deprecated"}
 POLICY_DOCS = ["README.md", "TERMS.md", ".codex/AGENTS.md"]
 OS_NOISE_NAMES = {".DS_Store", "Thumbs.db"}
@@ -515,6 +515,7 @@ ALLOWED_FAMILIES = {
     "memory",
     "knowledge",
     "evaluation",
+    "loop",
     "skill_system",
 }
 

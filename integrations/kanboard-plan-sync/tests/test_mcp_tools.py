@@ -47,6 +47,7 @@ class McpRegistryTest(unittest.TestCase):
                 "sync_plan_to_board",
                 "pull_board_status",
                 "record_validation",
+                "record_session_update",
                 "curate_plan_board",
                 "inspect_workspace",
                 "register_workspace",
@@ -125,6 +126,32 @@ class McpHandlerTest(unittest.TestCase):
         self.assertEqual(out["status"], "dry_run")
         self.assertEqual(out["projection"]["task_reference"], "p:A1")
         self.assertIn("pytest green", out["projection"]["comment"])
+
+    def test_record_session_update_requires_task_reference(self):
+        out = run_tool(
+            "record_session_update",
+            {"session_summary": "implemented the mapped task"},
+        )
+        self.assertEqual(out["status"], "needs_task_reference")
+        self.assertFalse(out["applied"])
+
+    def test_record_session_update_dry_run(self):
+        out = run_tool(
+            "record_session_update",
+            {
+                "plan_id": "p",
+                "task_key": "A1",
+                "session_summary": "implemented the mapped task",
+                "result_label": "agent-verified",
+                "validation_evidence": "pytest green",
+                "changed_files": ["src/app.py"],
+            },
+        )
+        self.assertEqual(out["status"], "dry_run")
+        self.assertEqual(out["projection"]["task_reference"], "p:A1")
+        self.assertIn("implemented the mapped task", out["projection"]["comment"])
+        self.assertIn("pytest green", out["projection"]["comment"])
+        self.assertEqual(out["projection"]["subtask_title"], "session evidence: agent-verified")
 
     def test_curate_without_snapshot_needs_live(self):
         out = run_tool("curate_plan_board", {"plan_id": "2026-02-02-ws"})

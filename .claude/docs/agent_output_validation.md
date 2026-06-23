@@ -119,6 +119,17 @@ New live records are schema v2 hash-chain records. Existing schema v1 fixtures r
 - current run exists and is invalid: `turn_finalize_attempt` plus non-blocking continuation by default
 - current run is missing: `turn_finalize_attempt` with `UNVERIFIED`/`warn`, not pass
 
+## Loop Governance Packets
+
+Loop-specific success is not implied by a passing generic `Stop` hook. For accepted loop contracts, `workflow-loop-runner` should emit a `loop_stop_packet` artifact that records final success-condition status, verifier evidence, retry/no-progress state, non-idempotent retry handling, reward-hacking signals, context-poisoning signals, and comprehension-debt review status.
+
+Current hook behavior:
+- `Stop` can bind final agent-run evidence to the current session/turn.
+- `Stop` does not automatically evaluate loop progress, oscillation, over-orchestration, Wiki feedback promotion, or event-runtime support.
+- If no loop-aware artifact validator inspected `loop_stop_packet`, report `stop_hook_loop_evaluation: unverified`.
+
+Do not claim hook-level loop success from hook presence alone.
+
 Set `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict` only when the caller wants narrow blocking for current-turn evidence contradictions, such as an `agent-verified` claim backed by a failed command, missing evidence for a reported claim, or an assistant-message hash mismatch. Missing optional evidence, stale unrelated fixtures, old plan text, or release-profile failures remain observations unless an explicit release/audit command is running.
 
 By default, hook evidence is metadata-only. Commands and large tool inputs are recorded as categories and hashes; raw previews require `SKILL_SYSTEM_HOOK_CAPTURE_VERBOSE=1` and still pass through redaction.

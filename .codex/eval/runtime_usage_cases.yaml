@@ -1,4 +1,4 @@
-version: "7.3.1"
+version: "8.1.0"
 purpose: "Real-use quality observation cases, not package approval."
 cases:
   - case_id: runtime-001
@@ -163,3 +163,93 @@ cases:
     expected_output_shape: "source/test/config/build diff plus validation; plan status update is optional bookkeeping"
     quality_notes: "Markdown-only docs/plan updates are incomplete unless documentation-only work was explicitly requested."
     friction_risk: "editing the plan instead of implementing the planned change"
+  - case_id: runtime-019
+    user_request: "/goal로 돌리기 전에 완료 조건, 검증 기준, 중단 조건 계약서만 만들어줘."
+    expected_primary_skill: plan-loop-term
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-plan-runner, workflow-validation, plan-long-term-package]
+    expected_context: [goal_intent, success_conditions, verifier_evidence, stop_policy, retry_policy]
+    expected_output_shape: "loop_term contract with success conditions, verifier/evidence map, progress/stall criteria, retry/stop policy, checkpoints, and handoff text"
+    quality_notes: "Planning-stage contract only; no loop execution or implementation."
+    friction_risk: "treating a completion contract as a long-term phase package"
+  - case_id: runtime-020
+    user_request: "이 마이그레이션을 phase별 서브플랜 패키지로 만들고 각 phase의 loop term도 포함해줘."
+    expected_primary_skill: plan-long-term-package
+    expected_supporting_skills: [plan-loop-term]
+    should_not_trigger: [plan-short-term-docs, workflow-plan-runner]
+    expected_context: [migration_scope, phase_package_intent, loop_term_subartifact]
+    expected_output_shape: "phase planning package with loop term sections as nested contract artifacts"
+    quality_notes: "Long-term package owns broad decomposition; plan-loop-term is a subartifact pattern."
+    friction_risk: "letting the narrow loop-term skill replace package ownership"
+  - case_id: runtime-021
+    user_request: "이 주장에 대한 논문, 코드, 런타임 근거 중 어떤 evidence lane을 타야 할지 먼저 골라줘."
+    expected_primary_skill: search-router
+    expected_supporting_skills: []
+    should_not_trigger: [research-router, report-qualitative, workflow-plan-runner]
+    expected_context: [evidence_intent, domain_hints, claim_or_topic, final_task_owner]
+    expected_output_shape: "selected evidence lane, owning skill, handoff note, and Unverified gaps"
+    quality_notes: "Router selects the lane only; it does not synthesize, implement, or write a report."
+    friction_risk: "turning lane selection into final research or qualitative reporting"
+  - case_id: runtime-022
+    user_request: "이 구현을 검토하고 개선점 알려줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [search-router]
+    expected_context: [target_artifact_or_diff_if_provided]
+    expected_output_shape: "ordinary review or task-specific response; no evidence-lane routing unless source/proof intent is added"
+    quality_notes: "Bare review without explicit evidence/source/proof intent must not use search-router."
+    friction_risk: "over-triggering evidence routing for generic review"
+  - case_id: runtime-023
+    user_request: "버튼 색만 바꾸는 작업인데 루프로 돌릴 필요가 있는지 판단해줘."
+    expected_primary_skill: loop-readiness-router
+    expected_supporting_skills: []
+    should_not_trigger: [plan-loop-term, workflow-loop-runner, plan-long-term-package]
+    expected_context: [prompt_draft, target_domain, verifier_hints]
+    expected_output_shape: "loop_readiness classification as one_shot with decision_factors, minimum_sufficient_path, rationale, and direct next skill"
+    quality_notes: "Explicit readiness request but simple deterministic tweak should not become a loop; cite anti-loop signals and final-check-only verification."
+    friction_risk: "over-looping one-shot work"
+  - case_id: runtime-024
+    user_request: "이 Figma 화면을 맞을 때까지 구현하려고 해. 먼저 루프 준비 상태를 판정해줘."
+    expected_primary_skill: loop-readiness-router
+    expected_supporting_skills: [plan-loop-term, loop-verifier-registry]
+    should_not_trigger: [workflow-loop-runner]
+    expected_context: [prompt_draft, design_target, visual_verifier_need]
+    expected_output_shape: "loop_readiness classification as loop_worthy with verifier_feedback_value, state/checkpoint need, contract and verifier-map next steps"
+    quality_notes: "Design fidelity plus repeated screenshot/a11y evidence is loop-worthy, but execution waits for an accepted contract and verifier map."
+    friction_risk: "starting execution before the contract exists"
+  - case_id: runtime-025
+    user_request: "이 loop_term의 SC-DESIGN 조건들을 어떤 verifier skill이 봐야 하는지 매핑해줘."
+    expected_primary_skill: loop-verifier-registry
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-loop-runner, design-frontend]
+    expected_context: [loop_term, success_conditions, verifier_catalog]
+    expected_output_shape: "verifier_map from success condition ids to verifier owners, independence, deterministic-first notes, pass/fail signals, evidence, fallbacks, and unavailable labels"
+    quality_notes: "Verifier mapping does not run checks or implementation; maker/checker separation and evidence boundaries must be explicit."
+    friction_risk: "mixing verifier mapping with execution"
+  - case_id: runtime-026
+    user_request: "승인된 loop_term과 verifier_map 기준으로 반복 실행해줘."
+    expected_primary_skill: workflow-loop-runner
+    expected_supporting_skills: [workflow-recovery, workflow-validation]
+    should_not_trigger: [loop-readiness-router, plan-loop-term]
+    expected_context: [accepted_loop_term, verifier_map, loop_budget, checkpoint_state]
+    expected_output_shape: "observe-decide-act-verify-checkpoint iteration log, success-condition status, verifier evidence, retry classification, governance metrics, loop_stop_packet, checkpoint, and stop reason"
+    quality_notes: "Execution requires an accepted loop contract; missing contract should block rather than invent terms, and repeated failures must change strategy or recover."
+    friction_risk: "running a loop from a vague prompt"
+  - case_id: runtime-027
+    user_request: "이 루프는 배포 retry가 필요할 수도 있어. 비멱등 재시도, stop hook 평가, reward hacking 방지까지 계약에 넣어줘."
+    expected_primary_skill: plan-loop-term
+    expected_supporting_skills: [loop-verifier-registry]
+    should_not_trigger: [workflow-loop-runner, knowledge-base-maintenance]
+    expected_context: [loop_intent, governance_contract, side_effect_boundary, verifier_hints]
+    expected_output_shape: "loop_term governance block with stop_hook_expectation, non_idempotent retry policy, anti_reward_hacking, safety/verifier/process/outcome metrics, and approval gates"
+    quality_notes: "Runtime-sensitive governance belongs in the contract before execution; do not claim Stop-hook loop validation is agent-verified without current evidence."
+    friction_risk: "executing non-idempotent retry or overstating hook/runtime support"
+  - case_id: runtime-028
+    user_request: "loop 실행 결과에서 Wiki Bank에 남길 개선 후보만 정리하고 accepted knowledge로는 올리지 마."
+    expected_primary_skill: workflow-loop-runner
+    expected_supporting_skills: [knowledge-base-maintenance]
+    should_not_trigger: [knowledge-context-harness, memory-bank-ingestion]
+    expected_context: [accepted_loop_term, loop_checkpoint, verifier_evidence, knowledge_feedback_candidates]
+    expected_output_shape: "checkpoint with knowledge_feedback_candidates and explicit note that accepted Wiki Bank mutation requires knowledge-base-maintenance review"
+    quality_notes: "Loop output can create feedback candidates, not accepted Wiki Bank knowledge. Knowledge maintenance is only a review/promotion handoff."
+    friction_risk: "context compounding or poisoning from unreviewed loop observations"

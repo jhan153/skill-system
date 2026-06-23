@@ -104,6 +104,15 @@ unverified: []
 - If contrast or target size cannot be measured, report the unavailable evidence.
 - If a browser interaction check is unavailable, keep keyboard/focus behavior `user-verification-needed` or `unverified`.
 
+## Loop Contract Consumption
+When invoked as a loop verifier:
+- Read the accepted `loop_term` and verifier map.
+- Verify only the accessibility success conditions assigned to `design-a11y-audit`.
+- Return status per success condition id: `pass`, `fail`, `unverified`, or `blocked`.
+- Include the evidence source for keyboard, focus, semantics, labels, contrast, target size, and responsive readability.
+- Treat missing rendered UI as `blocked` for interaction evidence and `unverified` for static-only evidence, depending on the requested condition.
+- Do not weaken accessibility findings to satisfy visual fidelity.
+
 ## Recovery
 - If rendered UI is unavailable, run source/static inspection only and mark manual checks needed.
 - If color tokens are unavailable, report contrast as unverified and hand off token gaps if relevant.

@@ -11,6 +11,17 @@
 - Hardened the P0 completion gate after execution feedback: failed/unverified `Stop` checks now record `turn_finalize_attempt` so repair work remains valid, Codex `PermissionRequest` without `tool_use_id` is accepted as approximate, dangling tool calls fail validation, `Stop.last_assistant_message` is hash-bound to the run manifest, unknown tool responses record `warn`, runtime traces are excluded from packaged evidence, and package verification uses synthetic fixtures.
 - Registered `workflow-minimal-implementation` in user-facing README catalogs and added routing/negative eval cases for minimal-implementation modifier behavior.
 
+## 8.1.0
+
+- Added `plan-loop-term` as a Planning-family specialist for `/goal` and loop term contracts.
+- Added loop term templates for success conditions, verifier evidence, progress/stall signals, retry and stop policies, checkpoints, side-effect notes, and execution handoff text.
+- Registered `plan-loop-term` in both Codex and Claude mirrors, README catalogs, skill registries, context routing, and runtime usage eval cases.
+- Preserved `plan-long-term-package` as the owner of broad multi-document planning packages; `plan-loop-term` is a narrow nested contract artifact when used inside long-term plans.
+- Tuned GPT-5.5-era skill fit: shortened report routing, moved long-term package detail into references, added stop/idempotency gates for Kanboard and Knowledge maintenance, outcome-first guidance for design/algorithm skills, search-router validation, and selective implicit entry routers.
+- Split Loop Engineering into dedicated readiness, verifier mapping, and accepted execution skills: `loop-readiness-router`, `loop-verifier-registry`, and `workflow-loop-runner`, with design loop contract support.
+- Strengthened Loop Engineering skills with source-grounded readiness factors, deterministic-first verifier mapping, maker/checker separation, durable loop state, retry taxonomy, untrusted-observation handling, and observe-decide-act-verify-checkpoint execution.
+- Added loop governance coverage for Stop-hook limits, progress heuristics, Wiki Bank feedback candidates, durable/event-runtime labels, improvement/safety/verifier/efficiency/process/outcome metrics, comprehension debt, over-orchestration, parallel conflicts, non-idempotent retry, context poisoning, reward hacking, thrashing, infinite retry, premature completion, and oscillation.
+
 ## 8.0.2
 
 - Promoted the Context Compounding package to the 8.0.2 field line.

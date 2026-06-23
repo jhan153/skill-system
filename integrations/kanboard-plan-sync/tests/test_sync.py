@@ -9,11 +9,11 @@ from kanboard_plan_sync.sync import apply_diff, ensure_members
 from tests._fakes import FakeKanboard
 
 
-def _task(key, status):
+def _task(key, status, title=None):
     return PlanTask(
         task_key=key,
         task_reference=f"plan:{key}",
-        title=f"task {key}",
+        title=title or f"task {key}",
         markdown_status=status,
         kanboard_column=column_for_status(status),
     )
@@ -65,6 +65,7 @@ class FakeClient:
         self.created_tasks.append(
             {
                 "task_id": tid,
+                "title": title,
                 "reference": reference,
                 "column_id": column_id,
                 "owner_id": owner_id,
@@ -132,6 +133,33 @@ class ApplyDiffTest(unittest.TestCase):
         self.assertEqual(state.get("plan:A1").last_synced_column, "완료")
         # no new project created
         self.assertEqual(client.created_projects, [])
+
+    def test_noop_refreshes_existing_card_projection(self):
+        manifest = PlanManifest(
+            plan_id="plan",
+            plan_path="x",
+            plan_title="Plan",
+            tasks=[_task("A1", "todo", title="Phase 1: Refresh board copy")],
+        )
+        state = SyncState(
+            references={
+                "plan:A1": TaskState(
+                    kanboard_task_id=555,
+                    kanboard_project_id=100,
+                    last_synced_column="TODO",
+                )
+            }
+        )
+        ops = build_diff(manifest, state)
+        client = FakeClient(existing_project={"id": 100})
+
+        report = apply_diff(client, manifest, state, ops)
+
+        self.assertEqual(report["applied_count"], 0)
+        self.assertEqual(report["refreshed_count"], 1)
+        self.assertEqual(len(client.updates), 1)
+        self.assertEqual(client.updates[0]["title"], "Refresh board copy")
+        self.assertIn("Completion Gate", client.updates[0]["description"])
 
 
 class EnsureMembersTest(unittest.TestCase):

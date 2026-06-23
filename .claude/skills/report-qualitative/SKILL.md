@@ -1,6 +1,6 @@
 ---
 name: report-qualitative
-description: "Evidence-based qualitative evaluation reports for artifacts, docs, skills, workflows, specs, implementations, research plans, or designs — strengths/weaknesses, readiness, rubric scoring, risk, prioritized improvements. Compact mode only for `srq` or formal completion reports. Not for blocker-first QA gates, diffs, inventories, or implementation."
+description: "Produce evidence-based qualitative evaluation reports for artifacts, skills, plans, designs, or implementations: scope, rubric scores, risks, readiness, and prioritized improvements. Not for blocker QA gates, eval telemetry, diffs, inventories, or implementation."
 ---
 
 # Qualitative Evaluation Report
@@ -34,6 +34,7 @@ description: "Evidence-based qualitative evaluation reports for artifacts, docs,
 - expected_outputs:
   - qualitative report with scope, method, evidence map, criterion findings, risks, recommendations, final judgment, and limitations
   - compact evidence-first report only when legacy `srq`/completion-report mode is explicitly requested
+  - explicit boundary note when the request is closer to `report-critical`, `evaluation-harness`, `report-diff`, or implementation
 - context_targets:
   must_read:
     - target artifact or the smallest relevant slice
@@ -210,6 +211,7 @@ Do not enter this mode from vague requests such as "검토해줘", "요약해줘
 Enter this mode only when the user explicitly says `srq`, `srq로`, `formal report`, or asks for a verified completion/evidence report.
 
 ## Cross-Skill Resolution
+- Keep this skill report-shaped. If the task needs a blocking verdict, eval-case review, changed-line diff, artifact list, or code change, route to the owning skill instead of widening this report.
 - `report-critical` owns blocker diagnosis, QA gates, severe-risk verdicts, and critical review findings.
 - `report-diff` owns changed-line and before/after presentation.
 - `report-artifact-inventory` owns artifact lists, verification notes, and handoff inventories.

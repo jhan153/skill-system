@@ -27,7 +27,11 @@ from kanboard_plan_sync.snapshot import fetch_board_snapshot, resolve_project_id
 from kanboard_plan_sync.state import load_state, save_state
 from kanboard_plan_sync.status import CANONICAL_TO_COLUMN
 from kanboard_plan_sync.sync import apply_board_skeleton, apply_diff, board_target, default_assignee
-from kanboard_plan_sync.validation import apply_validation
+from kanboard_plan_sync.validation import (
+    apply_session_update,
+    apply_validation,
+    session_update_projection,
+)
 from kanboard_plan_sync.workspace import inspect_workspace as _inspect_workspace
 
 # Kanboard column order for a freshly created board projection.
@@ -72,6 +76,42 @@ def _resolve_plan_path(plan_id: str, config: Optional[WorkspaceConfig]) -> Optio
     for entry in config.plans:
         if Path(entry.path).stem == plan_id:
             return str(Path(config.workspace_root) / entry.path)
+    return None
+
+
+def _task_reference_from_args(args: dict) -> Optional[str]:
+    if args.get("task_reference"):
+        return str(args["task_reference"])
+    if args.get("plan_id") and args.get("task_key"):
+        return f"{args['plan_id']}:{args['task_key']}"
+    return None
+
+
+def _plan_id_from_reference(reference: str) -> Optional[str]:
+    if ":" not in reference:
+        return None
+    return reference.split(":", 1)[0] or None
+
+
+def _resolve_task_id(reference: str, client, state, config) -> Optional[int]:
+    ts = state.get(reference)
+    if ts and ts.kanboard_task_id:
+        return ts.kanboard_task_id
+
+    project_id = resolve_project_id(state)
+    plan_id = _plan_id_from_reference(reference)
+    if project_id is None and plan_id:
+        plan_path = _resolve_plan_path(plan_id, config)
+        manifest = build_manifest(plan_path, config=config) if plan_path else None
+        if manifest is not None:
+            project_name, _ = board_target(config, manifest)
+            project_id = _resolve_live_project_id(client, state, project_name)
+
+    if project_id is None:
+        return None
+    task = client.get_task_by_reference(project_id, reference)
+    if isinstance(task, dict) and task.get("id"):
+        return int(task["id"])
     return None
 
 
@@ -252,17 +292,7 @@ def h_record_validation(args: dict) -> dict:
         }
 
     state = load_state(args["workspace"]) if args.get("workspace") else load_state(".")
-    task_id = None
-    ts = state.get(reference)
-    if ts and ts.kanboard_task_id:
-        task_id = ts.kanboard_task_id
-    else:
-        manifest = build_manifest(_resolve_plan_path(plan_id, config), config=config) if _resolve_plan_path(plan_id, config) else None
-        project_id = _resolve_live_project_id(client, state, manifest) if manifest else resolve_project_id(state)
-        if project_id is not None:
-            task = client.get_task_by_reference(project_id, reference)
-            if isinstance(task, dict) and task.get("id"):
-                task_id = int(task["id"])
+    task_id = _resolve_task_id(reference, client, state, config)
 
     if task_id is None:
         return {
@@ -277,6 +307,80 @@ def h_record_validation(args: dict) -> dict:
     result = apply_validation(client, task_id, evidence, label=task_key)
     return {
         "tool": "record_validation",
+        "dry_run": False,
+        "applied": True,
+        "projection": projection,
+        "status": "ok",
+        "result": result,
+    }
+
+
+def h_record_session_update(args: dict) -> dict:
+    reference = _task_reference_from_args(args)
+    dry_run = args.get("dry_run", True)
+    if reference is None:
+        return {
+            "tool": "record_session_update",
+            "dry_run": dry_run,
+            "applied": False,
+            "status": "needs_task_reference",
+            "note": "pass task_reference or plan_id + task_key; post-session sync will not guess the Kanboard card",
+        }
+
+    projection = session_update_projection(
+        task_reference=reference,
+        session_summary=args["session_summary"],
+        result_label=args.get("result_label"),
+        validation_evidence=args.get("validation_evidence"),
+        changed_files=args.get("changed_files"),
+        blocked_reason=args.get("blocked_reason"),
+    )
+    if dry_run:
+        return {
+            "tool": "record_session_update",
+            "dry_run": True,
+            "applied": False,
+            "projection": projection,
+            "status": "dry_run",
+            "note": "dry-run projection only",
+        }
+
+    config = _config_opt(args.get("workspace"))
+    client = _live_client(args, config)
+    if client is None:
+        return {
+            "tool": "record_session_update",
+            "dry_run": False,
+            "applied": False,
+            "projection": projection,
+            "status": "needs_live_kanboard",
+            "note": "recording to Kanboard requires workspace config + API token (env)",
+        }
+
+    state = load_state(args["workspace"]) if args.get("workspace") else load_state(".")
+    task_id = _resolve_task_id(reference, client, state, config)
+    if task_id is None:
+        return {
+            "tool": "record_session_update",
+            "dry_run": False,
+            "applied": False,
+            "projection": projection,
+            "status": "needs_sync",
+            "note": f"no Kanboard task for {reference}; run sync_plan_to_board first",
+        }
+
+    result = apply_session_update(
+        client,
+        task_id,
+        task_reference=reference,
+        session_summary=args["session_summary"],
+        result_label=args.get("result_label"),
+        validation_evidence=args.get("validation_evidence"),
+        changed_files=args.get("changed_files"),
+        blocked_reason=args.get("blocked_reason"),
+    )
+    return {
+        "tool": "record_session_update",
         "dry_run": False,
         "applied": True,
         "projection": projection,
@@ -443,6 +547,27 @@ PLAN_TOOLS: list[ToolSpec] = [
             "required": ["plan_id", "task_key", "evidence"],
         },
         h_record_validation,
+    ),
+    ToolSpec(
+        "record_session_update",
+        "Record a post-session task summary on the mapped Kanboard card; creates an evidence subtask only when validation_evidence is supplied. Dry-run by default.",
+        {
+            "type": "object",
+            "properties": {
+                "task_reference": {"type": "string"},
+                "plan_id": {"type": "string"},
+                "task_key": {"type": "string"},
+                "session_summary": {"type": "string"},
+                "result_label": {"type": "string"},
+                "validation_evidence": {"type": "string"},
+                "changed_files": {"type": "array", "items": {"type": "string"}},
+                "blocked_reason": {"type": "string"},
+                "workspace": {"type": "string"},
+                "dry_run": {"type": "boolean", "default": True},
+            },
+            "required": ["session_summary"],
+        },
+        h_record_session_update,
     ),
     ToolSpec(
         "curate_plan_board",
