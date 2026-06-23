@@ -38,6 +38,14 @@ EVENT_MAP = {
 SUPPORTED_HOOK_EVENTS = set(EVENT_MAP)
 MAX_TEXT = 1200
 STRICT_GATE = "strict"
+BLOCKING_VALIDATION_PATTERNS = (
+    "agent-verified result has nonzero command validation",
+    "agent-verified result has failed hook event",
+    "assistant_message.sha256 does not match",
+    "last_assistant_message sha256 does not match",
+    "evidence file not found",
+    "evidence path is not run-relative",
+)
 SENSITIVE_PATTERN = re.compile(
     r"(?i)(api[_-]?key|authorization|bearer|cookie|password|passwd|secret|token|client[_-]?secret|database[_-]?url)"
 )
@@ -387,18 +395,32 @@ def strict_gate_enabled(data: dict[str, Any]) -> bool:
     return str(configured).lower() == STRICT_GATE
 
 
+def has_blocking_validation_failure(validation_output: str) -> bool:
+    return any(pattern in validation_output for pattern in BLOCKING_VALIDATION_PATTERNS)
+
+
 def stop_output(data: dict[str, Any], validation_code: int, validation_output: str) -> dict[str, Any]:
     if validation_code == 0:
         return {
             "continue": True,
             "systemMessage": "Agent output validation passed.",
         }
-    if validation_code == 4 and not strict_gate_enabled(data):
+    observation = (
+        "Agent output validation recorded a non-blocking observation. "
+        "Do not repair repository-wide metadata, plans, or eval fixtures because of this Stop hook result.\n\n"
+        f"{validation_output}"
+    )
+    if not strict_gate_enabled(data):
         return {
             "continue": True,
-            "systemMessage": validation_output,
+            "systemMessage": observation,
         }
-    reason = "Agent output validation failed before final response. Fix the run artifact evidence and rerun validation."
+    if validation_code == 4 or not has_blocking_validation_failure(validation_output):
+        return {
+            "continue": True,
+            "systemMessage": observation,
+        }
+    reason = "Agent output validation found a strict-mode blocking contradiction in current-turn evidence."
     return {
         "decision": "block",
         "reason": f"{reason}\n\n{validation_output}",

@@ -1124,7 +1124,7 @@ class ValidationToolTests(unittest.TestCase):
                 ".codex/schemas/harness/agent-run.schema.json",
             )
 
-    def test_codex_hook_adapter_stop_message_mismatch_blocks_recoverably(self) -> None:
+    def test_codex_hook_adapter_stop_message_mismatch_is_observation_by_default(self) -> None:
         ledger = self.temp_ledger("live-hook-stop-message-mismatch")
         if ledger.exists():
             ledger.unlink()
@@ -1139,12 +1139,36 @@ class ValidationToolTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         output = json.loads(result.stdout)
-        self.assertEqual(output["decision"], "block")
-        self.assertNotIn("continue", output)
+        self.assertTrue(output["continue"])
+        self.assertIn("non-blocking observation", output["systemMessage"])
         event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[0])
         self.assertEqual(event["neutral_event"], "turn_finalize_attempt")
         self.assertEqual(event["status"], "fail")
         ledger.unlink()
+
+    def test_codex_hook_adapter_strict_stop_blocks_message_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            input_file = Path(tmp) / "stop-message-mismatch-strict.json"
+            data = json.loads((FIXTURES / "hooks" / "stop-message-mismatch.json").read_text(encoding="utf-8"))
+            data["skill_system_agent_output_gate"] = "strict"
+            input_file.write_text(json.dumps(data), encoding="utf-8")
+            ledger = Path(tmp) / "ledger.jsonl"
+            result = self.run_tool(
+                ".codex/hooks/codex_hook_adapter.py",
+                "--input-file",
+                str(input_file),
+                "--run-dir",
+                str(FIXTURES / "agent-runs" / "current-run"),
+                "--ledger",
+                str(ledger),
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            output = json.loads(result.stdout)
+            self.assertEqual(output["decision"], "block")
+            self.assertNotIn("continue", output)
+            event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[0])
+            self.assertEqual(event["neutral_event"], "turn_finalize_attempt")
+            self.assertEqual(event["status"], "fail")
 
     def test_codex_hook_adapter_stop_missing_current_run_is_unverified(self) -> None:
         ledger = self.temp_ledger("live-hook-stop-missing")

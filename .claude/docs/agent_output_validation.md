@@ -113,13 +113,13 @@ The adapter records hook events to `SKILL_SYSTEM_HOOK_LEDGER` when that environm
 
 New live records are schema v2 hash-chain records. Existing schema v1 fixtures remain readable for compatibility, but new v2 run fixtures are expected to prove request receipt, context load, tool lifecycle, and finalization.
 
-`Stop` validates only the current session/turn run directory. It does not treat static sample runs as evidence for the current turn.
+`Stop` validates only the current session/turn run directory. It does not treat static sample runs as evidence for the current turn, and it does not run bundle hygiene, behavior evals, release profiles, plan synchronization, or repository-wide repair.
 
 - current run exists and is valid: `pass`
-- current run exists and is invalid: `turn_finalize_attempt` plus continuation/block response
+- current run exists and is invalid: `turn_finalize_attempt` plus non-blocking continuation by default
 - current run is missing: `turn_finalize_attempt` with `UNVERIFIED`/`warn`, not pass
 
-Set `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict` to turn missing current-run evidence into a blocking completion gate.
+Set `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict` only when the caller wants narrow blocking for current-turn evidence contradictions, such as an `agent-verified` claim backed by a failed command, missing evidence for a reported claim, or an assistant-message hash mismatch. Missing optional evidence, stale unrelated fixtures, old plan text, or release-profile failures remain observations unless an explicit release/audit command is running.
 
 By default, hook evidence is metadata-only. Commands and large tool inputs are recorded as categories and hashes; raw previews require `SKILL_SYSTEM_HOOK_CAPTURE_VERBOSE=1` and still pass through redaction.
 
@@ -127,6 +127,6 @@ Codex still requires project trust and hook trust before these project-local hoo
 
 ## RC2 Freeze and 8.0 Policy
 
-The `7.3.1` RC2 hook behavior is frozen as the compatibility baseline. Known live-hook limits are documented rather than expanded into a broader Stop-hook project: hooks only run after project trust, missing current-run manifests are `UNVERIFIED`/`warn` unless strict gating is enabled, and permission events may be approximate when Codex does not provide a `tool_use_id`.
+The `7.3.1` RC2 hook behavior is frozen as the compatibility baseline. Known live-hook limits are documented rather than expanded into a broader Stop-hook project: hooks only run after project trust, missing current-run manifests are `UNVERIFIED`/`warn`, and permission events may be approximate when Codex does not provide a `tool_use_id`.
 
 The 8.0 branch policy is to preserve the external drop-in interface while moving the internal operating layer to `8.0.0 — Context Compounding / Wiki Bank Architecture`. Run Trace Integrity remains the execution evidence gate that supports the 8.0 Knowledge Store and Context Pack layers.

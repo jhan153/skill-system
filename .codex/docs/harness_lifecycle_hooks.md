@@ -15,7 +15,7 @@ Hooks are evidence and control surfaces. They do not replace `.codex/rules`, san
 | `tool_result` | Capture exit status, changed files, evidence, and failure attribution. | tool result ledger |
 | `tool_batch_completed` | Aggregate related tool results and partial failures. | batch observation summary |
 | `turn_finalize_attempt` | Record a failed or unverified `Stop` check without making the turn terminal. | recoverable finalization attempt |
-| `turn_finalize` | Check latest validation and task result label before final response. | final verification gate |
+| `turn_finalize` | Record final validation observation and task result label before final response. | final observation record |
 | `compact_before` | Preserve active plan, blocker, and validation evidence before compaction. | compaction handoff packet |
 | `compact_after` | Confirm handoff packet survived compaction. | compaction restore note |
 
@@ -72,17 +72,19 @@ tool_result
 
 Codex `PermissionRequest` can be turn-scoped and may not include `tool_use_id`; record that case with `support_level: approximate`. Multiple tool calls can repeat this sequence before a passing `turn_finalize`. A passing `turn_finalize` event must not arrive while a tool call is still missing its `tool_result`, and the ledger end must not leave a started tool unfinished.
 
-Failed or unverified `Stop` checks are recorded as `turn_finalize_attempt`. They preserve evidence but do not make later repair tool calls invalid.
+Failed or unverified `Stop` checks are recorded as `turn_finalize_attempt`. They preserve evidence but do not make later repair tool calls invalid, and the live hook continues by default unless strict mode sees a narrow current-turn evidence contradiction.
 
 Status values:
 - `pass`: successful event or exit code 0
 - `warn`: unverified, partial, missing optional current-run evidence, or unknown outcome
-- `fail`: nonzero tool exit, explicit failure, denied action, or invalid current-run evidence
+- `fail`: nonzero tool exit, explicit failure, denied action, or invalid current-run evidence; this is an observation status, not an automatic repository repair instruction
 - `skip`: intentionally not run
 
 ## Boundaries
 
 - Do not treat hook checks as a complete security boundary.
 - Do not bypass sandbox, approval, or rule policy because a hook record exists.
+- Do not use `Stop` to run bundle hygiene, behavior evals, release profiles, plan synchronization, or repository-wide repair.
+- Keep repair/sync workflows explicit and separate from read-only hook observation.
 - Project-local hooks may run automatically only after project trust and hook trust. They still do not install themselves or mutate user config.
-- Use hook records as structured evidence for behavior evals and final verification gates.
+- Use hook records as structured evidence for behavior evals and final report consistency checks.

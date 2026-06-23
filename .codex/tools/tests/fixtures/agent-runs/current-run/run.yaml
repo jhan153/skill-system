@@ -2,7 +2,7 @@ schema_version: 2
 run_id: AR-20260621-004
 bundle_version: "8.0.2"
 task:
-  user_request_summary: "Validate the current session/turn agent output gate."
+  user_request_summary: "Validate the current session/turn agent output observation."
   result_label: agent-verified
 routing:
   primary_skill: workflow-rigor
@@ -14,7 +14,7 @@ routing:
 context:
   context_pack_id: CP-20260621-001
   context_pack_ref: context/context-pack.yaml
-  context_pack_hash: 217ec8828599eeda2ccb4a4058a5378b36e691d99da30793d4cdd09ba29bec97
+  context_pack_hash: b5496036d1937c9efdf4890d86cdfa596bc3f052b3868f3ab9943d93525646b6
   admitted_claim_ids:
     - KC-20260621-001
   source_snapshot_refs:

@@ -10,7 +10,9 @@
 - The user may write instructions in Korean.
 - Interpret Korean instructions directly without asking the user to restate them in English.
 - Respond in Korean honorific style by default.
-- Start with the conclusion.
+- Start with the actual answer, finding, or result.
+- The first sentence must contain task-relevant information, not a meta statement about response process, format, or intent.
+- Avoid repeated opener phrases.
 - Keep answers concise unless the user asks for details.
 - Keep code identifiers, file paths, commands, logs, API names, and library names in their original language.
 - Do not translate code, errors, paths, logs, or technical identifiers unless explicitly requested.
