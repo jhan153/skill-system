@@ -81,7 +81,7 @@ class FakeClient:
         return True
 
     def move_task_position(self, project_id, task_id, column_id, position=1, swimlane_id=0):
-        self.moves.append({"task_id": task_id, "column_id": column_id})
+        self.moves.append({"task_id": task_id, "column_id": column_id, "position": position})
         return True
 
 
@@ -108,6 +108,22 @@ class ApplyDiffTest(unittest.TestCase):
         # A2 was created directly in the 완료 column (id 5)
         a2 = [t for t in client.created_tasks if t["reference"] == "plan:A2"][0]
         self.assertEqual(a2["column_id"], 5)
+
+    def test_created_tasks_bubble_to_top(self):
+        # New cards must be repositioned to the top (position 1) instead of
+        # stacking at the bottom of the column.
+        manifest = PlanManifest(
+            plan_id="plan", plan_path="x", plan_title="Plan", tasks=[_task("A1", "todo")]
+        )
+        state = SyncState()
+        ops = build_diff(manifest, state)
+        client = FakeClient(existing_project=None)
+
+        apply_diff(client, manifest, state, ops)
+
+        created_id = client.created_tasks[0]["task_id"]
+        top_moves = [m for m in client.moves if m["task_id"] == created_id and m.get("position") == 1]
+        self.assertTrue(top_moves, f"created task should bubble to position 1; moves={client.moves}")
 
     def test_move_uses_existing_state(self):
         manifest = PlanManifest(

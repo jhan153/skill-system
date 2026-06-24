@@ -3,7 +3,10 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
+
+sys.dont_write_bytecode = True
 
 from _validation import load_yaml_file, read_text
 

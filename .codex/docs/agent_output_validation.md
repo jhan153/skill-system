@@ -125,8 +125,9 @@ Loop-specific success is not implied by a passing generic `Stop` hook. For accep
 
 Current hook behavior:
 - `Stop` can bind final agent-run evidence to the current session/turn.
-- `Stop` does not automatically evaluate loop progress, oscillation, over-orchestration, Wiki feedback promotion, or event-runtime support.
-- If no loop-aware artifact validator inspected `loop_stop_packet`, report `stop_hook_loop_evaluation: unverified`.
+- `Stop` evaluates bounded LoopRun progress only when `SKILL_SYSTEM_LOOP_RUN_DIR` or `skill_system_loop_run_dir` points at an active LoopRun state directory.
+- `Stop` still does not infer event-runtime support, Wiki feedback promotion, over-orchestration, or arbitrary loop success from hook presence alone.
+- If no active LoopRun state was inspected, report `stop_hook_loop_evaluation: unverified`.
 
 Do not claim hook-level loop success from hook presence alone.
 

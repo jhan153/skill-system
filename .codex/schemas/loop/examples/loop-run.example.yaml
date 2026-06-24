@@ -1,0 +1,44 @@
+schema_version: 1
+loop_run_id: LR-20260623-010
+contract_ref: contract.yaml
+contract_hash: 2d45ab1490ee466f236cf42ba3c39400e886861bb6007e25f09d15b59f4163ea
+workspace:
+  root: .
+  revision: fixture
+  workspace_id: fixtureworkspace
+status: active
+iteration: 1
+started_at: '2026-06-23T00:00:00Z'
+updated_at: '2026-06-23T00:05:00Z'
+budgets:
+  iterations_used: 1
+  max_iterations: 3
+  stop_continuations_used: 1
+  max_stop_continuations: 3
+  wall_time_seconds: 42
+condition_results:
+- condition_id: SC-001
+  status: fail
+  evidence_refs:
+  - artifacts/sc-001-iter-1.log
+  failure_fingerprint: a1b2c3d4
+- condition_id: SC-002
+  status: pass
+  evidence_refs:
+  - docs/release-notes.md
+progress:
+  required_passed: 0
+  required_total: 1
+  no_progress_count: 0
+  repeated_failure_count: 1
+  oscillation_count: 0
+  state_hash: e77b9c2950697c314cc544c0727bae9c3a857bf977f5c8eb7d71af70e0bad5d8
+agent_run_refs:
+- iteration: 1
+  run_id: AR-20260623-010
+last_decision:
+  action: continue
+  reason_code: required_condition_not_passed
+  target_condition: SC-001
+  continuation_prompt: "Loop iteration 2/3. Target condition: SC-001. Continue only with the smallest action that can change verifier evidence."
+side_effect_journal: []

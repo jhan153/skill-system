@@ -46,6 +46,15 @@ class SyncAllTest(unittest.TestCase):
                 self.assertEqual(pr["status"], "dry_run")
                 self.assertIn("create_task", pr["summary"])
 
+    def test_workspace_root_filter_scopes_to_one(self):
+        # Session-start autosync targets only the active workspace, not all boards.
+        full = sync_all(apply=False, registry_file=self.reg)
+        scoped = sync_all(apply=False, registry_file=self.reg, workspace_root=str(self.repo_a))
+        unmatched = sync_all(apply=False, registry_file=self.reg, workspace_root=str(self.repo_a) + "-nope")
+        self.assertEqual(full["totals"]["workspaces"], 2)
+        self.assertEqual(scoped["totals"]["workspaces"], 1)
+        self.assertEqual(unmatched["totals"]["workspaces"], 0)
+
     def test_missing_config_is_isolated(self):
         # register a bare dir with no config
         bare = self.base / "bare"

@@ -25,7 +25,7 @@ This repository includes the skill bundle organized for version 7.3.1. Its main 
 
 ## 8.x Direction: Context Compounding
 
-The current architecture line is `8.x — Context Compounding / Wiki Bank Architecture`. The current implementation target is `8.1.0 — Loop Engineering Planning`: it keeps `8.0.2 — Context Compounding Field Hardening` as the context-compounding field baseline and adds loop readiness, loop contract, verifier mapping, and accepted loop execution support for `/goal` and repeated agent work.
+The current architecture line is `8.x — Context Compounding / Wiki Bank Architecture`. The current implementation target is `8.3.0 — Bounded Loop Hardening`, building on `8.1.0 — Bounded Verification Loops`: it keeps `8.0.2 — Context Compounding Field Hardening` as the context-compounding field baseline and hardens the LoopRun controller with a session activation bridge, monotonic iteration, terminal immutability, idempotent replay, `iterations/` audit, precedence-honored termination, and wall-time enforcement for explicit repeated agent work.
 
 `7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 drop-in bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
 
@@ -135,13 +135,13 @@ Workflow skills control implementation discipline, validation, and failure recov
 
 ### Loop Engineering
 
-Loop Engineering skills decide when repeated execution is justified, turn success conditions into verifier ownership, and run accepted loop contracts without over-looping simple work. The 8.1.0 layer also records governance gates for progress, trusted termination, non-idempotent retry, context poisoning, reward hacking, comprehension debt, and Wiki Bank feedback candidates.
+Loop Engineering skills decide when repeated execution is justified, turn success conditions into verifier ownership, and run accepted loop contracts without over-looping simple work. The 8.1.0 layer adds a bounded LoopRun runtime for explicit verification loops: contract/state schemas, checkpoints, progress/stall decisions, Stop-hook continuation, and recovery handoff. It does not add cron, webhooks, queues, a daemon, or automatic loop conversion for ordinary requests.
 
 | Skill                    | Role                                                                                                                                                    |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `loop-readiness-router`  | Classifies an initial request as `one_shot`, `contract_needed`, or `loop_worthy` before execution, including governance prerequisites.                    |
 | `loop-verifier-registry` | Maps loop success conditions and governance metrics to verifier skills, commands, evidence targets, pass/fail signals, fallback checks, and labels.       |
-| `workflow-loop-runner`   | Executes accepted loop contracts through observe/decide/act/verify/checkpoint batches, governance gates, verifier evidence, retry/recovery, and stops.   |
+| `workflow-loop-runner`   | Executes accepted loop contracts through observe/decide/act/verify/checkpoint batches, backed by LoopRun state tools for checkpointing, continuation, recovery, and stop decisions. |
 
 ### Planning
 
@@ -187,6 +187,7 @@ Search skills find evidence or define evidence-gathering paths while keeping syn
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `search-router`         | Detects search intent for papers, code, runtime evidence, visual references, or memory evidence, and routes it to the appropriate evidence lane. |
 | `search-paper-evidence` | Searches for paper/source evidence or plans a search path, while tracking citation status in an evidence ledger without fabricating citations.   |
+| `search-deep-evidence`  | Runs a deep multi-angle evidence sweep across lanes with adversarial verification and citation-status labels, producing a verified evidence set for report or synthesis skills. |
 
 ### Memory
 
@@ -235,7 +236,8 @@ The version history is not a complete feature checklist. It is a timeline showin
 |   7.2.x | Skill families                     | Added user-facing family groups, family-prefixed skill names, and the search/coordination/evaluation families. Version 7.2.1 added workflow execution subfamilies and `report-qualitative`; version 7.2.5 added a skill catalog that helps users understand each skill by family. |
 |   7.3.x | Execution assurance                | Stabilized agent output validation, release verification profiles, and run evidence fixtures as the compatibility baseline before the context-layer transition. |
 | 8.0.2 | Context compounding            | Promotes the Context Compounding package to the 8.0.2 field line, including Wiki Bank, Runtime Projection, Context Packs, source-grounded claims, review-gated knowledge feedback, hook/runtime validation hardening, analysis-codebase hardening, and home-install path cleanup. `7.4.x Context Assurance` is treated as a legacy transition label. |
-| 8.1.0 | Loop engineering planning            | Adds loop readiness classification, `plan-loop-term` contracts, verifier mapping, and accepted loop execution support for `/goal` and repeated agent work: success conditions, verifier evidence, progress/stall signals, retry and stop policies, checkpoints, idempotency notes, loop governance metrics, Wiki feedback candidates, and execution handoff text. |
+| 8.1.0 | Bounded verification loops            | Adds loop readiness classification, `plan-loop-term` contracts, verifier mapping, and a minimal LoopRun runtime for explicit repeated agent work: loop schemas, state/checkpoints, progress/stall decisions, Stop-hook continuation, recovery handoff, verifier evidence, idempotency notes, loop governance metrics, Wiki feedback candidates, and execution handoff text. |
+| 8.3.0 | Bounded loop hardening                | Closes the LoopRun integrity gaps: a session-scoped activation bridge (`activate_loop_run.py`/`deactivate_loop_run.py` + Stop hook resolves the run by `session_id`, decoupled from the generic agent-run manifest), monotonic iteration with terminal immutability and idempotent replay, `iterations/` audit records, precedence-honored termination with wall-time enforcement, a confirmed-only `search-deep-evidence` convergence verifier, and a runtime-schema-valid `plan-loop-term` contract. |
 
 ## License
 

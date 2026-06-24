@@ -216,6 +216,16 @@ def apply_diff(
                 color_id=proj["color_id"],
                 tags=proj["tags"],
             )
+            # Kanboard's createTask appends to the BOTTOM of the column. Bubble the
+            # new card to the top (position 1) so the most-recently-synced item is
+            # visible first, matching how OP_MOVE_TASK repositions moved cards.
+            if task_id and column_id is not None:
+                client.move_task_position(
+                    project_id=project_id,
+                    task_id=int(task_id),
+                    column_id=column_id,
+                    swimlane_id=swimlane_id or 0,
+                )
             state.upsert(
                 ref,
                 TaskState(

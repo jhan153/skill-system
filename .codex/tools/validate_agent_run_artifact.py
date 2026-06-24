@@ -7,8 +7,11 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Any
+
+sys.dont_write_bytecode = True
 
 from _validation import is_iso_datetime, load_json_file, load_yaml_file, validate_schema
 
@@ -95,12 +98,19 @@ def load_hook_events(path: Path) -> tuple[list[dict[str, Any]], list[str]]:
     return events, errors
 
 
-def validate_hook_events(run_dir: Path, rel: str, phase: str = "post-finalize") -> list[str]:
+def validate_hook_events(
+    run_dir: Path,
+    rel: str,
+    phase: str = "post-finalize",
+    candidate_final_event: dict[str, Any] | None = None,
+) -> list[str]:
     errors: list[str] = []
     if not repo_relative(rel):
         return [f"hook_events path is not run-relative: {rel}"]
     events, load_errors = load_hook_events(run_dir / rel)
     errors.extend(load_errors)
+    if candidate_final_event is not None:
+        events.append(candidate_final_event)
     tool_states: dict[str, str] = {}
     compact_started = False
     turn_finalized = False
@@ -383,6 +393,7 @@ def validate_run_file(
     schema: dict[str, Any],
     context_pack_schema: dict[str, Any] | None,
     phase: str,
+    candidate_final_event: dict[str, Any] | None,
 ) -> tuple[str, list[str]]:
     run_dir = path.parent
     errors: list[str] = []
@@ -453,7 +464,10 @@ def validate_run_file(
                     errors.append(f"{run_id}: {claim_id}.source_support references source outside context pack {source_ref}")
     hook_events_rel = data.get("hook_events")
     if isinstance(hook_events_rel, str):
-        errors.extend(f"{run_id}: {error}" for error in validate_hook_events(run_dir, hook_events_rel, phase))
+        errors.extend(
+            f"{run_id}: {error}"
+            for error in validate_hook_events(run_dir, hook_events_rel, phase, candidate_final_event)
+        )
     if result_label == "agent-verified":
         nonzero = [record for record in validations if isinstance(record, dict) and record.get("type") == "command_exit" and record.get("exit_code") != 0]
         if nonzero:
@@ -483,6 +497,7 @@ def main() -> int:
     parser.add_argument("--schema", type=Path, default=Path(".codex/schemas/harness/agent-run.schema.json"))
     parser.add_argument("--context-pack-schema", type=Path, default=Path(".codex/schemas/knowledge/context-pack.schema.json"))
     parser.add_argument("--phase", choices=["pre-finalize", "post-finalize"], default="post-finalize")
+    parser.add_argument("--candidate-final-event")
     args = parser.parse_args()
     if not args.path.exists():
         print(f"FAIL: agent run path not found: {args.path}")
@@ -502,6 +517,16 @@ def main() -> int:
         except Exception as exc:  # noqa: BLE001
             print(f"FAIL: invalid context pack schema: {exc}")
             return 2
+    candidate_final_event = None
+    if args.candidate_final_event:
+        try:
+            candidate_final_event = json.loads(args.candidate_final_event)
+        except json.JSONDecodeError as exc:
+            print(f"FAIL: invalid candidate final event JSON: {exc}")
+            return 2
+        if not isinstance(candidate_final_event, dict):
+            print("FAIL: candidate final event must be a JSON object")
+            return 2
     paths = run_files(args.path)
     if not paths:
         print(f"SKIP: no agent run artifacts under {args.path}")
@@ -509,7 +534,7 @@ def main() -> int:
     failed = False
     checks: list[tuple[str, list[str]]] = []
     for run_file in paths:
-        run_id, errors = validate_run_file(run_file, schema, context_pack_schema, args.phase)
+        run_id, errors = validate_run_file(run_file, schema, context_pack_schema, args.phase, candidate_final_event)
         failed = failed or bool(errors)
         checks.append((run_id, errors))
     print("FAIL" if failed else "PASS")

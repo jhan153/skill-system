@@ -127,7 +127,20 @@ Create the planning contract that makes a `/goal` or loop safe to run. This skil
 13. Produce an execution handoff for `/goal`, `workflow-loop-runner`, or the accepted active plan.
 
 ## Output Contract
-Use only the sections needed for the task:
+
+Produce two aligned artifacts (see `references/loop-term-template.md`):
+
+1. **Runtime Contract** — the canonical handoff fed to `init_loop_run.py`. It MUST
+   validate against `.codex/schemas/loop/loop-contract.schema.json` (top-level
+   `schema_version`, `contract_id` `^LC-[0-9]{8}-[0-9]{3}$`, `activation: explicit`,
+   `goal.success_conditions[].id` `^SC-[0-9]{3}$` with a `verifier.type` of
+   `command_exit|artifact_exists|manual_check|diff_scope`, `control`, `termination.precedence`).
+   No manual rewrite step: this YAML runs as-is.
+2. **Governance & Planning Companion** (`loop_term:` below) — planning intent,
+   metrics, and governance for reasoning. NOT consumed by `init_loop_run.py`; keep
+   its condition ids aligned with the Runtime Contract (`SC-001`, ...).
+
+Use only the companion sections needed for the task:
 
 ```yaml
 loop_term:
@@ -138,7 +151,7 @@ loop_term:
     includes: []
     excludes: []
   success_conditions:
-    - id: SC-01
+    - id: SC-001
       statement:
       verifier_owner:
       verifier:

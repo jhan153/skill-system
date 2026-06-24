@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 
 
-DEFAULT_PROFILES = ["core", "execution", "agent-output", "research", "integrations", "knowledge"]
+DEFAULT_PROFILES = ["core", "execution", "agent-output", "research", "integrations", "knowledge", "loop"]
 
 
 def run_profile(profile: str, root: Path, release: bool) -> dict[str, object]:

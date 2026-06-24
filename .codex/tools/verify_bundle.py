@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import signal
+import shutil
 import subprocess
 import sys
 import time
@@ -20,6 +21,8 @@ STATUS_SKIP = "SKIP"
 STATUS_ERROR = "ERROR"
 CHECK_TIMEOUT_SECONDS = 60
 MAX_CAPTURED_OUTPUT = 12000
+CACHE_DIR_NAMES = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
+CACHE_SUFFIXES = {".pyc", ".pyo"}
 
 
 class Check:
@@ -120,6 +123,14 @@ def run_check(check: Check) -> dict[str, object]:
     }
 
 
+def clean_cache_artifacts(root: Path) -> None:
+    for path in sorted(root.rglob("*"), key=lambda item: len(item.parts), reverse=True):
+        if path.is_dir() and not path.is_symlink() and path.name in CACHE_DIR_NAMES:
+            shutil.rmtree(path, ignore_errors=True)
+        elif path.is_file() and path.suffix in CACHE_SUFFIXES:
+            path.unlink(missing_ok=True)
+
+
 def profile_status(results: list[dict[str, object]]) -> str:
     required_results = [result for result in results if result.get("required")]
     if any(result["status"] == STATUS_ERROR for result in required_results):
@@ -193,7 +204,7 @@ def core_checks(root: Path) -> list[Check]:
         Check("context_compounding_plan", [py, ".codex/tools/check_context_compounding_plan.py"], root),
         Check(
             "validator_unit_tests",
-            [py, "-m", "unittest", "discover", "-s", ".codex/tools/tests"],
+            [py, ".codex/tools/run_validator_unit_tests.py"],
             root,
             timeout_seconds=180,
         ),
@@ -333,6 +344,49 @@ def knowledge_checks(root: Path) -> list[Check]:
     ]
 
 
+def loop_checks(root: Path) -> list[Check]:
+    py = sys.executable
+    return [
+        Check(
+            "loop_run_fixture",
+            [py, ".codex/tools/validate_loop_run.py", ".codex/tools/tests/fixtures/loop-runs/valid"],
+            root,
+        ),
+        Check(
+            "loop_init_smoke",
+            [
+                py,
+                "-c",
+                (
+                    "import subprocess, sys, tempfile; "
+                    "d = tempfile.mkdtemp(prefix='skill-system-loop-init-'); "
+                    "r = subprocess.run([sys.executable, '.codex/tools/init_loop_run.py', "
+                    "'.codex/schemas/loop/examples/loop-contract.example.yaml', "
+                    "'--output-root', d, '--force'], text=True); "
+                    "sys.exit(r.returncode)"
+                ),
+            ],
+            root,
+        ),
+        Check(
+            "loop_evidence_ledger",
+            [
+                py,
+                ".codex/tools/check_evidence_ledger.py",
+                ".codex/tools/tests/fixtures/evidence-ledgers/converged.yaml",
+                "--min-claims",
+                "2",
+            ],
+            root,
+        ),
+        Check(
+            "loop_engineering_invariants",
+            [py, ".codex/tools/tests/test_loop_engineering.py"],
+            root,
+        ),
+    ]
+
+
 def integrations_checks(root: Path) -> list[Check]:
     py = sys.executable
     integration = root / "integrations" / "kanboard-plan-sync"
@@ -392,12 +446,14 @@ def checks_for(profile: str, root: Path) -> list[Check]:
         return agent_output_checks(root)
     if profile == "knowledge":
         return knowledge_checks(root)
+    if profile == "loop":
+        return loop_checks(root)
     raise ValueError(f"unknown profile: {profile}")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--profile", choices=["core", "integrations", "execution", "agent-output", "research", "knowledge"], required=True)
+    parser.add_argument("--profile", choices=["core", "integrations", "execution", "agent-output", "research", "knowledge", "loop"], required=True)
     parser.add_argument("--format", choices=["text", "json"], default="text")
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--release", action="store_true", help="fail if any profile check is skipped")
@@ -406,6 +462,7 @@ def main() -> int:
     if not root.exists():
         print(f"ERROR: root not found: {root}")
         return 2
+    clean_cache_artifacts(root)
     try:
         checks = checks_for(args.profile, root)
     except ValueError as exc:

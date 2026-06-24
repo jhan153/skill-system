@@ -1,4 +1,4 @@
-# 7.3.1 Terms
+# 8.3.0 Terms
 
 ## version_cut
 
@@ -20,7 +20,7 @@ The location that an agent should treat as the source of runtime guidance.
 
 The bundle intentionally excludes `.codex/config.toml` so a manual copy does not overwrite the user's existing runtime config.
 
-`automations/` are also excluded from 7.3.1 core because this bundle is not a scheduled autonomous runtime loop.
+`automations/` are also excluded from 8.3.0 core because this bundle is not a scheduled autonomous runtime loop.
 
 The Codex hook files are project-local evidence/control surfaces. They can run inside a trusted project after `/hooks` approval, but they do not replace sandboxing, approval policy, or rules.
 
@@ -58,4 +58,4 @@ A small read-only sanity check for structure and obvious packaging mistakes. It 
 
 ## Removed From 7.3.1 Core
 
-7.3.1 core excludes automatic install flow, promotion flow, release flow, signoff workflow, rollback flow, evidence intake flow, evidence closure flow, package-cut scoring, runtime config replacement, automations, default `.system` payload, and skill-system finality modeling.
+8.3.0 core excludes automatic install flow, promotion flow, release flow, signoff workflow, rollback flow, evidence intake flow, evidence closure flow, package-cut scoring, runtime config replacement, automations, default `.system` payload, and skill-system finality modeling.

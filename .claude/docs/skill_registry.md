@@ -45,6 +45,7 @@ Maturity values must be one of `skeleton`, `usable`, `field_tuned`, `experimenta
 | `research-literature-synthesis` | research | `usable` | Turn evidence ledgers or papers into literature review synthesis. | The user wants experiment code or manuscript writing. | Add contradiction and limitation templates. | `research` |
 | `research-manuscript-writing` | research | `usable` | Draft or revise manuscript sections from verified research artifacts. | Citations, results, or evidence are missing and cannot be marked. | Add more citation-status and unverified-claim patterns. | `research` |
 | `search-paper-evidence` | research | `usable` | Search or plan searches and build evidence ledgers without fabricated citations. | The user wants code implementation or manuscript prose only. | Add current-source verification and citation-status examples. | `search` |
+| `search-deep-evidence` | search | `experimental` | Deep multi-angle evidence sweep with adversarial verification and citation-status labels for report/synthesis to consume. | Single paper lane (use search-paper-evidence), final report/synthesis ownership, or bare analysis without evidence intent. | Collect field cases for angle decomposition, lane routing, and adversarial-verification precision. | `search` |
 | `research-peer-review` | research | `usable` | Critique manuscripts, proposals, and research plans. | The user asks for implementation or literature search only. | Add more reproducibility and ethics/reporting examples. | `research` |
 | `research-router` | research_router | `usable` | Route scientific research requests to narrow research skills. | Non-research development work. | Add negative cases for model/loss terms in ordinary implementation. | `research` |
 | `research-statistical-analysis` | research | `usable` | Analyze result tables and metrics with statistical rationale. | No data exists and the user expects statistical conclusions. | Add planned-vs-exploratory examples. | `research` |
@@ -89,6 +90,7 @@ Phase B added `search-router`, `memory-bank-ingestion`, and `evaluation-usage-tr
 
 ### Cross-family tags
 - `search-paper-evidence`: primary `search`; tags `research`, `paper`, `citation`, `implementation_evidence`.
+- `search-deep-evidence`: primary `search`; tags `evidence_sweep`, `fact_check`, `adversarial_verification`, `report_input`.
 - `plan-loop-term`: primary `planning`; tags `loop`, `goal`, `contract`, `completion_criteria`.
 - `design-frontend`, `design-visual-regression`, `design-a11y-audit`: primary `design`; tags `loop_verifier_candidate` for design loop contracts.
 - `evaluation-harness`: primary `evaluation`; tag `skill_system`.

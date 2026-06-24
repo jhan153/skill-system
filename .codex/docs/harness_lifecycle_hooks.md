@@ -89,4 +89,4 @@ Status values:
 - Keep repair/sync workflows explicit and separate from read-only hook observation.
 - Project-local hooks may run automatically only after project trust and hook trust. They still do not install themselves or mutate user config.
 - Use hook records as structured evidence for behavior evals and final report consistency checks.
-- Loop-specific progress, trusted termination, Wiki feedback, reward-hacking, context-poisoning, idempotency, oscillation, and over-orchestration checks belong in loop governance artifacts unless a dedicated loop-aware validator is explicitly implemented and wired.
+- Loop-specific progress and bounded continuation are evaluated only for an explicitly active LoopRun state directory. Wiki feedback, reward-hacking, context-poisoning, idempotency, oscillation, over-orchestration, and event-runtime claims still belong in loop governance artifacts unless a dedicated validator is explicitly wired for that evidence.

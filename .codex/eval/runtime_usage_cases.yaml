@@ -1,4 +1,4 @@
-version: "8.1.0"
+version: "8.3.0"
 purpose: "Real-use quality observation cases, not package approval."
 cases:
   - case_id: runtime-001

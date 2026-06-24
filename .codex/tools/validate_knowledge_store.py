@@ -6,8 +6,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 from pathlib import Path
 from typing import Any
+
+sys.dont_write_bytecode = True
 
 from _validation import load_json_file, load_yaml_file, validate_schema
 from knowledge_policy import admissible_claims

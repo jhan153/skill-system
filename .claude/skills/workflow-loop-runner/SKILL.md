@@ -80,6 +80,7 @@ Run the loop described by a contract. This skill owns iteration control, checkpo
 - Treat Stop hook, event runtime, durable execution, and Wiki Bank update support as evidence-bound capabilities; do not claim them when only the skill contract exists.
 
 ## Execution Loop
+0. The executable input is the runtime contract (valid against `.codex/schemas/loop/loop-contract.schema.json`) and its LoopRun created by `init_loop_run.py`, then bound to the session with `activate_loop_run.py`. The `loop_term` planning artifact is companion context, not the runtime input. Submit each iteration's outcome with `evaluate_loop_run.py --iteration-result` (monotonic iteration N+1; terminal runs reopen only via `resume_loop_run.py`).
 1. Validate the contract has success, blocked, budget, unsafe, and fatal stop terms.
 2. Confirm each required success condition has a verifier owner and evidence target.
 3. Observe current state, pending conditions, prior verifier evidence, approval gates, and side-effect journal.
@@ -91,6 +92,13 @@ Run the loop described by a contract. This skill owns iteration control, checkpo
 9. Continue only if a verified progress signal changed or the strategy changed in response to new verifier evidence.
 10. Change strategy or hand off to `workflow-recovery` after the configured repeated failure threshold.
 11. Stop immediately on success, blocked input, exhausted budget, unsafe boundary, fatal verifier/tooling corruption, non-idempotent retry without approval, reward-hacking signal, context-poisoning conflict, unresolved parallel write conflict, thrashing, infinite retry, premature completion, or oscillation.
+
+## Runtime Tools
+- Use `.codex/tools/init_loop_run.py` to create a LoopRun directory from an accepted `LC-*` contract.
+- Use `.codex/tools/evaluate_loop_run.py` after each verifier batch to update condition status, checkpoint state, and decide `success`, `continue`, `recover`, `blocked`, or `budget_exhausted`.
+- Use `.codex/tools/validate_loop_run.py` before reporting loop success or before resuming from a saved checkpoint.
+- The Stop hook resolves the active LoopRun from the session-scoped pointer created by `activate_loop_run.py` (keyed by `session_id`); `SKILL_SYSTEM_LOOP_RUN_DIR` / `skill_system_loop_run_dir` remain compatibility overrides only. A terminal decision auto-deactivates the pointer, so later unrelated turns keep the existing non-loop Stop behavior.
+- These tools do not run cron, webhook, queue, daemon, external side-effect retries, or general-purpose workflow DAGs.
 
 ## Output Contract
 ```yaml

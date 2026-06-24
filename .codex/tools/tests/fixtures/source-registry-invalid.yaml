@@ -1,5 +1,0 @@
-schema_version: 1
-sources:
-  - source_id:
-    source_type: web_url
-    verification_status: unknown

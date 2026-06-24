@@ -44,6 +44,7 @@ description: "Route cross-domain evidence-search requests (papers, code, runtime
 
 ## Related Skills
 - `search-paper-evidence`: paper/source evidence lane and ledger owner.
+- `search-deep-evidence`: deep multi-angle sweep across lanes with adversarial verification; use when a single lane is insufficient and a verified evidence set is needed.
 - `research-router`: owns the research lifecycle when the task is a scientific claim, not just evidence.
 - `analysis-codebase`, `analysis-bug`: codebase evidence lanes.
 - `design-visual-regression`, `design-a11y-audit`: visual evidence lanes.
@@ -62,6 +63,7 @@ description: "Route cross-domain evidence-search requests (papers, code, runtime
 
 ## Evidence Lanes
 - paper/source evidence -> `search-paper-evidence`
+- deep multi-angle / adversarially-verified evidence set across several lanes -> `search-deep-evidence` (escalate here when one lane cannot establish the claim and a verified evidence set is required before report/synthesis)
 - paper evidence for implementation planning -> `search-paper-evidence` as support; implementation/planning skill stays primary
 - codebase evidence -> `analysis-codebase` or `analysis-bug` evidence phase
 - runtime evidence -> `workflow-rigor` evidence phase
@@ -72,7 +74,7 @@ description: "Route cross-domain evidence-search requests (papers, code, runtime
 ## Router Decision Steps
 1. Confirm explicit evidence intent (evidence/source/proof/근거/조사/ledger). If absent, defer to the normal Route Matrix — do not trigger.
 2. Identify the final owner of the task (implementation, planning, analysis, research, design). The owner stays primary; this router only opens an evidence lane.
-3. Select exactly one evidence lane from Evidence Lanes and hand off; do not own synthesis, implementation, reporting, or the research lifecycle.
+3. Select exactly one evidence lane from Evidence Lanes and hand off; do not own synthesis, implementation, reporting, or the research lifecycle. Escalate to `search-deep-evidence` when one lane cannot establish the claim and a multi-angle, adversarially-verified evidence set is required.
 4. For paper evidence used in implementation/planning, attach `search-paper-evidence` as support and keep the implementation/planning skill primary; route the whole task to `research-router` only for a scientific claim/experiment/manuscript/publishability decision.
 
 ## Validation

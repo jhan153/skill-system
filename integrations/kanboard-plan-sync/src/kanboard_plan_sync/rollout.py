@@ -25,14 +25,22 @@ def sync_all(
     registry_file: Optional[str] = None,
     client_factory: Optional[Callable] = None,
     environ: Optional[dict] = None,
+    workspace_root: Optional[str] = None,
 ) -> dict:
     """Process every registered workspace's sync-enabled plans.
 
     ``apply=False`` (default) is dry-run: report planned ops only. ``apply=True``
     writes to Kanboard via a live client (built per workspace, or supplied by
-    ``client_factory`` for tests). Returns an aggregate report.
+    ``client_factory`` for tests). ``workspace_root`` scopes the run to a single
+    registered workspace (matched by resolved path); unmatched roots yield an
+    empty report. Returns an aggregate report.
     """
     workspaces = load_workspaces(registry_file)
+    if workspace_root:
+        from pathlib import Path as _Path
+
+        target = str(_Path(workspace_root).expanduser().resolve())
+        workspaces = [w for w in workspaces if str(_Path(w).expanduser().resolve()) == target]
     ws_reports: list[dict] = []
     totals = {"workspaces": 0, "plans": 0, "applied": 0, "errors": 0, "skipped": 0}
 

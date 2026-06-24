@@ -7,9 +7,12 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any
+
+sys.dont_write_bytecode = True
 
 from _validation import load_yaml_file
 from knowledge_policy import admissible_claims, is_admissible_edge

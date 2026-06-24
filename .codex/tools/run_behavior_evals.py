@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Replay-first behavior eval runner for 7.3.1 execution assurance."""
+"""Replay-first behavior eval runner for 8.3.0 execution assurance."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from typing import Any
+
+sys.dont_write_bytecode = True
 
 from _validation import is_iso_datetime, load_yaml_file
 
@@ -171,11 +174,11 @@ def main() -> int:
     parser.add_argument("--mode", choices=["replay", "host-assisted", "live"], default="replay")
     parser.add_argument("--eval-path", type=Path, default=Path(".codex/eval"))
     parser.add_argument("--observed-runs", type=Path, default=Path(".codex/eval/observed-runs"))
-    parser.add_argument("--bundle-version", default="7.3.1")
+    parser.add_argument("--bundle-version", default="8.3.0")
     parser.add_argument("--format", choices=["text", "json"], default="text")
     args = parser.parse_args()
     if args.mode != "replay":
-        print(f"SKIP: mode {args.mode!r} is not implemented in 7.3.1 replay pilot")
+        print(f"SKIP: mode {args.mode!r} is not implemented in 8.3.0 replay pilot")
         return 0
     if not args.observed_runs.exists():
         print(f"SKIP: observed runs path not found: {args.observed_runs}")

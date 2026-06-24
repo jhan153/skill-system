@@ -5,9 +5,12 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
+
+sys.dont_write_bytecode = True
 
 from _validation import is_iso_date, load_yaml_file, read_text
 

@@ -134,6 +134,8 @@ Summary:
 - No citation without a source.
 - Do not hallucinate DOI, arXiv ID, venue, dataset, metric, or paper existence.
 - Search date is mandatory for latest/current/recent research requests.
+- Label each ledger entry `citation_status: verified | unverified | fabricated-risk` (shared vocabulary with `search-deep-evidence`): `verified` only when a real, retrievable source is confirmed; `fabricated-risk` when an identifier cannot be confirmed to exist; otherwise `unverified`.
+- Current-source check: for latest/current/recent claims, re-confirm each entry against a fresh `search_date` before labeling it `verified`.
 - If search tools are unavailable, fill the query plan and search limitations, then mark evidence as `not_acquired`.
 
 ## Validation

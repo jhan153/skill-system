@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only sanity checks for the 7.3.1 manual drop-in skill bundle."""
+"""Read-only sanity checks for the 8.3.0 manual drop-in skill bundle."""
 
 from __future__ import annotations
 
@@ -439,6 +439,36 @@ STALE_VERSION_LABELS = [
     "7.3.0 Bundle Policy",
     "7.3.0 manual drop-in",
     "7.3.0 is a manual drop-in",
+    "7.3.1 Terms",
+    "7.3.1 core",
+    "7.3.1 Bundle Policy",
+    "7.3.1 manual drop-in",
+    "7.3.1 is a manual drop-in",
+    "8.0.0 Terms",
+    "8.0.0 core",
+    "8.0.0 Bundle Policy",
+    "8.0.0 manual drop-in",
+    "8.0.0 is a manual drop-in",
+    "8.0.1 Terms",
+    "8.0.1 core",
+    "8.0.1 Bundle Policy",
+    "8.0.1 manual drop-in",
+    "8.0.1 is a manual drop-in",
+    "8.0.2 Terms",
+    "8.0.2 core",
+    "8.0.2 Bundle Policy",
+    "8.0.2 manual drop-in",
+    "8.0.2 is a manual drop-in",
+    "8.1.0 Terms",
+    "8.1.0 core",
+    "8.1.0 Bundle Policy",
+    "8.1.0 manual drop-in",
+    "8.1.0 is a manual drop-in",
+    "8.2.0 Terms",
+    "8.2.0 core",
+    "8.2.0 Bundle Policy",
+    "8.2.0 manual drop-in",
+    "8.2.0 is a manual drop-in",
 ]
 VERSION_LABEL_DOCS = ["README.md", "README.ko.md", "CHANGELOG.md", "TERMS.md", ".codex/AGENTS.md", ".claude/CLAUDE.md"]
 
@@ -558,7 +588,7 @@ def check_version_labels(root: Path, errors: list[str]) -> None:
         text = read_text(path)
         for label in STALE_VERSION_LABELS:
             if label in text:
-                errors.append(f"stale version label '{label}' in {rel}; use 7.3.1")
+                errors.append(f"stale version label '{label}' in {rel}; use 8.3.0")
 
 
 def main() -> int:

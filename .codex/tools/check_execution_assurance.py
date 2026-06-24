@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Check 7.3.1 execution assurance artifacts."""
+"""Check 8.3.0 execution assurance artifacts."""
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
+
+sys.dont_write_bytecode = True
 
 from _validation import load_json_file, load_yaml_file, read_text, validate_schema
 
@@ -21,14 +24,37 @@ REQUIRED_FILES = [
     ".codex/hooks/codex-pretooluse.example.sh",
     ".codex/hooks/codex_hook_adapter.py",
     ".codex/hooks.json",
+    ".claude/tools/claude_notify_adapter.py",
+    ".claude/tools/notify_desktop.py",
     ".codex/tools/hook_runtime.py",
+    ".codex/tools/notify_desktop.py",
     ".codex/tools/run_behavior_evals.py",
+    ".codex/tools/run_validator_unit_tests.py",
     ".codex/tools/run_verification_pipeline.py",
     ".codex/tools/validate_agent_run_artifact.py",
     ".codex/schemas/harness/agent-run.schema.json",
     ".codex/tools/tests/fixtures/agent-runs/current-run/run.yaml",
     ".codex/tools/tests/fixtures/agent-runs/permission-no-tool-id/run.yaml",
     ".codex/tools/tests/fixtures/agent-runs/repeated-tools/run.yaml",
+    ".codex/schemas/loop/loop-contract.schema.json",
+    ".codex/schemas/loop/loop-run.schema.json",
+    ".codex/schemas/loop/iteration-result.schema.json",
+    ".codex/schemas/loop/examples/loop-contract.example.yaml",
+    ".codex/schemas/loop/examples/loop-run.example.yaml",
+    ".codex/schemas/loop/examples/iteration-result.example.yaml",
+    ".codex/tools/init_loop_run.py",
+    ".codex/tools/evaluate_loop_run.py",
+    ".codex/tools/validate_loop_run.py",
+    ".codex/tools/loop_policy.py",
+    ".codex/tools/emit_loop_feedback.py",
+    ".codex/tools/check_evidence_ledger.py",
+    ".codex/tools/activate_loop_run.py",
+    ".codex/tools/deactivate_loop_run.py",
+    ".codex/tools/resume_loop_run.py",
+    ".codex/tools/tests/test_loop_engineering.py",
+    ".codex/tools/tests/fixtures/loop-runs/valid/contract.yaml",
+    ".codex/tools/tests/fixtures/loop-runs/valid/state.yaml",
+    ".codex/tools/tests/fixtures/loop-runs/valid/checkpoints/0000.yaml",
 ]
 SCHEMA_CONTRACTS = {
     ".codex/schemas/harness/lifecycle-event.schema.json": {
@@ -53,6 +79,49 @@ SCHEMA_CONTRACTS = {
             "outputs": {"final_report": "final-report.md", "artifact_refs": [], "claims": []},
             "validations": [],
             "hook_events": "hook-events.jsonl",
+        },
+    },
+    ".codex/schemas/loop/loop-contract.schema.json": {
+        "top_property": "goal",
+        "example": ".codex/schemas/loop/examples/loop-contract.example.yaml",
+        "invalid": {
+            "schema_version": 1,
+            "contract_id": "LC-1",
+            "activation": "implicit",
+            "goal": {"statement": "x"},
+            "control": {},
+            "termination": {},
+        },
+    },
+    ".codex/schemas/loop/loop-run.schema.json": {
+        "top_property": "progress",
+        "example": ".codex/schemas/loop/examples/loop-run.example.yaml",
+        "invalid": {
+            "schema_version": 1,
+            "loop_run_id": "LR-1",
+            "contract_ref": "contract.yaml",
+            "contract_hash": "nothex",
+            "workspace": {},
+            "status": "running",
+            "iteration": -1,
+            "started_at": "x",
+            "updated_at": "x",
+            "budgets": {},
+            "condition_results": [],
+            "progress": {},
+            "agent_run_refs": [],
+            "last_decision": {},
+            "side_effect_journal": [],
+        },
+    },
+    ".codex/schemas/loop/iteration-result.schema.json": {
+        "top_property": "condition_results",
+        "example": ".codex/schemas/loop/examples/iteration-result.example.yaml",
+        "invalid": {
+            "schema_version": 2,
+            "loop_run_id": "LR-1",
+            "iteration": 0,
+            "condition_results": [],
         },
     },
 }

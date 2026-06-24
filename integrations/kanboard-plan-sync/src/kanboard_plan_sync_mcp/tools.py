@@ -475,7 +475,7 @@ def h_list_workspaces(args: dict) -> dict:
 
 
 def h_sync_all(args: dict) -> dict:
-    report = _sync_all(apply=args.get("apply", False))
+    report = _sync_all(apply=args.get("apply", False), workspace_root=args.get("workspace"))
     report["tool"] = "sync_all"
     return report
 
