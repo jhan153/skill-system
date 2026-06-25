@@ -66,6 +66,20 @@ rm <kanboard>/data/db.sqlite
 - Sync ensures the 5 status columns (`TODO/진행중/검토 필요/보류/완료`); empty default
   Kanboard columns can be removed in the board's column settings for a cleaner view.
 
+## Optional ThemeRevision UI plugin
+ThemeRevision is a host-local Kanboard UI plugin, not part of this bundle. If
+you want the local board to use it, install a pinned checkout under the local
+Kanboard runtime:
+
+```sh
+git clone --branch 1.1.12 --depth 1 https://github.com/greyaz/ThemeRevision.git \
+  ~/.ai/infra/kanboard-local/plugins/ThemeRevision
+```
+
+Verify that Kanboard still responds and that `Settings -> ThemeRevision Settings`
+is available in the UI. Keep the plugin source out of skill-system archives,
+repo payloads, DB backups, and token/config bundles.
+
 ## Out of scope (not bundled)
 - Kanboard application source, `data/` (DB/cache/files), logs, API token.
 - ThemeRevision / any UI theme or custom plugin/hook.

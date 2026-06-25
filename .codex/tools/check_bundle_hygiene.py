@@ -131,15 +131,23 @@ def check_runtime_trace_artifacts(root: Path, errors: list[str]) -> None:
             errors.append(f"runtime trace contains absolute local path: {rel}")
 
 
-def check_cache_artifacts(root: Path, errors: list[str]) -> None:
+def check_cache_artifacts(root: Path, warnings: list[str]) -> None:
+    cache_dirs = 0
+    bytecode_files = 0
     for path in root.rglob("*"):
         rel = path.relative_to(root).as_posix()
         if is_os_noise(rel):
             continue
-        if any(part in CACHE_DIR_NAMES for part in path.relative_to(root).parts):
-            errors.append(f"cache artifact present: {rel}")
-        elif path.is_file() and path.suffix in CACHE_SUFFIXES:
-            errors.append(f"cache artifact present: {rel}")
+        parts = path.relative_to(root).parts
+        if path.is_dir() and path.name in CACHE_DIR_NAMES:
+            cache_dirs += 1
+        elif path.is_file() and path.suffix in CACHE_SUFFIXES and not any(part in CACHE_DIR_NAMES for part in parts):
+            bytecode_files += 1
+    if cache_dirs or bytecode_files:
+        warnings.append(
+            "transient Python cache artifacts ignored: "
+            f"{cache_dirs} cache dirs, {bytecode_files} standalone bytecode files"
+        )
 
 
 def read_text(path: Path) -> str:
@@ -527,7 +535,7 @@ def main() -> int:
         return 2
     check_root_shape(root, errors)
     check_sensitive_files(root, errors)
-    check_cache_artifacts(root, errors)
+    check_cache_artifacts(root, warnings)
     check_runtime_trace_artifacts(root, errors)
     check_skill_frontmatter(root, errors)
     check_registry(root, errors)

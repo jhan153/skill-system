@@ -1,0 +1,15 @@
+/docs/
+/.github/
+/.kanboard-plan/
+/.kanboard-plan.yml
+
+.DS_Store
+._*
+__MACOSX/
+Thumbs.db
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
