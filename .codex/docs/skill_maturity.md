@@ -31,7 +31,5 @@
 
 ## Non-Goals
 
-- Maturity is not a score.
-- Maturity is not package approval.
-- Maturity does not make the skill system finished.
-- Maturity does not replace task-specific validation.
+- Maturity is a local use-readiness label.
+- Task-specific validation remains separate from maturity assignment.

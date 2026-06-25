@@ -57,23 +57,17 @@ QUALITATIVE_CRITERIA = [
 README_REQUIRED = {
     "README.md": [
         "8.x — Context Compounding / Wiki Bank Architecture",
-        "8.1.0 — Bounded Verification Loops",
         "8.3.0 — Bounded Loop Hardening",
-        "8.0.2 — Context Compounding Field Hardening",
         "7.4.x Context Assurance",
         "legacy label",
-        "field baseline",
         "Wiki Bank",
         "Runtime Projection",
     ],
     "README.ko.md": [
         "8.x — Context Compounding / Wiki Bank Architecture",
-        "8.1.0 — Bounded Verification Loops",
         "8.3.0 — Bounded Loop Hardening",
-        "8.0.2 — Context Compounding Field Hardening",
         "7.4.x Context Assurance",
         "legacy label",
-        "field 기준선",
         "Wiki Bank",
         "Runtime Projection",
     ],

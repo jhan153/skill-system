@@ -1,6 +1,6 @@
 # Usage Quality Note
 
-This template is for manual field review. It is not package approval.
+This template is for manual field review and improvement tracking.
 
 ## Request
 
@@ -49,4 +49,4 @@ This template is for manual field review. It is not package approval.
 
 Allowed verification values: `agent-verified`, `user-verification-needed`, `unverified`.
 
-Do not use this note as package approval, release decision, or bundle scoring.
+Use this note for usage-quality review, field observations, and improvement tracking.

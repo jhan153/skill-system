@@ -1,6 +1,6 @@
 ---
 name: evaluation-harness
-description: Reviews runtime usage eval cases as field-quality examples; it does not produce package-cut reports or readiness decisions.
+description: Reviews runtime usage eval cases as field-quality examples for routing and output improvement.
 ---
 
 # Evaluation Harness
@@ -17,7 +17,7 @@ description: Reviews runtime usage eval cases as field-quality examples; it does
   - the user asks to inspect or improve `.codex/eval` usage cases.
   - routing, negative routing, context, memory, handoff, design, or research cases need consistency review.
 - do_not_use_when:
-  - the user wants a bundle validator or package approval system.
+  - the user wants release governance, readiness signoff, or broad bundle validation.
   - the request is ordinary code execution unrelated to usage cases.
   - the work would create deployment, signoff, operational recovery, or evidence-finality machinery.
 - expected_inputs:
@@ -53,14 +53,14 @@ description: Reviews runtime usage eval cases as field-quality examples; it does
 
 ## Boundary
 - Runtime usage eval is for observing skill quality in real use.
-- It is not a package-cut validator and must not produce bundle approval state.
+- Release governance and readiness signoff belong to the owning release workflow.
 
 ## Workflow
 1. Select a small representative case set from `.codex/eval`.
 2. Compare the expected primary/supporting skills with the observed behavior from a real or dry-run request.
 3. Record routing, context, output shape, and friction using the manual result capture fields.
 4. Map each finding to candidate changes in eval cases, routing docs, registry notes, or skill text.
-5. Do not score the bundle, approve a release, or generate a readiness decision.
+5. Keep the result focused on usage-quality observations and improvement candidates.
 
 ## Manual Result Capture Fields
 

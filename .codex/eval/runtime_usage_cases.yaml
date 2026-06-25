@@ -1,5 +1,5 @@
-version: "8.3.0"
-purpose: "Real-use quality observation cases, not package approval."
+version: "8.3.1"
+purpose: "Real-use quality observation cases for routing and output improvement."
 cases:
   - case_id: runtime-001
     user_request: "이 버그가 왜 반복되는지 원인 분석해줘."
@@ -143,7 +143,7 @@ cases:
     should_not_trigger: [report-artifact-inventory]
     expected_context: [.codex/eval cases, observed behavior]
     expected_output_shape: "manual result capture and improvement candidates"
-    quality_notes: "Eval output is improvement evidence, not package approval."
+    quality_notes: "Eval output is improvement evidence for routing and output shape."
     friction_risk: "turning eval into readiness score"
   - case_id: runtime-017
     user_request: "이전 계획과 메모리가 섞였어. 지금 작업에 필요한 context pack만 다시 골라줘."

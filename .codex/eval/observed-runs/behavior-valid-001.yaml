@@ -4,7 +4,7 @@ host: codex
 host_version: unknown
 model: unknown
 model_version: unknown
-bundle_version: "8.3.0"
+bundle_version: "8.3.1"
 started_at: "2026-06-20T00:00:00Z"
 observed_route: report-qualitative
 observed_behaviors:

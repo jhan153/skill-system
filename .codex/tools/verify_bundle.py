@@ -469,6 +469,7 @@ def main() -> int:
         print(f"ERROR: {exc}")
         return 2
     results = [run_check(check) for check in checks]
+    clean_cache_artifacts(root)
     status = profile_status(results)
     if args.release and status == STATUS_PASS_WITH_SKIPS:
         status = STATUS_FAIL

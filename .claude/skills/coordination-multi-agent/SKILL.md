@@ -120,7 +120,7 @@ artifact_note:
   do_not_treat_as:
     - persistent registry entry
     - release decision
-    - skill-system finality
+    - system-wide completion claim
 ```
 
 Allowed `evidence_status` values:

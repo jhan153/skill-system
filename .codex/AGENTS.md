@@ -78,12 +78,12 @@
 - For risky or destructive commands, follow the configured approval policy and the user's explicit request.
 - When command results are relevant, prefer direct CLI verification.
 
-### 8.3.0 Bundle Policy
-- This bundle intentionally excludes `.codex/config.toml` to preserve the user's existing runtime config.
-- This bundle intentionally excludes `automations/` because 8.3.0 is a manual drop-in skill bundle, not a scheduled autonomous runtime loop.
-- Project-local lifecycle hooks may run after project trust and `/hooks` trust. They are evidence/control surfaces and do not replace sandboxing, approval policy, or rules.
-- Review `.codex/rules/default.rules` against local policy before copying it.
-- `.codex/skills/.system` is app-managed and is not part of the default copy payload.
+### Runtime Asset Policy
+- Runtime config and automation assets, including `.codex/config.toml` and `automations`, are managed by the host environment and local policy.
+- Preserve existing runtime settings unless the user explicitly requests replacement.
+- Project-local lifecycle hooks may run after project trust and `/hooks` trust. They operate under sandboxing, approval policy, and rules.
+- Review `.codex/rules/default.rules` against local policy before applying it.
+- `.codex/skills/.system` is app-managed; replacing it requires explicit user intent.
 
 ## Edit Boundary
 - Do not modify code or configuration files for pure explanation, analysis, or review requests.

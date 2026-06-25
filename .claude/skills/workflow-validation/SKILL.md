@@ -57,7 +57,7 @@ description: Designs or runs focused validation plans for completed or planned c
 ## Purpose
 - Turn vague "검증해줘" requests into a scoped validation matrix.
 - Separate agent-run checks from user/manual checks.
-- Prevent validation work from becoming package approval, critical review, or broad repo audit.
+- Keep validation work scoped to checks, evidence, and user-verification gaps.
 
 ## Activation
 - Primary when the user's actual goal is validation planning or validation-only execution.

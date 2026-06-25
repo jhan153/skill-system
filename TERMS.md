@@ -1,12 +1,12 @@
-# 8.3.0 Terms
+# 8.3.1 Terms
 
 ## version_cut
 
-A version cut is a new manual bundle snapshot. It does not mean the skill system is finished, approved, or globally correct.
+A version cut is a named snapshot of Skill System artifacts for a compatibility line. It records the current structure, guidance, and validation targets for that line.
 
-## manual_drop_in_skill_bundle
+## skill_system_bundle
 
-A manual drop-in skill bundle is copied by the user. It does not mutate live settings, install itself, or manage the user's runtime config. Project-local lifecycle hooks may run only after project trust and hook trust.
+A Skill System bundle is a portable set of skills, docs, eval cases, tools, and integration source. Host runtime configuration remains under the user's local policy and explicit choices.
 
 ## runtime_canonical
 
@@ -18,15 +18,13 @@ The location that an agent should treat as the source of runtime guidance.
 
 ## runtime_config_policy
 
-The bundle intentionally excludes `.codex/config.toml` so a manual copy does not overwrite the user's existing runtime config.
+Runtime configuration and automation assets, including `.codex/config.toml` and `automations`, are host-managed. Preserve existing local settings unless the user explicitly chooses to replace them.
 
-`automations/` are also excluded from 8.3.0 core because this bundle is not a scheduled autonomous runtime loop.
-
-The Codex hook files are project-local evidence/control surfaces. They can run inside a trusted project after `/hooks` approval, but they do not replace sandboxing, approval policy, or rules.
+The Codex hook files are project-local evidence/control surfaces. They run under project trust, hook trust, sandboxing, approval policy, and rules.
 
 ## app_managed_system_skills
 
-`.codex/skills/.system` is app-managed. It is not part of the default copy payload. A snapshot may be provided under `optional-system-skills-snapshot/` for manual review, but it should not overwrite an existing runtime `.system` folder unless the user explicitly chooses that.
+`.codex/skills/.system` is app-managed. Optional snapshots under `optional-system-skills-snapshot/` are comparison material and require explicit user intent before replacing an existing runtime `.system` folder.
 
 ## skill_maturity
 
@@ -46,7 +44,7 @@ The next practical work needed to improve a skill. It can mention routing precis
 
 ## runtime_usage_eval
 
-Usage examples that help observe skill behavior in real tasks. They are not package approval, release scoring, or proof that a skill is complete.
+Usage examples that help observe skill behavior in real tasks and collect improvement evidence.
 
 ## field_feedback
 
@@ -54,8 +52,8 @@ Human notes from real use. Feedback can update maturity, routing examples, negat
 
 ## bundle_hygiene_check
 
-A small read-only sanity check for structure and obvious packaging mistakes. It must not install, fix, generate reports, mutate live settings, or score real skill quality.
+A small read-only sanity check for structure, mirror consistency, and obvious packaging mistakes.
 
-## Removed From 7.3.1 Core
+## Host-Managed Or External Assets
 
-8.3.0 core excludes automatic install flow, promotion flow, release flow, signoff workflow, rollback flow, evidence intake flow, evidence closure flow, package-cut scoring, runtime config replacement, automations, default `.system` payload, and skill-system finality modeling.
+Runtime config such as `.codex/config.toml`, automations, app-managed system skills, release/signoff processes, rollback operations, and local third-party runtimes are governed by their owning host or workflow.

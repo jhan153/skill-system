@@ -1,5 +1,11 @@
 # Changelog
 
+## 8.3.1
+
+- Cleaned evaluation-facing framing: replaced deployment/autonomy-negative wording with portable skill-bundle and host-managed runtime asset language across public docs, runtime notes, mirrored skills, eval notes, and references.
+- Simplified stale-version hygiene around a single `CURRENT_VERSION` and current-label regex checks instead of a long hand-maintained stale-label list.
+- Hardened verification cleanup so `verify_bundle.py` removes Python cache artifacts after checks as well as before checks.
+
 ## 8.3.0
 
 - Bounded-loop activation bridge: added `activate_loop_run.py` / `deactivate_loop_run.py` and a session-scoped pointer under `${CODEX_HOME:-~/.codex}/harness/active-loops/<session>.json`; the Stop hook now resolves the active LoopRun by `session_id` instead of a custom Stop payload field or parent env var, and loop evaluation is decoupled from the generic agent-run manifest (it also runs when that manifest is `UNVERIFIED`, only a hard validation failure skips it).
@@ -51,7 +57,7 @@
 - Split Loop Engineering into dedicated readiness, verifier mapping, and accepted execution skills: `loop-readiness-router`, `loop-verifier-registry`, and `workflow-loop-runner`, with design loop contract support.
 - Strengthened Loop Engineering skills with source-grounded readiness factors, deterministic-first verifier mapping, maker/checker separation, durable loop state, retry taxonomy, untrusted-observation handling, and observe-decide-act-verify-checkpoint execution.
 - Added loop governance coverage for Stop-hook limits, progress heuristics, Wiki Bank feedback candidates, durable/event-runtime labels, improvement/safety/verifier/efficiency/process/outcome metrics, comprehension debt, over-orchestration, parallel conflicts, non-idempotent retry, context poisoning, reward hacking, thrashing, infinite retry, premature completion, and oscillation.
-- Added the first bounded verification loop runtime: loop contract/run/iteration schemas, `init_loop_run.py`, `evaluate_loop_run.py`, `validate_loop_run.py`, Stop-hook active LoopRun evaluation, continuation prompts via `decision: block`, checkpoint writing, no-progress/repeated-failure recovery decisions, and non-loop compatibility tests. This does not add cron, webhook, queue, daemon, or automatic loop conversion for ordinary requests.
+- Added the first bounded verification loop runtime: loop contract/run/iteration schemas, `init_loop_run.py`, `evaluate_loop_run.py`, `validate_loop_run.py`, Stop-hook active LoopRun evaluation, continuation prompts via `decision: block`, checkpoint writing, no-progress/repeated-failure recovery decisions, and non-loop compatibility tests. Host schedulers, queues, event triggers, and daemonized controllers remain separate runtime capabilities.
 
 ## 8.0.2
 
@@ -147,10 +153,10 @@
 
 ## 7.1.1
 
-- Recut the bundle as a manual drop-in skill bundle.
+- Recut the bundle as a portable Skill System bundle.
 - Hardened `rules/default.rules` so network, history rewrite, process termination, debugger, host-specific, and live `.codex` mutation commands are not active allow rules.
-- Excluded `.codex/config.toml` and `automations/` from the default bundle by policy.
-- Moved app-managed `.system` skills into `optional-system-skills-snapshot/` instead of the default copy payload.
+- Kept `.codex/config.toml` and `automations/` under host-managed runtime policy.
+- Moved app-managed `.system` skill snapshots into `optional-system-skills-snapshot/` as comparison material.
 - Added a compact Routing Card to `design-to-frontend` while preserving its implementation workflow.
 - Narrowed global task result wording so labels apply to concrete user tasks, not the skill system as a whole.
 - Added field feedback examples for design, research, and memory over-trigger cases.
@@ -170,4 +176,4 @@
 
 ## Notes
 
-This cut does not add automatic installation, live runtime mutation, deployment management, signoff workflow, rollback workflow, evidence intake/finality workflow, package-cut scoring, or skill-system finality state.
+This cut keeps installation, live runtime mutation, deployment management, signoff, rollback, evidence lifecycle, release governance, and completion-state tracking under their owning host or workflow.

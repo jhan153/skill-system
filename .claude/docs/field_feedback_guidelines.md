@@ -62,5 +62,5 @@ privacy_redactions: []
 ## Boundaries
 
 - Do not paste secrets, credentials, private sessions, or unrelated project data.
-- Do not turn feedback into package approval.
+- Keep feedback focused on routing, output quality, maturity, and concrete improvement candidates.
 - Do not use one anecdote to upgrade a skill to `field_tuned`.

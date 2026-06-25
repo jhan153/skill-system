@@ -141,4 +141,4 @@ Codex still requires project trust and hook trust before these project-local hoo
 
 The `7.3.1` RC2 hook behavior is frozen as the compatibility baseline. Known live-hook limits are documented rather than expanded into a broader Stop-hook project: hooks only run after project trust, missing current-run manifests are `UNVERIFIED`/`warn`, and permission events may be approximate when Codex does not provide a `tool_use_id`.
 
-The 8.0 branch policy is to preserve the external drop-in interface while moving the internal operating layer to `8.0.0 — Context Compounding / Wiki Bank Architecture`. Run Trace Integrity remains the execution evidence gate that supports the 8.0 Knowledge Store and Context Pack layers.
+The 8.0 branch policy is to preserve the external compatibility interface while moving the internal operating layer to `8.0.0 — Context Compounding / Wiki Bank Architecture`. Run Trace Integrity remains the execution evidence gate that supports the 8.0 Knowledge Store and Context Pack layers.

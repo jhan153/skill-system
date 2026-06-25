@@ -1,8 +1,8 @@
 # Runtime Terms
 
-## manual drop-in
+## skill system bundle
 
-The user unpacks the bundle and copies files manually. The bundle does not install itself or modify live runtime state.
+Skill System runtime material is organized as portable skills, docs, eval cases, tools, hooks, and integration source. Host-level settings remain under local runtime policy.
 
 ## runtime canonical
 
@@ -16,17 +16,17 @@ Claude runtime material lives inside `.claude`.
 
 ## root packaging layer
 
-Root files explain the bundle to a human. Root files are not runtime dependencies.
+Root files explain the Skill System package to a human. Runtime guidance lives under `.codex` and `.claude`.
 
 ## runtime config policy
 
-This bundle intentionally excludes `.codex/config.toml` to preserve the user's existing runtime config. It also excludes `automations/` because 7.3.1 core is a manual drop-in skill bundle, not an automatic runtime loop.
+Runtime configuration and automation assets, including `.codex/config.toml` and `automations`, are host-managed. Preserve existing local settings unless the user explicitly requests replacement.
 
 Review `.codex/rules/default.rules` against local policy before copying it.
 
 ## app-managed system skills
 
-`.codex/skills/.system` is app-managed and is not part of the default copy payload. Optional snapshots belong under `optional-system-skills-snapshot/` and must not overwrite an existing runtime `.system` folder without explicit user intent.
+`.codex/skills/.system` is app-managed. Optional snapshots belong under `optional-system-skills-snapshot/` and require explicit user intent before replacing an existing runtime `.system` folder.
 
 ## skill maturity
 
@@ -38,7 +38,7 @@ Improvement track is the next specific work needed to improve a skill. It is not
 
 ## runtime usage eval
 
-Runtime usage eval cases are examples for observing skill behavior in real use. They do not approve the bundle and do not prove skill quality.
+Runtime usage eval cases are examples for observing skill behavior in real use and collecting improvement evidence.
 
 ## field feedback
 
@@ -46,13 +46,13 @@ Field feedback is real-use observation collected for future skill text, routing,
 
 ## bundle hygiene
 
-Bundle hygiene checks only structure and obvious packaging mistakes. It is read-only and does not make quality decisions.
+Bundle hygiene checks structure, mirror consistency, and obvious packaging mistakes. It is read-only.
 
-## 7.3.1 Core Boundary
+## Core Runtime Scope
 
-7.3.1 core keeps skills, routing docs, maturity docs, usage cases, feedback guidance, source registry, generated mirror checks, and small sanity checkers.
+The core runtime scope keeps skills, routing docs, maturity docs, usage cases, feedback guidance, source registry, generated mirror checks, and small sanity checkers.
 
-7.3.1 core excludes install automation, live runtime mutation, deployment/signoff workflows, rollback flow, evidence finality workflows, package scoring, runtime config replacement, automations, default `.system` payload, and skill-system finality modeling.
+Host-managed assets include runtime config such as `.codex/config.toml`, automations, deployment/signoff workflows, rollback operations, app-managed system skills, and local third-party runtimes.
 
 ## MCP integration vs local runtime (7.3.1)
 

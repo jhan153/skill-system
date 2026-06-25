@@ -19,7 +19,7 @@ description: Frames explicit task DAGs and handoff notes only when the user asks
 - do_not_use_when:
   - the request can be handled with ordinary implementation steps.
   - the user says goal, objective, 목표, or 목적 but only wants a summary, next step, or direct implementation.
-  - the request depends on app-managed Codex Goal state mutation that this manual bundle cannot provide.
+  - the request depends on app-managed Codex Goal state mutation outside this skill's authority.
   - the work would create install, deployment, signoff, operational recovery, or evidence-finality machinery.
   - the requested output would model the skill system itself as a completable objective.
 - expected_inputs:

@@ -98,7 +98,7 @@ Run the loop described by a contract. This skill owns iteration control, checkpo
 - Use `.codex/tools/evaluate_loop_run.py` after each verifier batch to update condition status, checkpoint state, and decide `success`, `continue`, `recover`, `blocked`, or `budget_exhausted`.
 - Use `.codex/tools/validate_loop_run.py` before reporting loop success or before resuming from a saved checkpoint.
 - The Stop hook resolves the active LoopRun from the session-scoped pointer created by `activate_loop_run.py` (keyed by `session_id`); `SKILL_SYSTEM_LOOP_RUN_DIR` / `skill_system_loop_run_dir` remain compatibility overrides only. A terminal decision auto-deactivates the pointer, so later unrelated turns keep the existing non-loop Stop behavior.
-- These tools do not run cron, webhook, queue, daemon, external side-effect retries, or general-purpose workflow DAGs.
+- External schedulers, event triggers, queues, daemons, and side-effect retry systems must be verified as host/runtime capabilities before they are included in a loop contract.
 
 ## Output Contract
 ```yaml

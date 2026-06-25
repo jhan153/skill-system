@@ -108,7 +108,7 @@ Status rules:
 - `unverified`: the contract names the checkpoint/trigger but evidence is absent.
 - `unsupported`: the current host or skill layer has no trigger/scheduler/queue support.
 
-Do not claim cron/webhook/queue/event-driven execution from a copy-and-run skill bundle alone.
+Claim cron/webhook/queue/event-driven execution only when the current run has concrete host/runtime evidence for that capability.
 
 Missing durable/event-runtime evidence is not a progress target. Stop with `unverified` or `unsupported` unless the accepted contract explicitly includes implementing that runtime capability as the task itself.
 

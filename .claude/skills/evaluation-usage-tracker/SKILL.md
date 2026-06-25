@@ -12,7 +12,7 @@ description: "Aggregate metadata-only skill invocation records into usage summar
 - use_when:
   - the user wants invocation counts, low/high-use skills, over/under-trigger patterns, or maturity-upgrade candidates from a local ledger.
 - do_not_use_when:
-  - package approval, readiness signoff, automatic maturity changes, or analysis of raw prompts/transcripts.
+  - release governance, readiness signoff, automatic maturity changes, or analysis of raw prompts/transcripts.
   - no local invocation ledger or summarized records exist.
 - expected_inputs:
   - local invocation ledger or summarized usage records (metadata only)
@@ -46,7 +46,7 @@ description: "Aggregate metadata-only skill invocation records into usage summar
 - `usage tracking`, `호출 통계`, `사용량 요약`, `invocation metrics`
 
 ## Trigger Guard (Do Not Trigger)
-- Package approval, readiness scoring, or finality decisions.
+- Release governance, readiness scoring, or finality decisions.
 - Any request that would require reading raw user prompts or transcripts.
 
 ## Goal

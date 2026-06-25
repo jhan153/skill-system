@@ -12,7 +12,7 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 7.3.1 Drop-in Bundle
+## 7.3.1 Skill Bundle
 
 This repository includes the skill bundle organized for version 7.3.1. Its main components are:
 
@@ -25,9 +25,9 @@ This repository includes the skill bundle organized for version 7.3.1. Its main 
 
 ## 8.x Direction: Context Compounding
 
-The current architecture line is `8.x — Context Compounding / Wiki Bank Architecture`. The current implementation target is `8.3.0 — Bounded Loop Hardening`, building on `8.1.0 — Bounded Verification Loops`: it keeps `8.0.2 — Context Compounding Field Hardening` as the context-compounding field baseline and hardens the LoopRun controller with a session activation bridge, monotonic iteration, terminal immutability, idempotent replay, `iterations/` audit, precedence-honored termination, and wall-time enforcement for explicit repeated agent work.
+The current architecture line is `8.x — Context Compounding / Wiki Bank Architecture`. The current maintenance cut is `8.3.1 — Evaluation Framing Cleanup`, following the `8.3.0 — Bounded Loop Hardening` release.
 
-`7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 drop-in bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
+`7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 skill bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
 
 The Wiki Bank is not a Source of Truth. Repository files, tests, schemas, explicit user decisions, validated plans, Kanboard state, and Agent Run evidence remain authority sources. Hooks and runtime traces may produce proposal evidence, but accepted knowledge changes require explicit review.
 
@@ -135,7 +135,7 @@ Workflow skills control implementation discipline, validation, and failure recov
 
 ### Loop Engineering
 
-Loop Engineering skills decide when repeated execution is justified, turn success conditions into verifier ownership, and run accepted loop contracts without over-looping simple work. The 8.1.0 layer adds a bounded LoopRun runtime for explicit verification loops: contract/state schemas, checkpoints, progress/stall decisions, Stop-hook continuation, and recovery handoff. It does not add cron, webhooks, queues, a daemon, or automatic loop conversion for ordinary requests.
+Loop Engineering skills decide when repeated execution is justified, turn success conditions into verifier ownership, and run accepted loop contracts without over-looping simple work. The 8.1.0 layer adds a bounded LoopRun runtime for explicit verification loops: contract/state schemas, checkpoints, progress/stall decisions, Stop-hook continuation, and recovery handoff. Host schedulers and external event triggers are treated as separate runtime capabilities when present.
 
 | Skill                    | Role                                                                                                                                                    |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -208,7 +208,7 @@ Evaluation skills improve the skill system itself through cases and usage observ
 
 | Skill                      | Role                                                                                                                                                           |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `evaluation-harness`       | Reviews `.codex/eval` usage cases, routing expectations, and schema consistency. It is treated as a usage-quality review tool, not as a package approval tool. |
+| `evaluation-harness`       | Reviews `.codex/eval` usage cases, routing expectations, and schema consistency as a usage-quality review tool. |
 | `evaluation-usage-tracker` | Aggregates skill-call metadata into usage summaries, low/high-usage signals, and improvement candidates without storing original prompts or conversation logs. |
 
 ### Skill System
@@ -232,12 +232,13 @@ The version history is not a complete feature checklist. It is a timeline showin
 |     5.x | Agentic workflow and stabilization | Separated planning, execution, validation, reporting, and review into distinct responsibilities. The workflow also matured around explicit routing contracts, smoke-testable trigger rules, drift checks, lightweight automation, and phase-level planning packages. |
 |     6.x | Research lifecycle                 | Expanded the early research-planning branch into a routed research lifecycle, separating evidence search, literature synthesis, hypothesis planning, experiment design, analysis, manuscript writing, and peer review into distinct stages. |
 |     7.x | Public specification               | Reworked the private system into a publicly shareable timeline, design philosophy, and manifest/profile structure.                                                                                                                                                                |
-|   7.1.x | Drop-in bundle                     | Repackaged the system as a drop-in bundle with read-only structure checks and conservative explicit-first routing.                                                                                                                                                                |
+|   7.1.x | Portable skill bundle              | Repackaged the system as a portable skill bundle with read-only structure checks and conservative explicit-first routing.                                                                                                                                                          |
 |   7.2.x | Skill families                     | Added user-facing family groups, family-prefixed skill names, and the search/coordination/evaluation families. Version 7.2.1 added workflow execution subfamilies and `report-qualitative`; version 7.2.5 added a skill catalog that helps users understand each skill by family. |
 |   7.3.x | Execution assurance                | Stabilized agent output validation, release verification profiles, and run evidence fixtures as the compatibility baseline before the context-layer transition. |
 | 8.0.2 | Context compounding            | Promotes the Context Compounding package to the 8.0.2 field line, including Wiki Bank, Runtime Projection, Context Packs, source-grounded claims, review-gated knowledge feedback, hook/runtime validation hardening, analysis-codebase hardening, and home-install path cleanup. `7.4.x Context Assurance` is treated as a legacy transition label. |
 | 8.1.0 | Bounded verification loops            | Adds loop readiness classification, `plan-loop-term` contracts, verifier mapping, and a minimal LoopRun runtime for explicit repeated agent work: loop schemas, state/checkpoints, progress/stall decisions, Stop-hook continuation, recovery handoff, verifier evidence, idempotency notes, loop governance metrics, Wiki feedback candidates, and execution handoff text. |
 | 8.3.0 | Bounded loop hardening                | Closes the LoopRun integrity gaps: a session-scoped activation bridge (`activate_loop_run.py`/`deactivate_loop_run.py` + Stop hook resolves the run by `session_id`, decoupled from the generic agent-run manifest), monotonic iteration with terminal immutability and idempotent replay, `iterations/` audit records, precedence-honored termination with wall-time enforcement, a confirmed-only `search-deep-evidence` convergence verifier, and a runtime-schema-valid `plan-loop-term` contract. |
+| 8.3.1 | Evaluation framing cleanup            | Removes evaluation-distorting deployment/autonomy-negative wording, updates runtime and hygiene docs to host-managed asset language, and keeps cache cleanup stable after verification runs. |
 
 ## License
 

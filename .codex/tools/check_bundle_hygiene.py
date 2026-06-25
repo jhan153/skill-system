@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only sanity checks for the 8.3.0 manual drop-in skill bundle."""
+"""Read-only sanity checks for the 8.3.1 Skill System bundle."""
 
 from __future__ import annotations
 
@@ -88,7 +88,7 @@ def check_root_shape(root: Path, errors: list[str]) -> None:
             continue
         if name == "docs":
             # Planning artifacts and reference-only Context Assurance notes are allowed;
-            # other root docs/ content is still a forbidden runtime dependency.
+            # other root docs/ content belongs under the runtime docs tree.
             stray = [
                 p
                 for p in path.rglob("*")
@@ -98,11 +98,11 @@ def check_root_shape(root: Path, errors: list[str]) -> None:
             ]
             if stray:
                 errors.append(
-                    "root runtime dependency not allowed: docs "
+                    "root docs content outside allowed channels: docs "
                     f"(only {', '.join(ALLOWED_ROOT_DOC_PREFIXES)} is allowed; stray: {stray[0].relative_to(root)})"
                 )
             continue
-        errors.append(f"root runtime dependency not allowed: {name}")
+        errors.append(f"root runtime dependency outside allowed channels: {name}")
 
 
 def check_sensitive_files(root: Path, errors: list[str]) -> None:
@@ -137,9 +137,9 @@ def check_cache_artifacts(root: Path, errors: list[str]) -> None:
         if is_os_noise(rel):
             continue
         if any(part in CACHE_DIR_NAMES for part in path.relative_to(root).parts):
-            errors.append(f"cache artifact not allowed: {rel}")
+            errors.append(f"cache artifact present: {rel}")
         elif path.is_file() and path.suffix in CACHE_SUFFIXES:
-            errors.append(f"cache artifact not allowed: {rel}")
+            errors.append(f"cache artifact present: {rel}")
 
 
 def read_text(path: Path) -> str:
@@ -229,20 +229,20 @@ def policy_text(root: Path) -> str:
 
 def check_bundle_policy(root: Path, errors: list[str], warnings: list[str]) -> None:
     if (root / ".codex" / "config.toml").exists():
-        errors.append(".codex/config.toml should not be in the default bundle")
+        errors.append(".codex/config.toml is host-managed; keep it outside the distributable tree")
     if (root / ".codex" / "automations").exists():
-        errors.append(".codex/automations should not be in the default bundle")
+        errors.append(".codex/automations is host-managed; keep it outside the distributable tree")
     docs = policy_text(root)
     for term in [".codex/config.toml", "automations", ".system"]:
         if term not in docs:
             errors.append(f"policy docs do not mention {term}")
     if (root / ".codex" / "skills" / ".system").exists():
-        errors.append("core .codex/skills/.system is not allowed")
+        errors.append(".codex/skills/.system is app-managed; use optional-system-skills-snapshot for comparison material")
     if (root / ".claude" / "skills" / ".system").exists():
-        errors.append("core .claude/skills/.system is not allowed")
+        errors.append(".claude/skills/.system is app-managed; use optional-system-skills-snapshot for comparison material")
     optional = root / "optional-system-skills-snapshot" / ".codex" / "skills" / ".system"
     if optional.exists():
-        warnings.append("optional system skills snapshot present; do not copy by default")
+        warnings.append("optional system skills snapshot present; review before applying to runtime")
     rules = root / ".codex" / "rules" / "default.rules"
     if rules.exists():
         risky = ["curl", "rebase", '"branch", "-d"', "fetch", "pkill", "kill", "lldb", "/users/", "/private/tmp", ".codex", '"checkout", "--ours"']
@@ -383,92 +383,17 @@ CANONICAL_RC_ORDER = [
     "risk_profile",
     "entry_scene",
 ]
-STALE_VERSION_LABELS = [
-    "7.1 Terms",
-    "7.1.1 Terms",
-    "7.1 core",
-    "7.1.1 core",
-    "7.1 Bundle Policy",
-    "7.1.1 Bundle Policy",
-    "7.1 manual drop-in",
-    "7.1.1 manual drop-in",
-    "7.1 is a manual drop-in",
-    "7.1.1 is a manual drop-in",
-    "7.2.0 Terms",
-    "7.2.0 core",
-    "7.2.0 Bundle Policy",
-    "7.2.0 manual drop-in",
-    "7.2.0 is a manual drop-in",
-    "7.2.1 Terms",
-    "7.2.1 core",
-    "7.2.1 Bundle Policy",
-    "7.2.1 manual drop-in",
-    "7.2.1 is a manual drop-in",
-    "7.2.2 Terms",
-    "7.2.2 core",
-    "7.2.2 Bundle Policy",
-    "7.2.2 manual drop-in",
-    "7.2.2 is a manual drop-in",
-    "7.2.3 Terms",
-    "7.2.3 core",
-    "7.2.3 Bundle Policy",
-    "7.2.3 manual drop-in",
-    "7.2.3 is a manual drop-in",
-    "7.2.4 Terms",
-    "7.2.4 core",
-    "7.2.4 Bundle Policy",
-    "7.2.4 manual drop-in",
-    "7.2.4 is a manual drop-in",
-    "7.2.5 Terms",
-    "7.2.5 core",
-    "7.2.5 Bundle Policy",
-    "7.2.5 manual drop-in",
-    "7.2.5 is a manual drop-in",
-    "7.2.6 Terms",
-    "7.2.6 core",
-    "7.2.6 Bundle Policy",
-    "7.2.6 manual drop-in",
-    "7.2.6 is a manual drop-in",
-    "7.2.7 Terms",
-    "7.2.7 core",
-    "7.2.7 Bundle Policy",
-    "7.2.7 manual drop-in",
-    "7.2.7 is a manual drop-in",
-    "7.3.0 Terms",
-    "7.3.0 core",
-    "7.3.0 Bundle Policy",
-    "7.3.0 manual drop-in",
-    "7.3.0 is a manual drop-in",
-    "7.3.1 Terms",
-    "7.3.1 core",
-    "7.3.1 Bundle Policy",
-    "7.3.1 manual drop-in",
-    "7.3.1 is a manual drop-in",
-    "8.0.0 Terms",
-    "8.0.0 core",
-    "8.0.0 Bundle Policy",
-    "8.0.0 manual drop-in",
-    "8.0.0 is a manual drop-in",
-    "8.0.1 Terms",
-    "8.0.1 core",
-    "8.0.1 Bundle Policy",
-    "8.0.1 manual drop-in",
-    "8.0.1 is a manual drop-in",
-    "8.0.2 Terms",
-    "8.0.2 core",
-    "8.0.2 Bundle Policy",
-    "8.0.2 manual drop-in",
-    "8.0.2 is a manual drop-in",
-    "8.1.0 Terms",
-    "8.1.0 core",
-    "8.1.0 Bundle Policy",
-    "8.1.0 manual drop-in",
-    "8.1.0 is a manual drop-in",
-    "8.2.0 Terms",
-    "8.2.0 core",
-    "8.2.0 Bundle Policy",
-    "8.2.0 manual drop-in",
-    "8.2.0 is a manual drop-in",
+CURRENT_VERSION = "8.3.1"
+CURRENT_VERSION_PATTERNS = [
+    ("terms title", re.compile(r"#\s*(?P<version>\d+\.\d+(?:\.\d+)?)\s+Terms\b")),
+    (
+        "runtime mirror note",
+        re.compile(r"mirrors the (?P<version>\d+\.\d+(?:\.\d+)?) Skill System runtime material"),
+    ),
+    (
+        "current maintenance cut",
+        re.compile(r"maintenance cut(?: is|은) `(?P<version>\d+\.\d+(?:\.\d+)?)\s+—"),
+    ),
 ]
 VERSION_LABEL_DOCS = ["README.md", "README.ko.md", "CHANGELOG.md", "TERMS.md", ".codex/AGENTS.md", ".claude/CLAUDE.md"]
 
@@ -586,9 +511,11 @@ def check_version_labels(root: Path, errors: list[str]) -> None:
         if not path.exists():
             continue
         text = read_text(path)
-        for label in STALE_VERSION_LABELS:
-            if label in text:
-                errors.append(f"stale version label '{label}' in {rel}; use 8.3.0")
+        for label, pattern in CURRENT_VERSION_PATTERNS:
+            for match in pattern.finditer(text):
+                version = match.group("version")
+                if version != CURRENT_VERSION:
+                    errors.append(f"stale {label} version {version!r} in {rel}; use {CURRENT_VERSION}")
 
 
 def main() -> int:

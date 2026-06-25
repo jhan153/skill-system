@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check 8.3.0 execution assurance artifacts."""
+"""Check 8.3.1 execution assurance artifacts."""
 
 from __future__ import annotations
 
