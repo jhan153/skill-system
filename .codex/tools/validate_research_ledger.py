@@ -12,6 +12,10 @@ sys.dont_write_bytecode = True
 
 from _validation import load_json_file, load_yaml_file, validate_schema
 
+# Consumers under these prefixes are local-only / source-project paths (see project AGENTS.md);
+# they are intentionally excluded from the distributable bundle, so existence is not enforced here.
+LOCAL_ONLY_CONSUMER_PREFIXES = ("docs/", ".github/", ".kanboard-plan")
+
 
 def source_ids(registry: Path) -> set[str]:
     data = load_yaml_file(registry)
@@ -45,7 +49,12 @@ def validate_references(ledger: dict[str, Any], known_sources: set[str], root: P
             for consumer in consumers:
                 if not isinstance(consumer, str):
                     continue
-                if consumer.startswith("/") or not (root / consumer).exists():
+                if consumer.startswith("/"):
+                    errors.append(f"{entry_id}: local consumer not found or not repo-relative: {consumer}")
+                    continue
+                if consumer.startswith(LOCAL_ONLY_CONSUMER_PREFIXES):
+                    continue
+                if not (root / consumer).exists():
                     errors.append(f"{entry_id}: local consumer not found or not repo-relative: {consumer}")
     return errors
 

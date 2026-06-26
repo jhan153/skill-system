@@ -31,6 +31,9 @@ REQUIRED_FIELDS = {
 ALLOWED_SOURCE_TYPES = {"web_url", "github_raw", "arxiv", "repo_local_artifact", "transient_source"}
 ALLOWED_STATUS = {"agent-verified", "user-verification-needed", "archived", "transient-excluded"}
 LOCAL_PATH_RE = re.compile(r"(^|[\"'\s])/(Users|private|tmp|var)/")
+# Consumers under these prefixes are local-only / source-project paths (see project AGENTS.md);
+# they are intentionally excluded from the distributable bundle, so existence is not enforced here.
+LOCAL_ONLY_CONSUMER_PREFIXES = ("docs/", ".github/", ".kanboard-plan")
 
 
 def repo_root_for(registry: Path) -> Path:
@@ -83,6 +86,8 @@ def validate_source(source: dict[str, Any], root: Path) -> list[str]:
         for consumer in consumers:
             if consumer.startswith("/"):
                 errors.append(f"{label}: local consumer must be repo-relative: {consumer}")
+                continue
+            if consumer.startswith(LOCAL_ONLY_CONSUMER_PREFIXES):
                 continue
             if not (root / consumer).exists():
                 errors.append(f"{label}: local consumer not found: {consumer}")

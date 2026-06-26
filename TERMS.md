@@ -1,4 +1,4 @@
-# 8.3.1 Terms
+# 8.3.2 Terms
 
 ## version_cut
 
@@ -49,10 +49,6 @@ Usage examples that help observe skill behavior in real tasks and collect improv
 ## field_feedback
 
 Human notes from real use. Feedback can update maturity, routing examples, negative cases, docs, or skill text in the next version cut.
-
-## bundle_hygiene_check
-
-A small read-only sanity check for structure, mirror consistency, and obvious packaging mistakes.
 
 ## Host-Managed Or External Assets
 

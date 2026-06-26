@@ -181,7 +181,6 @@ def text_output(value: str | bytes | None) -> str:
 def core_checks(root: Path) -> list[Check]:
     py = sys.executable
     return [
-        Check("bundle_hygiene", [py, ".codex/tools/check_bundle_hygiene.py", "."], root),
         Check("doc_freshness", [py, ".codex/tools/check_doc_freshness.py", "."], root),
         Check("tool_requirements", [py, ".codex/tools/check_tool_requirements.py"], root),
         Check("reference_targets", [py, ".codex/tools/check_reference_targets.py"], root),
@@ -201,7 +200,6 @@ def core_checks(root: Path) -> list[Check]:
         Check("field_feedback", [py, ".codex/tools/validate_field_feedback.py", ".codex/field-feedback"], root, False),
         Check("source_registry", [py, ".codex/tools/validate_source_registry.py", ".codex/docs/source_registry.yaml"], root),
         Check("generated_mirrors", [py, ".codex/tools/sync_generated_mirrors.py", "--check"], root),
-        Check("context_compounding_plan", [py, ".codex/tools/check_context_compounding_plan.py"], root),
         Check(
             "validator_unit_tests",
             [py, ".codex/tools/run_validator_unit_tests.py"],

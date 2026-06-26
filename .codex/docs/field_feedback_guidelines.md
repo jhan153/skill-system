@@ -48,7 +48,7 @@ privacy_redactions: []
 - Upgrade `experimental` to `usable` only after repeated successful use with no major over-trigger or unsafe context behavior.
 - Upgrade `usable` to `field_tuned` only after repeated feedback improves routing, context, and output shape.
 - Downgrade immediately when a skill repeatedly triggers without explicit intent or pushes the agent toward broad context loading.
-- Do not change maturity from bundle hygiene results alone.
+- Do not change maturity from static validation results alone.
 
 ## Current Field-Tuning Watchlist
 

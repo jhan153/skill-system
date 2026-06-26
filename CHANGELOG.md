@@ -1,5 +1,11 @@
 # Changelog
 
+## 8.3.2
+
+- Scoped bundle verification to committed/distributable content: `validate_source_registry.py`, `validate_research_ledger.py`, and `validate_knowledge_store.py` no longer require local-only source-project paths (`docs/`, `.github/`, `.kanboard-plan`) to exist, while keeping schema validation, bundle-internal consumer/locator existence, and absolute-path rejection.
+- Removed the `context_compounding_plan` check from the `core` verification profile and deleted `check_context_compounding_plan.py`: it was a release-QA gate hardcoded to a local-only `docs/plan/...` document, not installed-bundle content.
+- Added `.claude/CLAUDE.md` as a Claude-adapted mapping of the global working rules in `.codex/AGENTS.md`, diverging only where Claude feature names differ (`settings.json` and permission modes, `.claude/` paths, `/loop`).
+
 ## 8.3.1
 
 - Cleaned evaluation-facing framing: replaced deployment/autonomy-negative wording with portable skill-bundle and host-managed runtime asset language across public docs, runtime notes, mirrored skills, eval notes, and references.

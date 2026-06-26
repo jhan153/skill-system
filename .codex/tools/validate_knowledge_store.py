@@ -84,6 +84,11 @@ def source_ids_from_strings(refs: Any) -> list[str]:
     return [ref for ref in refs if isinstance(ref, str) and ref.startswith("SRC-")]
 
 
+# Locators under these prefixes are local-only / source-project paths (see project AGENTS.md);
+# they are intentionally excluded from the distributable bundle, so existence is not enforced here.
+LOCAL_ONLY_REPO_PREFIXES = ("docs/", ".github/", ".kanboard-plan")
+
+
 def validate_repo_locator(source: dict[str, Any], root: Path) -> list[str]:
     source_id = source.get("source_id", "<unknown-source>")
     locator_type = source.get("locator_type")
@@ -97,6 +102,8 @@ def validate_repo_locator(source: dict[str, Any], root: Path) -> list[str]:
     rel = locator.removeprefix("repo://")
     if rel.startswith("/") or ".." in Path(rel).parts:
         return [f"{source_id}: repo_path locator must be repo-relative"]
+    if rel.startswith(LOCAL_ONLY_REPO_PREFIXES):
+        return []
     if not (root / rel).exists():
         return [f"{source_id}: repo_path locator target not found: {rel}"]
     return []

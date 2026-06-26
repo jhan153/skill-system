@@ -180,7 +180,7 @@ policy:
 ```
 
 ## Validation Checklist
-- [ ] `.codex/skills/.system` was not modified, counted, or treated as package noise.
+- [ ] `.codex/skills/.system` was not modified, counted, or treated as removable OS/editor residue.
 - [ ] Custom skill counts and audits exclude `.system`.
 - [ ] Frontmatter has `name` and specific `description` under 1024 chars.
 - [ ] `primary_skill` and `target_skill` are distinguished for hardening/migration/deprecation requests.

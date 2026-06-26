@@ -1,7 +1,7 @@
 # Agent Output Validation
 
 ## Purpose
-Agent output validation checks artifacts produced by a real Codex agent run. It is not a replacement for bundle hygiene or unit tests. Its job is to verify that the final report, explicit claims, command evidence, and hook event trail agree with each other.
+Agent output validation checks artifacts produced by a real Codex agent run. It is not a replacement for source-repo validation or unit tests. Its job is to verify that the final report, explicit claims, command evidence, and hook event trail agree with each other.
 
 Use this layer when an agent run claims `agent-verified`, `user-verification-needed`, `unverified`, or `blocked` in the final task result.
 
@@ -113,7 +113,7 @@ The adapter records hook events to `SKILL_SYSTEM_HOOK_LEDGER` when that environm
 
 New live records are schema v2 hash-chain records. Existing schema v1 fixtures remain readable for compatibility, but new v2 run fixtures are expected to prove request receipt, context load, tool lifecycle, and finalization.
 
-`Stop` validates only the current session/turn run directory. It does not treat static sample runs as evidence for the current turn, and it does not run bundle hygiene, behavior evals, release profiles, plan synchronization, or repository-wide repair.
+`Stop` validates only the current session/turn run directory. It does not treat static sample runs as evidence for the current turn, and it does not run source-repo validation, behavior evals, release profiles, plan synchronization, or repository-wide repair.
 
 - current run exists and is valid: `pass`
 - current run exists and is invalid: `turn_finalize_attempt` plus non-blocking continuation by default

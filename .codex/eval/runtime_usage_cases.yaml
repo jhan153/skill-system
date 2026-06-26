@@ -1,4 +1,4 @@
-version: "8.3.1"
+version: "8.3.2"
 purpose: "Real-use quality observation cases for routing and output improvement."
 cases:
   - case_id: runtime-001
@@ -100,15 +100,6 @@ cases:
     expected_output_shape: "direct explanation or scoped doc update if requested"
     quality_notes: "Conceptual explanation does not need orchestration."
     friction_risk: "turning glossary work into workflow state"
-  - case_id: runtime-012
-    user_request: "7.1 bundle hygiene만 읽기 전용으로 확인해줘."
-    expected_primary_skill: null
-    expected_supporting_skills: []
-    should_not_trigger: [evaluation-harness, report-artifact-inventory]
-    expected_context: [bundle root, .codex/tools/check_bundle_hygiene.py]
-    expected_output_shape: "command result and concrete findings"
-    quality_notes: "Checker is sanity-only."
-    friction_risk: "treating hygiene as quality approval"
   - case_id: runtime-013
     user_request: "완료된 plan은 핵심 결정만 memory 후보로 남기고 raw plan은 다음부터 active context에서 빼줘."
     expected_primary_skill: plan-spec-curator

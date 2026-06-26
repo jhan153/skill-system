@@ -115,7 +115,7 @@ Phase B added `search-router`, `memory-bank-ingestion`, and `evaluation-usage-tr
 - `design-frontend` remains `usable`.
 - Broad orchestration or package-like skills should not be upgraded without field feedback.
 - Maturity changes should be backed by `FIELD_FEEDBACK.md` entries or runtime usage eval updates.
-- A maturity increase requires repeated successful field feedback, not just passing bundle hygiene.
+- A maturity increase requires repeated successful field feedback, not just passing static validation.
 - A maturity decrease is allowed after one severe over-trigger, unsafe context load, or repeated output-shape mismatch.
 - Surface-specific implementation skills are active `experimental` skills, but remain explicit-only until field feedback proves implicit invocation is safe.
 - Analysis skills with workflow/output/validation sections may be `experimental` even before field tuning, but must keep conservative routing until real-use feedback exists.

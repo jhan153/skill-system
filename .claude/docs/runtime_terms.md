@@ -44,10 +44,6 @@ Runtime usage eval cases are examples for observing skill behavior in real use a
 
 Field feedback is real-use observation collected for future skill text, routing, maturity, or eval updates.
 
-## bundle hygiene
-
-Bundle hygiene checks structure, mirror consistency, and obvious packaging mistakes. It is read-only.
-
 ## Core Runtime Scope
 
 The core runtime scope keeps skills, routing docs, maturity docs, usage cases, feedback guidance, source registry, generated mirror checks, and small sanity checkers.

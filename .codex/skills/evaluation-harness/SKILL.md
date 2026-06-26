@@ -45,7 +45,7 @@ description: Reviews runtime usage eval cases as field-quality examples for rout
   writes:
     - none unless the user explicitly asks to edit eval cases
   tools:
-    - optional read-only bundle hygiene check
+    - optional read-only eval validation
   sensitive_resources:
     - credentials default deny
 - entry_scene:

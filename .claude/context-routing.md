@@ -127,23 +127,6 @@ Design cluster conservative defaults:
 ## Routing Card Audit Shape
 Each user-managed custom `SKILL.md` Routing Card, excluding `.codex/skills/.system/**`, should keep these Markdown fields in this order unless a local reason exists: `role`, `intent_signature`, `use_when`, `do_not_use_when`, `expected_inputs`, `expected_outputs`, `context_targets` with `must_read`, `read_if_needed`, `do_not_load_by_default`, `risk_profile` with `reads`, `writes`, `tools`, `sensitive_resources`, and `entry_scene`.
 
-## Multi-Host Portability
-This `.codex` setup is used on multiple host environments. Multiple host-specific homes may be valid. Reusable skills and automations should prefer `$CODEX_HOME`, `$HOME/.codex`, `${CODEX_HOME:-$HOME/.codex}`, or relative paths. Do not collapse host-specific paths to a single home directory.
-
-Path classification:
-- Trusted project paths in `config.toml` may be host-specific and should coexist when intentional.
-- Host-specific project rules in global rules must stay prompt-gated; repeated repo workflows belong in repo-level policy.
-- Reusable skill instructions, automation prompts, scripts, and examples should not hardcode one user home.
-- Historical notes may mention old host paths; add clarification instead of rewriting history.
-
-
-## Packaging Hygiene
-Future settings archives should exclude package noise: `.DS_Store`, `__MACOSX/*`, and `*/._*`. Do not treat `.codex/skills/.system` as package noise.
-
-```bash
-zip -r Settings5.9.zip . -x "*.DS_Store" "__MACOSX/*" "*/._*"
-```
-
 ## Route Smoke Tests
 Use these examples as drift checks for routing behavior. They are not user-facing templates.
 
