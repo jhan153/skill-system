@@ -4,6 +4,9 @@
 
 Tool policy is task-conditioned. A tool name alone is not enough to decide whether an invocation is safe.
 
+For the human-readable operating catalog (`routine`, `risky`, `blocked`) and
+representative tool-class examples, read `.codex/docs/tool_policy.md`.
+
 ## Policy Shape
 
 ```yaml

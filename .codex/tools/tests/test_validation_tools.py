@@ -810,6 +810,100 @@ condition_results:
         self.assertIn("UNVERIFIED", event["evidence"]["agent_output_validation"])
         ledger.unlink()
 
+    def test_codex_hook_adapter_bootstraps_live_agent_run_manifest(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            run_dir = tmp_path / "live-run"
+            env = {
+                **os.environ,
+                "PYTHONDONTWRITEBYTECODE": "1",
+                "SKILL_SYSTEM_AGENT_RUN_BOOTSTRAP": "1",
+                "SKILL_SYSTEM_DESKTOP_NOTIFY": "dry-run",
+                "CODEX_MODEL": "gpt-5.5",
+                "CODEX_MODEL_REASONING_EFFORT": "xhigh",
+            }
+            for name, payload in [
+                (
+                    "user.json",
+                    {
+                        "hook_event_name": "UserPromptSubmit",
+                        "session_id": "session-live-bootstrap",
+                        "turn_id": "turn-live-bootstrap",
+                        "cwd": str(ROOT),
+                        "permission_mode": "workspace-write",
+                        "prompt": "bootstrap a live manifest",
+                    },
+                ),
+                (
+                    "session.json",
+                    {
+                        "hook_event_name": "SessionStart",
+                        "session_id": "session-live-bootstrap",
+                        "turn_id": "turn-live-bootstrap",
+                        "cwd": str(ROOT),
+                        "permission_mode": "workspace-write",
+                    },
+                ),
+            ]:
+                inp = tmp_path / name
+                inp.write_text(json.dumps(payload), encoding="utf-8")
+                result = subprocess.run(
+                    [sys.executable, ".codex/hooks/codex_hook_adapter.py", "--input-file", str(inp), "--run-dir", str(run_dir)],
+                    cwd=ROOT,
+                    env=env,
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    check=False,
+                    timeout=30,
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            self.assertTrue((run_dir / "run.yaml").exists())
+            stop = tmp_path / "stop.json"
+            stop.write_text(
+                json.dumps(
+                    {
+                        "hook_event_name": "Stop",
+                        "session_id": "session-live-bootstrap",
+                        "turn_id": "turn-live-bootstrap",
+                        "cwd": str(ROOT),
+                        "permission_mode": "workspace-write",
+                        "last_assistant_message": (
+                            "# Agent Run Final Report\n\n"
+                            "result_label: unverified\n\n"
+                            "## Claims\n\n"
+                            "- C-001: live agent-run manifest bootstrap initialized current run evidence capture.\n"
+                        ),
+                    }
+                ),
+                encoding="utf-8",
+            )
+            result = subprocess.run(
+                [sys.executable, ".codex/hooks/codex_hook_adapter.py", "--input-file", str(stop), "--run-dir", str(run_dir)],
+                cwd=ROOT,
+                env=env,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+                timeout=30,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            output = json.loads(result.stdout)
+            self.assertTrue(output["continue"])
+            self.assertIn("passed", output["systemMessage"])
+            events = [json.loads(line) for line in (run_dir / "hook-events.jsonl").read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(events[0]["neutral_event"], "request_received")
+            self.assertEqual(events[1]["neutral_event"], "context_loaded")
+            self.assertEqual(events[-1]["neutral_event"], "turn_finalize")
+            self.assert_passes(
+                ".codex/tools/validate_agent_run_artifact.py",
+                str(run_dir),
+                "--schema",
+                ".codex/schemas/harness/agent-run.schema.json",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

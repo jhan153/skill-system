@@ -314,6 +314,41 @@ route_smoke_tests:
     must_not_route_to:
       - "workflow-loop-runner"
     notes: "Non-idempotent retry and Stop-hook loop evaluation are governance contract concerns before execution."
+  - request: "현재 turn의 live agent-run run.yaml이 자동으로 시작되고 Stop 검증까지 이어지게 bootstrap을 추가해줘"
+    expected_primary_skill: "task-specific implementation"
+    expected_attachments:
+      - "workflow-rigor for hook/runtime validation risk"
+      - "workflow-task-ledger if this spans multiple dependent changes"
+    must_read:
+      - ".codex/docs/agent_output_validation.md"
+      - ".codex/hooks/codex_hook_adapter.py"
+      - ".codex/schemas/harness/agent-run.schema.json"
+    must_not_route_to:
+      - "workflow-loop-runner"
+      - "plan-loop-term"
+    notes: "Live run manifest bootstrap is harness implementation, not LoopRun execution."
+  - request: "이 번들에서 tool class를 routine/risky/blocked로 보는 운영 카탈로그를 정리해줘"
+    expected_primary_skill: "task-specific documentation"
+    expected_attachments:
+      - "workflow-rigor only if policy examples or rules are changed"
+    must_read:
+      - ".codex/docs/tool_hardening_profile.md"
+      - ".codex/rules/default.rules"
+      - ".codex/schemas/tools/tool-policy.schema.json"
+    must_not_route_to:
+      - "loop-readiness-router"
+      - "workflow-loop-runner"
+    notes: "Tool policy catalog explains operating boundaries; it does not replace host approval/rules."
+  - request: "이 loop를 cron/webhook/queue로 계속 돌릴 수 있는지 runtime capability부터 판단해줘"
+    expected_primary_skill: "loop-readiness-router"
+    expected_route_class: "loop_readiness_contract_needed"
+    expected_attachments:
+      - "plan-loop-term only after runtime support and success criteria are contract-ready"
+    must_read:
+      - ".codex/docs/orchestration_capability_contract.md"
+    must_not_route_to:
+      - "workflow-loop-runner"
+    notes: "General orchestration runtime must be verified or marked external_host_dependent/unsupported before execution claims."
   - request: "loop 실행 결과에서 Wiki Bank에 남길 개선 후보만 정리하고 accepted knowledge로는 올리지 마"
     expected_primary_skill: "workflow-loop-runner"
     expected_attachments:

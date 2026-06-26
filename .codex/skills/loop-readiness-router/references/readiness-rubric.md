@@ -20,6 +20,10 @@ Use these factors before classification:
 
 Default to the smallest reliable workflow. Use loop engineering when repetition plus verification can improve the outcome, not when a direct workflow is enough.
 
+When cron, webhook, queue, automation, durable scheduling, or event-triggered
+runtime is requested, require `.codex/docs/orchestration_capability_contract.md`
+or equivalent current evidence before treating that runtime as available.
+
 ## Classification Rules
 
 ### `one_shot`
@@ -45,6 +49,7 @@ Use when execution should wait for explicit terms:
 - independent maker/checker separation is needed but not mapped yet
 - state, checkpoint, retry, idempotency, or stop terms are missing
 - Stop-hook loop evaluation, durable execution, event-driven runtime, Wiki feedback, or improvement-loop expectations are requested but not evidenced
+- cron, webhook, queue, automation, or event-trigger runtime is requested without a verified orchestration capability contract
 - parallel agents or non-idempotent retries are requested without ownership, merge, idempotency, or approval gates
 - side effects, approval gates, credentials, deployment, deletion, paid APIs, or external writes may be involved
 - user says "알아서 끝까지" but has not defined stop criteria

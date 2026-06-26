@@ -106,6 +106,7 @@ Phase B added `search-router`, `memory-bank-ingestion`, and `evaluation-usage-tr
 - 7.0 coordination concepts remain only as lightweight support skills.
 - `plan-spec-curator` is a context-governance support skill, not a task executor or memory mutator.
 - `plan-loop-term` is a narrow Planning specialist for goal/loop completion terms; broad planning packages remain owned by `plan-long-term-package`.
+- Orchestration capability contracts are runtime evidence artifacts, not skills; cron, webhook, queue, automation, and event-trigger claims remain external-host-dependent until verified.
 - Loop Engineering cluster is split into readiness (`loop-readiness-router`), verifier mapping (`loop-verifier-registry`), accepted execution (`workflow-loop-runner`), and planning contract support (`plan-loop-term`).
 - Knowledge skills are distinct from Memory Bank skills: read-only context compilation uses `knowledge-context-harness`; accepted knowledge mutation/review uses `knowledge-base-maintenance`; persistent Memory Bank mutation still requires explicit memory-bank workflows.
 - Heavy artifact-producing skills require explicit artifact intent.

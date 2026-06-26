@@ -1,0 +1,12 @@
+schema_version: 1
+capability:
+  id: ORCH-host-cron
+  type: cron
+  support_state: external_host_dependent
+  host_surface: host scheduler outside the Skill System bundle
+  task_scope: durable repeated agent execution after the current turn
+  verification:
+    method: not_available
+    unavailable_reason: current session has not inspected or verified host scheduler configuration
+  evidence_refs: []
+  expires_or_review_at: before any loop contract claims scheduled execution

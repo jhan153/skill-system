@@ -10,6 +10,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
@@ -54,6 +55,7 @@ EXIT_CODE_PATTERN = re.compile(r"(?i)(?:exit(?:ed)?(?:\s+with)?\s+code|exit_code
 KANBOARD_POST_SESSION_MODES = {"dry-run", "apply"}
 DESKTOP_NOTIFY_DISABLED = {"0", "false", "off", "no", "none", "disabled"}
 DESKTOP_NOTIFY_DRY_RUN = {"dry-run", "dry_run", "test"}
+AGENT_RUN_BOOTSTRAP_ENABLED = {"1", "true", "on", "yes"}
 
 
 def sanitize_id(value: object, fallback: str) -> str:
@@ -679,6 +681,79 @@ def strict_gate_enabled(data: dict[str, Any]) -> bool:
     return str(configured).lower() == STRICT_GATE
 
 
+def agent_run_bootstrap_enabled(data: dict[str, Any]) -> bool:
+    configured = data.get("skill_system_agent_run_bootstrap") or os.environ.get("SKILL_SYSTEM_AGENT_RUN_BOOTSTRAP", "")
+    return str(configured).lower() in AGENT_RUN_BOOTSTRAP_ENABLED
+
+
+def _run_init_agent_run(args: argparse.Namespace, command: list[str]) -> dict[str, Any]:
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / ".codex" / "tools" / "init_agent_run.py"), *command],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        timeout=10,
+    )
+    output = "\n".join(part for part in [completed.stdout.strip(), completed.stderr.strip()] if part)
+    try:
+        parsed = json.loads(completed.stdout) if completed.stdout.strip() else {}
+    except json.JSONDecodeError:
+        parsed = {"output": truncate(output, 500)}
+    if not isinstance(parsed, dict):
+        parsed = {"output": truncate(output, 500)}
+    parsed["exit_code"] = completed.returncode
+    if completed.returncode != 0 and output:
+        parsed["error"] = truncate(output, 500)
+    return parsed
+
+
+def maybe_bootstrap_agent_run(args: argparse.Namespace, data: dict[str, Any]) -> dict[str, Any] | None:
+    if not agent_run_bootstrap_enabled(data) or args.ledger is not None:
+        return None
+    if str(data.get("hook_event_name") or "") not in {"UserPromptSubmit", "SessionStart"}:
+        return None
+    run_dir = current_run_dir(args, data)
+    if run_dir is None:
+        return {"status": "skipped", "reason": "missing session_id or turn_id"}
+    summary = data.get("prompt") or data.get("task_subject") or "Live Codex agent run."
+    command = [
+        "init",
+        "--session-id",
+        str(data.get("session_id") or ""),
+        "--turn-id",
+        str(data.get("turn_id") or ""),
+        "--user-request-summary",
+        truncate(str(summary), 240),
+        "--primary-skill",
+        str(data.get("primary_skill") or "unknown"),
+        "--run-dir",
+        str(run_dir),
+    ]
+    return _run_init_agent_run(args, command)
+
+
+def maybe_finalize_agent_run(args: argparse.Namespace, data: dict[str, Any]) -> dict[str, Any] | None:
+    if not agent_run_bootstrap_enabled(data) or args.ledger is not None:
+        return None
+    run_dir = current_run_dir(args, data)
+    if run_dir is None or not (run_dir / "run.yaml").exists():
+        return None
+    message = data.get("last_assistant_message")
+    if not isinstance(message, str) or not message:
+        return {"status": "skipped", "reason": "missing last_assistant_message"}
+    temp_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", delete=False, prefix="agent-run-stop-", suffix=".json") as handle:
+            json.dump({"last_assistant_message": message}, handle)
+            temp_path = Path(handle.name)
+        return _run_init_agent_run(args, ["finalize", str(run_dir), "--input-file", str(temp_path)])
+    finally:
+        if temp_path is not None:
+            temp_path.unlink(missing_ok=True)
+
+
 def measurement_enabled(data: dict[str, Any]) -> bool:
     """Out-of-band holdout measurement (opt-in, default off). When on, the off
     arm records would_fire but does not block (gate-off baseline) so the harness
@@ -1041,10 +1116,14 @@ def handle(args: argparse.Namespace) -> int:
         return 2
     hook_event = str(data.get("hook_event_name") or "")
     if hook_event == "Stop":
+        agent_run_finalize = maybe_finalize_agent_run(args, data)
         validation_code, validation_output = run_agent_output_validation(args, data, "pre-finalize")
         status = "pass" if validation_code == 0 else "warn" if validation_code == 4 else "fail"
-        record_event(args, data, status, {"agent_output_validation": validation_output}, "turn_finalize_attempt")
-        finalize_extra: dict[str, Any] = {"agent_output_validation": validation_output}
+        attempt_extra: dict[str, Any] = {"agent_output_validation": validation_output}
+        if agent_run_finalize is not None:
+            attempt_extra["agent_run_finalize"] = agent_run_finalize
+        record_event(args, data, status, attempt_extra, "turn_finalize_attempt")
+        finalize_extra: dict[str, Any] = dict(attempt_extra)
         if validation_code == 0:
             run_dir = current_run_dir(args, data)
             final_candidate = (
@@ -1137,13 +1216,14 @@ def handle(args: argparse.Namespace) -> int:
         output = loop_stop_output(loop_evaluation, data) if loop_evaluation is not None else None
         print(json.dumps(output or stop_output(data, validation_code, validation_output), sort_keys=True))
         return 0
-    extra = None
+    extra = maybe_bootstrap_agent_run(args, data)
+    extra = {"agent_run_bootstrap": extra} if extra is not None else None
     if hook_event == "PermissionRequest":
-        extra = {"desktop_notification": notify_permission_request(data)}
+        extra = {**(extra or {}), "desktop_notification": notify_permission_request(data)}
     elif hook_event == "SessionStart":
         autosync = maybe_autosync_kanboard(data)
         if autosync is not None:
-            extra = {"kanboard_autosync": autosync}
+            extra = {**(extra or {}), "kanboard_autosync": autosync}
     record_event(args, data, classify_status(data), extra)
     return 0
 

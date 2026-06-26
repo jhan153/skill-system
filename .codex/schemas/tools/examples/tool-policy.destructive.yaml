@@ -1,0 +1,27 @@
+tool_policy:
+  tool_id: destructive.cleanup
+  capabilities:
+    - destructive
+    - filesystem_write
+    - process
+  invocation_scope:
+    routine_only_for:
+      - artifacts_created_by_current_task_after_inspection
+    requires_approval_for:
+      - recursive_delete
+      - git_index_mutation
+      - branch_delete
+      - history_rewrite
+    blocked_commands:
+      - git reset --hard
+      - broad git clean
+      - deleting_unrelated_user_work
+  decision:
+    default: deny
+  execution:
+    dry_run_first: true
+    rollback_or_recovery_note_required: true
+  postconditions:
+    capture_target_paths: true
+    capture_changed_files: true
+    record_user_approval: true

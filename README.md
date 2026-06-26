@@ -135,13 +135,15 @@ Workflow skills control implementation discipline, validation, and failure recov
 
 ### Loop Engineering
 
-Loop Engineering skills decide when repeated execution is justified, turn success conditions into verifier ownership, and run accepted loop contracts without over-looping simple work. The 8.1.0 layer adds a bounded LoopRun runtime for explicit verification loops: contract/state schemas, checkpoints, progress/stall decisions, Stop-hook continuation, and recovery handoff. Host schedulers and external event triggers are treated as separate runtime capabilities when present.
+Loop Engineering skills decide when repeated execution is justified, turn success conditions into verifier ownership, and run accepted loop contracts without over-looping simple work. The 8.1.0 layer adds a bounded LoopRun runtime for explicit verification loops: contract/state schemas, checkpoints, progress/stall decisions, Stop-hook continuation, and recovery handoff. Host schedulers and external event triggers are treated as separate runtime capabilities when present and must be recorded through the orchestration capability contract before they are claimed as available.
 
 | Skill                    | Role                                                                                                                                                    |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `loop-readiness-router`  | Classifies an initial request as `one_shot`, `contract_needed`, or `loop_worthy` before execution, including governance prerequisites.                    |
 | `loop-verifier-registry` | Maps loop success conditions and governance metrics to verifier skills, commands, evidence targets, pass/fail signals, fallback checks, and labels.       |
 | `workflow-loop-runner`   | Executes accepted loop contracts through observe/decide/act/verify/checkpoint batches, backed by LoopRun state tools for checkpointing, continuation, recovery, and stop decisions. |
+
+Runtime assurance also includes an opt-in live agent-run manifest bootstrap (`.codex/tools/init_agent_run.py`), a tool/permission operating catalog (`.codex/docs/tool_policy.md`), and an orchestration capability contract (`.codex/docs/orchestration_capability_contract.md`). These are support layers, not new task-execution skills.
 
 ### Planning
 
