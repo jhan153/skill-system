@@ -1,5 +1,13 @@
 # Changelog
 
+## 8.4.2
+
+- Added opt-in live agent-run manifest bootstrap (`.codex/tools/init_agent_run.py`) so current-turn `run.yaml`, final report, bootstrap evidence, and context pack can be created before Stop validation.
+- Wired Codex `UserPromptSubmit` / `SessionStart` to bootstrap live manifests and `Stop` to finalize the manifest from the final assistant message when `SKILL_SYSTEM_AGENT_RUN_BOOTSTRAP=1` is set. Default behavior remains off.
+- Added a tool/permission operating catalog plus representative network, destructive, and browser/MCP policy examples.
+- Added an orchestration capability contract with schema and example so cron, webhook, queue, automation, and event-trigger claims remain evidence-bound instead of implied by LoopRun, hooks, or Kanboard.
+- Connected orchestration capability checks into loop-readiness guidance, routing smoke tests, registry notes, README catalogs, and Claude mirrors.
+
 ## 8.4.1
 
 - Added Claude-side strict-block parity: an opt-in transcript-based observed-vs-claimed Stop gate (`SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict`) in `.claude/hooks/claude_hook_adapter.py` that blocks a stop when the final message claims `agent-verified` but a tool result errored with no later success. Pure decision logic, fail-open transcript parsing, and a `stop_hook_active` re-block guard.

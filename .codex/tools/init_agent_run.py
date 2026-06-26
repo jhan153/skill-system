@@ -23,7 +23,7 @@ sys.dont_write_bytecode = True
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT_ROOT = ROOT / ".codex" / "harness" / "agent-runs"
-DEFAULT_BUNDLE_VERSION = "8.4.1"
+DEFAULT_BUNDLE_VERSION = "8.4.2"
 RESULT_LABELS = {"agent-verified", "user-verification-needed", "unverified", "blocked"}
 
 
