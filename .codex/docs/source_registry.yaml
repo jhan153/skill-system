@@ -156,7 +156,7 @@ sources:
     stable_locator: https://github.com/baskduf/FableCodex
     repository: baskduf/FableCodex
     path:
-    revision: main
+    revision: 406faa1981ffe8a3b6b44e770bc2fc2ee189c8d0
     retrieved_at: "2026-06-24"
     license: AGPL-3.0-or-later
     verification_status: agent-verified
@@ -170,7 +170,7 @@ sources:
     stable_locator: https://github.com/fivetaku/fablize
     repository: fivetaku/fablize
     path:
-    revision: main
+    revision: d338460454c340736c16648df0920ca9eea6acea
     retrieved_at: "2026-06-25"
     license: MIT
     verification_status: agent-verified
@@ -185,7 +185,9 @@ adoption_decisions:
     upstream_reference: SRC-FABLIZE
     local_surface:
       - .codex/skills/workflow-rigor/SKILL.md
-    rationale: "Observed-evidence-over-claim completion plus accepted_risk terminal; enforcement reuses the existing Codex Stop-hook strict agent-output gate (validate_agent_run_artifact), not upstream code."
+      - .codex/hooks/codex_hook_adapter.py
+      - .claude/hooks/claude_hook_adapter.py
+    rationale: "Observed-evidence-over-claim completion plus accepted_risk terminal. Codex enforces via the manifest-bound strict agent-output gate; the Claude adapter adds a transcript-based observed-vs-claimed strict gate (8.4.1) for parity. No upstream code."
   - concept: debugging-hypothesis-ladder
     decision: adapted
     upstream_reference: SRC-FABLECODEX
@@ -203,9 +205,16 @@ adoption_decisions:
     upstream_reference: SRC-FABLIZE
     local_surface:
       - .codex/skills/evaluation-usage-tracker/references/harness-measurement-protocol.md
-    rationale: "Out-of-band holdout and sunset as a design reference; observed-runs remain replay fixtures, not an outcome source. Live instrumentation deferred."
+      - .codex/tools/analyze_harness_measurement.py
+      - .codex/hooks/codex_hook_adapter.py
+      - .claude/hooks/claude_hook_adapter.py
+    rationale: "Out-of-band 80/20 holdout + sunset implemented (8.4.1): analyze_harness_measurement.py aggregates adapter-tagged turn_finalize events; the off arm is a gate-off baseline. observed-runs remain replay fixtures, not an outcome source; automated revert/reinstruction collection is a follow-up."
   - concept: checkpointed-execution-task-ledger
-    decision: not_applicable
+    decision: adapted
     upstream_reference: SRC-FABLECODEX
-    local_surface: []
-    rationale: "8.4.0 is design-only for Checkpointed Execution; implementation deferred to 8.4.1. LoopRun already covers iterative verifier loops."
+    local_surface:
+      - .codex/skills/workflow-task-ledger/SKILL.md
+      - .codex/schemas/task/task-run.schema.json
+      - .codex/tools/task_ledger.py
+      - .codex/tools/validate_task_run.py
+    rationale: "Implemented in 8.4.1 as the workflow-task-ledger skill plus task-run schema/CLI/validator: a resume-safe step/finding ledger with observed evidence_refs and a completion gate, sitting between one-shot and a LoopRun (not a LoopRun)."

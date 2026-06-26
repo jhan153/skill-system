@@ -54,6 +54,7 @@
 - Documentation, plan, status, or synchronization-only edits are not implementation completion unless explicitly requested.
 - Implementation completion requires a source, test, runtime config/build, executable scaffold change, or a `blocked`/analysis-only report explaining why no such change is possible.
 - Do not claim completion when the success conditions are unclear or unsupported by evidence.
+- Before finalizing, if the closing response promises an action that is still part of the current request, perform it now or report the exact blocker; do not end on an unfulfilled "I will…" promise.
 
 ## Skill Alias Interpretation
 - Resolve family and group aliases from `.codex/docs/skill_registry.md`; use `.codex/context-routing.md` and the target skill's Routing Card to determine routing role and scope.

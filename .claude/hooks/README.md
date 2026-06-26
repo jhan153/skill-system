@@ -11,11 +11,18 @@ file is only the runtime wiring.
 - **Observational by default** — it records events and always allows stop. This
   matches the Codex adapter's non-strict default and decision 6 (observational
   default).
-- **Strict block is deferred.** The Codex strict gate blocks a stop when an
-  `agent-verified` claim contradicts observed evidence, which depends on a
-  per-run `run.yaml` manifest. The Claude runtime does not yet emit that
-  manifest, so strict mode degrades to observational here. A Claude run-manifest
-  producer is the prerequisite for strict-block parity (future 8.4.x).
+- **Strict block (opt-in, transcript-based).** Set
+  `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict` to enable it. On stop it reads the
+  transcript and blocks (`{"decision":"block"}`) when the final assistant
+  message claims `agent-verified` but a tool result errored with no later
+  success. The Codex side enforces the same intent through a pre-declared
+  `run.yaml` manifest; the Claude runtime does not emit that manifest, so this
+  adapter derives the contradiction from the transcript instead (same intent,
+  runtime-specific mechanism). The decision logic (`claims_verified`,
+  `has_unresolved_tool_failure`, `strict_block`) is pure and unit-testable;
+  transcript parsing is best-effort and fails open. A `stop_hook_active` guard
+  prevents re-blocking the same stop. Live verification against a real Claude
+  transcript schema is still recommended before relying on it in production.
 - **Fail-open** — any error (including missing `.codex/tools`) exits 0 so a host
   session is never broken.
 

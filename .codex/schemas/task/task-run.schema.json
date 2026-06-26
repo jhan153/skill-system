@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-task-run.schema.json",
+  "title": "Skill System Task Run (Checkpointed Execution)",
+  "type": "object",
+  "required": ["schema_version", "task_run_id", "objective", "status", "steps", "findings", "final_verification"],
+  "properties": {
+    "schema_version": { "enum": [1] },
+    "task_run_id": { "type": "string", "minLength": 1 },
+    "objective": { "type": "string", "minLength": 1 },
+    "workspace": {
+      "type": "object",
+      "properties": {
+        "root": { "type": "string" },
+        "revision": { "type": "string" }
+      }
+    },
+    "status": { "enum": ["active", "complete", "blocked", "cancelled"] },
+    "active_step_id": { "type": ["string", "null"] },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "status", "evidence_refs"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string" },
+          "status": { "enum": ["pending", "in_progress", "complete", "failed", "blocked"] },
+          "evidence_refs": { "type": "array", "items": { "type": "object" } }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "comment": "a complete step must carry observed evidence",
+            "if": { "properties": { "status": { "const": "complete" } }, "required": ["status"] },
+            "then": { "properties": { "evidence_refs": { "minItems": 1 } } }
+          }
+        ]
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "severity", "status", "evidence_refs"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string" },
+          "step_id": { "type": ["string", "null"] },
+          "severity": { "enum": ["low", "medium", "high", "critical"] },
+          "status": { "enum": ["open", "resolved", "rejected", "accepted_risk"] },
+          "evidence_refs": { "type": "array", "items": { "type": "object", "properties": { "kind": { "enum": ["discovery", "resolution", "verification"] } } } },
+          "resolution": { "type": "string" },
+          "accepted_by": { "enum": ["user", "project_policy"] },
+          "reason": { "type": "string" },
+          "review_at": { "type": "string" }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "comment": "accepted_risk must record who accepted it, why, and when to revisit",
+            "if": { "properties": { "status": { "const": "accepted_risk" } }, "required": ["status"] },
+            "then": { "required": ["accepted_by", "reason", "review_at"] }
+          },
+          {
+            "comment": "a resolved finding needs a resolution and observed evidence",
+            "if": { "properties": { "status": { "const": "resolved" } }, "required": ["status"] },
+            "then": { "required": ["resolution"], "properties": { "evidence_refs": { "minItems": 1 } } }
+          }
+        ]
+      }
+    },
+    "final_verification": {
+      "type": "object",
+      "required": ["status", "evidence_refs"],
+      "properties": {
+        "status": { "enum": ["pending", "pass"] },
+        "evidence_refs": { "type": "array", "items": { "type": "object" } }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "comment": "a passing final verification must carry observed evidence",
+          "if": { "properties": { "status": { "const": "pass" } }, "required": ["status"] },
+          "then": { "properties": { "evidence_refs": { "minItems": 1 } } }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

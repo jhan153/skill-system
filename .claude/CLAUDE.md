@@ -70,6 +70,7 @@
 - Documentation, plan, status, or synchronization-only edits are not implementation completion unless explicitly requested.
 - Implementation completion requires a source, test, runtime config/build, executable scaffold change, or a `blocked`/analysis-only report explaining why no such change is possible.
 - Do not claim completion when the success conditions are unclear or unsupported by evidence.
+- Before finalizing, if the closing response promises an action that is still part of the current request, perform it now or report the exact blocker; do not end on an unfulfilled "I will…" promise.
 
 ## Skill Alias Interpretation
 - Resolve family and group aliases from `.claude/docs/skill_registry.md`; use `.claude/context-routing.md` and the target skill's Routing Card to determine routing role and scope.
@@ -115,7 +116,7 @@
 - Preserve existing runtime settings unless the user explicitly requests replacement.
 - Project-local hooks may run after project trust and hook approval. They operate under permission modes and settings policy.
 - Review `settings.json` permissions, and any project-local `.claude/settings.json`, against local policy before applying.
-- The bundle ships an optional, observational evidence-recording hook at `.claude/hooks/claude_hook_adapter.py` (Claude-side counterpart of the Codex `hooks.json` adapter). It is not auto-installed: enable it by adding it to `settings.json` per `.claude/hooks/README.md`. It records lifecycle events to the shared evidence ledger and is observational by default; it does not block stop unless both a strict gate and a per-run manifest are present.
+- The bundle ships an optional, observational evidence-recording hook at `.claude/hooks/claude_hook_adapter.py` (Claude-side counterpart of the Codex `hooks.json` adapter). It is not auto-installed: enable it by adding it to `settings.json` per `.claude/hooks/README.md`. It records lifecycle events to the shared evidence ledger and is observational by default; under an opt-in strict gate (`SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict`) it blocks a stop when the final message claims `agent-verified` but the transcript shows an unrecovered tool failure.
 - `.claude/skills/.system` is app-managed; replacing it requires explicit user intent.
 
 ### Harness And Stop Boundary

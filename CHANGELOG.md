@@ -1,5 +1,12 @@
 # Changelog
 
+## 8.4.1
+
+- Added Claude-side strict-block parity: an opt-in transcript-based observed-vs-claimed Stop gate (`SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict`) in `.claude/hooks/claude_hook_adapter.py` that blocks a stop when the final message claims `agent-verified` but a tool result errored with no later success. Pure decision logic, fail-open transcript parsing, and a `stop_hook_active` re-block guard.
+- Added the `workflow-task-ledger` skill (Checkpointed Execution): a resume-safe step/finding ledger for multi-turn work between one-shot and a LoopRun, with observed `evidence_refs` (not free text), an `accepted_risk` terminal, and a completion gate (all required steps complete + final verification pass + zero open findings). Ships `schemas/task/task-run.schema.json`, `tools/task_ledger.py`, unit tests, a `checkpointed_task` classification in `loop-readiness-router`, and registry/eval entries.
+- Added out-of-band harness-paradox measurement: `analyze_harness_measurement.py` (deterministic 80/20 holdout, per-arm gate-fire/block/finalize-fail rates, `harness_paradox_fail_delta`, and sunset). Both hook adapters tag `turn_finalize` events and treat the off arm as a gate-off baseline (opt-in `SKILL_SYSTEM_HARNESS_MEASUREMENT=1`, default off, so baseline behavior is unchanged).
+- Scope note: "harness parity" here means Claude/Codex contradiction-gate parity (observed-vs-claimed). It is not fablize 2.1 observation-gate feature parity — the quick/normal/deep task classifier, risk flags, a bounded max-block ceiling, and an automated revert/re-instruction outcome collector are intentionally not implemented (the system already has routers, risk boundaries, recovery, and LoopRun).
+
 ## 8.4.0
 
 - Adopted Fable-style harness discipline (FableCodex, fablize) as concepts rather than code: observed-evidence completion plus an `accepted_risk` terminal in `workflow-rigor`, a debugging hypothesis ladder in `analysis-bug`, capability-ceiling escalation in `workflow-recovery`, and verification-grounding / noise-control runtime eval cases (`runtime-029..032`).

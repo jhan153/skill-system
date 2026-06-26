@@ -55,6 +55,14 @@ REQUIRED_FILES = [
     ".codex/tools/tests/fixtures/loop-runs/valid/contract.yaml",
     ".codex/tools/tests/fixtures/loop-runs/valid/state.yaml",
     ".codex/tools/tests/fixtures/loop-runs/valid/checkpoints/0000.yaml",
+    ".codex/skills/workflow-task-ledger/SKILL.md",
+    ".codex/schemas/task/task-run.schema.json",
+    ".codex/schemas/task/examples/task-run.example.yaml",
+    ".codex/tools/task_ledger.py",
+    ".codex/tools/validate_task_run.py",
+    ".codex/tools/tests/test_task_ledger.py",
+    ".codex/tools/analyze_harness_measurement.py",
+    ".codex/tools/tests/test_harness_measurement.py",
 ]
 SCHEMA_CONTRACTS = {
     ".codex/schemas/harness/lifecycle-event.schema.json": {
@@ -122,6 +130,19 @@ SCHEMA_CONTRACTS = {
             "loop_run_id": "LR-1",
             "iteration": 0,
             "condition_results": [],
+        },
+    },
+    ".codex/schemas/task/task-run.schema.json": {
+        "top_property": "steps",
+        "example": ".codex/schemas/task/examples/task-run.example.yaml",
+        "invalid": {
+            "schema_version": 1,
+            "task_run_id": "TR-x",
+            "objective": "x",
+            "status": "active",
+            "steps": [{"id": "S1", "title": "t", "status": "complete", "evidence_refs": []}],
+            "findings": [],
+            "final_verification": {"status": "pending", "evidence_refs": []},
         },
     },
 }

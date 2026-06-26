@@ -1,4 +1,4 @@
-version: "8.4.0"
+version: "8.4.1"
 purpose: "Real-use quality observation cases for routing and output improvement."
 cases:
   - case_id: runtime-001
@@ -280,3 +280,12 @@ cases:
     expected_output_shape: "direct minimal edit with no rigor gate or loop"
     quality_notes: "A quick harmless edit must not trigger the evidence gate or a loop (noise control)."
     friction_risk: "over-governing trivial work"
+  - case_id: runtime-033
+    user_request: "이 마이그레이션은 여러 턴에 걸쳐 진행되고 중간 발견사항을 잊으면 안 돼. 루프까진 아니야. 진행 상태를 추적해줘."
+    expected_primary_skill: workflow-task-ledger
+    expected_supporting_skills: [loop-readiness-router]
+    should_not_trigger: [workflow-loop-runner, plan-loop-term, plan-long-term-package]
+    expected_context: [objective, dependent steps, observed evidence, open findings]
+    expected_output_shape: "resume-safe step/finding ledger with observed evidence_refs; completion blocked while open findings remain"
+    quality_notes: "Checkpointed-task tier — not a LoopRun; evidence is observed refs, not free text."
+    friction_risk: "escalating a non-convergent multi-turn task into a full LoopRun"

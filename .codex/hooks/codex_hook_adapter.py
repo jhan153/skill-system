@@ -679,6 +679,23 @@ def strict_gate_enabled(data: dict[str, Any]) -> bool:
     return str(configured).lower() == STRICT_GATE
 
 
+def measurement_enabled(data: dict[str, Any]) -> bool:
+    """Out-of-band holdout measurement (opt-in, default off). When on, the off
+    arm records would_fire but does not block (gate-off baseline) so the harness
+    paradox can be measured. Default off => baseline behavior is unchanged."""
+    configured = data.get("skill_system_harness_measurement") or os.environ.get("SKILL_SYSTEM_HARNESS_MEASUREMENT", "")
+    return str(configured).lower() in {"1", "true", "on", "yes"}
+
+
+def _holdout_arm(session_id: str) -> str:
+    try:
+        from analyze_harness_measurement import holdout_arm  # noqa: PLC0415
+
+        return holdout_arm(session_id)
+    except Exception:  # noqa: BLE001 - measurement must never break the hook.
+        return "on"
+
+
 def has_blocking_validation_failure(validation_output: str) -> bool:
     return any(pattern in validation_output for pattern in BLOCKING_VALIDATION_PATTERNS)
 
@@ -703,6 +720,13 @@ def stop_output(data: dict[str, Any], validation_code: int, validation_output: s
         return {
             "continue": True,
             "systemMessage": observation,
+        }
+    if measurement_enabled(data) and _holdout_arm(str(data.get("session_id") or "")) == "off":
+        # Gate-off baseline arm: observe instead of block so the harness paradox
+        # (does the gate help vs not?) can be measured out-of-band.
+        return {
+            "continue": True,
+            "systemMessage": "[measurement baseline] " + observation,
         }
     reason = "Agent output validation found a strict-mode blocking contradiction in current-turn evidence."
     return {
@@ -1038,6 +1062,18 @@ def handle(args: argparse.Namespace) -> int:
                 validation_code = post_code
                 validation_output = post_output
                 finalize_extra["agent_output_validation"] = validation_output
+        if measurement_enabled(data):
+            # Tagged after post-finalize re-validation so would_fire/did_block match
+            # the final block decision in stop_output (not the pre-finalize state).
+            would_fire = (
+                strict_gate_enabled(data)
+                and validation_code not in (0, 4)
+                and has_blocking_validation_failure(validation_output)
+            )
+            arm = _holdout_arm(str(data.get("session_id") or ""))
+            finalize_extra["holdout_arm"] = arm
+            finalize_extra["would_fire"] = bool(would_fire)
+            finalize_extra["did_block"] = bool(would_fire and arm == "on")
         loop_evaluation = maybe_evaluate_active_loop(data, validation_code)
         loop_context: dict[str, Any] | None = None
         if loop_evaluation is not None:

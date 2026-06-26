@@ -5,8 +5,12 @@ helps **before** defaulting it on. A mandatory gate can add context noise and
 re-instruction churn that cancels or outweighs its benefit — the "harness
 paradox". Measure that first; do not assume "gate on" equals "quality up".
 
-This is a design reference only. It defines how a measurement would run; it does
-not itself enable live instrumentation (deferred to a later 8.4.x point).
+This is implemented. Holdout assignment and event tagging run in the hook
+adapters (opt-in via `SKILL_SYSTEM_HARNESS_MEASUREMENT=1` with the strict gate
+enabled); `.codex/tools/analyze_harness_measurement.py` aggregates the tagged
+`turn_finalize` events read-only. Automated outcome collection beyond gate
+firing / finalize status (reverts, re-instructions) still needs a host-specific
+transcript/git collector and is a follow-up.
 
 ## Principles
 - **Out-of-band only.** Labels and metrics are recorded after a session ends
@@ -36,11 +40,17 @@ not itself enable live instrumentation (deferred to a later 8.4.x point).
   post_session_defect: true | false
 ```
 
-## On/off comparison (sketch)
-- Per arm: session count, gate-fire rate, mean reverts, mean re-instructions.
-- Key signal: `harness_paradox_delta = mean_reverts(on) - mean_reverts(off)`.
-- Keep collecting while the delta is not yet comparable; sunset when the horizon
-  is reached without a signal.
+## On/off comparison (implemented)
+- Per arm: `sessions`, `finalizes`, `would_fire_rate`, `block_rate`, `finalize_fail_rate`.
+- Key signal: `harness_paradox_fail_delta = finalize_fail_rate(on) - finalize_fail_rate(off)`.
+  Negative = the gate reduces failures; ~0 = no effect; positive = the gate may be adding friction.
+- `mean_reverts` / `mean_reinstructions` need the outcome collector (follow-up).
+- Keep collecting until both arms have data; sunset at the horizon without a signal.
+
+## Run it
+- Enable (both runtimes): `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict SKILL_SYSTEM_HARNESS_MEASUREMENT=1`.
+- Adapters tag each `turn_finalize` event with `holdout_arm` (deterministic 80/20 by session id), `would_fire`, and `did_block`; the off arm records `would_fire` but never blocks (gate-off baseline).
+- Aggregate: `python3 .codex/tools/analyze_harness_measurement.py [--ledger PATH]`.
 
 ## Boundaries
 - `eval/observed-runs/*` are **replay fixtures** for behavior evals, not a

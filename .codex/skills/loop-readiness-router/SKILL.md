@@ -31,7 +31,7 @@ description: Classify whether an initial request should be handled as one-shot w
   - available verifier hints, side effects, budgets, and approval boundaries when known
   - requested durability, event runtime, Wiki feedback, parallelism, or improvement loop expectations when known
 - expected_outputs:
-  - readiness classification: `one_shot`, `contract_needed`, or `loop_worthy`
+  - readiness classification: `one_shot`, `checkpointed_task`, `contract_needed`, or `loop_worthy`
   - short rationale tied to observable risk/uncertainty
   - recommended primary skill and optional supporting skills
   - missing governance prerequisites when execution should not start
@@ -66,6 +66,7 @@ Decide whether a request deserves a loop before work begins. This skill prevents
 
 ## Classification
 - `one_shot`: execute directly with a normal validation step.
+- `checkpointed_task`: heavier than one-shot but not a loop — multi-turn or resumable work with dependent steps and accepted findings to track; attach `workflow-task-ledger`. No repeated verifier-feedback convergence.
 - `contract_needed`: do not execute yet; create a `plan-loop-term` contract first.
 - `loop_worthy`: create a loop contract and verifier map; execute later through `workflow-loop-runner` only after the contract is accepted.
 
@@ -88,7 +89,7 @@ Decide whether a request deserves a loop before work begins. This skill prevents
 ## Output Contract
 ```yaml
 loop_readiness:
-  classification: one_shot|contract_needed|loop_worthy
+  classification: one_shot|checkpointed_task|contract_needed|loop_worthy
   rationale: []
   decision_factors:
     outcome_observability:
@@ -108,6 +109,7 @@ loop_readiness:
 
 ## Handoff Rules
 - `one_shot` -> hand off to the task-specific primary skill or direct execution path.
+- `checkpointed_task` -> hand off to the task-specific primary skill with `workflow-task-ledger` attached for resume-safe step/finding state; do not escalate to a LoopRun.
 - `contract_needed` -> hand off to `plan-loop-term`.
 - `loop_worthy` -> hand off to `plan-loop-term`, then `loop-verifier-registry`; use `workflow-loop-runner` only after the contract is accepted.
 - Design-loop candidates should mention `design-frontend`, `design-visual-regression`, and `design-a11y-audit` as likely downstream skills.

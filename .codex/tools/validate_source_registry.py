@@ -30,6 +30,7 @@ REQUIRED_FIELDS = {
 }
 ALLOWED_SOURCE_TYPES = {"web_url", "github_raw", "arxiv", "repo_local_artifact", "transient_source"}
 ALLOWED_STATUS = {"agent-verified", "user-verification-needed", "archived", "transient-excluded"}
+ADOPTION_DECISIONS = {"adopted", "adapted", "rejected", "not_applicable"}
 LOCAL_PATH_RE = re.compile(r"(^|[\"'\s])/(Users|private|tmp|var)/")
 # Consumers under these prefixes are local-only / source-project paths (see project AGENTS.md);
 # they are intentionally excluded from the distributable bundle, so existence is not enforced here.
@@ -125,6 +126,31 @@ def validate(path: Path) -> list[str]:
                 errors.append(f"duplicate source_id: {sid}")
             seen.add(sid)
         errors.extend(validate_source(source, root))
+    errors.extend(validate_adoption_decisions(data))
+    return errors
+
+
+def validate_adoption_decisions(data: dict[str, Any]) -> list[str]:
+    decisions = data.get("adoption_decisions")
+    if decisions is None:
+        return []
+    errors: list[str] = []
+    if not isinstance(decisions, list):
+        return ["adoption_decisions must be a list"]
+    for idx, decision in enumerate(decisions):
+        label = f"adoption_decisions[{idx}]"
+        if not isinstance(decision, dict):
+            errors.append(f"{label} must be a mapping")
+            continue
+        if not decision.get("concept"):
+            errors.append(f"{label}: missing concept")
+        if decision.get("decision") not in ADOPTION_DECISIONS:
+            errors.append(f"{label}: invalid decision {decision.get('decision')!r}")
+        surface = decision.get("local_surface")
+        if not isinstance(surface, list):
+            errors.append(f"{label}: local_surface must be a list")
+        elif decision.get("decision") in {"adopted", "adapted"} and not surface:
+            errors.append(f"{label}: {decision.get('decision')} requires a non-empty local_surface")
     return errors
 
 
