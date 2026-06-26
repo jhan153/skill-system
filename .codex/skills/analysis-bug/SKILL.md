@@ -107,6 +107,7 @@ description: "Repro-and-evidence-first workflow for recurring, unclear, or high-
 - If one class is unavailable, say why and mark it `Unverified`.
 - No fix recommendation without evidence.
 - No implementation without enough evidence to justify the change.
+- When the cause is unclear, hold 2-3 competing hypotheses and run the cheapest measurement that discriminates between them first; record refuting evidence, not only confirming evidence. This is an intermediate narrowing step only — still converge to one primary root cause in Step 3 and never present multiple causes as the final answer.
 
 ## Step 3) Root Cause Decision
 - State one primary root cause.

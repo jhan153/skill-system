@@ -1,4 +1,4 @@
-version: "8.3.2"
+version: "8.4.0"
 purpose: "Real-use quality observation cases for routing and output improvement."
 cases:
   - case_id: runtime-001
@@ -244,3 +244,39 @@ cases:
     expected_output_shape: "checkpoint with knowledge_feedback_candidates and explicit note that accepted Wiki Bank mutation requires knowledge-base-maintenance review"
     quality_notes: "Loop output can create feedback candidates, not accepted Wiki Bank knowledge. Knowledge maintenance is only a review/promotion handoff."
     friction_risk: "context compounding or poisoning from unreviewed loop observations"
+  - case_id: runtime-029
+    user_request: "이 SVG 차트를 만들었는데 빌드만 통과했어. 실제로 렌더해서 보이는지 확인하고 완료해줘."
+    expected_primary_skill: design-visual-regression
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [analysis-codebase, research-router]
+    expected_context: [artifact, renderer or command, observed output]
+    expected_output_shape: "rendered observation evidence before completion, not build/syntax-only pass"
+    quality_notes: "Well-formed is not correct; require one clean observed render, then stop."
+    friction_risk: "claiming visual success from a build pass"
+  - case_id: runtime-030
+    user_request: "컨텍스트가 압축됐어. 이어서 작업하기 전에 현재 파일 상태부터 다시 확인해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: [workflow-rigor]
+    should_not_trigger: [memory-bank-update, analysis-codebase]
+    expected_context: [current files, prior change scope]
+    expected_output_shape: "re-confirm current file/tool state before acting; do not trust a stale summary"
+    quality_notes: "Resume from observed current state, not assumed memory."
+    friction_risk: "trusting a stale summary after compaction"
+  - case_id: runtime-031
+    user_request: "구현 끝났다고 하기 전에, 변경 동작을 실제로 검증한 증거를 같이 보여줘."
+    expected_primary_skill: workflow-rigor
+    expected_supporting_skills: []
+    should_not_trigger: [report-diff, analysis-codebase]
+    expected_context: [changed files, validation command and output]
+    expected_output_shape: "completion only with observed verification evidence (command/exit/validator); claim-only is insufficient"
+    quality_notes: "Observed evidence over claim text; a blocker closes only as accepted_risk with explicit approval."
+    friction_risk: "claiming done without observed verification"
+  - case_id: runtime-032
+    user_request: "주석 오타 하나만 고쳐줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-rigor, workflow-loop-runner, plan-loop-term]
+    expected_context: [target line]
+    expected_output_shape: "direct minimal edit with no rigor gate or loop"
+    quality_notes: "A quick harmless edit must not trigger the evidence gate or a loop (noise control)."
+    friction_risk: "over-governing trivial work"

@@ -82,6 +82,7 @@ notes:
 
 ## Reference
 - Read `references/usage-summary-template.md` for an input ledger sample, output summary sample, redaction checklist, and the no-data output shape.
+- Read `references/harness-measurement-protocol.md` for the out-of-band holdout + sunset measurement design used to decide whether a harness gate actually helps before defaulting it on.
 
 ## Output Contract
 1. Usage count summary (by skill and family)

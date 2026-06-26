@@ -151,3 +151,61 @@ sources:
       - .codex/tools/_validation.py
       - .github/workflows/verify-bundle.yml
     local_modifications: dependency-adopted
+  - source_id: SRC-FABLECODEX
+    source_type: web_url
+    stable_locator: https://github.com/baskduf/FableCodex
+    repository: baskduf/FableCodex
+    path:
+    revision: main
+    retrieved_at: "2026-06-24"
+    license: AGPL-3.0-or-later
+    verification_status: agent-verified
+    local_consumers:
+      - .codex/skills/workflow-rigor/SKILL.md
+      - .codex/skills/analysis-bug/SKILL.md
+      - .codex/eval/runtime_usage_cases.yaml
+    local_modifications: summarized
+  - source_id: SRC-FABLIZE
+    source_type: web_url
+    stable_locator: https://github.com/fivetaku/fablize
+    repository: fivetaku/fablize
+    path:
+    revision: main
+    retrieved_at: "2026-06-25"
+    license: MIT
+    verification_status: agent-verified
+    local_consumers:
+      - .codex/skills/workflow-recovery/SKILL.md
+      - .codex/skills/evaluation-usage-tracker/references/harness-measurement-protocol.md
+      - .codex/eval/runtime_usage_cases.yaml
+    local_modifications: summarized
+adoption_decisions:
+  - concept: observed-evidence-completion-gate
+    decision: adapted
+    upstream_reference: SRC-FABLIZE
+    local_surface:
+      - .codex/skills/workflow-rigor/SKILL.md
+    rationale: "Observed-evidence-over-claim completion plus accepted_risk terminal; enforcement reuses the existing Codex Stop-hook strict agent-output gate (validate_agent_run_artifact), not upstream code."
+  - concept: debugging-hypothesis-ladder
+    decision: adapted
+    upstream_reference: SRC-FABLECODEX
+    local_surface:
+      - .codex/skills/analysis-bug/SKILL.md
+    rationale: "2-3 competing hypotheses and a cheapest discriminating measurement as an intermediate step; still converge to one primary root cause."
+  - concept: capability-ceiling-escalation
+    decision: adapted
+    upstream_reference: SRC-FABLIZE
+    local_surface:
+      - .codex/skills/workflow-recovery/SKILL.md
+    rationale: "Distinguish procedure failure from capability ceiling; escalate to higher effort/model or the user instead of adding retry/gate loops."
+  - concept: harness-paradox-measurement
+    decision: adapted
+    upstream_reference: SRC-FABLIZE
+    local_surface:
+      - .codex/skills/evaluation-usage-tracker/references/harness-measurement-protocol.md
+    rationale: "Out-of-band holdout and sunset as a design reference; observed-runs remain replay fixtures, not an outcome source. Live instrumentation deferred."
+  - concept: checkpointed-execution-task-ledger
+    decision: not_applicable
+    upstream_reference: SRC-FABLECODEX
+    local_surface: []
+    rationale: "8.4.0 is design-only for Checkpointed Execution; implementation deferred to 8.4.1. LoopRun already covers iterative verifier loops."

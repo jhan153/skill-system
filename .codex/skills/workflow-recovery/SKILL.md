@@ -100,6 +100,10 @@ Choose one diagnostic at a time:
 - Do not stack multiple speculative fixes before revalidation.
 - Do not call the issue fixed until the original failure signal is addressed.
 
+## Capability Ceiling
+- After evidence-changing recovery attempts, distinguish a procedure failure (fixable by narrowing, isolating, or changing one cause) from a capability ceiling (the model cannot produce the needed output: out-of-spec defect discovery, open-ended creative depth, or self-driven propagation beyond current evidence).
+- When the blocker is a capability ceiling, do not add more retry or gate loops. Escalate instead — raise reasoning effort or model, or hand off to the user — and report `blocked` with the ceiling named, not as a procedure failure.
+
 ## Output Contract
 Return only the sections needed:
 - `failure_loop`

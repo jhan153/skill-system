@@ -25,7 +25,7 @@ This repository includes the skill bundle organized for version 7.3.1. Its main 
 
 ## 8.x Direction: Context Compounding
 
-The current architecture line is `8.x — Context Compounding / Wiki Bank Architecture`. The current maintenance cut is `8.3.2 — Verification Scope Cleanup`, following the `8.3.1 — Evaluation Framing Cleanup` release.
+The current architecture line is `8.x — Context Compounding / Wiki Bank Architecture`. The current maintenance cut is `8.4.0 — Fable Harness Reinforcement`, following the `8.3.2 — Verification Scope Cleanup` release.
 
 `7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 skill bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
 
@@ -239,6 +239,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 8.1.0 | Bounded verification loops            | Adds loop readiness classification, `plan-loop-term` contracts, verifier mapping, and a minimal LoopRun runtime for explicit repeated agent work: loop schemas, state/checkpoints, progress/stall decisions, Stop-hook continuation, recovery handoff, verifier evidence, idempotency notes, loop governance metrics, Wiki feedback candidates, and execution handoff text. |
 | 8.3.0 | Bounded loop hardening                | Closes the LoopRun integrity gaps: a session-scoped activation bridge (`activate_loop_run.py`/`deactivate_loop_run.py` + Stop hook resolves the run by `session_id`, decoupled from the generic agent-run manifest), monotonic iteration with terminal immutability and idempotent replay, `iterations/` audit records, precedence-honored termination with wall-time enforcement, a confirmed-only `search-deep-evidence` convergence verifier, and a runtime-schema-valid `plan-loop-term` contract. |
 | 8.3.1 | Evaluation framing cleanup            | Removes evaluation-distorting deployment/autonomy-negative wording, updates runtime and hygiene docs to host-managed asset language, and keeps cache cleanup stable after verification runs. |
+| 8.4.0 | Fable harness reinforcement           | Adopts Fable-style harness discipline (FableCodex, fablize) as concepts, not code: observed-evidence completion plus an `accepted_risk` terminal in `workflow-rigor`, a debugging hypothesis ladder in `analysis-bug`, capability-ceiling escalation in `workflow-recovery`, verification-grounding / noise-control eval cases, a harness-paradox holdout measurement reference, an `adoption_decisions` source ledger (`SRC-FABLECODEX` AGPL-3.0, `SRC-FABLIZE` MIT), and an opt-in Claude observational hook adapter at parity with the Codex hook. |
 | 8.3.2 | Verification scope cleanup            | Scopes bundle verification to committed/distributable content: source-registry, research-ledger, and knowledge-store validators no longer require local-only source-project paths (`docs/`, `.github/`, `.kanboard-plan`) to exist, and the local-only context-compounding release gate is removed from `core`. Adds a Claude-side `.claude/CLAUDE.md` mapping of the global working rules. |
 
 ## License

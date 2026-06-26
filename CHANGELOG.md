@@ -1,5 +1,12 @@
 # Changelog
 
+## 8.4.0
+
+- Adopted Fable-style harness discipline (FableCodex, fablize) as concepts rather than code: observed-evidence completion plus an `accepted_risk` terminal in `workflow-rigor`, a debugging hypothesis ladder in `analysis-bug`, capability-ceiling escalation in `workflow-recovery`, and verification-grounding / noise-control runtime eval cases (`runtime-029..032`).
+- Added a harness-paradox out-of-band holdout + sunset measurement reference under `evaluation-usage-tracker`, and registered `SRC-FABLECODEX` (AGPL-3.0-or-later) and `SRC-FABLIZE` (MIT) in `source_registry.yaml` with an `adoption_decisions` ledger.
+- Added an opt-in Claude-side observational hook adapter (`.claude/hooks/claude_hook_adapter.py`) that records lifecycle events to the shared hash-chained evidence ledger, reaching observed-evidence parity with the Codex `hooks.json` adapter in the default observational mode. Strict-block parity is deferred pending a Claude run-manifest producer.
+- Published the Checkpointed Execution (`workflow-task-ledger`) design as design-only; implementation is gated to a later release.
+
 ## 8.3.2
 
 - Scoped bundle verification to committed/distributable content: `validate_source_registry.py`, `validate_research_ledger.py`, and `validate_knowledge_store.py` no longer require local-only source-project paths (`docs/`, `.github/`, `.kanboard-plan`) to exist, while keeping schema validation, bundle-internal consumer/locator existence, and absolute-path rejection.

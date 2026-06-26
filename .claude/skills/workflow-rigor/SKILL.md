@@ -141,6 +141,7 @@ description: Mode-based execution control for evidence-first implementation, sco
 - For changes, cite the decisive diff, snippet, or command output that supports the claim.
 - Prefer a few high-signal proofs over exhaustive transcripts.
 - Mark missing or incomplete proof as `Unverified`.
+- Completion rests on observed evidence — command exit code, validator/verifier result, the applied diff, rendered/observed output, or connector readback — not on the assistant's claim that the work succeeded. A result labeled `agent-verified` whose observed evidence contradicts it (nonzero exit, failed check, missing evidence file) is not complete. (Runtime enforcement is the Codex Stop-hook strict agent-output gate; this contract is the source of its expectations.)
 
 ## Validation Contract
 - Always split validation into two tracks:
@@ -213,6 +214,7 @@ description: Mode-based execution control for evidence-first implementation, sco
 - For implementation-class requests, do not report completion unless the Implementation Completion Gate is satisfied or the result is explicitly reported as `blocked`/analysis-only.
 - A passed test alone is insufficient.
 - If required proof or validation is missing, keep the gap explicit as `Unverified`, or report `blocked` when the next step is external.
+- A blocking issue may be closed as `accepted_risk` only with explicit user or project-policy approval, a stated reason, and a review/revisit point; otherwise it stays `blocked` or `Unverified`. Never silently downgrade a blocker to completion.
 
 ## Blocked Report Contract
 - When blocked, report only:

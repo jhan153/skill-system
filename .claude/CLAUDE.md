@@ -115,6 +115,7 @@
 - Preserve existing runtime settings unless the user explicitly requests replacement.
 - Project-local hooks may run after project trust and hook approval. They operate under permission modes and settings policy.
 - Review `settings.json` permissions, and any project-local `.claude/settings.json`, against local policy before applying.
+- The bundle ships an optional, observational evidence-recording hook at `.claude/hooks/claude_hook_adapter.py` (Claude-side counterpart of the Codex `hooks.json` adapter). It is not auto-installed: enable it by adding it to `settings.json` per `.claude/hooks/README.md`. It records lifecycle events to the shared evidence ledger and is observational by default; it does not block stop unless both a strict gate and a per-run manifest are present.
 - `.claude/skills/.system` is app-managed; replacing it requires explicit user intent.
 
 ### Harness And Stop Boundary
