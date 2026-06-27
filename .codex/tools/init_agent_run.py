@@ -25,6 +25,8 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT_ROOT = ROOT / ".codex" / "harness" / "agent-runs"
 DEFAULT_BUNDLE_VERSION = "8.4.2"
 RESULT_LABELS = {"agent-verified", "user-verification-needed", "unverified", "blocked"}
+CLAIM_LINE = re.compile(r"(?m)^\s*(?:[-*]\s*)?(C-[0-9]{3})\s*:\s*(.+?)\s*$")
+RESULT_LABEL_LINE = re.compile(r"(?m)^\s*result_label:\s*([A-Za-z0-9_-]+)\s*$")
 
 
 def utc_now() -> str:
@@ -52,6 +54,54 @@ def file_sha256(path: Path) -> str:
 def canonical_hash(data: dict[str, Any]) -> str:
     raw = json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(raw).hexdigest()
+
+
+def parse_result_label(text: str) -> str | None:
+    match = RESULT_LABEL_LINE.search(text)
+    if not match:
+        return None
+    value = match.group(1)
+    return value if value in RESULT_LABELS else None
+
+
+def parse_report_claims(text: str) -> list[tuple[str, str]]:
+    claims: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    for match in CLAIM_LINE.finditer(text):
+        claim_id = match.group(1)
+        claim_text = match.group(2).strip()
+        if claim_id in seen or not claim_text:
+            continue
+        seen.add(claim_id)
+        claims.append((claim_id, claim_text))
+    return claims
+
+
+def claim_records_from_report(manifest: dict[str, Any], parsed_claims: list[tuple[str, str]]) -> list[dict[str, Any]]:
+    outputs = manifest.get("outputs") if isinstance(manifest.get("outputs"), dict) else {}
+    existing_claims = outputs.get("claims", []) if isinstance(outputs.get("claims"), list) else []
+    existing_by_id = {
+        claim.get("claim_id"): claim
+        for claim in existing_claims
+        if isinstance(claim, dict) and isinstance(claim.get("claim_id"), str)
+    }
+    records: list[dict[str, Any]] = []
+    for claim_id, text in parsed_claims:
+        previous = existing_by_id.get(claim_id)
+        previous_text = previous.get("text") if isinstance(previous, dict) else None
+        if isinstance(previous, dict) and previous_text == text:
+            records.append(dict(previous))
+            continue
+        records.append({
+            "claim_id": claim_id,
+            "text": text,
+            "claim_class": "execution_result",
+            "support": {
+                "type": "manual_check",
+                "evidence_ref": "final-report.md",
+            },
+        })
+    return records
 
 
 def next_run_id(output_root: Path, date_id: str) -> str:
@@ -270,13 +320,40 @@ def finalize_run(args: argparse.Namespace) -> int:
     if not isinstance(manifest, dict):
         raise SystemExit("FAIL: run.yaml is not a mapping")
     (run_dir / "final-report.md").write_text(message, encoding="utf-8")
+    parsed_label = parse_result_label(message)
+    parsed_claims = parse_report_claims(message)
+    if parsed_label is not None:
+        task = manifest.get("task")
+        if isinstance(task, dict):
+            task["result_label"] = parsed_label
     assistant = manifest.get("assistant_message")
     if not isinstance(assistant, dict):
         assistant = {}
         manifest["assistant_message"] = assistant
     assistant["sha256"] = sha256_text(message)
+    if parsed_label is not None:
+        assistant["result_label"] = parsed_label
+    if parsed_claims:
+        claim_ids = [claim_id for claim_id, _ in parsed_claims]
+        assistant["claim_ids"] = claim_ids
+        outputs = manifest.get("outputs")
+        if not isinstance(outputs, dict):
+            outputs = {}
+            manifest["outputs"] = outputs
+        outputs["claims"] = claim_records_from_report(manifest, parsed_claims)
+        validations = manifest.get("validations")
+        if not isinstance(validations, list):
+            validations = []
+            manifest["validations"] = validations
+        if not any(isinstance(item, dict) and item.get("type") == "manual_check" and item.get("evidence_ref") == "final-report.md" for item in validations):
+            validations.append({"type": "manual_check", "evidence_ref": "final-report.md"})
     write_yaml(manifest_path, manifest)
-    print(json.dumps({"status": "finalized", "manifest": str(manifest_path)}, sort_keys=True))
+    print(json.dumps({
+        "status": "finalized",
+        "manifest": str(manifest_path),
+        "parsed_claim_ids": [claim_id for claim_id, _ in parsed_claims],
+        "parsed_result_label": parsed_label or "",
+    }, sort_keys=True))
     return 0
 
 

@@ -11,6 +11,8 @@ import shutil
 import tempfile
 from pathlib import Path
 
+import yaml
+
 
 ROOT = Path(__file__).resolve().parents[3]
 FIXTURES = ROOT / ".codex" / "tools" / "tests" / "fixtures"
@@ -871,9 +873,9 @@ condition_results:
                         "permission_mode": "workspace-write",
                         "last_assistant_message": (
                             "# Agent Run Final Report\n\n"
-                            "result_label: unverified\n\n"
+                            "result_label: user-verification-needed\n\n"
                             "## Claims\n\n"
-                            "- C-001: live agent-run manifest bootstrap initialized current run evidence capture.\n"
+                            "- C-002: live bootstrap finalization synchronized the task claim manifest.\n"
                         ),
                     }
                 ),
@@ -897,6 +899,12 @@ condition_results:
             self.assertEqual(events[0]["neutral_event"], "request_received")
             self.assertEqual(events[1]["neutral_event"], "context_loaded")
             self.assertEqual(events[-1]["neutral_event"], "turn_finalize")
+            manifest = yaml.safe_load((run_dir / "run.yaml").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["task"]["result_label"], "user-verification-needed")
+            self.assertEqual(manifest["assistant_message"]["result_label"], "user-verification-needed")
+            self.assertEqual(manifest["assistant_message"]["claim_ids"], ["C-002"])
+            self.assertEqual(manifest["outputs"]["claims"][0]["claim_id"], "C-002")
+            self.assertEqual(manifest["outputs"]["claims"][0]["support"]["evidence_ref"], "final-report.md")
             self.assert_passes(
                 ".codex/tools/validate_agent_run_artifact.py",
                 str(run_dir),
