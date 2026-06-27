@@ -7,3 +7,15 @@ policy:
   invocation_surface: support_only
   allow_implicit_invocation: false
   may_own_execution: false
+
+work_horizon:
+  level: task_ticket
+  role: primary_state_owner
+  above: one_shot
+  below: short_plan
+  typical_turns: "3-5"
+
+execution_mode:
+  kind: checkpoint_ledger
+  owns_execution: false
+  owns_state: true

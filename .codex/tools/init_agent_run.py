@@ -23,7 +23,7 @@ sys.dont_write_bytecode = True
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT_ROOT = ROOT / ".codex" / "harness" / "agent-runs"
-DEFAULT_BUNDLE_VERSION = "8.5.0"
+DEFAULT_BUNDLE_VERSION = "8.5.1"
 RESULT_LABELS = {"agent-verified", "user-verification-needed", "unverified", "blocked"}
 CLAIM_LINE = re.compile(r"(?m)^\s*(?:[-*]\s*)?(C-[0-9]{3})\s*:\s*(.+?)\s*$")
 RESULT_LABEL_LINE = re.compile(r"(?m)^\s*result_label:\s*([A-Za-z0-9_-]+)\s*$")

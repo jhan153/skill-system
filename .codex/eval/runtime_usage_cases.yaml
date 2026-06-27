@@ -1,4 +1,4 @@
-version: "8.5.0"
+version: "8.5.1"
 purpose: "Real-use quality observation cases for routing and output improvement."
 cases:
   - case_id: runtime-001
@@ -298,3 +298,21 @@ cases:
     expected_output_shape: "WorkItem state artifact or lifecycle summary with runtime boundary flags kept false; TaskRun linkage only when an execution slice exists"
     quality_notes: "WorkItem is lifecycle governance, not a queue runtime, scheduler, Kanboard source of truth, or LoopRun replacement."
     friction_risk: "turning lifecycle state into unsupported automation"
+  - case_id: runtime-035
+    user_request: "one-shot보다는 크지만 short plan까지는 아니야. 다음 턴에도 finding과 evidence를 잃지 않게 ticket 상태만 잡고 진행해."
+    expected_primary_skill: workflow-task-ledger
+    expected_supporting_skills: []
+    should_not_trigger: [plan-short-term-docs, plan-long-term-package, workflow-loop-runner]
+    expected_context: [objective, dependent steps, evidence_refs, findings, next_action]
+    expected_output_shape: "Task/Ticket checkpoint ledger with observed evidence_refs; no short-plan artifact unless explicitly requested"
+    quality_notes: "TaskLedger is the task/ticket horizon state layer between one-shot and short plan."
+    friction_risk: "escalating a task/ticket into a plan package or LoopRun"
+  - case_id: runtime-036
+    user_request: "short-term은 달력 기간이 아니라 지금 실행 가능한 4~8시간짜리 설계 horizon이야. 이 작업을 docs/plan으로 고정해줘."
+    expected_primary_skill: plan-short-term-docs
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [plan-long-term-package, workflow-plan-runner, workflow-task-ledger]
+    expected_context: [requirements, task_breakdown, validation_strategy, implementation_transition]
+    expected_output_shape: "persisted tactical design plan for the current execution horizon"
+    quality_notes: "Short plan owns a tactical plan artifact, not task/ticket state or execution."
+    friction_risk: "confusing short-plan artifact creation with plan execution or task ledger state"

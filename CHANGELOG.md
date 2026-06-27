@@ -1,5 +1,12 @@
 # Changelog
 
+## 8.5.1
+
+- Added the Work Horizon model to separate `one_shot`, `task_ticket`, `short_plan`, `long_plan`, `loop_overlay`, and `cross_horizon` work without introducing queue/runtime automation.
+- Added plan/workflow metadata: `work_horizon`, `planning_altitude`, and `execution_mode` now distinguish tactical plan artifacts, strategic packages, loop contracts, lifecycle curation, plan batch execution, loop convergence, checkpoint ledgers, and support/intervention facets.
+- Added `check_work_horizon_policy.py` and unit coverage, wired into the core verification profile with `.codex`/`.claude` metadata parity checks.
+- Added routing docs and runtime eval cases for the key boundary: `workflow-task-ledger` is the task/ticket state layer between one-shot and short-plan artifacts, while WorkItem remains the lifecycle envelope.
+
 ## 8.5.0
 
 - Added WorkItem lifecycle governance as a schema-bound state model for `triage -> explore -> ready -> implement -> verify -> review -> closed`, with explicit `blocked` handling, source/owner metadata, state history, evidence refs, findings, and next action.

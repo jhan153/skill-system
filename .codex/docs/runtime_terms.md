@@ -50,6 +50,10 @@ WorkItem is the 8.5.0 state model for work that needs lifecycle governance befor
 
 WorkItem is not a queue runtime, scheduler, autonomous worker, Kanboard source of truth, or LoopRun replacement.
 
+## work horizon
+
+Work horizon is the 8.5.1 model for choosing between direct one-shot work, task/ticket state, short-plan artifacts, long-plan packages, loop overlays, and cross-horizon support facets. See `.codex/docs/work_horizon_model.md`.
+
 ## Core Runtime Scope
 
 The core runtime scope keeps skills, routing docs, maturity docs, usage cases, feedback guidance, source registry, generated mirror checks, and small sanity checkers.

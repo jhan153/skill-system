@@ -101,6 +101,21 @@ Knowledge context compilation does not imply Memory Bank mutation. Persistent Me
 
 Aliases may remain in user-facing language, but routing docs should show actual skill IDs. Use system-provided `skill-creator` only when the runtime explicitly exposes it and the user asks for that platform-specific path; otherwise `create-skill-pack` owns user-managed custom `.codex` skill lifecycle work, including reference packs, hardening, migration, metadata, routing registration, smoke tests, and deprecation notes. `.system` skills are outside this lifecycle.
 
+## Work Horizon Decision Table
+
+Use `.codex/docs/work_horizon_model.md` as the detailed reference. The table below resolves plan/workflow ambiguity before selecting a primary skill.
+
+| Horizon / intent | Primary route | Attachments | Exclude |
+| --- | --- | --- | --- |
+| direct one-shot edit/check | task-specific direct execution | none by default | `workflow-task-ledger`, `plan-short-term-docs`, `plan-loop-term`, `workflow-loop-runner` |
+| task/ticket state across turns | task-specific primary plus `workflow-task-ledger` | WorkItem only as lifecycle envelope when requested or already present | `plan-long-term-package`, `workflow-loop-runner` unless verifier feedback is required |
+| tactical design/current execution plan | `plan-short-term-docs` | `workflow-validation` or `report-critical` only when requested | `plan-long-term-package` |
+| strategic phase/package plan | `plan-long-term-package` | `plan-spec-curator` for lifecycle cleanup | `plan-short-term-docs` as primary |
+| loop contract | `plan-loop-term` | `loop-verifier-registry` when verifier ownership is unclear | `workflow-loop-runner` before contract acceptance |
+| approved plan execution | `workflow-plan-runner` | `workflow-task-ledger` only when batch state must survive turns; `workflow-validation` for checks | plan creation skills as primary |
+| accepted loop execution | `workflow-loop-runner` | `workflow-recovery` for repeated failure; `workflow-task-ledger` only for adjacent non-loop task state | one-shot execution, plan creation |
+| plan/spec/context lifecycle cleanup | `plan-spec-curator` | memory/knowledge workflows only with explicit mutation/review intent | implementation owners, full history loading |
+
 ## Design Cluster Routing
 
 Design specialists are narrow. `design-frontend` remains the primary implementation owner for concrete visual artifacts. Evidence gates and analysis skills should not take over code changes unless the user explicitly asks for that kind of artifact.
