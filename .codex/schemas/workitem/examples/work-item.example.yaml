@@ -1,0 +1,75 @@
+schema_version: 1
+work_item_id: WI-20260627-001
+title: "Add WorkItem lifecycle governance"
+source:
+  type: plan
+  ref: "docs/plan/2026-06-27-8.4.4-activation-surface-8.5-workitem.md"
+state: closed
+owner: agent
+primary_skill: workflow-task-ledger
+task_run_ref: TR-20260627-001
+loop_run_ref: null
+runtime_boundary:
+  mode: state_model
+  queue_runtime: false
+  scheduler_runtime: false
+  kanboard_source_of_truth: false
+  looprun_replacement: false
+history:
+  - state: triage
+    at: "2026-06-27T00:00:00Z"
+    actor: human
+    note: "Select WorkItem lifecycle as the 8.5.0 structural target."
+    evidence_refs:
+      - type: user_approval
+        note: "8.5.0 go"
+  - state: explore
+    at: "2026-06-27T00:05:00Z"
+    actor: agent
+    note: "Inspect TaskRun and LoopRun boundaries."
+    evidence_refs:
+      - type: file
+        locator: ".codex/skills/workflow-task-ledger/SKILL.md"
+  - state: ready
+    at: "2026-06-27T00:10:00Z"
+    actor: agent
+    note: "Scope fixed to schema, docs, validator, and TaskRun linkage."
+    evidence_refs:
+      - type: file
+        locator: ".codex/docs/work_item_lifecycle.md"
+  - state: implement
+    at: "2026-06-27T00:15:00Z"
+    actor: agent
+    note: "Implement WorkItem schema and validator."
+    evidence_refs:
+      - type: file
+        locator: ".codex/schemas/workitem/work-item.schema.json"
+  - state: verify
+    at: "2026-06-27T00:20:00Z"
+    actor: agent
+    note: "Run WorkItem validator."
+    evidence_refs:
+      - type: command
+        command: "python3 .codex/tools/validate_work_item.py .codex/schemas/workitem/examples/work-item.example.yaml"
+        exit_code: 0
+  - state: review
+    at: "2026-06-27T00:25:00Z"
+    actor: agent
+    note: "Confirm runtime boundary remains non-queue."
+    evidence_refs:
+      - type: file
+        locator: ".codex/docs/work_item_lifecycle.md"
+  - state: closed
+    at: "2026-06-27T00:30:00Z"
+    actor: agent
+    note: "Schema, docs, validator, and tests landed without queue runtime."
+    evidence_refs:
+      - type: command
+        command: "python3 .codex/tools/validate_work_item.py .codex/schemas/workitem/examples/work-item.example.yaml"
+        exit_code: 0
+evidence_refs:
+  - type: command
+    command: "python3 .codex/tools/validate_work_item.py .codex/schemas/workitem/examples/work-item.example.yaml"
+    exit_code: 0
+open_findings: []
+next_action: ""

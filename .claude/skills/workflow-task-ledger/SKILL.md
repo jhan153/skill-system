@@ -62,12 +62,19 @@ description: Resume-safe checkpoint ledger for multi-turn tasks between one-shot
 - Refuse completion while accepted findings are open or blocked.
 - Use observed evidence references, never free-text claims.
 
+## WorkItem Boundary
+- WorkItem is the broader lifecycle state model (`triage -> explore -> ready -> implement -> verify -> review -> closed`).
+- TaskRun is the narrower checkpoint ledger for an execution slice inside a WorkItem.
+- Use `work_item_ref` to link a TaskRun to a WorkItem when the parent item exists.
+- Closing a TaskRun does not close the WorkItem; the WorkItem still needs its own lifecycle evidence gate.
+- Do not treat WorkItem as a queue runtime, scheduler, Kanboard source of truth, or LoopRun replacement.
+
 ## TaskRun is not a LoopRun
 - No repeated verifier-feedback convergence, no Stop-hook continuation, no budgets/idempotency/retry governance.
 - If the next action depends on repeated verifier feedback, escalate to `plan-loop-term` + `workflow-loop-runner` instead.
 
 ## State (see `.codex/schemas/task/task-run.schema.json`)
-- `task-run.yaml`: objective, workspace (root + revision), status, steps, findings, final_verification.
+- `task-run.yaml`: optional `work_item_ref`, objective, workspace (root + revision), status, steps, findings, final_verification.
 - Steps: `pending -> in_progress -> complete | failed | blocked`. A `complete` step requires non-empty observed `evidence_refs`.
 - Findings: `open -> resolved | rejected | accepted_risk`. `resolved` needs resolution + evidence; `accepted_risk` needs `accepted_by`, `reason`, `review_at`.
 - Resume priority: when the ledger conflicts with current files, prefer current files and re-confirm before claiming progress.
@@ -90,7 +97,8 @@ Keep finding evidence distinct so admission and closure are not conflated:
 A finding becomes `resolved` only with both a resolution and verification evidence (not just the original discovery); `accepted_risk` instead records why it is not resolved. The CLI enforces this: `finding-resolve` requires a non-empty `--resolution` plus new `--evidence` (the verification, distinct from the admission/discovery evidence). Mark each `evidence_ref` with `kind` (`discovery` | `resolution` | `verification`) so discovery is not mistaken for verification.
 
 ## CLI (`.codex/tools/task_ledger.py <dir> ...`)
-- `init` — create a task-run; `add-step` — append a step.
+- `init` — create a task-run; pass `--work-item-ref WI-YYYYMMDD-001` when linking to a WorkItem.
+- `add-step` — append a step.
 - `checkpoint --step --status [--evidence ...]` — transition a step (complete requires evidence).
 - `finding-add` / `finding-resolve` / `finding-accept-risk` — manage findings.
 - `final-verify --status pass [--evidence ...]` — record final verification.

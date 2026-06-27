@@ -100,6 +100,12 @@ termination:
             ".codex/eval/eval-case.schema.json",
         )
 
+    def test_work_item_example_validates(self) -> None:
+        self.assert_passes(
+            ".codex/tools/validate_work_item.py",
+            ".codex/schemas/workitem/examples/work-item.example.yaml",
+        )
+
 
 
 

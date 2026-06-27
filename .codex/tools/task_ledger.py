@@ -68,6 +68,7 @@ def cmd_init(args: argparse.Namespace) -> int:
     data = {
         "schema_version": 1,
         "task_run_id": args.task_run_id or run_dir.name or "task-run",
+        "work_item_ref": args.work_item_ref or None,
         "objective": args.objective,
         "workspace": {"root": args.workspace_root or "", "revision": args.revision or ""},
         "status": "active",
@@ -227,6 +228,7 @@ def main() -> int:
     p.add_argument("--workspace-root", default="")
     p.add_argument("--revision", default="")
     p.add_argument("--task-run-id", default="")
+    p.add_argument("--work-item-ref", default="")
     p.set_defaults(func=cmd_init)
 
     p = sub.add_parser("add-step"); add_dir(p)

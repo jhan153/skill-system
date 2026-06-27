@@ -112,6 +112,7 @@ Phase B added `search-router`, `memory-bank-ingestion`, and `evaluation-usage-tr
 - Heavy artifact-producing skills require explicit artifact intent.
 - Invocation surface metadata lives in each skill's `agents/openai.yaml` policy. It classifies activation shape (`explicit_procedure`, `selective_router`, `evidence_gate`, `support_only`) without replacing Routing Card roles.
 - `analyze_context_surface.py` is advisory only. It highlights likely context leakage and fanout, but does not fail release verification or penalize long explicit procedure skills by itself.
+- WorkItem lifecycle is a schema-governed state model for `triage -> explore -> ready -> implement -> verify -> review -> closed`. It can link to `TaskRun` or `LoopRun`, but it is not a queue runtime, scheduler, Kanboard source of truth, or LoopRun replacement.
 
 ## Maturity Review Rules
 

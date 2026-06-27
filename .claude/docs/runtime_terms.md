@@ -44,6 +44,12 @@ Runtime usage eval cases are examples for observing skill behavior in real use a
 
 Field feedback is real-use observation collected for future skill text, routing, maturity, or eval updates.
 
+## WorkItem lifecycle
+
+WorkItem is the 8.5.0 state model for work that needs lifecycle governance before it becomes a `TaskRun`, `LoopRun`, or external board projection. It records source, owner, state history, evidence, findings, and next action.
+
+WorkItem is not a queue runtime, scheduler, autonomous worker, Kanboard source of truth, or LoopRun replacement.
+
 ## Core Runtime Scope
 
 The core runtime scope keeps skills, routing docs, maturity docs, usage cases, feedback guidance, source registry, generated mirror checks, and small sanity checkers.

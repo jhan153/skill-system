@@ -1,4 +1,4 @@
-version: "8.4.4"
+version: "8.5.0"
 purpose: "Real-use quality observation cases for routing and output improvement."
 cases:
   - case_id: runtime-001
@@ -289,3 +289,12 @@ cases:
     expected_output_shape: "resume-safe step/finding ledger with observed evidence_refs; completion blocked while open findings remain"
     quality_notes: "Checkpointed-task tier — not a LoopRun; evidence is observed refs, not free text."
     friction_risk: "escalating a non-convergent multi-turn task into a full LoopRun"
+  - case_id: runtime-034
+    user_request: "이 작업은 queue로 돌리지 말고 WorkItem lifecycle로 triage부터 closed까지 상태와 근거를 잡아줘."
+    expected_primary_skill: workflow-task-ledger
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-loop-runner, plan-loop-term, kanboard-plan-ops]
+    expected_context: [source, owner, lifecycle_state, evidence_refs, findings, next_action]
+    expected_output_shape: "WorkItem state artifact or lifecycle summary with runtime boundary flags kept false; TaskRun linkage only when an execution slice exists"
+    quality_notes: "WorkItem is lifecycle governance, not a queue runtime, scheduler, Kanboard source of truth, or LoopRun replacement."
+    friction_risk: "turning lifecycle state into unsupported automation"

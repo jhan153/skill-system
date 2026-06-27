@@ -1,5 +1,6 @@
 schema_version: 1
 task_run_id: TR-20260625-001
+work_item_ref: WI-20260627-001
 objective: "Demo checkpointed run: implement importer fix across turns"
 workspace:
   root: "/repo"

@@ -93,6 +93,20 @@ class TaskLedgerTests(unittest.TestCase):
         self.assertEqual(ok.returncode, 0, ok.stdout + ok.stderr)
         self.assertEqual(self.state()["findings"][0]["status"], "resolved")
 
+    def test_init_can_link_work_item(self) -> None:
+        linked_dir = self.tmp / "linked"
+        result = run(
+            "init",
+            str(linked_dir),
+            "--objective",
+            "linked",
+            "--work-item-ref",
+            "WI-20260627-001",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        data = yaml.safe_load((linked_dir / "task-run.yaml").read_text(encoding="utf-8"))
+        self.assertEqual(data["work_item_ref"], "WI-20260627-001")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,12 @@
 # Changelog
 
+## 8.5.0
+
+- Added WorkItem lifecycle governance as a schema-bound state model for `triage -> explore -> ready -> implement -> verify -> review -> closed`, with explicit `blocked` handling, source/owner metadata, state history, evidence refs, findings, and next action.
+- Added `work-item.schema.json`, a canonical example, `validate_work_item.py`, and unit tests. Core verification now validates the canonical WorkItem example, and execution assurance tracks the WorkItem schema/tool/test artifacts.
+- Linked WorkItem to checkpointed execution without replacing it: `task-run.schema.json` and `task_ledger.py init` now support optional `work_item_ref`, while `TaskRun` remains the execution-slice ledger and WorkItem remains the parent lifecycle state.
+- Documented the WorkItem boundary in `.codex` and `.claude` runtime docs and `workflow-task-ledger`: WorkItem is not a queue runtime, scheduler, Kanboard source of truth, autonomous worker, or LoopRun replacement.
+
 ## 8.4.4
 
 - Added invocation-surface policy metadata to skill agent manifests, classifying skills as `explicit_procedure`, `selective_router`, `evidence_gate`, or `support_only` while preserving the existing Routing Card roles.
