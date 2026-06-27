@@ -5,4 +5,6 @@ interface:
   default_prompt: "Use $plan-long-term-package to ingest existing reports and create a validated phase/group planning package for this task."
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true

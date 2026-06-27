@@ -1,5 +1,13 @@
 # Changelog
 
+## 8.4.4
+
+- Added invocation-surface policy metadata to skill agent manifests, classifying skills as `explicit_procedure`, `selective_router`, `evidence_gate`, or `support_only` while preserving the existing Routing Card roles.
+- Added `check_invocation_surface_policy.py` to verify invocation-surface / implicit-invocation consistency and `.codex` / `.claude` policy parity in the core verification profile.
+- Added `analyze_context_surface.py` as an advisory, report-only context-surface analyzer so likely context leakage can be inspected without creating a release-blocking budget gate.
+- Extended field feedback with optional `harness_improvement_candidate` metadata and documented friction-signal maturity review guidance without introducing automatic maturity scoring.
+- Kept WorkItem lifecycle as an 8.5.0 horizon concept; no queue runtime, scheduler, worker, Kanboard state mapping, or LoopRun transition runtime is introduced in this cut.
+
 ## 8.4.3
 
 - Updated live bootstrap finalization so a structured final report's `result_label` and `C-###` task claims synchronize back into `run.yaml` instead of leaving the manifest bound to the bootstrap placeholder claim.

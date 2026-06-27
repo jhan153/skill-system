@@ -3,4 +3,8 @@ interface:
   short_description: "Capture and compare visual evidence across target viewports."
   default_prompt: "Use $design-visual-regression to inspect rendered screenshots, check nonblank/framing evidence, and report viewport-specific visual gaps."
 policy:
+  invocation_surface: evidence_gate
   allow_implicit_invocation: false
+  may_own_execution: false
+  may_write: false
+  may_block_completion: true

@@ -4,4 +4,6 @@ interface:
   default_prompt: "Use $memory-bank-update to mutate persistent goals or rules with append-only events and current-state reflection."
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true

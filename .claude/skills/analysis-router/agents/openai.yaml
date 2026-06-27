@@ -4,4 +4,7 @@ interface:
   default_prompt: "Use $analysis-router to choose the right deep analysis mode and continue with bug diagnosis, algorithm recommendation, or a hybrid sequence."
 
 policy:
+  invocation_surface: selective_router
   allow_implicit_invocation: true
+  may_own_execution: false
+  may_write: false

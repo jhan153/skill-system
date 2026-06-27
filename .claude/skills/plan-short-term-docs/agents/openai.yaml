@@ -7,4 +7,6 @@ interface:
     Do not activate from a casual `플랜` mention alone. Preserve active-plan continuation behavior when an existing plan artifact owns the current task.
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true

@@ -7,4 +7,6 @@ interface:
     Do not use it to execute the loop or implement the planned work.
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true

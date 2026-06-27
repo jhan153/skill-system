@@ -30,4 +30,6 @@ interface:
     - Collapse generated, lock, vendored, or binary file changes to a file-level summary unless the user explicitly asks for raw diff details.
 
 policy:
+  invocation_surface: support_only
   allow_implicit_invocation: false
+  may_own_execution: false

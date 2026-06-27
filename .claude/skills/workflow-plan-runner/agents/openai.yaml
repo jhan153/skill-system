@@ -4,4 +4,6 @@ interface:
   default_prompt: "Use $workflow-plan-runner to implement from an approved plan, spec, or package in scoped batches with validation after each batch. Confirm the execution source is sufficient, lock scope, return execution_scope/batch_plan/changed_artifacts/validation_per_batch, and use rollback_or_fallback when validation fails or scope is unsafe."
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true

@@ -7,4 +7,6 @@ interface:
     Produce a verified, citation-status-labeled evidence set and hand off synthesis. Do not touch .codex/skills/.system.
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true

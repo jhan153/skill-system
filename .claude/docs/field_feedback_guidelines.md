@@ -32,6 +32,11 @@ validation_evidence:
 outcome: pass
 friction: "none recorded"
 privacy_redactions: []
+harness_improvement_candidate:
+  needed: false
+  category: validation
+  failure_prevented: "not applicable"
+  priority: low
 ```
 
 ## Routing Back Into The Next Cut
@@ -41,6 +46,20 @@ privacy_redactions: []
 - Output issue: update the skill's expected output shape.
 - Repeated success: consider maturity upgrade.
 - Repeated friction: add negative case or lower maturity.
+
+## Harness Improvement Candidates
+
+Use `harness_improvement_candidate` only when a real run exposes a recurring or high-impact system gap. It is optional; most feedback entries should not grow a harness task.
+
+Record a candidate when one of these is true:
+
+- the same failure is likely to recur
+- a completion claim could pass without enough evidence
+- the issue crosses a tool, permission, validation, recovery, loop, WorkItem, or reporting boundary
+- context overload or wrong skill routing is likely to repeat
+- the user explicitly asks for recurrence prevention
+
+Do not use this field to turn every bug fix, correction, or weak output into a new validator or workflow asset.
 
 ## Maturity Feedback Rules
 
@@ -64,3 +83,4 @@ privacy_redactions: []
 - Do not paste secrets, credentials, private sessions, or unrelated project data.
 - Keep feedback focused on routing, output quality, maturity, and concrete improvement candidates.
 - Do not use one anecdote to upgrade a skill to `field_tuned`.
+- Do not make `harness_improvement_candidate` mandatory.

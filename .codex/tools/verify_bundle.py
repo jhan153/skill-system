@@ -199,6 +199,7 @@ def core_checks(root: Path) -> list[Check]:
         ),
         Check("field_feedback", [py, ".codex/tools/validate_field_feedback.py", ".codex/field-feedback"], root, False),
         Check("source_registry", [py, ".codex/tools/validate_source_registry.py", ".codex/docs/source_registry.yaml"], root),
+        Check("invocation_surface_policy", [py, ".codex/tools/check_invocation_surface_policy.py"], root),
         Check("generated_mirrors", [py, ".codex/tools/sync_generated_mirrors.py", "--check"], root),
         Check(
             "validator_unit_tests",

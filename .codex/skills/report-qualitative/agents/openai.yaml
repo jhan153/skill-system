@@ -21,4 +21,6 @@ interface:
     Do not use this skill for blocker-first QA gates, failure diagnosis, changed-line diffs, artifact inventories, implementation, debugging, validation execution, or usage telemetry. If another specialized report skill is unavailable, handle only the qualitative reporting portion and state the limitation.
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true

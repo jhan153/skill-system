@@ -4,4 +4,6 @@ interface:
   default_prompt: "Use $memory-bank-ingestion to promote an approved closeout packet and proposal candidates into durable long-term memory with append-only ingestion events and archive pointers, only after explicit memory-mutation approval."
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true

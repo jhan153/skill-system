@@ -4,4 +4,6 @@ interface:
   default_prompt: "Use $workflow-loop-runner to execute an accepted loop contract by iterating implementation, verifier evidence, checkpoints, recovery, and stop conditions."
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true

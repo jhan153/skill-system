@@ -82,6 +82,66 @@
       "items": {
         "type": "string"
       }
+    },
+    "harness_improvement_candidate": {
+      "type": "object",
+      "required": [
+        "needed",
+        "category",
+        "failure_prevented",
+        "priority"
+      ],
+      "properties": {
+        "needed": {
+          "type": "boolean"
+        },
+        "category": {
+          "enum": [
+            "routing",
+            "context",
+            "validation",
+            "permission",
+            "recovery",
+            "work_item",
+            "loop",
+            "reporting"
+          ]
+        },
+        "failure_prevented": {
+          "type": "string"
+        },
+        "proposed_asset": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "negative_case",
+                "schema_check",
+                "validator",
+                "routing_rule",
+                "tool_policy",
+                "work_item_gate"
+              ]
+            },
+            "path": {
+              "type": "string"
+            }
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "priority": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        }
+      }
     }
   }
 }

@@ -4,4 +4,6 @@ interface:
   default_prompt: "Use $analysis-algorithm to frame the problem, compare credible approaches, recommend the best-fit option, and define validation."
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true

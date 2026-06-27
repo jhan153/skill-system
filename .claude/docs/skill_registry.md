@@ -110,6 +110,8 @@ Phase B added `search-router`, `memory-bank-ingestion`, and `evaluation-usage-tr
 - Loop Engineering cluster is split into readiness (`loop-readiness-router`), verifier mapping (`loop-verifier-registry`), accepted execution (`workflow-loop-runner`), and planning contract support (`plan-loop-term`).
 - Knowledge skills are distinct from Memory Bank skills: read-only context compilation uses `knowledge-context-harness`; accepted knowledge mutation/review uses `knowledge-base-maintenance`; persistent Memory Bank mutation still requires explicit memory-bank workflows.
 - Heavy artifact-producing skills require explicit artifact intent.
+- Invocation surface metadata lives in each skill's `agents/openai.yaml` policy. It classifies activation shape (`explicit_procedure`, `selective_router`, `evidence_gate`, `support_only`) without replacing Routing Card roles.
+- `analyze_context_surface.py` is advisory only. It highlights likely context leakage and fanout, but does not fail release verification or penalize long explicit procedure skills by itself.
 
 ## Maturity Review Rules
 

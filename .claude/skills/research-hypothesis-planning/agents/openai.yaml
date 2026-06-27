@@ -9,4 +9,6 @@ interface:
     Do not activate for ordinary software implementation, bug diagnosis, refactoring, repo planning, existing skill execution, casual conceptual questions, generic algorithm recommendation, or implementation of an already chosen method.
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true
