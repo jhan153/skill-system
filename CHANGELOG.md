@@ -1,5 +1,10 @@
 # Changelog
 
+## 8.4.3
+
+- Updated live bootstrap finalization so a structured final report's `result_label` and `C-###` task claims synchronize back into `run.yaml` instead of leaving the manifest bound to the bootstrap placeholder claim.
+- Kept the finalization sync evidence-bound: structured final reports can record user-verification-needed outcomes without inventing an agent-verified result.
+
 ## 8.4.2
 
 - Added opt-in live agent-run manifest bootstrap (`.codex/tools/init_agent_run.py`) so current-turn `run.yaml`, final report, bootstrap evidence, and context pack can be created before Stop validation.
@@ -7,7 +12,6 @@
 - Added a tool/permission operating catalog plus representative network, destructive, and browser/MCP policy examples.
 - Added an orchestration capability contract with schema and example so cron, webhook, queue, automation, and event-trigger claims remain evidence-bound instead of implied by LoopRun, hooks, or Kanboard.
 - Connected orchestration capability checks into loop-readiness guidance, routing smoke tests, registry notes, README catalogs, and Claude mirrors.
-- Updated live bootstrap finalization so a structured final report's `result_label` and `C-###` task claims synchronize back into `run.yaml` instead of leaving the manifest bound to the bootstrap placeholder claim.
 
 ## 8.4.1
 
