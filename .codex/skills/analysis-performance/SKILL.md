@@ -87,6 +87,7 @@ description: Performance analysis for software systems. Use when Codex must diag
 - Do not report percentage improvements unless both before and after measurements are comparable.
 - Do not trade correctness, data freshness, security, or accessibility for speed without explicit user acceptance.
 - When measurements cannot run locally, provide the exact command, expected signal, and user-verification gap.
+- If the user explicitly asked to optimize or fix performance and one primary bottleneck is verified within the current scope, hand off to `workflow-implementation` for the smallest optimization instead of stopping at recommendation.
 
 ## Output Contract
 Return only the sections needed:
@@ -97,6 +98,7 @@ Return only the sections needed:
 - `primary_bottleneck`
 - `optimization_options`
 - `recommended_next_change`
+- `implementation_handoff`
 - `validation_plan`
 - `unverified_gaps`
 

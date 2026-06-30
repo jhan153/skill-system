@@ -108,6 +108,7 @@ Return only the sections needed:
 - `workflow-implementation` owns feature or behavior-changing implementation.
 - `workflow-bug-fix` owns concrete failure repair.
 - `workflow-minimal-implementation` can challenge speculative abstractions introduced by the refactor.
+- `workflow-validation` owns characterization-check matrices when installed or explicitly requested.
 - `workflow-recovery` owns repeated validation failure after attempted refactor fixes.
 
 ## Invocation Examples

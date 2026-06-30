@@ -11,9 +11,10 @@ description: "Repro-and-evidence-first workflow for recurring, unclear, or high-
   - `deep-bug`, `deep-debug`, `root-cause`, `rca`, `원인 분석`, `버그 분석`
 - use_when:
   - the user needs reproducibility, evidence collection, root-cause selection, fix comparison, or validation.
-  - implementation is requested after a credible diagnosis.
+  - RCA-only or broad root-cause selection is explicitly requested.
 - do_not_use_when:
   - the request is pure algorithm selection, pure architecture design, or a quick obvious patch.
+  - the user asks to fix a concrete failure with implementation and verification; use `workflow-bug-fix` unless RCA-only or broad root-cause selection is explicitly requested.
 - expected_inputs:
   - symptom or observed failure
   - expected behavior
@@ -47,6 +48,7 @@ description: "Repro-and-evidence-first workflow for recurring, unclear, or high-
 
 ## Related Skills
 - `analysis-router`: router and backward-compatible entry point.
+- `workflow-bug-fix`: owns concrete failure repair when the user asks to fix a failing test, build error, runtime exception, regression, or broken behavior.
 - `workflow-rigor`: owns execution rigor, review, and completion gates when implementation is requested.
 - `report-qualitative`: owns final formal report shape when explicitly active.
 - `analysis-algorithm`: use after diagnosis when the remaining question is which new approach should replace the current one.
@@ -65,6 +67,7 @@ description: "Repro-and-evidence-first workflow for recurring, unclear, or high-
 - Pure algorithm/model/pattern selection with no current failure to diagnose.
 - Pure architecture/HLD/LLD requests.
 - Quick local patch requests where the failure and fix are already obvious.
+- Concrete "fix this failing test/build/runtime error" requests where implementation is expected.
 - Information-only requests that do not need diagnosis or implementation.
 
 ## Goal
@@ -75,7 +78,7 @@ description: "Repro-and-evidence-first workflow for recurring, unclear, or high-
 
 ## Modes
 - `diagnosis-only`: stop after root cause, fix options, and validation plan.
-- `diagnosis+fix`: continue into implementation and verification when the user asks for the change.
+- `diagnosis+fix`: continue into implementation and verification only when RCA has been explicitly requested before the fix; otherwise hand off concrete repairs to `workflow-bug-fix`.
 
 ## Required Inputs
 - symptom or observed failure
@@ -126,6 +129,7 @@ description: "Repro-and-evidence-first workflow for recurring, unclear, or high-
 
 ## Step 5) Implementation Rules
 - Implementation is optional and only applies in `diagnosis+fix` mode.
+- If the user's primary request is "fix this failing signal," hand off to `workflow-bug-fix` after identifying the active diagnosis.
 - Respect runtime approval and sandbox policy before mutating files or state.
 - Prefer the smallest fix that resolves the primary root cause without hiding it.
 - Avoid patch-chaining and indefinite dual paths.

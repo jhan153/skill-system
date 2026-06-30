@@ -65,7 +65,7 @@ description: Implementation workflow for fixing concrete software failures. Use 
 ## Activation
 - Primary for "fix this bug", "make this failing test pass", "repair this build error", or "this regression is broken" requests.
 - Attach `analysis-bug` when the cause is unclear enough that RCA discipline must lead before editing.
-- Attach `workflow-validation` when the existing check is too broad, missing, or needs a focused matrix.
+- Attach `workflow-validation` when installed or when the user explicitly asks for a validation matrix; otherwise use the local validation rules and mark deeper validation as `user_verification_needed`.
 - Attach `workflow-rigor` for medium/high-risk fixes.
 
 ## Workflow
@@ -105,7 +105,7 @@ Return only the sections needed:
 - `analysis-bug` owns diagnosis-only RCA and broad root-cause selection.
 - `workflow-recovery` owns repeated same-signature failure after attempted fixes.
 - `workflow-implementation` owns ordinary feature work and refactoring without a current failure.
-- `workflow-validation` owns validation-only planning or revised check selection.
+- `workflow-validation` owns validation-only planning or revised check selection when installed or explicitly requested.
 - `analysis-codebase-design` owns deep module, seam, and boundary decisions when the fix needs structural change.
 
 ## Invocation Examples

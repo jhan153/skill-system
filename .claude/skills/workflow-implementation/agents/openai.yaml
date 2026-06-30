@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Implementation"
-  short_description: "Direct coding and refactoring execution workflow"
-  default_prompt: "Use $workflow-implementation to make the requested code, test, script, API, config, or build change with scoped context, focused validation, and concise evidence. Attach minimality, rigor, validation, bug-fix, or recovery skills only when their narrower trigger is present."
+  short_description: "Direct coding execution workflow"
+  default_prompt: "Use $workflow-implementation to make the requested code, test, script, API, config, or build change with scoped context, focused validation, and concise evidence. Attach minimality, rigor, validation, bug-fix, refactor, or recovery skills only when their narrower trigger is present."
 
 policy:
   invocation_surface: explicit_procedure

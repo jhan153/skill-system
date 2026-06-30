@@ -31,6 +31,8 @@ The current architecture line is `9.x — Neutral Source & Plugin Packaging`. Th
 
 The Wiki Bank is not a Source of Truth. Repository files, tests, schemas, explicit user decisions, validated plans, Kanboard state, and Agent Run evidence remain authority sources. Hooks and runtime traces may produce proposal evidence, but accepted knowledge changes require explicit review.
 
+For development-focused installs, use `skill-system-core` + `skill-system-dev` as the minimum profile. Add `skill-system-quality` as the recommended companion when you want validation matrix support, including `workflow-validation`; dev workflows still fall back to their local validation rules when quality skills are not installed.
+
 ## Core Principles
 
 This system is designed to treat repetitive AI work as skills that can be selected, executed, and inspected, rather than as one-off prompts.
@@ -88,10 +90,14 @@ Analysis skills are used to diagnose failures, compare approaches, or build code
 
 | Skill                | Role                                                                                                                                           |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `analysis-router`    | Selects the appropriate analysis path for complex technical requests, such as bug diagnosis, algorithm comparison, or codebase analysis.       |
+| `analysis-router`    | Selects the appropriate analysis path for complex technical requests, such as bug diagnosis, algorithm comparison, codebase design, domain modeling, or performance analysis. |
 | `analysis-bug`       | Reproduces and diagnoses recurring, unclear, or high-risk failures, then summarizes the primary cause and regression validation path.          |
 | `analysis-algorithm` | Compares algorithms, architectures, models, search strategies, or implementation approaches against explicit constraints and success criteria. |
 | `analysis-codebase`  | Performs codebase-level analysis when repository-wide artifacts, architecture maps, dependency views, or quality-gate reports are needed.      |
+| `analysis-codebase-design` | Judges targeted module boundaries, deep modules, interfaces, seams, adapters, dependency direction, and testability before implementation. |
+| `analysis-architecture-deepening` | Finds ranked architecture-deepening, deep-module, seam, adapter, shallow-wrapper, and policy-move candidates without a full repo report. |
+| `analysis-domain-modeling` | Clarifies domain concepts, entity/value-object boundaries, state transitions, invariants, business rules, and naming language for software design. |
+| `analysis-performance` | Diagnoses latency, throughput, CPU, memory, query, rendering, startup, bundle, or algorithmic bottlenecks with scoped evidence. |
 
 ### Design
 
@@ -127,6 +133,10 @@ Workflow skills control implementation discipline, validation, and failure recov
 
 | Skill                  | Role                                                                                                                                                                    |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `workflow-implementation` | Owns direct coding requests from scoped requirement to changed artifacts and focused validation. |
+| `workflow-bug-fix` | Fixes concrete software failures with a repro signal, targeted code/test change, and verification against the original failure. |
+| `workflow-dependency-upgrade` | Upgrades dependencies, runtimes, SDKs, frameworks, packages, and lockfiles with required compatibility fixes and validation. |
+| `workflow-refactor-safely` | Runs behavior-preserving refactors with a behavior contract, characterization checks, small batches, and validation. |
 | `workflow-rigor`       | Applies evidence-first execution, scoped changes, separated validation results, and review discipline for medium- and high-risk changes.                                |
 | `workflow-minimal-implementation` | Applies conditional YAGNI pressure to implementation and refactoring work to avoid unnecessary dependencies, abstractions, files, and boilerplate. |
 | `workflow-plan-runner` | Executes approved plans, specifications, or packages as implementation batches, while managing scoped validation, rollback, or alternative choices.                     |

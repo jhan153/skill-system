@@ -1,6 +1,6 @@
 ---
 name: analysis-domain-modeling
-description: Domain-modeling analysis for development work. Use when Codex must clarify domain concepts, entities, value objects, state transitions, invariants, terminology, API/data model names, or model boundaries before code changes, without defaulting to persistent glossary or ADR edits.
+description: Analyze domain concepts, entity/value-object boundaries, state transitions, invariants, business rules, and naming language for software design. Use when a development task depends on clarifying the domain model before implementation or refactoring. Do not use for generic architecture review, full codebase reports, persistent glossary writing, or documentation-only work unless explicitly requested.
 ---
 
 # Analysis Domain Modeling
@@ -10,19 +10,31 @@ description: Domain-modeling analysis for development work. Use when Codex must 
 - intent_signature:
   - domain modeling
   - ubiquitous language
-  - entity value object
+  - entity boundary
+  - value object
+  - aggregate boundary
   - invariant
+  - business rule
   - state transition
+  - domain concept
+  - naming boundary
   - 도메인 모델링
-  - 도메인 용어
+  - 도메인 모델
+  - 엔티티 경계
+  - 값 객체
+  - 상태 전이
+  - 불변식
+  - 업무 규칙
 - use_when:
   - the user asks to clarify domain concepts, names, invariants, lifecycle states, or model boundaries.
   - implementation friction comes from confused terminology, leaky data shapes, or mixed domain concepts.
   - a feature, refactor, or API change needs a domain model decision before code changes.
 - do_not_use_when:
   - the task is ordinary implementation with clear existing terminology; use `workflow-implementation`.
+  - the task is generic architecture review or full codebase reporting; use `analysis-codebase-design`, `analysis-architecture-deepening`, or `analysis-codebase` by scope.
   - the question is a module/interface/seam decision rather than domain language; use `analysis-codebase-design`.
   - the user asks for persistent memory, glossary, ADR, or docs mutation without explicit write scope.
+  - the user asks for documentation-only work without a development design dependency.
   - the task is pure research hypothesis planning, product strategy, or business ideation.
 - expected_inputs:
   - domain area, user story, API/data model, entity, workflow, or naming concern
@@ -82,9 +94,13 @@ description: Domain-modeling analysis for development work. Use when Codex must 
 ## Modeling Rules
 - Prefer terms already used consistently in the codebase.
 - When the code and user language conflict, surface the conflict instead of silently renaming.
-- Do not invent business rules from names alone; mark missing evidence `Unverified`.
+- Do not invent business rules from names alone.
+- Treat inferred rules as hypotheses until confirmed by tests, code paths, docs, or user input.
+- Mark missing evidence `Unverified`.
 - Make invalid states hard to represent when the target language/framework supports it without large churn.
-- Keep domain docs as output proposals unless the user explicitly asks to write them.
+- Do not write persistent glossary, ADR, memory, or wiki files unless explicitly requested.
+- Prefer a bounded domain model note in the response over broad documentation edits.
+- If implementation is requested after the model is clarified, hand off to `workflow-implementation` or `workflow-refactor-safely`.
 
 ## Output Contract
 Return only the sections needed:

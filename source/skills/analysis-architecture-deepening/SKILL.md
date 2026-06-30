@@ -74,6 +74,7 @@ Look for current evidence, not speculative futures:
 
 ## Workflow
 1. Scope the scan: repo area, workflow, module set, or pain signal.
+   If no scoped area is provided, sample one representative workflow or module cluster first; do not scan the whole repository by default.
 2. Sample enough files, call sites, tests, and docs to locate real friction.
 3. Identify 3-5 candidate deepening moves.
 4. For each candidate, state:

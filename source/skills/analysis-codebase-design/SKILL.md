@@ -124,4 +124,4 @@ Positive:
 Negative:
 - "이 기능 그냥 구현해줘." -> `workflow-implementation`
 - "repo-wide architecture report 만들어줘." -> `analysis-codebase`
-- "도메인 용어집을 정리해줘." -> domain-modeling or docs workflow, not this skill
+- "도메인 용어집을 정리해줘." -> `analysis-domain-modeling` for analysis, or memory/knowledge/docs workflow when persistent mutation is requested.

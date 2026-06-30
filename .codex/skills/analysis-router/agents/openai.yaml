@@ -1,7 +1,7 @@
 interface:
   display_name: "Analysis Router"
-  short_description: "Route deep analysis to diagnosis or recommendation"
-  default_prompt: "Use $analysis-router to choose the right deep analysis mode and continue with bug diagnosis, algorithm recommendation, or a hybrid sequence."
+  short_description: "Route deep analysis to the right specialist"
+  default_prompt: "Use $analysis-router to choose the right deep analysis mode and continue with bug diagnosis, algorithm recommendation, codebase design, architecture deepening, domain modeling, performance analysis, or a hybrid sequence."
 
 policy:
   invocation_surface: selective_router

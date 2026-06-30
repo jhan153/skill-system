@@ -1,6 +1,6 @@
 ---
 name: analysis-router
-description: "Routing workflow for deep technical analysis: choose bug diagnosis, algorithm recommendation, or a hybrid sequence based on the user's actual question."
+description: "Routing workflow for deep technical analysis: choose bug diagnosis, algorithm recommendation, codebase design, architecture deepening, domain modeling, performance analysis, or a hybrid sequence based on the user's actual question."
 ---
 
 # Analysis Router
@@ -10,7 +10,7 @@ description: "Routing workflow for deep technical analysis: choose bug diagnosis
 - intent_signature:
   - `deep-analysis`, `da`, 심층 기술 분석, 원인과 접근을 같이 봐야 하는 요청
 - use_when:
-  - bug diagnosis, algorithm proposal, or hybrid technical analysis must be selected before work starts.
+  - bug diagnosis, algorithm proposal, codebase design, architecture deepening, domain modeling, performance analysis, or hybrid technical analysis must be selected before work starts.
   - the request needs a specialist workflow but not a repo-wide report artifact.
 - do_not_use_when:
   - a quick fix, pure Q&A, ordinary architecture sketch, or explicit heavy report workflow is enough.
@@ -19,7 +19,7 @@ description: "Routing workflow for deep technical analysis: choose bug diagnosis
   - current user request
   - known symptom, decision, or analysis goal
 - expected_outputs:
-  - selected mode: `bug`, `algorithm`, `hybrid`, or `out-of-scope`
+  - selected mode: `bug`, `algorithm`, `codebase_design`, `architecture_deepening`, `domain_modeling`, `performance`, `hybrid`, or `out-of-scope`
   - selected specialist skill and context boundary
 - context_targets:
   must_read:
@@ -47,6 +47,10 @@ description: "Routing workflow for deep technical analysis: choose bug diagnosis
 ## Related Skills
 - `analysis-bug`: owns reproducibility, evidence collection, root-cause selection, and bug-fix validation.
 - `analysis-algorithm`: owns constraint extraction, candidate comparison, recommendation, and validation planning.
+- `analysis-codebase-design`: owns one module/interface/seam/adapter/dependency-direction/testability design decision.
+- `analysis-architecture-deepening`: owns ranked architecture improvement and deep-module candidate discovery.
+- `analysis-domain-modeling`: owns domain concepts, entity/value-object boundaries, state transitions, invariants, and naming boundaries.
+- `analysis-performance`: owns performance symptom, metric, baseline, bottleneck, optimization option, and measurement planning.
 - `workflow-rigor`: owns execution rigor when implementation work is requested.
 - `report-qualitative`: owns formal user-facing report structure when explicitly active.
 - `analysis-codebase`: use only when the user explicitly wants a repo-wide integrated analysis/report artifact rather than point diagnosis or recommendation.
@@ -58,7 +62,7 @@ description: "Routing workflow for deep technical analysis: choose bug diagnosis
 
 ## Trigger Guard (Do Not Trigger)
 - Pure quick-patch requests where the failure and fix are already obvious.
-- Pure architecture/HLD/LLD requests where system boundaries are the main decision.
+- Pure high-level architecture/HLD/LLD sketches without a codebase design decision.
 - Information-only requests that do not need deep diagnosis or recommendation.
 - `탐색해` by itself; require explicit deep technical analysis, RCA, or approach-selection intent.
 
@@ -70,23 +74,29 @@ description: "Routing workflow for deep technical analysis: choose bug diagnosis
 ## Mode Gate
 - `bug`: the main question is why something broke, where the root cause is, or why it recurs.
 - `algorithm`: the main question is what algorithm, model, retrieval strategy, or local solution approach fits best.
+- `codebase_design`: the main question is one module boundary, interface, seam, adapter, dependency direction, or testability decision.
+- `architecture_deepening`: the main question is which architecture improvement or deep-module candidate has the best leverage.
+- `domain_modeling`: the main question is how to model concepts, entities, value objects, state transitions, invariants, business rules, or naming boundaries.
+- `performance`: the main question is latency, throughput, memory, CPU, query count, rendering cost, startup time, bundle size, or an algorithmic bottleneck.
 - `hybrid`: the task needs both diagnosis and recommendation.
 - `out-of-scope`: a lighter workflow or a different specialist skill is a better fit.
 
 ## Selection Rules
 - Choose `bug` when the core request is to diagnose, debug, explain a malfunction, or confirm a root cause.
 - Choose `algorithm` when the core request is to recommend or compare approaches.
+- Choose `codebase_design` when one code structure decision blocks implementation or refactor work.
+- Choose `architecture_deepening` when the user asks for ranked architecture improvement candidates or deep-module opportunities.
+- Choose `domain_modeling` when domain concepts, entity/value-object boundaries, lifecycle states, invariants, business rules, or names must be clarified.
+- Choose `performance` when optimization depends on a measured or evidence-backed bottleneck.
 - Choose `hybrid` when the current failure must be explained before recommending the replacement strategy.
-- Choose `out-of-scope` when a quick local fix, architecture design, or information-only answer is enough.
+- Choose `out-of-scope` when a quick local fix, pure high-level architecture sketch, validation-only task, or information-only answer is enough.
 - Do not escalate a point bug or recommendation request into `analysis-codebase` unless the user explicitly asks for a repo-wide report artifact, architecture report, or metrics report.
 
 ## Execution Order
 1. Frame the user request in one sentence.
 2. Select one mode.
 3. Use only the selected specialist skill.
-4. For `hybrid`, fixed order is:
-   1. `analysis-bug`
-   2. `analysis-algorithm`
+4. For `hybrid`, diagnose first, then run the narrow specialist that resolves the remaining decision.
 5. Pull in `workflow-rigor` only if implementation is requested.
 6. Pull in `report-qualitative` only if the user explicitly asks for a formal report.
 7. Pull in `analysis-codebase` only when the user explicitly requests a repo-wide integrated report or report artifact.
@@ -109,6 +119,10 @@ description: "Routing workflow for deep technical analysis: choose bug diagnosis
 ## Recovery and Context Expansion
 - If the request looks like a bug but lacks a symptom or repro, route to `analysis-bug` with missing inputs marked `Unverified`.
 - If the request asks for an approach but lacks constraints or success metrics, route to `analysis-algorithm`.
+- If the request asks for one structural code decision, route to `analysis-codebase-design`.
+- If the request asks for architecture candidates without a selected module, route to `analysis-architecture-deepening`.
+- If the request asks for domain concepts or terminology but lacks evidence, route to `analysis-domain-modeling` and mark inferred rules `Unverified`.
+- If the request asks for speed, memory, throughput, query, rendering, startup, bundle, or CPU improvement, route to `analysis-performance`.
 - If repo structure is unclear, read repo source outline first.
 - If the user goal is unclear, state the assumption rather than loading unrelated context.
 - If skill mismatch is detected, return to scheduling and select a more appropriate skill.

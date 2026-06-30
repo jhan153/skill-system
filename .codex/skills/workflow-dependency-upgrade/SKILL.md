@@ -83,6 +83,8 @@ description: Implementation workflow for dependency, package, runtime, framework
 - Do not commit generated lockfile churn without checking whether it matches the requested scope.
 - Do not bypass peer dependency, engine, or type errors without explaining the compatibility risk.
 - Treat package-manager lifecycle scripts, private registries, and network installs as boundary-sensitive.
+- Do not run networked package-manager commands or lifecycle-script-triggering installs unless the user or host policy has allowed network/process side effects for the current task.
+- If package install/update cannot run safely, edit only manifest-compatible changes and mark lockfile/install validation as `user_verification_needed`.
 - If migration docs are unavailable, mark the gap `Unverified` and rely on compiler/tests/runtime evidence.
 
 ## Output Contract
@@ -101,7 +103,7 @@ Return only the sections needed:
 - `analysis-performance` owns performance bottleneck diagnosis before choosing dependency changes for speed.
 - `workflow-recovery` owns repeated same-signature failures after upgrade attempts.
 - `report-critical` owns security/release verdicts and blocker reviews.
-- `workflow-validation` owns validation-only matrices for upgrade plans.
+- `workflow-validation` owns validation-only matrices for upgrade plans when installed or explicitly requested.
 
 ## Invocation Examples
 Positive:

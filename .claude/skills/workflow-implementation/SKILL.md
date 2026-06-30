@@ -1,6 +1,6 @@
 ---
 name: workflow-implementation
-description: Primary workflow for direct software implementation and refactoring. Use when the user asks Codex to build, change, refactor, add tests, wire APIs, update scripts, or make repo code/config changes from current requirements rather than from an approved plan package or repeated failure loop.
+description: Primary workflow for direct software implementation. Use when the user asks Codex to build, change, add tests, wire APIs, update scripts, or make repo code/config changes from current requirements. Do not use for behavior-preserving refactors, concrete bug fixes, approved plan execution, or repeated failure recovery.
 ---
 
 # Workflow Implementation
@@ -10,11 +10,9 @@ description: Primary workflow for direct software implementation and refactoring
 - intent_signature:
   - direct implementation
   - code change
-  - refactor
   - add tests
   - implement feature
   - 구현
-  - 리팩터링
 - use_when:
   - the user asks for a concrete code, test, script, API, config, or build change.
   - requirements are sufficient for a current-turn implementation slice.
@@ -22,6 +20,7 @@ description: Primary workflow for direct software implementation and refactoring
 - do_not_use_when:
   - the user asks to execute an approved plan/spec/package; use `workflow-plan-runner`.
   - the user asks to fix a concrete failure or failing test; use `workflow-bug-fix`.
+  - the user asks for behavior-preserving rename, move, extract, collapse, simplify, or restructure work; use `workflow-refactor-safely`.
   - the same failure has repeated after an attempted fix; use `workflow-recovery`.
   - the request is pure analysis, planning, review, validation-only, or report generation.
 - expected_inputs:
@@ -62,11 +61,12 @@ description: Primary workflow for direct software implementation and refactoring
 - Attach analysis, minimality, rigor, validation, or recovery only when their narrower trigger is present.
 
 ## Activation
-- Primary for direct "implement", "add", "refactor", "wire", "update tests", or "change this behavior" requests.
+- Primary for direct "implement", "add", "wire", "update tests", or "change this behavior" requests.
 - Attach `workflow-minimal-implementation` when abstraction, dependency, file-count, or boilerplate pressure appears.
 - Attach `workflow-rigor` for medium/high-risk changes.
-- Attach `workflow-validation` when check selection is the narrow concern.
+- Attach `workflow-validation` when installed or when the user explicitly asks for a validation matrix; otherwise use the local Validation Rules and mark deeper validation as `user_verification_needed`.
 - Use `workflow-bug-fix` instead when the task starts from a failing behavior that must be fixed.
+- Use `workflow-refactor-safely` instead when the task is behavior-preserving restructuring.
 
 ## Workflow
 1. Define the requested behavior and observable success condition.
@@ -107,16 +107,17 @@ Return only the sections needed:
 - `analysis-codebase-design` owns module-boundary and deep-module design judgment before or after implementation.
 - `workflow-minimal-implementation` owns YAGNI pressure; it does not replace implementation ownership.
 - `workflow-rigor` owns evidence depth and completion discipline for risky changes.
-- `workflow-validation` owns validation-only work and check matrices.
+- `workflow-validation` owns validation-only work and check matrices when installed or explicitly requested.
 - `design-frontend` owns concrete visual UI implementation when the visual/design surface is primary.
 
 ## Invocation Examples
 Positive:
 - "이 API 필드 추가하고 테스트도 맞춰줘."
-- "이 모듈을 기존 패턴대로 리팩터링해줘."
+- "이 API 라우트를 기존 패턴대로 구현해줘."
 - "스크립트 옵션 하나 추가하고 검증까지 해줘."
 
 Negative:
 - "이 버그 원인만 분석해줘." -> `analysis-bug`
+- "이 모듈을 동작 보존하면서 리팩터링해줘." -> `workflow-refactor-safely`
 - "같은 테스트가 또 실패해. fake fix 말고 격리하자." -> `workflow-recovery`
 - "이 승인된 plan package Phase 2를 실행해." -> `workflow-plan-runner`
