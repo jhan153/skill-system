@@ -1,0 +1,9 @@
+interface:
+  display_name: "Analysis Domain Modeling"
+  short_description: "Clarify domain concepts, invariants, states, and names"
+  default_prompt: "Use $analysis-domain-modeling to clarify domain concepts, entities, value objects, invariants, state transitions, terminology, API/data model names, and model boundaries before code changes. Return the model and handoff without editing glossary, ADR, memory, or docs unless explicitly requested."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true

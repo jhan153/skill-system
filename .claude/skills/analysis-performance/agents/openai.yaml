@@ -1,0 +1,9 @@
+interface:
+  display_name: "Analysis Performance"
+  short_description: "Diagnose latency, memory, CPU, query, rendering, and throughput bottlenecks"
+  default_prompt: "Use $analysis-performance to diagnose performance issues with a baseline, hot path, bottleneck hypotheses, primary bottleneck, optimization options, and validation plan before recommending or applying optimizations."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true

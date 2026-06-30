@@ -4,9 +4,17 @@ version: "9.0.0"
 description: 'Skill System dev — analysis, implementation, refactoring, codebase understanding, failure recovery for the engineering role.'
 skills:
   - analysis-algorithm
+  - analysis-architecture-deepening
   - analysis-bug
   - analysis-codebase
+  - analysis-codebase-design
+  - analysis-domain-modeling
+  - analysis-performance
   - analysis-router
   - report-diff
+  - workflow-bug-fix
+  - workflow-dependency-upgrade
+  - workflow-implementation
   - workflow-minimal-implementation
   - workflow-recovery
+  - workflow-refactor-safely

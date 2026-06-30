@@ -456,13 +456,13 @@ cases:
     friction_risk: "routing a direct rule save to ingestion"
   - case_id: neg-grp-004
     user_request: "이 기능 좀 구현해줘."
-    expected_primary_skill: null
+    expected_primary_skill: workflow-implementation
     expected_supporting_skills: []
     should_not_trigger: [workflow-plan-runner]
-    expected_family: none
+    expected_family: workflow
     expected_context: [task intent, target files]
-    expected_output_shape: "task-specific implementation; not plan-execution orchestration"
-    quality_notes: "Implementation without an approved plan/spec/package pointer routes to a task-specific primary, not workflow-plan-runner (F3)."
+    expected_output_shape: "direct implementation workflow; not plan-execution orchestration"
+    quality_notes: "Implementation without an approved plan/spec/package pointer routes to workflow-implementation, not workflow-plan-runner (F3)."
     friction_risk: "workflow-plan-runner over-trigger on ordinary 구현 requests"
   - case_id: neg-grp-005
     user_request: "이 테스트가 처음 실패했어. 원인 좀 봐줘."

@@ -1,0 +1,17 @@
+interface:
+  display_name: "Workflow Dependency Upgrade"
+  short_description: "Upgrade dependencies, lockfiles, runtimes, and compatibility fixes"
+  default_prompt: "Use $workflow-dependency-upgrade to update dependency, package, runtime, framework, SDK, or lockfile versions with bounded scope, required migration fixes, lockfile review, validation, and rollback/fallback notes."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: cross_horizon
+  role: dependency_upgrade_owner
+
+execution_mode:
+  kind: dependency_upgrade_execution
+  owns_execution: true

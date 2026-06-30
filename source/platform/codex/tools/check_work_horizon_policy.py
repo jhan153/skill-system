@@ -20,6 +20,10 @@ EXPECTED: dict[str, dict[str, str]] = {
     "plan-short-term-docs": {"work_horizon": "short_plan", "planning_altitude": "tactical_design"},
     "plan-loop-term": {"work_horizon": "loop_overlay", "planning_altitude": "loop_contract"},
     "plan-spec-curator": {"work_horizon": "cross_horizon", "planning_altitude": "lifecycle_curation"},
+    "workflow-implementation": {"work_horizon": "cross_horizon", "execution_mode": "implementation_execution"},
+    "workflow-bug-fix": {"work_horizon": "cross_horizon", "execution_mode": "bug_fix_execution"},
+    "workflow-dependency-upgrade": {"work_horizon": "cross_horizon", "execution_mode": "dependency_upgrade_execution"},
+    "workflow-refactor-safely": {"work_horizon": "cross_horizon", "execution_mode": "safe_refactor_execution"},
     "workflow-plan-runner": {"work_horizon": "cross_horizon", "execution_mode": "plan_batch_execution"},
     "workflow-loop-runner": {"work_horizon": "loop_overlay", "execution_mode": "loop_convergence_execution"},
     "workflow-task-ledger": {"work_horizon": "task_ticket", "execution_mode": "checkpoint_ledger"},
@@ -32,6 +36,10 @@ EXPECTED: dict[str, dict[str, str]] = {
 VALID_HORIZONS = {"task_ticket", "short_plan", "long_plan", "loop_overlay", "cross_horizon"}
 VALID_ALTITUDES = {"strategic_package", "tactical_design", "loop_contract", "lifecycle_curation"}
 VALID_EXECUTION_MODES = {
+    "implementation_execution",
+    "bug_fix_execution",
+    "dependency_upgrade_execution",
+    "safe_refactor_execution",
     "plan_batch_execution",
     "loop_convergence_execution",
     "checkpoint_ledger",

@@ -43,6 +43,10 @@ Workflow skills are separated by how they control execution:
 
 | execution_mode | owner | role |
 | --- | --- | --- |
+| `implementation_execution` | `workflow-implementation` | own direct coding and refactoring from requirement to validated diff |
+| `bug_fix_execution` | `workflow-bug-fix` | own concrete failure repair from failure signal to verified fix |
+| `dependency_upgrade_execution` | `workflow-dependency-upgrade` | own dependency/runtime/package upgrades and compatibility validation |
+| `safe_refactor_execution` | `workflow-refactor-safely` | own behavior-preserving refactors with characterization checks |
 | `plan_batch_execution` | `workflow-plan-runner` | execute an approved plan/spec/package in batches |
 | `loop_convergence_execution` | `workflow-loop-runner` | run an accepted loop contract through verifier feedback |
 | `checkpoint_ledger` | `workflow-task-ledger` | preserve task/ticket steps, findings, and evidence |
@@ -56,6 +60,10 @@ Workflow skills are separated by how they control execution:
 | user intent | route |
 | --- | --- |
 | "작은 오타 하나만 고쳐" | direct one-shot execution; no ledger or plan |
+| "이 기능 구현해줘" | `workflow-implementation`; attach rigor/minimality/validation only when triggered |
+| "이 failing test 고쳐줘" | `workflow-bug-fix`; escalate to `workflow-recovery` if the same signature repeats |
+| "React 버전 올리고 깨지는 call site까지 고쳐줘" | `workflow-dependency-upgrade` |
+| "동작 보존하면서 모듈을 나눠줘" | `workflow-refactor-safely` |
 | "다음 세션에도 이어갈 수 있게 상태를 남겨" | task-specific primary plus `workflow-task-ledger` |
 | "이 작업을 플랜 문서로 만들어" | `plan-short-term-docs` |
 | "이 migration을 phase package로 나눠" | `plan-long-term-package` |

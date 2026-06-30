@@ -316,3 +316,75 @@ cases:
     expected_output_shape: "persisted tactical design plan for the current execution horizon"
     quality_notes: "Short plan owns a tactical plan artifact, not task/ticket state or execution."
     friction_risk: "confusing short-plan artifact creation with plan execution or task ledger state"
+  - case_id: runtime-037
+    user_request: "이 API 필드 추가하고 기존 패턴대로 테스트까지 맞춰서 구현해줘."
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [workflow-plan-runner, analysis-codebase, research-router]
+    expected_context: [repo instructions, target source files, local patterns, validation command]
+    expected_output_shape: "scoped implementation, changed artifacts, focused validation, user-verification gaps"
+    quality_notes: "Direct coding work now has an implementation owner; it is not plan execution or repo-wide analysis."
+    friction_risk: "leaving ordinary implementation as an unowned task-specific gap"
+  - case_id: runtime-038
+    user_request: "이 failing test 원인 확인해서 코드 고치고 원래 실패가 사라졌는지 검증해줘."
+    expected_primary_skill: workflow-bug-fix
+    expected_supporting_skills: [analysis-bug]
+    should_not_trigger: [workflow-recovery, workflow-plan-runner, analysis-codebase]
+    expected_context: [failure signal, expected behavior, implicated source and test, validation output]
+    expected_output_shape: "failure signal, active diagnosis, targeted fix, original-signal verification, regression coverage note"
+    quality_notes: "First fix pass is workflow-bug-fix; recovery is only after repeated same-signature failure."
+    friction_risk: "routing concrete bug fixing to diagnosis-only RCA or repeated-failure recovery too early"
+  - case_id: runtime-039
+    user_request: "이 코드베이스에서 deep module 후보를 3개만 찾아서 다음에 뭘 고칠지 랭킹해줘."
+    expected_primary_skill: analysis-architecture-deepening
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-codebase, workflow-implementation, workflow-bug-fix]
+    expected_context: [scoped source tree, representative call sites, tests, architecture friction signals]
+    expected_output_shape: "scanned scope, friction signals, ranked deepening candidates, recommended next candidate"
+    quality_notes: "Deepening candidate discovery is lighter than repo-wide codebase reporting and does not implement before selection."
+    friction_risk: "turning architecture exploration into a heavy report or premature rewrite"
+  - case_id: runtime-040
+    user_request: "이 모듈을 deep module로 만들 interface와 seam을 설계해줘. 구현은 아직 하지 마."
+    expected_primary_skill: analysis-codebase-design
+    expected_supporting_skills: [workflow-minimal-implementation]
+    should_not_trigger: [analysis-codebase, workflow-implementation, workflow-plan-runner]
+    expected_context: [design pressure, target module, callers, tests, local patterns]
+    expected_output_shape: "current boundary, candidate moves, abstraction gate, recommended design, implementation handoff"
+    quality_notes: "One selected boundary decision belongs to codebase-design analysis, with minimality pressure against speculative layers."
+    friction_risk: "adding shallow abstractions or implementing before the design is selected"
+  - case_id: runtime-041
+    user_request: "주문 상태 모델에서 entity/value object/state transition/invariant를 정리하고 코드에 반영할 이름을 제안해줘."
+    expected_primary_skill: analysis-domain-modeling
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-codebase-design, workflow-implementation, memory-bank-update]
+    expected_context: [domain area, current terminology, source schemas or tests, existing docs if referenced]
+    expected_output_shape: "domain area, current language, concept model, invariants, state transitions, naming decisions, implementation handoff"
+    quality_notes: "Domain modeling is analysis-first and must not silently mutate docs, memory, or code."
+    friction_risk: "confusing domain language modeling with module-boundary design or persistent memory mutation"
+  - case_id: runtime-042
+    user_request: "이 API latency가 왜 늘었는지 baseline과 hot path 중심으로 병목을 찾아줘. 아직 최적화 코드는 쓰지 마."
+    expected_primary_skill: analysis-performance
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-implementation, analysis-bug, analysis-codebase]
+    expected_context: [performance symptom, metric, workload, baseline or profile gap, relevant hot path]
+    expected_output_shape: "performance target, baseline evidence, hot path, bottleneck hypotheses, primary bottleneck, validation plan"
+    quality_notes: "Performance work starts from measurement and bottleneck selection, not guessed optimization patches."
+    friction_risk: "premature optimization without baseline evidence"
+  - case_id: runtime-043
+    user_request: "이 SDK를 minor 최신으로 올리고 lockfile, 깨지는 call site, 검증까지 처리해줘."
+    expected_primary_skill: workflow-dependency-upgrade
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [workflow-implementation, analysis-algorithm, report-critical]
+    expected_context: [manifest, lockfile, target dependency, usage sites, validation command]
+    expected_output_shape: "upgrade scope, manifest and lockfile changes, migration fixes, validation, lockfile review, rollback or fallback"
+    quality_notes: "Dependency upgrade owns package/runtime version changes and compatibility fixes, not generic implementation."
+    friction_risk: "unbounded package churn or missing lockfile review"
+  - case_id: runtime-044
+    user_request: "이 서비스를 동작 보존하면서 파일을 나누고 이름을 정리해줘. 기능 변화는 없어야 해."
+    expected_primary_skill: workflow-refactor-safely
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [workflow-implementation, workflow-bug-fix, analysis-codebase]
+    expected_context: [behavior contract, target files and callers, tests or smoke command, local patterns]
+    expected_output_shape: "behavior contract, refactor scope, batch plan, changed artifacts, validation, behavior preservation evidence"
+    quality_notes: "Safe refactor owns behavior-preserving restructuring and must separate it from feature or bug-fix changes."
+    friction_risk: "mixing behavior changes into refactor work or validating only by inspection"
