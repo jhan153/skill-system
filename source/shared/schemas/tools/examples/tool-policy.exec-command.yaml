@@ -1,0 +1,19 @@
+tool_policy:
+  tool_id: functions.exec_command
+  capabilities:
+    - process
+    - filesystem_write
+  invocation_scope:
+    default_sandbox: workspace-write
+    requires_escalation_for:
+      - network
+      - destructive
+      - host_gui
+  decision:
+    default: ask
+  execution:
+    timeout_ms: 30000
+    output_limit: bounded
+  postconditions:
+    record_exit_code: true
+    report_validation_state: true

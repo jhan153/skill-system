@@ -1,0 +1,17 @@
+interface:
+  display_name: "Workflow Recovery"
+  short_description: "Break repeated implementation or validation failure loops"
+  default_prompt: "Use $workflow-recovery when the same failure signature repeats after at least one attempted fix/rerun, or when the user explicitly asks to stop fake fixes. Freeze the loop, choose one hypothesis, run one diagnostic or apply one targeted fix, revalidate, and report rollback_or_fallback without weakening tests or logs."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: cross_horizon
+  role: recovery_intervention_owner
+
+execution_mode:
+  kind: recovery_intervention
+  may_take_over_on_repeated_failure: true

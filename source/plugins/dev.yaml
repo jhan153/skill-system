@@ -1,0 +1,12 @@
+# source/plugins/dev.yaml — plugin membership manifest (hand-authored input).
+name: skill-system-dev
+version: "9.0.0"
+description: 'Skill System dev — analysis, implementation, refactoring, codebase understanding, failure recovery for the engineering role.'
+skills:
+  - analysis-algorithm
+  - analysis-bug
+  - analysis-codebase
+  - analysis-router
+  - report-diff
+  - workflow-minimal-implementation
+  - workflow-recovery

@@ -1,0 +1,103 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import os, subprocess, sys; from pathlib import Path; raw = sys.stdin.read(); roots = []; explicit = os.environ.get('SKILL_SYSTEM_ROOT'); codex_home = os.environ.get('CODEX_HOME'); home = os.environ.get('HOME'); roots.extend([('project', Path(explicit).expanduser())] if explicit else []); roots.extend([('home', Path(codex_home).expanduser())] if codex_home else []); roots.extend([('home', Path(home).expanduser() / '.codex')] if home else []); paths = []; [paths.append((root.resolve() / '.codex/hooks/codex_hook_adapter.py') if kind == 'project' else (root.resolve() / 'hooks/codex_hook_adapter.py')) for kind, root in roots]; adapter = next((a for a in paths if a.is_file()), None); print('SKIP: Skill-System hook adapter not found in trusted project/home roots.', file=sys.stderr) if adapter is None else None; sys.exit(0 if adapter is None else subprocess.run([sys.executable, str(adapter)], input=raw, text=True).returncode)\"",
+            "timeout": 30,
+            "statusMessage": "Recording request receipt"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import os, subprocess, sys; from pathlib import Path; raw = sys.stdin.read(); roots = []; explicit = os.environ.get('SKILL_SYSTEM_ROOT'); codex_home = os.environ.get('CODEX_HOME'); home = os.environ.get('HOME'); roots.extend([('project', Path(explicit).expanduser())] if explicit else []); roots.extend([('home', Path(codex_home).expanduser())] if codex_home else []); roots.extend([('home', Path(home).expanduser() / '.codex')] if home else []); paths = []; [paths.append((root.resolve() / '.codex/hooks/codex_hook_adapter.py') if kind == 'project' else (root.resolve() / 'hooks/codex_hook_adapter.py')) for kind, root in roots]; adapter = next((a for a in paths if a.is_file()), None); print('SKIP: Skill-System hook adapter not found in trusted project/home roots.', file=sys.stderr) if adapter is None else None; sys.exit(0 if adapter is None else subprocess.run([sys.executable, str(adapter)], input=raw, text=True).returncode)\"",
+            "timeout": 30,
+            "statusMessage": "Recording context load"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import os, subprocess, sys; from pathlib import Path; raw = sys.stdin.read(); roots = []; explicit = os.environ.get('SKILL_SYSTEM_ROOT'); codex_home = os.environ.get('CODEX_HOME'); home = os.environ.get('HOME'); roots.extend([('project', Path(explicit).expanduser())] if explicit else []); roots.extend([('home', Path(codex_home).expanduser())] if codex_home else []); roots.extend([('home', Path(home).expanduser() / '.codex')] if home else []); paths = []; [paths.append((root.resolve() / '.codex/hooks/codex_hook_adapter.py') if kind == 'project' else (root.resolve() / 'hooks/codex_hook_adapter.py')) for kind, root in roots]; adapter = next((a for a in paths if a.is_file()), None); print('SKIP: Skill-System hook adapter not found in trusted project/home roots.', file=sys.stderr) if adapter is None else None; sys.exit(0 if adapter is None else subprocess.run([sys.executable, str(adapter)], input=raw, text=True).returncode)\"",
+            "timeout": 30,
+            "statusMessage": "Recording tool preflight"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import os, subprocess, sys; from pathlib import Path; raw = sys.stdin.read(); roots = []; explicit = os.environ.get('SKILL_SYSTEM_ROOT'); codex_home = os.environ.get('CODEX_HOME'); home = os.environ.get('HOME'); roots.extend([('project', Path(explicit).expanduser())] if explicit else []); roots.extend([('home', Path(codex_home).expanduser())] if codex_home else []); roots.extend([('home', Path(home).expanduser() / '.codex')] if home else []); paths = []; [paths.append((root.resolve() / '.codex/hooks/codex_hook_adapter.py') if kind == 'project' else (root.resolve() / 'hooks/codex_hook_adapter.py')) for kind, root in roots]; adapter = next((a for a in paths if a.is_file()), None); print('SKIP: Skill-System hook adapter not found in trusted project/home roots.', file=sys.stderr) if adapter is None else None; sys.exit(0 if adapter is None else subprocess.run([sys.executable, str(adapter)], input=raw, text=True).returncode)\"",
+            "timeout": 30,
+            "statusMessage": "Recording permission boundary"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|apply_patch|Edit|Write|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import os, subprocess, sys; from pathlib import Path; raw = sys.stdin.read(); roots = []; explicit = os.environ.get('SKILL_SYSTEM_ROOT'); codex_home = os.environ.get('CODEX_HOME'); home = os.environ.get('HOME'); roots.extend([('project', Path(explicit).expanduser())] if explicit else []); roots.extend([('home', Path(codex_home).expanduser())] if codex_home else []); roots.extend([('home', Path(home).expanduser() / '.codex')] if home else []); paths = []; [paths.append((root.resolve() / '.codex/hooks/codex_hook_adapter.py') if kind == 'project' else (root.resolve() / 'hooks/codex_hook_adapter.py')) for kind, root in roots]; adapter = next((a for a in paths if a.is_file()), None); print('SKIP: Skill-System hook adapter not found in trusted project/home roots.', file=sys.stderr) if adapter is None else None; sys.exit(0 if adapter is None else subprocess.run([sys.executable, str(adapter)], input=raw, text=True).returncode)\"",
+            "timeout": 30,
+            "statusMessage": "Recording tool result"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import os, subprocess, sys; from pathlib import Path; raw = sys.stdin.read(); roots = []; explicit = os.environ.get('SKILL_SYSTEM_ROOT'); codex_home = os.environ.get('CODEX_HOME'); home = os.environ.get('HOME'); roots.extend([('project', Path(explicit).expanduser())] if explicit else []); roots.extend([('home', Path(codex_home).expanduser())] if codex_home else []); roots.extend([('home', Path(home).expanduser() / '.codex')] if home else []); paths = []; [paths.append((root.resolve() / '.codex/hooks/codex_hook_adapter.py') if kind == 'project' else (root.resolve() / 'hooks/codex_hook_adapter.py')) for kind, root in roots]; adapter = next((a for a in paths if a.is_file()), None); print('SKIP: Skill-System hook adapter not found in trusted project/home roots.', file=sys.stderr) if adapter is None else None; sys.exit(0 if adapter is None else subprocess.run([sys.executable, str(adapter)], input=raw, text=True).returncode)\"",
+            "timeout": 30,
+            "statusMessage": "Checking agent output evidence"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import os, subprocess, sys; from pathlib import Path; raw = sys.stdin.read(); roots = []; explicit = os.environ.get('SKILL_SYSTEM_ROOT'); codex_home = os.environ.get('CODEX_HOME'); home = os.environ.get('HOME'); roots.extend([('project', Path(explicit).expanduser())] if explicit else []); roots.extend([('home', Path(codex_home).expanduser())] if codex_home else []); roots.extend([('home', Path(home).expanduser() / '.codex')] if home else []); paths = []; [paths.append((root.resolve() / '.codex/hooks/codex_hook_adapter.py') if kind == 'project' else (root.resolve() / 'hooks/codex_hook_adapter.py')) for kind, root in roots]; adapter = next((a for a in paths if a.is_file()), None); print('SKIP: Skill-System hook adapter not found in trusted project/home roots.', file=sys.stderr) if adapter is None else None; sys.exit(0 if adapter is None else subprocess.run([sys.executable, str(adapter)], input=raw, text=True).returncode)\"",
+            "timeout": 30,
+            "statusMessage": "Recording context compaction start"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import os, subprocess, sys; from pathlib import Path; raw = sys.stdin.read(); roots = []; explicit = os.environ.get('SKILL_SYSTEM_ROOT'); codex_home = os.environ.get('CODEX_HOME'); home = os.environ.get('HOME'); roots.extend([('project', Path(explicit).expanduser())] if explicit else []); roots.extend([('home', Path(codex_home).expanduser())] if codex_home else []); roots.extend([('home', Path(home).expanduser() / '.codex')] if home else []); paths = []; [paths.append((root.resolve() / '.codex/hooks/codex_hook_adapter.py') if kind == 'project' else (root.resolve() / 'hooks/codex_hook_adapter.py')) for kind, root in roots]; adapter = next((a for a in paths if a.is_file()), None); print('SKIP: Skill-System hook adapter not found in trusted project/home roots.', file=sys.stderr) if adapter is None else None; sys.exit(0 if adapter is None else subprocess.run([sys.executable, str(adapter)], input=raw, text=True).returncode)\"",
+            "timeout": 30,
+            "statusMessage": "Recording context compaction end"
+          }
+        ]
+      }
+    ]
+  }
+}

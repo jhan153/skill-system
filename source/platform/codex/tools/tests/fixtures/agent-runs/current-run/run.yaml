@@ -1,0 +1,52 @@
+schema_version: 2
+run_id: AR-20260621-004
+bundle_version: "8.0.2"
+task:
+  user_request_summary: "Validate the current session/turn agent output observation."
+  result_label: agent-verified
+routing:
+  primary_skill: workflow-rigor
+  modifiers: []
+  review_gate: null
+  output_modifier: null
+  memory_operation: null
+  knowledge_context_mode: optional
+context:
+  context_pack_id: CP-20260621-001
+  context_pack_ref: context/context-pack.yaml
+  context_pack_hash: b5496036d1937c9efdf4890d86cdfa596bc3f052b3868f3ab9943d93525646b6
+  admitted_claim_ids:
+    - KC-20260621-001
+  source_snapshot_refs:
+    - SRC-20260621-001
+assistant_message:
+  sha256: 2879baba9047b6ca25f17e99e484569061d1de3fdacb8607b026852fad05ffa3
+  result_label: agent-verified
+  claim_ids:
+    - C-001
+outputs:
+  final_report: final-report.md
+  artifact_refs:
+    - artifacts/verification.txt
+  claims:
+    - claim_id: C-001
+      text: "current session/turn agent output validation passed"
+      claim_class: execution_result
+      support:
+        type: command_exit
+        command: "python3 .codex/tools/verify_bundle.py --profile agent-output --format text"
+        exit_code: 0
+        evidence_ref: artifacts/verification.txt
+      context_support:
+        claim_ids:
+          - KC-20260621-001
+        relation_path_ids: []
+      source_support:
+        source_refs:
+          - SRC-20260621-001
+validations:
+  - type: command_exit
+    command: "python3 .codex/tools/verify_bundle.py --profile agent-output --format text"
+    exit_code: 0
+    evidence_ref: artifacts/verification.txt
+hook_events: hook-events.jsonl

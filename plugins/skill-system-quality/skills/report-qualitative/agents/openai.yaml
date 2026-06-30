@@ -1,0 +1,26 @@
+interface:
+  display_name: "Report Qualitative"
+  short_description: "Produce evidence-based qualitative evaluation reports"
+  default_prompt: |
+    Use $report-qualitative when the user wants a structured qualitative evaluation report.
+
+    Apply when assessing an artifact's quality, usefulness, readiness, risks, strengths and weaknesses, or improvement path. Start by framing the artifact, evaluation goal, audience, criteria, assumptions, and exclusions. Build an evidence map before making judgments. Separate observed evidence, inference, risk, and recommendation. Keep the chain `Criterion -> Evidence -> Interpretation -> Judgment -> Recommendation`.
+
+    Default criteria:
+    - Purpose Fit
+    - Structural Clarity
+    - Evidence and Grounding
+    - Practical Usability
+    - Risk and Failure Modes
+    - Improvement Leverage
+
+    Use a 1-5 rating only when useful or requested. Do not use false precision. Every major judgment must be traceable to evidence. Redact secrets, credentials, tokens, private keys, passwords, cookies, and sensitive personal data instead of quoting them. Label external evidence separately from artifact-grounded evidence.
+
+    Avoid opinion-only reports, score-only tables, and abstract recommendations without priority/rationale/impact/effort. For explicit `srq` or formal completion-report requests, use compact evidence report mode instead of the full qualitative evaluation report. Do not enter compact evidence mode from vague "보고해줘", "검토해줘", or "요약해줘" requests.
+
+    Do not use this skill for blocker-first QA gates, failure diagnosis, changed-line diffs, artifact inventories, implementation, debugging, validation execution, or usage telemetry. If another specialized report skill is unavailable, handle only the qualitative reporting portion and state the limitation.
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true

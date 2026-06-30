@@ -1,0 +1,21 @@
+interface:
+  display_name: "Workflow Task Ledger"
+  short_description: "Resume-safe checkpoint/findings ledger for multi-turn tasks (not a LoopRun)"
+  default_prompt: "Use $workflow-task-ledger when a task spans turns/sessions with dependent steps and accepted findings that must not be lost, but does not need LoopRun verifier-feedback convergence. Track steps and findings with observed evidence_refs and gate completion on open findings."
+
+policy:
+  invocation_surface: support_only
+  allow_implicit_invocation: false
+  may_own_execution: false
+
+work_horizon:
+  level: task_ticket
+  role: primary_state_owner
+  above: one_shot
+  below: short_plan
+  typical_turns: "3-5"
+
+execution_mode:
+  kind: checkpoint_ledger
+  owns_execution: false
+  owns_state: true

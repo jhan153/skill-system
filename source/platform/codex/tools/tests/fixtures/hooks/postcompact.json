@@ -1,0 +1,7 @@
+{
+  "hook_event_name": "PostCompact",
+  "session_id": "session-test",
+  "turn_id": "turn-test",
+  "cwd": "/Users/master/repo/software/Skill-System",
+  "permission_mode": "workspace-write"
+}

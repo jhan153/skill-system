@@ -1,0 +1,66 @@
+{
+  "scheduling": {
+    "goal": "Convert concrete visual design artifacts into production UI source changes in the current repository.",
+    "intent_signatures": [
+      "Figma-to-code",
+      "screenshot-to-code",
+      "mockup-to-code",
+      "design spec to implementation",
+      "AI-generated UI design doc to production frontend/native UI"
+    ],
+    "expected_inputs": [
+      "design artifact or UI reference",
+      "current repository",
+      "target surface or platform constraint when provided"
+    ],
+    "expected_outputs": [
+      "integrated source code changes",
+      "rendered route/screen/component/story/native view",
+      "validation evidence",
+      "completion status and fidelity gaps"
+    ],
+    "dependencies": [
+      "repository inspection",
+      "design artifact access",
+      "existing component/token/styling system",
+      "available preview/test/screenshot tools"
+    ]
+  },
+  "resource_scopes": [
+    "CODEBASE: read and write project source files",
+    "LOCAL_FS: read/write assets and screenshots",
+    "NETWORK: optional Figma/design-tool access when available",
+    "PROCESS: run local preview/build/test commands",
+    "CREDENTIALS: must not read, request, expose, or commit secrets"
+  ],
+  "control_flow_features": {
+    "has_branch": true,
+    "has_loop": true,
+    "has_tool_call": true,
+    "touches_sensitive_resources": false,
+    "writes_codebase": true,
+    "uses_external_design_context": true,
+    "runs_local_processes": true,
+    "captures_visual_evidence": true
+  },
+  "structural": {
+    "scenes": [
+      "PREPARE: inspect repository and target surface",
+      "ACQUIRE: read design artifact and assets",
+      "REASON: extract design contract and source priority",
+      "ACT: implement smallest complete slice",
+      "VERIFY: run preview/checks and capture visual evidence",
+      "RECOVER: fix mismatches or report blocked gaps",
+      "FINALIZE: report status, validation, and assumptions"
+    ]
+  },
+  "logical_resource_evidence": [
+    "READ design artifact",
+    "READ repository",
+    "WRITE codebase",
+    "CALL preview/test tools",
+    "CAPTURE screenshots when available",
+    "COMPARE visual result",
+    "REPORT completion status"
+  ]
+}

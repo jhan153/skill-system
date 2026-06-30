@@ -1,0 +1,430 @@
+version: "7.3.1"
+purpose: "Positive routing examples for common requests."
+cases:
+  - case_id: route-001
+    schema_version: 2
+    user_request: "analysis-bug로 이 장애를 분석해줘."
+    expected_primary_skill: analysis-bug
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-codebase]
+    expected_context: [symptom, repro, logs]
+    expected_output_shape: "root cause analysis"
+    quality_notes: "Explicit skill invocation wins."
+    friction_risk: "missing repro"
+    expected_behaviors:
+      - route_to_analysis_bug
+    forbidden_behaviors:
+      - route_to_analysis_codebase
+    required_evidence:
+      - type: route_match
+        expected: analysis-bug
+  - case_id: route-002
+    schema_version: 2
+    user_request: "srq로 검증 결과를 보고해줘."
+    expected_primary_skill: report-qualitative
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-rigor]
+    expected_context: [verified work, command outputs]
+    expected_output_shape: "compact evidence-first report"
+    quality_notes: "Legacy srq uses report-qualitative compact evidence report mode."
+    friction_risk: "too verbose for simple work"
+    expected_behaviors:
+      - compact_evidence_first_report
+    forbidden_behaviors:
+      - route_to_workflow_rigor
+    required_evidence:
+      - type: command_exit
+        expected: 0
+  - case_id: route-report-qualitative-001
+    schema_version: 2
+    user_request: "이 SKILL.md 초안을 실사용성, 근거성, 리스크, 개선 우선순위 관점에서 정성평가 리포트로 작성해줘."
+    expected_primary_skill: report-qualitative
+    expected_supporting_skills: []
+    should_not_trigger: [report-critical, report-diff, evaluation-harness]
+    expected_family: report
+    expected_context: [artifact, evaluation_goal, criteria, evidence_anchors]
+    expected_output_shape: "qualitative evaluation report"
+    quality_notes: "Qualitative report intent routes to report-qualitative, not critical QA verdicting or eval-case review."
+    friction_risk: "turning ordinary assessment into blocker-first critique"
+    expected_behaviors:
+      - route_to_report_qualitative
+    forbidden_behaviors:
+      - route_to_report_critical
+    required_evidence:
+      - type: route_match
+        expected: report-qualitative
+  - case_id: route-report-qualitative-002
+    schema_version: 2
+    user_request: "이 diff를 품질, 리스크, 개선안 중심으로 정성평가해줘."
+    expected_primary_skill: report-qualitative
+    expected_supporting_skills: []
+    should_not_trigger: [report-diff, report-critical]
+    expected_family: report
+    expected_context: [diff_or_change_snapshot, evaluation_goal, risk_criteria, evidence_anchors]
+    expected_output_shape: "qualitative diff evaluation without changed-line diff blocks"
+    quality_notes: "A diff can be the evaluated artifact; changed-line presentation still belongs to report-diff unless explicitly requested."
+    friction_risk: "confusing qualitative judgment with readable diff output"
+    expected_behaviors:
+      - evaluate_diff_qualitatively
+    forbidden_behaviors:
+      - emit_changed_line_diff_only
+    required_evidence:
+      - type: route_match
+        expected: report-qualitative
+  - case_id: route-003
+    schema_version: 2
+    user_request: "새 custom Codex skill pack 만들어줘."
+    expected_primary_skill: create-skill-pack
+    expected_supporting_skills: []
+    should_not_trigger: [research-router]
+    expected_context: [skill name, use case, target directory]
+    expected_output_shape: "skill files and routing metadata"
+    quality_notes: "Skill lifecycle work."
+    friction_risk: "touching .system skills"
+    expected_behaviors:
+      - scaffold_skill_pack
+    forbidden_behaviors:
+      - mutate_system_skills
+    required_evidence:
+      - type: route_match
+        expected: create-skill-pack
+  - case_id: route-004
+    schema_version: 2
+    user_request: "논문 관련 evidence search 해줘."
+    expected_primary_skill: search-router
+    expected_supporting_skills: [research-router]
+    should_not_trigger: [research-manuscript-writing]
+    expected_context: [topic, source constraints, date range]
+    expected_output_shape: "evidence ledger"
+    quality_notes: "Search before synthesis."
+    friction_risk: "unsupported citations"
+    expected_behaviors:
+      - create_evidence_ledger
+    forbidden_behaviors:
+      - write_manuscript_without_search
+    required_evidence:
+      - type: route_match
+        expected: search-router
+  - case_id: route-005
+    schema_version: 2
+    user_request: "Figma spec을 Next.js 화면으로 구현해줘."
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: []
+    should_not_trigger: [design-tokens]
+    expected_context: [design spec, repo stack]
+    expected_output_shape: "implemented route/component"
+    quality_notes: "Concrete implementation."
+    friction_risk: "standalone demo instead of repo integration"
+    expected_behaviors:
+      - implement_in_repo_frontend
+    forbidden_behaviors:
+      - create_standalone_demo_only
+    required_evidence:
+      - type: route_match
+        expected: design-frontend
+  - case_id: route-006
+    schema_version: 2
+    user_request: "memory bank 상태를 점검해줘."
+    expected_primary_skill: memory-bank-maintenance
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update]
+    expected_context: [memory files]
+    expected_output_shape: "state inspection"
+    quality_notes: "Inspect does not imply update."
+    friction_risk: "unrequested mutation"
+    expected_behaviors:
+      - inspect_memory_state
+    forbidden_behaviors:
+      - update_memory_without_request
+    required_evidence:
+      - type: route_match
+        expected: memory-bank-maintenance
+  - case_id: route-007
+    schema_version: 2
+    user_request: "결과 CSV 통계 분석 계획을 세워줘."
+    expected_primary_skill: research-statistical-analysis
+    expected_supporting_skills: []
+    should_not_trigger: [search-paper-evidence]
+    expected_context: [metrics, table schema, planned comparisons]
+    expected_output_shape: "analysis plan or report depending on data"
+    quality_notes: "No data means no conclusions."
+    friction_risk: "invented p-values"
+    expected_behaviors:
+      - produce_statistical_analysis_plan
+    forbidden_behaviors:
+      - invent_statistical_results
+    required_evidence:
+      - type: route_match
+        expected: research-statistical-analysis
+  - case_id: route-008
+    schema_version: 2
+    user_request: "이 PR 코멘트들을 비판적으로 검토해줘."
+    expected_primary_skill: report-critical
+    expected_supporting_skills: []
+    should_not_trigger: [report-diff]
+    expected_context: [comments, patch, tests]
+    expected_output_shape: "findings first"
+    quality_notes: "Review stance."
+    friction_risk: "summary before findings"
+    expected_behaviors:
+      - findings_first_review
+    forbidden_behaviors:
+      - summarize_before_findings
+    required_evidence:
+      - type: route_match
+        expected: report-critical
+  - case_id: route-009
+    schema_version: 2
+    user_request: "visual regression evidence를 확인해줘."
+    expected_primary_skill: design-visual-regression
+    expected_supporting_skills: [design-frontend]
+    should_not_trigger: [analysis-codebase]
+    expected_context: [local app URL, viewport list, screenshots]
+    expected_output_shape: "visual gaps and verification notes"
+    quality_notes: "Experimental support skill."
+    friction_risk: "no rendered target"
+    expected_behaviors:
+      - inspect_visual_regression_evidence
+    forbidden_behaviors:
+      - perform_repo_wide_analysis
+    required_evidence:
+      - type: route_match
+        expected: design-visual-regression
+  - case_id: route-010
+    schema_version: 2
+    user_request: "component contract mapper로 variant/state 매핑해줘."
+    expected_primary_skill: design-component-mapper
+    expected_supporting_skills: []
+    should_not_trigger: [design-frontend]
+    expected_context: [design components, repo components]
+    expected_output_shape: "component-state mapping"
+    quality_notes: "Experimental evidence gate; ask for source if missing."
+    friction_risk: "mapping without design source"
+    expected_behaviors:
+      - map_component_contracts
+    forbidden_behaviors:
+      - implement_without_mapping_request
+    required_evidence:
+      - type: route_match
+        expected: design-component-mapper
+  - case_id: route-011
+    schema_version: 2
+    user_request: "old plan들이 context를 오염시키는 것 같아. active plan만 남기고 load policy를 정리해줘."
+    expected_primary_skill: plan-spec-curator
+    expected_supporting_skills: []
+    should_not_trigger: [plan-short-term-docs, coordination-brief, memory-bank-maintenance]
+    expected_context: [current_goal, candidate_plan_index]
+    expected_output_shape: "active context decision and archive/load policy"
+    quality_notes: "Context lifecycle curation is separate from plan artifact writing and memory maintenance."
+    friction_risk: "opening every old plan before admission"
+    expected_behaviors:
+      - curate_active_context_policy
+    forbidden_behaviors:
+      - load_all_old_plans_by_default
+    required_evidence:
+      - type: route_match
+        expected: plan-spec-curator
+  - case_id: route-grp-001
+    schema_version: 2
+    user_request: "분석 스킬군에서 적절한 스킬 골라줘."
+    expected_primary_skill: analysis-router
+    expected_supporting_skills: []
+    should_not_trigger: []
+    expected_family: analysis
+    expected_context: [request intent, family alias map]
+    expected_output_shape: "group entry selection"
+    quality_notes: "Explicit 스킬군 framing enters group-selection mode; analysis entry is analysis-router."
+    friction_risk: "selecting a non-entry skill in the family"
+    expected_behaviors:
+      - select_analysis_family_entry
+    forbidden_behaviors:
+      - select_non_entry_skill_by_default
+    required_evidence:
+      - type: route_match
+        expected: analysis-router
+  - case_id: route-grp-002
+    schema_version: 2
+    user_request: "보고 스킬군으로 이 결과 검토해줘."
+    expected_primary_skill: report-critical
+    expected_supporting_skills: []
+    should_not_trigger: [report-qualitative]
+    expected_family: report
+    expected_context: [request intent, review target]
+    expected_output_shape: "critical review verdict"
+    quality_notes: "report family; 검토/QA intent routes to report-critical, not output formatting (Q16)."
+    friction_risk: "defaulting to report-qualitative for a review request"
+    expected_behaviors:
+      - select_report_review_gate
+    forbidden_behaviors:
+      - default_to_report_qualitative
+    required_evidence:
+      - type: route_match
+        expected: report-critical
+  - case_id: route-grp-003
+    user_request: "검색 스킬군으로 논문 근거 찾아줘."
+    expected_primary_skill: search-paper-evidence
+    expected_supporting_skills: []
+    should_not_trigger: [research-router]
+    expected_family: search
+    expected_context: [topic, evidence intent]
+    expected_output_shape: "evidence ledger"
+    quality_notes: "Search group entry is search-router (Phase B); whole task must not route to the research cluster."
+    friction_risk: "routing the whole task to the research cluster"
+  - case_id: route-grp-004
+    user_request: "search-router로 이 코드 근거 좀 찾아줘."
+    expected_primary_skill: search-router
+    expected_supporting_skills: []
+    should_not_trigger: [research-router]
+    expected_family: search
+    expected_context: [topic, evidence domain hints]
+    expected_output_shape: "selected evidence lane and handoff"
+    quality_notes: "search-router selects the evidence lane; it does not own synthesis or implementation."
+    friction_risk: "router owning evidence collection itself"
+  - case_id: route-grp-005
+    user_request: "이 승인된 closeout 패킷을 장기 기억으로 승격해줘."
+    expected_primary_skill: memory-bank-ingestion
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update, plan-spec-curator]
+    expected_family: memory
+    expected_context: [approved closeout packet, target memory-bank path, mutation approval]
+    expected_output_shape: "appended ingestion event and archive pointers"
+    quality_notes: "Promotion of an approved packet is ingestion, not direct goal/rule update or curation."
+    friction_risk: "promoting without approval"
+  - case_id: route-grp-006
+    user_request: "스킬 호출 통계 요약해줘."
+    expected_primary_skill: evaluation-usage-tracker
+    expected_supporting_skills: []
+    should_not_trigger: [evaluation-harness]
+    expected_family: evaluation
+    expected_context: [local invocation ledger]
+    expected_output_shape: "usage summary and improvement candidates"
+    quality_notes: "Invocation telemetry is evaluation-usage-tracker; eval-case review is evaluation-harness."
+    friction_risk: "reading raw prompts instead of metadata"
+  - case_id: route-workflow-001
+    user_request: "이 승인된 스펙대로 Phase 1 초기 구현을 진행해줘."
+    expected_primary_skill: workflow-plan-runner
+    expected_supporting_skills: [workflow-rigor, workflow-validation]
+    should_not_trigger: [plan-long-term-package, coordination-brief]
+    expected_family: workflow
+    expected_context: [approved spec, target phase, source files, validation contract]
+    expected_output_shape: "implementation batches with validation"
+    quality_notes: "Approved plan/spec execution is workflow-plan-runner; planning package creation must not take over."
+    friction_risk: "plan-only edits instead of implementation"
+  - case_id: route-workflow-002
+    user_request: "이 변경을 어떻게 검증할지 validation matrix만 짜줘."
+    expected_primary_skill: workflow-validation
+    expected_supporting_skills: []
+    should_not_trigger: [evaluation-harness, report-critical]
+    expected_family: workflow
+    expected_context: [changed artifact, success criteria, available checks]
+    expected_output_shape: "validation matrix"
+    quality_notes: "Product validation planning is workflow-validation, not skill-system eval or QA verdicting."
+    friction_risk: "turning validation planning into implementation"
+  - case_id: route-workflow-003
+    user_request: "같은 테스트가 계속 실패해. fake fix 말고 원인 하나씩 격리하자."
+    expected_primary_skill: workflow-recovery
+    expected_supporting_skills: [analysis-bug, workflow-validation]
+    should_not_trigger: [plan-long-term-package, report-qualitative]
+    expected_family: workflow
+    expected_context: [failing command, latest attempted fix, target files]
+    expected_output_shape: "failure loop isolation and next recovery action"
+    quality_notes: "Repeated failure loop selects recovery as primary."
+    friction_risk: "stacking speculative fixes"
+  - case_id: route-workflow-004
+    user_request: "이 승인된 plan package의 Batch 2를 실제 코드 변경으로 실행하고 검증까지 해줘."
+    expected_primary_skill: workflow-plan-runner
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [plan-long-term-package, coordination-brief]
+    expected_family: workflow
+    expected_context: [approved package, batch id, executable scope, validation expectation]
+    expected_output_shape: "execution_scope, batch_plan, changed_artifacts, validation_per_batch"
+    quality_notes: "Approved package batch execution routes to plan-runner; package creation must not take over."
+    friction_risk: "status-only or docs-only completion"
+  - case_id: route-workflow-005
+    user_request: "이 UI 변경은 어떤 smoke/manual check가 필요한지 risk tier별로 검증 계획만 짜줘."
+    expected_primary_skill: workflow-validation
+    expected_supporting_skills: []
+    should_not_trigger: [design-visual-regression, report-critical]
+    expected_family: workflow
+    expected_context: [changed UI artifact, risk boundary, available checks]
+    expected_output_shape: "risk-tiered validation matrix"
+    quality_notes: "Validation strategy is workflow-validation; design visual regression may be a later concrete check, not primary routing."
+    friction_risk: "running broad UI audits instead of planning targeted checks"
+  - case_id: route-workflow-006
+    user_request: "방금 수정했는데 같은 build error가 또 나와. 테스트를 약화하지 말고 recovery mode로 원인 하나만 격리해줘."
+    expected_primary_skill: workflow-recovery
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [analysis-codebase, report-critical]
+    expected_family: workflow
+    expected_context: [same failure signature, attempted fix, failing command, latest diff]
+    expected_output_shape: "failure_loop, active_hypothesis, diagnostic_or_fix, rollback_or_fallback"
+    quality_notes: "Same failure after a fix plus anti-fake-fix wording selects recovery."
+    friction_risk: "broad repo analysis or weakening validation"
+  - case_id: route-workflow-minimal-001
+    schema_version: 2
+    user_request: "최소 구현으로 이 기능 추가해줘. 새 의존성은 가능하면 피하고 과잉 추상화도 막아줘."
+    expected_primary_skill: null
+    expected_supporting_skills: [workflow-minimal-implementation]
+    should_not_trigger: [analysis-codebase, plan-long-term-package]
+    expected_family: workflow
+    expected_context: [requested behavior, relevant files, validation command]
+    expected_output_shape: "smallest coherent implementation with focused validation"
+    quality_notes: "Minimal implementation is an execution modifier attached to the task-specific implementation path."
+    friction_risk: "turning YAGNI pressure into a broad architecture review"
+    expected_behaviors:
+      - attach_minimal_implementation_modifier
+    forbidden_behaviors:
+      - add_speculative_abstraction
+    required_evidence:
+      - type: route_match
+        expected: workflow-minimal-implementation
+  - case_id: hs-pos-001
+    user_request: "이번 작업 산출물과 검증 내역 정리해줘."
+    expected_primary_skill: report-artifact-inventory
+    expected_supporting_skills: []
+    should_not_trigger: [report-diff, report-critical]
+    expected_family: report
+    expected_context: [changed files, validation evidence]
+    expected_output_shape: "artifact inventory (changed/generated/validation/followups)"
+    quality_notes: "Task-local artifact inventory, not a diff or a critical verdict."
+    friction_risk: "building a persistent registry"
+  - case_id: hs-pos-002
+    user_request: "accepted memory에서 이 작업용 context pack 만들어줘."
+    expected_primary_skill: memory-bank-harness
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update, memory-bank-ingestion]
+    expected_family: memory
+    expected_context: [accepted memory, task request]
+    expected_output_shape: "filtered context pack with admitted/excluded/conflicts"
+    quality_notes: "Read-only context compilation; no memory mutation."
+    friction_risk: "admitting stale/conflicting memory"
+  - case_id: hs-pos-003
+    user_request: "이 논문 근거를 찾아서 구현 플랜에 반영해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: [search-paper-evidence]
+    should_not_trigger: [research-router]
+    expected_family: none
+    expected_context: [implementation goal, paper topic]
+    expected_output_shape: "implementation/planning primary with paper evidence as support"
+    quality_notes: "Paper evidence supports implementation; the research cluster is not primary (search-router opens the lane)."
+    friction_risk: "routing the whole task to research"
+  - case_id: route-kanboard-rollout-001
+    user_request: "이 repo의 docs/plan 들을 칸보드에 올리고 등록해서 한 번에 동기화해줘."
+    expected_primary_skill: kanboard-plan-rollout
+    expected_supporting_skills: []
+    should_not_trigger: [kanboard-plan-ops, plan-short-term-docs]
+    expected_family: workflow
+    expected_context: [workspace path, docs/plan, approval boundary]
+    expected_output_shape: "register + sync-all dry-run then apply on approval"
+    quality_notes: "Onboarding/bulk register+sync is rollout, not single-board ops."
+    friction_risk: "applying live before dry-run approval"
+  - case_id: route-kanboard-ops-001
+    user_request: "plan 바뀐 내용 칸보드 보드에 반영하고, 보드에서 수동으로 옮긴 것들 변경 후보로 알려줘."
+    expected_primary_skill: kanboard-plan-ops
+    expected_supporting_skills: []
+    should_not_trigger: [kanboard-plan-rollout]
+    expected_family: workflow
+    expected_context: [registered workspace, plan path]
+    expected_output_shape: "markdown-primary push + pull candidates (markdown unchanged)"
+    quality_notes: "Ongoing push/pull on a registered board is ops, not onboarding."
+    friction_risk: "promoting completion to markdown without evidence"

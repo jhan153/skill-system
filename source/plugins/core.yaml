@@ -1,0 +1,30 @@
+# source/plugins/core.yaml — plugin membership manifest (hand-authored input).
+name: skill-system-core
+version: "9.0.0"
+description: 'Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, search broker, validation/reporting contract, task state) used by all role plugins.'
+skills:
+  - coordination-brief
+  - coordination-multi-agent
+  - kanboard-plan-ops
+  - kanboard-plan-rollout
+  - knowledge-base-maintenance
+  - knowledge-context-harness
+  - loop-readiness-router
+  - loop-verifier-registry
+  - memory-bank-correction-capture
+  - memory-bank-harness
+  - memory-bank-ingestion
+  - memory-bank-init
+  - memory-bank-maintenance
+  - memory-bank-update
+  - plan-long-term-package
+  - plan-loop-term
+  - plan-short-term-docs
+  - plan-spec-curator
+  - report-artifact-inventory
+  - search-deep-evidence
+  - search-router
+  - workflow-loop-runner
+  - workflow-plan-runner
+  - workflow-rigor
+  - workflow-task-ledger

@@ -1,0 +1,20 @@
+{
+  "hook_event_name": "PostToolUse",
+  "session_id": "session-test",
+  "turn_id": "turn-redaction",
+  "cwd": "/Users/master/repo/software/Skill-System",
+  "permission_mode": "workspace-write",
+  "tool_name": "Bash",
+  "tool_use_id": "tool-redaction-001",
+  "tool_response": {
+    "exit_code": 0,
+    "changed_files": [
+      "/Users/alice/private/token-secret.txt",
+      "/Users/master/repo/software/Skill-System/.codex/hooks/codex_hook_adapter.py"
+    ],
+    "network_targets": [
+      "https://example.com/?api_key=sk-secretsecretsecretsecret"
+    ],
+    "stdout": "PASS"
+  }
+}

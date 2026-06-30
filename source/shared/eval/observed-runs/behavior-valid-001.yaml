@@ -1,0 +1,20 @@
+run_id: BR-20260620-001
+case_id: route-002
+host: codex
+host_version: unknown
+model: unknown
+model_version: unknown
+bundle_version: "8.3.1"
+started_at: "2026-06-20T00:00:00Z"
+observed_route: report-qualitative
+observed_behaviors:
+  - compact_evidence_first_report
+artifacts:
+  - FIELD_FEEDBACK.md
+verification:
+  - type: command_exit
+    command: "python3 .codex/tools/verify_bundle.py --profile core --format text"
+    exit_code: 0
+    checked_at: "2026-06-20T00:00:00Z"
+result: pass
+failure_attribution:

@@ -1,0 +1,9 @@
+interface:
+  display_name: "Loop Verifier Registry"
+  short_description: "Map loop terms to verifiers"
+  default_prompt: "Use $loop-verifier-registry to map loop success conditions to concrete verifier skills, commands, evidence targets, and fallback checks."
+
+policy:
+  invocation_surface: support_only
+  allow_implicit_invocation: false
+  may_own_execution: false

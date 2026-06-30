@@ -1,0 +1,110 @@
+schema_version: 2
+pack_id: CP-20260621-101
+task: Compile the minimum context needed to continue 8.0 implementation.
+primary_skill: workflow-plan-runner
+anchors:
+  files:
+  - docs/plan/2026-06-21-context-assurance-llm-wiki-kanboard.md
+  topics:
+  - active-anchor
+  - context-compounding
+  - kanboard
+  - legacy-label
+  - transition-trace
+  - version-policy
+  decisions:
+  - KC-20260621-101
+  components: []
+  kanboard_cards:
+  - kanboard://card/KB-20260621-001
+admitted_claims:
+- claim_id: KC-20260621-101
+  statement: 8.0.0 is the current Context Compounding target.
+  authority_class: normative
+  verification_state: agent-verified
+  freshness: current
+  operational_effect: For task 'Compile the minimum context needed to continue 8.0
+    implementation.', apply this decision during skill routing and context lowering.
+  evidence_refs:
+  - SRC-20260621-101
+- claim_id: KC-20260621-102
+  statement: 7.4.x labels are legacy transition traces, not the implementation target.
+  authority_class: normative
+  verification_state: agent-verified
+  freshness: current
+  operational_effect: For task 'Compile the minimum context needed to continue 8.0
+    implementation.', apply this compatibility_contract during skill routing and context
+    lowering.
+  evidence_refs:
+  - SRC-20260621-101
+- claim_id: KC-20260621-103
+  statement: Active Kanboard card KB-20260621-001 anchors the current 8.0 implementation
+    context.
+  authority_class: operational
+  verification_state: agent-verified
+  freshness: current
+  operational_effect: For task 'Compile the minimum context needed to continue 8.0
+    implementation.', apply this plan_state during skill routing and context lowering.
+  evidence_refs:
+  - SRC-20260621-102
+relation_paths:
+- path_id: RP-20260621-101
+  edge_ids:
+  - KE-20260621-101
+  relation_summary: KC-20260621-102 supports KC-20260621-101
+- path_id: RP-20260621-102
+  edge_ids:
+  - KE-20260621-102
+  relation_summary: KC-20260621-103 depends_on KC-20260621-101
+raw_source_handles:
+- source_id: SRC-20260621-101
+  locator: repo://docs/plan/2026-06-21-context-assurance-llm-wiki-kanboard.md
+  revision: 879be1b06a4b5a91ba969964f998e300b6ebdbedccc00d78a3ec96a8a5c75197
+  load_when: Need raw evidence for source SRC-20260621-101.
+- source_id: SRC-20260621-102
+  locator: kanboard://card/KB-20260621-001
+  revision: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  load_when: Need raw evidence for source SRC-20260621-102.
+expansion_handles:
+- handle_id: EH-20260621-101
+  claim_id: KC-20260621-101
+  source_ids:
+  - SRC-20260621-101
+  expand_when: Need high-context background for KC-20260621-101.
+- handle_id: EH-20260621-102
+  claim_id: KC-20260621-102
+  source_ids:
+  - SRC-20260621-101
+  expand_when: Need high-context background for KC-20260621-102.
+- handle_id: EH-20260621-103
+  claim_id: KC-20260621-103
+  source_ids:
+  - SRC-20260621-102
+  expand_when: Need high-context background for KC-20260621-103.
+retrieval_trace:
+  query_type: lexical-graph-fixture
+  lexical_hits:
+  - KC-20260621-101
+  - KC-20260621-102
+  - KC-20260621-103
+  vector_hits: []
+  graph_expansions:
+  - KE-20260621-101
+  - KE-20260621-102
+  reranked:
+  - KC-20260621-101
+  - KC-20260621-102
+  - KC-20260621-103
+compilation:
+  knowledge_graph_version: fixture
+  index_version: runtime-index-v1
+  source_snapshot:
+  - SRC-20260621-101
+  - SRC-20260621-102
+  max_hops: 1
+  token_budget: 1024
+  generated_at: '2026-06-21T00:00:00Z'
+  compiler_version: context-pack-builder-v1
+pack_hash:
+  algorithm: sha256
+  value: 345ecf7de99e413ec81d87e33f7793cbebac8836340c38b816ab631842f086b5

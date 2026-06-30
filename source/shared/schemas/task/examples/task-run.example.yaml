@@ -1,0 +1,35 @@
+schema_version: 1
+task_run_id: TR-20260625-001
+work_item_ref: WI-20260627-001
+objective: "Demo checkpointed run: implement importer fix across turns"
+workspace:
+  root: "/repo"
+  revision: "abc123"
+status: complete
+active_step_id: S001
+steps:
+  - id: S001
+    title: "Fix quoted-comma parsing"
+    status: complete
+    evidence_refs:
+      - type: command
+        command: "pytest tests/test_import.py"
+        exit_code: 0
+findings:
+  - id: F001
+    title: "Legacy delimiter path left unhandled (out of scope)"
+    step_id: S001
+    severity: low
+    status: accepted_risk
+    evidence_refs:
+      - type: file
+        locator: "src/importer.py"
+    accepted_by: user
+    reason: "Out of scope for this release; tracked separately."
+    review_at: "next-release"
+final_verification:
+  status: pass
+  evidence_refs:
+    - type: command
+      command: "pytest tests/test_import.py"
+      exit_code: 0

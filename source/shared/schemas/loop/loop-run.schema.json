@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-loop-run.schema.json",
+  "title": "Skill System Loop Run State",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "loop_run_id",
+    "contract_ref",
+    "contract_hash",
+    "workspace",
+    "status",
+    "iteration",
+    "started_at",
+    "updated_at",
+    "budgets",
+    "condition_results",
+    "progress",
+    "agent_run_refs",
+    "last_decision",
+    "side_effect_journal"
+  ],
+  "properties": {
+    "schema_version": { "enum": [1] },
+    "loop_run_id": {
+      "type": "string",
+      "pattern": "^LR-[0-9]{8}-[0-9]{3}$"
+    },
+    "contract_ref": { "type": "string", "minLength": 1 },
+    "contract_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "workspace": {
+      "type": "object",
+      "required": ["root", "revision", "workspace_id"],
+      "properties": {
+        "root": { "type": "string", "minLength": 1 },
+        "revision": { "type": "string", "minLength": 1 },
+        "workspace_id": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "enum": ["active", "success", "blocked", "budget_exhausted", "unsafe", "fatal", "stalled"]
+    },
+    "iteration": { "type": "integer", "minimum": 0 },
+    "started_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "budgets": {
+      "type": "object",
+      "required": ["iterations_used", "max_iterations", "stop_continuations_used", "max_stop_continuations"],
+      "properties": {
+        "iterations_used": { "type": "integer", "minimum": 0 },
+        "max_iterations": { "type": "integer", "minimum": 1 },
+        "stop_continuations_used": { "type": "integer", "minimum": 0 },
+        "max_stop_continuations": { "type": "integer", "minimum": 0 },
+        "wall_time_seconds": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "condition_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["condition_id", "status", "evidence_refs"],
+        "properties": {
+          "condition_id": {
+            "type": "string",
+            "pattern": "^SC-[0-9]{3}$"
+          },
+          "status": { "enum": ["pass", "fail", "unverified", "blocked"] },
+          "evidence_refs": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "failure_fingerprint": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "progress": {
+      "type": "object",
+      "required": ["required_passed", "required_total", "no_progress_count", "repeated_failure_count", "state_hash"],
+      "properties": {
+        "required_passed": { "type": "integer", "minimum": 0 },
+        "required_total": { "type": "integer", "minimum": 1 },
+        "no_progress_count": { "type": "integer", "minimum": 0 },
+        "repeated_failure_count": { "type": "integer", "minimum": 0 },
+        "oscillation_count": { "type": "integer", "minimum": 0 },
+        "state_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "agent_run_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["iteration", "run_id"],
+        "properties": {
+          "iteration": { "type": "integer", "minimum": 1 },
+          "run_id": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "last_decision": {
+      "type": "object",
+      "required": ["action", "reason_code"],
+      "properties": {
+        "action": { "enum": ["success", "continue", "recover", "pause", "blocked", "budget_exhausted", "unsafe", "fatal"] },
+        "reason_code": { "type": "string", "minLength": 1 },
+        "target_condition": { "type": ["string", "null"] },
+        "continuation_prompt": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "side_effect_journal": { "type": "array" },
+    "applied_results": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          { "type": "integer", "minimum": 1 },
+          {
+            "type": "object",
+            "required": ["iteration"],
+            "properties": {
+              "iteration": { "type": "integer", "minimum": 1 },
+              "payload_hash": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "resumes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "reason", "resumed_at"],
+        "properties": {
+          "from": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 },
+          "resumed_at": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

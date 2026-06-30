@@ -1,0 +1,17 @@
+schema_version: 1
+store_id: KS-20260621-101
+edges:
+  - edge_id: KE-20260621-101
+    from_claim_id: KC-20260621-102
+    to_claim_id: KC-20260621-101
+    relation_type: supports
+    verification_state: agent-verified
+    source_refs:
+      - SRC-20260621-101
+  - edge_id: KE-20260621-102
+    from_claim_id: KC-20260621-103
+    to_claim_id: KC-20260621-101
+    relation_type: depends_on
+    verification_state: agent-verified
+    source_refs:
+      - SRC-20260621-102

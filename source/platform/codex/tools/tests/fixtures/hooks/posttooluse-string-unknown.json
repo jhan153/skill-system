@@ -1,0 +1,10 @@
+{
+  "hook_event_name": "PostToolUse",
+  "session_id": "session-test",
+  "turn_id": "turn-string-unknown",
+  "cwd": "/Users/master/repo/software/Skill-System",
+  "permission_mode": "workspace-write",
+  "tool_name": "Bash",
+  "tool_use_id": "tool-string-unknown-001",
+  "tool_response": "command output without a reliable exit status"
+}

@@ -1,0 +1,355 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-agent-run.schema.json",
+  "title": "Skill System Agent Run Artifact",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "bundle_version",
+    "task",
+    "assistant_message",
+    "outputs",
+    "validations",
+    "hook_events"
+  ],
+  "properties": {
+    "schema_version": {
+      "enum": [
+        1,
+        2
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^AR-[0-9]{8}-[0-9]{3}$"
+    },
+    "bundle_version": {
+      "type": "string"
+    },
+    "task": {
+      "type": "object",
+      "required": [
+        "user_request_summary",
+        "result_label"
+      ],
+      "properties": {
+        "user_request_summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result_label": {
+          "enum": [
+            "agent-verified",
+            "user-verification-needed",
+            "unverified",
+            "blocked"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "routing": {
+      "type": "object",
+      "properties": {
+        "primary_skill": {
+          "type": "string"
+        },
+        "modifiers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_gate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "output_modifier": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "memory_operation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "knowledge_context_mode": {
+          "enum": [
+            "none",
+            "optional",
+            "required"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "context": {
+      "type": "object",
+      "required": [
+        "context_pack_id",
+        "context_pack_ref",
+        "context_pack_hash",
+        "admitted_claim_ids",
+        "source_snapshot_refs"
+      ],
+      "properties": {
+        "context_pack_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "context_pack_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "context_pack_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "admitted_claim_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_snapshot_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "outputs": {
+      "type": "object",
+      "required": [
+        "final_report",
+        "artifact_refs",
+        "claims"
+      ],
+      "properties": {
+        "final_report": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "claims": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "claim_id",
+              "text",
+              "support"
+            ],
+            "properties": {
+              "claim_id": {
+                "type": "string",
+                "pattern": "^C-[0-9]{3}$"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "claim_class": {
+                "enum": [
+                  "execution_result",
+                  "source_fact",
+                  "interpretation",
+                  "limitation"
+                ]
+              },
+              "support": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "evidence_ref"
+                ],
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "command_exit",
+                      "artifact_exists",
+                      "manual_check",
+                      "source_span",
+                      "artifact_digest",
+                      "repo_revision",
+                      "retrieved_claim",
+                      "user_decision"
+                    ]
+                  },
+                  "command": {
+                    "type": "string"
+                  },
+                  "exit_code": {
+                    "type": "integer"
+                  },
+                  "evidence_ref": {
+                    "type": "string"
+                  },
+                  "selector": {
+                    "type": "string"
+                  },
+                  "expected": {
+                    "type": "string"
+                  },
+                  "digest": {
+                    "type": "string"
+                  },
+                  "revision": {
+                    "type": "string"
+                  },
+                  "source_id": {
+                    "type": "string"
+                  },
+                  "claim_id": {
+                    "type": "string"
+                  },
+                  "artifact_ref": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "context_support": {
+                "type": "object",
+                "properties": {
+                  "claim_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "relation_path_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "source_support": {
+                "type": "object",
+                "properties": {
+                  "source_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "assistant_message": {
+      "type": "object",
+      "required": [
+        "sha256",
+        "result_label",
+        "claim_ids"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "result_label": {
+          "enum": [
+            "agent-verified",
+            "user-verification-needed",
+            "unverified",
+            "blocked"
+          ]
+        },
+        "claim_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^C-[0-9]{3}$"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "validations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "evidence_ref"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "command_exit",
+              "manual_check"
+            ]
+          },
+          "command": {
+            "type": "string"
+          },
+          "exit_code": {
+            "type": "integer"
+          },
+          "evidence_ref": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "hook_events": {
+      "type": "string",
+      "minLength": 1
+    },
+    "knowledge_feedback": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": 2
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "context"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": false
+}

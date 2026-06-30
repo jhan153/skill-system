@@ -1,0 +1,8 @@
+interface:
+  display_name: "Design UI Decomposer"
+  short_description: "Decompose UI references into implementation structure."
+  default_prompt: "Use $design-ui-decomposer to break the supplied UI reference into hierarchy, layout regions, component candidates, token candidates, and state requirements without writing code."
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true

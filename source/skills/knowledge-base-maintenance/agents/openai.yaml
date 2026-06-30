@@ -1,0 +1,7 @@
+interface:
+  display_name: "Knowledge Base Maintenance"
+  short_description: "Validate and maintain Wiki Bank sources, claims, edges, and feedback packets."
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true

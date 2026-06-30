@@ -1,0 +1,11 @@
+interface:
+  display_name: "Report Critical"
+  short_description: "Diagnose blockers or run evidence-first QA review"
+  default_prompt: "Use $report-critical to identify the current blocker in a conversation first, then run QA-gate review when risk or finalization requires it."
+
+policy:
+  invocation_surface: evidence_gate
+  allow_implicit_invocation: false
+  may_own_execution: false
+  may_write: false
+  may_block_completion: true

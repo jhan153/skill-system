@@ -1,0 +1,213 @@
+{
+  "version": "2.1.0",
+  "collection": {
+    "top_n_default": 120,
+    "commit_depth_default": 200,
+    "mode_default": "full",
+    "analysis_categories": ["code", "config", "test"],
+    "code_extensions": [".py", ".js", ".ts", ".tsx", ".jsx", ".java", ".go", ".rb", ".php", ".cs", ".cpp", ".cc", ".c", ".h", ".hpp"],
+    "include_prefixes": [],
+    "exclude_prefixes": [
+      ".venv/",
+      "venv/",
+      "node_modules/",
+      "dist/",
+      "build/",
+      "out/",
+      "out2/",
+      "output/",
+      "saved/",
+      "artifacts/",
+      "docs/report/artifacts/",
+      "__pycache__/"
+    ],
+    "exclude_extensions": [
+      ".3mf",
+      ".7z",
+      ".bmp",
+      ".dae",
+      ".db",
+      ".dmg",
+      ".fbx",
+      ".gif",
+      ".ico",
+      ".jpeg",
+      ".jpg",
+      ".obj",
+      ".pdf",
+      ".png",
+      ".sqlite",
+      ".stl",
+      ".tar",
+      ".tiff",
+      ".webp",
+      ".zip"
+    ],
+    "category_rules": [
+      {"prefix": "scripts/", "category": "code"},
+      {"prefix": "tests/", "category": "test"},
+      {"prefix": "config/", "category": "config"},
+      {"prefix": "data/", "category": "asset"},
+      {"prefix": "docs/", "category": "doc"}
+    ]
+  },
+  "priority_model": {
+    "weights": {
+      "architecture": 0.35,
+      "algorithm": 0.25,
+      "performance": 0.20,
+      "refactor": 0.15,
+      "test_guard": 0.05
+    },
+    "category_bias": {
+      "code": 0.80,
+      "config": 0.40,
+      "test": -1.10,
+      "asset": -2.50,
+      "doc": -2.50,
+      "unknown": 0.0
+    },
+    "severity_thresholds": {
+      "critical": 4.60,
+      "high": 3.80,
+      "medium": 2.90,
+      "low": 2.00
+    },
+    "profile_thresholds": {
+      "architecture": 3.60,
+      "algorithm": 3.30,
+      "performance": 3.20,
+      "refactor": 2.40
+    },
+    "due_days_by_severity": {
+      "critical": 14,
+      "high": 30,
+      "medium": 60,
+      "low": 90,
+      "info": 120
+    }
+  },
+  "action_profiles": {
+    "architecture": {
+      "quality_attribute": "architecture",
+      "title": "모듈 경계 재설계 및 의존성 역전",
+      "summary": "결합도가 높아 구조 변경 전파 위험이 큽니다. 경계를 분리하고 의존 방향을 단방향으로 정리해야 합니다.",
+      "verification": [
+        "모듈 간 순환 의존 0건",
+        "핵심 모듈 fan-in/fan-out 20% 이상 개선",
+        "변경 영향 범위(Blast Radius) 축소"
+      ]
+    },
+    "algorithm": {
+      "quality_attribute": "algorithmic-complexity",
+      "title": "알고리즘 개선 및 Big-O 감소",
+      "summary": "분기/루프 복잡도가 높아 입력 증가 시 비용이 급증할 수 있습니다. 알고리즘 경로를 단순화해야 합니다.",
+      "verification": [
+        "핵심 함수 CC 20% 이상 감소",
+        "주요 경로의 이론적 복잡도 단계 하향",
+        "동일 입력 대비 처리 시간 기울기 개선"
+      ]
+    },
+    "performance": {
+      "quality_attribute": "performance",
+      "title": "핫패스 성능 최적화",
+      "summary": "런타임 병목 징후가 있어 핫패스 최적화가 필요합니다.",
+      "verification": [
+        "p95 지연시간 감소",
+        "메모리 피크 증가 없음",
+        "동일 워크로드 처리량 개선"
+      ]
+    },
+    "refactor": {
+      "quality_attribute": "maintainability",
+      "title": "구조 단순화 중심 리팩토링",
+      "summary": "변경량과 복잡도가 겹치는 유지보수 핫스팟입니다. 책임 분리와 함수 경계 재구성이 필요합니다.",
+      "verification": [
+        "파일/함수 복잡도 20% 이상 감소",
+        "중복 로직 감소",
+        "변경 후 회귀 증상 없음"
+      ]
+    },
+    "test_guard": {
+      "quality_attribute": "reliability",
+      "title": "회귀 방어 테스트 최소 보강",
+      "summary": "테스트는 우선순위 주도 항목이 아니라 회귀 방어를 위한 최소 안전장치로 유지합니다.",
+      "verification": [
+        "핵심 시나리오 회귀 테스트 통과",
+        "새 구조/알고리즘 경계 조건 검증"
+      ]
+    },
+    "security": {
+      "quality_attribute": "security",
+      "title": "보안 이슈 우선 조치",
+      "summary": "보안 취약점이 발견되어 우선 조치가 필요합니다.",
+      "verification": [
+        "재스캔에서 취약점 미재현",
+        "보안 회귀 테스트 통과"
+      ]
+    }
+  },
+  "owners": {
+    "default": "team-core",
+    "security": "team-security",
+    "prefix_map": {
+      "scripts/gui/": "team-gui",
+      "scripts/render_core/": "team-render-core",
+      "scripts/render_": "team-render-core",
+      "tests/": "team-qa",
+      "config/": "team-config"
+    }
+  },
+  "quality_gates": {
+    "default": {
+      "security_critical_max": 0,
+      "security_high_max": 1,
+      "expired_exceptions_max": 0,
+      "unverified_warn_ratio": 0.20,
+      "unverified_fail_ratio": 0.35,
+      "require_top10_plan_fields": true,
+      "max_test_findings_top10": 2,
+      "max_missing_architecture_views": 0,
+      "max_fallback_diagrams": 1,
+      "max_diagrams_without_provenance": 1,
+      "max_runtime_views_without_entrypoint": 0
+    },
+    "strict": {
+      "security_critical_max": 0,
+      "security_high_max": 0,
+      "expired_exceptions_max": 0,
+      "unverified_warn_ratio": 0.10,
+      "unverified_fail_ratio": 0.20,
+      "require_top10_plan_fields": true,
+      "max_test_findings_top10": 1,
+      "max_missing_architecture_views": 0,
+      "max_fallback_diagrams": 0,
+      "max_diagrams_without_provenance": 0,
+      "max_runtime_views_without_entrypoint": 0
+    }
+  },
+  "diagram": {
+    "max_sequence_steps": 7,
+    "max_lld_sequence_steps": 8,
+    "subsystem_depth": 3,
+    "max_system_participants": 12,
+    "max_system_edges": 24,
+    "max_hld_flow_edges": 20,
+    "exclude_test_subsystems": true,
+    "max_class_nodes": 26,
+    "max_class_edges": 40,
+    "exclude_class_names": ["object", "TypedDict", "ABC", "ABCMeta", "A"]
+  },
+  "architecture_model": {
+    "component_depth": 3,
+    "max_components": 18,
+    "max_component_edges": 24,
+    "max_container_edges": 16,
+    "max_scenarios": 4,
+    "max_scenario_steps": 7,
+    "max_decision_candidates": 6
+  },
+  "runtime": {
+    "tools": ["perf", "pprof", "bpftrace", "valgrind", "java", "otelcol"]
+  }
+}

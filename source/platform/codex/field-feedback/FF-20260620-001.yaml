@@ -1,0 +1,28 @@
+feedback_id: FF-20260620-001
+bundle_version: "7.3.1"
+bundle_hash_or_commit: "24d996d+workspace"
+date: "2026-06-20"
+host: codex
+host_version: "codex-cli 0.140.0-alpha.19"
+model: "gpt-5.5"
+request_class: "live-hook-runtime-activation"
+expected_primary_skill: "workflow-minimal-implementation"
+actual_primary_skill: "workflow-minimal-implementation"
+artifact_refs:
+  - .codex/hooks.json
+  - .codex/hooks/codex_hook_adapter.py
+  - .codex/tools/validate_agent_run_artifact.py
+  - .codex/tools/tests/test_validation_tools.py
+  - .codex/docs/agent_output_validation.md
+validation_evidence:
+  - "Codex interactive launch reported: 4 hooks are new or changed."
+  - "Selected Trust all and continue; Codex displayed Trusting hooks... and entered the main screen."
+  - "Second Codex interactive launch entered the main screen without showing the hook review prompt."
+  - "codex features list reported hooks stable true."
+  - "python3 .codex/tools/run_verification_pipeline.py --profiles core execution agent-output research --release: PASS"
+  - "python3 .codex/tools/verify_bundle.py --profile execution --format text: PASS"
+  - "python3 .codex/tools/verify_bundle.py --profile agent-output --format text: PASS"
+outcome: pass
+friction: "TERM=dumb required confirmation in nested Codex TUI; no hook trust regression after re-launch."
+privacy_redactions:
+  - "No private prompt transcript or credential material recorded."

@@ -1,0 +1,9 @@
+# GENERATED TARGET — do not edit files in this tree directly.
+do_not_edit: true
+target: .codex
+generated_from: source/
+generator: source/tools/generate_targets.py --target runtime
+integrity_gate: source/tools/check_generated_targets.py --target runtime --baseline
+note: |
+  This directory is regenerated from the neutral source/ tree. Edit source/ instead.
+  Direct edits here are overwritten on regeneration and rejected by the integrity gate.

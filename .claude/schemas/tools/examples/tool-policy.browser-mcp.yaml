@@ -1,0 +1,30 @@
+tool_policy:
+  tool_id: browser_or_mcp_connector
+  capabilities:
+    - browser
+    - mcp
+    - network
+  invocation_scope:
+    routine_only_for:
+      - read_only_page_inspection
+      - local_app_verification
+      - project_metadata_readback
+    requires_action_time_confirmation_for:
+      - form_submission
+      - external_system_mutation
+      - file_upload
+      - account_or_permission_change
+      - purchase_or_payment
+    blocked_without_explicit_authorization:
+      - sensitive_data_transmission
+      - credential_entry
+      - bypassing_auth_or_paywalls
+  decision:
+    default: ask
+  execution:
+    prefer_read_only_api: true
+    output_limit: bounded
+  postconditions:
+    capture_readback: true
+    capture_external_target: true
+    redact_sensitive_output: true

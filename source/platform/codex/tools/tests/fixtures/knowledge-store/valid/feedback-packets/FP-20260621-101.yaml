@@ -1,0 +1,26 @@
+schema_version: 1
+packet_id: FP-20260621-101
+source_run_id: AR-20260621-004
+created_at: "2026-06-21T00:00:00Z"
+review_state: proposed
+proposals:
+  - proposal_id: KFP-001
+    proposal_type: add_claim
+    rationale: "Agent Run v2 context linkage became validated implementation evidence."
+    evidence_refs:
+      - SRC-20260621-101
+    candidate_claim:
+      claim_type: operational_rule
+      statement: "Agent Run v2 records should include a run-local Context Pack hash before runtime integration."
+      source_refs:
+        - SRC-20260621-101
+  - proposal_id: KFP-002
+    proposal_type: add_claim
+    rationale: "Closed plan closeout should become a reviewed knowledge candidate, not an automatic accepted runtime claim."
+    evidence_refs:
+      - SRC-20260621-103
+    candidate_claim:
+      claim_type: plan_state
+      statement: "A completed plan closeout may propose durable decisions after review."
+      source_refs:
+        - SRC-20260621-103

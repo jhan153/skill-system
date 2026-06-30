@@ -1,0 +1,29 @@
+schema_version: 1
+run_id: AR-20260620-003
+bundle_version: "7.3.1"
+task:
+  user_request_summary: "Validate repeated tool lifecycle events."
+  result_label: agent-verified
+assistant_message:
+  sha256: c0e258d5e95a825ba6d2de2da324bf00c7bab67197ee364ffbf9ce3bf427ce37
+  result_label: agent-verified
+  claim_ids:
+    - C-001
+outputs:
+  final_report: final-report.md
+  artifact_refs:
+    - artifacts/verification.txt
+  claims:
+    - claim_id: C-001
+      text: "two repeated tool calls completed before finalization"
+      support:
+        type: command_exit
+        command: "python3 .codex/tools/verify_bundle.py --profile agent-output --format text"
+        exit_code: 0
+        evidence_ref: artifacts/verification.txt
+validations:
+  - type: command_exit
+    command: "python3 .codex/tools/verify_bundle.py --profile agent-output --format text"
+    exit_code: 0
+    evidence_ref: artifacts/verification.txt
+hook_events: hook-events.jsonl

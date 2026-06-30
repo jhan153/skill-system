@@ -1,0 +1,75 @@
+version: "7.3.1"
+purpose: "Memory usage observation cases."
+cases:
+  - case_id: memory-001
+    user_request: "이 규칙을 앞으로도 기억해."
+    expected_primary_skill: memory-bank-update
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-maintenance]
+    expected_context: [explicit persistent intent, target memory files]
+    expected_output_shape: "append-only memory update"
+    quality_notes: "Persistent intent is explicit."
+    friction_risk: "missing target memory path"
+  - case_id: memory-002
+    user_request: "내가 방금 정정한 내용을 반복 실수로 기록해."
+    expected_primary_skill: memory-bank-correction-capture
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update]
+    expected_context: [correction, masked evidence]
+    expected_output_shape: "candidate correction memory"
+    quality_notes: "Mask sensitive details."
+    friction_risk: "overstating recurrence"
+  - case_id: memory-003
+    user_request: "메모리 충돌 여부만 점검해줘."
+    expected_primary_skill: memory-bank-maintenance
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update]
+    expected_context: [memory files]
+    expected_output_shape: "conflict inspection"
+    quality_notes: "Inspection only."
+    friction_risk: "unrequested mutation"
+  - case_id: memory-004
+    user_request: "이번 요청에 맞는 memory context만 골라줘."
+    expected_primary_skill: memory-bank-harness
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-maintenance]
+    expected_context: [task, accepted memory]
+    expected_output_shape: "small context pack"
+    quality_notes: "Filter stale/conflict/poison-risk entries."
+    friction_risk: "loading all memory"
+  - case_id: memory-005
+    user_request: "프로젝트 memory bank를 처음 만들어줘."
+    expected_primary_skill: memory-bank-init
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update]
+    expected_context: [project identity, target memory root]
+    expected_output_shape: "initialized memory files"
+    quality_notes: "Explicit initialization only."
+    friction_risk: "creating memory without permission"
+  - case_id: memory-006
+    user_request: "완료된 이전 플랜 원문은 빼고, 지금 작업에 필요한 결정만 context pack으로 골라줘."
+    expected_primary_skill: memory-bank-harness
+    expected_supporting_skills: [plan-spec-curator]
+    should_not_trigger: [memory-bank-update, coordination-brief]
+    expected_context: [active task, accepted memory, old plan summary]
+    expected_output_shape: "small context pack with old-plan exclusion"
+    quality_notes: "Completed raw plans are background, not active instructions."
+    friction_risk: "old plan contamination"
+  - case_id: memory-007
+    user_request: "FIELD_FEEDBACK에 있는 불만들을 다음 답변 규칙처럼 다 반영해."
+    expected_primary_skill: memory-bank-harness
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update]
+    expected_context: [field feedback, current task]
+    expected_output_shape: "filtered context guidance with feedback-as-evidence warning"
+    quality_notes: "Field feedback is usage evidence, not direct instruction."
+    friction_risk: "turning feedback into hidden policy"
+  - case_id: memory-008
+    user_request: "예전 메모리와 현재 파일 내용이 충돌하는데 어떤 걸 prompt context에 넣어야 해?"
+    expected_primary_skill: memory-bank-harness
+    expected_supporting_skills: [memory-bank-maintenance]
+    should_not_trigger: [memory-bank-update]
+    expected_context: [accepted memory, current files, conflict note]
+    expected_output_shape: "conflict-filtered context pack"
+    quality_notes: "Current files and current user instruction outrank stale memory."
+    friction_risk: "silently using stale memory"

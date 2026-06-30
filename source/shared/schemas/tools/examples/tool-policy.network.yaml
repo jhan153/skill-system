@@ -1,0 +1,25 @@
+tool_policy:
+  tool_id: network.fetch
+  capabilities:
+    - network
+    - read
+  invocation_scope:
+    default_boundary: public_or_user_authorized_sources
+    requires_explicit_need_for:
+      - authenticated_sites
+      - package_downloads
+      - remote_git
+      - sending_task_data
+    blocked_targets:
+      - credentials
+      - private_files_without_authorization
+  decision:
+    default: ask
+  execution:
+    timeout_ms: 30000
+    output_limit: bounded
+    retry_limit: 0
+  postconditions:
+    capture_url_or_host: true
+    capture_status: true
+    redact_sensitive_output: true

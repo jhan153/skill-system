@@ -1,0 +1,19 @@
+interface:
+  display_name: "Workflow Loop Runner"
+  short_description: "Run accepted loop contracts"
+  default_prompt: "Use $workflow-loop-runner to execute an accepted loop contract by iterating implementation, verifier evidence, checkpoints, recovery, and stop conditions."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: loop_overlay
+  role: loop_execution_owner
+  consumes:
+    - loop_contract
+
+execution_mode:
+  kind: loop_convergence_execution
+  requires_accepted_contract: true

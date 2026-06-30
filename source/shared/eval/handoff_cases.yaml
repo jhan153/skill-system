@@ -1,0 +1,75 @@
+version: "7.3.1"
+purpose: "Lightweight handoff and coordination cases."
+cases:
+  - case_id: handoff-001
+    user_request: "이 계획을 두 세션으로 나눌 handoff note만 만들어줘."
+    expected_primary_skill: coordination-multi-agent
+    expected_supporting_skills: []
+    should_not_trigger: [plan-long-term-package]
+    expected_context: [existing plan, file scopes]
+    expected_output_shape: "handoff note"
+    quality_notes: "No persistent workflow files."
+    friction_risk: "over-structuring"
+  - case_id: handoff-002
+    user_request: "이 TODO를 task DAG로 가볍게 정리해줘."
+    expected_primary_skill: coordination-brief
+    expected_supporting_skills: []
+    should_not_trigger: [plan-long-term-package]
+    expected_context: [task list]
+    expected_output_shape: "small DAG"
+    quality_notes: "Descriptive only."
+    friction_risk: "creating state files"
+  - case_id: handoff-003
+    user_request: "변경 산출물과 검증 명령만 인수인계용으로 요약해줘."
+    expected_primary_skill: report-artifact-inventory
+    expected_supporting_skills: []
+    should_not_trigger: [evaluation-harness]
+    expected_context: [changed files, checks]
+    expected_output_shape: "artifact inventory"
+    quality_notes: "No registry."
+    friction_risk: "turning summary into tracking system"
+  - case_id: handoff-004
+    user_request: "이 작업은 병렬로 나눌 수 있는지 lock scope 기준으로 봐줘."
+    expected_primary_skill: coordination-multi-agent
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-codebase]
+    expected_context: [files, task boundaries]
+    expected_output_shape: "lock-scope recommendation"
+    quality_notes: "May be response-only."
+    friction_risk: "missing file boundaries"
+  - case_id: handoff-005
+    user_request: "다음 작업자가 읽을 짧은 continuation note 작성해줘."
+    expected_primary_skill: report-artifact-inventory
+    expected_supporting_skills: [coordination-brief]
+    should_not_trigger: [plan-long-term-package]
+    expected_context: [current state, changed files, next step]
+    expected_output_shape: "short continuation note"
+    quality_notes: "Keep it human-readable."
+    friction_risk: "too much process"
+  - case_id: handoff-006
+    user_request: "이 디자인 스킬 보강을 agent A/B/C로 나눠서 allowed files와 validation owner까지 task card로 만들어줘."
+    expected_primary_skill: coordination-multi-agent
+    expected_supporting_skills: [coordination-brief]
+    should_not_trigger: [plan-long-term-package]
+    expected_context: [active plan, allowed files, validation requirements]
+    expected_output_shape: "response-first task cards"
+    quality_notes: "Must include owner, lock_scope, expected_output, review_required, and validation_owner."
+    friction_risk: "parallel agents touching the same file"
+  - case_id: handoff-007
+    user_request: "목표, non-goals, do-not-touch만 공유용 goal brief로 정리해줘. 파일은 만들지 마."
+    expected_primary_skill: coordination-brief
+    expected_supporting_skills: []
+    should_not_trigger: [coordination-multi-agent, plan-short-term-docs]
+    expected_context: [current plan, user constraints]
+    expected_output_shape: "goal brief"
+    quality_notes: "Response-only goal brief; no persistent state."
+    friction_risk: "creating a plan document"
+  - case_id: handoff-008
+    user_request: "이전 agent가 바꾼 것/안 바꾼 것/검증한 것/남은 위험을 handoff packet으로 남겨줘."
+    expected_primary_skill: coordination-multi-agent
+    expected_supporting_skills: [report-artifact-inventory]
+    should_not_trigger: [evaluation-harness]
+    expected_context: [changed files, validation output, remaining risks]
+    expected_output_shape: "handoff packet"
+    quality_notes: "Must distinguish changed, not_changed, validation_done, and remaining_risk."
+    friction_risk: "treating handoff as completion evidence"

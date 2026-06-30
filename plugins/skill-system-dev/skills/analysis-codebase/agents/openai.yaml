@@ -1,0 +1,12 @@
+interface:
+  display_name: "Analysis Codebase"
+  short_description: "Repo-wide evidence report artifact generator"
+  default_prompt: |
+    Use $analysis-codebase only when the user explicitly wants a repo-wide codebase analysis, architecture, metrics, security, Git-evidence, or design documentation report artifact.
+
+    Do not activate for single-bug diagnosis, short code review, one-file inspection, or generic analysis without report artifact intent.
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true

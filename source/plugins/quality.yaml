@@ -1,0 +1,8 @@
+# source/plugins/quality.yaml — plugin membership manifest (hand-authored input).
+name: skill-system-quality
+version: "9.0.0"
+description: 'Skill System quality — acceptance, test strategy, regression/review gates for the QA/QC role.'
+skills:
+  - report-critical
+  - report-qualitative
+  - workflow-validation

@@ -1,0 +1,8 @@
+mapping:
+  neutral_event: tool_preflight
+  host: codex
+  host_event: PreToolUse
+  support_level: native
+  fallback_strategy: "Record the tool decision and defer permission enforcement to sandbox/rules/approval policy."
+  limitations:
+    - "Hook evidence does not replace sandbox or approval policy."

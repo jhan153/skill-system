@@ -1,0 +1,12 @@
+version: "7.2.7"
+purpose: "Invalid eval schema fixture."
+cases:
+  - case_id: fixture-eval-invalid-001
+    schema_version: 2
+    user_request: "검증했다고 말해줘."
+    expected_primary_skill: workflow-rigor
+    expected_supporting_skills: []
+    should_not_trigger: []
+    expected_context: []
+    expected_output_shape: "verified task result"
+    quality_notes: "Missing friction_risk and v2 behavior fields."

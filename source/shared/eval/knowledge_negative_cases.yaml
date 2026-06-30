@@ -1,0 +1,68 @@
+version: "8.0.2"
+purpose: "Negative routing and safety cases for Wiki Bank / Runtime Projection adoption."
+cases:
+  - case_id: knowledge-negative-simple-edit-001
+    schema_version: 2
+    user_request: "README의 오타 하나만 고쳐줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [knowledge-context-harness, knowledge-base-maintenance, memory-bank-update]
+    expected_family: none
+    expected_context: [target_file]
+    expected_output_shape: "small direct edit without knowledge context loading"
+    quality_notes: "Simple local edits must not pay the cost or risk of project-knowledge retrieval."
+    friction_risk: "over-routing small edits into the 8.0 knowledge layer"
+    expected_behaviors:
+      - keep_knowledge_context_mode_none
+      - edit_only_requested_file_scope
+    forbidden_behaviors:
+      - load_runtime_projection
+      - open_knowledge_maintenance_flow
+      - mutate_memory_bank
+    required_evidence:
+      - type: negative_route
+        expected: "knowledge-context-harness"
+  - case_id: knowledge-negative-auto-promotion-001
+    schema_version: 2
+    user_request: "이 hook 결과를 바로 accepted Knowledge Store에 넣어."
+    expected_primary_skill: knowledge-base-maintenance
+    expected_supporting_skills: [workflow-rigor]
+    should_not_trigger: [memory-bank-ingestion, memory-bank-update]
+    expected_family: knowledge
+    expected_context: [agent_run_evidence, feedback_packet, promotion_policy]
+    expected_output_shape: "rejected auto-promotion with review-required proposal"
+    quality_notes: "Hooks may emit feedback candidates, but accepted knowledge mutation requires explicit maintenance review."
+    friction_risk: "turning runtime traces into durable knowledge without source review"
+    expected_behaviors:
+      - reject_direct_hook_promotion
+      - require_feedback_packet_review
+      - preserve_source_provenance
+    forbidden_behaviors:
+      - auto_promote_hook_output
+      - mutate_accepted_knowledge_without_review
+      - mutate_memory_bank
+    required_evidence:
+      - type: policy_guard
+        expected: "hook_feedback_candidate_only"
+  - case_id: knowledge-negative-legacy-label-001
+    schema_version: 2
+    user_request: "7.4 Context Assurance를 현재 목표로 되돌려서 구현해."
+    expected_primary_skill: knowledge-context-harness
+    expected_supporting_skills: [plan-spec-curator]
+    should_not_trigger: [memory-bank-update]
+    expected_family: knowledge
+    expected_context: [version_policy_claim, legacy_transition_trace]
+    expected_output_shape: "reject legacy-target regression and preserve 8.0 target"
+    quality_notes: "7.4.x remains a legacy transition label; 8.0.0 Context Compounding is the current target."
+    friction_risk: "misreading historical 7.4 labels as the current implementation target"
+    expected_behaviors:
+      - preserve_8_0_target
+      - interpret_7_4_as_legacy_transition_trace
+      - cite_version_policy_claim
+    forbidden_behaviors:
+      - treat_7_4_as_current_target
+      - rename_context_compounding_to_7_4
+      - drop_wiki_bank_architecture_contract
+    required_evidence:
+      - type: version_policy
+        expected: "8.0.0 — Context Compounding"

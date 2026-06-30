@@ -1,0 +1,15 @@
+# source/plugins/research.yaml — plugin membership manifest (hand-authored input).
+name: skill-system-research
+version: "9.0.0"
+description: 'Skill System research — literature, hypothesis, experiment, statistics, manuscript, paper evidence for the research role.'
+skills:
+  - research-experiment-blueprint
+  - research-experiment-scaffold
+  - research-hypothesis-planning
+  - research-literature-ideation
+  - research-literature-synthesis
+  - research-manuscript-writing
+  - research-peer-review
+  - research-router
+  - research-statistical-analysis
+  - search-paper-evidence

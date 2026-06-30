@@ -1,5 +1,13 @@
 # Changelog
 
+## 9.0.0
+
+- Introduced a neutral canonical `source/` tree (`skills/`, `shared/`, `platform/{codex,claude}/`, `plugins/`, `mirror-meta.json`, `tools/`) as the single source of truth, replacing hand-maintained `.codex` / `.claude` dual trees.
+- Added `source/tools/generate_targets.py` and `source/tools/check_generated_targets.py`: `.codex` and `.claude` are now generated runtime targets, reproduced byte-identically from `source/` (verbatim shared payload, mirror-from-canonical with frozen timestamps, and platform overlay).
+- Cutover: `.codex` / `.claude` are generated-only and carry a `.generated` do-not-edit marker; integrity is enforced by regeneration (`check_generated_targets.py --baseline`) rather than a stored checksum manifest.
+- Shared the platform-agnostic JSON schema definitions to the Claude target (`.claude/schemas`), closing the one genuine runtime-scaffolding mirror gap; codex-specific items (research routing, harness README, the codex-tool-referencing schema example, `notify_desktop.py` variants) stay platform-native.
+- Added initial role-based Codex plugin packages under `plugins/` (`skill-system-{core,dev,design,research,quality,maintainer}`), each with `.codex-plugin/plugin.json` and its member skills; the 58 skills are partitioned with full, disjoint coverage.
+
 ## 8.5.1
 
 - Added the Work Horizon model to separate `one_shot`, `task_ticket`, `short_plan`, `long_plan`, `loop_overlay`, and `cross_horizon` work without introducing queue/runtime automation.

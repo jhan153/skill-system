@@ -1,0 +1,12 @@
+interface:
+  display_name: "Search Deep Evidence"
+  short_description: "Deep multi-angle evidence sweep with adversarial verification and citation-status labels; produces a verified evidence set, not final synthesis."
+  default_prompt: |
+    Use $search-deep-evidence only for broad multi-source evidence investigation with explicit fact-checking. Do not activate for a single paper lane (use search-paper-evidence), for the final written report or literature synthesis (owned by report-* / research-literature-synthesis), or for ordinary development.
+
+    Produce a verified, citation-status-labeled evidence set and hand off synthesis. Do not touch .codex/skills/.system.
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true

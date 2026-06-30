@@ -1,0 +1,21 @@
+schema_version: 1
+search_date: "2026-06-23"
+claims:
+  - id: C-001
+    statement: "Bounded verification loops are exercised end to end in the runtime."
+    citation_status: verified
+    verdict: confirmed
+    sources: [".codex/tools/evaluate_loop_run.py"]
+    retained: true
+  - id: C-002
+    statement: "Claim whose cited identifier could not be confirmed to exist."
+    citation_status: fabricated-risk
+    verdict: partial
+    sources: []
+    retained: true
+  - id: C-003
+    statement: "Claim still awaiting a retrievable source."
+    citation_status: unverified
+    verdict: partial
+    sources: []
+    retained: true

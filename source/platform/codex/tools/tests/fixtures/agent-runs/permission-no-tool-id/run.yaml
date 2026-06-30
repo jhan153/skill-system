@@ -1,0 +1,29 @@
+schema_version: 1
+run_id: AR-20260621-001
+bundle_version: "7.3.1"
+task:
+  user_request_summary: "Validate Codex PermissionRequest without tool_use_id."
+  result_label: agent-verified
+assistant_message:
+  sha256: 4f8684aa83965f330b66518897347535ef007b57f71aaa120417f54fae71d220
+  result_label: agent-verified
+  claim_ids:
+    - C-001
+outputs:
+  final_report: final-report.md
+  artifact_refs:
+    - artifacts/verification.txt
+  claims:
+    - claim_id: C-001
+      text: "permission request without tool_use_id was recorded as approximate turn-scoped evidence"
+      support:
+        type: command_exit
+        command: "python3 .codex/tools/verify_bundle.py --profile agent-output --format text"
+        exit_code: 0
+        evidence_ref: artifacts/verification.txt
+validations:
+  - type: command_exit
+    command: "python3 .codex/tools/verify_bundle.py --profile agent-output --format text"
+    exit_code: 0
+    evidence_ref: artifacts/verification.txt
+hook_events: hook-events.jsonl

@@ -1,0 +1,22 @@
+interface:
+  display_name: "Plan Long Term Package"
+  short_description: "Build evidence-ingested phase planning packages"
+  brand_color: "#2563EB"
+  default_prompt: "Use $plan-long-term-package to ingest existing reports and create a validated phase/group planning package for this task."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: long_plan
+  role: strategic_package_owner
+  contains:
+    - short_plan
+  typical_agentic_duration: "2-3 weeks"
+  legacy_equivalent: "18-24 months"
+
+planning_altitude:
+  kind: strategic_package
+  artifact_level: multi_horizon_phase_package

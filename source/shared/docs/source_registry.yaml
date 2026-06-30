@@ -1,0 +1,220 @@
+schema_version: 1
+sources:
+  - source_id: SRC-OPENAI-HARNESS
+    source_type: web_url
+    stable_locator: https://openai.com/ko-KR/index/harness-engineering/
+    repository:
+    path:
+    revision:
+    retrieved_at: "2026-06-20"
+    license:
+    verification_status: agent-verified
+    local_consumers:
+      - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
+      - .codex/docs/agent_output_validation.md
+      - .codex/docs/harness_lifecycle_hooks.md
+      - .codex/docs/tool_hardening_profile.md
+      - .codex/schemas/harness/agent-run.schema.json
+      - .codex/tools/validate_agent_run_artifact.py
+      - .codex/hooks.json
+      - .codex/hooks/codex_hook_adapter.py
+      - .codex/tools/tests/fixtures/agent-runs/current-run/run.yaml
+      - .codex/tools/tests/fixtures/agent-runs/permission-no-tool-id/run.yaml
+      - .codex/tools/tests/fixtures/agent-runs/stop-recovery/run.yaml
+      - .codex/tools/tests/fixtures/agent-runs/repeated-tools/run.yaml
+      - .claude/docs/agent_output_validation.md
+      - .claude/docs/harness_lifecycle_hooks.md
+      - .claude/docs/tool_hardening_profile.md
+    local_modifications: summarized
+  - source_id: SRC-OPENAI-CODEX-HOOKS
+    source_type: web_url
+    stable_locator: https://developers.openai.com/codex/hooks
+    repository:
+    path:
+    revision:
+    retrieved_at: "2026-06-20"
+    license:
+    verification_status: user-verification-needed
+    local_consumers:
+      - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
+      - .codex/docs/agent_output_validation.md
+      - .codex/docs/harness_lifecycle_hooks.md
+      - .codex/schemas/harness/lifecycle-event.schema.json
+      - .codex/tools/hook_runtime.py
+      - .codex/hooks/codex-pretooluse.example.sh
+      - .codex/hooks/codex_hook_adapter.py
+      - .codex/hooks.json
+      - .codex/tools/tests/fixtures/agent-runs/current-run/hook-events.jsonl
+      - .codex/tools/tests/fixtures/agent-runs/permission-no-tool-id/hook-events.jsonl
+      - .codex/tools/tests/fixtures/agent-runs/stop-recovery/hook-events.jsonl
+      - .codex/tools/tests/fixtures/agent-runs/repeated-tools/hook-events.jsonl
+      - .claude/docs/agent_output_validation.md
+      - .claude/docs/harness_lifecycle_hooks.md
+    local_modifications: summarized
+  - source_id: SRC-OPENAI-AGENTS-GUARDRAILS
+    source_type: web_url
+    stable_locator: https://openai.github.io/openai-agents-python/guardrails/
+    repository: openai/openai-agents-python
+    path: docs/guardrails.md
+    revision:
+    retrieved_at: "2026-06-20"
+    license:
+    verification_status: agent-verified
+    local_consumers:
+      - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
+      - .codex/docs/tool_hardening_profile.md
+      - .codex/schemas/tools/tool-policy.schema.json
+      - .claude/docs/tool_hardening_profile.md
+    local_modifications: summarized
+  - source_id: SRC-HARNESSX
+    source_type: arxiv
+    stable_locator: https://arxiv.org/abs/2606.14249
+    repository:
+    path:
+    revision:
+    retrieved_at: "2026-06-20"
+    license:
+    verification_status: agent-verified
+    local_consumers:
+      - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
+      - .codex/docs/harness_lifecycle_hooks.md
+      - .codex/schemas/harness/lifecycle-event.schema.json
+      - .codex/research/ledger.yaml
+    local_modifications: summarized
+  - source_id: SRC-SKILLSCOPE
+    source_type: arxiv
+    stable_locator: https://arxiv.org/abs/2605.05868
+    repository:
+    path:
+    revision:
+    retrieved_at: "2026-06-20"
+    license:
+    verification_status: agent-verified
+    local_consumers:
+      - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
+      - .codex/docs/tool_hardening_profile.md
+      - .codex/eval/eval-case.schema.json
+      - .codex/research/research-ledger.schema.json
+    local_modifications: summarized
+  - source_id: REVIEW-20260620-CONDITIONAL
+    source_type: transient_source
+    stable_locator:
+    repository:
+    path:
+    revision:
+    retrieved_at: "2026-06-20"
+    license:
+    verification_status: transient-excluded
+    transient_locator: codex_attachment:21bbac1c-e421-4201-afd4-5a675a45b286
+    local_consumers:
+      - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
+      - .codex/tools/verify_bundle.py
+      - .codex/tools/validate_eval_cases.py
+      - .codex/tools/validate_field_feedback.py
+      - .codex/tools/validate_source_registry.py
+      - .codex/tools/validate_research_ledger.py
+      - .codex/tools/run_verification_pipeline.py
+    local_modifications: summarized
+  - source_id: REVIEW-20260620-APPROVED
+    source_type: transient_source
+    stable_locator:
+    repository:
+    path:
+    revision:
+    retrieved_at: "2026-06-20"
+    license:
+    verification_status: transient-excluded
+    transient_locator: codex_attachment:35775143-99f4-455c-b9cb-7d5b09530e7e
+    local_consumers:
+      - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
+      - .codex/tools/sync_generated_mirrors.py
+      - .codex/tools/check_execution_assurance.py
+      - .codex/tools/run_behavior_evals.py
+      - .codex/tools/hook_runtime.py
+      - .codex/tools/validate_agent_run_artifact.py
+      - .codex/hooks/codex_hook_adapter.py
+      - .codex/hooks.json
+      - .codex/tools/tests/test_validation_tools.py
+      - .github/workflows/verify-bundle.yml
+    local_modifications: summarized
+  - source_id: SRC-JSONSCHEMA-PY
+    source_type: web_url
+    stable_locator: https://python-jsonschema.readthedocs.io/
+    repository: python-jsonschema/jsonschema
+    path:
+    revision:
+    retrieved_at: "2026-06-20"
+    license:
+    verification_status: user-verification-needed
+    local_consumers:
+      - .codex/tools/requirements.txt
+      - .codex/tools/_validation.py
+      - .github/workflows/verify-bundle.yml
+    local_modifications: dependency-adopted
+  - source_id: SRC-FABLECODEX
+    source_type: web_url
+    stable_locator: https://github.com/baskduf/FableCodex
+    repository: baskduf/FableCodex
+    path:
+    revision: 406faa1981ffe8a3b6b44e770bc2fc2ee189c8d0
+    retrieved_at: "2026-06-24"
+    license: AGPL-3.0-or-later
+    verification_status: agent-verified
+    local_consumers:
+      - .codex/skills/workflow-rigor/SKILL.md
+      - .codex/skills/analysis-bug/SKILL.md
+      - .codex/eval/runtime_usage_cases.yaml
+    local_modifications: summarized
+  - source_id: SRC-FABLIZE
+    source_type: web_url
+    stable_locator: https://github.com/fivetaku/fablize
+    repository: fivetaku/fablize
+    path:
+    revision: d338460454c340736c16648df0920ca9eea6acea
+    retrieved_at: "2026-06-25"
+    license: MIT
+    verification_status: agent-verified
+    local_consumers:
+      - .codex/skills/workflow-recovery/SKILL.md
+      - .codex/skills/evaluation-usage-tracker/references/harness-measurement-protocol.md
+      - .codex/eval/runtime_usage_cases.yaml
+    local_modifications: summarized
+adoption_decisions:
+  - concept: observed-evidence-completion-gate
+    decision: adapted
+    upstream_reference: SRC-FABLIZE
+    local_surface:
+      - .codex/skills/workflow-rigor/SKILL.md
+      - .codex/hooks/codex_hook_adapter.py
+      - .claude/hooks/claude_hook_adapter.py
+    rationale: "Observed-evidence-over-claim completion plus accepted_risk terminal. Codex enforces via the manifest-bound strict agent-output gate; the Claude adapter adds a transcript-based observed-vs-claimed strict gate (8.4.1) for parity. No upstream code."
+  - concept: debugging-hypothesis-ladder
+    decision: adapted
+    upstream_reference: SRC-FABLECODEX
+    local_surface:
+      - .codex/skills/analysis-bug/SKILL.md
+    rationale: "2-3 competing hypotheses and a cheapest discriminating measurement as an intermediate step; still converge to one primary root cause."
+  - concept: capability-ceiling-escalation
+    decision: adapted
+    upstream_reference: SRC-FABLIZE
+    local_surface:
+      - .codex/skills/workflow-recovery/SKILL.md
+    rationale: "Distinguish procedure failure from capability ceiling; escalate to higher effort/model or the user instead of adding retry/gate loops."
+  - concept: harness-paradox-measurement
+    decision: adapted
+    upstream_reference: SRC-FABLIZE
+    local_surface:
+      - .codex/skills/evaluation-usage-tracker/references/harness-measurement-protocol.md
+      - .codex/tools/analyze_harness_measurement.py
+      - .codex/hooks/codex_hook_adapter.py
+      - .claude/hooks/claude_hook_adapter.py
+    rationale: "Out-of-band 80/20 holdout + sunset implemented (8.4.1): analyze_harness_measurement.py aggregates adapter-tagged turn_finalize events; the off arm is a gate-off baseline. observed-runs remain replay fixtures, not an outcome source; automated revert/reinstruction collection is a follow-up."
+  - concept: checkpointed-execution-task-ledger
+    decision: adapted
+    upstream_reference: SRC-FABLECODEX
+    local_surface:
+      - .codex/skills/workflow-task-ledger/SKILL.md
+      - .codex/schemas/task/task-run.schema.json
+      - .codex/tools/task_ledger.py
+      - .codex/tools/validate_task_run.py
+    rationale: "Implemented in 8.4.1 as the workflow-task-ledger skill plus task-run schema/CLI/validator: a resume-safe step/finding ledger with observed evidence_refs and a completion gate, sitting between one-shot and a LoopRun (not a LoopRun)."

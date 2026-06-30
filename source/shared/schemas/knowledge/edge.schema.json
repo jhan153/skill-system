@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-knowledge-edge.schema.json",
+  "title": "Skill System Knowledge Edge Store",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "store_id",
+    "edges"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "store_id": {
+      "type": "string",
+      "pattern": "^KS-[0-9]{8}-[0-9]{3}$"
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "edge_id",
+          "from_claim_id",
+          "to_claim_id",
+          "relation_type",
+          "verification_state",
+          "source_refs"
+        ],
+        "properties": {
+          "edge_id": {
+            "type": "string",
+            "pattern": "^KE-[0-9]{8}-[0-9]{3}$"
+          },
+          "from_claim_id": {
+            "type": "string",
+            "pattern": "^KC-[0-9]{8}-[0-9]{3}$"
+          },
+          "to_claim_id": {
+            "type": "string",
+            "pattern": "^KC-[0-9]{8}-[0-9]{3}$"
+          },
+          "relation_type": {
+            "enum": [
+              "supports",
+              "contradicts",
+              "supersedes",
+              "depends_on",
+              "validated_by",
+              "lowered_to",
+              "derived_from",
+              "blocks"
+            ]
+          },
+          "verification_state": {
+            "enum": [
+              "agent-verified",
+              "user-verification-needed",
+              "unverified"
+            ]
+          },
+          "source_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,14 @@
+schema_version: 1
+loop_run_id: LR-20260623-010
+iteration: 2
+agent_run_id: AR-20260623-011
+condition_results:
+- condition_id: SC-001
+  status: pass
+  evidence_refs:
+  - artifacts/sc-001-iter-2.log
+- condition_id: SC-002
+  status: pass
+  evidence_refs:
+  - docs/release-notes.md
+side_effects: []

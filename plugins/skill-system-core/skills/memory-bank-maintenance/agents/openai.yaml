@@ -1,0 +1,9 @@
+interface:
+  display_name: "Memory Bank Maintenance"
+  short_description: "Validate, consolidate, and report memory state"
+  default_prompt: "Use $memory-bank-maintenance to inspect, validate, or consolidate an existing project memory bank with explicit write boundaries."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true

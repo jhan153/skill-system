@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-tool-policy.schema.json",
+  "title": "Tool Policy",
+  "type": "object",
+  "required": [
+    "tool_policy"
+  ],
+  "properties": {
+    "tool_policy": {
+      "type": "object",
+      "required": [
+        "tool_id",
+        "capabilities",
+        "invocation_scope",
+        "decision",
+        "execution",
+        "postconditions"
+      ],
+      "properties": {
+        "tool_id": {
+          "type": "string"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "read",
+              "filesystem_write",
+              "process",
+              "network",
+              "credential",
+              "destructive",
+              "browser",
+              "mcp"
+            ]
+          }
+        },
+        "invocation_scope": {
+          "type": "object"
+        },
+        "decision": {
+          "type": "object",
+          "required": [
+            "default"
+          ],
+          "properties": {
+            "default": {
+              "enum": [
+                "allow",
+                "ask",
+                "deny"
+              ]
+            }
+          }
+        },
+        "execution": {
+          "type": "object"
+        },
+        "postconditions": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

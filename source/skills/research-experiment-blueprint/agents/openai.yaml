@@ -1,0 +1,12 @@
+interface:
+  display_name: "Research Experiment Blueprint"
+  short_description: "Creates experiment blueprint artifacts from one selected hypothesis or research plan, with checkpoint-first evaluation, matched datasets/met"
+  default_prompt: |
+    Use $research-experiment-blueprint only for its narrow Research Cluster role. Do not activate for ordinary development, implementation, bug fixing, repo planning, casual explanation, or unrelated research stages.
+
+    Do not install or invoke a monolithic codex-research-lifecycle skill. Do not touch .codex/skills/.system.
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true

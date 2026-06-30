@@ -1,0 +1,54 @@
+schema_version: 2
+pack_id: CP-20260621-001
+task: Validate the current session/turn agent output observation.
+primary_skill: workflow-rigor
+anchors:
+  files:
+  - .codex/tools/validate_agent_run_artifact.py
+  topics:
+  - agent-output-validation
+  - run-trace-integrity
+  decisions: []
+  components: []
+  kanboard_cards: []
+admitted_claims:
+- claim_id: KC-20260621-001
+  statement: Agent output validation must observe current run evidence.
+  authority_class: normative
+  verification_state: agent-verified
+  freshness: current
+  operational_effect: The Stop hook must observe the run-local manifest and evidence without initiating repository-wide repair.
+  evidence_refs:
+  - SRC-20260621-001
+relation_paths: []
+raw_source_handles:
+- source_id: SRC-20260621-001
+  locator: repo://.codex/tools/tests/fixtures/agent-runs/current-run/run.yaml
+  revision: fixture
+  load_when: context hash mismatch is detected
+expansion_handles:
+- handle_id: EH-20260621-001
+  claim_id: KC-20260621-001
+  source_ids:
+  - SRC-20260621-001
+  expand_when: Need high-context background for KC-20260621-001.
+retrieval_trace:
+  query_type: fixture
+  lexical_hits:
+  - KC-20260621-001
+  vector_hits: []
+  graph_expansions: []
+  reranked:
+  - KC-20260621-001
+compilation:
+  knowledge_graph_version: fixture
+  index_version: fixture
+  source_snapshot:
+  - SRC-20260621-001
+  max_hops: 0
+  token_budget: 512
+  generated_at: '2026-06-21T00:00:00Z'
+  compiler_version: fixture
+pack_hash:
+  algorithm: sha256
+  value: 56ec484ecc4f103dfced02030a5dc9866c96036925f40f218548b2e0910172ec
