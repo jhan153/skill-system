@@ -10,7 +10,7 @@ observed_route: report-qualitative
 observed_behaviors:
   - compact_evidence_first_report
 artifacts:
-  - field-feedback/FF-20260620-001.yaml
+  - .codex/field-feedback/FF-20260620-001.yaml
 verification:
   - type: command_exit
     command: "python3 .codex/tools/verify_bundle.py --profile core --format text"

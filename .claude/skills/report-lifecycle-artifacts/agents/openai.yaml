@@ -1,0 +1,24 @@
+interface:
+  display_name: "Report Lifecycle Artifacts"
+  short_description: "Package formal SDLC lifecycle artifacts with traceability"
+  default_prompt: |
+    Use $report-lifecycle-artifacts only when the user explicitly asks for lifecycle deliverables, SDLC/product-development documents, evidence-backed artifact packaging, or traceability across requirements, design, implementation, validation, security, release, and retrospective artifacts.
+
+    Do not fabricate test, QA, security, or release completion. Label missing evidence as planned, not_executed, evidence_unavailable, user_verification_needed, or blocked. Do not use for direct implementation, casual planning, small TODOs, validation-only execution, critique-only review, docs/plan status sync, or memory promotion.
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: cross_horizon
+  role: lifecycle_artifact_report_owner
+  applies_to:
+    - short_plan
+    - long_plan
+    - task_ticket
+
+planning_altitude:
+  kind: lifecycle_artifact_reporting
+  artifact_level: formal_sdlc_artifact_pack

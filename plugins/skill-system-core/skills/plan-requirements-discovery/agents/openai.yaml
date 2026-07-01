@@ -1,0 +1,10 @@
+interface:
+  display_name: "Plan Requirements Discovery"
+  short_description: "Human-in-loop requirements discovery interview"
+  default_prompt: |
+    Use $plan-requirements-discovery only when the user explicitly wants guided requirements discovery before PRD, HLD, LLD, planning, or implementation.
+
+    Ask one decision-bearing question at a time. Capture domain terms, constraints, edge cases, non-goals, assumptions, and open questions. Do not use for direct implementation, existing stable requirements, docs/plan sync, or lifecycle reporting.
+
+policy:
+  allow_implicit_invocation: false

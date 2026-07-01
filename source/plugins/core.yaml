@@ -19,9 +19,12 @@ skills:
   - memory-bank-update
   - plan-long-term-package
   - plan-loop-term
+  - plan-requirements-brief
+  - plan-requirements-discovery
   - plan-short-term-docs
   - plan-spec-curator
   - report-artifact-inventory
+  - report-lifecycle-artifacts
   - search-deep-evidence
   - search-router
   - workflow-loop-runner

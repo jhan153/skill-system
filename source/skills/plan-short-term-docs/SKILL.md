@@ -1,6 +1,6 @@
 ---
 name: plan-short-term-docs
-description: docs/plan 하위의 지속 플랜 문서를 생성·갱신하고, 질의/결정/TODO를 동기화하며, 현재 활성 플랜 범위 안에서 구현 전환을 관리한다. 사용자가 실제 플랜 문서나 active plan artifact를 원할 때 사용하며, "플랜" 단독 언급만으로는 발동하지 않는다.
+description: Create or update active docs/plan artifacts for current-horizon implementation design and status sync.
 ---
 
 # Plan Short Term Docs

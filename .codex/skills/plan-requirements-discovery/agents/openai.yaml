@@ -1,0 +1,24 @@
+interface:
+  display_name: "Plan Requirements Discovery"
+  short_description: "Human-in-loop requirements discovery interview"
+  default_prompt: |
+    Use $plan-requirements-discovery only when the user explicitly wants guided requirements discovery before PRD, HLD, LLD, planning, or implementation.
+
+    Ask one decision-bearing question at a time. Capture domain terms, constraints, edge cases, non-goals, assumptions, and open questions. Do not use for direct implementation, existing stable requirements, docs/plan sync, or lifecycle reporting.
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: short_plan
+  role: requirements_discovery_owner
+  contains:
+    - task_ticket
+  typical_agentic_duration: "30-90 minutes"
+  legacy_equivalent: "1-2 weeks of stakeholder discovery"
+
+planning_altitude:
+  kind: requirements_discovery
+  artifact_level: requirements_discovery_record

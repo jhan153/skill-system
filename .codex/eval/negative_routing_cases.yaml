@@ -600,6 +600,36 @@ cases:
     expected_output_shape: "research routing"
     quality_notes: "Scientific hypothesis is research-router, not the evidence lane router."
     friction_risk: "search-router owning research lifecycle"
+  - case_id: neg-plan-requirements-001
+    user_request: "요구사항은 위에 다 정리했으니 바로 구현해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [plan-requirements-discovery, plan-requirements-brief]
+    expected_family: workflow
+    expected_context: [provided_requirements, target_files, validation]
+    expected_output_shape: "direct implementation workflow"
+    quality_notes: "Stable requirements plus implementation intent should not reopen discovery or PRD drafting."
+    friction_risk: "blocking execution with unnecessary requirements interview"
+  - case_id: neg-plan-requirements-002
+    user_request: "active docs/plan 문서 TODO랑 결정사항만 최신화해줘."
+    expected_primary_skill: plan-short-term-docs
+    expected_supporting_skills: []
+    should_not_trigger: [plan-requirements-brief, plan-requirements-discovery]
+    expected_family: planning
+    expected_context: [active_plan_path, decisions, todos]
+    expected_output_shape: "updated active docs/plan artifact"
+    quality_notes: "Active plan synchronization remains plan-short-term-docs, not requirements brief."
+    friction_risk: "rewriting an implementation plan as a PRD"
+  - case_id: neg-report-lifecycle-artifacts-001
+    user_request: "이번 작업에서 바뀐 파일이랑 검증 명령만 간단히 정리해줘."
+    expected_primary_skill: report-artifact-inventory
+    expected_supporting_skills: []
+    should_not_trigger: [report-lifecycle-artifacts]
+    expected_family: report
+    expected_context: [changed_files, validation_evidence]
+    expected_output_shape: "task-local artifact inventory"
+    quality_notes: "Small task artifact inventory should not become a formal SDLC lifecycle package."
+    friction_risk: "heavy lifecycle artifact over-trigger"
   - case_id: neg-kanboard-001
     user_request: "칸보드가 뭔지, 어떻게 쓰는 건지 개념만 설명해줘."
     expected_primary_skill: null

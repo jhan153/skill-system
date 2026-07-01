@@ -1,6 +1,6 @@
 ---
 name: plan-long-term-package
-description: Create a heavy multi-document planning package only when the user explicitly asks for phase/subplan/package-style planning that future sessions must continue from docs alone.
+description: Create explicit multi-document phase/package plans for cross-session work; Agentic HLD-level planning.
 ---
 
 # Plan Long Term Package

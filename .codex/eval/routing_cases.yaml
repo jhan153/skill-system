@@ -225,6 +225,64 @@ cases:
     required_evidence:
       - type: route_match
         expected: plan-spec-curator
+  - case_id: route-plan-requirements-discovery-001
+    schema_version: 2
+    user_request: "구현 전에 요구사항을 한 번에 하나씩 질문해서 범위, 예외, 디자인 방향을 끌어내줘."
+    expected_primary_skill: plan-requirements-discovery
+    expected_supporting_skills: []
+    should_not_trigger: [plan-requirements-brief, plan-short-term-docs, workflow-implementation]
+    expected_family: planning
+    expected_context: [rough_goal, domain_hints, user_answers]
+    expected_output_shape: "requirements discovery interview and discovery record"
+    quality_notes: "Explicit human-in-loop requirements interview routes to requirements discovery, not implementation or docs/plan sync."
+    friction_risk: "asking broad multi-question forms instead of one decision-bearing question at a time"
+    expected_behaviors:
+      - ask_one_decision_question_at_a_time
+    forbidden_behaviors:
+      - start_implementation
+      - create_docs_plan_by_default
+    required_evidence:
+      - type: route_match
+        expected: plan-requirements-discovery
+  - case_id: route-plan-requirements-brief-001
+    schema_version: 2
+    user_request: "방금 인터뷰 답변을 PRD/SRS-lite 요구사항 계약으로 압축해줘. 안 할 것도 명확히 써줘."
+    expected_primary_skill: plan-requirements-brief
+    expected_supporting_skills: []
+    should_not_trigger: [plan-requirements-discovery, plan-short-term-docs, plan-long-term-package]
+    expected_family: planning
+    expected_context: [discovery_notes, stakeholder_answers, decisions]
+    expected_output_shape: "requirements contract with scope, non-goals, stories, acceptance criteria"
+    quality_notes: "Discovery-to-PRD distillation routes to requirements brief."
+    friction_risk: "continuing interview instead of stabilizing the contract"
+    expected_behaviors:
+      - produce_requirements_contract
+    forbidden_behaviors:
+      - ask_interview_questions_as_primary_output
+      - create_phase_package
+    required_evidence:
+      - type: route_match
+        expected: plan-requirements-brief
+  - case_id: route-report-lifecycle-artifacts-001
+    schema_version: 2
+    user_request: "요구사항 기록, PRD, HLD/LLD 플랜, 테스트/QA/보안/릴리즈 체크를 SDLC 산출물 패키지와 traceability matrix로 만들어줘."
+    expected_primary_skill: report-lifecycle-artifacts
+    expected_supporting_skills: []
+    should_not_trigger: [report-artifact-inventory, report-critical, workflow-validation]
+    expected_family: report
+    expected_context: [requirements_artifacts, planning_artifacts, validation_evidence, traceability_needs]
+    expected_output_shape: "lifecycle artifact pack and traceability matrix"
+    quality_notes: "Formal lifecycle artifact packaging routes to the report lifecycle skill, not task-local inventory."
+    friction_risk: "claiming QA/security/release completion without evidence"
+    expected_behaviors:
+      - package_lifecycle_artifacts
+      - label_missing_evidence
+    forbidden_behaviors:
+      - execute_validation_as_primary_task
+      - fabricate_completion_evidence
+    required_evidence:
+      - type: route_match
+        expected: report-lifecycle-artifacts
   - case_id: route-grp-001
     schema_version: 2
     user_request: "분석 스킬군에서 적절한 스킬 골라줘."

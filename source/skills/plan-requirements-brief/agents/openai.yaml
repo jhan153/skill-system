@@ -1,0 +1,24 @@
+interface:
+  display_name: "Plan Requirements Brief"
+  short_description: "Distill discovery into a requirements contract"
+  default_prompt: |
+    Use $plan-requirements-brief only when the user explicitly wants discovery notes, stakeholder answers, or decisions distilled into a requirements contract, PRD, or SRS-lite.
+
+    Preserve scope, non-goals, acceptance criteria, assumptions, risks, and open questions. Do not use for interactive elicitation, active docs/plan sync, direct implementation, validation execution, or lifecycle result reporting.
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: short_plan
+  role: requirements_contract_owner
+  contains:
+    - task_ticket
+  typical_agentic_duration: "30-120 minutes"
+  legacy_equivalent: "1-3 weeks of PRD/SRS drafting"
+
+planning_altitude:
+  kind: requirements_contract
+  artifact_level: requirements_contract
