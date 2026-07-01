@@ -1,37 +1,41 @@
 # create-skill-pack Reference
 
 ## Overview
-Use this reference for user-managed Codex custom skill lifecycle work: creation, hardening, migration, metadata, routing registration, smoke tests, and deprecation notes. `.codex/skills/.system` is Codex app-managed and outside this lifecycle.
+Use this reference for Skill System bundle lifecycle work: source skill creation, hardening, migration, metadata, plugin package membership, routing registration, eval smoke tests, generated target sync, and deprecation notes.
+
+The canonical implementation workspace is `source/`. Generated `.codex/`, `.claude/`, and `plugins/` outputs mirror source and should not drift.
 
 ## Scope Guard
-- Include: `.codex/skills/*` user-managed custom skills, excluding `.system`.
-- Exclude: `.codex/skills/.system/**`, system-managed markers, app-managed skill files, repo `AGENTS.md`-only rules, memory-only updates, and one-turn preferences.
+- Include: `source/skills/*`, `source/shared/*`, `source/platform/{codex,claude}/*`, and `source/plugins/*.yaml` when the user asks for Skill System skill/package lifecycle work.
+- Exclude: `.codex/skills/.system/**`, live `$HOME/.codex`, live `$HOME/.claude`, plugin caches, host-local config, automations, credentials, repo `AGENTS.md`-only rules, memory-only updates, and one-turn preferences.
 - Do not audit, patch, migrate, deprecate, route-register, smoke-test, or add metadata to `.system` skills through `create-skill-pack`.
-- Existing skill hardening uses `create-skill-pack` as `primary_skill`; the inspected or patched custom skill is `target_skill`.
+- Existing skill hardening uses `create-skill-pack` as `primary_skill`; the inspected or patched skill is `target_skill`.
 
-## Skill Lifecycle Mode Table
+## Lifecycle Mode Table
 | Mode | Use when | Writes |
 | --- | --- | --- |
-| `create_new_skill_pack` | A reusable custom Codex behavior needs a new skill. | New custom skill directory and optional metadata. |
-| `create_reference_pack` | Only reusable docs/templates are needed. | `.codex/references/{reference-pack-id}/reference.md` and `docs/document.md` only. |
-| `harden_existing_skill` | A custom skill lacks routing, risk, recovery, limits, validation, or metadata alignment. | Targeted sections/files only. |
-| `migrate_existing_skill` | A legacy custom skill should match current Routing Card style. | Targeted migration edits and notes. |
-| `split_or_merge_skill` | Custom skills are overloaded or duplicate. | Proposal first; no deletion by default. |
-| `deprecate_skill` | A custom skill is superseded or should stop routing. | Deprecation/migration notes and routing references. |
-| `register_routing` | A custom skill should enter the route matrix or smoke tests. | `context-routing.md` only. |
-| `update_agent_metadata` | Custom skill metadata is missing or stale. | `agents/openai.yaml`. |
-| `add_route_smoke_tests` | Trigger behavior needs regression checks. | `context-routing.md` smoke tests. |
+| `create_source_skill_pack` | A reusable Skill System behavior needs a new canonical skill. | `source/skills/{skill-id}/` and optional registry/routing/eval/plugin membership. |
+| `create_reference_or_runtime_companion_pack` | Docs, schemas, hooks, tools, or platform runtime files are needed without a new skill. | `source/shared/` or `source/platform/{codex,claude}/`. |
+| `harden_existing_skill` | A source skill lacks routing, risk, recovery, limits, validation, output contract, examples, or metadata alignment. | Targeted source sections/files only. |
+| `migrate_existing_skill` | An older skill should match the current source/plugin architecture. | Targeted migration edits and generated target sync. |
+| `split_or_merge_skill` | Skills are overloaded or duplicate. | Proposal first; no deletion by default. |
+| `deprecate_skill` | A skill is superseded or should stop routing. | Deprecation notes, routing/eval updates, and plugin membership changes when approved. |
+| `register_routing` | A skill should enter the route matrix, registry, or smoke tests. | `source/shared/context-routing.md`, `source/shared/docs/skill_registry.md`, and eval cases. |
+| `update_agent_metadata` | Skill metadata is missing or stale. | `source/skills/{skill-id}/agents/openai.yaml`. |
+| `update_plugin_membership` | A skill should move between role packages or be added to one. | `source/plugins/{role}.yaml`, then generated `plugins/`. |
+| `add_route_smoke_tests` | Trigger behavior needs regression checks. | `source/shared/eval/*.yaml` and route smoke tests. |
 
 ## Pack Type Decision Table
 | User intent | Pack type |
 | --- | --- |
-| Reusable behavior with triggers | Codex Skill Pack under `.codex/skills/{skill-id}/` with `SKILL.md` |
-| Templates/reference only | Reference Pack under `.codex/references/{reference-pack-id}/` |
-| Temporary reference under `skills/` | No `SKILL.md`, no metadata, no route registration |
+| Reusable Skill System behavior with triggers | Source Skill Pack under `source/skills/{skill-id}/` |
+| Role package distribution | Plugin membership in `source/plugins/{role}.yaml` |
+| Runtime hooks/tools/rules/schemas/docs/eval | Runtime Companion Payload under `source/shared/` or `source/platform/` |
+| Local home deployment | Install/mirror operation, not source lifecycle, unless explicitly requested |
 | One-turn preference | No pack |
 | Project-specific convention | Repo `AGENTS.md` or project docs |
 | Persistent preference/rule | Memory operation, not this skill |
-| `.system` skill request | Out of scope; do not patch or lifecycle-manage |
+| `.system` or plugin cache request | Out of scope; do not patch or lifecycle-manage |
 
 ## Role Decision Table
 | Role | Owns |
@@ -44,47 +48,83 @@ Use this reference for user-managed Codex custom skill lifecycle work: creation,
 | `memory_operation` | Persistent memory mutation/inspection |
 | `heavy_artifact_generator` | Explicit report/package artifacts only |
 
+## Template Handling Rule
+The templates below are scaffolding for patches, not content to paste into final answers.
+
+- Never leave angle-bracket placeholders, blank dummy fields, `TODO`, `TBD`, or `placeholder` text in generated source artifacts.
+- For analysis/review requests, report concrete findings and cite files/lines instead of outputting the whole template.
+- For creation/migration requests, replace placeholders with task-specific values or remove the field with an explicit skip reason.
+- For route/eval examples, use realistic user requests and real skill ids; use `expected_route_class` when there is no single primary skill.
+- Before finalizing, run a focused placeholder search over changed non-reference files.
+
+Suggested focused check:
+
+```bash
+rg -n '<[^>]+>|TODO|TBD|FIXME|placeholder|dummy|더미' <changed-files>
+```
+
+Do not apply that check blindly to this `reference.md`; the template section intentionally contains placeholders.
+
 ## Trigger Guard Examples
-- Good: `새 Codex 스킬 팩 만들어줘`, `기존 스킬 Routing Card 보강해줘`, `이 스킬 deprecated 처리해줘`.
+- Good: `새 Skill System source skill pack 만들어줘`, `기존 스킬 Routing Card 보강해줘`, `이 스킬 deprecated 처리하고 plugin membership도 정리해줘`.
 - Guard: `.system 스킬도 보강해줘` is out of custom lifecycle scope.
 - Guard: `스킬이란 뭐야?` is conceptual explanation, not lifecycle work.
 - Guard: `analysis-bug로 분석해줘` executes that skill; it does not update the skill pack.
 - Guard: `기존 analysis-bug 스킬 보강해줘` reads `analysis-bug` as `target_skill`; it does not execute it as `primary_skill`.
 - Guard: `이번 답변만 짧게 해줘` is one-turn preference, not memory or skill creation.
 
+## Generation Flow
+After source edits:
+
+```bash
+python3 source/tools/generate_targets.py --target runtime
+python3 source/tools/generate_targets.py --target plugins
+```
+
+Then validate:
+
+```bash
+python3 source/platform/codex/tools/verify_bundle.py --root . --profile core --format text
+```
+
+From the project parent, also run:
+
+```bash
+python3 tools/check_bundle_hygiene.py Skill-System
+```
+
 ## Routing Registration Decision
-Update `context-routing.md` only when:
-- the new or modified custom skill should be discoverable as a primary, router, modifier, review gate, output modifier, memory operation, or heavy artifact generator.
+Update `source/shared/context-routing.md` and relevant eval cases only when:
+- the new or modified skill should be discoverable as a primary, router, modifier, review gate, output modifier, memory operation, or heavy artifact generator.
 - the user explicitly asks to register routing.
 - trigger overlap or smoke-test coverage requires a route update.
-- a custom skill is deprecated, superseded, merged, split, or renamed.
+- a skill is deprecated, superseded, merged, split, or renamed.
 
-Do not update `context-routing.md` when:
-- the task is reference-only.
-- the change is only typo/editing cleanup.
+Do not update routing when:
+- the task is runtime companion only.
+- the change is typo/editing cleanup.
 - the skill is not intended for routing.
-- the target is `.system`.
+- the target is `.system` or plugin cache content.
 - the user asks only for a proposal and not patches.
 
 ## Agent Metadata Decision
-Create or update `agents/openai.yaml` when:
-- a user-managed custom skill is created.
-- a custom skill changes role, trigger, or lifecycle scope.
-- a heavy artifact generator, memory operation, output modifier, review gate, or lifecycle manager needs explicit invocation policy.
+Create or update `source/skills/{skill-id}/agents/openai.yaml` when:
+- a source skill is created.
+- a skill changes role, trigger, lifecycle scope, or plugin membership.
+- a heavy artifact generator, memory operation, output modifier, review gate, router, or lifecycle manager needs explicit invocation policy.
 
-Do not create metadata when:
-- the pack is reference-only.
-- the target is `.system`.
-- the change is docs-only.
-- the request is a one-turn preference.
-- the request belongs only in repo `AGENTS.md`.
+Default source policy for conservative skills:
 
-Default policy for user custom skills:
 ```yaml
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true
 ```
-Do not enable implicit invocation without explicit user approval and route smoke-test coverage.
+
+Use `support_only` and `may_own_execution: false` only when the skill never owns a user request. If route/eval cases expect the skill as `expected_primary_skill`, it should not be marked support-only.
+
+Codex plugin packages sanitize source-only policy fields and keep only host-supported fields such as `allow_implicit_invocation`. That generated difference is expected.
 
 ## Agent Metadata Template
 ```yaml
@@ -97,7 +137,9 @@ interface:
     Do not activate for <nearby non-goals>.
 
 policy:
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
+  may_own_execution: true
 ```
 
 ## Route Smoke Test Template
@@ -129,6 +171,7 @@ policy:
 - Reason:
 - Migration path:
 - Routing impact:
+- Plugin membership impact:
 - Do not delete without explicit user approval.
 ```
 
@@ -140,6 +183,8 @@ policy:
 - Changed sections:
 - Routing changes:
 - Metadata changes:
+- Plugin membership changes:
+- Generated targets synced:
 - Smoke tests added:
 - Remaining manual review:
 ```
@@ -180,41 +225,34 @@ policy:
 ```
 
 ## Validation Checklist
+- [ ] Canonical edits were made under `source/`, not directly in live home or plugin cache.
 - [ ] `.codex/skills/.system` was not modified, counted, or treated as removable OS/editor residue.
-- [ ] Custom skill counts and audits exclude `.system`.
 - [ ] Frontmatter has `name` and specific `description` under 1024 chars.
 - [ ] `primary_skill` and `target_skill` are distinguished for hardening/migration/deprecation requests.
-- [ ] `SKILL.md` is compact and links to `reference.md`/`docs/document.md` for long material.
+- [ ] `SKILL.md` is compact and links to `reference.md`, `references/`, or `docs/document.md` for long material.
 - [ ] Routing Card has all standard fields.
 - [ ] `context_targets` include `must_read`, `read_if_needed`, and `do_not_load_by_default`.
 - [ ] Resource/Risk Boundary and Recovery/Context Expansion exist.
-- [ ] Known Limits and Validation sections exist for skill packs.
-- [ ] Reference-only packs do not create `SKILL.md`, metadata, or routing registration unless promoted.
+- [ ] Known Limits, Validation, Anti-Patterns, and Output Contract exist for skill packs.
+- [ ] Runtime companion payloads do not create `SKILL.md`, metadata, or route registration unless promoted into a real skill.
 - [ ] Agent metadata exists or has an explicit skip reason.
-- [ ] Route matrix and smoke tests are updated or intentionally skipped.
+- [ ] Plugin membership exists or has an explicit skip reason.
+- [ ] Route matrix, registry, and eval smoke tests are updated or intentionally skipped.
 - [ ] Smoke tests use auditable fields such as `target_skill`, `exclude_as_primary_skill`, and `must_not_route_to` where appropriate.
 - [ ] Wildcard expectations are avoided unless explicitly documented.
 - [ ] Free-form expected skill names are replaced with `expected_route_class` where needed.
 - [ ] Broad triggers are guarded.
 - [ ] Reusable examples avoid hardcoding one host path.
-- [ ] No secrets, tokens, credentials, or private values are added.
+- [ ] Generated runtime/plugin targets were synced when source changes require it.
+- [ ] No unresolved dummy placeholders, secrets, tokens, credentials, or private values are added.
 
 ## Anti-Patterns
-- Treating `.system` as a user custom skill.
+- Treating `.system`, live home runtime, or plugin cache content as source.
 - Generic descriptions such as "helps with docs".
-- Missing validation section.
+- Missing validation section or output contract.
 - Docs and `SKILL.md` describing different behavior.
 - Broad trigger aliases without guards.
 - Full library scans for a single skill update.
-- Silent route matrix or metadata edits when lifecycle registration was not requested.
-- Route-registering a reference-only pack as a skill.
+- Silent route matrix, metadata, plugin membership, or generated-target edits when lifecycle registration was not requested.
+- Route-registering runtime companion payload as a skill.
 - Deleting skills during migration/deprecation without explicit approval.
-
-## Research Cluster Source Decomposition
-- Treat broad source archives as source material, not installable monolithic skills.
-- Do not create `.codex/skills/codex-research-lifecycle/`.
-- Split evidence search, synthesis, ideation, blueprint, scaffold, analysis, writing, and peer review into narrow skills.
-- Add `agents/openai.yaml` with `allow_implicit_invocation: false` for every new custom skill.
-- Put reference-only packs such as speech-enhancement research under `.codex/references/`, not `.codex/skills/`.
-- Keep `.codex/context-routing.md` thin and put detailed research routes in `.codex/research-routing.md`.
-- Do not use `create-skill-pack` to decide actual research claims, citations, hypotheses, experiment design, statistical conclusions, or manuscript content.

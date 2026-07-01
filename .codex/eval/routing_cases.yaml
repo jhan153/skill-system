@@ -73,18 +73,19 @@ cases:
         expected: report-qualitative
   - case_id: route-003
     schema_version: 2
-    user_request: "새 custom Codex skill pack 만들어줘."
+    user_request: "새 Skill System source skill pack 만들어줘."
     expected_primary_skill: create-skill-pack
     expected_supporting_skills: []
     should_not_trigger: [research-router]
-    expected_context: [skill name, use case, target directory]
-    expected_output_shape: "skill files and routing metadata"
-    quality_notes: "Skill lifecycle work."
-    friction_risk: "touching .system skills"
+    expected_context: [skill name, use case, source target, plugin membership decision]
+    expected_output_shape: "source skill files, routing metadata, plugin membership decision"
+    quality_notes: "Skill System source lifecycle work."
+    friction_risk: "touching .system skills, live home runtime, or plugin cache"
     expected_behaviors:
-      - scaffold_skill_pack
+      - scaffold_source_skill_pack
     forbidden_behaviors:
       - mutate_system_skills
+      - hand_edit_plugin_cache
     required_evidence:
       - type: route_match
         expected: create-skill-pack
@@ -297,9 +298,9 @@ cases:
     should_not_trigger: [evaluation-harness]
     expected_family: evaluation
     expected_context: [local invocation ledger]
-    expected_output_shape: "usage summary and improvement candidates"
+    expected_output_shape: "usage summary, no-data status, and improvement candidates"
     quality_notes: "Invocation telemetry is evaluation-usage-tracker; eval-case review is evaluation-harness."
-    friction_risk: "reading raw prompts instead of metadata"
+    friction_risk: "reading raw prompts instead of metadata or copying sample counts as measured data"
   - case_id: route-workflow-001
     user_request: "이 승인된 스펙대로 Phase 1 초기 구현을 진행해줘."
     expected_primary_skill: workflow-plan-runner

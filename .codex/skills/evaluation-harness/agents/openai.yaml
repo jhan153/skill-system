@@ -1,7 +1,8 @@
 interface:
   display_name: "Evaluation Harness"
   short_description: "Review runtime usage eval cases; not a package validator."
+  default_prompt: "Use $evaluation-harness when the user asks to inspect, improve, or manually capture Skill System eval/routing usage cases, without making release readiness decisions."
 policy:
-  invocation_surface: support_only
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
-  may_own_execution: false
+  may_own_execution: true

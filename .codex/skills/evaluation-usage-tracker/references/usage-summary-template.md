@@ -1,5 +1,9 @@
 # Usage Summary Template
 
+These examples show shape only. Do not copy the sample counts, dates, or skill
+names into a real usage summary unless the local metadata ledger actually
+contains those values.
+
 ## Input ledger sample (metadata only)
 ```yaml
 - timestamp: 2026-06-15T10:00:00Z

@@ -3,7 +3,7 @@
 This file is the operational routing reference for the global `.codex` setup. Keep `AGENTS.md` thin; put route details, conflict rules, and audit contracts here.
 
 ## Custom Skill Scope
-`.codex/skills/.system` is a Codex app-managed namespace. Custom skill lifecycle operations apply only to user-managed skills under `.codex/skills/*` excluding `.system`. Do not audit, patch, migrate, deprecate, route-register, or smoke-test `.system` skills through `create-skill-pack`.
+`.codex/skills/.system`, live home runtime directories, and plugin caches are app-managed or deployment state. Skill System lifecycle operations apply to canonical `source/` assets first, then generated `.codex`, `.claude`, and `plugins` targets. Do not audit, patch, migrate, deprecate, route-register, or smoke-test `.system` skills through `create-skill-pack`.
 
 ## Mode Separation
 Development / Implementation Mode:
@@ -101,13 +101,13 @@ Build this bundle before multi-step work, writes, broad scans, reports, automati
 | diff presentation | `report-diff` | `report-critical` only if verdict requested | verified diff or snapshot | root-cause workflow |
 | critical review | `report-critical` | `report-qualitative` if formal report requested | artifact slice, goal, evidence anchors | full history |
 | memory operation | `memory-bank-init`, `memory-bank-update`, `memory-bank-correction-capture`, or `memory-bank-maintenance` | none by default | matching active memory cards and target memory files | unrelated memory |
-| skill lifecycle | `create-skill-pack` for user-managed custom skills under `.codex/skills/*` excluding `.system` | `report-critical` optional after draft | lifecycle request, target custom skill, one or two adjacent examples | `.system`, unrelated repo files, full skill library |
+| skill lifecycle | `create-skill-pack` for Skill System source skills, runtime companion payloads, plugin membership, and generated target sync | `report-critical` optional after draft | lifecycle request, target source skill or package, one or two adjacent examples, relevant `source/plugins/*.yaml` when membership is in scope | `.system`, live home runtime, plugin caches, unrelated repo files, full skill library |
 
 Development/implementation requests keep the existing implementation, bug, algorithm, or plan skills as primary and follow concrete user requirements as task specifications. Do not route to the research cluster merely because a development request mentions model, metric, experiment, loss, or training. Detailed Research Cluster routing lives in `.codex/research-routing.md`.
 
 Knowledge context compilation does not imply Memory Bank mutation. Persistent Memory Bank mutation still requires explicit memory-bank workflows, and generated Wiki Bank / Runtime Projection artifacts must not be treated as editable memory state.
 
-Aliases may remain in user-facing language, but routing docs should show actual skill IDs. Use system-provided `skill-creator` only when the runtime explicitly exposes it and the user asks for that platform-specific path; otherwise `create-skill-pack` owns user-managed custom `.codex` skill lifecycle work, including reference packs, hardening, migration, metadata, routing registration, smoke tests, and deprecation notes. `.system` skills are outside this lifecycle.
+Aliases may remain in user-facing language, but routing docs should show actual skill IDs. Use system-provided `skill-creator` only when the runtime explicitly exposes it and the user asks for platform-specific personal skill creation; otherwise `create-skill-pack` owns Skill System source skill lifecycle work, including runtime companion payloads, plugin membership, hardening, migration, metadata, routing registration, smoke tests, generated target sync, and deprecation notes. `.system` skills and plugin caches are outside this lifecycle.
 
 ## Work Horizon Decision Table
 
@@ -148,7 +148,7 @@ Design cluster conservative defaults:
 - Each new design skill needs at least three `should_not_trigger` cases before implicit invocation can be reconsidered.
 
 ## Routing Card Audit Shape
-Each user-managed custom `SKILL.md` Routing Card, excluding `.codex/skills/.system/**`, should keep these Markdown fields in this order unless a local reason exists: `role`, `intent_signature`, `use_when`, `do_not_use_when`, `expected_inputs`, `expected_outputs`, `context_targets` with `must_read`, `read_if_needed`, `do_not_load_by_default`, `risk_profile` with `reads`, `writes`, `tools`, `sensitive_resources`, and `entry_scene`.
+Each Skill System source `SKILL.md` Routing Card should keep these Markdown fields in this order unless a local reason exists: `role`, `intent_signature`, `use_when`, `do_not_use_when`, `expected_inputs`, `expected_outputs`, `context_targets` with `must_read`, `read_if_needed`, `do_not_load_by_default`, `risk_profile` with `reads`, `writes`, `tools`, `sensitive_resources`, and `entry_scene`.
 
 ## Route Smoke Tests
 Use these examples as drift checks for routing behavior. They are not user-facing templates.
@@ -163,53 +163,53 @@ Schema meanings:
 
 ```yaml
 route_smoke_tests:
-  - request: "새 Codex 스킬 팩 만들어줘"
+  - request: "새 Skill System source skill pack 만들어줘"
     expected_primary_skill: "create-skill-pack"
-    expected_mode: "create_new_skill_pack"
+    expected_mode: "create_source_skill_pack"
     expected_attachments: []
     must_not_route_to:
       - "analysis-codebase"
       - "plan-long-term-package"
     notes: "Skill lifecycle creation, not repo-wide reporting or planning package generation."
-  - request: "기존 analysis-bug 스킬의 Routing Card와 Risk Boundary를 보강해줘"
+  - request: "기존 analysis-bug source skill의 Routing Card와 Risk Boundary를 보강해줘"
     expected_primary_skill: "create-skill-pack"
     expected_mode: "harden_existing_skill"
     target_skill: "analysis-bug"
     must_read:
-      - "skills/analysis-bug/SKILL.md"
+      - "source/skills/analysis-bug/SKILL.md"
     exclude_as_primary_skill:
       - "analysis-bug"
     expected_attachments:
       - "report-critical optional after draft"
     notes: "This is skill lifecycle hardening, not bug analysis execution."
-  - request: "스킬 말고 reference pack만 만들어줘"
+  - request: "스킬 말고 runtime companion reference pack만 만들어줘"
     expected_primary_skill: "create-skill-pack"
-    expected_mode: "create_reference_pack"
+    expected_mode: "create_reference_or_runtime_companion_pack"
     expected_attachments: []
     expected_default_exclude:
-      - "skills/{pack-name}/SKILL.md"
-      - "skills/{pack-name}/agents/openai.yaml"
-      - "context-routing.md route registration"
+      - "source/skills/{pack-name}/SKILL.md"
+      - "source/skills/{pack-name}/agents/openai.yaml"
+      - "source/shared/context-routing.md route registration"
     must_not_route_to:
       - "memory-bank-init"
       - "memory-bank-update"
       - "memory-bank-correction-capture"
       - "memory-bank-maintenance"
       - "analysis-codebase"
-    notes: "Reference-only packs prefer `.codex/references/{reference-pack-id}/` and are not route-registered as skills."
+    notes: "Runtime companion/reference payloads live under source/shared or source/platform and are not route-registered as skills."
   - request: "스킬이란 개념이 뭐야?"
     expected_primary_skill: null
     expected_route_class: "conceptual_explanation"
     expected_attachments: []
     must_not_route_to:
       - "create-skill-pack"
-    notes: "Conceptual explanation does not create or modify skill artifacts."
+    notes: "Conceptual explanation does not create or modify source skill artifacts."
   - request: "analysis-bug로 이 버그 분석해줘"
     expected_primary_skill: "analysis-bug"
     expected_attachments: []
     must_not_route_to:
       - "create-skill-pack"
-    notes: "Executing a skill is not creating or hardening a skill."
+    notes: "Executing a skill is not creating or hardening source skill/package assets."
   - request: "최소 구현으로 이 기능 추가해줘. 새 의존성은 가능하면 피하고 과잉 추상화도 막아줘"
     expected_primary_skill: "task-specific primary"
     expected_attachments:
@@ -224,23 +224,23 @@ route_smoke_tests:
     expected_attachments: []
     must_not_route_to:
       - "memory-bank-maintenance"
-    notes: "Deprecation updates lifecycle notes and routing references; deletion requires explicit approval."
-  - request: "방금 만든 스킬을 context-routing에 등록하고 smoke test도 추가해줘"
+    notes: "Deprecation updates lifecycle notes, routing/eval references, and plugin membership when needed; deletion requires explicit approval."
+  - request: "방금 만든 source skill을 context-routing에 등록하고 smoke test도 추가해줘"
     expected_primary_skill: "create-skill-pack"
     expected_mode: "register_routing"
     expected_attachments: []
     must_read:
-      - "context-routing.md"
+      - "source/shared/context-routing.md"
     must_not_route_to:
       - "analysis-codebase"
-    notes: "Routing registration and smoke tests are skill lifecycle work."
+    notes: "Routing registration and smoke tests are source skill lifecycle work."
   - request: ".system 스킬도 Routing Card 보강해줘"
     expected_primary_skill: null
     expected_route_class: "out_of_scope_system_managed_skill"
     expected_attachments: []
     must_not_route_to:
       - "create-skill-pack"
-    notes: "`.codex/skills/.system` is Codex app-managed and outside custom skill lifecycle scope."
+    notes: "`.codex/skills/.system` is app-managed and outside source skill lifecycle scope."
   - request: "이 버그가 왜 반복되는지 원인 분석해줘"
     expected_primary_skill: "analysis-bug"
     expected_route_class: "routed_by_deep-analysis-workflow"
@@ -641,6 +641,7 @@ route_smoke_tests:
     expected_primary_skill: null
     expected_route_class: "blocked_monolithic_research_skill"
     must_not_create:
+      - "source/skills/codex-research-lifecycle"
       - ".codex/skills/codex-research-lifecycle"
     notes: "Source archive is source material only; do not install as a monolithic skill."
   - request: "일반 웹앱 버그 수정해줘"

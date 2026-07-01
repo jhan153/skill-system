@@ -568,7 +568,7 @@ cases:
     expected_family: report
     expected_context: [artifact, readiness criteria]
     expected_output_shape: "readiness/critical verdict"
-    quality_notes: "Readiness judgment is report-critical/evaluation-harness, not usage telemetry."
+    quality_notes: "Readiness judgment is report-critical, not usage telemetry or eval-case review."
     friction_risk: "usage tracker treated as readiness gate"
   - case_id: hs-neg-007
     user_request: "이 closeout은 아직 proposal인데 그냥 기억에 넣어줘."

@@ -27,6 +27,9 @@ transcript/git collector and is a follow-up.
   gate whose benefit was never demonstrated.
 
 ## Outcome ledger (out-of-band, metadata only)
+This is a schema shape. Do not paste it as a blank result, and do not invent
+outcome values when the local hook/event ledger does not contain them.
+
 ```yaml
 - session_id_hash:            # stable hash; raw id never stored
   holdout_arm: on | off
