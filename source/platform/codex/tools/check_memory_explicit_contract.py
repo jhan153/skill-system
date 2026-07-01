@@ -8,11 +8,10 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True
 
-from _validation import load_yaml_file, read_text
+from _validation import load_yaml_file, read_text, resolve_bundle_path, skill_dirs
 
 
 ROOT = Path(".")
-MEMORY_SKILL_GLOB = ".codex/skills/memory-bank-*/agents/openai.yaml"
 KNOWLEDGE_SKILLS = [
     ".codex/skills/knowledge-context-harness/agents/openai.yaml",
     ".codex/skills/knowledge-base-maintenance/agents/openai.yaml",
@@ -50,22 +49,26 @@ def allow_implicit(path: Path) -> bool | None:
 
 def main() -> int:
     errors: list[str] = []
-    memory_skill_paths = sorted(ROOT.glob(MEMORY_SKILL_GLOB))
+    memory_skill_paths = sorted(
+        skill / "agents" / "openai.yaml"
+        for skill in skill_dirs(ROOT, ".codex")
+        if skill.name.startswith("memory-bank-") and (skill / "agents" / "openai.yaml").is_file()
+    )
     if not memory_skill_paths:
         errors.append("no memory-bank skill agent metadata found")
     for path in memory_skill_paths:
         if allow_implicit(path) is not False:
             errors.append(f"{path}: memory-bank skills must keep allow_implicit_invocation: false")
     for rel in KNOWLEDGE_SKILLS:
-        path = ROOT / rel
-        if not path.exists():
+        path = resolve_bundle_path(ROOT, rel)
+        if path is None:
             errors.append(f"missing knowledge skill agent metadata: {rel}")
             continue
         if allow_implicit(path) is not False:
             errors.append(f"{rel}: knowledge skills must start explicit-only")
     for rel, required_snippets in REQUIRED_TEXT.items():
-        path = ROOT / rel
-        if not path.exists():
+        path = resolve_bundle_path(ROOT, rel)
+        if path is None:
             errors.append(f"missing contract file: {rel}")
             continue
         text = read_text(path)

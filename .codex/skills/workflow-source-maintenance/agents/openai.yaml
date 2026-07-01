@@ -1,0 +1,17 @@
+interface:
+  display_name: "Workflow Source Maintenance"
+  short_description: "Behavior-preserving source cleanup and pruning"
+  default_prompt: "Use $workflow-source-maintenance to prune dead code, remove stale scaffolding, and clean up source while preserving intended behavior."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: cross_horizon
+  role: source_maintenance_owner
+
+execution_mode:
+  kind: source_maintenance_execution
+  owns_execution: true

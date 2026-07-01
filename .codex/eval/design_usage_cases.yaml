@@ -1,4 +1,4 @@
-version: "7.3.1"
+version: "9.0.2"
 purpose: "Design cluster usage-quality cases."
 cases:
   - case_id: design-001

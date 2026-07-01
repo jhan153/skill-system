@@ -1,5 +1,32 @@
 {
   "name": "skill-system-maintainer",
-  "version": "9.0.0",
-  "description": "Skill System maintainer — Skill System self-management: routing eval, usage telemetry, skill lifecycle."
+  "version": "9.0.2",
+  "description": "Skill System maintainer — Skill System self-management: routing eval, usage telemetry, skill lifecycle.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "codex",
+    "maintainer"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Skill System Maintainer",
+    "shortDescription": "Skill-system maintenance, evaluation, and package creation skills.",
+    "longDescription": "Skill System maintainer — Skill System self-management: routing eval, usage telemetry, skill lifecycle.",
+    "developerName": "Skill System Maintainers",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Skill System Maintainer skills for this task."
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
 }

@@ -1,5 +1,32 @@
 {
   "name": "skill-system-research",
-  "version": "9.0.0",
-  "description": "Skill System research — literature, hypothesis, experiment, statistics, manuscript, paper evidence for the research role."
+  "version": "9.0.2",
+  "description": "Skill System research — literature, hypothesis, experiment, statistics, manuscript, paper evidence for the research role.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "codex",
+    "research"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Skill System Research",
+    "shortDescription": "Scientific research, synthesis, experiment, and manuscript skills.",
+    "longDescription": "Skill System research — literature, hypothesis, experiment, statistics, manuscript, paper evidence for the research role.",
+    "developerName": "Skill System Maintainers",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Skill System Research skills for this task."
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
 }

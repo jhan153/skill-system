@@ -1,4 +1,4 @@
-version: "7.3.1"
+version: "9.0.2"
 purpose: "Requests that should not trigger heavy or wrong skills."
 cases:
   - case_id: neg-001
@@ -118,6 +118,42 @@ cases:
     expected_output_shape: "short conceptual explanation"
     quality_notes: "Concept explanation does not attach implementation modifiers."
     friction_risk: "turning a simple explanation into implementation policy"
+  - case_id: neg-workflow-source-maintenance-001
+    user_request: "코드 유지보수라는 말이 무슨 뜻이야?"
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-source-maintenance, workflow-refactor-safely]
+    expected_context: []
+    expected_output_shape: "short conceptual explanation"
+    quality_notes: "Concept explanation does not start a source cleanup workflow."
+    friction_risk: "triggering maintenance execution on a terminology question"
+  - case_id: neg-workflow-source-maintenance-002
+    user_request: "서비스 레이어를 동작 보존하면서 파일 3개로 나눠줘."
+    expected_primary_skill: workflow-refactor-safely
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-source-maintenance, workflow-implementation]
+    expected_context: [behavior contract, target files, callers, validation command]
+    expected_output_shape: "behavior-preserving refactor plan and validation"
+    quality_notes: "Structural split is refactor ownership, not post-development pruning."
+    friction_risk: "source maintenance stealing structural refactor requests"
+  - case_id: neg-workflow-comment-maintenance-001
+    user_request: "주석이랑 docstring이 뭐가 다른 거야?"
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-comment-maintenance, workflow-implementation]
+    expected_context: []
+    expected_output_shape: "short conceptual explanation"
+    quality_notes: "Concept explanation does not start a comment maintenance workflow."
+    friction_risk: "triggering comment execution on a terminology question"
+  - case_id: neg-workflow-comment-maintenance-002
+    user_request: "리팩터링하면서 주석도 같이 맞춰줘."
+    expected_primary_skill: workflow-refactor-safely
+    expected_supporting_skills: [workflow-comment-maintenance]
+    should_not_trigger: [workflow-implementation, workflow-source-maintenance]
+    expected_context: [behavior contract, target files, callers, comment sync substep, validation command]
+    expected_output_shape: "behavior-preserving refactor plan with comment sync as a substep and validation"
+    quality_notes: "Structural refactor stays refactor ownership; comment sync rides along as a substep, not primary."
+    friction_risk: "comment maintenance stealing structural refactor requests"
   - case_id: neg-report-qualitative-001
     user_request: "이 문장 맞춤법만 봐줘."
     expected_primary_skill: null

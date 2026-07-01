@@ -1,6 +1,6 @@
 # Global CLAUDE
 
-> Claude-side global working rules for the Skill System bundle (9.0.0). This file maps the
+> Claude-side global working rules for the Skill System bundle (9.0.2). This file maps the
 > bundle's global working rules (`.codex/AGENTS.md`) to the Claude runtime. It diverges from the
 > Codex source only where Claude feature names differ (`settings.json` / permission modes,
 > `.claude/` paths, `/loop`); the working principles are identical. The rest of the Claude side

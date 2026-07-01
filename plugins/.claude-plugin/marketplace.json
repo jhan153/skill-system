@@ -1,0 +1,51 @@
+{
+  "name": "skill-system-local",
+  "owner": {
+    "name": "Skill System Maintainers"
+  },
+  "description": "Skill System role-based plugin packages (local marketplace).",
+  "plugins": [
+    {
+      "name": "skill-system-core",
+      "source": "./skill-system-core",
+      "description": "Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, search broker, validation/reporting contract, task state) used by all role plugins.",
+      "version": "9.0.2",
+      "category": "Developer Tools"
+    },
+    {
+      "name": "skill-system-design",
+      "source": "./skill-system-design",
+      "description": "Skill System design — UI/UX, design system, visual QA, layout/component mapping for the design role.",
+      "version": "9.0.2",
+      "category": "Developer Tools"
+    },
+    {
+      "name": "skill-system-dev",
+      "source": "./skill-system-dev",
+      "description": "Skill System dev — analysis, implementation, refactoring, codebase understanding, failure recovery for the engineering role.",
+      "version": "9.0.2",
+      "category": "Developer Tools"
+    },
+    {
+      "name": "skill-system-maintainer",
+      "source": "./skill-system-maintainer",
+      "description": "Skill System maintainer — Skill System self-management: routing eval, usage telemetry, skill lifecycle.",
+      "version": "9.0.2",
+      "category": "Developer Tools"
+    },
+    {
+      "name": "skill-system-quality",
+      "source": "./skill-system-quality",
+      "description": "Skill System quality — acceptance, test strategy, regression/review gates for the QA/QC role.",
+      "version": "9.0.2",
+      "category": "Developer Tools"
+    },
+    {
+      "name": "skill-system-research",
+      "source": "./skill-system-research",
+      "description": "Skill System research — literature, hypothesis, experiment, statistics, manuscript, paper evidence for the research role.",
+      "version": "9.0.2",
+      "category": "Developer Tools"
+    }
+  ]
+}

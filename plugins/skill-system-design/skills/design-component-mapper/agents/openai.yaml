@@ -3,8 +3,4 @@ interface:
   short_description: "Map design components to implementation contracts and states."
   default_prompt: "Use $design-component-mapper to map design components, variants, and states to existing repo components and report unresolved gaps."
 policy:
-  invocation_surface: evidence_gate
   allow_implicit_invocation: false
-  may_own_execution: false
-  may_write: false
-  may_block_completion: true

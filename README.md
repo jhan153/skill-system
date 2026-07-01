@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 7.3.1 Skill Bundle
+## 9.0.2 Skill Bundle
 
-This repository includes the skill bundle organized for version 7.3.1. Its main components are:
+This repository includes the skill bundle organized for version 9.0.2 (the 7.3.1 bundle remains the compatibility baseline; see the 9.x direction note below). Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -25,13 +25,15 @@ This repository includes the skill bundle organized for version 7.3.1. Its main 
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current maintenance cut is `9.0.0 — Neutral Source & Plugin Packaging`, following the `8.5.1 — Work Horizon Routing Clarification` release.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current maintenance cut is `9.0.2 — Legacy Template Cleanup`, following the `9.0.1 — Dev Plugin Skill Expansion` release.
 
 `7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 skill bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
 
 The Wiki Bank is not a Source of Truth. Repository files, tests, schemas, explicit user decisions, validated plans, Kanboard state, and Agent Run evidence remain authority sources. Hooks and runtime traces may produce proposal evidence, but accepted knowledge changes require explicit review.
 
 For development-focused installs, use `skill-system-core` + `skill-system-dev` as the minimum profile. Add `skill-system-quality` as the recommended companion when you want validation matrix support, including `workflow-validation`; dev workflows still fall back to their local validation rules when quality skills are not installed.
+
+For local Codex plugin installation from this repository, see [Local Plugin Marketplace](LOCAL_PLUGIN_MARKETPLACE.md).
 
 ## Core Principles
 
@@ -254,6 +256,8 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 8.4.1 | Checkpointed execution + harness parity | Adds Claude-side strict-block parity (an opt-in transcript-based observed-vs-claimed Stop gate), the `workflow-task-ledger` checkpointed-execution skill (resume-safe step/finding ledger with observed `evidence_refs`, an `accepted_risk` terminal, and a findings completion gate), and out-of-band harness-paradox measurement (`analyze_harness_measurement.py`: 80/20 holdout, per-arm fire/block/finalize-fail rates, fail delta, sunset). All opt-in and default-off. Here "harness parity" means Claude/Codex contradiction-gate parity, not fablize-2.1 observation-gate feature parity. |
 | 8.5.1 | Work horizon routing clarification | Adds the Work Horizon model plus `work_horizon`, `planning_altitude`, and `execution_mode` metadata for plan/workflow skills. This clarifies one-shot vs task/ticket vs short-plan vs long-plan vs loop-overlay routing without adding queue/runtime behavior. |
 | 9.0.0 | Neutral source & plugin packaging | Promotes a neutral canonical `source/` tree as the single source of truth and generates `.codex`/`.claude` runtime targets byte-identically from it (verbatim shared payload, mirror-from-canonical, platform overlay), with a generated-only cutover and regeneration-enforced integrity. Shares platform-agnostic schema definitions to the Claude target and adds initial role-based Codex plugin packages (`skill-system-{core,dev,design,research,quality,maintainer}`) with full disjoint coverage of the 58 skills. |
+| 9.0.1 | Dev plugin skill expansion | Expands the `skill-system-dev` engineering role beyond the initial 9.0.0 cut with concrete execution-owner and analysis skills (`analysis-architecture-deepening`, `analysis-codebase-design`, `analysis-domain-modeling`, `analysis-performance`, `workflow-implementation`, `workflow-bug-fix`, `workflow-dependency-upgrade`, `workflow-refactor-safely`, `workflow-source-maintenance`, `workflow-comment-maintenance`), adding `source_maintenance_execution` / `comment_maintenance_execution` work-horizon modes plus routing, registry, and runtime/negative eval coverage. Skill count 58 → 68; targets regenerated and integrity-verified. |
+| 9.0.2 | Legacy template cleanup | Template-hygiene and output-quality maintenance cut after 9.0.1: removes toy C++ before/after examples from the short-term plan template and `plan-short-term-docs` evidence rule, propagates the `plan-short-term-docs` diagram policy to `workflow-rigor` and `report-critical` (no default plan-lifecycle/approval/agent-workflow diagrams), makes the long-term `ui-state-contract` transition diagram conditional on real transitions, and converts `analysis-codebase` `report.py` unverified fallback diagrams (subsystem/path/class/metric) to plain text notices. Bundle version bumped to 9.0.2; targets regenerated and integrity-verified. |
 | 8.5.0 | WorkItem lifecycle governance | Adds a schema-bound WorkItem state model for triage/explore/ready/implement/verify/review/closed, validation tooling, execution-assurance coverage, and optional `work_item_ref` linkage from TaskRun. This remains lifecycle governance, not a queue runtime, scheduler, Kanboard source of truth, or LoopRun replacement. |
 | 8.4.4 | Activation surface & feedback hardening | Adds invocation-surface policy metadata and validation, report-only context-surface analysis, optional harness-improvement field feedback, and friction-signal maturity guidance. WorkItem lifecycle remains an 8.5.0 horizon concept, not a queue runtime in this cut. |
 | 8.4.3 | Live manifest finalization hardening | Updates live bootstrap finalization so structured final reports synchronize `result_label` and `C-###` task claims back into `run.yaml`, reducing placeholder-claim drift while keeping bootstrap opt-in and evidence-bound. |

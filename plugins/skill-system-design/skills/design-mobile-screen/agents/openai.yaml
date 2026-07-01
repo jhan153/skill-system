@@ -3,6 +3,4 @@ interface:
   short_description: "Guide mobile screen implementation constraints."
   default_prompt: "Use $design-mobile-screen to apply mobile screen constraints for safe areas, navigation, keyboard overlays, touch targets, scrolling, states, and accessibility."
 policy:
-  invocation_surface: support_only
   allow_implicit_invocation: false
-  may_own_execution: false

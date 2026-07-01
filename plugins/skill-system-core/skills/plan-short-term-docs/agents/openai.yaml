@@ -7,18 +7,4 @@ interface:
     Do not activate from a casual `플랜` mention alone. Preserve active-plan continuation behavior when an existing plan artifact owns the current task.
 
 policy:
-  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
-  may_own_execution: true
-
-work_horizon:
-  level: short_plan
-  role: tactical_design_owner
-  contains:
-    - task_ticket
-  typical_agentic_duration: "4-8 hours"
-  legacy_equivalent: "6-10 weeks / 1-2 sprints"
-
-planning_altitude:
-  kind: tactical_design
-  artifact_level: current_execution_horizon_plan

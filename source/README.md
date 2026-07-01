@@ -4,7 +4,7 @@ As of the Phase 1.5 cutover, **`.codex/` and `.claude/` are generated targets. D
 directly.** Edit `source/` and regenerate.
 
 ## Layout
-- `source/skills/` — 58 skills (neutral; generated verbatim into both targets)
+- `source/skills/` — 68 skills (neutral; generated verbatim into both targets)
 - `source/shared/` — `context-routing.md`, `docs/`, `eval/` (neutral; generated into both)
 - `source/platform/codex/` — codex-only + maintainer payload (AGENTS.md, hooks, hooks.json, rules, schemas, research, research-routing.md, harness, field-feedback, tools)
 - `source/platform/claude/` — claude-only payload (CLAUDE.md, hooks, tools)

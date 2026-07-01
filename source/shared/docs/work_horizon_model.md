@@ -45,7 +45,9 @@ Workflow skills are separated by how they control execution:
 | --- | --- | --- |
 | `implementation_execution` | `workflow-implementation` | own direct coding and refactoring from requirement to validated diff |
 | `bug_fix_execution` | `workflow-bug-fix` | own concrete failure repair from failure signal to verified fix |
+| `comment_maintenance_execution` | `workflow-comment-maintenance` | own behavior-preserving comment/docstring/TODO-FIXME sync to current code meaning |
 | `dependency_upgrade_execution` | `workflow-dependency-upgrade` | own dependency/runtime/package upgrades and compatibility validation |
+| `source_maintenance_execution` | `workflow-source-maintenance` | own post-development source cleanup and evidence-gated dead-code pruning |
 | `safe_refactor_execution` | `workflow-refactor-safely` | own behavior-preserving refactors with characterization checks |
 | `plan_batch_execution` | `workflow-plan-runner` | execute an approved plan/spec/package in batches |
 | `loop_convergence_execution` | `workflow-loop-runner` | run an accepted loop contract through verifier feedback |
@@ -63,6 +65,8 @@ Workflow skills are separated by how they control execution:
 | "이 기능 구현해줘" | `workflow-implementation`; attach rigor/minimality/validation only when triggered |
 | "이 failing test 고쳐줘" | `workflow-bug-fix`; escalate to `workflow-recovery` if the same signature repeats |
 | "React 버전 올리고 깨지는 call site까지 고쳐줘" | `workflow-dependency-upgrade` |
+| "1차 개발 끝났으니 죽은 코드 지우고 소스 정리해줘" | `workflow-source-maintenance` |
+| "주석이 코드랑 안 맞으니 최신화하고 불필요한 주석 정리해줘" | `workflow-comment-maintenance` |
 | "동작 보존하면서 모듈을 나눠줘" | `workflow-refactor-safely` |
 | "다음 세션에도 이어갈 수 있게 상태를 남겨" | task-specific primary plus `workflow-task-ledger` |
 | "이 작업을 플랜 문서로 만들어" | `plan-short-term-docs` |

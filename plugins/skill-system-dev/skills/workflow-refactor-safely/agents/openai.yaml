@@ -4,14 +4,4 @@ interface:
   default_prompt: "Use $workflow-refactor-safely to rename, move, extract, collapse, simplify, or restructure code while preserving observable behavior. Lock the behavior contract, use characterization checks, refactor in small batches, validate, and report behavior-preservation evidence."
 
 policy:
-  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
-  may_own_execution: true
-
-work_horizon:
-  level: cross_horizon
-  role: safe_refactor_owner
-
-execution_mode:
-  kind: safe_refactor_execution
-  owns_execution: true

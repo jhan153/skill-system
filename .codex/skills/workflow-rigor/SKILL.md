@@ -133,7 +133,8 @@ description: Mode-based execution control for evidence-first implementation, sco
 - Plan depth must match the selected mode.
 - Include changed files or modules, core change intent, key risks, and validation strategy for non-trivial work.
 - If `plan-short-term-docs` is active, do not override its file location or plan-state sections; add only the evidence and validation depth required by the selected mode.
-- Use a Mermaid diagram only when runtime interaction, control flow, or concurrency is materially relevant, or when the user explicitly asks for one.
+- Use a Mermaid diagram only when runtime interaction, control flow, concurrency, component boundary, class design, or data model structure is materially relevant, or when the user explicitly asks for one.
+- Plan lifecycle, approval flow, and agent workflow are not default plan diagrams; a requested workflow diagram must be scoped explicitly as an artifact about agent process, not silently inserted into implementation plans.
 - Do not force `sequenceDiagram` for every plan.
 
 ## Evidence Contract

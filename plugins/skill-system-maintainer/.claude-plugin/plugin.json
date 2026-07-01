@@ -1,0 +1,16 @@
+{
+  "name": "skill-system-maintainer",
+  "displayName": "Skill System Maintainer",
+  "version": "9.0.2",
+  "description": "Skill System maintainer — Skill System self-management: routing eval, usage telemetry, skill lifecycle.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "claude",
+    "maintainer"
+  ],
+  "skills": "./skills/"
+}

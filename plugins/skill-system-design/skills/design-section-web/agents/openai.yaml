@@ -3,6 +3,4 @@ interface:
   short_description: "Guide section-based web implementation."
   default_prompt: "Use $design-section-web to apply section-based web constraints for hero, semantic sections, CTA flow, responsive order, and accessibility."
 policy:
-  invocation_surface: support_only
   allow_implicit_invocation: false
-  may_own_execution: false

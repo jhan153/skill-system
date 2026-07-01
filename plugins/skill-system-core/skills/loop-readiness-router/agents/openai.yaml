@@ -4,7 +4,4 @@ interface:
   default_prompt: "Use $loop-readiness-router to classify whether a request should be handled as one-shot work, needs a loop contract, or is loop-worthy before execution."
 
 policy:
-  invocation_surface: selective_router
   allow_implicit_invocation: false
-  may_own_execution: false
-  may_write: false

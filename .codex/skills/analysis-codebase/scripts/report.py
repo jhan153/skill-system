@@ -1192,8 +1192,7 @@ def build_system_sequence_diagram(call_graph: dict[str, Any], policy: dict[str, 
 
     selected_transitions = [(s, d, w) for s, d, w in transitions if s in selected_participants and d in selected_participants][:max_edges]
     if not selected_transitions:
-        lines = ["```mermaid", "sequenceDiagram", 'participant A as "UnverifiedSubsystem"', "```"]
-        return "\n".join(lines)
+        return unverified_sequence("Unverified Subsystem")
 
     participants = sorted({s for s, _, _ in selected_transitions} | {d for _, d, _ in selected_transitions})
     pid_map = {name: f"S{idx}" for idx, name in enumerate(participants, start=1)}
@@ -1232,7 +1231,7 @@ def build_hld_flowchart(call_graph: dict[str, Any], policy: dict[str, Any]) -> s
             break
 
     if not transitions:
-        return "\n".join(["```mermaid", "flowchart LR", "  X[UnverifiedSubsystem]", "```"])
+        return unverified_flowchart("Unverified Subsystem")
 
     nodes = sorted({src for src, _, _ in transitions} | {dst for _, dst, _ in transitions})
     node_ids: dict[str, str] = {}
@@ -1312,7 +1311,7 @@ def build_anchor_path(
 
 def build_path_sequence_diagram(path_nodes: list[str]) -> str:
     if len(path_nodes) < 2:
-        return "\n".join(["```mermaid", "sequenceDiagram", 'participant A as "UnverifiedPath"', "```"])
+        return unverified_sequence("Unverified Path")
 
     lines = ["```mermaid", "sequenceDiagram"]
     pid_by_node: dict[str, str] = {}
@@ -1401,7 +1400,7 @@ def build_xy_metric_chart(
 ) -> str:
     selected = [row for row in rows if isinstance(row, dict) and str(row.get("file", "")).strip()][:max_items]
     if not selected:
-        return "\n".join(["```mermaid", "xychart-beta", f'    title "{title}"', "```"])
+        return f"> _Unverified — {title}: 차트 생성에 필요한 metric evidence가 부족하여 차트를 생략합니다._"
 
     labels: list[str] = []
     values: list[float] = []
@@ -1634,8 +1633,7 @@ def build_class_diagram(class_hierarchy: dict[str, Any], policy: dict[str, Any])
                 break
 
     if not selected:
-        lines = ["```mermaid", "classDiagram", "class UnverifiedClass", "```"]
-        return "\n".join(lines), []
+        return unverified_flowchart("Unverified Class"), []
 
     selected_set = set(selected)
     selected_edges = [(p, c) for p, c in normalized_edges if p in selected_set and c in selected_set][:max_edges]
@@ -1726,11 +1724,13 @@ def build_diagram_view(
 
 
 def unverified_flowchart(label: str = "Unverified View") -> str:
-    return "\n".join(["```mermaid", "flowchart LR", f'  X["{mermaid_quoted(label)}"]', "```"])
+    # Evidence-less fallback: emit a plain text notice instead of a placeholder diagram.
+    return f"> _Unverified — {label}: 다이어그램 생성에 필요한 구조 evidence가 부족하여 다이어그램을 생략합니다._"
 
 
 def unverified_sequence(label: str = "Unverified Scenario") -> str:
-    return "\n".join(["```mermaid", "sequenceDiagram", f'    participant A as "{mermaid_quoted(label)}"', "```"])
+    # Evidence-less fallback: emit a plain text notice instead of a placeholder diagram.
+    return f"> _Unverified — {label}: 다이어그램 생성에 필요한 상호작용 evidence가 부족하여 다이어그램을 생략합니다._"
 
 
 def flowchart_node(node_id: str, label: str, kind: str) -> str:

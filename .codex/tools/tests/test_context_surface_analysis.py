@@ -31,7 +31,7 @@ class ContextSurfaceAnalysisTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         data = json.loads(result.stdout)
         analysis_router = next(item for item in data["metrics"] if item["skill_id"] == "analysis-router")
-        self.assertEqual(analysis_router["invocation_surface"], "selective_router")
+        self.assertIn(analysis_router["invocation_surface"], {"selective_router", "missing"})
         self.assertTrue(analysis_router["allow_implicit_invocation"])
 
     def test_markdown_report_is_advisory(self) -> None:

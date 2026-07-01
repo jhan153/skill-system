@@ -9,7 +9,7 @@ from typing import Any
 
 sys.dont_write_bytecode = True
 
-from _validation import load_json_file, load_yaml_file, read_text, validate_schema
+from _validation import load_json_file, load_yaml_file, read_text, resolve_bundle_path, validate_schema
 
 
 REQUIRED_FILES = [
@@ -194,7 +194,7 @@ def validate_schema_contract(path: Path, contract: dict[str, Any], root: Path) -
         errors.append(f"{path.relative_to(root)}: schema must require {top_property}")
     if top_property not in schema.get("properties", {}):
         errors.append(f"{path.relative_to(root)}: schema must define {top_property}")
-    example_path = root / contract["example"]
+    example_path = resolve_bundle_path(root, contract["example"]) or root / contract["example"]
     try:
         example = load_yaml_file(example_path)
     except Exception as exc:  # noqa: BLE001
@@ -213,7 +213,7 @@ def main() -> int:
     root = Path(".").resolve()
     errors: list[str] = []
     for rel in REQUIRED_FILES:
-        if not (root / rel).exists():
+        if resolve_bundle_path(root, rel) is None:
             errors.append(f"missing: {rel}")
     lifecycle = root / ".codex/docs/harness_lifecycle_hooks.md"
     if lifecycle.exists():
@@ -228,7 +228,7 @@ def main() -> int:
             if term not in text:
                 errors.append(f"tool hardening doc missing term: {term}")
     for rel, contract in SCHEMA_CONTRACTS.items():
-        path = root / rel
+        path = resolve_bundle_path(root, rel) or root / rel
         if path.exists():
             errors.extend(validate_schema_contract(path, contract, root))
     if errors:

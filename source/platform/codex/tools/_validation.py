@@ -25,6 +25,66 @@ def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
+def plugin_skill_roots(root: Path) -> list[Path]:
+    """Return Codex plugin skill roots installed under a runtime home."""
+
+    cache = root / ".codex" / "plugins" / "cache"
+    if not cache.exists():
+        return []
+    roots: list[Path] = []
+    for marketplace in sorted(path for path in cache.iterdir() if path.is_dir()):
+        for plugin in sorted(path for path in marketplace.iterdir() if path.is_dir()):
+            for version in sorted(path for path in plugin.iterdir() if path.is_dir()):
+                skills = version / "skills"
+                if skills.is_dir() and (version / ".codex-plugin" / "plugin.json").is_file():
+                    roots.append(skills)
+    return roots
+
+
+def skill_dirs(root: Path, namespace: str = ".codex") -> list[Path]:
+    """Return skill directories for legacy mirrors plus installed Codex plugins."""
+
+    roots = []
+    legacy = root / namespace / "skills"
+    if legacy.exists():
+        roots.append(legacy)
+    if namespace == ".codex":
+        roots.extend(plugin_skill_roots(root))
+
+    seen: set[str] = set()
+    dirs: list[Path] = []
+    for base in roots:
+        for path in sorted(base.iterdir()):
+            if not (path / "SKILL.md").is_file() or path.name in seen:
+                continue
+            seen.add(path.name)
+            dirs.append(path)
+    return dirs
+
+
+def skill_dirs_by_id(root: Path, namespace: str = ".codex") -> dict[str, Path]:
+    return {path.name: path for path in skill_dirs(root, namespace)}
+
+
+def resolve_bundle_path(root: Path, rel: str | Path) -> Path | None:
+    """Resolve repo-relative paths, accepting plugin-installed skill payloads."""
+
+    rel_path = Path(rel)
+    direct = root / rel_path
+    if direct.exists():
+        return direct
+    parts = rel_path.parts
+    if len(parts) < 3 or parts[0] not in {".codex", ".claude"} or parts[1] != "skills":
+        return None
+    skill_id = parts[2]
+    suffix = Path(*parts[3:]) if len(parts) > 3 else Path()
+    skill_dir = skill_dirs_by_id(root, parts[0]).get(skill_id)
+    if skill_dir is None:
+        return None
+    candidate = skill_dir / suffix
+    return candidate if candidate.exists() else None
+
+
 def load_json_file(path: Path) -> dict[str, Any]:
     data = json.loads(read_text(path))
     if not isinstance(data, dict):

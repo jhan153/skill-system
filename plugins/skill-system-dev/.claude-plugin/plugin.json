@@ -1,0 +1,16 @@
+{
+  "name": "skill-system-dev",
+  "displayName": "Skill System Dev",
+  "version": "9.0.2",
+  "description": "Skill System dev — analysis, implementation, refactoring, codebase understanding, failure recovery for the engineering role.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "claude",
+    "dev"
+  ],
+  "skills": "./skills/"
+}

@@ -4,7 +4,4 @@ interface:
   default_prompt: "Use $search-router to detect evidence intent and route the request to the correct evidence lane (paper, code, runtime, visual, memory) without owning synthesis or implementation."
 
 policy:
-  invocation_surface: selective_router
   allow_implicit_invocation: true
-  may_own_execution: false
-  may_write: false

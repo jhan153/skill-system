@@ -7,6 +7,4 @@ interface:
     Do not activate for single-bug diagnosis, short code review, one-file inspection, or generic analysis without report artifact intent.
 
 policy:
-  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
-  may_own_execution: true

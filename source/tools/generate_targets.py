@@ -44,6 +44,15 @@ MIRROR_META_FILE = "mirror-meta.json"
 
 _CACHE_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 
+PLUGIN_DISPLAY = {
+    "skill-system-core": ("Skill System Core", "Shared operating platform skills for Codex workflows."),
+    "skill-system-dev": ("Skill System Dev", "Engineering analysis, implementation, refactoring, and recovery skills."),
+    "skill-system-design": ("Skill System Design", "Frontend, UI, layout, component, token, and visual validation skills."),
+    "skill-system-research": ("Skill System Research", "Scientific research, synthesis, experiment, and manuscript skills."),
+    "skill-system-quality": ("Skill System Quality", "QA, qualitative review, critical review, and validation skills."),
+    "skill-system-maintainer": ("Skill System Maintainer", "Skill-system maintenance, evaluation, and package creation skills."),
+}
+
 
 def _is_junk(name: str) -> bool:
     return (
@@ -74,6 +83,55 @@ def _copy(src: Path, dst: Path) -> None:
         shutil.copyfile(src, dst)
     else:
         raise SystemExit(f"missing source path: {src}")
+
+
+def _top_level_key(line: str) -> str | None:
+    if not line.strip() or line.startswith((" ", "\t")) or ":" not in line:
+        return None
+    return line.split(":", 1)[0].strip()
+
+
+def _filter_policy_block(block: list[str]) -> list[str]:
+    kept = [block[0]]
+    for line in block[1:]:
+        stripped = line.lstrip()
+        if stripped.startswith("allow_implicit_invocation:"):
+            kept.append(line)
+    return kept if len(kept) > 1 else []
+
+
+def _sanitize_plugin_agent_manifest(path: Path) -> None:
+    """Project bundle-only agent metadata to the stricter Codex plugin schema."""
+    blocks: list[list[str]] = []
+    current: list[str] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if _top_level_key(line) is not None:
+            if current:
+                blocks.append(current)
+            current = [line]
+        elif current:
+            current.append(line)
+    if current:
+        blocks.append(current)
+
+    output: list[str] = []
+    for block in blocks:
+        key = _top_level_key(block[0])
+        if key in {"interface", "dependencies"}:
+            output.extend(block)
+        elif key == "policy":
+            output.extend(_filter_policy_block(block))
+
+    while output and not output[-1].strip():
+        output.pop()
+    path.write_text("\n".join(output) + "\n", encoding="utf-8")
+
+
+def _copy_plugin_skill(src: Path, dst: Path) -> None:
+    _copy(src, dst)
+    agent_manifest = dst / "agents" / "openai.yaml"
+    if agent_manifest.is_file():
+        _sanitize_plugin_agent_manifest(agent_manifest)
 
 
 def _render_yaml_mirror(canonical: Path, generated_from: str, generated_at: str, checksum: str) -> str:
@@ -203,28 +261,92 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
         raise SystemExit(f"no plugin manifests under {source / 'plugins'}")
     src_skills = {p.name for p in (source / "skills").iterdir() if p.is_dir()}
     seen: dict[str, str] = {}
+    marketplace_plugins: list[dict] = []
     for mf in manifests:
         spec = _load_manifest(mf)
         name = spec["name"]
         pkg = plugins_root / name
         if pkg.exists():
             shutil.rmtree(pkg)
-        manifest = {"name": name, "version": str(spec["version"]), "description": spec["description"]}
+        display_name, short_description = PLUGIN_DISPLAY.get(
+            name,
+            (name.replace("-", " ").title(), spec["description"]),
+        )
+        manifest = {
+            "name": name,
+            "version": str(spec["version"]),
+            "description": spec["description"],
+            "author": {"name": "Skill System Maintainers"},
+            "license": "MIT",
+            "keywords": ["skill-system", "codex", name.removeprefix("skill-system-")],
+            "skills": "./skills/",
+            "interface": {
+                "displayName": display_name,
+                "shortDescription": short_description,
+                "longDescription": spec["description"],
+                "developerName": "Skill System Maintainers",
+                "category": "Developer Tools",
+                "capabilities": ["Interactive", "Read", "Write"],
+                "defaultPrompt": [f"Use {display_name} skills for this task."],
+                "brandColor": "#2563EB",
+                "screenshots": [],
+            },
+        }
         plugin_json = pkg / ".codex-plugin" / "plugin.json"
         plugin_json.parent.mkdir(parents=True, exist_ok=True)
         plugin_json.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         written.append(plugin_json.as_posix())
+        # Claude Code plugin manifest (accurate Claude schema): no Codex `interface`/`policy`/
+        # `capabilities` blocks; components are directory-discovered, skills declared by path.
+        claude_manifest = {
+            "name": name,
+            "displayName": display_name,
+            "version": str(spec["version"]),
+            "description": spec["description"],
+            "author": {"name": "Skill System Maintainers"},
+            "license": "MIT",
+            "keywords": ["skill-system", "claude", name.removeprefix("skill-system-")],
+            "skills": "./skills/",
+        }
+        claude_plugin_json = pkg / ".claude-plugin" / "plugin.json"
+        claude_plugin_json.parent.mkdir(parents=True, exist_ok=True)
+        claude_plugin_json.write_text(json.dumps(claude_manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        written.append(claude_plugin_json.as_posix())
+        # Catalog entry for the Claude repo-local marketplace (source is a path relative to the
+        # marketplace root = the plugins/ dir that hosts .claude-plugin/marketplace.json).
+        marketplace_plugins.append(
+            {
+                "name": name,
+                "source": f"./{name}",
+                "description": spec["description"],
+                "version": str(spec["version"]),
+                "category": "Developer Tools",
+            }
+        )
         for sid in spec["skills"]:
             if sid not in src_skills:
                 raise SystemExit(f"plugin {name}: unknown skill '{sid}' (not in source/skills)")
             if sid in seen:
                 raise SystemExit(f"skill '{sid}' assigned to both {seen[sid]} and {name}")
             seen[sid] = name
-            _copy(source / "skills" / sid, pkg / "skills" / sid)
+            _copy_plugin_skill(source / "skills" / sid, pkg / "skills" / sid)
             written.append((pkg / "skills" / sid).as_posix())
     uncovered = src_skills - seen.keys()
     if uncovered:
         raise SystemExit(f"plugin coverage gap: {len(uncovered)} skills in no plugin: {sorted(uncovered)}")
+    # Claude repo-local marketplace catalog (accurate Claude marketplace.json schema): required
+    # `name` + `owner`, plugins listed with relative-path `source`. Register with
+    # `/plugin marketplace add <repo>/plugins`; install `<name>@skill-system-local`.
+    marketplace = {
+        "name": "skill-system-local",
+        "owner": {"name": "Skill System Maintainers"},
+        "description": "Skill System role-based plugin packages (local marketplace).",
+        "plugins": marketplace_plugins,
+    }
+    marketplace_json = plugins_root / ".claude-plugin" / "marketplace.json"
+    marketplace_json.parent.mkdir(parents=True, exist_ok=True)
+    marketplace_json.write_text(json.dumps(marketplace, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    written.append(marketplace_json.as_posix())
     return written
 
 

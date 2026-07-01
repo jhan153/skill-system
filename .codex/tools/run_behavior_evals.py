@@ -11,7 +11,7 @@ from typing import Any
 
 sys.dont_write_bytecode = True
 
-from _validation import is_iso_datetime, load_yaml_file
+from _validation import is_iso_datetime, load_yaml_file, resolve_bundle_path
 
 
 REQUIRED_RUN_FIELDS = {
@@ -30,6 +30,18 @@ REQUIRED_RUN_FIELDS = {
     "result",
 }
 RESULTS = {"pass", "partial", "fail"}
+
+
+def plugin_runtime(root: Path) -> bool:
+    return (root / ".codex" / "plugins" / "cache").exists()
+
+
+def artifact_available(root: Path, artifact: str) -> bool:
+    if artifact.startswith("/"):
+        return False
+    if (root / artifact).exists() or resolve_bundle_path(root, artifact) is not None:
+        return True
+    return plugin_runtime(root) and not artifact.startswith(".codex/")
 
 
 def yaml_files(path: Path) -> list[Path]:
@@ -145,7 +157,7 @@ def validate_run(path: Path, cases: dict[str, dict[str, Any]], root: Path, bundl
         artifacts = []
     else:
         for artifact in artifacts:
-            if artifact.startswith("/") or not (root / artifact).exists():
+            if not artifact_available(root, artifact):
                 errors.append(f"artifact not found or not repo-relative: {artifact}")
     if result == "pass" and not observed_behaviors:
         errors.append("pass result requires observed_behaviors")

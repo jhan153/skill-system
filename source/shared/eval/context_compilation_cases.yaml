@@ -1,4 +1,4 @@
-version: "8.0.2"
+version: "9.0.2"
 purpose: "Context Pack compilation cases for plan and Kanboard source admission."
 cases:
   - case_id: context-compile-plan-kanboard-001

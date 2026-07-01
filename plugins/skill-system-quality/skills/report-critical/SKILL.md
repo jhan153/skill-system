@@ -233,7 +233,7 @@ This skill remains a review gate. Do not generate the research plan unless the u
    - questions and answers (`질의`)
    - TODO list with status
    - implementation transition status
-7. In `qa_gate`, if a plan includes a diagram or the user explicitly requested one, the review must check that the diagram scope matches the requested runtime or design scope and is not an agent workflow unless the user asked for a workflow diagram.
+7. In `qa_gate`, if a plan includes a diagram or the user explicitly requested one, the review must check that the diagram scope matches an actual runtime interaction, control-flow, concurrency, component-boundary, class-design, or data-model concern, and that plan lifecycle, approval flow, and agent workflow are not inserted as default plan diagrams. A workflow diagram is allowed only when the user explicitly asked for one, scoped as an agent-process artifact.
 
 ## Reporting Contract
 - Start with one-line `primary_problem`.

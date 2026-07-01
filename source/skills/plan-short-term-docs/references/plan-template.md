@@ -3,26 +3,7 @@
 > File location: `docs/plan/YYYY-MM-DD-<task-slug>.md`
 > Activation note: casual `플랜` mentions alone do not create a plan; use this template for persisted plan artifacts or active plan synchronization.
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant A as Agent
-    participant P as Plan Doc
-
-    U->>A: Persisted plan artifact request
-    A->>P: Create or update docs/plan artifact
-    loop During planning
-        U->>A: Question or adjustment
-        A->>P: Update 질의/결정/TODO
-    end
-    alt Implementation transition phrase detected
-        U->>A: "구현 시작" (or equivalent)
-        A->>P: Mark implementation transition = active
-        A->>A: Start implementation
-    else Planning continues
-        A->>A: Keep planning-only mode
-    end
-```
+This plan remains planning-only until an explicit implementation transition is recorded.
 
 ## 1) 작업 개요
 - 목적:
@@ -38,15 +19,16 @@ sequenceDiagram
 
 ## 4) 현재 상태 vs 예정 상태
 
-### 4.1 코드
+### 4.1 코드 (필요 시)
+- 코드 변경이 유의미할 때만 작성한다. 실제 변경 언어로 before/after를 각각 별도 코드 블록에 넣는다(placeholder/toy code 금지).
 ### 변경 전
-```cpp
-printf("hello\n");
+```text
+(실제 현재 코드)
 ```
 
 ### 변경 후
-```cpp
-std::cout << "hello" << std::endl;
+```text
+(실제 변경 코드)
 ```
 
 ### 4.2 수식 (필요 시)
@@ -57,6 +39,8 @@ $$C_{old} = a + b$$
 $$C_{new} = a + b + \delta$$
 
 ### 4.3 다이어그램 (필요 시)
+- 다이어그램은 실제 runtime interaction, component boundary, class/data model 변화가 있을 때만 추가한다.
+- agent workflow, plan lifecycle, approval flow만 설명하는 다이어그램은 기본 생성하지 않는다.
 - 권장 기준:
   - 클래스 변경: 클래스 다이어그램
   - 호출/상호작용 변경: 시퀀스 다이어그램

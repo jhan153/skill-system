@@ -124,11 +124,28 @@ def run_check(check: Check) -> dict[str, object]:
 
 
 def clean_cache_artifacts(root: Path) -> None:
+    cleanup_roots = [path for path in [
+        root / ".codex",
+        root / ".claude",
+        root / "source",
+        root / "plugins",
+        root / "integrations",
+    ] if path.exists()]
+    if not cleanup_roots:
+        cleanup_roots = [root]
+    for cleanup_root in cleanup_roots:
+        clean_cache_artifacts_under(cleanup_root)
+
+
+def clean_cache_artifacts_under(root: Path) -> None:
     for path in sorted(root.rglob("*"), key=lambda item: len(item.parts), reverse=True):
         if path.is_dir() and not path.is_symlink() and path.name in CACHE_DIR_NAMES:
             shutil.rmtree(path, ignore_errors=True)
         elif path.is_file() and path.suffix in CACHE_SUFFIXES:
-            path.unlink(missing_ok=True)
+            try:
+                path.unlink(missing_ok=True)
+            except PermissionError:
+                continue
 
 
 def profile_status(results: list[dict[str, object]]) -> str:

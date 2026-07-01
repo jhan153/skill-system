@@ -1,4 +1,4 @@
-version: "9.0.0"
+version: "9.0.2"
 purpose: "Real-use quality observation cases for routing and output improvement."
 cases:
   - case_id: runtime-001
@@ -388,3 +388,39 @@ cases:
     expected_output_shape: "behavior contract, refactor scope, batch plan, changed artifacts, validation, behavior preservation evidence"
     quality_notes: "Safe refactor owns behavior-preserving restructuring and must separate it from feature or bug-fix changes."
     friction_risk: "mixing behavior changes into refactor work or validating only by inspection"
+  - case_id: runtime-045
+    user_request: "1차 개발 끝났으니 소스코드 다이어트해줘. 안 쓰는 함수, stale scaffold, unused export를 증거 확인해서 지워줘."
+    expected_primary_skill: workflow-source-maintenance
+    expected_supporting_skills: [workflow-validation, workflow-minimal-implementation]
+    should_not_trigger: [workflow-implementation, workflow-refactor-safely, analysis-codebase]
+    expected_context: [maintenance scope, target source and callers, public exports, dynamic entrypoint risks, validation command]
+    expected_output_shape: "maintenance scope, candidate inventory, delete plan, deleted or pruned code, preserved candidates with reasons, validation, behavior preservation evidence"
+    quality_notes: "Source maintenance owns post-development cleanup and dead-code pruning with delete evidence, not feature work or broad restructuring."
+    friction_risk: "deleting code that is public, dynamically loaded, generated, migration-related, or only apparently unused"
+  - case_id: runtime-046
+    user_request: "새 기능 구현하고 난 다음 cleanup도 같이 해줘."
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: [workflow-source-maintenance]
+    should_not_trigger: [workflow-refactor-safely, analysis-codebase]
+    expected_context: [feature requirements, target source files, cleanup substep, validation command]
+    expected_output_shape: "feature implementation as primary work, then bounded cleanup substep with separate validation and behavior-preservation note"
+    quality_notes: "Feature work remains workflow-implementation; source maintenance is only a requested cleanup phase after implementation."
+    friction_risk: "letting cleanup primary steal feature implementation"
+  - case_id: runtime-047
+    user_request: "주석이 코드랑 안 맞아. docstring이랑 inline 주석을 현재 동작에 맞게 최신화하고, 불필요한 주석은 정리하되 설계 이유 적힌 건 남겨줘."
+    expected_primary_skill: workflow-comment-maintenance
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [workflow-implementation, workflow-refactor-safely, workflow-source-maintenance]
+    expected_context: [comment scope, target source and described code, public/framework docstring consumption, validation command]
+    expected_output_shape: "comment scope, comment inventory, sync plan, updated or pruned comments, preserved high-context comments with reasons, public-contract impact, validation, behavior preservation evidence"
+    quality_notes: "Comment maintenance owns behavior-preserving comment/docstring sync and must preserve high-context rationale while changing no executable code."
+    friction_risk: "editing executable code or deleting design-rationale comments under a comment-only request"
+  - case_id: runtime-048
+    user_request: "이 기능 구현하고 관련 주석이랑 docstring도 같이 맞춰줘."
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: [workflow-comment-maintenance]
+    should_not_trigger: [workflow-refactor-safely, workflow-source-maintenance]
+    expected_context: [feature requirements, target source files, comment sync substep, validation command]
+    expected_output_shape: "feature implementation as primary work, then bounded comment/docstring sync substep with separate validation"
+    quality_notes: "Feature work remains workflow-implementation; comment maintenance is only a requested sync phase after implementation."
+    friction_risk: "letting comment sync steal feature implementation ownership"

@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 
 sys.dont_write_bytecode = True
 
-from _validation import is_iso_date, load_yaml_file, read_text
+from _validation import is_iso_date, load_yaml_file, read_text, resolve_bundle_path
 
 
 REQUIRED_FIELDS = {
@@ -90,7 +90,7 @@ def validate_source(source: dict[str, Any], root: Path) -> list[str]:
                 continue
             if consumer.startswith(LOCAL_ONLY_CONSUMER_PREFIXES):
                 continue
-            if not (root / consumer).exists():
+            if resolve_bundle_path(root, consumer) is None:
                 errors.append(f"{label}: local consumer not found: {consumer}")
     else:
         errors.append(f"{label}: local_consumers entries must be strings")

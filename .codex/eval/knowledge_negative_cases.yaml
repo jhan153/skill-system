@@ -1,4 +1,4 @@
-version: "8.0.2"
+version: "9.0.2"
 purpose: "Negative routing and safety cases for Wiki Bank / Runtime Projection adoption."
 cases:
   - case_id: knowledge-negative-simple-edit-001

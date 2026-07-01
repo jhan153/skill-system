@@ -14,7 +14,7 @@ from typing import Any
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _validation import load_yaml_file, read_text  # noqa: E402
+from _validation import load_yaml_file, read_text, skill_dirs as iter_skill_dirs  # noqa: E402
 
 
 SECTION_RE = re.compile(r"^##\s+", re.M)
@@ -22,10 +22,7 @@ RELATED_SKILL_RE = re.compile(r"`([a-z][a-z0-9-]+)`")
 
 
 def skill_dirs(root: Path, namespace: str) -> list[Path]:
-    base = root / namespace / "skills"
-    if not base.exists():
-        return []
-    return sorted(path for path in base.iterdir() if (path / "SKILL.md").is_file())
+    return iter_skill_dirs(root, namespace)
 
 
 def section_text(text: str, heading: str) -> str:

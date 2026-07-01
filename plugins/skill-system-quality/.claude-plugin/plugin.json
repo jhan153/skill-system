@@ -1,0 +1,16 @@
+{
+  "name": "skill-system-quality",
+  "displayName": "Skill System Quality",
+  "version": "9.0.2",
+  "description": "Skill System quality — acceptance, test strategy, regression/review gates for the QA/QC role.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "claude",
+    "quality"
+  ],
+  "skills": "./skills/"
+}

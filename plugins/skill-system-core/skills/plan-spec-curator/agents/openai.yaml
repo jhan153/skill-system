@@ -7,19 +7,4 @@ interface:
     Do not activate for ordinary implementation, normal docs/plan creation, direct memory mutation, code review, bug diagnosis, algorithm recommendation, or research evidence search.
 
 policy:
-  invocation_surface: support_only
   allow_implicit_invocation: false
-  may_own_execution: false
-
-work_horizon:
-  level: cross_horizon
-  role: lifecycle_curator
-  applies_to:
-    - task_ticket
-    - short_plan
-    - long_plan
-    - loop_overlay
-
-planning_altitude:
-  kind: lifecycle_curation
-  artifact_level: active_context_and_plan_lifecycle

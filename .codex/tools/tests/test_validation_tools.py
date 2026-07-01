@@ -17,6 +17,16 @@ import yaml
 ROOT = Path(__file__).resolve().parents[3]
 FIXTURES = ROOT / ".codex" / "tools" / "tests" / "fixtures"
 sys.dont_write_bytecode = True
+sys.path.insert(0, str(ROOT / ".codex" / "tools"))
+
+from _validation import resolve_bundle_path  # noqa: E402
+
+
+def bundle_path(rel: str) -> Path:
+    path = resolve_bundle_path(ROOT, rel)
+    if path is None:
+        raise AssertionError(f"bundle path not found: {rel}")
+    return path
 
 
 class ValidationToolTests(unittest.TestCase):
@@ -182,7 +192,7 @@ termination:
             result = subprocess.run(
                 [
                     "bash",
-                    str(ROOT / ".codex/skills/analysis-codebase/scripts/collect.sh"),
+                    str(bundle_path(".codex/skills/analysis-codebase/scripts/collect.sh")),
                     "--repo-path",
                     str(repo),
                     "--mode",
@@ -190,7 +200,7 @@ termination:
                     "--output-dir",
                     str(output),
                     "--policy",
-                    str(ROOT / ".codex/skills/analysis-codebase/references/policy-default.json"),
+                    str(bundle_path(".codex/skills/analysis-codebase/references/policy-default.json")),
                 ],
                 cwd=ROOT,
                 env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
@@ -218,13 +228,13 @@ termination:
 
             report = output / "codebase-analysis-report.md"
             result = self.run_tool(
-                ".codex/skills/analysis-codebase/scripts/report.py",
+                str(bundle_path(".codex/skills/analysis-codebase/scripts/report.py")),
                 "--input-dir",
                 str(output),
                 "--output",
                 str(report),
                 "--policy",
-                ".codex/skills/analysis-codebase/references/policy-default.json",
+                str(bundle_path(".codex/skills/analysis-codebase/references/policy-default.json")),
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             report_text = report.read_text(encoding="utf-8")
@@ -817,6 +827,59 @@ condition_results:
         self.assertEqual(event["status"], "warn")
         self.assertIn("UNVERIFIED", event["evidence"]["agent_output_validation"])
         ledger.unlink()
+
+    def test_codex_hook_adapter_stop_missing_current_run_skips_in_notification_mode(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            ledger = tmp_path / "hook-events.jsonl"
+            session_id = f"session-notification-skip-{os.getpid()}"
+            turn_id = f"turn-notification-skip-{os.getpid()}"
+            inp = tmp_path / "stop.json"
+            inp.write_text(
+                json.dumps(
+                    {
+                        "hook_event_name": "Stop",
+                        "session_id": session_id,
+                        "turn_id": turn_id,
+                        "cwd": str(ROOT),
+                        "permission_mode": "workspace-write",
+                        "last_assistant_message": "Plain final answer without an agent-run manifest.",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            env = {
+                **os.environ,
+                "PYTHONDONTWRITEBYTECODE": "1",
+                "SKILL_SYSTEM_DESKTOP_NOTIFY": "dry-run",
+                "SKILL_SYSTEM_HOOK_LEDGER": str(ledger),
+                "CODEX_MODEL": "gpt-5.5",
+                "CODEX_MODEL_REASONING_EFFORT": "xhigh",
+            }
+            env.pop("SKILL_SYSTEM_AGENT_OUTPUT_GATE", None)
+            env.pop("SKILL_SYSTEM_AGENT_RUN_BOOTSTRAP", None)
+            result = subprocess.run(
+                [sys.executable, ".codex/hooks/codex_hook_adapter.py", "--input-file", str(inp)],
+                cwd=ROOT,
+                env=env,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+                timeout=30,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            output = json.loads(result.stdout)
+            self.assertTrue(output["continue"])
+            self.assertIn("SKIP: agent output validation skipped", output["systemMessage"])
+            self.assertNotIn("UNVERIFIED", output["systemMessage"])
+            events = [json.loads(line) for line in ledger.read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(events[0]["neutral_event"], "turn_finalize_attempt")
+            self.assertEqual(events[0]["status"], "skip")
+            self.assertEqual(events[-1]["neutral_event"], "turn_finalize")
+            self.assertEqual(events[-1]["status"], "skip")
+            note = events[-1]["evidence"]["desktop_notifications"]["turn_complete"]
+            self.assertEqual(note["status"], "dry_run")
 
     def test_codex_hook_adapter_bootstraps_live_agent_run_manifest(self) -> None:
         with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:

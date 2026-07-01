@@ -1,5 +1,32 @@
 {
   "name": "skill-system-quality",
-  "version": "9.0.0",
-  "description": "Skill System quality — acceptance, test strategy, regression/review gates for the QA/QC role."
+  "version": "9.0.2",
+  "description": "Skill System quality — acceptance, test strategy, regression/review gates for the QA/QC role.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "codex",
+    "quality"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Skill System Quality",
+    "shortDescription": "QA, qualitative review, critical review, and validation skills.",
+    "longDescription": "Skill System quality — acceptance, test strategy, regression/review gates for the QA/QC role.",
+    "developerName": "Skill System Maintainers",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Skill System Quality skills for this task."
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
 }

@@ -1,5 +1,32 @@
 {
   "name": "skill-system-dev",
-  "version": "9.0.0",
-  "description": "Skill System dev — analysis, implementation, refactoring, codebase understanding, failure recovery for the engineering role."
+  "version": "9.0.2",
+  "description": "Skill System dev — analysis, implementation, refactoring, codebase understanding, failure recovery for the engineering role.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "codex",
+    "dev"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Skill System Dev",
+    "shortDescription": "Engineering analysis, implementation, refactoring, and recovery skills.",
+    "longDescription": "Skill System dev — analysis, implementation, refactoring, codebase understanding, failure recovery for the engineering role.",
+    "developerName": "Skill System Maintainers",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Skill System Dev skills for this task."
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
 }

@@ -1,0 +1,16 @@
+{
+  "name": "skill-system-design",
+  "displayName": "Skill System Design",
+  "version": "9.0.2",
+  "description": "Skill System design — UI/UX, design system, visual QA, layout/component mapping for the design role.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "claude",
+    "design"
+  ],
+  "skills": "./skills/"
+}

@@ -491,6 +491,25 @@ def run_id_for_event(args: argparse.Namespace, data: dict[str, Any]) -> str:
     return f"{session_id}:{turn_id}"
 
 
+def missing_manifest_should_warn(args: argparse.Namespace, data: dict[str, Any]) -> bool:
+    return (
+        args.ledger is not None
+        or args.run_dir is not None
+        or strict_gate_enabled(data)
+        or agent_run_bootstrap_enabled(data)
+    )
+
+
+def validation_skipped(validation_output: str) -> bool:
+    return validation_output.startswith("SKIP:")
+
+
+def validation_status(validation_code: int, validation_output: str) -> str:
+    if validation_code == 0:
+        return "skip" if validation_skipped(validation_output) else "pass"
+    return "warn" if validation_code == 4 else "fail"
+
+
 def run_dir_has_passing_turn_finalize(run_dir: Path) -> bool:
     manifest_path = run_dir / "run.yaml"
     try:
@@ -643,8 +662,12 @@ def run_agent_output_validation(
 ) -> tuple[int, str]:
     run_dir = current_run_dir(args, data)
     if run_dir is None:
+        if not missing_manifest_should_warn(args, data):
+            return 0, "SKIP: agent output validation skipped because hook input did not include session_id and turn_id."
         return 4, "UNVERIFIED: hook input did not include session_id and turn_id for current run binding."
     if not (run_dir / "run.yaml").exists():
+        if not missing_manifest_should_warn(args, data):
+            return 0, f"SKIP: agent output validation skipped because no current run manifest is configured: {run_dir / 'run.yaml'}"
         return 4, f"UNVERIFIED: current run manifest not found: {run_dir / 'run.yaml'}"
     cmd = [
         sys.executable,
@@ -777,6 +800,11 @@ def has_blocking_validation_failure(validation_output: str) -> bool:
 
 def stop_output(data: dict[str, Any], validation_code: int, validation_output: str) -> dict[str, Any]:
     if validation_code == 0:
+        if validation_skipped(validation_output):
+            return {
+                "continue": True,
+                "systemMessage": validation_output,
+            }
         return {
             "continue": True,
             "systemMessage": "Agent output validation passed.",
@@ -1118,13 +1146,13 @@ def handle(args: argparse.Namespace) -> int:
     if hook_event == "Stop":
         agent_run_finalize = maybe_finalize_agent_run(args, data)
         validation_code, validation_output = run_agent_output_validation(args, data, "pre-finalize")
-        status = "pass" if validation_code == 0 else "warn" if validation_code == 4 else "fail"
+        status = validation_status(validation_code, validation_output)
         attempt_extra: dict[str, Any] = {"agent_output_validation": validation_output}
         if agent_run_finalize is not None:
             attempt_extra["agent_run_finalize"] = agent_run_finalize
         record_event(args, data, status, attempt_extra, "turn_finalize_attempt")
         finalize_extra: dict[str, Any] = dict(attempt_extra)
-        if validation_code == 0:
+        if validation_code == 0 and not validation_skipped(validation_output):
             run_dir = current_run_dir(args, data)
             final_candidate = (
                 None
@@ -1209,7 +1237,13 @@ def handle(args: argparse.Namespace) -> int:
         if notifications:
             finalize_extra["desktop_notifications"] = notifications
         if validation_code == 0:
-            record_event(args, data, "pass", finalize_extra, "turn_finalize")
+            record_event(
+                args,
+                data,
+                validation_status(validation_code, validation_output),
+                finalize_extra,
+                "turn_finalize",
+            )
         elif kanboard_post_session is not None or notifications:
             status = "warn" if validation_code == 4 else "fail"
             record_event(args, data, status, finalize_extra, "turn_finalize_attempt")

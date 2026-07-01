@@ -24,9 +24,7 @@ derived_from: []
 | --- | --- | --- | --- | --- | --- | --- |
 
 ## Transitions
-```mermaid
-flowchart LR
-```
+- 실제 상태 전이가 존재할 때만 `flowchart LR` Mermaid 블록을 추가한다. 전이가 없으면 이 섹션을 비워 둔다(빈 다이어그램 블록은 넣지 않는다).
 
 ## Error States
 | State ID | Trigger | User-visible behavior | Recovery | Retry / Recovery Invariant |

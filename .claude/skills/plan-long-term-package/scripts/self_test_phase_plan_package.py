@@ -376,8 +376,9 @@ def seed_contract_for_strict(spec_dir: Path, slug: str, suffix: str) -> None:
     elif suffix == "ui-state-contract":
         insert_table_row(path, "## Canonical State IDs", "| empty | Empty | no material | app start | material loaded | none | false |")
         text = path.read_text(encoding="utf-8").replace(
-            "```mermaid\nflowchart LR\n```",
-            "```mermaid\nflowchart LR\n  empty --> material_loaded\n```",
+            "## Transitions\n",
+            "## Transitions\n```mermaid\nflowchart LR\n  empty --> material_loaded\n```\n",
+            1,
         )
         path.write_text(text, encoding="utf-8")
         insert_table_row(path, "## Error States", "| error_loading | load failure | show error | retry load | retry preserves input |")

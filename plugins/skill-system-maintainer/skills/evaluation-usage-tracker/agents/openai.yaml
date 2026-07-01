@@ -4,6 +4,4 @@ interface:
   default_prompt: "Use $evaluation-usage-tracker to aggregate a local, metadata-only invocation ledger into usage summaries, over/under-trigger candidates, and review-gated improvement suggestions, without storing raw prompts or transcripts."
 
 policy:
-  invocation_surface: support_only
   allow_implicit_invocation: false
-  may_own_execution: false

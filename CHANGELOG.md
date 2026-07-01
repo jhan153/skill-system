@@ -1,5 +1,21 @@
 # Changelog
 
+## 9.0.2
+
+- Template-hygiene and output-quality maintenance cut after 9.0.1.
+- Removed toy C++ before/after examples from the short-term plan template (`plan-short-term-docs/references/plan-template.md`) and the `plan-short-term-docs` evidence rule; before/after code evidence now uses the change's actual language with no placeholder/toy code.
+- Propagated the `plan-short-term-docs` diagram policy to `workflow-rigor` and `report-critical`: Mermaid only for actual runtime/control-flow/concurrency/component-boundary/class-design/data-model concerns, and plan lifecycle, approval flow, and agent workflow are not default plan diagrams.
+- Made the long-term `ui-state-contract` transition diagram conditional on real transitions (no shipped empty `flowchart LR` block); kept the phase-plan-package self-test in sync.
+- Converted `analysis-codebase` `report.py` unverified fallback diagrams (subsystem/path/class/metric) to plain text notices instead of meaningless placeholder diagrams; evidence-backed diagrams are unchanged.
+- Bumped the bundle version to 9.0.2 across plugin/eval manifests, `DEFAULT_BUNDLE_VERSION`, the Claude platform header, and README current pointers; regenerated `.codex`/`.claude`/plugin targets and re-verified integrity.
+
+## 9.0.1
+
+- Expanded the `skill-system-dev` engineering role beyond the initial 9.0.0 cut with concrete execution-owner and analysis skills: `analysis-architecture-deepening`, `analysis-codebase-design`, `analysis-domain-modeling`, `analysis-performance`, `workflow-implementation`, `workflow-bug-fix`, `workflow-dependency-upgrade`, `workflow-refactor-safely`, `workflow-source-maintenance`, and `workflow-comment-maintenance`. Skill count 58 → 68.
+- Added `workflow-source-maintenance` (post-development source cleanup, evidence-gated dead-code pruning, source diet) and `workflow-comment-maintenance` (behavior-preserving comment/docstring/TODO-FIXME sync) as separate primaries, with explicit boundaries against `workflow-implementation`, `workflow-refactor-safely`, and each other.
+- Added `source_maintenance_execution` and `comment_maintenance_execution` work-horizon execution modes, plus routing-matrix rows, registry entries, family aliases, and runtime/negative routing eval coverage for the new skills.
+- Regenerated the `.codex`/`.claude` runtime targets and the `skill-system-dev` plugin from `source/`; integrity re-verified byte-identical and the full verification pipeline passes.
+
 ## 9.0.0
 
 - Introduced a neutral canonical `source/` tree (`skills/`, `shared/`, `platform/{codex,claude}/`, `plugins/`, `mirror-meta.json`, `tools/`) as the single source of truth, replacing hand-maintained `.codex` / `.claude` dual trees.

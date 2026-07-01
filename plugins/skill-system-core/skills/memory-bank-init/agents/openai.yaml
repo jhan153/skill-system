@@ -4,6 +4,4 @@ interface:
   default_prompt: "Use $memory-bank-init to initialize persistent project memory after resolving project identity and validating file creation."
 
 policy:
-  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
-  may_own_execution: true

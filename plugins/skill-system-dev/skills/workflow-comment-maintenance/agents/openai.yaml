@@ -1,0 +1,7 @@
+interface:
+  display_name: "Workflow Comment Maintenance"
+  short_description: "Behavior-preserving comment and docstring sync"
+  default_prompt: "Use $workflow-comment-maintenance to sync comments, docstrings, and TODO/FIXME markers with current code while preserving intended behavior."
+
+policy:
+  allow_implicit_invocation: false

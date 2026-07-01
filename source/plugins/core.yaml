@@ -1,6 +1,6 @@
 # source/plugins/core.yaml — plugin membership manifest (hand-authored input).
 name: skill-system-core
-version: "9.0.0"
+version: "9.0.2"
 description: 'Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, search broker, validation/reporting contract, task state) used by all role plugins.'
 skills:
   - coordination-brief

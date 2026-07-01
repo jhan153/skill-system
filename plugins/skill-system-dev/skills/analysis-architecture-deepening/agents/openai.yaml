@@ -4,6 +4,4 @@ interface:
   default_prompt: "Use $analysis-architecture-deepening to scan a scoped codebase area for architecture friction and return ranked deep-module, seam, adapter, shallow-wrapper, or policy-move candidates without generating a full repo-wide report artifact."
 
 policy:
-  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
-  may_own_execution: true

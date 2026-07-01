@@ -12,7 +12,7 @@ from typing import Any
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _validation import load_yaml_file  # noqa: E402
+from _validation import load_yaml_file, skill_dirs_by_id  # noqa: E402
 
 
 EXPECTED: dict[str, dict[str, str]] = {
@@ -22,7 +22,9 @@ EXPECTED: dict[str, dict[str, str]] = {
     "plan-spec-curator": {"work_horizon": "cross_horizon", "planning_altitude": "lifecycle_curation"},
     "workflow-implementation": {"work_horizon": "cross_horizon", "execution_mode": "implementation_execution"},
     "workflow-bug-fix": {"work_horizon": "cross_horizon", "execution_mode": "bug_fix_execution"},
+    "workflow-comment-maintenance": {"work_horizon": "cross_horizon", "execution_mode": "comment_maintenance_execution"},
     "workflow-dependency-upgrade": {"work_horizon": "cross_horizon", "execution_mode": "dependency_upgrade_execution"},
+    "workflow-source-maintenance": {"work_horizon": "cross_horizon", "execution_mode": "source_maintenance_execution"},
     "workflow-refactor-safely": {"work_horizon": "cross_horizon", "execution_mode": "safe_refactor_execution"},
     "workflow-plan-runner": {"work_horizon": "cross_horizon", "execution_mode": "plan_batch_execution"},
     "workflow-loop-runner": {"work_horizon": "loop_overlay", "execution_mode": "loop_convergence_execution"},
@@ -39,6 +41,8 @@ VALID_EXECUTION_MODES = {
     "implementation_execution",
     "bug_fix_execution",
     "dependency_upgrade_execution",
+    "comment_maintenance_execution",
+    "source_maintenance_execution",
     "safe_refactor_execution",
     "plan_batch_execution",
     "loop_convergence_execution",
@@ -49,13 +53,6 @@ VALID_EXECUTION_MODES = {
     "minimality_constraint",
 }
 COMPARE_KEYS = {"work_horizon", "planning_altitude", "execution_mode"}
-
-
-def skill_dirs(root: Path, namespace: str) -> dict[str, Path]:
-    base = root / namespace / "skills"
-    if not base.exists():
-        return {}
-    return {path.name: path for path in sorted(base.iterdir()) if (path / "SKILL.md").is_file()}
 
 
 def load_agent(skill_dir: Path) -> dict[str, Any]:
@@ -103,7 +100,9 @@ def metadata_subset(data: dict[str, Any]) -> dict[str, Any]:
 
 def validate_namespace(root: Path, namespace: str, allow_partial: bool) -> list[str]:
     errors: list[str] = []
-    skills = skill_dirs(root, namespace)
+    if namespace == ".claude" and not (root / ".claude" / "skills").exists() and (root / ".codex" / "plugins" / "cache").exists():
+        return errors
+    skills = skill_dirs_by_id(root, namespace)
     for skill_id in sorted(EXPECTED):
         skill_dir = skills.get(skill_id)
         if skill_dir is None:
@@ -116,8 +115,10 @@ def validate_namespace(root: Path, namespace: str, allow_partial: bool) -> list[
 
 def validate_mirror_parity(root: Path, allow_partial: bool) -> list[str]:
     errors: list[str] = []
-    codex = skill_dirs(root, ".codex")
-    claude = skill_dirs(root, ".claude")
+    if not (root / ".claude" / "skills").exists() and (root / ".codex" / "plugins" / "cache").exists():
+        return errors
+    codex = skill_dirs_by_id(root, ".codex")
+    claude = skill_dirs_by_id(root, ".claude")
     for skill_id in sorted(EXPECTED):
         if skill_id not in codex or skill_id not in claude:
             if not allow_partial:
@@ -128,6 +129,22 @@ def validate_mirror_parity(root: Path, allow_partial: bool) -> list[str]:
     return errors
 
 
+def is_plugin_runtime(root: Path) -> bool:
+    return (root / ".codex" / "plugins" / "cache").exists() and not any(
+        (root / ".codex" / "skills" / skill_id / "agents" / "openai.yaml").is_file()
+        for skill_id in EXPECTED
+    )
+
+
+def validate_plugin_runtime(root: Path, allow_partial: bool) -> list[str]:
+    errors: list[str] = []
+    skills = skill_dirs_by_id(root, ".codex")
+    for skill_id in sorted(EXPECTED):
+        if skill_id not in skills and not allow_partial:
+            errors.append(f"plugin runtime missing expected work-horizon skill payload: {skill_id}")
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path("."))
@@ -135,6 +152,15 @@ def main() -> int:
     args = parser.parse_args()
     root = args.root.resolve()
     errors: list[str] = []
+    if is_plugin_runtime(root):
+        errors.extend(validate_plugin_runtime(root, args.allow_partial))
+        if errors:
+            print("FAIL")
+            for error in errors:
+                print(f"- {error}")
+            return 1
+        print("PASS")
+        return 0
     for namespace in [".codex", ".claude"]:
         errors.extend(validate_namespace(root, namespace, args.allow_partial))
     errors.extend(validate_mirror_parity(root, args.allow_partial))

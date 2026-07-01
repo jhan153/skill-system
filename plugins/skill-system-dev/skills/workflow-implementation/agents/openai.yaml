@@ -4,14 +4,4 @@ interface:
   default_prompt: "Use $workflow-implementation to make the requested code, test, script, API, config, or build change with scoped context, focused validation, and concise evidence. Attach minimality, rigor, validation, bug-fix, refactor, or recovery skills only when their narrower trigger is present."
 
 policy:
-  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
-  may_own_execution: true
-
-work_horizon:
-  level: cross_horizon
-  role: direct_implementation_owner
-
-execution_mode:
-  kind: implementation_execution
-  owns_execution: true

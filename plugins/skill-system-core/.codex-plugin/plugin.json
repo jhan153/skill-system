@@ -1,5 +1,32 @@
 {
   "name": "skill-system-core",
-  "version": "9.0.0",
-  "description": "Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, search broker, validation/reporting contract, task state) used by all role plugins."
+  "version": "9.0.2",
+  "description": "Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, search broker, validation/reporting contract, task state) used by all role plugins.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "codex",
+    "core"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Skill System Core",
+    "shortDescription": "Shared operating platform skills for Codex workflows.",
+    "longDescription": "Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, search broker, validation/reporting contract, task state) used by all role plugins.",
+    "developerName": "Skill System Maintainers",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Skill System Core skills for this task."
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
 }

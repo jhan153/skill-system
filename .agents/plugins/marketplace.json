@@ -1,0 +1,80 @@
+{
+  "name": "skill-system-local",
+  "interface": {
+    "displayName": "Skill System Local"
+  },
+  "plugins": [
+    {
+      "name": "skill-system-core",
+      "source": {
+        "source": "local",
+        "path": "./plugins/skill-system-core"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "skill-system-dev",
+      "source": {
+        "source": "local",
+        "path": "./plugins/skill-system-dev"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "skill-system-design",
+      "source": {
+        "source": "local",
+        "path": "./plugins/skill-system-design"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "skill-system-research",
+      "source": {
+        "source": "local",
+        "path": "./plugins/skill-system-research"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "skill-system-quality",
+      "source": {
+        "source": "local",
+        "path": "./plugins/skill-system-quality"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "skill-system-maintainer",
+      "source": {
+        "source": "local",
+        "path": "./plugins/skill-system-maintainer"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

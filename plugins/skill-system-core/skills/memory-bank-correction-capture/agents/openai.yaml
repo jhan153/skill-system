@@ -4,6 +4,4 @@ interface:
   default_prompt: "Use $memory-bank-correction-capture to record project-level recurring corrections as candidate mistake memory with masked evidence."
 
 policy:
-  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
-  may_own_execution: true

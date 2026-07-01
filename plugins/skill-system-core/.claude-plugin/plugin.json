@@ -1,0 +1,16 @@
+{
+  "name": "skill-system-core",
+  "displayName": "Skill System Core",
+  "version": "9.0.2",
+  "description": "Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, search broker, validation/reporting contract, task state) used by all role plugins.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "claude",
+    "core"
+  ],
+  "skills": "./skills/"
+}

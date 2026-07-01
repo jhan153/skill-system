@@ -109,7 +109,7 @@ python3 .codex/tools/run_verification_pipeline.py --profiles core execution agen
 ## Live Codex Hook Wiring
 `.codex/hooks.json` wires `UserPromptSubmit`, `SessionStart`, `PreToolUse`, `PermissionRequest`, `PostToolUse`, `Stop`, `PreCompact`, and `PostCompact` to `.codex/hooks/codex_hook_adapter.py`.
 
-The adapter records hook events to `SKILL_SYSTEM_HOOK_LEDGER` when that environment variable is set. Otherwise, when Codex provides `session_id` and `turn_id` and the current run manifest already exists, it writes to `.codex/harness/agent-runs/<session-id>/<turn-id>/hook-events.jsonl`. If the manifest is missing, it falls back to `hook_runtime.py`'s temp ledger path so release packages do not accumulate orphan runtime traces.
+The adapter records hook events to `SKILL_SYSTEM_HOOK_LEDGER` when that environment variable is set. Otherwise, when Codex provides `session_id` and `turn_id` and the current run manifest already exists, it writes to `.codex/harness/agent-runs/<session-id>/<turn-id>/hook-events.jsonl`. If the manifest is missing in the default notification-only Stop path, validation is recorded as `skip` and the adapter falls back to `hook_runtime.py`'s temp ledger path so release packages do not accumulate orphan runtime traces.
 
 New live records are schema v2 hash-chain records. Existing schema v1 fixtures remain readable for compatibility, but new v2 run fixtures are expected to prove request receipt, context load, tool lifecycle, and finalization.
 
@@ -117,7 +117,8 @@ New live records are schema v2 hash-chain records. Existing schema v1 fixtures r
 
 - current run exists and is valid: `pass`
 - current run exists and is invalid: `turn_finalize_attempt` plus non-blocking continuation by default
-- current run is missing: `turn_finalize_attempt` with `UNVERIFIED`/`warn`, not pass
+- current run is missing in notification-only mode: `turn_finalize_attempt` with `SKIP`/`skip`, not pass
+- current run is missing under strict gate, explicit `--run-dir`, explicit `--ledger`, or opt-in bootstrap: `turn_finalize_attempt` with `UNVERIFIED`/`warn`, not pass
 
 ## Loop Governance Packets
 
@@ -139,6 +140,6 @@ Codex still requires project trust and hook trust before these project-local hoo
 
 ## RC2 Freeze and 8.0 Policy
 
-The `7.3.1` RC2 hook behavior is frozen as the compatibility baseline. Known live-hook limits are documented rather than expanded into a broader Stop-hook project: hooks only run after project trust, missing current-run manifests are `UNVERIFIED`/`warn`, and permission events may be approximate when Codex does not provide a `tool_use_id`.
+The `7.3.1` RC2 hook behavior is the historical compatibility baseline. Current live-hook limits are documented rather than expanded into a broader Stop-hook project: hooks only run after project trust, missing current-run manifests are `skip` in notification-only mode and `UNVERIFIED`/`warn` only when validation is explicitly requested, and permission events may be approximate when Codex does not provide a `tool_use_id`.
 
 The 8.0 branch policy is to preserve the external compatibility interface while moving the internal operating layer to `8.0.0 — Context Compounding / Wiki Bank Architecture`. Run Trace Integrity remains the execution evidence gate that supports the 8.0 Knowledge Store and Context Pack layers.

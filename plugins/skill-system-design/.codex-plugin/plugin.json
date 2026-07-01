@@ -1,5 +1,32 @@
 {
   "name": "skill-system-design",
-  "version": "9.0.0",
-  "description": "Skill System design — UI/UX, design system, visual QA, layout/component mapping for the design role."
+  "version": "9.0.2",
+  "description": "Skill System design — UI/UX, design system, visual QA, layout/component mapping for the design role.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "codex",
+    "design"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Skill System Design",
+    "shortDescription": "Frontend, UI, layout, component, token, and visual validation skills.",
+    "longDescription": "Skill System design — UI/UX, design system, visual QA, layout/component mapping for the design role.",
+    "developerName": "Skill System Maintainers",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Skill System Design skills for this task."
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
 }
