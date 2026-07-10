@@ -1,6 +1,6 @@
 ---
 name: workflow-plan-runner
-description: Executes an approved plan, spec, or plan package into implementation batches. Use when the user asks to implement from an existing plan/spec/package, run a phase, build an initial waterfall-style version from requirements, or execute a planned scope rather than create the plan.
+description: Executes an approved plan or spec as the smallest safe implementation batch, preserving plan scope and distinguishing batch completion from whole-plan completion.
 ---
 
 # Workflow Plan Runner
@@ -8,129 +8,103 @@ description: Executes an approved plan, spec, or plan package into implementatio
 ## Routing Card
 - role: primary
 - intent_signature:
-  - approved plan execution
-  - spec-driven implementation
-  - plan package execution
-  - Phase 1 실행
-  - 기획서 기반 초기 구현
-  - waterfall-style initial build
+  - approved plan or spec execution
+  - target phase or batch implementation
+  - 기획서 기반 구현
 - use_when:
-  - the user asks to execute an approved short-term plan, long-term package, or spec.
-  - the user asks for initial implementation from a requirements/spec document rather than more planning.
-  - a large planned scope should be implemented in change batches with validation after each batch.
+  - the user asks to implement an approved plan/spec/package or a named phase/batch.
+  - a broad approved scope needs ordered implementation batches.
 - do_not_use_when:
-  - the user asks to create or update the plan/spec/package; use `plan-short-term-docs` or `plan-long-term-package`.
-  - the task is a small direct edit that does not need plan/spec execution orchestration.
-  - the plan/spec is missing and the user has not provided enough requirements to execute safely.
-  - the request is handoff-only or multi-agent ownership only; use `coordination-brief` or `coordination-multi-agent`.
+  - the user asks to create, revise, review, or merely summarize the plan.
+  - a direct edit has no plan-execution dependency.
+  - no executable source is provided and material requirements cannot be derived safely.
 - expected_inputs:
-  - approved plan, spec, requirements document, or package pointer
-  - target phase, batch, or implementation slice
-  - repo write scope and validation expectations
+  - approved execution source and requested slice
+  - target code/config/tests and validation boundary
 - expected_outputs:
-  - execution slice, batch order, changed implementation artifacts, validation per batch, rollback/fallback decision when needed, status updates, and remaining gaps
+  - the approved request scope implemented as the smallest validated batches
+  - explicit per-batch status and evidence-backed phase/whole-plan status
 - context_targets:
   must_read:
     - current execution request
-    - approved plan/spec/package slice that owns the scope
-    - target source/test/config files for the current batch
+    - only the plan/spec/package slice that owns the requested scope
+    - target source, tests, and config for the next batch
   read_if_needed:
-    - active short-term plan for status sync
-    - long-term package README or relevant phase docs
-    - validation contract
-    - coordination notes when multiple owners are explicit
+    - relevant dependency phase or canonical contract
+    - active plan status fields when synchronization is requested
+    - validation or coordination contract when explicitly attached
   do_not_load_by_default:
     - full repo
-    - full memory bank
-    - all plan packages
-    - unrelated specs
-    - archived raw plans
+    - all plan packages or phase docs
+    - archived plans and unrelated specs
 - risk_profile:
   reads:
-    - approved plan/spec slice, targeted source files, tests, and validation output
+    - approved slice and targeted implementation evidence
   writes:
-    - WRITE_CODEBASE for the approved implementation slice; plan/status docs only when explicitly in scope
+    - approved codebase slice; plan status only when requested
   tools:
-    - CALL_PROCESS for targeted build/test/smoke checks tied to the current batch
+    - targeted build, test, or smoke checks
   sensitive_resources:
-    - credentials default deny; destructive, network, data, or external-side-effect steps require explicit boundary review
+    - external side effects require their normal approval boundary
 - entry_scene:
-  - PREPARE
+  - SOURCE_GATE
 
-## Purpose
-- Convert an approved plan/spec into real implementation batches.
-- Own "what to implement next" for plan-driven work.
-- Keep planning, coordination, validation, and reporting as separate support layers.
+## Execution Source Gate
 
-## Activation
-- Primary for "이 스펙대로 구현", "이 plan package Phase 1 실행", "기획서 기반으로 초기 구현", or "waterfall식으로 전체 골격 구현" requests.
-- Attach `workflow-rigor` for medium/high-risk execution discipline.
-- Attach `workflow-validation` for validation matrix or validation-only substeps.
-- Attach `coordination-brief` or `coordination-multi-agent` only for explicit handoff, lock scope, or multi-agent ownership.
+Proceed only when the current slice identifies:
+
+- observable behavior or acceptance criteria
+- bounded implementation surface or a safe discovery step
+- blocking dependencies and non-goals
+- a validation target
+- no unresolved approval marker for the proposed write
+
+A missing detail may be recorded as an assumption only when it cannot alter public behavior, data ownership, safety, or scope. Otherwise stop with the exact missing decision; do not invent requirements from neighboring plan prose.
+
+## Batch Contract
+
+Choose the smallest batch that closes one observable condition. A batch is the validation unit, not the default stopping point: continue through the user's approved request scope while each batch passes and no blocker, approval boundary, or user stop is reached. Record:
+
+| Field | Meaning |
+| --- | --- |
+| `source_anchor` | exact plan/spec condition owned by this batch |
+| `scope` | files/components and explicit non-goals |
+| `change` | one coherent implementation outcome |
+| `validation` | check that can confirm or reject that outcome |
+| `status` | `passed`, `failed`, `blocked`, or `user-verification-needed` |
+
+Do not open the next batch until the current batch is passed or explicitly isolated. Attach `workflow-recovery` after a same-signature failure repeats; attach `workflow-validation` only when check design is itself the task.
 
 ## Workflow
-1. Confirm the plan/spec/package is approved or sufficient for execution.
-2. Select the smallest executable slice for the current turn.
-3. Lock scope: files/modules, non-goals, risk boundary, and validation target.
-4. Build a batch order: each batch has change intent, expected artifact, and validation.
-5. Implement one batch at a time.
-6. Validate each batch before expanding scope.
-7. Sync status to the active plan only when plan status tracking is explicitly in scope.
-8. Report changed implementation artifacts, validation, remaining gaps, and next batch.
 
-## Execution Source Checklist
-Treat the plan/spec/package as sufficient for execution only when it provides:
-- target behavior or acceptance criteria for the current slice
-- implementation boundary: files, modules, routes, services, or artifacts likely to change
-- non-goals or deferred scope when the plan is broad
-- validation expectation or enough context to derive one
-- no unresolved approval marker that blocks writes
+1. Resolve the requested phase/batch to its canonical source anchor and blocking predecessors.
+2. Apply the execution-source gate and freeze the current batch scope.
+3. Inspect only the implementation surface needed for that batch.
+4. Implement and run its targeted validation.
+5. Record condition delta and evidence; synchronize plan state only when requested.
+6. If approved request scope remains, select the next batch and repeat. Stop only when that scope is complete, a blocker/approval/user-verification gate is reached, or the user requested a single batch.
 
-If one item is missing but the safe implementation slice is still obvious, proceed and mark the assumption. If two or more are missing, stop and report the missing execution source instead of inventing the plan.
+## Completion Semantics
+
+- `batch_complete`: every condition in the current batch passed with evidence.
+- `phase_complete`: all required batches and phase exit gates passed.
+- `plan_complete`: every required phase and final plan gate passed.
+
+Never infer `phase_complete` or `plan_complete` from one successful batch. Conversely, do not stop after the first passing batch when the user approved a broader executable scope. Documentation-only status updates do not complete an implementation batch. If no safe executable slice exists, the result is `blocked`, not completion.
 
 ## Output Contract
-Return only the sections needed:
-- `execution_scope`
-- `batch_plan`
-- `changed_artifacts`
-- `validation_per_batch`
-- `rollback_or_fallback`
-- `blocked_items`
-- `remaining_gaps`
-- `next_batch`
 
-## Rollback And Fallback
-- Continue normal execution when validation passes or failures are unrelated to the current batch.
-- Re-run validation only when the command, environment, or fixture is suspect and the changed code is not implicated.
-- Hand off to `workflow-recovery` when the same failure signature repeats after a targeted fix or when fake-fix pressure appears.
-- Roll back or isolate the last batch when it introduced a regression and the cause is not understood.
-- Stop execution and report `blocked` when the plan/spec is insufficient, validation cannot be run, or the next batch would exceed the approved scope.
+Report only:
 
-## Completion Gate
-- Completion requires source, test, runtime config/build, or executable scaffold changes tied to the approved plan/spec.
-- Plan-only, spec-only, report-only, or TODO-only edits do not satisfy implementation completion.
-- If no executable slice is safe, report `blocked` with the exact missing input or approval boundary.
+1. `source_anchor` and executed batch scopes
+2. changed implementation artifacts by batch
+3. validation evidence and status per batch
+4. `phase_status` / `plan_status` only when known from the execution source
+5. next approved batch or the single blocker
 
-## Invocation Examples
-Positive:
-- "이 승인된 스펙대로 Phase 1 초기 구현을 진행해줘."
-- "이 plan package의 Batch 2를 실제 코드로 실행해줘."
-- "기획서 기반으로 MVP 골격을 먼저 구현해줘."
+## Boundaries And Validation
 
-Negative:
-- "이 스펙 초안을 보고 구현 계획만 더 다듬어줘." -> `plan-short-term-docs`
-- "이 변경을 어떻게 검증할지만 matrix로 짜줘." -> `workflow-validation`
-- "같은 테스트가 계속 실패해. 원인 하나씩 격리하자." -> `workflow-recovery`
-
-## Cross-Skill Boundaries
-- `plan-short-term-docs` owns short-term plan document creation and synchronization.
-- `plan-long-term-package` owns multi-document package creation.
-- `workflow-rigor` owns evidence depth and completion discipline.
-- `workflow-validation` owns validation strategy and validation-only runs.
-- `coordination-*` owns handoff and ownership notes, not execution order.
-- `report-*` owns final presentation, diff, artifact inventory, or critical verdicts.
-
-## Known Limits
-- This skill assumes an executable source of truth exists.
-- It does not invent missing specs or turn ambiguous requirements into implementation without marking uncertainty.
-- It does not create persistent workflow state or multi-agent event logs.
+- Planning skills own plan creation; this skill consumes approved execution sources.
+- Coordination skills own handoff/ownership records, not implementation order.
+- Reporting skills may format the result but do not change completion state.
+- Confirm the diff stays within the batch source anchor and that material acceptance conditions have direct evidence.

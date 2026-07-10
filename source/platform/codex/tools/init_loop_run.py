@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -14,6 +15,7 @@ sys.dont_write_bytecode = True
 from _validation import load_json_file, load_yaml_file, validate_schema
 from loop_policy import (
     append_jsonl,
+    contract_runtime_errors,
     control_value,
     file_sha256,
     git_revision,
@@ -53,6 +55,7 @@ def main() -> int:
         print("FAIL: loop contract must be a mapping")
         return 2
     errors = validate_schema(contract, schema)
+    errors.extend(contract_runtime_errors(contract))
     if errors:
         print("FAIL")
         for error in errors:
@@ -62,6 +65,9 @@ def main() -> int:
     workspace_root = args.workspace_root.resolve()
     ws_id = workspace_id(workspace_root)
     loop_run_id = safe_id(args.loop_run_id or default_loop_run_id(str(contract["contract_id"])), "LR-00000000-001")
+    if re.fullmatch(r"LR-[0-9]{8}-[0-9]{3}", loop_run_id) is None:
+        print(f"FAIL: loop_run_id must match LR-YYYYMMDD-NNN: {loop_run_id}")
+        return 1
     loop_dir = args.output_root / ws_id / loop_run_id
     if loop_dir.exists():
         if not args.force:
@@ -78,7 +84,7 @@ def main() -> int:
     required_ids = required_condition_ids(contract)
     now = utc_now()
     state = {
-        "schema_version": 1,
+        "schema_version": 2,
         "loop_run_id": loop_run_id,
         "contract_ref": "contract.yaml",
         "contract_hash": file_sha256(loop_dir / "contract.yaml"),
@@ -103,6 +109,7 @@ def main() -> int:
                 "condition_id": condition["id"],
                 "status": "unverified",
                 "evidence_refs": [],
+                "evidence": [],
             }
             for condition in success_conditions(contract)
         ],

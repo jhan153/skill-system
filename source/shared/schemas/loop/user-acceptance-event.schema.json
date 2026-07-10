@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-user-acceptance-event.schema.json",
+  "title": "Skill System Procedural User Acceptance Event",
+  "description": "Durable audit evidence captured from actual user input. Digest and field binding are validated, but actor identity is not cryptographically authenticated by this schema.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "event_type",
+    "contract_id",
+    "loop_run_id",
+    "condition_id",
+    "actor",
+    "scope",
+    "accepted",
+    "observed_at",
+    "source"
+  ],
+  "properties": {
+    "schema_version": { "enum": [1] },
+    "event_type": { "enum": ["user_acceptance"] },
+    "contract_id": {
+      "type": "string",
+      "pattern": "^LC-[0-9]{8}-[0-9]{3}$"
+    },
+    "loop_run_id": {
+      "type": "string",
+      "pattern": "^LR-[0-9]{8}-[0-9]{3}$"
+    },
+    "condition_id": {
+      "type": "string",
+      "pattern": "^SC-[0-9]{3}$"
+    },
+    "actor": { "type": "string", "minLength": 1 },
+    "scope": { "type": "string", "minLength": 1 },
+    "accepted": { "enum": [true] },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "source": { "enum": ["user_input"] }
+  },
+  "additionalProperties": false
+}

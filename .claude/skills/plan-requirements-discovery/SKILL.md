@@ -1,6 +1,6 @@
 ---
 name: plan-requirements-discovery
-description: Run a human-in-loop requirements discovery interview before planning or implementation, eliciting goals, domain terms, constraints, edge cases, non-goals, assumptions, and unresolved questions one decision at a time. Use only when explicitly requested.
+description: Run a one-question-at-a-time requirements interview that converts goals, scope, constraints, edge cases, non-goals, and assumptions into explicit decisions before planning or implementation. Use only when the user explicitly requests guided discovery.
 ---
 
 # Plan Requirements Discovery
@@ -8,93 +8,78 @@ description: Run a human-in-loop requirements discovery interview before plannin
 ## Routing Card
 - role: primary
 - intent_signature:
-  - requirements discovery
-  - guided requirements interview
-  - 요구사항 인터뷰
-  - 구현 전에 질문
-  - scope discovery
+  - requirements/scope discovery interview
+  - ask questions before PRD, plan, or implementation
 - use_when:
-  - the user explicitly asks to be questioned before PRD, HLD, LLD, planning, or implementation.
-  - the request has a meaningful requirements gap and the user wants guided discovery rather than immediate execution.
-  - domain terms, constraints, non-goals, edge cases, or acceptance boundaries must be elicited from the user.
+  - the user explicitly asks for guided elicitation and meaningful requirements gaps remain.
 - do_not_use_when:
-  - the user already provided stable requirements or an approved spec.
-  - the user asks for direct implementation, active `docs/plan` synchronization, phase package planning, validation execution, or lifecycle reporting.
-  - a brief clarification question is enough for a small one-shot task.
+  - requirements are stable, one clarification is enough, or the user requests direct implementation, plan synchronization, packaging, validation, or reporting.
 - expected_inputs:
-  - rough goal, idea, feature, bugfix intent, or product direction
-  - known constraints, target user, domain, repo area, or non-goals when available
-  - explicit user willingness to answer questions
+  - rough goal, known constraints/non-goals, domain hints, and willingness to answer
 - expected_outputs:
-  - requirements-discovery-record with question/answer decisions
-  - domain terms, goals, constraints, assumptions, risks, edge cases, non-goals, and open questions
-  - handoff notes for `plan-requirements-brief`, `plan-long-term-package`, or `plan-short-term-docs`
+  - decision ledger and a discovery record ready for requirements distillation
 - context_targets:
   must_read:
-    - current discovery request
-    - any provided rough goal, notes, screenshots, docs, or repo slice explicitly in scope
+    - current discovery request and provided goal/notes
   read_if_needed:
-    - `references/interview-protocol.md`
-    - `references/discovery-record-template.md`
-    - narrow repo docs only when the user asks to discover requirements against an existing codebase
+    - `references/interview-protocol.md` for a complex interview
+    - `references/discovery-record-template.md` when persisting or handing off the record
+    - narrow repo docs when discovery must match an existing surface
   do_not_load_by_default:
-    - full repo
-    - full memory bank
-    - plan packages
-    - implementation files unrelated to the elicitation target
+    - full repo, memory bank, plan packages, or unrelated implementation files
 - risk_profile:
   reads:
     - user-provided notes and narrowly referenced artifacts
   writes:
-    - none by default; write a discovery artifact only when explicitly requested
+    - none by default; persist a record only when explicitly requested
   tools:
     - none by default
   sensitive_resources:
-    - credentials default deny; do not ask the user to reveal secrets or private data unless absolutely necessary and explicitly scoped
+    - do not request secrets or private data unless necessary and explicitly scoped
 - entry_scene:
   - PREPARE
 
-## Purpose
-- Elicit requirements before they become a PRD, HLD, LLD, active plan, or implementation task.
-- Force missing assumptions into explicit decisions.
-- Produce a reusable discovery record without pretending it is an implementation plan.
+## State Boundary
+- Own `scratch -> discovery` in the shared Planning State Model.
+- Fire `ask_decision_question` only for a gap that can change scope, acceptance, edge behavior, data ownership, constraints, or non-goals.
+- Fire `record_decision` only when an answer resolves or narrows that gap.
+- Do not treat discovery completion as an approved requirements contract, active plan, or implementation permission.
 
-## Interview Rules
-1. Ask one decision-bearing question at a time.
-2. Include 2-4 recommended answer options when that helps the user decide quickly.
-3. Prefer questions that change scope, acceptance criteria, edge behavior, data ownership, constraints, or non-goals.
-4. Do not ask trivia or questions whose answer can be safely inferred from provided context.
-5. Stop when the remaining unknowns are minor enough to hand off as assumptions or open questions.
+## Interview Workflow
+1. Extract known facts, explicit decisions, assumptions, and open gaps from the provided material before asking anything.
+2. Rank gaps by downstream impact: blocking/irreversible decisions first, then costly scope or interface decisions, then preferences.
+3. Ask exactly one highest-impact question. Explain its effect in one sentence; when useful, put the recommended choice first among 2-4 mutually exclusive options and state the tradeoff briefly.
+4. Record a ledger delta: decision id, question, answer, status (`decided`, `assumed`, or `open`), affected scope/criterion, and source.
+5. Re-rank remaining gaps after each answer. Skip questions whose answers are safely inferable from admitted context.
+6. Stop when the Discovery Readiness Gate passes, the user stops, or one unresolved blocking decision requires an external stakeholder.
 
-## Discovery Dimensions
-- goal and success signal
-- target user or actor
-- domain terms and business rules
+Do not ask broad questionnaires, trivia, implementation details with no product effect, or the same decision in different wording.
+
+## Discovery Readiness Gate
+Confirm applicable dimensions are either decided or explicitly recorded as assumptions/open questions:
+
+- objective, target actor, and observable success signal
 - scope, non-goals, and deferred work
-- acceptance criteria and failure cases
-- data, permissions, privacy, credentials, and external systems
-- UI/API/runtime constraints when relevant
-- validation and launch expectations
+- domain terms/business rules and ownership boundaries
+- acceptance behavior, edge/failure cases, and excluded behavior
+- data, privacy, permissions, credentials, and external-system constraints
+- UI/API/runtime constraints and validation/launch expectations
 
-## Output Contract
-Return only the sections needed:
-- `discovery_scope`
-- `decisions_made`
-- `domain_terms`
-- `constraints`
-- `non_goals`
-- `edge_cases`
-- `acceptance_signals`
-- `open_questions`
-- `handoff_target`
+Handoff is ready when no unrecorded unknown blocks a requirements contract. A known open question may remain only with its impact, owner, and blocking status.
+
+## Token-Efficient Output
+During the interview, return only:
+
+- the next decision-bearing question;
+- its short rationale/options when useful; and
+- the latest ledger delta when continuity requires it.
+
+Do not repeat the full discovery record every turn. At stop or explicit artifact request, use `references/discovery-record-template.md` and emit only populated sections: discovery scope, decisions, domain terms, constraints, non-goals, edge cases, acceptance signals, assumptions, open questions, and handoff target.
 
 ## Handoff
-- Use `plan-requirements-brief` when the discovery record should become a requirements contract or PRD/SRS-lite.
-- Use `plan-long-term-package` only when the user explicitly wants a heavy phase/package architecture plan.
-- Use `plan-short-term-docs` only when the user wants an active `docs/plan` implementation design record.
-- Use implementation workflows only after requirements are stable enough for execution.
+- Use `plan-requirements-brief` to distill an accepted discovery record into a requirements contract.
+- Use `plan-short-term-docs` only for an explicitly requested active `docs/plan` artifact.
+- Use `plan-long-term-package` only for explicit heavy package intent.
+- Hand implementation to its workflow only after requirements are stable enough for execution.
 
-## Known Limits
-- This skill discovers requirements; it does not write production code.
-- It does not replace product judgment from the user or stakeholders.
-- It should not block obvious small changes with an interview.
+Report unresolved blockers as `user-verification-needed` or `unverified`; never invent stakeholder decisions.

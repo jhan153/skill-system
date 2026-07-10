@@ -79,8 +79,8 @@ Use this skill for visual evidence, not for implementation ownership. It can sup
    - Missing variants/states go to `design-component-mapper`.
    - Focus/keyboard/contrast/target-size issues go to `design-a11y-audit`.
 
-## Output schema
-Return or write a structured report with these fields:
+## Output
+For one screenshot or viewport question, lead with confirmed visual differences and the evidence path. Use the structured shape only for an explicit regression artifact or multi-viewport comparison; omit empty fields.
 
 ```yaml
 target:
@@ -104,6 +104,7 @@ unverified: []
 - Do not claim visual readiness from build success alone.
 - Do not claim pixel-perfect equivalence without side-by-side evidence or image diff evidence.
 - If a script is used, include the command and mark it as a nonblank/framing aid only.
+- Do not turn a single clipping or blank-render check into a full fidelity review.
 
 ## Loop Contract Consumption
 When invoked as a loop verifier:

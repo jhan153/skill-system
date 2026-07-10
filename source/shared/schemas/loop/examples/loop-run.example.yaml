@@ -1,7 +1,7 @@
-schema_version: 1
+schema_version: 2
 loop_run_id: LR-20260623-010
 contract_ref: contract.yaml
-contract_hash: 2d45ab1490ee466f236cf42ba3c39400e886861bb6007e25f09d15b59f4163ea
+contract_hash: aa9cb20c99eb25810ece9735ef847515e30d419c45b4ea1ef0b7c5ca38820d3a
 workspace:
   root: .
   revision: fixture
@@ -26,13 +26,21 @@ condition_results:
   status: pass
   evidence_refs:
   - docs/release-notes.md
+  evidence:
+  - kind: artifact_exists
+    verifier_owner: agent:codex
+    observed_at: '2026-06-23T00:04:00Z'
+    outcome: pass
+    artifact_ref: docs/release-notes.md
+    artifact_scope: workspace
+    artifact_sha256: '2222222222222222222222222222222222222222222222222222222222222222'
 progress:
   required_passed: 0
   required_total: 1
   no_progress_count: 0
   repeated_failure_count: 1
   oscillation_count: 0
-  state_hash: e77b9c2950697c314cc544c0727bae9c3a857bf977f5c8eb7d71af70e0bad5d8
+  state_hash: 1ea0f6b04dc4b06ecdaa7e4ba70ee13dce75f775b1273b021409cb2b724672eb
 agent_run_refs:
 - iteration: 1
   run_id: AR-20260623-010

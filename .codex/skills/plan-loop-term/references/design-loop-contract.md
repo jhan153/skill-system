@@ -1,103 +1,112 @@
 # Design Loop Contract
 
-Use this profile when a loop term targets UI, visual design, Figma/screenshot implementation, responsive behavior, or design-to-production work.
+Use this profile for UI, screenshot/Figma implementation, responsive behavior, or design-to-production work. Keep runtime verifier types schema-valid and represent visual/a11y judgment as separate quality verifiers.
 
-## Default Downstream Skills
-- Implementation owner: `design-frontend`
-- Visual evidence gate: `design-visual-regression`
-- Accessibility evidence gate: `design-a11y-audit`
-- Optional token evidence: `design-tokens`
-- Optional component/state evidence: `design-component-mapper`
-- Optional validation owner: `workflow-validation`
-- Execution loop owner after acceptance: `workflow-loop-runner`
+## Owners
 
-## Required Success Conditions
-Use stable ids such as `SC-DESIGN-01`.
+- implementation: `design-frontend`
+- visual quality: `design-visual-regression`
+- accessibility quality: `design-a11y-audit`
+- optional tokens/states: `design-tokens`, `design-component-mapper`
+- deterministic build/schema checks: project command or `workflow-validation`
+- loop execution after acceptance: `workflow-loop-runner`
+
+## Condition Profile
+
+Use `SC-NNN` only. Copy each `runtime_verifier.type` and its command/path into the runtime contract; keep `quality_verifiers` in the companion.
 
 ```yaml
+contract_id: LC-YYYYMMDD-NNN
+loop_run_id: null
 success_conditions:
-  - id: SC-DESIGN-01
-    statement: "Target route/screen/component/story exists and is integrated into the repo."
-    verifier_owner: design-frontend
-    evidence: "changed files plus rendered target path or preview surface"
-  - id: SC-DESIGN-02
-    statement: "Rendered target is nonblank and primary UI is correctly framed."
-    verifier_owner: design-visual-regression
-    evidence: "screenshot path, viewport, nonblank/framing result"
-  - id: SC-DESIGN-03
-    statement: "Visual hierarchy, layout regions, typography, color, imagery, and spacing match the source reference within available evidence."
-    verifier_owner: design-visual-regression
-    evidence: "comparison notes or image diff, with unavailable source details marked"
-  - id: SC-DESIGN-04
-    statement: "Relevant desktop/mobile viewports have no obvious clipping, overflow, text overlap, or off-canvas primary content."
-    verifier_owner: design-visual-regression
-    evidence: "viewport-specific screenshots and findings"
-  - id: SC-DESIGN-05
-    statement: "Keyboard/focus, semantics, labels, contrast, target size, and responsive readability gaps are handled or explicitly marked."
-    verifier_owner: design-a11y-audit
-    evidence: "a11y result or user-verification-needed/unverified labels"
+  - id: SC-001
+    statement: "The target route/screen/component is integrated and passes its real build or smoke command."
+    runtime_verifier:
+      owner: workflow-validation
+      type: command_exit
+      evidence_target: "command output and exit code"
+    quality_verifiers: []
+
+  - id: SC-002
+    statement: "Every required current screenshot is nonblank."
+    runtime_verifier:
+      owner: design-visual-regression
+      type: command_exit
+      evidence_target: "check_screenshot_nonblank.py command receipt over every required screenshot"
+    quality_verifiers: []
+
+  - id: SC-003
+    statement: "Framing, hierarchy, layout, typography, color, imagery, and spacing meet the admitted source criteria."
+    runtime_verifier:
+      owner: "<accepting-user>"
+      type: manual_check
+      evidence_target: "accepted user event scoped to SC-003:visual-fidelity"
+      acceptance_scope: "SC-003:visual-fidelity"
+    quality_verifiers:
+      - {owner: design-visual-regression, type: visual, evidence_target: "comparison verdict and gap list"}
+
+  - id: SC-004
+    statement: "Required viewports have no clipping, overflow, overlap, or off-canvas primary content."
+    runtime_verifier:
+      owner: "<accepting-user>"
+      type: manual_check
+      evidence_target: "accepted user event scoped to SC-004:viewport-behavior"
+      acceptance_scope: "SC-004:viewport-behavior"
+    quality_verifiers:
+      - {owner: design-visual-regression, type: visual, evidence_target: "viewport screenshots and findings"}
+
+  - id: SC-005
+    statement: "Required keyboard, focus, semantics, labels, contrast, target-size, and readability checks pass."
+    runtime_verifier:
+      owner: "<accepting-user>"
+      type: manual_check
+      evidence_target: "accepted user event scoped to SC-005:accessibility"
+      acceptance_scope: "SC-005:accessibility"
+    quality_verifiers:
+      - {owner: design-a11y-audit, type: a11y, evidence_target: "tool/manual observations and verdicts"}
 ```
+
+Replace `<accepting-user>` and each scope with the accepted contract's real owner/scope. Record a real visual/a11y validator command or manual event as audit evidence, but local v2 cannot authenticate either as pass. Semantic conditions remain `unverified` or `user-verification-needed`; the quality report informs the decision but cannot close the condition by existing.
+
+Use `artifact_exists` only when the condition itself is “this exact artifact exists.” It cannot prove framing, fidelity, responsive behavior, accessibility, or any report verdict. If no deterministic or accepted-manual oracle exists, keep the semantic condition `unverified` or `user-verification-needed`.
+
+Use runtime `manual_check` only for explicit user acceptance. Local v2 validates the event shape/digest for audit but keeps it non-passing without host-authenticated provenance.
 
 ## Evidence Boundaries
-- Build success proves the target can compile or run; it does not prove visual fidelity.
-- A nonblank screenshot proves something rendered; it does not prove hierarchy, spacing, typography, or responsive quality.
-- Visual comparison proves observable UI gaps; it does not prove keyboard, focus, semantic, or screen reader behavior.
-- Static accessibility hints can identify gaps; they do not prove complete WCAG compliance.
-- Human/user design acceptance is valid only when recorded as `user-verification-needed` resolved by the user or as explicit user-provided evidence.
 
-## Progress Signals
-- a required design success condition changes from fail/unverified to pass
-- a screenshot becomes nonblank or correctly framed
-- a viewport-specific overflow/clipping finding is fixed
-- accessibility evidence is collected or a gap is resolved
-- a build/render failure changes into a visual/a11y verifier result
-- the next implementation batch is changed because a visual/a11y verifier identified a concrete gap
+- Build success proves build/smoke scope, not visual or accessibility quality.
+- A nonblank screenshot proves render presence, not fidelity.
+- Visual comparison does not prove keyboard, semantics, or screen-reader behavior.
+- Static a11y hints do not prove complete WCAG compliance.
+- A screenshot/report without source, viewport, owner, freshness, and verdict is incomplete evidence.
+- Free-form refs and maker self-review never prove pass.
 
-## Stop Policy Defaults
-- `success`: required visual/build/a11y success conditions pass or have accepted user-verification-needed labels.
-- `blocked`: source reference, assets, render target, authenticated design context, or preview environment is unavailable.
-- `budget`: viewport/fidelity iteration budget is exhausted.
-- `unsafe`: next action requires private session access, external publishing, paid API, credential, or unrelated broad redesign.
-- `fatal`: screenshot/verifier tooling or source-reference state cannot be trusted.
+## Progress And Stop
 
-## Design Loop State
-```yaml
-design_loop_state:
-  source_reference:
-    type: figma|screenshot|description|existing_app|unknown
-    trust_status: accepted|untrusted_observation|user-verification-needed
-  rendered_targets: []
-  viewports: []
-  visual_gaps: []
-  accessibility_gaps: []
-  unavailable_assets: []
-  accepted_substitutions: []
-```
+Progress is a verified `SC-NNN`/evidence delta: a build failure becomes a quality-verifier result, a concrete visual/a11y finding is fixed, or a current report changes the next action. More edits or screenshots without a verdict delta are not progress.
 
-## Handoff Shape
+- `success`: every required condition has a fresh schema-valid passing receipt; no user/manual gate remains open.
+- `blocked`: source, asset, target, authenticated context, or preview environment is unavailable.
+- `budget`: accepted viewport/fidelity iteration budget is exhausted.
+- `unsafe`: next action requires private-session access, external publishing, paid API, credential, or unrelated broad redesign.
+- `fatal`: source or verifier state is untrustworthy.
+
+## Checkpoint And Handoff
+
 ```yaml
 handoff:
-  primary_execution_skill: design-frontend
-  verifier_gates:
-    - design-visual-regression
-    - design-a11y-audit
-  optional_gates:
-    - design-tokens
-    - design-component-mapper
+  contract_id: LC-YYYYMMDD-NNN
+  loop_run_id: null
+  implementation_owner: design-frontend
+  verifier_gates: [design-visual-regression, design-a11y-audit]
+  optional_gates: [design-tokens, design-component-mapper]
   loop_runner: workflow-loop-runner
   max_iterations: 3
   strategy_change_after: 2
   checkpoint_after_each:
-    - changed files
-    - rendered target
-    - screenshot paths
-    - verifier results
-    - remaining failed success conditions
+    - changed_files
+    - rendered_target_and_viewports
+    - quality_report_and_screenshot_refs
+    - structured_evidence_receipts
+    - remaining_SC_NNN
 ```
-
-## Do Not Use As Proof
-- Build success alone
-- Agent self-review
-- A screenshot without viewport/source context
-- A11y static hints as full WCAG compliance
-- Pixel-perfect claims without side-by-side evidence or image diff evidence

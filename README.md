@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.0.2 Skill Bundle
+## 9.1.0 Skill Bundle
 
-This repository includes the skill bundle organized for version 9.0.2 (the 7.3.1 bundle remains the compatibility baseline; see the 9.x direction note below). Its main components are:
+This repository includes the skill bundle organized for version 9.1.0 (the 7.3.1 bundle remains the compatibility baseline; see the 9.x direction note below). Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -25,7 +25,7 @@ This repository includes the skill bundle organized for version 9.0.2 (the 7.3.1
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current maintenance cut is `9.0.2 — Legacy Template Cleanup`, following the `9.0.1 — Dev Plugin Skill Expansion` release.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current release is `9.1.0 — Canonical Quality, Harness Hardening & Skill Consolidation`, following the latest published tag, `v9.0.2`.
 
 `7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 skill bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
 
@@ -107,16 +107,13 @@ Design skills turn visual intent into implementable UI work or verifiable eviden
 
 | Skill                      | Role                                                                                                                                                                                                                |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `design-frontend`          | Implements a concrete visual design as frontend code. It reuses the target repository’s existing framework, components, tokens, and assets, and validates the rendered result when possible.                        |
+| `design-frontend`          | Implements a concrete visual design as frontend code. It selects one conditional mobile, dashboard, section-web, or general profile, reuses repository components/tokens/assets, and validates the rendered result. |
 | `design-ui-decomposer`     | Breaks down UI references such as screenshots, Figma exports, mockups, or AI-generated images into hierarchy, layout, repeated patterns, component/token candidates, states, and validation items.                  |
 | `design-layout-translator` | Translates Auto Layout, flex/grid, resizing, overflow, and breakpoint constraints into layout rules that can be implemented in code.                                                                                |
 | `design-tokens`            | Normalizes design token sources and maps them to platform values. It does not invent values, and reports missing, conflicting, or drifting tokens with evidence.                                                    |
 | `design-component-mapper`  | Maps design components, variants, states, slots, and events to existing repository components and identifies unresolved implementation gaps.                                                                        |
 | `design-visual-regression` | Captures or reviews rendered UI screenshots and reports blank states, framing issues, overflow, and visual differences across screen sizes.                                                                         |
 | `design-a11y-audit`        | Reviews accessibility evidence for implemented UI, including keyboard reachability, focus visibility, semantic structure, contrast, target size, and responsive readability.                                        |
-| `design-mobile-screen`     | Applies mobile and native screen constraints such as safe areas, navigation/tab bars, keyboard overlays, touch targets, scroll/fixed regions, platform states, and mobile accessibility.                            |
-| `design-dashboard`         | Applies dashboard-specific constraints such as KPI hierarchy, filters, search, date ranges, charts, tables, information density, async/empty/error/loading states, and operational accessibility.                   |
-| `design-section-web`       | Checks section-based web pages such as landing, product, documentation, portfolio, or marketing pages for hero structure, section hierarchy, CTA flow, responsive order, media placement, and first-screen signals. |
 
 ### Report
 
@@ -127,7 +124,6 @@ Report skills organize evidence, reviews, changes, and work artifacts into resul
 | `report-qualitative`        | Produces qualitative evaluation reports with explicit criteria, evidence, interpretation, judgment, and recommendations.   |
 | `report-critical`           | Performs blocker-first critical review, risk review, and QA-style judgment on artifacts, plans, outputs, or conversations. |
 | `report-diff`               | Presents only actual changed lines or verified before/after snapshots in a readable grouped diff format.                   |
-| `report-artifact-inventory` | Summarizes artifacts, executed commands, validation records, and remaining checks produced during a single task.           |
 
 ### Workflow
 
@@ -172,10 +168,9 @@ Planning skills create or organize planning and specification artifacts without 
 
 Coordination skills provide lightweight structures for task splitting and handoff without creating permanent workflow machinery.
 
-| Skill                      | Role                                                                                                               |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `coordination-brief`       | Creates goal briefs, task DAG fragments, handoff notes, and lock-scope outlines from existing plans or task lists. |
-| `coordination-multi-agent` | Splits explicitly multi-agent work into task cards, ownership notes, lock scopes, and handoff boundaries.          |
+| Skill                      | Role                                                                                                                                              |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `coordination-handoff`     | Creates explicit goal briefs, task DAGs, multi-agent/session handoffs, lock scopes, validation ownership, and task-local artifact inventories.     |
 
 ### Research
 
@@ -227,11 +222,11 @@ Evaluation skills improve the skill system itself through cases and usage observ
 
 ### Skill System
 
-Skill System skills create and maintain the skill bundle itself.
+Skill System skills integrate authored skills into this repository and maintain the generated bundle.
 
-| Skill               | Role                                                                               |
-| ------------------- | ---------------------------------------------------------------------------------- |
-| `create-skill-pack` | Creates, strengthens, migrates, retires, and registers custom skills and metadata. |
+| Skill                       | Role                                                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `skill-system-repo-adapter` | Integrates accepted skill behavior into canonical source, routing, manifests, generated targets, and validation.  |
 
 ## Design Timeline
 
@@ -253,17 +248,18 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 8.1.0 | Bounded verification loops            | Adds loop readiness classification, `plan-loop-term` contracts, verifier mapping, and a minimal LoopRun runtime for explicit repeated agent work: loop schemas, state/checkpoints, progress/stall decisions, Stop-hook continuation, recovery handoff, verifier evidence, idempotency notes, loop governance metrics, Wiki feedback candidates, and execution handoff text. |
 | 8.3.0 | Bounded loop hardening                | Closes the LoopRun integrity gaps: a session-scoped activation bridge (`activate_loop_run.py`/`deactivate_loop_run.py` + Stop hook resolves the run by `session_id`, decoupled from the generic agent-run manifest), monotonic iteration with terminal immutability and idempotent replay, `iterations/` audit records, precedence-honored termination with wall-time enforcement, a confirmed-only `search-deep-evidence` convergence verifier, and a runtime-schema-valid `plan-loop-term` contract. |
 | 8.3.1 | Evaluation framing cleanup            | Removes evaluation-distorting deployment/autonomy-negative wording, updates runtime and hygiene docs to host-managed asset language, and keeps cache cleanup stable after verification runs. |
+| 8.3.2 | Verification scope cleanup            | Scopes bundle verification to committed/distributable content: source-registry, research-ledger, and knowledge-store validators no longer require local-only source-project paths (`docs/`, `.github/`, `.kanboard-plan`) to exist, and the local-only context-compounding release gate is removed from `core`. Adds a Claude-side `.claude/CLAUDE.md` mapping of the global working rules. |
+| 8.4.0 | Fable harness reinforcement           | Adopts Fable-style harness discipline (FableCodex, fablize) as concepts, not code: observed-evidence completion plus an `accepted_risk` terminal in `workflow-rigor`, a debugging hypothesis ladder in `analysis-bug`, capability-ceiling escalation in `workflow-recovery`, verification-grounding / noise-control eval cases, a harness-paradox holdout measurement reference, an `adoption_decisions` source ledger (`SRC-FABLECODEX` AGPL-3.0, `SRC-FABLIZE` MIT), and an opt-in Claude observational hook adapter at parity with the Codex hook. |
 | 8.4.1 | Checkpointed execution + harness parity | Adds Claude-side strict-block parity (an opt-in transcript-based observed-vs-claimed Stop gate), the `workflow-task-ledger` checkpointed-execution skill (resume-safe step/finding ledger with observed `evidence_refs`, an `accepted_risk` terminal, and a findings completion gate), and out-of-band harness-paradox measurement (`analyze_harness_measurement.py`: 80/20 holdout, per-arm fire/block/finalize-fail rates, fail delta, sunset). All opt-in and default-off. Here "harness parity" means Claude/Codex contradiction-gate parity, not fablize-2.1 observation-gate feature parity. |
+| 8.4.2 | Runtime capability closure | Adds opt-in live agent-run manifest bootstrap, a tool/permission operating catalog, and an orchestration capability contract so hooks, permissions, and host schedulers are recorded as evidence-bound capabilities rather than implied package behavior. |
+| 8.4.3 | Live manifest finalization hardening | Updates live bootstrap finalization so structured final reports synchronize `result_label` and `C-###` task claims back into `run.yaml`, reducing placeholder-claim drift while keeping bootstrap opt-in and evidence-bound. |
+| 8.4.4 | Activation surface & feedback hardening | Adds invocation-surface policy metadata and validation, report-only context-surface analysis, optional harness-improvement field feedback, and friction-signal maturity guidance. WorkItem lifecycle remains an 8.5.0 horizon concept, not a queue runtime in this cut. |
+| 8.5.0 | WorkItem lifecycle governance | Adds a schema-bound WorkItem state model for triage/explore/ready/implement/verify/review/closed, validation tooling, execution-assurance coverage, and optional `work_item_ref` linkage from TaskRun. This remains lifecycle governance, not a queue runtime, scheduler, Kanboard source of truth, or LoopRun replacement. |
 | 8.5.1 | Work horizon routing clarification | Adds the Work Horizon model plus `work_horizon`, `planning_altitude`, and `execution_mode` metadata for plan/workflow skills. This clarifies one-shot vs task/ticket vs short-plan vs long-plan vs loop-overlay routing without adding queue/runtime behavior. |
 | 9.0.0 | Neutral source & plugin packaging | Promotes a neutral canonical `source/` tree as the single source of truth and generates `.codex`/`.claude` runtime targets byte-identically from it (verbatim shared payload, mirror-from-canonical, platform overlay), with a generated-only cutover and regeneration-enforced integrity. Shares platform-agnostic schema definitions to the Claude target and adds initial role-based Codex plugin packages (`skill-system-{core,dev,design,research,quality,maintainer}`) with full disjoint coverage of the 58 skills. |
 | 9.0.1 | Dev plugin skill expansion | Expands the `skill-system-dev` engineering role beyond the initial 9.0.0 cut with concrete execution-owner and analysis skills (`analysis-architecture-deepening`, `analysis-codebase-design`, `analysis-domain-modeling`, `analysis-performance`, `workflow-implementation`, `workflow-bug-fix`, `workflow-dependency-upgrade`, `workflow-refactor-safely`, `workflow-source-maintenance`, `workflow-comment-maintenance`), adding `source_maintenance_execution` / `comment_maintenance_execution` work-horizon modes plus routing, registry, and runtime/negative eval coverage. Skill count 58 → 68; targets regenerated and integrity-verified. |
 | 9.0.2 | Legacy template cleanup | Template-hygiene and output-quality maintenance cut after 9.0.1: removes toy C++ before/after examples from the short-term plan template and `plan-short-term-docs` evidence rule, propagates the `plan-short-term-docs` diagram policy to `workflow-rigor` and `report-critical` (no default plan-lifecycle/approval/agent-workflow diagrams), makes the long-term `ui-state-contract` transition diagram conditional on real transitions, and converts `analysis-codebase` `report.py` unverified fallback diagrams (subsystem/path/class/metric) to plain text notices. Bundle version bumped to 9.0.2; targets regenerated and integrity-verified. |
-| 8.5.0 | WorkItem lifecycle governance | Adds a schema-bound WorkItem state model for triage/explore/ready/implement/verify/review/closed, validation tooling, execution-assurance coverage, and optional `work_item_ref` linkage from TaskRun. This remains lifecycle governance, not a queue runtime, scheduler, Kanboard source of truth, or LoopRun replacement. |
-| 8.4.4 | Activation surface & feedback hardening | Adds invocation-surface policy metadata and validation, report-only context-surface analysis, optional harness-improvement field feedback, and friction-signal maturity guidance. WorkItem lifecycle remains an 8.5.0 horizon concept, not a queue runtime in this cut. |
-| 8.4.3 | Live manifest finalization hardening | Updates live bootstrap finalization so structured final reports synchronize `result_label` and `C-###` task claims back into `run.yaml`, reducing placeholder-claim drift while keeping bootstrap opt-in and evidence-bound. |
-| 8.4.2 | Runtime capability closure | Adds opt-in live agent-run manifest bootstrap, a tool/permission operating catalog, and an orchestration capability contract so hooks, permissions, and host schedulers are recorded as evidence-bound capabilities rather than implied package behavior. |
-| 8.4.0 | Fable harness reinforcement           | Adopts Fable-style harness discipline (FableCodex, fablize) as concepts, not code: observed-evidence completion plus an `accepted_risk` terminal in `workflow-rigor`, a debugging hypothesis ladder in `analysis-bug`, capability-ceiling escalation in `workflow-recovery`, verification-grounding / noise-control eval cases, a harness-paradox holdout measurement reference, an `adoption_decisions` source ledger (`SRC-FABLECODEX` AGPL-3.0, `SRC-FABLIZE` MIT), and an opt-in Claude observational hook adapter at parity with the Codex hook. |
-| 8.3.2 | Verification scope cleanup            | Scopes bundle verification to committed/distributable content: source-registry, research-ledger, and knowledge-store validators no longer require local-only source-project paths (`docs/`, `.github/`, `.kanboard-plan`) to exist, and the local-only context-compounding release gate is removed from `core`. Adds a Claude-side `.claude/CLAUDE.md` mapping of the global working rules. |
+| 9.1.0 | Canonical quality, harness hardening & skill consolidation | Consolidates the canonical surface from 71 to 66 skills, hardens schema-v2 hook evidence and the observe-default Recovery Guard, adds planning determinism and token-cost controls, and aligns the release identity after `v9.0.2`. Claude-specific standalone compatibility follow-up is deferred to 9.1.1. |
 
 ## License
 

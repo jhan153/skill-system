@@ -1,6 +1,6 @@
 ---
 name: analysis-codebase
-description: "Repo-wide integrated analysis report from static/dynamic/security/git evidence with design diagrams, an actionable finding backlog, and explicit Unverified handling. Only when the user explicitly wants a codebase-wide report (정적분석/런타임분석/메트릭/Git 변화/설계 문서화 리포트 등)."
+description: "Generate one repo-wide integrated codebase report from static, runtime, security, and Git evidence, with architecture views, an actionable findings backlog, and explicit Unverified gaps. Use only when the user explicitly requests a codebase-wide report/artifact; do not use for point diagnosis, one design decision, candidate discovery, or ordinary review."
 ---
 
 # Analysis Codebase
@@ -8,112 +8,129 @@ description: "Repo-wide integrated analysis report from static/dynamic/security/
 ## Routing Card
 - role: heavy_artifact_generator
 - intent_signature:
-  - repo-wide integrated report, 코드베이스 분석 리포트, 정적/동적/보안/Git evidence report, architecture quality report
+  - explicit repo-wide integrated codebase report artifact
 - use_when:
-  - the user explicitly requests a codebase-wide report artifact or architecture/metrics/security/git-evidence report.
+  - both repo-wide scope and an integrated report/artifact are explicit.
+  - the requested artifact needs architecture, metrics, security, runtime, or Git evidence lanes.
 - do_not_use_when:
-  - the user asks for a single bug diagnosis, short code review, one-file inspection, or algorithm recommendation.
-  - `코드 리뷰 리포트` is ambiguous and the user does not ask for a repo-wide report artifact.
+  - the user wants a bug RCA, one module decision, ranked architecture candidates, short review, or direct implementation.
+  - “architecture,” “analysis,” or “code review report” appears without explicit codebase-wide artifact intent.
 - expected_inputs:
-  - repo root
-  - report scope
-  - requested evidence types and output path when relevant
+  - repo root, report scope, requested evidence lanes, commit range when relevant, and output directory
 - expected_outputs:
-  - integrated markdown report, architecture models, findings backlog, quality gate result
+  - one integrated Markdown report, architecture models, `findings.json`, and `quality-gate-result.json`
 - context_targets:
   must_read:
-    - current explicit report request
-    - repo root and policy defaults
-    - report scripts and schemas
+    - explicit report request, repo policy, output/write scope, and compact tracked-source outline
   read_if_needed:
-    - tracked file list
-    - static/dynamic/security/git evidence outputs
-    - prior reports for comparison
+    - summarized collection artifacts and only the references mapped to the current stage
+    - source paths selected by the evidence-sampling plan
   do_not_load_by_default:
-    - unrelated memory bank
-    - phase package templates
-    - single-bug specialist workflows
+    - raw full inventories, every source file, all reports/references, full memory, or point-analysis workflows
 - risk_profile:
   reads:
     - READ_CODEBASE high
   writes:
-    - WRITE_LOCAL_FS high for report artifacts and architecture JSON
+    - WRITE_LOCAL_FS high, limited to the requested report directory
   tools:
-    - CALL_PROCESS high for collection and report scripts
+    - CALL_PROCESS high for deterministic collectors and report generation
   sensitive_resources:
-    - NETWORK normally no; CREDENTIALS must not access
+    - network normally no; credentials and secret files default deny
 - entry_scene:
   - PREPARE
 
-## Goal
-- 요약본/상세본 분리 없이 단일 통합 마크다운 리포트를 생성합니다.
-- 증거를 공통 아키텍처 모델로 승격한 뒤 HLD/LLD 뷰를 파생 생성합니다.
-- 모든 finding은 실행 가능한 개선 백로그 항목으로 연결합니다.
-- 증거 부족 항목은 반드시 `Unverified`로 명시합니다.
+## Success Contract
+- Produce one integrated report; do not split summary and detail into separate Markdown reports.
+- Build report views from `evidence -> architecture model -> report` rather than from prose intuition.
+- Tie every material finding to concrete `evidence_refs`, an evidence grade, impact, action, and validation path.
+- Mark missing, blocked, or inference-only evidence `Unverified`.
+- Report honest coverage and exclusions; repo-wide scope does not imply that every file was read by the model.
 
-## Related Skills
-- `workflow-rigor`: 수집/생성 단계가 중간 이상 위험도를 가지거나 실행 통제가 필요할 때 evidence depth, validation, review rigor를 보강합니다.
-- `report-qualitative`: 사용자가 형식적인 handoff나 감사형 요약을 원할 때 채팅 응답 형식을 정리합니다. 생성되는 리포트 파일의 장/섹션 계약은 이 스킬이 계속 소유합니다.
-- `report-critical`: 생성된 리포트, `findings.json`, `quality-gate-result.json`에 대해 최종 QA gate가 필요할 때 후행 검토를 담당합니다.
-- `report-diff`: 사용자가 실제 변경 줄 비교를 원할 때만 후처리 뷰로 사용합니다. 통합 리포트 자체를 대체하지 않습니다.
+## Scope Gate
+Before collection:
+1. Record repo root, tracked-file boundary, output directory, requested evidence lanes, commit range, and exclusions.
+2. Identify material product/service/language/runtime groups from manifests and the source outline.
+3. Record safe defaults instead of asking when they do not change the deliverable or risk boundary.
+4. Stop or request authority if collection would access credentials, external systems, destructive commands, or writes outside the report directory.
 
-## Trigger
-- `코드베이스 분석`
-- `코드베이스 분석 리포트`
-- `정적분석 리포트`
-- `런타임분석 리포트`
-- `아키텍처 품질`
-- `코드 리뷰 리포트`
-- `메트릭 리포트`
-- `Git 변화 분석 리포트`
-- `설계 문서 자동화`
+## Progressive Evidence Plan
 
-## When Not To Use
-- 단일 버그의 현재 원인만 찾는 요청
-- 특정 증상 하나에 대한 재현/원인 분석 요청
-- 알고리즘 추천이나 접근 비교가 핵심인 요청
-- 사용자가 리포트 산출물보다 짧은 진단이나 한두 개의 finding만 원하는 요청
-- 모호한 `코드 리뷰 리포트` 요청 중 repo-wide report artifact 의도가 확인되지 않은 요청
+### Stage A: Inventory Without Context Flooding
+- Run the deterministic collector over the approved tracked scope.
+- Keep raw file lists, tool logs, and complete metric tables in artifacts; load only compact summaries and selected rows.
+- Use `top-n` outputs as a candidate pool, not as a mandate to read every candidate.
+- Separate generated/vendor/resource files before deriving churn, ownership, or architecture conclusions.
 
-## Cross-Skill Resolution
-- 이 스킬은 리포트 산출물 스키마와 장 순서의 source of truth입니다.
-- `report-qualitative`가 함께 활성화되어도 리포트 파일 구조는 바꾸지 않고, 사용자에게 보여 주는 요약 응답만 정리합니다.
-- `workflow-rigor`가 함께 활성화되면 실행 모드, 검증, 리뷰 강도는 그 스킬을 따르되 리포트 내용 계약은 이 스킬을 유지합니다.
-- `report-critical`가 요청되면 리포트 생성 후 후행 QA gate로 실행합니다.
-- 사용자가 diff 표현을 요구한 경우에만 `report-diff`를 추가로 사용하며, integrated report findings를 prose-only 요약으로 축소하지 않습니다.
-- 현재 고장 원인, 반복 버그, 알고리즘 선택 같은 point diagnosis/recommendation 요청은 이 스킬의 우선 범위가 아니며, 그런 요청은 `analysis-router` 쪽을 우선합니다.
+### Stage B: Stratified Sampling
+Cover each material codebase group at inventory level, then sample relevant strata:
+- an entrypoint and representative end-to-end workflow
+- internal module/dependency boundaries
+- external I/O, auth/security, storage, queue, or runtime boundaries
+- tests that encode critical behavior
+- hotspots where multiple signals intersect, such as churn + complexity + centrality
+- one low-signal control path to challenge hotspot-only bias
 
-## Mandatory Workflow
-1. `collect.sh`로 tracked files를 분류하고 증거 아티팩트를 수집합니다.
-2. 정적/동적/Git/보안 증거를 `architecture/*.json` 모델(`entrypoints/context/container/component/interface/scenario/deployment/crosscutting/decision`)로 승격합니다.
-3. `report.py`가 모델 기반으로 우선순위/게이트/개선 백로그와 HLD/LLD 뷰를 계산합니다.
-4. 단일 마크다운 리포트와 `findings.json`, `quality-gate-result.json`를 함께 출력합니다.
+Start with one representative path per relevant stratum/group. Expand only when:
+- another usage shape differs materially.
+- evidence conflicts or a counterexample weakens a claim.
+- a required architecture/report view remains unsupported.
+- the new sample could change a high-priority finding or quality gate.
+
+### Stage C: Deepen Shortlisted Claims
+- Inspect complete claim paths—source, caller, dependency/config, and relevant test—rather than isolated snippets.
+- Use runtime, trace, security, and Git evidence only within the approved/requested lanes.
+- Deduplicate symptoms that share one root policy, ownership, or dependency cause.
+- Promote a candidate to a finding only after recording evidence quality and a falsifiable validation step.
+
+## Coverage Ledger
+Maintain a compact ledger with:
+- codebase group and evidence stratum
+- candidates enumerated vs paths inspected
+- sample-selection reason
+- evidence artifact/path and confidence
+- excluded, unsampled, failed, or permission-blocked gaps
+
+Use the ledger to qualify claims such as “no issue found.” Absence from a sample or grep result is not proof of absence.
+
+## Evidence and Finding Rules
+- Reference exact artifact IDs, commands, paths/lines, traces, tests, or Git ranges; avoid unsupported summaries.
+- Separate `observed` facts, `inferred` explanations, and `recommended` changes.
+- Triangulate high-impact findings across independent signal types when feasible. If only one source exists, state that limitation in the evidence grade.
+- Do not infer runtime behavior solely from static calls, deployment behavior from file names, or security from tool silence.
+- Treat churn, complexity, coupling, imports, file extensions, frameworks, and topology as candidate-selection evidence only. Those static hotspot candidates remain `verification-needed`, cannot receive grade `A`, and cannot exceed `medium` severity until behavioral impact is observed.
+- A security scanner may retain its upstream severity for conservative triage, but a single static scan remains grade `B`/`verification-needed` until rule applicability, reachability, or deployed-version exposure is confirmed.
+- Write one root-cause finding instead of repeating the same symptom across chapters.
+- Make each backlog item name the change, affected surface, expected impact, validation, and rollback/containment where material.
+
+## Semantic Comparison Gate
+Activate this gate only for a port, migration, legacy/new pair, or two implementations of the same capability. Read `references/semantic-comparison.md` before writing any parity or end-to-end difference section.
+
+- Pair one capability and the same input/trigger before comparing implementations.
+- Call a difference material only when a caller/user can observe a delta in output, state/persistence, error/recovery, external side effect, ordering/timing, precision/tolerance, or permission behavior.
+- Treat language, framework/toolkit, runtime/platform stack, library/dependency, build system, type, symbol, file layout, architecture shape, and internal control flow as implementation vocabulary. They may appear in architecture context but never as a parity gap or finding by themselves.
+- Require paired behavioral result artifacts from both sides for `different` or `equivalent`; test source locations are not execution evidence. Static inference, one-sided evidence, or a missing oracle is `Unverified` plus the cheapest paired characterization test.
+- Never write a bare “다르다” row. State the common capability/input, baseline observable, candidate observable, exact semantic delta/status, paired evidence, and validation.
+- Compare one critical flow per pair first; expand only when a material or `Unverified` result could change the backlog or gate.
+
+## Saturation and Stop Rules
+Stop evidence expansion when all are true:
+- every material codebase group has inventory coverage or an explicit exclusion.
+- every required stratum/view is represented or marked `Unverified` with a reason.
+- material findings meet the evidence contract.
+- one deliberate expansion of the weakest or highest-risk stratum no longer changes the top backlog or gate result.
+- architecture models, report, findings, and quality-gate artifacts have been generated and checked.
+
+If a new sample changes the top backlog, deepen only that stratum until the ranking stabilizes or the agreed budget is reached. At a time, token, permission, or tool boundary, stop broadening and report the remaining ledger gaps; never claim exhaustive coverage.
 
 ## Architecture Model Contract
-- 내부 구조는 `evidence -> architecture model -> report views` 순서여야 합니다.
-- `call-graph.json`, `class-hierarchy.json`은 보조 증거이며 HLD/LLD의 단일 소스가 아닙니다.
-- 기본 정책은 repo-wide 수집을 허용하고, binary/resource 확장자는 `exclude_extensions`로 제외합니다.
-- C/C++ repo에서는 regex 기반 `main()`/`#include`/CMake `add_executable()` 신호와 optional `lizard` 산출물을 보조 근거로 사용합니다.
-- C/C++ `lizard` 산출물은 함수/CCN 보강 근거이며, clang AST나 `compile_commands.json` 기반 semantic graph를 대체하지 않습니다.
-- interface/crosscutting은 단순 text grep보다 import/reference/env-access 신호를 우선 사용합니다.
-- entrypoint는 코드 엔트리포인트 우선, 필요 시 manifest(`package.json`, `pyproject.toml`, `Procfile`, `Makefile`)에서 보강합니다.
-- manifest entrypoint는 command path를 이용해 실제 컴포넌트/API/Worker 컨테이너에 연결합니다.
-- 외부 시스템은 `DATABASE_URL`, `REDIS_URL`, `BROKER_URL`, `SENTRY_DSN` 같은 env/DSN 신호도 사용합니다.
-- 시나리오는 컴포넌트 간 내부 경로가 약할 때도 entrypoint에서 external interface까지 확장해 대표 흐름을 만듭니다.
-- deployment view는 `defines/manages/runs/builds/deploys` 관계를 우선 복원합니다.
-- 최소 모델 아티팩트:
-  - `architecture/entrypoints.json`
-  - `architecture/context-model.json`
-  - `architecture/container-model.json`
-  - `architecture/component-model.json`
-  - `architecture/interface-model.json`
-  - `architecture/scenario-model.json`
-  - `architecture/deployment-model.json`
-  - `architecture/crosscutting-model.json`
-  - `architecture/decision-candidates.json`
+- Generate the required models for entrypoints, context, containers, components, interfaces, scenarios, deployment, crosscutting concerns, and decision candidates.
+- Treat call graphs, class hierarchies, regex signals, manifests, and optional complexity tools as supporting evidence, not as the architecture source of truth.
+- Connect scenarios to traces/root spans when available; otherwise anchor them to evidenced entrypoints and mark fallback provenance.
+- Keep deployment and runtime views `Unverified` when their evidence is unavailable.
+- Use domain subject names in diagrams and preserve provenance/fallback flags. Load `reference.md` for detailed model and rendering rules only after inventory.
 
-## Deliverables Contract
-리포트 섹션 순서는 반드시 아래 순서를 따릅니다.
+## Report Contract
+Keep this section order:
 1. 실행 요약
 2. 범위/가정/비목표
 3. 코드베이스 개요
@@ -125,115 +142,43 @@ description: "Repo-wide integrated analysis report from static/dynamic/security/
 9. 우선순위 개선 백로그
 10. 부록
 
-## Section Rules
-- 4장(HLD): `Context View + Container View + Deployment View + Crosscutting Concepts + Architecture Decisions` 필수.
-- 5장(LLD): `대표 런타임 시나리오(복수) + Component View + Interface Contracts` 필수.
-- 5장 코드 레벨: 클래스 다이어그램/함수 명세는 선택형 보강이며, 복잡한 핵심 컴포넌트가 있을 때 우선 생성합니다.
-- 6장(정적): 표 위주가 아니라 그래프(LOC/Complexity/Branches/Density 축) 중심으로 작성.
-- 9장(백로그): 아래 컬럼을 반드시 사용.
-  - `파인딩`, `액션`, `Severity`, `Priority`, `구체적인 개선 내용`, `관련 파일`
-- 모든 다이어그램은 provenance를 가져야 하며, fallback 생성 여부를 드러내야 합니다.
+Quality requirements:
+- HLD: Context, Container, Deployment, Crosscutting, and Architecture Decision Candidate views.
+- LLD: multiple representative runtime scenarios plus Component and Interface views; add class/function detail only for complex core components.
+- Label heuristic architecture items as decision candidates with a verification method, not accepted decisions.
+- When semantic comparison is in scope, use `artifacts/manual/contract-comparisons.json`; exclude implementation-only/invalid-dimension rows, surface static-only rows as `Unverified`, and promote confirmed non-intentional behavior deltas into findings/backlog.
+- Require result refs to resolve under approved runtime/test-result/manual artifact lanes; confirmed high/critical semantic-contract findings participate in the quality gate.
+- Static analysis: graph-first LOC, complexity, branch, density, and LOC-vs-complexity views; do not replace the quadrant with a table.
+- Backlog columns: `파인딩`, `액션`, `Severity`, `Priority`, `구체적인 개선 내용`, `관련 파일`.
+- Every diagram must expose provenance and fallback status.
 
-## Diagram Rendering Cautions
-다이어그램 라벨은 파일 경로(`*.py`)를 그대로 노출하지 말고 도메인 주체명으로 표시합니다.
-메시지는 `x10`, `call`, `return` 같은 축약 표기 대신 의미 있는 동작 문구를 사용합니다.
+## Execution and Validation
+1. Read `docs/document.md` only when preparing commands; resolve `SKILL_ROOT` through `CODEX_HOME` or an explicit path.
+2. Run `scripts/collect.sh` with the approved scope and `references/policy-default.json`.
+3. Build/promote architecture models, then run `scripts/report.py` against the collected output.
+4. Check that required model files, `findings.json`, `quality-gate-result.json`, and the single Markdown report exist and parse.
+5. Inspect the gate reasons, top findings, coverage ledger, `Unverified` notes, diagram provenance, and entrypoint/scenario linkage.
+   If semantic comparison is in scope, also inspect paired evidence, excluded implementation-only rows, and every `Unverified` comparison task.
+6. Rerun only the failed stage with identical inputs after fixing or obtaining approval; do not repeat broad collection by default.
 
-### QuadrantChart Rule
-- 헤더는 `title`, `x-axis`, `y-axis`, `quadrant-1..4`의 7줄 패턴을 유지합니다.
-- 데이터 포인트는 무따옴표 라벨을 사용합니다: `label: [x, y]`
-- 데이터 라벨은 `^[A-Za-z_][A-Za-z0-9_]*$`로 정규화합니다. (비허용 문자는 `_`, 연속 `_` 축약, 숫자 시작 시 `item_` 접두사)
-- 좌표는 `0..1` 범위 숫자를 사용합니다. 예: `[1, 1]`, `[0.608, 0.816]`
+Keep collector/reporter success separate from report quality: a zero exit code does not prove coverage, evidence quality, or actionable findings.
 
-### Flowchart Rule
-- 노드 라벨은 도메인 주체명으로 작성합니다.
-- 엣지 라벨은 의미+수량 중심의 짧은 문구로 작성합니다.
-- 엣지 라벨은 괄호 `()` 없이 작성합니다.
+## Progressive Resource Map
+Load resources only at their decision point:
+- `reference.md`: architecture/report rules after inventory, before model/report generation
+- `references/policy-default.json`: pass to tools; inspect only for policy overrides
+- `references/quality-gates.md`: interpret or repair gate failures
+- `references/schemas.md`: generate, inspect, or repair JSON artifacts
+- `references/review-checklists.md`: only for requested manual review lanes
+- `references/semantic-comparison.md`: only for port/migration/legacy-new or equivalent capability comparison
+- `docs/document.md`: command/CI setup
 
-### SequenceDiagram Rule
-- 참여자 라벨은 도메인 주체명으로 작성합니다.
-- 메시지는 동작 의미가 드러나는 문장형으로 작성합니다.
+Do not load all references or script source by default; prefer tool help, summarized artifacts, and targeted failure output.
 
-## CLI
-### Path Contract
-Prefer `$CODEX_HOME` when set. If unset, fall back to `$HOME/.codex`. This setup may run under multiple host-specific homes; reusable examples must not hardcode any single home path. If neither `$CODEX_HOME` nor `$HOME/.codex` resolves to the skill root, require the runtime or user to provide `SKILL_ROOT`.
-
-```bash
-CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-SKILL_ROOT="${SKILL_ROOT:-$CODEX_HOME/skills/analysis-codebase}"
-test -d "$SKILL_ROOT" || { echo "Set CODEX_HOME or SKILL_ROOT to analysis-codebase" >&2; exit 1; }
-```
-
-### Collector
-```bash
-CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-SKILL_ROOT="${SKILL_ROOT:-$CODEX_HOME/skills/analysis-codebase}"
-"$SKILL_ROOT/scripts/collect.sh" \
-  --repo-path /abs/repo \
-  --commit-range auto \
-  --mode full \
-  --output-dir /abs/output \
-  --top-n 120 \
-  --policy "$SKILL_ROOT/references/policy-default.json"
-```
-
-### Reporter
-```bash
-CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-SKILL_ROOT="${SKILL_ROOT:-$CODEX_HOME/skills/analysis-codebase}"
-python3 "$SKILL_ROOT/scripts/report.py" \
-  --input-dir /abs/output \
-  --output /abs/repo/docs/report/codebase-analysis-report.md \
-  --risk-model default \
-  --policy "$SKILL_ROOT/references/policy-default.json"
-```
-
-## Evidence Rules
-- 모든 finding은 `evidence_refs`를 가져야 합니다.
-- 증거가 부족하면 `evidence_grade`를 낮추고 `Unverified`를 유지합니다.
-- 권한/실행 제한으로 증거 수집 실패 시 실패 이유를 `notes/unverified.tsv`에 남깁니다.
-- 시나리오는 가능한 경우 trace/root span과 연결하고, 없으면 entrypoint 기반 대표 흐름으로 생성합니다.
-- deployment view는 IaC/compose/k8s/workflow 파일이 없으면 `Unverified`로 유지합니다.
-
-## Permission Handling
-- 수집/실행 단계에서 권한 거부가 발생하면 결과를 추정하지 않습니다.
-- 거부 원인을 `Unverified`로 남기고, 승인 후 동일 명령으로 재실행합니다.
-
-## Resource and Risk Boundary
-- Reads: repo tracked files, build/test metadata, static/dynamic/security/git evidence, and report policy.
-- Writes: local report artifacts, architecture JSON, findings JSON, and quality-gate outputs only.
-- Tool/process calls: collector, report generator, optional safe analysis commands; each needs a clear purpose.
-- Network access: normally no; do not fetch external data unless explicitly requested and bounded.
-- Credential access: must not access secrets, tokens, private keys, or credential files.
-- Generated artifacts: high; keep outputs in the requested report directory.
-- Destructive actions: out of scope.
-- Required checkpoints: explicit repo-wide artifact intent, output directory, evidence scope, no credential access, validation status for generated report.
-
-## Recovery and Context Expansion
-- If repo structure is unclear, start with tracked file list and repo source outline.
-- If a collector step fails, read the exact failure output and mark missing evidence `Unverified`.
-- If architecture boundary is unclear, inspect only entrypoints/manifests and relevant module docs before broader scans.
-- If the user asks a point-diagnosis question, return to scheduling and use `analysis-router`.
-- If validation fails, read the failing artifact and command output before rerunning broad collection.
-- Never recover by loading all memory, all repo docs, or all unrelated reports at once.
-
-## References
-- Core rules: [`reference.md`](reference.md)
-- Quality gates: [`references/quality-gates.md`](references/quality-gates.md)
-- Policy: [`references/policy-default.json`](references/policy-default.json)
-- Schemas: [`references/schemas.md`](references/schemas.md)
-- Manual review: [`references/review-checklists.md`](references/review-checklists.md)
-- CI guide: [`docs/document.md`](docs/document.md)
-
-## Anti-Patterns
-- HLD를 import fan-in/fan-out 요약만으로 대체하는 보고
-- LLD를 하드코딩된 anchor 함수 세트에만 의존하는 보고
-- 대표 시나리오를 entrypoint/trace와 연결하지 못한 채 호출쌍만 나열하는 보고
-- 정적 분석을 표만으로 표현하고 그래프를 생략하는 보고
-- 개선 백로그에 실행 가능한 구체 작업 없이 템플릿 문구만 반복하는 보고
-
-## Known Limits
-- Static architecture models can miss runtime behavior, generated-code semantics, and deployment conditions.
-- Dynamic, security, or Git evidence remains `Unverified` when tools or permissions are unavailable.
-- C/C++ support is shallow unless external tools are available: default collection detects files, `main()`, `#include`, CMake executable declarations, and optional `lizard` complexity, but does not build a clang semantic call graph.
-- Repo-wide collection requires explicit artifact intent, output scope, and side-effect risk gates.
-- If `$CODEX_HOME` and `$HOME/.codex` do not resolve the skill root, require `SKILL_ROOT` instead of assuming an empty path.
+## Risk, Failure, and Handoff
+- Write only report artifacts under the approved output directory; destructive actions are out of scope.
+- Do not fetch external data or inspect secrets unless separately authorized and bounded.
+- On permission/tool failure, record the exact lane and reason in `notes/unverified.tsv` and keep it out of PASS assumptions.
+- Static models may miss runtime/generated semantics; C/C++ semantic depth remains limited without compilation metadata and suitable tools.
+- Route a point bug to `analysis-bug`, one structural decision to `analysis-codebase-design`, and a ranked opportunity scan to `analysis-architecture-deepening`.
+- Let implementation workflows own code changes. Load review/report formatting skills only when explicitly requested after artifact generation.

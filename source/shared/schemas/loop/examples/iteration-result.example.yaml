@@ -1,4 +1,4 @@
-schema_version: 1
+schema_version: 2
 loop_run_id: LR-20260623-010
 iteration: 2
 agent_run_id: AR-20260623-011
@@ -6,9 +6,25 @@ condition_results:
 - condition_id: SC-001
   status: pass
   evidence_refs:
-  - artifacts/sc-001-iter-2.log
+  - artifacts/primary.ok
+  evidence:
+  - kind: artifact_exists
+    verifier_owner: agent:codex
+    observed_at: '2026-06-23T00:10:00Z'
+    outcome: pass
+    artifact_ref: artifacts/primary.ok
+    artifact_scope: workspace
+    artifact_sha256: '1111111111111111111111111111111111111111111111111111111111111111'
 - condition_id: SC-002
   status: pass
   evidence_refs:
   - docs/release-notes.md
+  evidence:
+  - kind: artifact_exists
+    verifier_owner: agent:codex
+    observed_at: '2026-06-23T00:10:05Z'
+    outcome: pass
+    artifact_ref: docs/release-notes.md
+    artifact_scope: workspace
+    artifact_sha256: '2222222222222222222222222222222222222222222222222222222222222222'
 side_effects: []

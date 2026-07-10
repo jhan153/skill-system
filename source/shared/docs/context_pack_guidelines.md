@@ -30,6 +30,31 @@ context_pack:
 - Include field feedback only as observed usage evidence, not as a direct runtime instruction.
 - Prefer short source-traced summaries over raw transcripts or full old plan text.
 
+## Cache-Friendly Ordering
+
+Order context from stable to volatile so repeated turns can reuse the stable prefix:
+
+1. Stable: repo rules, selected route summary, selected `SKILL.md`, stable validation policy.
+2. Semi-stable: active plan, selected source files, selected reference index or catalog.
+3. Volatile: current date/time, newest user clarification, latest command output, transient logs, screenshots, or external observations.
+
+Do not put volatile command output, timestamps, or fresh logs before stable routing and policy context unless the current task is only to inspect that output.
+
+## Reference Admission
+
+- Load indexes, catalogs, or routing cards before large reference folders.
+- Admit only the reference needed for the current decision or artifact.
+- Keep template/reference admission to 1-3 files per expansion step unless the user explicitly requested a broad package.
+- Record why a large reference set is needed before reading it.
+- Prefer `read_if_needed` over eager `must_read` for templates, examples, and historical packages.
+
+## Token-Cost Notes
+
+- Context-surface scores are advisory; they are not billing-token measurements.
+- Favor late reference loading over deleting useful skill instructions.
+- Optimize repeated work by keeping stable context stable and appending volatile evidence later.
+- If quality and cost conflict, preserve routing, risk boundary, and validation evidence first.
+
 ## Admission Checklist
 
 - Does the current task explicitly need this context?
@@ -38,6 +63,8 @@ context_pack:
 - Is there a stale, conflict, poison-risk, or sensitive-data reason to exclude it?
 - Can the task proceed with a smaller summary?
 - Is the context needed now, or only if the first read layer is insufficient?
+- Can stable context be placed before volatile observations to improve cache reuse?
+- Can an index or summary replace raw template/reference loading for this turn?
 
 ## Good Targets
 
@@ -45,6 +72,7 @@ context_pack:
 - local `AGENTS.md`
 - active plan file
 - directly touched source files
+- selected reference index or one selected template
 - command output or logs tied to the symptom
 - relevant memory entries only when memory operation is explicit
 
@@ -52,6 +80,7 @@ context_pack:
 
 - broad repo dumps
 - unrelated skill libraries
+- all references/templates for a high-fanout skill
 - private sessions
 - credentials
 - archived sessions

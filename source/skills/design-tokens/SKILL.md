@@ -81,8 +81,8 @@ Use this skill when a design-to-production task needs trustworthy token source h
 6. Hand off evidence:
    - Provide token mapping to `design-frontend`, `design-component-mapper`, or visual review when implementation continues.
 
-## Output schema
-Return or write a structured report with these fields:
+## Output
+For a narrow token question, return only the source mapping, conflict, or missing value in scope. Use the structured shape for an explicit token inventory/export artifact; omit empty categories.
 
 ```yaml
 source_pointer: []
@@ -111,6 +111,7 @@ unverified: []
 - Missing values must stay gaps; do not silently invent colors, sizes, names, or aliases.
 - If a script is used, include the command and state that it is an inventory aid, not a full design-system proof.
 - If no token source exists, report `user-verification-needed` or `unverified`; do not claim token readiness.
+- Do not expand one surface's token gap into a full design-system redesign or exhaustive token catalog.
 
 ## Recovery
 - If token files cannot be parsed, inspect a smaller file or report parser failure with the path and error.

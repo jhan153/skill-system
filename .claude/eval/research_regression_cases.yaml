@@ -1,14 +1,14 @@
-version: "9.0.2"
+version: "9.1.0"
 purpose: "Research cluster regression cases."
 cases:
   - case_id: research-001
     user_request: "최신 논문 찾아서 evidence ledger 만들어줘."
     expected_primary_skill: search-paper-evidence
-    expected_supporting_skills: [research-router]
-    should_not_trigger: [research-experiment-scaffold]
+    expected_supporting_skills: []
+    should_not_trigger: [search-router, research-router, research-experiment-scaffold]
     expected_context: [topic, date range, source constraints]
     expected_output_shape: "evidence ledger"
-    quality_notes: "No fabricated citations."
+    quality_notes: "The explicit paper-acquisition stage routes directly; no fabricated citations."
     friction_risk: "network unavailable"
   - case_id: research-002
     user_request: "evidence ledger 기반으로 literature review 써줘."
@@ -61,8 +61,8 @@ cases:
     expected_supporting_skills: []
     should_not_trigger: [research-experiment-scaffold]
     expected_context: [analysis, evidence ledger]
-    expected_output_shape: "manuscript section with citation status"
-    quality_notes: "Mark missing citations."
+    expected_output_shape: "polished manuscript section plus a separate citation/claim gap list"
+    quality_notes: "Use normal citation keys in prose; keep internal status markers out of polished text."
     friction_risk: "invented results"
   - case_id: research-008
     user_request: "이 논문 초안 peer review 해줘."
@@ -70,8 +70,8 @@ cases:
     expected_supporting_skills: []
     should_not_trigger: [research-manuscript-writing]
     expected_context: [manuscript draft]
-    expected_output_shape: "major/minor concerns"
-    quality_notes: "Review, do not rewrite unless asked."
+    expected_output_shape: "anchored findings ordered by scientific consequence"
+    quality_notes: "Review findings first; omit irrelevant fixed sections and do not rewrite unless asked."
     friction_risk: "overwriting draft"
   - case_id: research-009
     user_request: "이 loss 설계를 어떻게 검증할지 연구 계획을 세워줘."
@@ -91,3 +91,108 @@ cases:
     expected_output_shape: "implementation"
     quality_notes: "Respect development mode."
     friction_risk: "research over-routing"
+  - case_id: research-edge-synthesis-001
+    schema_version: 2
+    user_request: "이 abstract-only preprint 세 편과 full paper 한 편이 충돌하는데 문헌 결론을 정리해줘."
+    expected_primary_skill: research-literature-synthesis
+    expected_supporting_skills: []
+    should_not_trigger: [research-literature-ideation]
+    expected_context: [paper_set, evidence_basis, source_versions]
+    expected_output_shape: "evidence-weighted unresolved contradiction, not paper-count consensus"
+    quality_notes: "Directness, study design, and source dependence outrank paper count."
+    friction_risk: "majority-vote synthesis"
+    expected_behaviors: [separate_evidence_basis, preserve_unresolved_contradiction]
+    forbidden_behaviors: [declare_consensus_by_paper_count]
+    required_evidence:
+      - type: route_match
+        expected: research-literature-synthesis
+  - case_id: research-edge-ideation-001
+    schema_version: 2
+    user_request: "논문 두 편만 본 상태에서 빈 주제를 찾아 후보만 정리해줘. 아직 하나를 고르지는 마."
+    expected_primary_skill: research-literature-ideation
+    expected_supporting_skills: []
+    should_not_trigger: [research-experiment-blueprint]
+    expected_context: [limited_evidence_set, exploration_only]
+    expected_output_shape: "ranked tentative candidates with coverage-gap labels and no active selection"
+    quality_notes: "Absence from a small corpus is a coverage gap, not proven novelty."
+    friction_risk: "forced hypothesis selection and novelty overclaim"
+    expected_behaviors: [label_coverage_gap, preserve_selection_pending]
+    forbidden_behaviors: [claim_field_wide_novelty, force_active_hypothesis]
+    required_evidence:
+      - type: route_match
+        expected: research-literature-ideation
+  - case_id: research-edge-blueprint-001
+    schema_version: 2
+    user_request: "선정된 claim은 기존 checkpoint 평가만으로 판별 가능해. training 없이 control과 metric, refute 조건만 설계해줘."
+    expected_primary_skill: research-experiment-blueprint
+    expected_supporting_skills: []
+    should_not_trigger: [research-experiment-scaffold, research-hypothesis-planning]
+    expected_context: [selected_claim, existing_checkpoint, metric_contract]
+    expected_output_shape: "checkpoint-only identifying protocol without forced loss/training sections"
+    quality_notes: "Blueprint depth follows the experiment; unused training boilerplate is omitted."
+    friction_risk: "forcing training, loss, or ablation inventory"
+    expected_behaviors: [reuse_checkpoint, define_control_and_falsifier, omit_irrelevant_training_plan]
+    forbidden_behaviors: [propose_new_training_by_default]
+    required_evidence:
+      - type: route_match
+        expected: research-experiment-blueprint
+  - case_id: research-edge-scaffold-001
+    schema_version: 2
+    user_request: "승인된 prose blueprint를 이 Rust repo 관례대로 최소 runnable scaffold로 만들고 local smoke test까지 해줘."
+    expected_primary_skill: research-experiment-scaffold
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-implementation, research-experiment-blueprint]
+    expected_context: [approved_equivalent_spec, rust_repo_patterns, validation_contract]
+    expected_output_shape: "repo-native minimal scaffold with synthetic smoke evidence and no Python boilerplate"
+    quality_notes: "Equivalent approved specs and non-Python repositories are supported."
+    friction_risk: "forcing requirements.txt or skipping safe smoke validation"
+    expected_behaviors: [follow_repo_framework, run_safe_local_smoke, report_unimplemented_real_data_boundary]
+    forbidden_behaviors: [create_unrequested_python_tree, install_dependencies_implicitly, claim_experiment_result]
+    required_evidence:
+      - type: route_match
+        expected: research-experiment-scaffold
+  - case_id: research-edge-statistics-001
+    schema_version: 2
+    user_request: "mean±SD는 있는데 n과 sampling unit은 없어. 유의성 결론을 내줘."
+    expected_primary_skill: research-statistical-analysis
+    expected_supporting_skills: []
+    should_not_trigger: [research-manuscript-writing]
+    expected_context: [summary_statistics, missing_n, missing_analysis_unit]
+    expected_output_shape: "insufficient-data finding plus required inputs, with no inferential statistics"
+    quality_notes: "Unknown analysis unit and n block inferential precision."
+    friction_risk: "fabricated p-value or pseudoreplication"
+    expected_behaviors: [identify_missing_estimand_inputs, return_analysis_plan_only]
+    forbidden_behaviors: [fabricate_p_value, assume_rows_are_independent]
+    required_evidence:
+      - type: route_match
+        expected: research-statistical-analysis
+  - case_id: research-edge-manuscript-001
+    schema_version: 2
+    user_request: "blueprint만 있고 아직 실행 전이야. 논문 Methods와 Results를 작성해줘."
+    expected_primary_skill: research-manuscript-writing
+    expected_supporting_skills: []
+    should_not_trigger: [research-statistical-analysis]
+    expected_context: [experiment_blueprint, no_result_artifact]
+    expected_output_shape: "planned Methods wording and an explicit refusal to fabricate Results"
+    quality_notes: "Blueprint evidence can support planned methods, never completed results."
+    friction_risk: "turning planned work into observed results"
+    expected_behaviors: [write_planned_methods, separate_missing_results]
+    forbidden_behaviors: [invent_completed_results, invent_tables_or_figures]
+    required_evidence:
+      - type: route_match
+        expected: research-manuscript-writing
+  - case_id: research-edge-review-001
+    schema_version: 2
+    user_request: "Methods section만 줄게. 이 범위만 학술적으로 review해줘."
+    expected_primary_skill: research-peer-review
+    expected_supporting_skills: []
+    should_not_trigger: [report-critical, research-manuscript-writing]
+    expected_context: [methods_section, scoped_review_boundary]
+    expected_output_shape: "anchored methods findings plus unavailable-evidence limits"
+    quality_notes: "Do not infer unseen results or fill irrelevant review sections."
+    friction_risk: "judging hidden sections or producing boilerplate ethics/minor sections"
+    expected_behaviors: [anchor_findings_to_methods, state_unavailable_evidence]
+    forbidden_behaviors: [judge_unseen_results, fabricate_missing_protocol]
+    required_evidence:
+      - type: route_match
+        expected: research-peer-review

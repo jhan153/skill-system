@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Plan Runner"
-  short_description: "Execute approved plans or specs into implementation batches"
-  default_prompt: "Use $workflow-plan-runner to implement from an approved plan, spec, or package in scoped batches with validation after each batch. Confirm the execution source is sufficient, lock scope, return execution_scope/batch_plan/changed_artifacts/validation_per_batch, and use rollback_or_fallback when validation fails or scope is unsafe."
+  short_description: "Execute one approved implementation batch"
+  default_prompt: "Execute the smallest safe batch anchored to the approved plan/spec, validate it, and keep batch, phase, and whole-plan completion explicitly separate."
 
 policy:
   invocation_surface: explicit_procedure
@@ -11,9 +11,7 @@ policy:
 work_horizon:
   level: cross_horizon
   role: plan_execution_owner
-  consumes:
-    - short_plan
-    - long_plan
+  consumes: [short_plan, long_plan]
 
 execution_mode:
   kind: plan_batch_execution

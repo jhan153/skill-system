@@ -4,7 +4,8 @@
 Answers the harness-paradox question: does the strict gate help, hurt, or do
 nothing vs a gate-off baseline? Reads the hash-chained hook event ledger
 (hook_runtime), groups `turn_finalize` events by holdout arm, and reports
-per-arm gate-fire / block / finalize-fail rates plus a sunset recommendation.
+per-arm evidence-gate and Recovery Guard fire/block rates, finalize-fail rates,
+and a sunset recommendation.
 
 Read-only: never writes, never touches the gate. Pure functions (`holdout_arm`,
 `stratified_compare`, `sunset_status`) are unit-testable without I/O. Holdout
@@ -58,6 +59,8 @@ def stratified_compare(events: list) -> dict:
     sessions = {a: set() for a in ARMS}
     fire = {a: 0 for a in ARMS}
     block = {a: 0 for a in ARMS}
+    recovery_audit = {a: 0 for a in ARMS}
+    recovery_block = {a: 0 for a in ARMS}
     fail = {a: 0 for a in ARMS}
     total = {a: 0 for a in ARMS}
     for e in _finalize_events(events):
@@ -71,6 +74,10 @@ def stratified_compare(events: list) -> dict:
             fire[arm] += 1
         if ev.get("did_block"):
             block[arm] += 1
+        if ev.get("recovery_would_audit"):
+            recovery_audit[arm] += 1
+        if ev.get("recovery_did_block"):
+            recovery_block[arm] += 1
         if e.get("status") == "fail":
             fail[arm] += 1
     res: dict[str, Any] = {}
@@ -81,6 +88,8 @@ def stratified_compare(events: list) -> dict:
             "finalizes": t,
             "would_fire_rate": (fire[a] / t) if t else None,
             "block_rate": (block[a] / t) if t else None,
+            "recovery_would_audit_rate": (recovery_audit[a] / t) if t else None,
+            "recovery_block_rate": (recovery_block[a] / t) if t else None,
             "finalize_fail_rate": (fail[a] / t) if t else None,
         }
     on_f, off_f = res["on"]["finalize_fail_rate"], res["off"]["finalize_fail_rate"]

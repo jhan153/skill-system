@@ -6,14 +6,14 @@
       "canonical": "shared/docs/source_registry.yaml",
       "generated_from": ".codex/docs/source_registry.yaml",
       "generated_at": "2026-06-25T22:01:27Z",
-      "source_checksum": "7d2e0aca57399a6d86f0702f04485f0130f0c9aebeca163c7ae320fa5d585e2e"
+      "source_checksum": "db7058c9a35ca00d748ae1035040934d4b48a459a7affdcc1a6902d7731145a9"
     },
     "eval/eval-case.schema.json": {
       "kind": "json",
       "canonical": "shared/eval/eval-case.schema.json",
       "generated_from": ".codex/eval/eval-case.schema.json",
       "generated_at": "2026-06-25T22:01:27Z",
-      "source_checksum": "f5ecff2ea246ccfd90702bf700aac070e1a625d00d40de47fcea40c250c93946"
+      "source_checksum": "8897c7e194553b675e715454f903cd2af2e66525110d4a9bd40e4e09579c06d0"
     }
   }
 }

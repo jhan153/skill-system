@@ -1,21 +1,31 @@
-schema_version: 1
+schema_version: 2
 search_date: "2026-06-23"
 claims:
   - id: C-001
     statement: "Bounded verification loops are exercised end to end in the runtime."
-    citation_status: verified
-    verdict: confirmed
-    sources: [".codex/tools/evaluate_loop_run.py"]
-    retained: true
+    conclusion: supported
+    evidence:
+      - acquisition_status: acquired
+        source_status: verified_identity
+        claim_relation: supports
+        evidence_basis: source_code
+        locator: ".codex/tools/evaluate_loop_run.py"
   - id: C-002
     statement: "The loop verify profile is gated in the release pipeline."
-    citation_status: verified
-    verdict: confirmed
-    sources: [".codex/tools/run_verification_pipeline.py", ".github/workflows/verify-bundle.yml"]
-    retained: true
+    conclusion: mixed
+    evidence:
+      - acquisition_status: acquired
+        source_status: verified_identity
+        claim_relation: supports
+        evidence_basis: source_code
+        locator: ".codex/tools/run_verification_pipeline.py"
+      - acquisition_status: acquired
+        source_status: verified_identity
+        claim_relation: contradicts
+        evidence_basis: workflow_config
+        locator: ".github/workflows/verify-bundle.yml"
   - id: C-003
-    statement: "An unsupported claim that adversarial verification refuted."
-    citation_status: unverified
-    verdict: refuted
-    sources: []
-    retained: false
+    statement: "An evidence gap remains for host-attested semantic verification."
+    conclusion: insufficient
+    missing_evidence: ["host-authenticated command attestation"]
+    evidence: []

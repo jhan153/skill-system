@@ -1,39 +1,42 @@
 # Deep Evidence Method
 
-This reference details the `search-deep-evidence` sweep. The skill owns evidence
-gathering and verification only; final synthesis is handed to a report or
-research-synthesis skill.
+Use this reference only when a claim genuinely needs more than one evidence lane. The skill gathers and verifies evidence; a report or research-synthesis owner writes the final narrative.
 
-## 1. Angle decomposition
-- Split the topic/claim into 3-6 angles that fail differently (definition, mechanism, counter-evidence, recency, scale/limits, adversarial/critique).
-- Each angle must be independently searchable so one blind spot does not hide evidence.
+## Claim decomposition
+- Split only where subclaims require different evidence or can fail independently.
+- Record the claim scope, freshness need, and what observation would support or contradict it.
+- Do not force a fixed number of angles or agents.
 
-## 2. Lane mapping (via search-router)
+## Lane selection
 | evidence kind | lane / owner |
 | --- | --- |
 | papers / citations | `search-paper-evidence` |
-| codebase | `analysis-codebase` / `analysis-bug` evidence phase |
-| runtime | `workflow-rigor` evidence phase |
-| visual | `design-visual-regression` / `design-a11y-audit` |
-| memory | `memory-bank-harness` |
-| project knowledge | `knowledge-context-harness` (read) |
-| open web | web search when permitted |
+| source code / contracts | targeted code inspection or the owning analysis skill |
+| runtime | authorized runtime observation from the owning workflow |
+| visual / accessibility | `design-visual-regression` / `design-a11y-audit` |
+| accepted memory | `memory-bank-harness` |
+| project knowledge | `knowledge-context-harness` (read-only) |
+| current public facts | authoritative web sources |
 
-## 3. Evidence ledger discipline
-- Reuse `search-paper-evidence` rules: no citation without a source; never fabricate DOI, arXiv ID, venue, dataset, metric, or result.
-- Record per entry: claim, source/identifier, evidence role (support | contradict | context), finding query.
+Lane selection grants no new write, network, runtime, credential, or mutation authority.
 
-## 4. Adversarial verification
-- For each falsifiable claim, run N independent skeptics (default 3) that try to REFUTE using the cited source.
-- Kill the claim when a majority refute (default 2 of 3). Keep verdict: `confirmed | refuted | partial` with the vote tally.
-- Prefer outcome/source evidence over transcript assertion; diverse skeptic lenses beat identical ones.
+## Evidence record
+Record these axes separately:
 
-## 5. Citation-status labels (shared with search-paper-evidence)
-- `verified`: claim has a real, retrievable source and survived adversarial verification.
-- `unverified`: source missing, unreachable, or verification inconclusive.
-- `fabricated-risk`: citation/identifier could not be confirmed to exist; treat as non-evidence until checked.
+- `acquisition_status`: acquired, partial, inaccessible, or not_acquired
+- `source_status`: verified_identity, metadata_partial, duplicate_version, corrected, retracted, or unverified
+- `claim_relation`: supports, contradicts, mixed, mentions, or not_assessed
+- `evidence_basis`: exact source/code/runtime/visual basis
+- `locator`: direct URL, file/line, artifact ID, or receipt
+- directness, authority, independence, recency, and limitations
 
-## 6. Handoff
-- Output the verified evidence set and name the owning skill for synthesis
-  (`report-critical`, `report-qualitative`, or `research-literature-synthesis`).
-- Mark missing evidence and `Unverified` inputs explicitly; never invent to fill gaps.
+Source identity is not claim verification. Dependent sources are not independent votes.
+
+## Adversarial verification
+- Search for the strongest plausible contradiction and alternative explanation.
+- Compare evidence predictions and provenance, not agent/source counts.
+- Preserve `mixed` or `insufficient` conclusions when evidence conflicts or is unavailable.
+- Never delete a contradicted claim merely to make the ledger pass.
+
+## Handoff
+Return a resolved claim–evidence matrix and name the owning synthesis/review skill. A valid resolution may be `supported`, `contradicted`, `mixed`, or `insufficient` with explicit missing evidence.

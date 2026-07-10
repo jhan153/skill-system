@@ -19,6 +19,22 @@ from _validation import load_yaml_file, read_text, skill_dirs as iter_skill_dirs
 
 SECTION_RE = re.compile(r"^##\s+", re.M)
 RELATED_SKILL_RE = re.compile(r"`([a-z][a-z0-9-]+)`")
+VOLATILE_CONTEXT_RE = re.compile(
+    r"\b("
+    r"latest|current|transient|temporary|raw|logs?|output|history|full\s+repo|"
+    r"all\s+skills?|all\s+plans?|memory\s+bank|chat\s+history|field\s+feedback"
+    r")\b",
+    re.I,
+)
+REFERENCE_FANOUT_FREE_ALLOWANCE = 3
+REFERENCE_PATH_RE = re.compile(r"(?:references|docs)/[^\s`,;]+", re.I)
+SELECTIVE_REFERENCE_RE = re.compile(
+    r"(do not load[^\n]{0,80}(?:entire|all)[^\n]{0,40}(?:references|templates)|"
+    r"index(?:-first|/catalog| or catalog)|"
+    r"load only[^\n]{0,80}(?:reference|template)|"
+    r"1-3 (?:files|references|templates))",
+    re.I,
+)
 
 
 def skill_dirs(root: Path, namespace: str) -> list[Path]:
@@ -35,9 +51,9 @@ def section_text(text: str, heading: str) -> str:
     return text[start:end].strip()
 
 
-def count_context_items(routing_card: str, key: str) -> int:
+def context_items(routing_card: str, key: str) -> list[str]:
     lines = routing_card.splitlines()
-    count = 0
+    items: list[str] = []
     in_key = False
     key_indent = 0
     for line in lines:
@@ -51,8 +67,12 @@ def count_context_items(routing_card: str, key: str) -> int:
             if stripped and indent <= key_indent and not stripped.startswith("-"):
                 break
             if stripped.startswith("- "):
-                count += 1
-    return count
+                items.append(stripped[2:].strip())
+    return items
+
+
+def count_context_items(routing_card: str, key: str) -> int:
+    return len(context_items(routing_card, key))
 
 
 def related_skill_count(text: str) -> int:
@@ -67,6 +87,10 @@ def reference_count(skill_dir: Path) -> int:
         if base.exists():
             total += sum(1 for path in base.rglob("*") if path.is_file())
     return total
+
+
+def volatile_context_mentions(text: str) -> int:
+    return len(VOLATILE_CONTEXT_RE.findall(text))
 
 
 def load_agent(agent_file: Path) -> dict[str, Any]:
@@ -89,13 +113,49 @@ def metric_for(skill_dir: Path, root: Path, namespace: str) -> dict[str, Any]:
     initial_surface_chars = len(short_description) + len(default_prompt) + len(routing_card)
     static_size_score = len(skill_text) + len(default_prompt)
     activation_risk_score = 3 if allow_implicit else (2 if surface in {"selective_router", "support_only"} else 1)
+    must_read_items = context_items(routing_card, "must_read")
+    read_if_needed_items = context_items(routing_card, "read_if_needed")
+    must_read_count = len(must_read_items)
+    read_if_needed_count = len(read_if_needed_items)
+    references = reference_count(skill_dir)
+    eager_reference_count = sum(bool(REFERENCE_PATH_RE.search(item)) for item in must_read_items)
+    conditional_reference_count = sum(bool(REFERENCE_PATH_RE.search(item)) for item in read_if_needed_items)
+    selective_reference_admission = bool(SELECTIVE_REFERENCE_RE.search(skill_text))
+    reference_inventory_risk = (
+        0
+        if references <= REFERENCE_FANOUT_FREE_ALLOWANCE
+        else 1 + (references - REFERENCE_FANOUT_FREE_ALLOWANCE) // 10
+    )
+    support_fanout = related_skill_count(skill_text)
     fanout_score = (
-        count_context_items(routing_card, "must_read")
-        + count_context_items(routing_card, "read_if_needed")
-        + reference_count(skill_dir)
-        + related_skill_count(skill_text)
+        must_read_count
+        + read_if_needed_count
+        + support_fanout
+        + (0 if selective_reference_admission else reference_inventory_risk)
     )
     leakage_risk_score = activation_risk_score * initial_surface_chars
+    volatile_context_risk = activation_risk_score * volatile_context_mentions(
+        "\n".join([short_description, default_prompt, routing_card])
+    )
+    reference_fanout_risk = (
+        eager_reference_count * 2
+        + max(0, conditional_reference_count - 8)
+        + (0 if selective_reference_admission else reference_inventory_risk)
+        + max(0, fanout_score - 12)
+    )
+    support_attachment_risk = (
+        support_fanout
+        + (3 if surface == "support_only" else 2 if surface in {"selective_router", "evidence_gate"} else 0)
+        + (2 if allow_implicit else 0)
+    )
+    cache_stability_risk = (initial_surface_chars // 1000) + volatile_context_risk + (2 if allow_implicit else 0)
+    token_cost_risk_score = (
+        static_size_score // 5000
+        + reference_fanout_risk
+        + cache_stability_risk
+        + volatile_context_risk
+        + support_attachment_risk
+    )
     return {
         "skill_id": skill_dir.name,
         "namespace": namespace,
@@ -103,16 +163,26 @@ def metric_for(skill_dir: Path, root: Path, namespace: str) -> dict[str, Any]:
         "default_prompt_chars": len(default_prompt),
         "skill_body_chars": len(skill_text),
         "routing_card_chars": len(routing_card),
-        "must_read_count": count_context_items(routing_card, "must_read"),
-        "read_if_needed_count": count_context_items(routing_card, "read_if_needed"),
-        "reference_count": reference_count(skill_dir),
-        "support_skill_fanout": related_skill_count(skill_text),
+        "initial_surface_chars": initial_surface_chars,
+        "must_read_count": must_read_count,
+        "read_if_needed_count": read_if_needed_count,
+        "reference_count": references,
+        "eager_reference_count": eager_reference_count,
+        "conditional_reference_count": conditional_reference_count,
+        "selective_reference_admission": selective_reference_admission,
+        "reference_inventory_risk": reference_inventory_risk,
+        "support_skill_fanout": support_fanout,
         "allow_implicit_invocation": allow_implicit,
         "invocation_surface": surface,
         "static_size_score": static_size_score,
         "activation_risk_score": activation_risk_score,
         "fanout_score": fanout_score,
         "leakage_risk_score": leakage_risk_score,
+        "reference_fanout_risk": reference_fanout_risk,
+        "cache_stability_risk": cache_stability_risk,
+        "volatile_context_risk": volatile_context_risk,
+        "support_attachment_risk": support_attachment_risk,
+        "token_cost_risk_score": token_cost_risk_score,
     }
 
 
@@ -121,29 +191,30 @@ def collect_metrics(root: Path, namespace: str) -> list[dict[str, Any]]:
 
 
 def markdown_report(metrics: list[dict[str, Any]], top: int) -> str:
-    rows = sorted(metrics, key=lambda item: int(item["leakage_risk_score"]), reverse=True)[:top]
+    rows = sorted(metrics, key=lambda item: int(item["token_cost_risk_score"]), reverse=True)[:top]
     lines = [
         "# Context Surface Advisory Report",
         "",
-        "This report is advisory only. It does not fail release verification.",
+        "This report is advisory only. It does not fail release verification or estimate billing tokens.",
         "",
-        "| Skill | Surface | Implicit | Initial chars | Fanout | Leakage risk |",
-        "| --- | --- | --- | ---: | ---: | ---: |",
+        "| Skill | Surface | Implicit | Initial chars | Ref files | Selective | Fanout | Token-cost risk | Reference risk | Cache risk | Volatile risk | Support risk |",
+        "| --- | --- | --- | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for item in rows:
         lines.append(
             "| {skill_id} | {invocation_surface} | {allow_implicit_invocation} | "
-            "{initial_chars} | {fanout_score} | {leakage_risk_score} |".format(
-                initial_chars=(
-                    int(item["short_description_chars"])
-                    + int(item["default_prompt_chars"])
-                    + int(item["routing_card_chars"])
-                ),
+            "{initial_surface_chars} | {reference_count} | {selective_reference_admission} | "
+            "{fanout_score} | {token_cost_risk_score} | "
+            "{reference_fanout_risk} | {cache_stability_risk} | {volatile_context_risk} | "
+            "{support_attachment_risk} |".format(
                 **item,
             )
         )
     lines.append("")
-    lines.append("Use this to inspect likely context leakage, not to penalize long explicit procedures.")
+    lines.append(
+        "Use this to inspect likely context leakage, reference fanout, cache-instability, volatile input, and support over-attachment risk. "
+        "Do not treat the scores as measured cost savings."
+    )
     return "\n".join(lines) + "\n"
 
 

@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Rigor"
   short_description: "Mode-based evidence-first execution control"
-  default_prompt: "Use $workflow-rigor to enforce evidence-first execution, split validation, and review on higher-risk changes."
+  default_prompt: "Use $workflow-rigor when execution risk needs extra proof: select lite/standard/strict from consequence and coupling, then attach only the matching validation and review gates."
 
 policy:
   allow_implicit_invocation: false

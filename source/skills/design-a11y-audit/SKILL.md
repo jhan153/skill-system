@@ -80,8 +80,8 @@ Use this skill for accessibility evidence. It can support implementation, but it
    - Missing state coverage goes to `design-component-mapper`.
    - Missing token values go to `design-tokens`.
 
-## Output schema
-Return or write a structured report with these fields:
+## Output
+For a conversational check, lead with the highest-impact confirmed gaps and the evidence needed next. Use the structured shape only when the user requests an audit artifact or several checks must be tracked; omit empty fields.
 
 ```yaml
 target:
@@ -103,6 +103,7 @@ unverified: []
 - Static scan output cannot claim full WCAG compliance.
 - If contrast or target size cannot be measured, report the unavailable evidence.
 - If a browser interaction check is unavailable, keep keyboard/focus behavior `user-verification-needed` or `unverified`.
+- Do not expand a single focus, label, or contrast question into the full audit schema.
 
 ## Loop Contract Consumption
 When invoked as a loop verifier:

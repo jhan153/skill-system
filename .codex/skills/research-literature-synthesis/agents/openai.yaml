@@ -1,10 +1,7 @@
 interface:
   display_name: "Research Literature Synthesis"
-  short_description: "Turns an evidence ledger or provided papers into literature review and related work synthesis while separating consensus, disagreement, cont"
-  default_prompt: |
-    Use $research-literature-synthesis only for its narrow Research Cluster role. Do not activate for ordinary development, implementation, bug fixing, repo planning, casual explanation, or unrelated research stages.
-
-    Do not install or invoke a monolithic codex-research-lifecycle skill. Do not touch .codex/skills/.system.
+  short_description: "Synthesize papers into calibrated themes and contradictions"
+  default_prompt: "Use $research-literature-synthesis to compare an existing evidence set by method, data, metric, and study design, preserving contradictions and coverage limits instead of counting papers as consensus."
 
 policy:
   invocation_surface: explicit_procedure

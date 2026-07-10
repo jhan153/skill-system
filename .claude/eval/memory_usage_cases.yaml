@@ -1,4 +1,4 @@
-version: "9.0.2"
+version: "9.1.0"
 purpose: "Memory usage observation cases."
 cases:
   - case_id: memory-001
@@ -50,7 +50,7 @@ cases:
     user_request: "완료된 이전 플랜 원문은 빼고, 지금 작업에 필요한 결정만 context pack으로 골라줘."
     expected_primary_skill: memory-bank-harness
     expected_supporting_skills: [plan-spec-curator]
-    should_not_trigger: [memory-bank-update, coordination-brief]
+    should_not_trigger: [memory-bank-update, coordination-handoff]
     expected_context: [active task, accepted memory, old plan summary]
     expected_output_shape: "small context pack with old-plan exclusion"
     quality_notes: "Completed raw plans are background, not active instructions."

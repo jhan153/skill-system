@@ -13,7 +13,8 @@
       "/Users/master/repo/software/Skill-System/.codex/hooks/codex_hook_adapter.py"
     ],
     "network_targets": [
-      "https://example.com/?api_key=sk-secretsecretsecretsecret"
+      "https://example.com/?api_key=sk-secretsecretsecretsecret",
+      "https://alice:shortpass@example.com/private"
     ],
     "stdout": "PASS"
   }

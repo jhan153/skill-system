@@ -78,7 +78,9 @@ Use this skill to convert a visual reference into an implementation-ready analys
    - List visible or required loading, empty, error, disabled, hover, focus, selected, expanded, collapsed, and responsive states.
    - Recommend support gates only when relevant evidence exists.
 
-## Output schema
+## Output
+For one screen or one decomposition question, return the confirmed hierarchy and implementation-relevant uncertainties directly. Use the structured shape only for an explicit design-contract artifact; omit empty fields.
+
 ```yaml
 source_reference:
 surface_type:
@@ -99,10 +101,6 @@ unverified: []
 
 ## Validation
 - The output must distinguish confirmed visible evidence from inferred implementation decisions.
-- Include at least three negative route checks before promoting implicit invocation:
-  - not direct implementation
-  - not token-only
-  - not screenshot-diff-only
 - Do not claim exact measurements unless source metadata provides them.
 
 ## Recovery

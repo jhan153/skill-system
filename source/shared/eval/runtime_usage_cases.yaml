@@ -1,4 +1,4 @@
-version: "9.0.2"
+version: "9.1.0"
 purpose: "Real-use quality observation cases for routing and output improvement."
 cases:
   - case_id: runtime-001
@@ -45,7 +45,7 @@ cases:
     expected_context: [design source, repo framework, assets, validation command]
     expected_output_shape: "implemented UI with visual verification"
     quality_notes: "Design-to-frontend remains the generic implementation primary."
-    friction_risk: "over-triggering analysis or explicit-only surface skills"
+    friction_risk: "loading unrelated surface profiles or analysis skills"
   - case_id: runtime-006
     user_request: "design token JSON을 플랫폼별 token으로 정리하는 스킬을 써줘."
     expected_primary_skill: design-tokens
@@ -95,7 +95,7 @@ cases:
     user_request: "스킬 maturity 기준과 improvement track을 정리해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [coordination-brief, evaluation-harness]
+    should_not_trigger: [coordination-handoff, evaluation-harness]
     expected_context: [.codex/docs/skill_maturity.md, .codex/docs/skill_registry.md]
     expected_output_shape: "direct explanation or scoped doc update if requested"
     quality_notes: "Conceptual explanation does not need orchestration."
@@ -104,7 +104,7 @@ cases:
     user_request: "완료된 plan은 핵심 결정만 memory 후보로 남기고 raw plan은 다음부터 active context에서 빼줘."
     expected_primary_skill: plan-spec-curator
     expected_supporting_skills: []
-    should_not_trigger: [plan-short-term-docs, memory-bank-update, coordination-brief]
+    should_not_trigger: [plan-short-term-docs, memory-bank-update, coordination-handoff]
     expected_context: [current_goal, target_plan_slice, lifecycle_state]
     expected_output_shape: "closeout summary, memory proposal candidates, archive load policy, one next action"
     quality_notes: "Do not mutate memory directly and do not keep closed raw plans as active instructions."
@@ -120,8 +120,8 @@ cases:
     friction_risk: "loading full history to solve instruction bloat"
   - case_id: runtime-015
     user_request: "이 구현 계획을 세 agent가 동시에 작업할 수 있게 lock scope와 task card로 나눠줘."
-    expected_primary_skill: coordination-multi-agent
-    expected_supporting_skills: [coordination-brief]
+    expected_primary_skill: coordination-handoff
+    expected_supporting_skills: []
     should_not_trigger: [plan-long-term-package]
     expected_context: [active plan, file scopes, validation requirements]
     expected_output_shape: "response-first task cards with validation owners"
@@ -131,7 +131,7 @@ cases:
     user_request: "runtime usage eval 5개를 돌려본 결과를 수동 capture 형식으로 정리해줘."
     expected_primary_skill: evaluation-harness
     expected_supporting_skills: []
-    should_not_trigger: [report-artifact-inventory]
+    should_not_trigger: [coordination-handoff]
     expected_context: [.codex/eval cases, observed behavior]
     expected_output_shape: "manual result capture and improvement candidates"
     quality_notes: "Eval output is improvement evidence for routing and output shape."
@@ -140,7 +140,7 @@ cases:
     user_request: "이전 계획과 메모리가 섞였어. 지금 작업에 필요한 context pack만 다시 골라줘."
     expected_primary_skill: memory-bank-harness
     expected_supporting_skills: [plan-spec-curator]
-    should_not_trigger: [memory-bank-update, coordination-brief]
+    should_not_trigger: [memory-bank-update, coordination-handoff]
     expected_context: [active task, accepted memory, old plan summaries]
     expected_output_shape: "filtered task-specific context pack"
     quality_notes: "Old plans and raw transcript do not become active instructions."

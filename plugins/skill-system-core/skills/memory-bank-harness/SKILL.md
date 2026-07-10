@@ -24,6 +24,7 @@ description: Compiles task-specific context packs from accepted memory while fil
   - accepted memory sources
   - validation context
   - risk boundary
+  - context budget when provided
 - expected_outputs:
   - small context pack in the current response or an explicitly requested document
   - memory guard findings
@@ -31,9 +32,10 @@ description: Compiles task-specific context packs from accepted memory while fil
 - context_targets:
   must_read:
     - accepted memory entries relevant to the task
-    - `.codex/docs/context_pack_guidelines.md`
-    - `.codex/docs/memory_usage_guidelines.md`
   read_if_needed:
+    - `.codex/docs/context_pack_guidelines.md` when pack shape or budget policy is unclear
+    - `.codex/docs/memory_usage_guidelines.md` when admission precedence or source status is unclear
+    - `references/admission-decision-tree.md` for conflict, stale, or poison-risk decisions
     - memory-bank current/archive/events when the user explicitly requests memory inspection
   do_not_load_by_default:
     - raw transcripts
@@ -44,7 +46,7 @@ description: Compiles task-specific context packs from accepted memory while fil
   reads:
     - accepted memory and task-local context only
   writes:
-    - none unless the user explicitly requested a document update
+    - none by default; only an explicitly requested context-pack artifact
   tools:
     - none by default
   sensitive_resources:
@@ -72,6 +74,9 @@ description: Compiles task-specific context packs from accepted memory while fil
 context_pack:
   task:
   primary_skill:
+  budget:
+  admitted_words:
+  admitted_utf8_bytes:
   admitted:
     - source:
       reason:
@@ -108,6 +113,7 @@ Allowed `status` values:
 - Default to a short, source-traced summary per admitted entry, not raw memory text.
 - Use raw/full memory text only when the user explicitly needs it and it is task-relevant.
 - Prefer excluding marginal entries over inflating the pack; a smaller, trustworthy pack beats a large noisy one.
+- Report measured admitted words/UTF-8 bytes separately from any advisory token estimate; do not present the estimate as billed tokens.
 
 ## Reference
 - Read `references/admission-decision-tree.md` for the full admission decision tree, a compact context-pack example, and rejected-entry examples.

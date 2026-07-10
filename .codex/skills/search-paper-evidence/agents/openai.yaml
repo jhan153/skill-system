@@ -1,10 +1,7 @@
 interface:
   display_name: "Search Paper Evidence"
-  short_description: "Searches or plans searches for paper/reference evidence and builds evidence ledgers without hallucinating citations, papers, datasets, metri"
-  default_prompt: |
-    Use $search-paper-evidence only for its narrow Research Cluster role. Do not activate for ordinary development, implementation, bug fixing, repo planning, casual explanation, or unrelated research stages.
-
-    Do not install or invoke a monolithic codex-research-lifecycle skill. Do not touch .codex/skills/.system.
+  short_description: "Find traceable paper evidence without fabricated metadata"
+  default_prompt: "Use $search-paper-evidence for explicit paper or citation acquisition. Verify source identity, record evidence basis and claim relation separately, deduplicate versions, and match output depth to the request."
 
 policy:
   invocation_surface: explicit_procedure

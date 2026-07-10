@@ -79,7 +79,9 @@ Use this skill to produce code-ready layout constraints. It can attach to `desig
    - For code changes, hand off layout rules to `design-frontend`.
    - For rendered proof, hand off viewport checks to `design-visual-regression`.
 
-## Output schema
+## Output
+Answer a narrow layout question with only the decisive constraint mapping and unverified assumptions. Use the structured shape for an explicit implementation contract or multi-region surface; omit empty fields.
+
 ```yaml
 source_reference:
 target_platform:
@@ -101,10 +103,6 @@ unverified: []
 - Each layout rule must cite source evidence or be marked inferred.
 - Do not scale font size with viewport width.
 - Do not claim responsive correctness without breakpoint rules or screenshot evidence.
-- Include at least three negative route checks before promoting implicit invocation:
-  - not full implementation
-  - not screenshot-diff-only
-  - not component-state-only
 
 ## Recovery
 - If Figma metadata is unavailable, infer from visible hierarchy and mark exact sizes `Unverified`.

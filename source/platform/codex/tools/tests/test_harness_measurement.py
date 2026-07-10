@@ -14,12 +14,26 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from analyze_harness_measurement import holdout_arm, stratified_compare, sunset_status  # noqa: E402
 
 
-def finalize(session_id, arm, would_fire=False, did_block=False, status="pass"):
+def finalize(
+    session_id,
+    arm,
+    would_fire=False,
+    did_block=False,
+    status="pass",
+    recovery_would_audit=False,
+    recovery_did_block=False,
+):
     return {
         "neutral_event": "turn_finalize",
         "session_id": session_id,
         "status": status,
-        "evidence": {"holdout_arm": arm, "would_fire": would_fire, "did_block": did_block},
+        "evidence": {
+            "holdout_arm": arm,
+            "would_fire": would_fire,
+            "did_block": did_block,
+            "recovery_would_audit": recovery_would_audit,
+            "recovery_did_block": recovery_did_block,
+        },
     }
 
 
@@ -59,6 +73,18 @@ class StratifiedCompareTests(unittest.TestCase):
     def test_ignores_non_finalize_events(self) -> None:
         cmp = stratified_compare([{"neutral_event": "tool_result", "evidence": {"holdout_arm": "on"}}])
         self.assertIsNone(cmp["on"]["finalize_fail_rate"])
+
+    def test_reports_recovery_guard_rates_separately(self) -> None:
+        events = [
+            finalize("s1", "on", recovery_would_audit=True, recovery_did_block=True),
+            finalize("s2", "on"),
+            finalize("s3", "off", recovery_would_audit=True),
+        ]
+        cmp = stratified_compare(events)
+        self.assertEqual(cmp["on"]["recovery_would_audit_rate"], 0.5)
+        self.assertEqual(cmp["on"]["recovery_block_rate"], 0.5)
+        self.assertEqual(cmp["off"]["recovery_would_audit_rate"], 1.0)
+        self.assertEqual(cmp["off"]["recovery_block_rate"], 0.0)
 
 
 class SunsetTests(unittest.TestCase):

@@ -1,145 +1,52 @@
 # Global AGENTS
 
-## Purpose
-- This file defines global working rules for Codex.
-- It covers request interpretation, response boundaries, edit scope, evidence, and validation.
-- Execution permissions, sandboxing, and approval policy are managed by `config.toml` and rules.
-- Repository-specific rules belong in the repository-level `AGENTS.md`.
+## Authority And Scope
+- Execution permissions, sandboxing, approvals, and blocking policy are owned by `config.toml` and rules; do not redefine them here.
+- Repository-specific instructions belong in the nearest repository `AGENTS.md` and override these general working rules within their scope.
+- Repeated workflows, routing matrices, artifact formats, and specialist validation belong in Skills or references so this file stays an always-on set of invariants.
 
 ## Language And Response
-- The user may write instructions in Korean.
-- Interpret Korean instructions directly without asking the user to restate them in English.
-- Respond in Korean honorific style by default.
-- Start with the actual answer, finding, or result.
-- The first sentence must contain task-relevant information, not a meta statement about response process, format, or intent.
-- Avoid repeated opener phrases.
-- Keep answers concise unless the user asks for details.
-- Keep code identifiers, file paths, commands, logs, API names, and library names in their original language.
-- Do not translate code, errors, paths, logs, or technical identifiers unless explicitly requested.
-- Answer simple requests directly and briefly; add structure only when it improves clarity.
-- For reviews, critiques, or analysis, lead with actionable findings.
+- Interpret instructions in the user's language; respond to Korean requests in Korean honorific style by default.
+- Identify the user's intended outcome before drafting. Once clear, state the conclusion directly; keep simple answers short.
+- Preserve code identifiers, paths, commands, APIs, errors, and logs in their original form unless translation is requested.
+- Add structure, rationale, and evidence only to the depth needed for the user to judge or act on the result.
 
-## Integrity
-- Do not present unverified information as confirmed.
-- Mark unverified claims as `Unverified`.
-- Do not state assumptions as facts.
-- Surface assumptions briefly when they affect implementation or conclusions.
+## Evidence And Integrity
+- Do not present assumptions, inferences, or unverified claims as confirmed facts. State material uncertainty where it affects the conclusion or implementation.
+- Prefer direct source, test, command, runtime, or observed-behavior evidence. Cite the relevant file, line, output, or observation when reporting analysis or changes.
+- A structural check, hook, harness, or generic Stop result proves only its own contract; it does not by itself prove the user's success conditions.
+- Never weaken tests, assertions, logs, validation criteria, or evidence requirements to manufacture a pass. Validation must cover the user-visible symptom and material regression risk.
 
-## Core Behavioral Rules
+## Decision And Edit Boundary
+- Do not silently choose among interpretations that materially change the deliverable, write scope, safety boundary, or validation path. Inspect narrowly or ask for the one decision that cannot be derived safely.
+- Prefer the smallest sufficient and reversible change. Do not add unrequested features, abstractions, dependencies, configurability, or impossible-case handling.
+- Touch only files and lines connected to the request, preserve unrelated work in a dirty tree, and match existing ownership and style boundaries.
+- Explanation, diagnosis, review, and status requests are read-only unless the user also requests a mutation. For requested document or source changes, modify only the authorized scope.
+- Report unrelated issues as risks or follow-ups rather than silently repairing them.
 
-### Think Before Coding
-- Do not silently choose among materially different interpretations.
-- State assumptions briefly when they affect scope, safety, design, or validation.
-- Ask only when ambiguity changes the deliverable, write scope, safety boundary, or validation path.
-- Use targeted inspection or the smallest reversible interpretation when safe.
+## Goal And Depth
+- For non-trivial requests, identify the intended outcome, observable success, constraints and non-goals, decisive unknowns, and closing evidence before answering or acting. A quick answer, plan step, file change, or passing check is not the goal.
+- Scale depth with ambiguity and consequence. Act directly on simple, local, reversible requests; deepen when interpretations, causes, or designs compete, static structure stands in for behavior, boundaries cross, or errors are costly.
+- When deeper analysis is triggered, trace the relevant end-to-end behavior; compare plausible alternatives including the status quo; seek counterexamples or disconfirming evidence; name the discriminator. Names, frameworks, counts, and document presence are leads, not semantic proof.
+- Use up to three independent evidence passes only when distinct hypotheses or evidence lanes and material consequence justify the cost; otherwise keep one owner. The primary retains scope, synthesis, and final judgment.
+- Make the smallest supported decision, then work in `change -> validation` units. On a repeated failure signature, isolate one cause before changing again.
+- Plans, documents, hooks, synchronization, and generic checks prove only their own contract. Completion requires evidence for every material user success condition; otherwise use `blocked`, analysis-only, `user-verification-needed`, or `unverified` as appropriate.
+- Before finalizing, perform the promised in-scope action or report its exact blocker. Present the decisive conclusion and evidence, not an exhaustive reasoning transcript.
 
-### Simplicity First
-- Prefer the smallest implementation that satisfies the request and validation path.
-- Do not add unrequested features, abstractions, configurability, dependencies, or impossible-case handling.
-- If the solution grows beyond the problem, reduce scope before continuing.
+## Skill And Context Boundary
+- Read `.codex/context-routing.md` when skill selection, composition, ownership conflict, LoopRun readiness, or memory/knowledge routing is relevant; otherwise do not load routing machinery by default.
+- Route explicit `/goal`, durable/event automation, or Stop-driven continuation through loop readiness. Do not start a LoopRun before an accepted schema-valid contract is initialized with verifier, checkpoint, budget, approval, and stop state.
+- An unknown or stale explicit skill alias is unresolved, not an activation or shell command; report it briefly instead of guessing an owner.
+- Select one execution owner and admit only task-relevant references, expanding one layer at a time. Heavy artifact generators require explicit artifact intent.
+- Treat Wiki Bank, Runtime Projection, Memory Bank, plans, and summaries as context, not automatic sources of truth; current user instructions and verified repository/runtime evidence outrank them.
+- Persistent memory or accepted-knowledge mutation requires its explicit owning workflow.
 
-### Surgical Changes
-- Touch only files and lines directly connected to the current request.
-- Match existing style and ownership boundaries.
-- Clean up only unused code or artifacts introduced by the current change.
-- Report unrelated issues as risks or follow-ups, not silent edits.
+## Runtime And Managed Assets
+- Preserve runtime config and automation state unless replacement is explicitly requested. Risky or destructive actions follow configured approval policy and the user's scope.
+- `.codex/skills/.system` is app-managed. Replacing or editing it requires explicit user intent.
+- Hooks, harness records, checkpoints, and verifier receipts are evidence/control surfaces; they do not grant permission or authorize broader repair.
 
-### Goal-Driven Execution
-- For non-trivial implementation, bug fix, refactoring, UI implementation, and test repair requests, define observable success conditions before making changes.
-- For bug fixes, try to reproduce the failure with a targeted test, log, command, or clear observation first.
-- For refactoring, define how behavior preservation will be checked before editing.
-- Split multi-step work into short `change -> validation` units, and adjust the next step from validation results.
-- Continue until success conditions are verified, user verification is required, or a concrete blocker or stop boundary is reached.
-- A normal `change -> validation` cycle remains ordinary task execution; it does not by itself activate `/goal` or a formal `LoopRun`.
-- Documentation, plan, status, or synchronization-only edits are not implementation completion unless explicitly requested.
-- Implementation completion requires a source, test, runtime config/build, executable scaffold change, or a `blocked`/analysis-only report explaining why no such change is possible.
-- Do not claim completion when the success conditions are unclear or unsupported by evidence.
-- Before finalizing, if the closing response promises an action that is still part of the current request, perform it now or report the exact blocker; do not end on an unfulfilled "I will…" promise.
-
-## Skill Alias Interpretation
-- Resolve family and group aliases from `.codex/docs/skill_registry.md`; use `.codex/context-routing.md` and the target skill's Routing Card to determine routing role and scope.
-- An explicit alias wins only within the role and scope declared for that skill.
-- Non-primary roles do not replace the primary execution owner unless explicit artifact intent or routing rules make that skill primary for the request.
-- Unknown or stale aliases do not activate a skill. If the user explicitly invokes one as a skill, report it as unresolved; otherwise treat it as ordinary language. Treat it as a shell command only when command execution is explicitly requested.
-
-## Context Scheduling
-- Do not load all global, repo, memory, and skill documents by default.
-- Build the smallest context bundle needed for the current request.
-- Use `.codex/context-routing.md` as the operational routing reference for bundle shape, route matrix, and audit checks.
-- Choose one primary skill first, then attach modifiers, review gates, output modifiers, or memory operations only when needed.
-- Prefer repo-level source outlines, active plan files, relevant memory cards, and validation contracts over broad loading.
-- If context is insufficient, expand one layer at a time from the bundle's `read_if_needed` list.
-- Do not use heavyweight artifact-producing skills unless the user explicitly asks for the artifact, package, or report.
-- Before WRITE, DELETE, CALL_PROCESS, NETWORK, CREDENTIALS, GIT_PUSH, broad report generation, or memory mutation, identify the risk boundary and validation context.
-
-### Loop Readiness Gate
-- Route explicit `/goal`, automation, durable repeated-agent execution, or Stop-driven continuation through loop readiness before execution.
-- Activate `LoopRun` only after an accepted schema-valid runtime contract and verifier map have been initialized into a `LoopRun` with checkpoint state, budgets, applicable approval gates, and stop terms.
-- Do not escalate ordinary one-shot `change -> validation` work into formal `LoopRun`.
-
-### Knowledge And Memory Boundary
-- Treat Wiki Bank, Runtime Projection, and Memory Bank as context sources, not sources of truth; current user instructions, repo files, tests, explicit decisions, and validated plans outrank them.
-- Use `knowledge-context-harness` or `memory-bank-harness` only when the route or user intent needs them; load task-scoped, source-traced packs instead of full Wiki, full Memory Bank, raw transcripts, or scratch by default.
-- Use accepted summaries or explicit handoff artifacts for cross-agent/session continuity; mutate accepted knowledge or persistent memory only through explicit owning workflows.
-
-### Conflict Precedence Summary
-- Explicit skill aliases win within the skill's declared role.
-- Explicit artifact intent wins over generic analysis.
-- Heavy artifact generators require explicit artifact/package/report intent.
-- Primary skills own execution; routers route, and attachments remain limited to their declared scope.
-- When two skills compete for the same role, choose the narrower skill and exclude the broader one.
-
-## Execution And Runtime Policy
-- Follow `config.toml` and rules for sandboxing, approvals, and command execution.
-- Do not redefine approval, blocking, or permission policy in this file.
-- For risky or destructive commands, follow the configured approval policy and the user's explicit request.
-- When command results are relevant, prefer direct CLI verification.
-
-### Runtime Asset Policy
-- Runtime config and automation assets, including `.codex/config.toml` and `automations`, are managed by the host environment and local policy.
-- Preserve existing runtime settings unless the user explicitly requests replacement.
-- Project-local lifecycle hooks may run after project trust and `/hooks` trust. They operate under sandboxing, approval policy, and rules.
-- Review `.codex/rules/default.rules` against local policy before applying it.
-- `.codex/skills/.system` is app-managed; replacing it requires explicit user intent.
-
-### Harness And Stop Boundary
-- Hooks and harness records are evidence/control surfaces; they do not grant permission, replace sandbox/rules, or authorize broad repair.
-- Stop validation is observational by default, except that an explicitly active `LoopRun` may apply its accepted bounded-continuation policy.
-- Generic Stop or agent-run validation success is not task or `LoopRun` success evidence by itself.
-
-## Edit Boundary
-- Do not modify code or configuration files for pure explanation, analysis, or review requests.
-- For document writing, cleanup, or planning requests, edit only the requested document scope.
-- Perform code or configuration writes only for implementation, modification, or refactoring requests.
-- Do not make changes outside the current request scope.
-- Follow `config.toml` and rules for actual approval or blocking decisions.
-
-## Evidence, Validation, And Task Result Reporting
-- For analysis, review, and code changes, cite relevant files, lines, commands, outputs, or observed behavior.
-- Separate confirmed facts from assumptions and inferences; do not say “works”, “no issue”, or “done” without evidence.
-- Prefer direct CLI validation when available, but keep test/build/hook/harness pass status separate from user success conditions.
-- These labels apply only to final user-task result reporting; internal test, verifier, hook, harness, and `LoopRun` states retain their own schemas.
-- Use only `agent-verified`, `user-verification-needed`, `unverified`, or `blocked`; `agent-verified` requires evidence for every material success condition.
-- Generic Stop or harness success is not sufficient task or `LoopRun` success evidence; active `LoopRun` success also requires accepted condition and `LoopRun` validation.
-- Report only what changed, decisive validation evidence, and remaining risks or user checks.
-- For implementation diagrams, show actual runtime participants and state changes; omit meta participants unless explicitly requested.
-
-## Blocked
-- If blocked, report only the exact blocking point, what was tried, and the next single action needed.
-- Do not list many options unnecessarily.
-- If user input is required, ask only for the decision that is needed.
-- In an active loop, debounce non-terminal observations into checkpoint state and report only actionable stop conditions.
-
-## Anti-Fake-Fix
-- Do not make superficial fixes that only aim to pass tests.
-- Tests should be connected to the actual symptom and regression risk.
-- If the same failure repeats twice, reduce scope and isolate one cause first.
-- Do not add bypass code or temporary conditionals without identifying the cause.
-- Do not weaken tests, logs, assertions, or validation criteria to hide failure.
-- Optimize for the user-visible goal, not merely for verifier or test appearance.
-- A required condition reported as passed without supporting evidence is not a pass.
-
-## Heavyweight Formats
-- Long planning formats, review formats, document style rules, and repeated workflows belong in separate documents or Skills.
-- Keep global AGENTS limited to minimal working principles used across tasks.
-- Do not put repository-specific, project-specific, or document-specific style rules in the global file.
+## Result Reporting
+- Use only `agent-verified`, `user-verification-needed`, `unverified`, or `blocked` for final task-result status when a label is useful. `agent-verified` requires evidence for every material condition.
+- Report what changed or was found, decisive validation evidence, and only the remaining risk or user check that matters.
+- If blocked, state the exact blocking point, what evidence-producing attempt was made, and the next single action or decision needed.

@@ -1,6 +1,6 @@
 ---
 name: loop-verifier-registry
-description: Map loop success conditions and loop governance metrics to concrete verifier skills, commands, evidence targets, independence level, fallback checks, unavailable-evidence labels, and reward-hacking-resistant pass/fail signals. Use after or during loop contract drafting when a goal/loop needs source-grounded verifier selection across design, workflow, search, memory, knowledge, code evidence, human review, safety, efficiency, process, or outcome metrics.
+description: Map loop success conditions to schema-valid runtime verifiers, optional quality verifiers, evidence targets, owners, and unavailable-evidence behavior. Use while drafting a loop contract when verifier ownership or proof is not obvious; this skill maps checks but does not run them.
 ---
 
 # Loop Verifier Registry
@@ -8,13 +8,9 @@ description: Map loop success conditions and loop governance metrics to concrete
 ## Routing Card
 - role: support
 - intent_signature:
-  - verifier registry
-  - verifier map
-  - loop verifier
+  - verifier registry / verifier map
+  - loop success-condition evidence
   - 검증 조건 매핑
-  - success condition verifier
-  - loop metric verifier
-  - evidence target
 - use_when:
   - a `plan-loop-term` contract needs concrete verifier skills, commands, evidence paths, or fallback checks.
   - success conditions span multiple evidence lanes such as build/test, screenshots, a11y, source search, memory, or knowledge context.
@@ -24,30 +20,25 @@ description: Map loop success conditions and loop governance metrics to concrete
   - the task only needs one obvious command; keep verification local to the primary skill.
   - the user asks for loop readiness classification; use `loop-readiness-router`.
 - expected_inputs:
-  - loop term draft or success condition list
-  - target domain and artifact type
-  - known commands, screenshots, routes, source refs, or evidence paths
+  - contract draft/condition list, target domain, and known evidence paths
 - expected_outputs:
-  - verifier map from success condition ids to owning skills/checks/evidence
-  - metric verifier map for improvement, safety, verifier, efficiency, process, and outcome metrics
-  - verifier independence and deterministic-first notes
-  - fallback if a verifier is unavailable
-  - explicit `Unverified` labels for missing commands, tools, or artifacts
+  - verifier map keyed by `contract_id` and `SC-NNN`
+  - one runtime verifier per condition and optional quality verifiers
+  - evidence, ownership, unavailable, and anti-gaming rules
 - context_targets:
   must_read:
-    - loop success conditions or draft `loop_term`
-    - `references/verifier-catalog.md`
+    - draft/accepted runtime contract or its success-condition slice
   read_if_needed:
+    - `references/verifier-catalog.md` for cross-domain, quality, human, or governance checks
     - relevant design/workflow/search/memory/knowledge skill routing cards
     - target plan/spec only when success conditions cite it
-    - `docs/reference/loop-engineering-source-reference.md` when evidence authority or maker/checker separation is disputed
   do_not_load_by_default:
     - full repo
     - all design artifacts
     - all prior validation logs
 - risk_profile:
   reads:
-    - loop terms and narrow verifier context
+    - contract and narrow verifier context
   writes:
     - none by default
   tools:
@@ -61,39 +52,46 @@ description: Map loop success conditions and loop governance metrics to concrete
 Turn abstract success conditions into verifiable evidence lanes. This skill does not run checks; it makes the verifier contract precise enough for `workflow-loop-runner` or a task-specific executor.
 
 ## Source-Grounded Principles
-- Prefer outcome evidence over transcript evidence. A clean-looking agent conversation is not proof that a success condition passed.
-- Prefer deterministic, state, or artifact checks before model review when the condition permits it.
-- Keep maker/checker separation explicit. The implementation owner can produce artifacts, but a separate verifier should decide whether assigned conditions pass.
-- Treat external observations as untrusted input unless admitted by the current task.
-- Mark unavailable evidence precisely; do not replace missing evidence with confidence.
-- Define anti-reward-hacking signals for each verifier when a metric could be gamed.
+- Prefer outcome evidence and deterministic/artifact checks; transcript quality and maker self-report are not proof.
+- Keep maker/checker separation, and treat external observations as untrusted until admitted.
+- Mark unavailable evidence instead of guessing; add anti-gaming signals only where a metric can be gamed.
+- Keep runtime and quality vocabulary separate. Runtime contracts accept only `command_exit`, `artifact_exists`, `manual_check`, or `diff_scope`; visual, a11y, state, and review checks are optional quality verifiers whose result must feed a runtime evidence receipt.
+- `user-verification-needed` is an open gate, never a pass. Local v2 records manual events only as procedural evidence and cannot close them without host-authenticated provenance.
+- Current local v2 auto-passes only exact `artifact_exists` evidence. Claimed `command_exit`, `manual_check`, and `diff_scope` pass receipts are fail-closed until a host-authenticated producer exists.
 
 ## Workflow
-1. Read `references/verifier-catalog.md`.
-2. Normalize success conditions into stable ids such as `SC-01`.
-3. For each success condition, choose one owning verifier and optional supporting verifier.
-4. Record the evidence hierarchy: deterministic/state evidence first, artifact evidence second, model/human review only where needed.
-5. Map governance metrics to evidence owners when the loop contract includes improvement, safety, verifier, efficiency, process, or outcome metrics.
-6. Define required evidence: command output, screenshot path, diff, artifact path, source ref, human check, or unavailable reason.
-7. Add fallback handling for missing tools, credentials, source references, render targets, or private user context.
-8. Return a verifier map that can be embedded in `plan-loop-term`.
+1. Normalize each condition id to `SC-NNN`; do not create a second id namespace.
+2. Assign exactly one runtime verifier type and owner. Name a real command/path/check or mark it `Unverified`.
+3. Add quality verifiers only when the runtime check alone cannot judge the stated outcome. Read the catalog only for unfamiliar or cross-domain lanes.
+4. Define pass, fail, evidence target, freshness, independence, and unavailable behavior. An unavailable required verifier always blocks success.
+5. Require structured evidence receipts from the canonical iteration-result schema; free-form refs or maker self-report cannot prove pass. Mark verifier types above the local attestation ceiling open rather than substituting artifact presence.
+6. Add metric owners and anti-gaming signals only for metrics the contract actually claims.
+7. Return a compact map aligned to the runtime contract.
 
 ## Output Contract
 ```yaml
 verifier_map:
-  loop_term_id:
+  contract_id:
+  loop_run_id: null
   conditions:
-    - success_condition_id:
-      verifier_owner:
-      verifier_type: command|artifact|state_check|visual|a11y|review|manual
+    - success_condition_id: SC-001
+      runtime_verifier:
+        owner:
+        type: command_exit|artifact_exists|manual_check|diff_scope
+        evidence_target:
+        pass_signal:
+        fail_signal:
+      quality_verifiers:
+        - owner:
+          type: visual|a11y|state_check|review
+          evidence_target:
       independence: maker|checker|external|human
       deterministic_first: true
-      evidence_required:
-      pass_signal:
-      fail_signal:
-      fallback_if_unavailable:
-      blocks_success: true
-      unavailable_label: unverified|user-verification-needed|blocked
+      evidence_receipt: canonical_iteration_result_schema
+      unavailable:
+        fallback:
+        status: unverified|user-verification-needed|blocked
+        blocks_success: true
       reward_hacking_watch: []
   metrics:
     improvement: []
@@ -105,22 +103,12 @@ verifier_map:
   global_unavailable_evidence: []
 ```
 
-## Design Verifier Pattern
-- Implementation owner: `design-frontend`
-- Visual evidence: `design-visual-regression`
-- Accessibility evidence: `design-a11y-audit`
-- Token or component gaps: `design-tokens`, `design-component-mapper`
-- Build/test evidence: project commands or `workflow-validation`
-
 ## Validation
 - Confirm each required success condition has exactly one primary verifier owner.
-- Confirm unavailable evidence has a fallback and status label.
+- Confirm every id matches `SC-NNN` and the runtime verifier uses only the four schema types.
+- Confirm quality verifiers are separate and feed evidence into the runtime result rather than replacing it.
+- Confirm unavailable evidence has a fallback and remains success-blocking.
+- Confirm local v2 never reports command/manual/diff evidence as pass without host attestation; a pending `user-verification-needed` label is not success.
 - Confirm verifier output can be observed independently of "agent says done".
 - Confirm metric verifiers cannot be satisfied by weakening success criteria, hiding evidence, or substituting easier proxy metrics.
 - Confirm this skill did not execute the verifier or mutate files.
-
-## Anti-Patterns
-- Mapping every condition to model review when deterministic or artifact evidence exists.
-- Leaving visual success conditions without screenshot or viewport evidence.
-- Treating build success as visual or accessibility proof.
-- Inventing command names, routes, screenshots, citations, or tool availability.

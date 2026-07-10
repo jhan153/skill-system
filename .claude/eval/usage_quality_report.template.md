@@ -12,6 +12,8 @@ This template is for manual field review and improvement tracking.
 - expected_primary_skill:
 - actual_primary_skill:
 - observed_primary_skill:
+- expected_route_class:
+- observed_route_class:
 - supporting_skills:
 - observed_supporting_skills:
 

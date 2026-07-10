@@ -1,6 +1,6 @@
 ---
 name: analysis-algorithm
-description: "Constraint-first workflow for recommending algorithms, modeling approaches, or technical solution patterns: frame the problem, compare candidates, choose one, explain why it fits, and define validation."
+description: Compare algorithms, modeling approaches, or technical solution patterns under concrete constraints and recommend the best fit with a causal explanation and validation criteria. Use when the approach is not yet selected; do not use for unresolved bug diagnosis, research-hypothesis planning, or direct implementation of an already chosen approach.
 ---
 
 # Analysis Algorithm
@@ -8,312 +8,97 @@ description: "Constraint-first workflow for recommending algorithms, modeling ap
 ## Routing Card
 - role: primary
 - intent_signature:
-  - `deep-algo`, `algorithm-proposal`, `best approach`, `recommend algorithm`, `무슨 알고리즘`, `어떤 접근`
+  - algorithm or approach recommendation
+  - candidate comparison under constraints
+  - best technical approach
+  - 알고리즘 또는 접근 추천
 - use_when:
-  - the user needs candidate algorithm or technical approach comparison under constraints.
-  - validation thresholds, rollback triggers, or integration constraints matter before implementation.
+  - the user needs to choose among credible solution families.
+  - latency, memory, data, dependency, deployment, or implementation constraints change the choice.
 - do_not_use_when:
-  - a concrete failure still needs root-cause diagnosis.
-  - the task is a small local edit with the approach already selected.
+  - a current failure still needs causal diagnosis; use `analysis-bug`.
+  - the method is already selected and the user wants code; use `workflow-implementation`.
+  - the request is a paper idea, hypothesis, ablation, loss, or training plan; use `research-hypothesis-planning`.
 - expected_inputs:
-  - problem statement
-  - constraints and success metrics
-  - integration limits and current baseline when available
+  - decision to make, current baseline, constraints, and success signal
 - expected_outputs:
-  - candidate comparison, selected primary approach, fallback, implementation outline, validation plan
+  - recommendation, decisive trade-offs, mechanism, validation, and fallback when useful
 - context_targets:
   must_read:
-    - problem constraints
-    - success metrics
-    - integration constraints
+    - current decision and explicit constraints
+    - baseline or current approach when one exists
   read_if_needed:
-    - candidate algorithm families
-    - `references/problem-class-map.md` only when the problem class is broad or ambiguous
-    - relevant source outline if implementation integration is part of the decision
+    - `references/problem-class-map.md` only when candidate discovery is genuinely broad
+    - narrow integration source or current benchmark evidence
   do_not_load_by_default:
-    - full repo
-    - full memory bank
-    - codebase-intel artifacts
+    - full repo, full memory bank, broad codebase reports, or unrelated candidate catalogs
 - risk_profile:
   reads:
-    - request context, constraints, and narrow integration context
+    - request context and narrow integration or measurement evidence
   writes:
-    - none unless the user asks for an implementation plan document or code change
+    - none unless the user explicitly requests a plan artifact or implementation
   tools:
-    - none by default; CALL_PROCESS only for explicit benchmark or validation commands
+    - focused benchmark or validation commands only when they can discriminate candidates
   sensitive_resources:
     - credentials default deny
 - entry_scene:
   - PREPARE
 
-## Related Skills
-- `analysis-router`: router and backward-compatible entry point.
-- `analysis-bug`: use first when the current failure mode is still unclear.
-- `report-qualitative`: owns final formal report shape when explicitly active.
-- `workflow-rigor`: owns execution rigor when the recommendation is immediately implemented.
-- `research-hypothesis-planning`: owns research plans, paper ideas, ablation/loss design, training plans, and hypothesis-driven experiment design.
+## Decision Standard
+Success is not a long candidate list. It is a defensible decision whose winner follows from the user's actual constraints.
 
-## Trigger
-- `deep-algo`
-- `algorithm-proposal`
-- `algo-proposal`
-- `best approach`
-- `recommend algorithm`
-- `무슨 알고리즘`
-- `어떤 접근`
-- `알고리즘 추천`
+1. State the decision and observable success signal.
+2. Separate hard constraints from preferences and mark material assumptions `Unverified`.
+3. Include the current baseline when it is a real option.
+4. Compare only candidates that could plausibly win:
+   - use one direct recommendation when constraints leave no meaningful alternative;
+   - use two to four candidates when a genuine trade-off exists.
+5. Explain the causal mechanism: what limitation changes, why the chosen mechanism helps, and where it can fail.
+6. Define the cheapest check that can falsify the recommendation before broad implementation.
 
-## Research Planning Boundary
-- If the request is a research plan, paper idea, ablation design, loss design, training plan, or hypothesis-driven experiment design, return to scheduling and use `research-hypothesis-planning` unless the user only wants a generic algorithm recommendation.
-- If the user asks to implement a specific algorithm or approach, do not redirect to research planning. Treat it as Development / Implementation Mode and proceed through the appropriate implementation workflow.
-- For research-like requests, do not treat user claims as facts.
-- For implementation-like requests, treat user-provided requirements as task specifications unless unsafe, contradictory, impossible, or repo-conflicting.
-- Avoid proposing new training or multiple losses unless `research-hypothesis-planning` owns the plan.
+Do not classify the problem more deeply than needed to change the candidate set. Do not reward novelty, popularity, or benchmark rank without checking integration cost and workload fit.
 
-## Trigger Guard (Do Not Trigger)
-- Pure root-cause or debugging questions with a concrete failure to diagnose.
-- Pure architecture/HLD/LLD requests where module boundaries are the main decision.
-- Small local implementation tasks where the approach is already chosen.
-- Research plans, paper ideas, ablation/loss/training-plan design, or hypothesis-driven experiment design.
-- Quick patch requests that do not need candidate comparison.
+## Comparison Axes
+Select only axes that affect this decision:
 
-## Goal
-- Recommend the best-fit algorithm, pattern, or technical approach for the given problem.
-- Make trade-offs explicit instead of naming a favorite method too early.
-- Explain how the chosen approach solves the problem under the stated constraints.
-- Define a validation plan before implementation.
+- correctness and problem fit
+- assumptions about data, workload, labels, or environment
+- latency, throughput, memory, compute, and scaling behavior
+- dependency and deployment constraints
+- implementation and operational complexity
+- failure modes, observability, and rollback cost
 
-## Required Inputs
-- problem statement
-- current baseline or current approach when available
-- constraints:
-  - latency / throughput / memory
-  - data size / input quality / label quality
-  - platform / dependency / deployment limits
-  - implementation budget or complexity budget
-- success metric
-- missing information must be marked `Unverified`
+Expected gains without comparable evidence remain hypotheses. A static complexity claim does not prove runtime performance, and an external benchmark does not prove fit for the user's workload.
 
-## Reference Use
-- When the problem class is ambiguous or candidate families are broad, load [problem-class-map.md](references/problem-class-map.md).
-- Use the reference as a candidate discovery aid, not as an automatic answer.
+## Recommendation Shape
+For a small decision, answer with:
 
-## Outcome-First Decision Loop
-Success means the recommendation identifies the decision being made, states constraints and success metrics, compares credible candidates, selects one primary approach plus fallback when useful, explains the causal mechanism, and defines validation thresholds or rollback triggers. Use the shortest decision path that proves those outcomes.
+- selected approach
+- decisive reason
+- main risk
+- validation check
 
-Recommended loop:
-1. Frame the problem and decision.
-2. Extract constraints and success metrics.
-3. Classify the problem type only as far as it changes candidate choice.
-4. Generate 2-4 credible candidates, including the current baseline when it exists.
-5. Compare candidates on fit, cost, risk, and validation.
-6. Select one primary recommendation and explain why the alternatives lose.
-7. Define implementation stages and validation thresholds.
+For a consequential or ambiguous decision, add the constraint set, compact candidate comparison, causal mechanism, fallback, and implementation stages. Omit empty sections and do not emit a formal matrix unless it makes the trade-off clearer.
 
-## Step 1) Problem Framing
-- Rewrite the request in one tight sentence.
-- Separate:
-  - current issue or goal
-  - desired outcome
-  - decision to make
-- If the user mixed multiple decisions, split them before recommending.
+## Implementation Boundary
+- Recommendation-only requests do not authorize code or document writes.
+- If the user asks to implement the selected approach, hand the decision and validation target to `workflow-implementation`.
+- If measurements reveal that the real issue is a current bottleneck, use `analysis-performance`.
+- If the decision depends on an unresolved failure cause, diagnose with `analysis-bug` first.
 
-## Step 2) Constraint Extraction
-- Capture explicit constraints first.
-- Infer only when reasonable, and label inferred items as `Assumed`.
-- Always check:
-  - performance limits
-  - data and input conditions
-  - integration or dependency limits
-  - implementation budget
-  - success metric
+## Validation
+- Tie every selection reason to a stated constraint or observed baseline.
+- Name what evidence would reverse the recommendation.
+- Distinguish offline checks, runtime checks, and user/environment checks only when each is relevant.
+- Never claim measured improvement without comparable before/after evidence.
 
-## Step 3) Problem Classification
-- Select one primary problem class.
-- Add one secondary class only if it materially changes the candidate set.
-- Typical classes:
-  - search or retrieval
-  - ranking or reranking
-  - optimization or scheduling
-  - estimation or fitting
-  - detection, segmentation, or pose
-  - forecasting
-  - control or tracking
-  - recommendation or matching
-  - system performance or scaling
-  - workflow orchestration
-
-## Step 4) Candidate Generation
-- Generate 2-4 credible candidates.
-- Include the current baseline as one candidate when it exists.
-- Do not collapse to one answer unless only one family is realistically valid.
-
-## Step 5) Candidate Comparison
-- Compare each candidate on:
-  - problem fit
-  - assumptions or prerequisites
-  - expected gain
-  - compute, latency, and memory cost
-  - data requirement
-  - implementation effort
-  - failure modes
-  - rollbackability
-- Avoid comparing only by raw accuracy or only by speed.
-
-## Step 6) Recommendation
-- Select:
-  - one primary recommendation
-  - one fallback when appropriate
-- State:
-  - why the winner fits best
-  - why the others were not selected
-
-## Step 7) Solve Mechanism
-- Explain the recommendation causally:
-  - current limitation
-  - what changes
-  - why that change improves the result
-- Avoid slogan-like claims such as "more robust" without a mechanism.
-
-## Step 8) Implementation Outline
-- Give implementation in stages:
-  1. minimum viable version
-  2. integration points
-  3. instrumentation or logging
-  4. rollback or fallback path
-- Do not output full code unless the user explicitly asks for implementation.
-
-## Step 9) Validation Plan
-- Always define:
-  - offline validation
-  - online or real-world validation
-  - success threshold
-  - rollback trigger
-- Prefer measurable thresholds over vague confidence.
-
-## Resource and Risk Boundary
-- Reads: problem statement, constraints, existing approach, and narrow integration context.
-- Writes: none for recommendation-only work; plan/code writes require explicit implementation or document request.
-- Tool/process calls: none by default; benchmark/test commands require a clear purpose and non-destructive check.
-- Network access: none by default unless external benchmark data or current docs are explicitly needed.
-- Credential access: default deny.
-- Generated artifacts: only requested plan or comparison artifacts.
-- Destructive actions: out of scope.
-- Required checkpoints: constraints before recommendation, validation thresholds before implementation, repo validation context before WRITE_CODEBASE.
-
-## Recovery and Context Expansion
-- If problem class is unclear, read `references/problem-class-map.md`.
-- If integration boundary is unclear, read repo source outline or nearby module docs.
-- If success metric is missing, state the assumption or ask one focused question before expanding context.
-- If validation command is unclear, read repo validation contract.
-- If a current failure must be diagnosed first, return to scheduling and use `analysis-bug`.
-- Never recover by loading the full repo, full memory bank, or codebase-intel artifacts at once.
-
-## Output Contract
-1. Problem summary
-2. Constraint set
-3. Candidate approaches
-4. Recommended algorithm or approach
-5. Why it fits this problem
-6. How it solves the problem
-7. Alternatives not selected
-8. Implementation outline
-9. Validation plan
-10. Risks, confidence, or missing info
-
-## Output Templates
-### Problem Summary Template
-```markdown
-problem summary
-- current issue or goal:
-- desired outcome:
-- decision to make:
-- primary problem class:
-- secondary class:
-```
-
-### Constraint Template
-```markdown
-constraints
-- latency / throughput:
-- memory / compute:
-- data / input quality:
-- platform / dependency limits:
-- implementation budget:
-- success metric:
-- assumed items:
-```
-
-### Candidate Comparison Template
-```markdown
-candidate A
-- approach type:
-- problem fit:
-- assumptions:
-- expected gain:
-- compute cost:
-- data requirement:
-- implementation effort:
-- failure modes:
-
-candidate B
-- approach type:
-- problem fit:
-- assumptions:
-- expected gain:
-- compute cost:
-- data requirement:
-- implementation effort:
-- failure modes:
-
-selected recommendation
-- primary:
-- fallback:
-- selection reason:
-```
-
-### Solve Mechanism Template
-```markdown
-how this solves the problem
-- current limitation:
-- chosen mechanism:
-- expected effect:
-- why this beats the baseline:
-```
-
-### Validation Template
-```markdown
-validation plan
-- offline test:
-- online or real-world test:
-- success threshold:
-- rollback trigger:
-```
-
-## Effectiveness Metrics
-- `problem_classification_rate`
-- `constraint_capture_rate`
-- `candidate_generation_rate`
-- `algorithm_explicit_rate`
-- `mechanism_explanation_rate`
-- `validation_plan_presence_rate`
-- `recommendation_acceptance_rate`
-- `outcome_verified_rate`
-
-## Metrics Logging Rules
-- Include one `metrics:` line only when the user asked for a formal or structured report.
-- Example:
-  `metrics: problem_classification_rate=5/5, constraint_capture_rate=5/5, candidate_generation_rate=5/5, algorithm_explicit_rate=5/5, mechanism_explanation_rate=4/5, validation_plan_presence_rate=5/5, outcome_verified_rate=Unverified`
-
-## Anti-Patterns
-- Naming one trendy algorithm without a trade-off comparison.
-- Ignoring constraints such as latency, data quality, or integration cost.
-- Giving no baseline and no fallback.
-- Claiming an expected gain without stating the mechanism.
-- Recommending an option with no measurable validation threshold.
+## Behavior Cases
+- Positive: “대규모 sparse graph에서 이 세 접근 중 무엇이 맞는지 메모리와 latency 기준으로 비교해줘.”
+- Negative: “이 failing test 원인 분석해줘.” → `analysis-bug`.
+- Negative: “이미 선택한 A*를 이 함수에 구현해줘.” → `workflow-implementation`.
+- Edge: only one option satisfies a hard platform constraint → recommend it directly; do not manufacture extra candidates.
 
 ## Known Limits
-- Recommendations depend on stated constraints and metrics; unstated requirements remain `Unverified`.
-- This skill does not benchmark or prove performance unless evidence is supplied or validation is run.
-- Generated or sample implementations need tests before adoption.
-- Return to scheduling when the task is actually bug diagnosis or implementation.
+- Unstated workload and integration constraints can change the winner.
+- Suggested validation is not evidence that the recommendation already works.
+- Current product, library, or benchmark facts require fresh authoritative evidence when they may have changed.

@@ -1,0 +1,7 @@
+{
+  "fixture": "fixtures/invalid-amount.json",
+  "capability": "create order",
+  "http_status": 500,
+  "body": {"error": "INTERNAL_ERROR"},
+  "orders_persisted": 0
+}

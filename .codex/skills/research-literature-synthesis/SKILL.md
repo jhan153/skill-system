@@ -1,6 +1,6 @@
 ---
 name: research-literature-synthesis
-description: Turns an evidence ledger or provided papers into literature review and related work synthesis while separating consensus, disagreement, contradictions, limitations, and gaps.
+description: Synthesize an existing paper set or evidence ledger into an evidence-calibrated map of themes, methods, consensus, disagreements, contradictions, limitations, and gaps. Use for literature understanding; use manuscript writing to turn an accepted synthesis into publication prose.
 ---
 
 # Research Literature Synthesis
@@ -8,130 +8,60 @@ description: Turns an evidence ledger or provided papers into literature review 
 ## Routing Card
 - role: primary
 - intent_signature:
-  - literature review
-  - related work
-  - survey synthesis
-  - what is known
-  - 문헌 리뷰
-  - 관련 연구 정리
-  - 이 분야 정리
+  - literature review, survey synthesis, evidence map, related-work analysis, 문헌 종합
 - use_when:
-  - the user asks for literature review, survey, related work, or thematic synthesis.
-  - provided papers or an evidence ledger need to be synthesized into a review.
+  - the user wants to understand what an existing evidence set collectively shows.
 - do_not_use_when:
-  - hypothesis generation or active hypothesis selection; use research-literature-ideation.
-  - paper search when no evidence exists; use search-paper-evidence first.
-  - final manuscript claims without verified citations.
+  - papers still need acquisition (`search-paper-evidence`).
+  - the task is gap-derived hypothesis selection (`research-literature-ideation`).
+  - an accepted synthesis must be rewritten as venue-ready prose (`research-manuscript-writing`).
 - expected_inputs:
-  - evidence_ledger.json
-  - provided papers
-  - search strategy
-  - inclusion/exclusion criteria
+  - paper set/evidence ledger, scope, and search/coverage status
 - expected_outputs:
-  - scope
-  - search strategy and verification status
-  - evidence table
-  - thematic synthesis
-  - consensus
-  - disagreements
-  - contradictions
-  - limitations
-  - gaps
-  - references
+  - evidence-calibrated themes, agreements, contradictions, limitations, and coverage gaps
 - context_targets:
   must_read:
-    - evidence ledger or provided paper set
-    - review scope
+    - evidence set and review scope
   read_if_needed:
-    - search strategy
-    - inclusion/exclusion criteria
-    - domain references
+    - search strategy, inclusion/exclusion rules, and full-text loci for disputed claims
   do_not_load_by_default:
-    - hypothesis ideation by default
-    - experiment blueprint
-    - code scaffold
+    - unrelated corpus, experiment code, hypothesis backlog, or manuscript templates
 - risk_profile:
   reads:
-    - evidence ledger
-    - provided papers
-    - search strategy
+    - provided papers and evidence artifacts
   writes:
-    - `papers/literature_review.md` only when requested
+    - review artifact only when explicitly requested
   tools:
-    - none by default
-  network:
-    - none by default; return to `search-paper-evidence` if more evidence is needed
-  credentials:
-    - none
-  generated_artifacts:
-    - literature review artifacts only if requested
-  destructive_actions:
-    - none
+    - none by default; missing evidence returns to acquisition
+  sensitive_resources:
+    - credentials default deny
 - entry_scene:
   - PREPARE
 
-## Purpose
-Turns an evidence ledger or provided papers into literature review and related work synthesis while separating consensus, disagreement, contradictions, limitations, and gaps.
+## Synthesis Standard
+1. State the review scope, search date/coverage, and whether the evidence set is narrative, systematic, or opportunistic.
+2. Normalize the unit of comparison: task, population/data, intervention/method, comparator, outcome/metric, and study design.
+3. Group evidence by the question it answers, not merely by paper title or chronology.
+4. For each theme, distinguish:
+   - convergent result under comparable conditions;
+   - disagreement explained by data, method, metric, or design differences;
+   - unresolved contradiction;
+   - limitation or uncovered boundary condition.
+5. Weight directness, source quality, study design, independence, and evidence basis; do not use paper count as consensus.
+6. Separate a field gap from a coverage gap in the supplied/search corpus.
 
-## When To Apply
-- the user asks for literature review, survey, related work, or thematic synthesis.
-- provided papers or an evidence ledger need to be synthesized into a review.
+`user_provided` is provenance, not verification. Track source acquisition/metadata status separately from whether a source supports, contradicts, or only mentions a claim.
 
-## When Not To Apply
-- hypothesis generation or active hypothesis selection; use research-literature-ideation.
-- paper search when no evidence exists; use search-paper-evidence first.
-- final manuscript claims without verified citations.
+## Output
+For a focused question, answer with the synthesis and the strongest limiting evidence. For an explicit review artifact, add scope/coverage, compact evidence table, thematic synthesis, agreements/disagreements, contradictions, limitations, gaps, and references. Omit categories not supported by the evidence.
 
-## Workflow
-1. PREPARE - define scope and whether the review is narrative or systematic.
-2. ACQUIRE - read evidence ledger or provided papers; if missing, return to evidence search.
-3. SYNTHESIZE - group by themes, methods, datasets, metrics, and failure modes.
-4. CALIBRATE - separate consensus, disagreement, contradictions, limitations, and gaps.
-5. FINALIZE - write concise synthesis or `papers/literature_review.md` only when artifact intent is explicit.
-
-## Resource and Risk Boundary
-Summary:
-- Reads evidence ledgers, provided papers, search strategy, and inclusion/exclusion criteria.
-- Writes `papers/literature_review.md` only when explicitly requested.
-- Uses no tools or network by default; return to `search-paper-evidence` if more evidence is needed.
-- Uses no credentials and performs no destructive actions.
-- Required checkpoints: evidence availability, citation status, verification limitations, and artifact intent.
-
-## Recovery and Context Expansion
-- If the request belongs to development/implementation, return to scheduling instead of forcing research routing.
-- If required inputs are missing, ask one focused question or produce a non-writing plan with missing evidence marked.
-- Expand from must-read to read-if-needed one layer at a time.
-- Do not load the full repo, full memory bank, `.system`, or unrelated research cluster skills by default.
-- Do not invent citations, datasets, metrics, results, or file artifacts to fill gaps.
-
-## Output Contract
-1. Scope
-2. Search/verification status
-3. Evidence table
-4. Thematic synthesis
-5. Consensus and disagreements
-6. Contradictions and limitations
-7. Gaps
-8. References
-
-## Citation Status Contract
-Use `citation_status` values: `verified`, `user_provided`, `placeholder`, `missing`, `unverified`. Separate verified claims from search limitations and assumptions. Do not turn citation gaps into final literature claims.
+## Behavior Cases
+- Positive: “이 evidence ledger를 방법·dataset·metric 차이를 반영해 문헌 흐름으로 종합해줘.”
+- Negative: “이 synthesis를 journal Related Work 문체로 써줘.” → `research-manuscript-writing`.
+- Edge: three abstract-only preprints agree but one full study contradicts them → preserve the conflict and evidence asymmetry; do not vote by paper count.
 
 ## Validation
-- Confirm `.codex/skills/.system` was not touched.
-- Confirm user intent matches this skill, not ordinary development.
-- Confirm required evidence or artifact inputs are present or explicitly marked missing.
-- Confirm no secrets, credentials, hardcoded single-host paths, fabricated citations, or fabricated results are introduced.
-- Confirm artifact writes happen only when explicitly requested.
-
-## Anti-Patterns
-- Installing or invoking monolithic `codex-research-lifecycle`.
-- Treating search keywords as conclusions.
-- Collapsing evidence search, ideation, blueprint, scaffold, analysis, writing, and review into one step.
-- Creating custom transcribe/speech skills from research source material.
-- Weakening development/implementation routing because a request mentions model, metric, loss, experiment, or training.
-
-## Known Limits
-- A synthesis is only as complete as the evidence ledger.
-- Citation metadata can be stale or incomplete.
-- This skill does not create final hypotheses or experiment designs.
+- Every synthesized claim has source anchors and an evidence-basis note.
+- Apparent disagreement is checked for non-comparable conditions.
+- Coverage limits and source dependence are explicit.
+- No missing literature is turned into a novelty claim.

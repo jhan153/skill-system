@@ -1,6 +1,6 @@
 ---
 name: analysis-architecture-deepening
-description: Finds targeted architecture deepening opportunities in a codebase. Use when the user asks to improve architecture, find deep-module candidates, reduce shallow modules, identify better seams/adapters, or choose high-leverage structural improvements without generating a full repo-wide report artifact.
+description: Find and rank evidence-backed deep-module, seam, adapter, shallow-wrapper, policy-move, and interface-narrowing opportunities. Use for a scoped architecture-improvement scan or “what should we improve next?” decision; do not use for one selected boundary, direct implementation, or a repo-wide report artifact.
 ---
 
 # Analysis Architecture Deepening
@@ -8,116 +8,100 @@ description: Finds targeted architecture deepening opportunities in a codebase. 
 ## Routing Card
 - role: primary
 - intent_signature:
-  - architecture deepening
-  - improve architecture
-  - deep module opportunities
-  - shallow module cleanup
-  - seam opportunities
-  - architecture improvement
-  - 아키텍처 개선
-  - 딥모듈 후보
+  - ranked architecture improvement or deep-module opportunity scan
 - use_when:
-  - the user asks for architecture improvement candidates or deep-module opportunities.
-  - the task needs a targeted scan across modules but not a heavy repo-wide report artifact.
-  - the goal is to choose what structural improvement to implement next.
+  - discover and rank several structural improvements before selecting one.
+  - inspect a workflow, module cluster, or explicitly broad codebase scope without generating a heavy report.
 - do_not_use_when:
-  - the user asks for a full codebase analysis report artifact; use `analysis-codebase`.
-  - the user already selected one module/interface decision; use `analysis-codebase-design`.
-  - the user asks for direct implementation; use `workflow-implementation` after a candidate is selected.
-  - the task is first-pass bug diagnosis or repeated failure recovery.
+  - one module/interface decision is already selected (`analysis-codebase-design`).
+  - the user requests direct implementation, bug RCA, or a repo-wide integrated report (`analysis-codebase`).
 - expected_inputs:
-  - repo area, architecture concern, or target workflow
-  - optional pain signal such as churn, test pain, duplicated policy, or dependency instability
-  - constraints on scope and implementation appetite
+  - target scope or workflow, current pain signals, and implementation appetite
 - expected_outputs:
-  - scanned scope, architecture friction signals, ranked deepening candidates, recommended next candidate, and implementation handoff
+  - coverage ledger, evidenced friction, ranked candidates, one recommended next candidate, and handoff
 - context_targets:
   must_read:
-    - current architecture improvement request
-    - scoped source tree or module list
-    - representative call sites/tests for candidate areas
+    - current improvement goal
+    - compact source/module outline for the scoped area
+    - representative path and test/dependency evidence for shortlisted candidates
   read_if_needed:
-    - recent diffs or churn evidence
-    - architecture docs, ADRs, or module README files
-    - validation contract for candidate implementation
+    - churn/complexity summaries, recent diffs, ADRs, manifests, or validation contracts that distinguish candidates
   do_not_load_by_default:
-    - full repo unless scope is explicitly repo-wide
-    - full memory bank
-    - generated report artifacts
-    - unrelated research or design assets
+    - every source file, full memory, generated reports, or unrelated docs
 - risk_profile:
   reads:
-    - targeted source, tests, dependency surfaces, docs, and optional git/churn evidence
+    - scoped source, usage/test surfaces, dependency signals, and optional git evidence
   writes:
-    - none by default; WRITE_CODEBASE only after handing off to an implementation owner
+    - none; hand selected work to an implementation owner
   tools:
-    - focused search, file listing, static inspection, and optional targeted tests for evidence
+    - focused inventory, search, and targeted checks only
   sensitive_resources:
-    - credentials default deny; architecture analysis should not inspect secrets
+    - credentials default deny
 - entry_scene:
   - PREPARE
 
-## Purpose
-- Find high-leverage structural improvements without turning every request into a heavy report.
-- Convert vague architecture improvement requests into a short ranked backlog.
-- Prefer changes that deepen modules, reduce caller knowledge, improve testability, or isolate unstable dependencies.
+## Candidate Standard
+Prefer a move only when current evidence shows that it removes caller knowledge, localizes change, isolates volatility, creates a useful test seam, or returns policy to its owner. Treat churn, file size, fan-out, wrapper count, and naming as discovery signals—not proof.
 
-## Candidate Signals
-Look for current evidence, not speculative futures:
-- callers repeatedly know the same policy, ordering, data shape, or error handling.
-- a module exposes many small operations but hides little complexity.
-- tests require broad setup because there is no stable seam.
-- external APIs, storage, network, or runtime services leak into domain logic.
-- changes frequently touch many files for one concept.
-- adapters or wrappers only delegate and can be collapsed.
-- module names do not match the concepts that own the policy.
+## Two-Pass Workflow
 
-## Workflow
-1. Scope the scan: repo area, workflow, module set, or pain signal.
-   If no scoped area is provided, sample one representative workflow or module cluster first; do not scan the whole repository by default.
-2. Sample enough files, call sites, tests, and docs to locate real friction.
-3. Identify 3-5 candidate deepening moves.
-4. For each candidate, state:
-   - current friction
-   - proposed deeper boundary
-   - caller knowledge removed
-   - validation or test seam gained
-   - implementation size and rollback cost
-5. Rank candidates by leverage, confidence, and implementation cost.
-6. Recommend one next candidate and hand off to `analysis-codebase-design` or `workflow-implementation`.
+### Pass 1: Broad, Cheap Discovery
+1. Bound the scan by workflow, module cluster, product/service group, or explicit repo-wide scope.
+2. Enumerate modules, entrypoints, dependencies, usages, tests, churn, and complexity mechanically; keep raw inventories out of context.
+3. Sample workflows, hotspots, external boundaries, broad test setup, duplicated caller policy, delegation layers, and ownership mismatches.
+4. Start with one path per relevant stratum/group; expand only for material variation or shortlist-changing evidence.
+5. Form hypotheses, not recommendations, from inventory signals.
 
-## Candidate Types
-- deepen module: keep interface small while moving policy and complexity inside.
-- extract seam: make hard-to-test behavior observable or substitutable.
-- isolate adapter: contain external dependency, protocol, storage, or runtime leakage.
-- collapse shallow wrapper: remove layers that repeat implementation without hiding decisions.
-- move policy: place rules with the concept that owns them.
-- narrow interface: remove caller choices that should be internal decisions.
+### Pass 2: Narrow, Deep Confirmation
+1. Shortlist 3-5 distinct candidates by leverage and evidence quality.
+2. Inspect one end-to-end path, caller, test, and boundary/dependency contract for each.
+3. Seek one counterexample, then deduplicate symptoms sharing one policy/ownership cause.
+4. Rank retained candidates and recommend one next design decision.
+
+## Coverage Ledger
+Track group/stratum, enumerated vs inspected counts, selection reason, evidence/confidence, exclusions, and unsampled/blocked gaps.
+
+Coverage means representative architecture evidence, not reading every file. For an explicitly broad scan, cover each material codebase group at inventory level and deepen only groups selected by risk plus one low-signal control sample.
+
+## Candidate Record
+For each retained candidate, provide:
+- observed friction and concrete evidence refs
+- proposed deeper boundary or removal
+- caller knowledge/policy removed
+- testability/dependency benefit, counterevidence, and confidence
+- size, blast radius, rollback, and validation
+
+Consider deepening a module, extracting a seam, isolating an adapter, collapsing a shallow wrapper, moving policy, or narrowing an interface. Do not assume adding a module is the answer.
+
+## Ranking
+Rank ordinally by leverage, knowledge/change surface removed, confidence/counterevidence, validation/reversibility, and cost/blast radius. Avoid fake precision; explain close calls with the decisive tradeoff.
+
+## False-Positive Checks
+- Exclude generated/vendor/migration churn from ownership conclusions.
+- Preserve thin wrappers that enforce security, lifecycle, protocol, or anti-corruption policy.
+- Do not infer poor boundaries from caller count, environmental test pain, or similar names alone.
+
+## Stop Conditions
+Stop when:
+- every material scope group has inventory coverage or an explicit exclusion.
+- 3-5 candidates have path-level evidence, or fewer candidates survive with the deficit explained.
+- one deliberate counter-sample does not change the top recommendation.
+- the top candidate has a clear design question and validation path.
+
+If unstable, expand only the weakest stratum. At a budget, permission, or runtime boundary, return the gap as `Unverified` instead of widening indefinitely.
 
 ## Output Contract
-Return only the sections needed:
-- `scanned_scope`
-- `friction_signals`
-- `candidates`
-- `ranking`
-- `recommended_next_candidate`
-- `handoff`
-- `unverified_gaps`
+Return only:
+- `scanned_scope` and `coverage_ledger`
+- `friction_signals` with evidence refs
+- `candidates` and `ranking`
+- `recommended_next_candidate` with decisive tradeoff
+- `handoff` to `analysis-codebase-design` or an implementation owner
+- `unverified_gaps` when material
 
-## Cross-Skill Boundaries
-- `analysis-codebase-design` owns the detailed design decision for one selected candidate.
-- `workflow-implementation` owns code changes after the user selects a candidate.
-- `workflow-minimal-implementation` should challenge candidates that add speculative abstractions.
-- `analysis-codebase` owns full repo-wide evidence reports and generated artifacts.
-- `analysis-bug` and `workflow-bug-fix` own concrete failure diagnosis and repair.
-
-## Invocation Examples
-Positive:
-- "이 코드베이스에서 deep module 후보를 찾아줘."
-- "아키텍처 개선할 만한 지점 3개만 뽑아줘."
-- "테스트가 어려운 구조를 seam 중심으로 개선 후보화해줘."
-
-Negative:
-- "이 선택된 모듈 interface를 설계해줘." -> `analysis-codebase-design`
-- "전체 코드베이스 분석 리포트 생성해줘." -> `analysis-codebase`
-- "이 후보를 바로 구현해줘." -> `workflow-implementation`
+## Boundaries
+- `analysis-codebase-design` decides the selected candidate's exact interface/boundary.
+- `analysis-codebase` owns explicit repo-wide report artifacts and generated architecture models.
+- `analysis-domain-modeling` owns domain concepts and invariants.
+- `workflow-implementation` owns writes after selection.
+- Do not turn this ranked backlog into an exhaustive architecture report.

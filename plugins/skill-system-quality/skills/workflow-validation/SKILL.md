@@ -17,12 +17,13 @@ description: Designs or runs focused validation plans for completed or planned c
 - use_when:
   - the user asks how to validate an implementation, migration, plan, or changed artifact.
   - the user asks to run validation only after implementation is already complete.
-  - an active implementation workflow needs a narrow validation support layer.
+  - an active workflow has a non-obvious validation choice, multi-surface risk, or agent/manual evidence split that the primary owner cannot express with one local check.
 - do_not_use_when:
   - the user is asking to implement the change, not design or run validation.
   - the request is skill-system runtime usage eval; use `evaluation-harness`.
   - the user asks for critical verdicts, blockers, or risk review; use `report-critical`.
   - one obvious command is explicitly requested and no validation strategy is needed.
+  - normal implementation validation is already clear from repository instructions and the change's direct test.
 - expected_inputs:
   - changed files, planned change, or artifact under validation
   - success criteria, acceptance criteria, or risk boundary
@@ -54,14 +55,9 @@ description: Designs or runs focused validation plans for completed or planned c
 - entry_scene:
   - PREPARE
 
-## Purpose
-- Turn vague "검증해줘" requests into a scoped validation matrix.
-- Separate agent-run checks from user/manual checks.
-- Keep validation work scoped to checks, evidence, and user-verification gaps.
-
 ## Activation
 - Primary when the user's actual goal is validation planning or validation-only execution.
-- Support when `workflow-plan-runner`, `workflow-rigor`, implementation work, or a plan/spec execution needs a validation layer.
+- Support only when `workflow-plan-runner`, `workflow-rigor`, or implementation work has a material validation-selection problem; ordinary focused checks stay with the primary owner.
 - Do not displace the implementation owner.
 
 ## Workflow
@@ -110,25 +106,7 @@ Return only the sections needed:
 - `unverified_gaps`
 - `next_validation_action`
 
-## Cross-Skill Boundaries
-- `workflow-rigor` owns execution rigor and completion gates for implementation.
-- `workflow-plan-runner` owns plan/spec-driven implementation order.
-- `workflow-recovery` owns repeated failure-loop recovery.
-- `evaluation-harness` owns skill-system eval case review, not product validation.
-- `report-critical` owns QA verdicts and blocker findings.
-
 ## Known Limits
 - Validation can only confirm the covered behavior and environment.
 - Missing commands, credentials, GUI access, or external services remain `Unverified`.
 - Passing checks do not prove full release readiness unless the release gate explicitly says so.
-
-## Invocation Examples
-Positive:
-- "이 변경을 어떻게 검증할지 validation matrix만 짜줘."
-- "이 UI 변경은 어떤 smoke/manual check가 필요해?"
-- "구현은 끝났고 검증만 실행해줘."
-
-Negative:
-- "이 플랜대로 구현해줘." -> `workflow-plan-runner`
-- "이 테스트 하나만 다시 실행해줘." -> direct command, no validation matrix
-- "이 결과가 release-ready인지 비판적으로 판단해줘." -> `report-critical`

@@ -1,5 +1,0 @@
-interface:
-  display_name: "Coordination Multi Agent"
-  short_description: "Create explicit handoff and lock-scope notes for requested multi-agent work."
-policy:
-  allow_implicit_invocation: false

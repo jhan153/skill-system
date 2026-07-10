@@ -1,0 +1,58 @@
+run_id: SOLAR-910-CODEBASE-001
+case_id: solar-910-codebase-semantic-001
+host: codex
+host_version: 0.144.0-alpha.4
+model: gpt-5.6-sol
+model_version: gpt-5.6-sol
+bundle_version: "9.1.0"
+started_at: "2026-07-10T13:30:56Z"
+observed_route: analysis-codebase
+observed_behaviors:
+  - compare_same_fixture_and_oracle
+  - report_observable_error_contract_delta
+  - exclude_implementation_vocabulary_from_parity_findings
+  - mark_static_only_comparison_unverified
+artifacts:
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/codebase-semantic-output.md
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/qualitative-review.md
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/codebase/report.md
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/codebase/quality-gate-result.json
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/codebase/findings.json
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/codebase/contract-comparisons.json
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/codebase/coverage-ledger.json
+verification:
+  - type: route_match
+    value: analysis-codebase
+    checked_at: "2026-07-10T14:04:36Z"
+  - type: model_identity
+    value: gpt-5.6-sol
+    checked_at: "2026-07-10T14:04:36Z"
+  - type: qualitative_review
+    value: pass
+    reviewer: /root/audit_research_search/review_alias_ledger
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/codebase-semantic-output.md
+    reviewed_sha256: 74f507ffe8e53a5e30c6e559f02931a900824eb9641fc86c5424a991954d05b4
+    review_artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/qualitative-review.md
+    checked_at: "2026-07-10T14:04:36Z"
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/codebase-semantic-output.md
+    sha256: 74f507ffe8e53a5e30c6e559f02931a900824eb9641fc86c5424a991954d05b4
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/qualitative-review.md
+    sha256: 1c3b3bc5c3f71b06cc2c2ae0e90fa3484a6a7e914c69640069d64c1ba5805f94
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/codebase/report.md
+    sha256: 2f9375cd19be5ed51312c312760fdf3fce7fcf158cf5fbf415cb854f457e51e7
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/codebase/quality-gate-result.json
+    sha256: 7d1b54bf2fdc92724ccdeee736334c444300a8e9454c85a6af5a9b69f9f09fb8
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/codebase/findings.json
+    sha256: 5a3d99953ecce6b2d6261b8fc9b6143e376dfd16290721cf2291aa0d4953017e
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/codebase/contract-comparisons.json
+    sha256: 4519bf09a33613dae4a835c03603ffe888f44566422c9b7ee9a09009ad962a56
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/codebase/coverage-ledger.json
+    sha256: 7bf26ebd8aefdfe74976d7b3c80ea4d7f8b81b3dd25afc5d3c954582710ab6bb
+result: pass

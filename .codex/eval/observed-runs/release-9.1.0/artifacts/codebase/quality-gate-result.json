@@ -1,0 +1,39 @@
+{
+  "status": "FAIL",
+  "reasons": [
+    "semantic_contract_high=1 > 0",
+    "unverified_ratio=0.933 > fail_threshold=0.35",
+    "fallback_diagrams=3 > 1"
+  ],
+  "warnings": [],
+  "metrics": {
+    "security_critical": 0,
+    "security_high": 0,
+    "semantic_contract_critical": 0,
+    "semantic_contract_high": 1,
+    "expired_exceptions": 0,
+    "unverified_ratio": 0.933,
+    "missing_top10_plan": 0,
+    "test_findings_top10": 0,
+    "static_only_findings": 0,
+    "missing_architecture_views": 0,
+    "fallback_diagrams": 3,
+    "diagrams_without_provenance": 1,
+    "runtime_views_without_entrypoint": 0
+  },
+  "applied_thresholds": {
+    "security_critical_max": 0,
+    "security_high_max": 1,
+    "semantic_contract_critical_max": 0,
+    "semantic_contract_high_max": 0,
+    "expired_exceptions_max": 0,
+    "unverified_warn_ratio": 0.2,
+    "unverified_fail_ratio": 0.35,
+    "require_top10_plan_fields": true,
+    "max_test_findings_top10": 2,
+    "max_missing_architecture_views": 0,
+    "max_fallback_diagrams": 1,
+    "max_diagrams_without_provenance": 1,
+    "max_runtime_views_without_entrypoint": 0
+  }
+}

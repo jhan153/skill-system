@@ -37,6 +37,8 @@ Plan skills are separated by artifact altitude:
 
 `requirements_discovery` and `requirements_contract` sit before tactical and strategic planning. They stabilize intent and scope, but they are not implementation plans by themselves.
 
+Use `planning_state_model.md` when a planning artifact might move between lifecycle states. Work horizon answers "how large and durable is this work?"; Planning State answers "which event and invariant admit this artifact into the next state?"
+
 `short-term` means current execution horizon. In agentic development that commonly compresses to a 4-8 hour design/implementation/validation unit, even if the legacy human equivalent was one or two sprints.
 
 `long-term` means multi-horizon architecture or phase package. In agentic development that can compress to two or three weeks, but it still governs multiple short plans.

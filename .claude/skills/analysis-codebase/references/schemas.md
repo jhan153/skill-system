@@ -5,10 +5,11 @@
 {
   "finding_id": "F-2026-001",
   "quality_attribute": "architecture",
-  "severity": "high",
+  "severity": "medium",
+  "estimated_severity": "high",
   "risk_score": 36,
   "priority_score": 4.21,
-  "evidence_grade": "A",
+  "evidence_grade": "B",
   "evidence_refs": [
     "artifacts/git/churn_all.tsv",
     "artifacts/static/complexity.json",
@@ -21,7 +22,9 @@
     "commit_range": "abc123..def456"
   },
   "decision": {
-    "summary": "churn=150.0, complexity=48.0, coupling=15.0, dominant_profile=architecture"
+    "status": "verification-needed",
+    "evidence_basis": "static-hotspot",
+    "summary": "정적 후보이며 동작/영향 확인이 필요합니다. churn=150.0, complexity=48.0, coupling=15.0, dominant_profile=architecture"
   },
   "score_breakdown": {
     "weighted": 4.01,
@@ -39,19 +42,19 @@
     "profile": "architecture",
     "owner": "team-render-core",
     "due": "2026-03-31",
-    "title": "모듈 경계 재설계 및 의존성 역전",
-    "summary": "결합도가 높아 구조 변경 전파 위험이 큽니다."
+    "title": "모듈 경계 후보 확인 및 필요 시 분리",
+    "summary": "정적 결합도는 후보 신호입니다. 대표 caller와 변경 전파를 확인한 뒤 구조 변경 여부를 결정합니다."
   },
   "improvement_plan": {
     "title": "visibility_occlusion.py 의존 경계 분리",
-    "detail": "fan-in/fan-out 분리를 위한 인터페이스 경계 재배치",
+    "detail": "대표 caller, 변경 전파, 소유권, 경계 부작용을 확인하고 실제 변경 마찰이 입증될 때만 의존 경계를 조정",
     "related_files": [
       "scripts/render_core/visibility_occlusion.py"
     ]
   },
   "verification_plan": [
-    "모듈 간 순환 의존 0건",
-    "핵심 모듈 fan-in/fan-out 20% 이상 개선"
+    "대표 caller와 변경 전파 경로 확인",
+    "구조 변경 시 핵심 시나리오 동작 보존"
   ],
   "exception": {
     "approved": false,
@@ -69,10 +72,13 @@
   "metrics": {
     "security_critical": 0,
     "security_high": 0,
+    "semantic_contract_critical": 0,
+    "semantic_contract_high": 0,
     "expired_exceptions": 0,
     "unverified_ratio": 0.12,
     "missing_top10_plan": 0,
     "test_findings_top10": 1,
+    "static_only_findings": 7,
     "missing_architecture_views": 0,
     "fallback_diagrams": 1,
     "diagrams_without_provenance": 0,
@@ -81,6 +87,8 @@
   "applied_thresholds": {
     "security_critical_max": 0,
     "security_high_max": 1,
+    "semantic_contract_critical_max": 0,
+    "semantic_contract_high_max": 0,
     "expired_exceptions_max": 0,
     "unverified_warn_ratio": 0.2,
     "unverified_fail_ratio": 0.35,
@@ -93,6 +101,12 @@
   }
 }
 ```
+
+Static hotspot findings have an evidence-grade ceiling of `B` and a severity ceiling of `medium`. Grade `A` requires direct behavioral, runtime, trace, executed contract-test-result, or equivalent primary evidence from a non-hotspot finding lane.
+
+## semantic contract comparison
+
+Use [`semantic-comparison.md`](semantic-comparison.md) for `artifacts/manual/contract-comparisons.json`. The reporter accepts only observable dimensions, filters implementation vocabulary and invalid dimensions, keeps static or one-sided claims `Unverified`, and promotes paired non-intentional behavior differences into findings/backlog.
 
 ## context-model
 ```json

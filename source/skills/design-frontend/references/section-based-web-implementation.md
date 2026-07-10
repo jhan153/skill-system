@@ -1,6 +1,6 @@
 # Design Section Web Reference
 
-Use this reference from `design-frontend` when the requested UI is a landing, product, docs, portfolio, venue, or marketing-like web page. For explicit section-page surface work, use `$design-section-web`; generic design-to-code remains owned by `design-frontend`.
+Load only for the `section-web` profile of `design-frontend`: a landing, product, docs, portfolio, venue, or marketing-like page organized primarily as a semantic section flow.
 
 ## Section tree
 
@@ -18,6 +18,8 @@ Use this reference from `design-frontend` when the requested UI is a landing, pr
 - Make responsive section order explicit.
 - Avoid nested cards and decorative section cards unless the item itself is a repeated card.
 - Keep text fitting and avoid overlap across mobile and desktop.
+- Keep media focused on the relevant product, place, object, or person rather than vague atmosphere.
+- Verify the first viewport communicates the literal offer and that responsive section order preserves the content argument.
 
 ## Handoff
 

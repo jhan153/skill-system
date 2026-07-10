@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -28,6 +29,17 @@ def main() -> int:
     if not (loop_dir / "state.yaml").is_file():
         print(f"FAIL: not a LoopRun dir (no state.yaml): {loop_dir}")
         return 2
+    integrity = subprocess.run(
+        [sys.executable, str(Path(__file__).with_name("validate_loop_run.py")), str(loop_dir)],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    if integrity.returncode != 0:
+        print("FAIL: LoopRun integrity validation failed; activation refused")
+        print(integrity.stdout.rstrip())
+        return 3
 
     pointer = session_pointer_path(args.session_id)
     pointer.parent.mkdir(parents=True, exist_ok=True)

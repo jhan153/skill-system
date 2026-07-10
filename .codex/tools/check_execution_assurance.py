@@ -29,6 +29,7 @@ REQUIRED_FILES = [
     ".claude/tools/claude_notify_adapter.py",
     ".claude/tools/notify_desktop.py",
     ".codex/tools/hook_runtime.py",
+    ".codex/tools/recovery_guard.py",
     ".codex/tools/notify_desktop.py",
     ".codex/tools/run_behavior_evals.py",
     ".codex/tools/run_validator_unit_tests.py",
@@ -41,9 +42,11 @@ REQUIRED_FILES = [
     ".codex/schemas/loop/loop-contract.schema.json",
     ".codex/schemas/loop/loop-run.schema.json",
     ".codex/schemas/loop/iteration-result.schema.json",
+    ".codex/schemas/loop/user-acceptance-event.schema.json",
     ".codex/schemas/loop/examples/loop-contract.example.yaml",
     ".codex/schemas/loop/examples/loop-run.example.yaml",
     ".codex/schemas/loop/examples/iteration-result.example.yaml",
+    ".codex/schemas/loop/examples/user-acceptance-event.example.yaml",
     ".codex/tools/init_loop_run.py",
     ".codex/tools/evaluate_loop_run.py",
     ".codex/tools/validate_loop_run.py",
@@ -69,6 +72,7 @@ REQUIRED_FILES = [
     ".codex/tools/tests/test_work_item_lifecycle.py",
     ".codex/tools/analyze_harness_measurement.py",
     ".codex/tools/tests/test_harness_measurement.py",
+    ".codex/tools/tests/test_recovery_guard.py",
 ]
 SCHEMA_CONTRACTS = {
     ".codex/schemas/harness/lifecycle-event.schema.json": {
@@ -136,6 +140,22 @@ SCHEMA_CONTRACTS = {
             "loop_run_id": "LR-1",
             "iteration": 0,
             "condition_results": [],
+        },
+    },
+    ".codex/schemas/loop/user-acceptance-event.schema.json": {
+        "top_property": "source",
+        "example": ".codex/schemas/loop/examples/user-acceptance-event.example.yaml",
+        "invalid": {
+            "schema_version": 1,
+            "event_type": "user_acceptance",
+            "contract_id": "LC-20260623-001",
+            "loop_run_id": "LR-20260623-001",
+            "condition_id": "SC-001",
+            "actor": "agent",
+            "scope": "SC-001",
+            "accepted": False,
+            "observed_at": "2026-06-23T00:00:00Z",
+            "source": "generated",
         },
     },
     ".codex/schemas/task/task-run.schema.json": {

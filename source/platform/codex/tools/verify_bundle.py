@@ -262,7 +262,41 @@ def execution_checks(root: Path) -> list[Check]:
         ),
         Check(
             "behavior_replay",
-            [py, ".codex/tools/run_behavior_evals.py", "--mode", "replay", "--observed-runs", ".codex/eval/observed-runs"],
+            [
+                py,
+                ".codex/tools/run_behavior_evals.py",
+                "--mode",
+                "replay",
+                "--observed-runs",
+                ".codex/eval/observed-runs",
+                "--bundle-version",
+                "8.3.1",
+            ],
+            root,
+        ),
+        Check(
+            "solar_forward_eval_9_1_0",
+            [
+                py,
+                ".codex/tools/run_behavior_evals.py",
+                "--mode",
+                "host-assisted",
+                "--eval-path",
+                ".codex/eval/release_forward_cases.yaml",
+                "--eval-schema",
+                ".codex/eval/eval-case.schema.json",
+                "--observed-runs",
+                ".codex/eval/observed-runs/release-9.1.0",
+                "--bundle-version",
+                "9.1.0",
+                "--required-model",
+                "gpt-5.6-sol",
+                "--require-all-cases",
+                "--not-before",
+                "2026-07-10T00:00:00Z",
+                "--not-after",
+                "2026-07-11T00:00:00Z",
+            ],
             root,
         ),
     ]
@@ -478,8 +512,11 @@ def main() -> int:
     parser.add_argument("--profile", choices=["core", "integrations", "execution", "agent-output", "research", "knowledge", "loop"], required=True)
     parser.add_argument("--format", choices=["text", "json"], default="text")
     parser.add_argument("--root", type=Path, default=Path("."))
-    parser.add_argument("--release", action="store_true", help="fail if any profile check is skipped")
+    parser.add_argument("--release", action="store_true", help="deprecated; use run_verification_pipeline.py --release")
     args = parser.parse_args()
+    if args.release:
+        print("ERROR: --release is valid only through run_verification_pipeline.py")
+        return 2
     root = args.root.resolve()
     if not root.exists():
         print(f"ERROR: root not found: {root}")
@@ -493,8 +530,6 @@ def main() -> int:
     results = [run_check(check) for check in checks]
     clean_cache_artifacts(root)
     status = profile_status(results)
-    if args.release and status == STATUS_PASS_WITH_SKIPS:
-        status = STATUS_FAIL
     report = {"profile": args.profile, "status": status, "checks": results}
     if args.format == "json":
         print(json.dumps(report, indent=2))

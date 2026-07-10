@@ -45,6 +45,11 @@
 7. fallback 게이트: fallback 다이어그램이 임계값 초과 시 FAIL
 8. provenance 게이트: 근거 refs 없는 다이어그램이 임계값 초과 시 FAIL
 9. runtime linkage 게이트: entrypoint 미연결 runtime 시나리오가 임계값 초과 시 FAIL
+10. 정적 증거 ceiling: churn/complexity/coupling 기반 후보는 grade `B`, severity `medium`을 넘지 않으며 `static_only_findings` 경고와 확인 계획을 가짐
+11. semantic comparison 게이트: implementation-only 행은 제외하고, static/one-sided 비교는 `Unverified`로 계산
+12. 보안 스캔 후보: upstream severity는 보수적 triage를 위해 유지할 수 있으나 단일 정적 스캔은 grade `B`, `verification-needed`이며 적용 가능성/도달성/배포 버전을 확인함
+13. `Unverified` 비율: `unverified / (confirmed findings + unverified review items)`로 계산하여 finding이 0인 비교 공백도 0으로 숨기지 않음
+14. 확인된 의미 계약 차이: non-intentional `semantic-contract` finding의 high/critical 수가 전용 임계값을 넘으면 migration/release gate를 FAIL
 
 ## 권한 차단/실행 실패 처리
 - 권한 문제로 수집이 차단되면 해당 트랙은 `Unverified`로 계산합니다.

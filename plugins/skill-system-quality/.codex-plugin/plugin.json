@@ -1,6 +1,6 @@
 {
   "name": "skill-system-quality",
-  "version": "9.0.2",
+  "version": "9.1.0",
   "description": "Skill System quality — acceptance, test strategy, regression/review gates for the QA/QC role.",
   "author": {
     "name": "Skill System Maintainers"

@@ -76,8 +76,8 @@ Use this skill when design-to-code work needs a clear contract between design co
 6. Hand off gaps:
    - Feed missing state/variant evidence into `design-frontend`, visual review, or accessibility review only when implementation continues.
 
-## Output schema
-Return or write a structured report with these fields:
+## Output
+For a narrow mapping question, return the mapping, missing contracts, and evidence pointers directly. Use the structured shape only for an explicit mapping artifact or multi-component review; omit empty matrices.
 
 ```yaml
 component_inventory: []
@@ -101,6 +101,7 @@ unverified: []
 - One-off page details must not become reusable component API requirements without justification.
 - If design and repo names differ, report the alias mapping instead of renaming automatically.
 - If a script is used, include the command and treat its output as inventory evidence, not complete contract proof.
+- Do not enumerate every theoretical state when the target component cannot express or require it.
 
 ## Recovery
 - If the repo lacks Storybook or component exports, inspect nearby routes/screens that use the component.

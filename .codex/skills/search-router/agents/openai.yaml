@@ -1,6 +1,6 @@
 interface:
   display_name: "Search Router"
-  short_description: "Route cross-domain evidence-search requests to the right evidence lane"
+  short_description: "Route evidence searches to the right lane"
   default_prompt: "Use $search-router to detect evidence intent and route the request to the correct evidence lane (paper, code, runtime, visual, memory) without owning synthesis or implementation."
 
 policy:

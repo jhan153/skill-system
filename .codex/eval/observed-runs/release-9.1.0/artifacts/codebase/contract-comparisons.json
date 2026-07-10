@@ -1,0 +1,122 @@
+{
+  "comparisons": [
+    {
+      "pair_key": "create-order|invalid-amount|http-error-contract",
+      "scenario": "create order with fixtures/invalid-amount.json",
+      "dimension": "error",
+      "severity": "high",
+      "quality_attribute": "correctness",
+      "baseline": {
+        "value": "HTTP 400 with body {error: INVALID_AMOUNT}",
+        "evidence_refs": ["artifacts/runtime/legacy-invalid-amount.json"],
+        "evidence_kind": "runtime"
+      },
+      "candidate": {
+        "value": "HTTP 500 with body {error: INTERNAL_ERROR}",
+        "evidence_refs": ["artifacts/runtime/candidate-invalid-amount.json"],
+        "evidence_kind": "runtime"
+      },
+      "verification": "Replay fixtures/invalid-amount.json against both implementations and assert HTTP status, error body, and persisted-order count.",
+      "related_files": [
+        "legacy-qt/checkout_controller.cpp",
+        "candidate-dotnet/CheckoutController.cs",
+        "fixtures/invalid-amount.json"
+      ],
+      "action_title": "Align candidate invalid-amount error contract",
+      "comparable": true
+    },
+    {
+      "pair_key": "create-order|invalid-amount|persistence-state",
+      "scenario": "create order with fixtures/invalid-amount.json",
+      "dimension": "state",
+      "severity": "high",
+      "quality_attribute": "correctness",
+      "baseline": {
+        "value": "0 orders persisted",
+        "evidence_refs": ["artifacts/runtime/legacy-invalid-amount.json"],
+        "evidence_kind": "runtime"
+      },
+      "candidate": {
+        "value": "0 orders persisted",
+        "evidence_refs": ["artifacts/runtime/candidate-invalid-amount.json"],
+        "evidence_kind": "runtime"
+      },
+      "verification": "Replay fixtures/invalid-amount.json against isolated repositories and assert that neither implementation persists an order.",
+      "related_files": [
+        "legacy-qt/checkout_controller.cpp",
+        "candidate-dotnet/CheckoutController.cs",
+        "fixtures/invalid-amount.json"
+      ],
+      "comparable": true
+    },
+    {
+      "pair_key": "create-order|valid-amount-fixture-needed|success-contract",
+      "scenario": "create order with a valid positive amount",
+      "dimension": "output",
+      "severity": "medium",
+      "quality_attribute": "correctness",
+      "baseline": {
+        "value": "Static candidate: HTTP 201 with body {status: created} and one repository save",
+        "evidence_refs": ["legacy-qt/checkout_controller.cpp"],
+        "evidence_kind": "static"
+      },
+      "candidate": {
+        "value": "Static candidate: HTTP 201 with body {status: created} and one repository save",
+        "evidence_refs": ["candidate-dotnet/CheckoutController.cs"],
+        "evidence_kind": "static"
+      },
+      "verification": "Add one shared positive-amount fixture, capture both executions, and assert status, body, persisted record, and persisted field values.",
+      "related_files": [
+        "legacy-qt/checkout_controller.cpp",
+        "candidate-dotnet/CheckoutController.cs"
+      ],
+      "comparable": true
+    },
+    {
+      "pair_key": "cancel-order|existing-order-fixture-needed|state-contract",
+      "scenario": "cancel an existing order",
+      "dimension": "state",
+      "severity": "high",
+      "quality_attribute": "correctness",
+      "baseline": {
+        "value": "Static candidate: mark the order cancelled and save it",
+        "evidence_refs": ["legacy-qt/checkout_controller.cpp"],
+        "evidence_kind": "static"
+      },
+      "candidate": {
+        "value": "Static candidate: delete the order",
+        "evidence_refs": ["candidate-dotnet/CheckoutController.cs"],
+        "evidence_kind": "static"
+      },
+      "verification": "Add one shared existing-order fixture, execute cancellation on isolated stores, and compare record existence, lifecycle status, and persisted fields.",
+      "related_files": [
+        "legacy-qt/checkout_controller.cpp",
+        "candidate-dotnet/CheckoutController.cs"
+      ],
+      "comparable": true
+    },
+    {
+      "pair_key": "cancel-order|existing-order-fixture-needed|response-contract",
+      "scenario": "cancel an existing order",
+      "dimension": "output",
+      "severity": "medium",
+      "quality_attribute": "correctness",
+      "baseline": {
+        "value": "Static candidate: HTTP 200 with body {status: cancelled}",
+        "evidence_refs": ["legacy-qt/checkout_controller.cpp"],
+        "evidence_kind": "static"
+      },
+      "candidate": {
+        "value": "Static candidate: HTTP 204 with an empty body",
+        "evidence_refs": ["candidate-dotnet/CheckoutController.cs"],
+        "evidence_kind": "static"
+      },
+      "verification": "Run the same existing-order cancellation fixture on both implementations and assert status and body against the accepted API contract.",
+      "related_files": [
+        "legacy-qt/checkout_controller.cpp",
+        "candidate-dotnet/CheckoutController.cs"
+      ],
+      "comparable": true
+    }
+  ]
+}

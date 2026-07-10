@@ -14,6 +14,14 @@
 - [ ] 병목 함수가 프로파일링 결과와 연결되는가
 - [ ] 정확성 검증(반례/불변식/테스트)이 기록됐는가
 
+## Semantic Comparison Review
+- [ ] 동일 capability와 동일 input/trigger가 pair 되었는가
+- [ ] baseline/candidate 양쪽에 behavioral evidence가 있는가
+- [ ] 차이가 output/state/error/side-effect/ordering/timing/precision/permission 중 하나인가
+- [ ] language/framework/toolkit/runtime/platform/architecture/type/file-layout 차이가 그 자체로 semantic gap에 들어가지 않았는가
+- [ ] static-only 또는 one-sided 주장은 `Unverified`와 결정 가능한 paired test를 가지는가
+- [ ] `다르다` 대신 정확한 baseline → candidate observable delta가 기록됐는가
+
 ## Security Review
 - [ ] 입력 검증/인코딩/직렬화 경계가 명확한가
 - [ ] 인증/인가 흐름이 우회 불가능한가

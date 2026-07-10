@@ -1,4 +1,4 @@
-version: "9.0.2"
+version: "9.1.0"
 purpose: "Requests that should not trigger heavy or wrong skills."
 cases:
   - case_id: neg-001
@@ -104,7 +104,7 @@ cases:
     user_request: "브랜치 이름 추천해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [coordination-multi-agent, plan-short-term-docs]
+    should_not_trigger: [coordination-handoff, plan-short-term-docs]
     expected_context: [task summary]
     expected_output_shape: "short branch name options"
     quality_notes: "No handoff."
@@ -203,7 +203,7 @@ cases:
     user_request: "skill이라는 개념이 뭐야?"
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [create-skill-pack]
+    should_not_trigger: [skill-system-repo-adapter]
     expected_context: []
     expected_output_shape: "concept explanation"
     quality_notes: "No skill creation."
@@ -230,7 +230,7 @@ cases:
     user_request: "작업을 두 명에게 나눠야 하는지 의견만 줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [coordination-multi-agent, coordination-brief]
+    should_not_trigger: [coordination-handoff]
     expected_context: [task description]
     expected_output_shape: "short recommendation"
     quality_notes: "Opinion is not handoff packet."
@@ -257,7 +257,7 @@ cases:
     user_request: "목표가 뭔지 한 문장으로 정리해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [coordination-brief, plan-long-term-package]
+    should_not_trigger: [coordination-handoff, plan-long-term-package]
     expected_context: [provided text]
     expected_output_shape: "one-sentence summary"
     quality_notes: "The word goal does not imply coordination."
@@ -266,7 +266,7 @@ cases:
     user_request: "이 작업의 다음 단계 하나만 추천해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [coordination-brief, coordination-multi-agent]
+    should_not_trigger: [coordination-handoff]
     expected_context: [current task state]
     expected_output_shape: "single recommendation"
     quality_notes: "No handoff or DAG."
@@ -275,7 +275,7 @@ cases:
     user_request: "간단한 TODO 세 개만 적어줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [plan-long-term-package, coordination-brief]
+    should_not_trigger: [plan-long-term-package, coordination-handoff]
     expected_context: [task summary]
     expected_output_shape: "short TODO list"
     quality_notes: "A TODO list is not a planning package."
@@ -293,7 +293,7 @@ cases:
     user_request: "이전 계획 내용을 한 문단으로 요약해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [plan-spec-curator, plan-short-term-docs, coordination-brief]
+    should_not_trigger: [plan-spec-curator, plan-short-term-docs, coordination-handoff]
     expected_context: [provided_plan_text]
     expected_output_shape: "brief summary"
     quality_notes: "Plain summarization is not lifecycle curation."
@@ -302,7 +302,7 @@ cases:
     user_request: "지금 목표를 한 문장으로 말해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [plan-spec-curator, coordination-brief]
+    should_not_trigger: [plan-spec-curator, coordination-handoff]
     expected_context: [current_task_context]
     expected_output_shape: "one-sentence goal summary"
     quality_notes: "The word goal alone does not imply context governance."
@@ -347,7 +347,7 @@ cases:
     user_request: "이 스킬 이름을 더 짧게 추천해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [create-skill-pack, coordination-brief]
+    should_not_trigger: [skill-system-repo-adapter, coordination-handoff]
     expected_context: [skill name]
     expected_output_shape: "name suggestions"
     quality_notes: "Naming suggestion is not skill lifecycle unless files are requested."
@@ -365,16 +365,16 @@ cases:
     user_request: "모바일에서 버튼 하나만 가운데 정렬해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [design-mobile-screen, design-frontend, design-layout-translator]
+    should_not_trigger: [design-frontend, design-layout-translator]
     expected_context: [target file, requested alignment]
     expected_output_shape: "small scoped edit"
     quality_notes: "A small UI edit is not a surface implementation request."
-    friction_risk: "over-triggering mobile surface skill"
+    friction_risk: "over-triggering full design implementation for a local tweak"
   - case_id: neg-034
     user_request: "대시보드라는 단어가 들어간 문장을 번역해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [design-dashboard, design-component-mapper]
+    should_not_trigger: [design-frontend, design-component-mapper]
     expected_context: [provided sentence]
     expected_output_shape: "translation"
     quality_notes: "Keyword alone must not trigger dashboard implementation."
@@ -383,7 +383,7 @@ cases:
     user_request: "이 landing page 예시가 무슨 뜻인지 설명만 해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [design-section-web, design-frontend, design-ui-decomposer]
+    should_not_trigger: [design-frontend, design-ui-decomposer]
     expected_context: [provided example]
     expected_output_shape: "short explanation"
     quality_notes: "Explanation-only request is not section implementation or decomposition."
@@ -392,7 +392,7 @@ cases:
     user_request: "목표 단어가 들어간 문장만 찾아줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [coordination-brief, coordination-multi-agent]
+    should_not_trigger: [coordination-handoff]
     expected_context: [provided text]
     expected_output_shape: "matching sentences"
     quality_notes: "The word goal is not coordination intent."
@@ -514,8 +514,8 @@ cases:
     user_request: "변경된 diff만 보여줘."
     expected_primary_skill: report-diff
     expected_supporting_skills: []
-    should_not_trigger: [report-artifact-inventory]
-    expected_family: report
+    should_not_trigger: [coordination-handoff]
+    expected_family: coordination
     expected_context: [diff]
     expected_output_shape: "readable diff"
     quality_notes: "Changed-line presentation is report-diff, not artifact inventory."
@@ -524,7 +524,7 @@ cases:
     user_request: "이 작업을 비판적으로 리뷰해줘."
     expected_primary_skill: report-critical
     expected_supporting_skills: []
-    should_not_trigger: [report-artifact-inventory]
+    should_not_trigger: [coordination-handoff]
     expected_family: report
     expected_context: [artifact, risk boundary]
     expected_output_shape: "critical review verdict"
@@ -622,7 +622,7 @@ cases:
     friction_risk: "rewriting an implementation plan as a PRD"
   - case_id: neg-report-lifecycle-artifacts-001
     user_request: "이번 작업에서 바뀐 파일이랑 검증 명령만 간단히 정리해줘."
-    expected_primary_skill: report-artifact-inventory
+    expected_primary_skill: coordination-handoff
     expected_supporting_skills: []
     should_not_trigger: [report-lifecycle-artifacts]
     expected_family: report
@@ -648,3 +648,253 @@ cases:
     expected_output_shape: "markdown-primary push only"
     quality_notes: "Ops vs rollout boundary: no onboarding when already registered."
     friction_risk: "re-onboarding an already registered repo"
+  - case_id: neg-plan-state-001
+    schema_version: 2
+    user_request: "승인."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-plan-runner, workflow-implementation, plan-short-term-docs]
+    expected_family: planning
+    expected_context: [surrounding_context]
+    expected_output_shape: "clarification or no-op because active plan scope is missing"
+    quality_notes: "A one-word approval without explicit active plan scope must not admit active_plan -> implementation_ready."
+    friction_risk: "starting implementation from ambiguous approval"
+    expected_behaviors:
+      - reject_invalid_transition
+    forbidden_behaviors:
+      - approve_implementation
+      - start_execution
+    required_evidence:
+      - type: route_match
+        expected: null
+  - case_id: neg-plan-state-002
+    schema_version: 2
+    user_request: "이 archived plan은 예전에 관련 있었으니까 raw 내용을 기본 context로 다시 넣어줘."
+    expected_primary_skill: plan-spec-curator
+    expected_supporting_skills: []
+    should_not_trigger: [plan-short-term-docs, workflow-plan-runner, memory-bank-update]
+    expected_family: planning
+    expected_context: [archived_plan_pointer, current_goal, context_admission]
+    expected_output_shape: "active context admission verdict with summary-only or explicit-request policy"
+    quality_notes: "Archived/raw plan re-entry requires admission; historical relevance alone is not active instruction."
+    friction_risk: "stale plan pollution"
+    expected_behaviors:
+      - run_context_admission_test
+      - reject_raw_default_load_without_need
+    forbidden_behaviors:
+      - load_raw_archived_plan_by_default
+      - start_plan_execution
+    required_evidence:
+      - type: route_match
+        expected: plan-spec-curator
+  - case_id: neg-token-cost-001
+    schema_version: 2
+    user_request: "스킬 전부 읽어보고 토큰 비용 줄일 곳 찾아줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-codebase, plan-long-term-package]
+    expected_family: none
+    expected_context: [skill_registry, context_routing, context_surface_report]
+    expected_output_shape: "bounded inspection plan or refusal to load full skill library"
+    quality_notes: "A token-cost request must not start with full skill-library admission."
+    friction_risk: "solving token cost by doing the highest-cost context load"
+    expected_behaviors:
+      - reject_full_skill_library_load
+      - use_context_surface_report_first
+    forbidden_behaviors:
+      - load_all_skills_by_default
+      - load_all_references_by_default
+    required_evidence:
+      - type: route_match
+        expected: null
+  - case_id: neg-token-cost-002
+    schema_version: 2
+    user_request: "간단한 README 오타 하나 고쳐줘. 꼼꼼하게 검증도 하고 최소구현도 붙여."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-rigor, workflow-validation, workflow-minimal-implementation]
+    expected_family: workflow
+    expected_context: [target_readme_line]
+    expected_output_shape: "small direct documentation edit with light verification"
+    quality_notes: "Support modifiers should not attach to trivial edits solely because the words 검증 or 최소구현 appear without real risk."
+    friction_risk: "support skill over-attachment on simple work"
+    expected_behaviors:
+      - perform_minimum_direct_check
+    forbidden_behaviors:
+      - attach_all_support_modifiers
+      - create_validation_matrix
+    required_evidence:
+      - type: route_match
+        expected: null
+  - case_id: neg-token-cost-003
+    schema_version: 2
+    user_request: "plan-long-term-package로 패키지 만들기 전에 references 폴더 전체를 먼저 읽어봐."
+    expected_primary_skill: plan-long-term-package
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-codebase]
+    expected_family: planning
+    expected_context: [current_package_request, archetype_catalog]
+    expected_output_shape: "index-first admission and selected-template loading"
+    quality_notes: "High-fanout package references are admitted through catalog/archetype selection, not a full template sweep."
+    friction_risk: "large reference fanout before archetype selection"
+    expected_behaviors:
+      - read_archetype_catalog_first
+      - load_selected_templates_only
+    forbidden_behaviors:
+      - read_all_package_templates
+      - load_full_reference_tree
+    required_evidence:
+      - type: route_match
+        expected: plan-long-term-package
+  - case_id: neg-skill-adapter-personal-001
+    schema_version: 2
+    user_request: "내 ~/.codex/skills에 개인 스킬 하나 만들어줘."
+    expected_primary_skill: null
+    expected_route_class: external_system_skill_creator
+    expected_supporting_skills: []
+    should_not_trigger: [skill-system-repo-adapter]
+    expected_family: skill_system
+    expected_context: [personal skill use case, target home skill path]
+    expected_output_shape: "personal skill authored by system skill-creator without Skill-System repository integration"
+    quality_notes: "The repository adapter never attaches to personal/home skill authoring."
+    friction_risk: "treating a live home as canonical Skill-System source"
+    expected_behaviors:
+      - author_personal_skill_with_skill_creator
+    forbidden_behaviors:
+      - attach_skill_system_repository_adapter
+      - edit_skill_system_source
+    required_evidence:
+      - type: route_class
+        expected: external_system_skill_creator
+  - case_id: neg-search-deep-single-lane-001
+    schema_version: 2
+    user_request: "이 주제의 2025년 이후 논문 세 편과 링크만 찾아줘."
+    expected_primary_skill: search-paper-evidence
+    expected_supporting_skills: []
+    should_not_trigger: [search-deep-evidence, research-literature-synthesis]
+    expected_family: search
+    expected_context: [paper_topic, date_range]
+    expected_output_shape: "concise date-stamped paper list with source/access limitations"
+    quality_notes: "A single explicit paper lane should not fan out into a multi-lane deep-evidence sweep or final synthesis."
+    friction_risk: "unnecessary lane fanout and fixed full-ledger output"
+    expected_behaviors:
+      - use_single_paper_lane
+      - keep_output_proportional
+    forbidden_behaviors:
+      - fan_out_unrelated_evidence_lanes
+      - emit_full_deep_evidence_matrix
+    required_evidence:
+      - type: route_match
+        expected: search-paper-evidence
+  - case_id: neg-architecture-deepening-targeted-001
+    schema_version: 2
+    user_request: "이 service와 adapter 사이 interface를 어떻게 나눌지 한 가지 설계 결정을 내려줘."
+    expected_primary_skill: analysis-codebase-design
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-architecture-deepening, analysis-codebase]
+    expected_family: analysis
+    expected_context: [target_modules, caller_contract]
+    expected_output_shape: "targeted boundary decision without repo-wide candidate backlog"
+    quality_notes: "One selected design decision belongs to codebase design, not architecture-deepening candidate discovery."
+    friction_risk: "expanding a local decision into a broad improvement inventory"
+    expected_behaviors: [decide_target_boundary]
+    forbidden_behaviors: [generate_repo_wide_deepening_backlog]
+    required_evidence:
+      - type: route_match
+        expected: analysis-codebase-design
+  - case_id: neg-domain-modeling-interface-001
+    schema_version: 2
+    user_request: "도메인 용어는 이미 명확해. 이 모듈 interface seam만 설계해줘."
+    expected_primary_skill: analysis-codebase-design
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-domain-modeling]
+    expected_family: analysis
+    expected_context: [target_module, existing_domain_terms]
+    expected_output_shape: "module seam decision without rebuilding the domain model"
+    quality_notes: "Clear domain language plus a module seam question does not need domain modeling."
+    friction_risk: "unnecessary entity/value-object analysis"
+    expected_behaviors: [preserve_existing_domain_language]
+    forbidden_behaviors: [rebuild_domain_model]
+    required_evidence:
+      - type: route_match
+        expected: analysis-codebase-design
+  - case_id: neg-performance-selected-fix-001
+    schema_version: 2
+    user_request: "병목은 이미 profiler로 확인했어. 이 N+1 query를 batch fetch로 바로 고쳐줘."
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-performance, analysis-algorithm]
+    expected_family: workflow
+    expected_context: [verified_bottleneck, target_query_path, validation]
+    expected_output_shape: "direct scoped optimization and before/after validation"
+    quality_notes: "A selected, verified optimization belongs to implementation rather than a new bottleneck analysis."
+    friction_risk: "re-diagnosing an already measured bottleneck"
+    expected_behaviors: [implement_selected_optimization]
+    forbidden_behaviors: [restart_bottleneck_discovery]
+    required_evidence:
+      - type: route_match
+        expected: workflow-implementation
+  - case_id: neg-loop-verifier-obvious-check-001
+    schema_version: 2
+    user_request: "이 JSON schema 파일 하나 validate 명령으로 확인해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [loop-verifier-registry, workflow-validation, workflow-loop-runner]
+    expected_family: none
+    expected_context: [schema_path, validation_command]
+    expected_output_shape: "one direct command result"
+    quality_notes: "One obvious local check needs neither verifier mapping nor a loop."
+    friction_risk: "turning one command into loop governance"
+    expected_behaviors: [run_direct_validation]
+    forbidden_behaviors: [create_verifier_registry, create_loop_contract]
+    required_evidence:
+      - type: route_match
+        expected: null
+  - case_id: neg-memory-init-update-001
+    schema_version: 2
+    user_request: "기존 memory bank의 rule_003을 새 정책으로 바꿔줘."
+    expected_primary_skill: memory-bank-update
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-init, memory-bank-correction-capture]
+    expected_family: memory
+    expected_context: [existing_memory_bank, rule_003, persistent_intent]
+    expected_output_shape: "append-only rule update without reinitialization"
+    quality_notes: "An existing rule mutation must not recreate or reset the bank."
+    friction_risk: "destructive reinitialization"
+    expected_behaviors: [update_existing_rule]
+    forbidden_behaviors: [reinitialize_memory_bank]
+    required_evidence:
+      - type: route_match
+        expected: memory-bank-update
+  - case_id: neg-peer-review-generic-spec-001
+    schema_version: 2
+    user_request: "이 API specification이 release-ready인지 blocker 중심으로 리뷰해줘."
+    expected_primary_skill: report-critical
+    expected_supporting_skills: []
+    should_not_trigger: [research-peer-review, research-manuscript-writing]
+    expected_family: report
+    expected_context: [api_specification, release_criteria]
+    expected_output_shape: "findings-first critical software artifact review"
+    quality_notes: "Scholarly peer review does not own generic software specifications."
+    friction_risk: "applying manuscript review categories to an API contract"
+    expected_behaviors: [review_release_blockers]
+    forbidden_behaviors: [emit_scholarly_peer_review]
+    required_evidence:
+      - type: route_match
+        expected: report-critical
+  - case_id: neg-dependency-upgrade-choice-001
+    schema_version: 2
+    user_request: "파일은 바꾸지 말고 이 두 라이브러리 중 어떤 걸 쓸지 constraints 기준으로 비교해줘."
+    expected_primary_skill: analysis-algorithm
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-dependency-upgrade, workflow-implementation]
+    expected_family: analysis
+    expected_context: [candidate_libraries, constraints, no_write_scope]
+    expected_output_shape: "constraint-based recommendation without manifest or lockfile changes"
+    quality_notes: "Dependency choice analysis is not an upgrade implementation."
+    friction_risk: "mutating manifests during analysis-only work"
+    expected_behaviors: [compare_candidates_without_write]
+    forbidden_behaviors: [edit_dependency_manifest, refresh_lockfile]
+    required_evidence:
+      - type: route_match
+        expected: analysis-algorithm

@@ -12,6 +12,10 @@ enabled); `.codex/tools/analyze_harness_measurement.py` aggregates the tagged
 firing / finalize status (reverts, re-instructions) still needs a host-specific
 transcript/git collector and is a follow-up.
 
+The Codex context-pressure Recovery Guard reuses the same holdout assignment. It records `recovery_would_audit` and `recovery_did_block` separately from the strict evidence gate. Default `observe` mode never blocks; `SKILL_SYSTEM_RECOVERY_GUARD=audit` permits the on arm to issue one bounded audit while the off arm remains observational.
+
+Recovery fire/block rates are exposure telemetry, not proof of quality improvement. The strict evidence gate and Recovery Guard currently share one session arm, and audit/handoff adds lifecycle events, so `harness_paradox_fail_delta` cannot be attributed to Recovery Guard alone. Re-instruction, revert, and accepted-outcome collection remains required before making an efficacy claim.
+
 ## Principles
 - **Out-of-band only.** Labels and metrics are recorded after a session ends
   (via the existing hook event ledger and transcript review), never injected
@@ -44,16 +48,18 @@ outcome values when the local hook/event ledger does not contain them.
 ```
 
 ## On/off comparison (implemented)
-- Per arm: `sessions`, `finalizes`, `would_fire_rate`, `block_rate`, `finalize_fail_rate`.
-- Key signal: `harness_paradox_fail_delta = finalize_fail_rate(on) - finalize_fail_rate(off)`.
-  Negative = the gate reduces failures; ~0 = no effect; positive = the gate may be adding friction.
+- Per arm: `sessions`, `finalizes`, `would_fire_rate`, `block_rate`, `recovery_would_audit_rate`, `recovery_block_rate`, and `finalize_fail_rate`.
+- Aggregate signal: `harness_paradox_fail_delta = finalize_fail_rate(on) - finalize_fail_rate(off)`.
+  Negative is consistent with fewer recorded finalize failures, ~0 with no recorded difference, and positive with possible added friction. It is not causal attribution when multiple gates share the arm.
 - `mean_reverts` / `mean_reinstructions` need the outcome collector (follow-up).
 - Keep collecting until both arms have data; sunset at the horizon without a signal.
 
 ## Run it
-- Enable (both runtimes): `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict SKILL_SYSTEM_HARNESS_MEASUREMENT=1`.
+- Enable strict evidence-gate measurement: `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict SKILL_SYSTEM_HARNESS_MEASUREMENT=1`.
+- Enable Recovery Guard audit measurement on Codex: `SKILL_SYSTEM_RECOVERY_GUARD=audit SKILL_SYSTEM_HARNESS_MEASUREMENT=1`.
 - Adapters tag each `turn_finalize` event with `holdout_arm` (deterministic 80/20 by session id), `would_fire`, and `did_block`; the off arm records `would_fire` but never blocks (gate-off baseline).
 - Aggregate: `python3 .codex/tools/analyze_harness_measurement.py [--ledger PATH]`.
+- Verify the source ledger first with `python3 .codex/tools/hook_runtime.py verify --ledger PATH`; the analyzer is an aggregator and does not establish ledger integrity.
 
 ## Boundaries
 - `eval/observed-runs/*` are **replay fixtures** for behavior evals, not a
@@ -62,3 +68,4 @@ outcome values when the local hook/event ledger does not contain them.
   auto-promotes to the Wiki Bank or changes skill maturity on its own.
 - Reuse the existing hash-chained hook event ledger as the event source; do not
   add a second always-on recorder.
+- The live hook ledger contains host session identifiers. Hash or aggregate identifiers before exporting an outcome projection; the example `session_id_hash` is not a claim that the raw ledger is anonymized.

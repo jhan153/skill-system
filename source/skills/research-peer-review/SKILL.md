@@ -1,6 +1,6 @@
 ---
 name: research-peer-review
-description: Produces peer-review-style critique for manuscripts, proposals, or research plans with major/minor concerns, reproducibility, ethics/reporting, citation issues, and revision advice.
+description: Review a scientific manuscript, proposal, or research plan for validity, evidential support, reproducibility, ethics/reporting, and revision priority. Use for scholarly peer-review critique; do not claim venue authority or review generic software artifacts.
 ---
 
 # Research Peer Review
@@ -8,133 +8,59 @@ description: Produces peer-review-style critique for manuscripts, proposals, or 
 ## Routing Card
 - role: review_gate
 - intent_signature:
-  - peer review
-  - reviewer 2
-  - 논문 리뷰
-  - proposal review
-  - major concerns
-  - minor concerns
-  - reproducibility review
+  - scholarly peer review, manuscript/proposal review, reviewer critique, 논문 리뷰
 - use_when:
-  - the user asks for peer-review-style critique of a manuscript, proposal, or research plan.
-  - major/minor/reproducibility/ethics/reporting concerns should be separated.
+  - the user wants a scientific review of a manuscript, proposal, or research plan.
 - do_not_use_when:
-  - general QA gate outside research; use report-critical.
-  - write the manuscript as primary task.
-  - fabricate reviewer identity or venue authority.
+  - the target is a generic code/spec/release artifact (`report-critical`) or the user wants manuscript rewriting as the primary task.
 - expected_inputs:
-  - manuscript/proposal/research plan
-  - review criteria
-  - evidence anchors
-  - target venue if provided
+  - review target, scope, criteria, and supporting evidence when available
 - expected_outputs:
-  - neutral summary
-  - major concerns
-  - minor concerns
-  - reproducibility concerns
-  - ethics/reporting concerns
-  - evidence/citation concerns
-  - revision advice
-  - author-facing revision plan
+  - prioritized anchored findings with scientific consequence and actionable revision
 - context_targets:
   must_read:
-    - review target
-    - review goal
+    - review target and requested stance/scope
   read_if_needed:
-    - evidence ledger
-    - analysis report
-    - target venue criteria
+    - cited sources, protocol, analysis artifacts, venue criteria, and reporting checklist relevant to a finding
   do_not_load_by_default:
-    - manuscript writing
-    - statistical reanalysis unless requested
+    - unrelated literature, hidden experiment assumptions, or statistical reanalysis not requested
 - risk_profile:
   reads:
-    - manuscript
-    - proposal
-    - research plan
-    - supporting evidence if provided
+    - review target and selected supporting evidence
   writes:
-    - `review/peer_review.md` only when requested
+    - review artifact only when explicitly requested
   tools:
-    - none by default
-  network:
-    - none by default
-  credentials:
-    - none
-  generated_artifacts:
-    - peer review artifact only if requested
-  destructive_actions:
-    - none
-  forbidden_by_default:
-    - claimed venue authority
-    - fabricated reviewer identity
+    - none by default; external verification is separate and must be disclosed
+  sensitive_resources:
+    - credentials default deny; do not fabricate reviewer identity
 - entry_scene:
   - PREPARE
 
-## Purpose
-Produces peer-review-style critique for manuscripts, proposals, or research plans with major/minor concerns, reproducibility, ethics/reporting, citation issues, and revision advice.
+## Review Standard
+Lead with actionable findings, ordered by scientific consequence.
 
-## When To Apply
-- the user asks for peer-review-style critique of a manuscript, proposal, or research plan.
-- major/minor/reproducibility/ethics/reporting concerns should be separated.
+For each material finding include:
 
-## When Not To Apply
-- general QA gate outside research; use report-critical.
-- write the manuscript as primary task.
-- fabricate reviewer identity or venue authority.
+- exact section/claim/table/figure anchor
+- observed issue and evidence
+- consequence for validity, interpretation, reproducibility, ethics, or reporting
+- severity (`major`, `minor`, or question/clarification)
+- smallest useful revision or discriminating check
 
-## Workflow
-1. PREPARE - identify review target and review stance.
-2. SUMMARIZE - state contribution neutrally.
-3. ASSESS - separate validity, novelty, reproducibility, ethics/reporting, evidence, and presentation issues.
-4. PRIORITIZE - classify major vs minor concerns.
-5. ADVISE - provide concrete revision actions.
-6. FINALIZE - produce review artifact only when requested.
+Assess validity and evidential support before novelty or presentation. Separate flaws in the work from evidence unavailable in the reviewed slice. Do not infer hidden methods, data, or results.
 
-## Resource and Risk Boundary
-Summary:
-- Reads the manuscript, proposal, research plan, and supporting evidence provided for review.
-- Writes `review/peer_review.md` only when explicitly requested.
-- Uses no tools or network by default.
-- Does not claim venue authority or fabricate reviewer identity.
-- Required checkpoints: review target, citation/evidence status, reproducibility concerns, and artifact intent.
+Review dimensions are conditional, not mandatory headings: research question/contribution, study design, data, methods, statistics, results, interpretation, reproducibility, ethics/reporting, citations, and presentation.
 
-## Recovery and Context Expansion
-- If the request belongs to development/implementation, return to scheduling instead of forcing research routing.
-- If required inputs are missing, ask one focused question or produce a non-writing plan with missing evidence marked.
-- Expand from must-read to read-if-needed one layer at a time.
-- Do not load the full repo, full memory bank, `.system`, or unrelated research cluster skills by default.
-- Do not invent citations, datasets, metrics, results, or file artifacts to fill gaps.
+## Output
+Return prioritized findings first. Add a short neutral contribution summary and overall assessment only when useful. Omit empty “ethics,” “minor concerns,” or other sections rather than filling them with boilerplate. An author-facing revision plan is optional and should follow the findings, not replace them.
 
-## Output Contract
-1. Neutral summary
-2. Overall assessment
-3. Major concerns
-4. Minor concerns
-5. Reproducibility concerns
-6. Ethics/reporting concerns
-7. Evidence/citation concerns
-8. Concrete revision advice
-9. Optional author-facing revision plan
-
-## Citation Status Review
-Use `citation_status` values: `verified`, `user_provided`, `placeholder`, `missing`, `unverified` when assessing evidence and citation concerns. Flag unsupported manuscript claims without inventing references or reviewer authority.
+## Behavior Cases
+- Positive: “이 manuscript를 validity와 reproducibility 중심으로 peer review해줘.”
+- Negative: “이 API spec이 release-ready인지 리뷰해줘.” → `report-critical`.
+- Edge: only Methods are provided → review that slice and list unavailable evidence; do not judge unseen Results.
 
 ## Validation
-- Confirm `.codex/skills/.system` was not touched.
-- Confirm user intent matches this skill, not ordinary development.
-- Confirm required evidence or artifact inputs are present or explicitly marked missing.
-- Confirm no secrets, credentials, hardcoded single-host paths, fabricated citations, or fabricated results are introduced.
-- Confirm artifact writes happen only when explicitly requested.
-
-## Anti-Patterns
-- Installing or invoking monolithic `codex-research-lifecycle`.
-- Treating search keywords as conclusions.
-- Collapsing evidence search, ideation, blueprint, scaffold, analysis, writing, and review into one step.
-- Creating custom transcribe/speech skills from research source material.
-- Weakening development/implementation routing because a request mentions model, metric, loss, experiment, or training.
-
-## Known Limits
-- Peer review is advisory and not a venue decision.
-- Findings depend on the provided manuscript/proposal slice.
-- External literature verification requires explicit search.
+- Every major concern has a target anchor and scientific consequence.
+- Claims about citations or current literature are verified or explicitly limited.
+- Recommendations address the cause, not only wording.
+- The response does not impersonate a venue decision or reviewer identity.

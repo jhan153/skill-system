@@ -50,7 +50,7 @@ PLUGIN_DISPLAY = {
     "skill-system-design": ("Skill System Design", "Frontend, UI, layout, component, token, and visual validation skills."),
     "skill-system-research": ("Skill System Research", "Scientific research, synthesis, experiment, and manuscript skills."),
     "skill-system-quality": ("Skill System Quality", "QA, qualitative review, critical review, and validation skills."),
-    "skill-system-maintainer": ("Skill System Maintainer", "Skill-system maintenance, evaluation, and package creation skills."),
+    "skill-system-maintainer": ("Skill System Maintainer", "Skill-system evaluation, repository integration, and bundle validation skills."),
 }
 
 

@@ -8,133 +8,117 @@ description: Conditional minimal-implementation policy for coding and refactorin
 ## Routing Card
 - role: execution_modifier
 - intent_signature:
-  - `workflow-minimal-implementation`, `minimal-implementation`, `minimum implementation`, `minimal solution`, `simplest correct solution`, `YAGNI`, `do less`, `avoid over-engineering`, `최소 구현`, `최소구현`, `과잉 구현`, `과잉설계`
+  - `minimal-implementation`, `simplest correct solution`, `YAGNI`, `avoid over-engineering`, `최소 구현`, `과잉설계`
 - use_when:
-  - implementation or refactoring work has a credible risk of unnecessary abstractions, new dependencies, boilerplate, generic infrastructure, or broad file churn.
-  - the user explicitly asks for the smallest correct implementation, YAGNI, dependency restraint, or over-engineering resistance.
-  - a planned or actual diff adds a package, framework, adapter layer, factory, interface, config surface, or multiple files for a narrow behavior change.
+  - implementation or refactoring has credible pressure toward unnecessary dependencies, abstractions, config, boilerplate, or file churn.
+  - the user explicitly asks for the smallest correct implementation, dependency restraint, or an over-engineering check.
 - do_not_use_when:
-  - the request is pure Q&A, research, planning, documentation, code explanation, or review with no implementation pressure.
-  - the user explicitly asks for a complete architecture, extensible framework, teaching walkthrough, or exhaustive implementation and accepts the added scope.
-  - minimality would remove input validation, security, data-loss prevention, accessibility, compliance behavior, migration safety, or an explicit user requirement.
+  - the request is Q&A, research, planning, documentation, explanation, or review without implementation pressure.
+  - the user explicitly chose a broader architecture or extensible framework and accepts its scope.
+  - reducing scope would remove safety, data integrity, accessibility, compliance, migration safeguards, or a stated requirement.
 - expected_inputs:
   - selected primary implementation workflow
-  - requested behavior and explicit non-negotiables
-  - relevant existing files, dependencies, and local patterns
-  - current or planned diff when doing the review pass
+  - required behavior and non-negotiables
+  - relevant local patterns and planned/current diff
 - expected_outputs:
-  - selected minimum viable change shape
-  - skipped complexity and the trigger that would justify adding it later
-  - one focused validation check for non-trivial logic
-  - optional over-engineering findings for the final diff
+  - minimum viable change shape and reuse choice
+  - skipped complexity with a concrete revisit trigger
+  - focused check for non-trivial logic
+  - deletion-focused findings only when the diff shows pressure signals
 - context_targets:
   must_read:
-    - current implementation or refactor request
-    - relevant source files and existing local patterns
-    - package/dependency manifest only when dependency choice is in scope
+    - current implementation request
+    - directly relevant source and local patterns
   read_if_needed:
-    - validation contract or existing tests for the touched behavior
-    - current diff after implementation when review pressure signals are present
-    - adjacent helper APIs only when choosing between reuse and new code
+    - dependency manifest when package choice is in scope
+    - touched tests or validation contract for non-trivial logic
+    - current diff when review pressure signals appear
+    - adjacent helper API when reuse is plausible
   do_not_load_by_default:
-    - full repo
-    - broad architecture docs
-    - unrelated skill library
-    - old plans or memory unless explicitly in scope
+    - full repo, broad architecture docs, unrelated skills, old plans, or memory
 - risk_profile:
   reads:
-    - targeted source, manifests, tests, and diff evidence only
+    - targeted source, manifest, tests, and diff only
   writes:
-    - WRITE_CODEBASE only through the selected primary implementation workflow
+    - none directly; the primary workflow owns implementation
   tools:
-    - focused search, diff, and validation commands tied to the touched behavior
+    - focused search, diff, and validation tied to the chosen change
   sensitive_resources:
-    - credentials default deny; do not inspect secrets to justify minimality
+    - credentials default deny
 - entry_scene:
   - PREPARE
 
-## Purpose
-Apply just enough YAGNI pressure to implementation work. This skill is a soft execution policy, not a hard gate: it changes how Codex chooses a solution, but it does not block tool calls, dependency installs, or large diffs by itself.
+## Decision Contract
+- Constrain solution shape; never replace the primary workflow or its correctness and validation duties.
+- Optimize for the smallest coherent change that satisfies current requirements, not the fewest lines at any cost.
+- Preserve trust-boundary validation, security, data-loss prevention, accessibility, operability, and explicit user scope.
+- Apply the pressure only where a real complexity choice exists; otherwise stay silent.
 
-Keep it conditional. Do not turn every task into a minimalism exercise.
+## Minimum Ladder
+Stop at the first rung that fully satisfies the current requirement:
 
-## When To Apply
-- Use before writing code when the request can be solved by reusing existing code, stdlib, platform behavior, or a narrow local change.
-- Use during implementation when the proposed solution starts adding new layers, packages, config, generic wrappers, or speculative extension points.
-- Use after implementation when a diff grew beyond the requested behavior and needs a deletion-focused check.
+1. Remove or defer behavior that is speculative rather than requested.
+2. Use standard-library or native-platform behavior.
+3. Reuse an installed dependency or an existing local helper.
+4. Make the narrowest local implementation and focused test change.
+5. Add a dependency, file, configuration surface, or abstraction only when the earlier rungs cannot satisfy a current requirement.
 
-## When Not To Apply
-- Do not use for pure analysis, documentation, planning, or research output.
-- Do not use to override explicit user scope after they confirm the larger design.
-- Do not simplify away trust-boundary validation, security controls, data-loss prevention, accessibility basics, migration safeguards, observability needed to operate the change, or hardware calibration knobs.
+When two rungs are equally small, prefer the one that fits established local patterns and handles required edge cases better.
 
-## Workflow
-1. Restate the minimum requested behavior in one sentence.
-2. Walk the ladder and stop at the first rung that satisfies the request:
-   - skip the feature if it is speculative and not actually required.
-   - use standard library behavior when available.
-   - use native platform behavior when available.
-   - reuse an already-installed dependency or existing local helper.
-   - implement the narrowest local change.
-3. Reject speculative structure unless the current task proves it is needed:
-   - no interface with one implementation.
-   - no factory for one product.
-   - no config for a value nobody changes.
-   - no wrapper that only delegates.
-   - no new package for behavior already covered by stdlib, platform, or installed code.
-4. Implement through the selected primary workflow with the smallest coherent diff.
-5. For non-trivial logic, leave one focused runnable check. Use the repo's existing test style when obvious; otherwise use the smallest command or assert-style check that fails if the logic breaks.
-6. If the diff added dependencies, abstractions, files, or broad boilerplate, run the review pass below before finalizing.
+## Complexity Gate
+Require a current-use justification for each new:
+
+- package or framework;
+- file or generated layer;
+- interface, factory, adapter, registry, or wrapper;
+- configuration option or extension point;
+- generic infrastructure replacing one concrete use.
+
+A possible future use is not a justification. Existing repeated use, a present boundary, or an explicit requirement is. If no justification exists, cut the addition or fold it into the narrow local change.
+
+## Attach Points
+- Before the primary workflow writes: identify `minimum_behavior`, the selected ladder rung, and any non-negotiable safeguard.
+- During implementation: re-evaluate only when a pressure signal appears; do not narrate routine small choices.
+- After implementation: run the review pass only if the diff added a dependency, abstraction, config surface, extra file, broad boilerplate, or substantially more churn than the behavior suggests.
+- For non-trivial logic, require one focused runnable check in the repository's existing style. If it cannot run, leave the gap explicit rather than weakening the solution.
 
 ## Review Pass
-Use this only after there is a planned or actual diff.
-
-Report one line per finding:
+Emit one line only for a meaningful cut:
 
 `<path>:<line>: <tag>: <what to cut>. <replacement>.`
 
 Tags:
-- `delete`: dead code, unused flexibility, speculative feature, or future-only branch.
-- `stdlib`: custom code that the standard library already provides.
-- `native`: dependency or custom code that the platform already provides.
-- `reuse`: new code that should use an existing local helper or installed dependency.
-- `yagni`: abstraction, config, interface, factory, adapter, or layer with no current second use.
-- `shrink`: same behavior in fewer lines with no loss of safety or clarity.
 
-End the review pass with `net: -<N> lines possible` when a useful estimate is available. If there is nothing meaningful to cut, say `Lean enough. Ship.`
+- `delete`: unused or speculative behavior.
+- `stdlib`: custom code covered by the standard library.
+- `native`: custom/dependency code covered by the platform.
+- `reuse`: duplicate of an existing helper or installed dependency.
+- `yagni`: layer or option without a current second use or boundary.
+- `shrink`: same behavior with less code and no safety/clarity loss.
+
+If useful, end with `net: -<N> lines possible`; otherwise omit the estimate. If there is nothing material to cut, say `No material minimality cut.` This is not a correctness or release verdict.
 
 ## Output Contract
-- Keep implementation notes short: what was changed, what was skipped, and when to add the skipped complexity.
-- Mark any intentional shortcut with a `minimal:` comment only when it has a known ceiling. The comment must name the ceiling and the trigger to revisit it.
-- Do not present minimality as verified correctness. Verification still comes from tests, runtime checks, or explicit evidence.
+Expose only decisions that matter to the user or primary workflow:
 
-## Resource and Risk Boundary
-- Reads stay local to the requested behavior, dependency surface, and diff.
-- Writes stay inside the selected primary workflow's code/test/config scope.
-- Tool calls are limited to search, diff, and focused validation.
-- Hard enforcement belongs outside this skill: CI checks, dependency policies, pre-commit rules, AST linters, file-count budgets, and review gates.
+- `change_shape`
+- `reused`
+- `skipped_complexity`
+- `revisit_trigger`
+- `focused_check`
+- optional review findings
 
-## Recovery and Context Expansion
-- If the minimum behavior is unclear, ask one focused clarification or choose the smallest safe interpretation and state it.
-- If two options are equally small, choose the one that handles edge cases better.
-- If a minimal version fails validation, fix the cause; do not add bypasses or weaken tests to preserve a smaller diff.
-- If the user reaffirms the broader architecture, stop challenging the scope and implement it cleanly.
+Do not produce a long minimalism report for a small diff. Use a `minimal:` code comment only when an intentional shortcut has a known ceiling; name both the ceiling and the condition that should trigger revision.
 
-## Known Limits
-- This skill cannot technically prevent package installation, broad edits, tool calls, or commits.
-- It can under-build if the user requirement hides scale, compliance, or operational constraints.
-- It should not be the only review for correctness, security, performance, or accessibility.
+## Recovery and Limits
+- If minimum behavior is ambiguous, choose the smallest safe interpretation and state the assumption, or ask one question when the deliverable would materially differ.
+- If the minimal version fails validation, fix the cause; do not add bypasses or weaken checks to preserve diff size.
+- If the user confirms the broader design, stop challenging its scope and apply minimality only inside that design.
+- This modifier cannot enforce dependency or file budgets and is not a correctness, security, performance, or accessibility review.
 
 ## Validation
-- Confirm the frontmatter has only `name` and `description`.
-- Confirm the Routing Card keeps the canonical field order.
-- Confirm non-trivial logic has one focused runnable check or an explicit `Unverified` gap.
-- Confirm any added dependency, abstraction, config, or extra file is justified by current requirements.
-- Confirm no safety, validation, data-loss, accessibility, or explicit user requirement was removed for minimality.
-
-## Anti-Patterns
-- Using this skill as an always-on personality mode.
-- Rejecting a confirmed user requirement because it is not minimal.
-- Removing safety checks to reduce line count.
-- Adding a custom mini-framework while claiming it is future-proof.
-- Writing a long justification for a tiny diff when one skipped-complexity line is enough.
+- Every added dependency, abstraction, config surface, and extra file has a current-use justification.
+- The chosen rung satisfies all explicit behavior and safeguards.
+- Non-trivial logic has a focused check or an explicit unverified gap.
+- The review ran only when a pressure signal existed.
+- The output records skipped complexity and a concrete revisit trigger without duplicating the primary workflow report.

@@ -1,7 +1,7 @@
-schema_version: 1
+schema_version: 2
 loop_run_id: LR-20260623-010
 contract_ref: contract.yaml
-contract_hash: 2d45ab1490ee466f236cf42ba3c39400e886861bb6007e25f09d15b59f4163ea
+contract_hash: e5449f17c7fd666e96546f22b1cf2783f71dc5fcb842f03e8152315f42e0bbe3
 workspace:
   root: .
   revision: fixture
@@ -20,9 +20,11 @@ condition_results:
 - condition_id: SC-001
   status: unverified
   evidence_refs: []
+  evidence: []
 - condition_id: SC-002
   status: unverified
   evidence_refs: []
+  evidence: []
 progress:
   required_passed: 0
   required_total: 1

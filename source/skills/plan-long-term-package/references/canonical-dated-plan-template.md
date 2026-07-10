@@ -34,6 +34,11 @@ derived_from: []
 - what:
 - why:
 
+### Claim Ledger
+| Claim ID | Statement | Grade | Source / Evidence | Planning Impact | Status |
+| --- | --- | --- | --- | --- | --- |
+| CL-001 |  | `verified-source | observed-runtime | inferred | decision-needed` |  |  | `accepted | open | rejected` |
+
 ## 4) Risks
 - risk:
 - impact:

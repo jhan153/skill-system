@@ -1,0 +1,63 @@
+run_id: SOLAR-910-LONG-TERM-001
+case_id: solar-910-long-term-package-001
+host: codex
+host_version: 0.144.0-alpha.4
+model: gpt-5.6-sol
+model_version: gpt-5.6-sol
+bundle_version: "9.1.0"
+started_at: "2026-07-10T13:30:56Z"
+observed_route: plan-long-term-package
+observed_behaviors:
+  - admit_explicit_package_scope
+  - select_contracts_proportionally
+  - define_single_authority_and_behavior_oracles
+  - define_measurable_phase_and_release_gates
+artifacts:
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/long-term-package-output.md
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/qualitative-review.md
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/long-term/canonical-plan.md
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/long-term/package-readme.md
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/long-term/release-gate.md
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/long-term/phase-1-discovery.md
+  - .codex/eval/observed-runs/release-9.1.0/artifacts/long-term/phase-r2-canary.md
+verification:
+  - type: route_match
+    value: plan-long-term-package
+    checked_at: "2026-07-10T14:04:36Z"
+  - type: model_identity
+    value: gpt-5.6-sol
+    checked_at: "2026-07-10T14:04:36Z"
+  - type: qualitative_review
+    value: pass
+    reviewer: /root/audit_research_search/review_alias_ledger
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/long-term-package-output.md
+    reviewed_sha256: 87b2a742bccbfb68bbe2c3e16a7197d0c9bd31575613c92873a8c781a463b1ee
+    review_artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/qualitative-review.md
+    checked_at: "2026-07-10T14:04:36Z"
+  - type: host_reported_usage
+    value: 187493
+    unit: tokens
+    qualifier: Codex CLI total; not independent billed-token proof
+    checked_at: "2026-07-10T14:04:36Z"
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/long-term-package-output.md
+    sha256: 87b2a742bccbfb68bbe2c3e16a7197d0c9bd31575613c92873a8c781a463b1ee
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/qualitative-review.md
+    sha256: 1c3b3bc5c3f71b06cc2c2ae0e90fa3484a6a7e914c69640069d64c1ba5805f94
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/long-term/canonical-plan.md
+    sha256: 45fe6982e5bf3e5e1c174070bd85fc219c579a98a2569e534c1895dc82c1077e
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/long-term/package-readme.md
+    sha256: 6faa26e7fe4038bdf4a798ef4a00cd11e34b3dc0d421154aadfa7d0afa60e267
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/long-term/release-gate.md
+    sha256: 50453eb046d15cdd0a322b0a99392fb8f0023242338974c9dc75631184345940
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/long-term/phase-1-discovery.md
+    sha256: 55c8379e19c69d268e382df3a46b069f185f18ec469a1424d0f6cffb0318b6cd
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.0/artifacts/long-term/phase-r2-canary.md
+    sha256: f8d7178d4c625ee5d3a1c7324670e1325e740fa2fdeea1ff41707b6bc7130635
+result: pass

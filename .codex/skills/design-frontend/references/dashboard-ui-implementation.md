@@ -1,6 +1,6 @@
 # Design Dashboard Reference
 
-Use this reference from `design-frontend` when the requested UI is an admin, SaaS, analytics, monitoring, reporting, or dense operational dashboard. For explicit dashboard surface work, use `$design-dashboard`; generic design-to-code remains owned by `design-frontend`.
+Load only for the `dashboard` profile of `design-frontend`: an admin, SaaS, analytics, monitoring, reporting, or dense operational surface dominated by data scanning and control.
 
 ## Region model
 
@@ -20,6 +20,8 @@ Use this reference from `design-frontend` when the requested UI is an admin, Saa
 - Use existing chart/table components when available.
 - Avoid inventing metrics or data semantics not present in the source or repo fixtures.
 - Verify responsive behavior: collapse, horizontal scroll, column hiding, or stacked summary.
+- Make loading, empty, filtered-empty, partial, stale, error, permission, and pagination states explicit when relevant.
+- Provide labels, units, legends, or accessible summaries for charts; do not encode meaning by color alone.
 
 ## Handoff
 

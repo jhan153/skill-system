@@ -38,6 +38,9 @@ EVENT_MAP = {
 }
 SUPPORTED_HOOK_EVENTS = set(EVENT_MAP)
 MAX_TEXT = 1200
+NOTIFICATION_TIMEOUT_SECONDS = 5
+AGENT_RUN_TOOL_TIMEOUT_SECONDS = 8
+LOOP_EVALUATION_TIMEOUT_SECONDS = 8
 STRICT_GATE = "strict"
 BLOCKING_VALIDATION_PATTERNS = (
     "agent-verified result has nonzero command validation",
@@ -46,6 +49,10 @@ BLOCKING_VALIDATION_PATTERNS = (
     "last_assistant_message sha256 does not match",
     "evidence file not found",
     "evidence path is not run-relative",
+    "agent-verified result cannot rely on manual_check",
+    "cannot rely on manual_check",
+    "cannot use final_report as its own evidence",
+    "command_exit has no matching PreToolUse/PostToolUse receipt",
 )
 SENSITIVE_PATTERN = re.compile(
     r"(?i)(api[_-]?key|authorization|bearer|cookie|password|passwd|secret|token|client[_-]?secret|database[_-]?url)"
@@ -56,6 +63,18 @@ KANBOARD_POST_SESSION_MODES = {"dry-run", "apply"}
 DESKTOP_NOTIFY_DISABLED = {"0", "false", "off", "no", "none", "disabled"}
 DESKTOP_NOTIFY_DRY_RUN = {"dry-run", "dry_run", "test"}
 AGENT_RUN_BOOTSTRAP_ENABLED = {"1", "true", "on", "yes"}
+RECOVERY_GUARD_DISABLED = {"0", "false", "off", "no", "none", "disabled"}
+RECOVERY_GUARD_AUDIT = {"audit", "strict", "block"}
+RECOVERY_AUDIT_TEMPLATE = """Recovery Guard detected a long-session correction loop without new progress evidence.
+Do not start a new task or expand scope. Return only this compact handoff; use [] when no evidence exists:
+
+recovery_audit:
+  goal_anchor: <original goal>
+  latest_user_delta: <latest correction>
+  observed_changes: []
+  verified_progress: []
+  open_gap_and_next_action: <one remaining gap and one scoped next action>
+"""
 
 
 def sanitize_id(value: object, fallback: str) -> str:
@@ -116,10 +135,18 @@ def safe_url(value: object) -> str:
         return redact_text(redacted)
     if not parsed.scheme or not parsed.netloc:
         return redact_text(redacted)
+    hostname = parsed.hostname or ""
+    if ":" in hostname and not hostname.startswith("["):
+        hostname = f"[{hostname}]"
+    try:
+        port = parsed.port
+    except ValueError:
+        port = None
+    netloc = f"{hostname}:{port}" if port is not None else hostname
     query = "<redacted-query>" if parsed.query else ""
     fragment = "<redacted-fragment>" if parsed.fragment else ""
     path = redact_text(parsed.path) if parsed.path else ""
-    return urlunsplit((parsed.scheme, parsed.netloc, path, query, fragment))
+    return urlunsplit((parsed.scheme, netloc, path, query, fragment))
 
 
 def extract_exit_code(value: object) -> int | None:
@@ -143,7 +170,12 @@ def summarize_tool_input(data: dict[str, Any]) -> dict[str, Any]:
         command = tool_input.get("command")
         if isinstance(command, str):
             summary["command_hash"] = sha256_text(command)
-            summary["command_category"] = command.strip().split(maxsplit=1)[0] if command.strip() else ""
+            first_token = command.strip().split(maxsplit=1)[0] if command.strip() else ""
+            summary["command_category"] = (
+                "<redacted>"
+                if "=" in first_token or SENSITIVE_PATTERN.search(first_token)
+                else redact_text(first_token)
+            )
             if verbose_capture_enabled():
                 summary["command_preview"] = redact_text(command)
         else:
@@ -348,7 +380,7 @@ def run_desktop_notify(
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             check=False,
-            timeout=8,
+            timeout=NOTIFICATION_TIMEOUT_SECONDS,
         )
     except Exception as exc:  # noqa: BLE001 - notification must not block hook recording.
         return {"status": "error", "event": event, "reason": truncate(str(exc), 500)}
@@ -553,6 +585,8 @@ def read_input(args: argparse.Namespace) -> dict[str, Any]:
 def support_level_for(data: dict[str, Any], neutral_event: str) -> str:
     if neutral_event == "permission_requested" and not data.get("tool_use_id"):
         return "approximate"
+    if neutral_event == "context_loaded":
+        return "approximate"
     hook_event = str(data.get("hook_event_name") or "")
     return "native" if hook_event in SUPPORTED_HOOK_EVENTS else "unsupported"
 
@@ -565,7 +599,7 @@ def build_event_payload(
     neutral_event_override: str | None = None,
 ) -> dict[str, Any]:
     hook_event = data.get("hook_event_name", "")
-    neutral_event = neutral_event_override or EVENT_MAP.get(str(hook_event), "turn_finalize")
+    neutral_event = neutral_event_override or EVENT_MAP[str(hook_event)]
     evidence: dict[str, Any] = {
         "session_id": data.get("session_id"),
         "turn_id": data.get("turn_id"),
@@ -682,15 +716,18 @@ def run_agent_output_validation(
     ]
     if candidate_final_event is not None:
         cmd.extend(["--candidate-final-event", json.dumps(candidate_final_event, sort_keys=True)])
-    completed = subprocess.run(
-        cmd,
-        cwd=ROOT,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=False,
-        timeout=20,
-    )
+    try:
+        completed = subprocess.run(
+            cmd,
+            cwd=ROOT,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=AGENT_RUN_TOOL_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        return 4, f"UNVERIFIED: agent output validation timed out after {AGENT_RUN_TOOL_TIMEOUT_SECONDS} seconds."
     output = "\n".join(part for part in [completed.stdout.strip(), completed.stderr.strip()] if part)
     if completed.returncode != 0:
         return completed.returncode, truncate(output, 2000)
@@ -710,15 +747,18 @@ def agent_run_bootstrap_enabled(data: dict[str, Any]) -> bool:
 
 
 def _run_init_agent_run(args: argparse.Namespace, command: list[str]) -> dict[str, Any]:
-    completed = subprocess.run(
-        [sys.executable, str(ROOT / ".codex" / "tools" / "init_agent_run.py"), *command],
-        cwd=ROOT,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=False,
-        timeout=10,
-    )
+    try:
+        completed = subprocess.run(
+            [sys.executable, str(ROOT / ".codex" / "tools" / "init_agent_run.py"), *command],
+            cwd=ROOT,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=AGENT_RUN_TOOL_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        return {"status": "error", "exit_code": 124, "reason": "agent-run bootstrap timed out"}
     output = "\n".join(part for part in [completed.stdout.strip(), completed.stderr.strip()] if part)
     try:
         parsed = json.loads(completed.stdout) if completed.stdout.strip() else {}
@@ -748,7 +788,7 @@ def maybe_bootstrap_agent_run(args: argparse.Namespace, data: dict[str, Any]) ->
         "--turn-id",
         str(data.get("turn_id") or ""),
         "--user-request-summary",
-        truncate(str(summary), 240),
+        truncate(redact_text(str(summary)), 240),
         "--primary-skill",
         str(data.get("primary_skill") or "unknown"),
         "--run-dir",
@@ -947,12 +987,14 @@ def maybe_autosync_kanboard(data: dict[str, Any]) -> dict[str, Any] | None:
 
     Scoped to the current workspace (cwd) only — not every registered board. A
     cwd that is not a registered workspace, or an unreachable Kanboard, degrades
-    to a no-op. Enabled by default; set KANBOARD_PLAN_AUTOSYNC to off/dry-run to
-    disable or soften. Non-blocking.
+    to a no-op. Disabled by default; set KANBOARD_PLAN_AUTOSYNC to dry-run or
+    apply explicitly. Non-blocking.
     """
-    mode = os.environ.get("KANBOARD_PLAN_AUTOSYNC", "apply").strip().lower()
-    if mode in KANBOARD_AUTOSYNC_DISABLED:
+    mode = os.environ.get("KANBOARD_PLAN_AUTOSYNC", "").strip().lower()
+    if not mode or mode in KANBOARD_AUTOSYNC_DISABLED:
         return None
+    if mode not in {"dry-run", "dry_run", "apply"}:
+        return {"status": "skipped", "reason": "invalid KANBOARD_PLAN_AUTOSYNC mode"}
     workspace = os.environ.get("KANBOARD_PLAN_WORKSPACE") or data.get("cwd")
     if not isinstance(workspace, str) or not workspace.strip():
         return None
@@ -1004,6 +1046,22 @@ def active_loop_run_dir(data: dict[str, Any]) -> Path | None:
     if isinstance(session_id, str) and session_id.strip():
         return _session_pointer_loop_dir(session_id)
     return None
+
+
+def active_loop_has_guard_precedence(data: dict[str, Any]) -> bool:
+    """Suppress the soft guard only for a materialized LoopRun, not a stale path hint."""
+
+    loop_dir = active_loop_run_dir(data)
+    if loop_dir is None or not loop_dir.is_dir() or not (loop_dir / "contract.yaml").is_file():
+        return False
+    state_path = loop_dir / "state.yaml"
+    if not state_path.is_file():
+        return False
+    try:
+        state_header = state_path.read_text(encoding="utf-8", errors="replace")[:8192]
+    except OSError:
+        return False
+    return re.search(r"(?m)^status:\s*active\s*$", state_header) is not None
 
 
 TERMINAL_LOOP_ACTIONS = {"success", "blocked", "budget_exhausted", "unsafe", "fatal", "stalled"}
@@ -1061,15 +1119,22 @@ def maybe_evaluate_active_loop(data: dict[str, Any], validation_code: int) -> di
     if loop_continuation_blocking(data):
         cmd.append("--record-stop-continuation")
     cmd += ["--format", "json"]
-    completed = subprocess.run(
-        cmd,
-        cwd=ROOT,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=False,
-        timeout=20,
-    )
+    try:
+        completed = subprocess.run(
+            cmd,
+            cwd=ROOT,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=LOOP_EVALUATION_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        return {
+            "status": "error",
+            "loop_run_dir": str(loop_dir),
+            "reason": f"evaluate_loop_run timed out after {LOOP_EVALUATION_TIMEOUT_SECONDS} seconds",
+        }
     output = "\n".join(part for part in [completed.stdout.strip(), completed.stderr.strip()] if part)
     if completed.returncode != 0:
         return {
@@ -1136,6 +1201,93 @@ def loop_stop_output(loop_evaluation: dict[str, Any], data: dict[str, Any]) -> d
     }
 
 
+def stop_decision_blocks(output: dict[str, Any] | None) -> bool:
+    return isinstance(output, dict) and output.get("decision") == "block"
+
+
+def recovery_guard_mode(data: dict[str, Any]) -> str:
+    environment_value = str(os.environ.get("SKILL_SYSTEM_RECOVERY_GUARD", "")).strip().lower()
+    # The environment-level off switch is an operational kill switch. It wins
+    # over per-event data so a bad rollout can be disabled without depending on
+    # the payload that triggered it.
+    if environment_value in RECOVERY_GUARD_DISABLED:
+        return "off"
+    configured = data.get("skill_system_recovery_guard")
+    if configured is None:
+        configured = environment_value or "observe"
+    value = str(configured).strip().lower()
+    if value in RECOVERY_GUARD_DISABLED:
+        return "off"
+    if value in RECOVERY_GUARD_AUDIT:
+        return "audit"
+    return "observe"
+
+
+def observe_recovery_guard(
+    data: dict[str, Any],
+    *,
+    block_allowed: bool,
+    consume_audit: bool = True,
+) -> dict[str, Any] | None:
+    """Update compact session state; any state failure is observational and fail-open."""
+
+    mode = recovery_guard_mode(data)
+    if mode == "off":
+        return None
+    if not data.get("session_id"):
+        return {"status": "skipped", "mode": mode, "reason": "missing_session_id"}
+    try:
+        from recovery_guard import state_path_for_session, update_state_atomic  # noqa: PLC0415
+
+        thresholds = data.get("skill_system_recovery_guard_thresholds")
+        if not isinstance(thresholds, dict):
+            thresholds = None
+        state, decision = update_state_atomic(
+            state_path_for_session(data["session_id"]),
+            data,
+            thresholds,
+            block_audit=bool(mode == "audit" and block_allowed),
+            consume_audit=consume_audit,
+        )
+    except Exception as exc:  # noqa: BLE001 - recovery observation must never break the host hook.
+        return {
+            "status": "error",
+            "mode": mode,
+            "reason": truncate(redact_text(str(exc)), 500),
+        }
+    action = str(decision.get("action") or "allow")
+    summary: dict[str, Any] = {
+        "status": "ok",
+        "mode": mode,
+        "action": action,
+        "phase": decision.get("phase"),
+        "armed": bool(decision.get("armed")),
+        "arm_reasons": decision.get("arm_reasons", []),
+        "reason_codes": decision.get("reason_codes", []),
+        "episode": decision.get("episode", 0),
+        "would_audit": action == "audit",
+        "did_audit_block": bool(action == "audit" and mode == "audit" and block_allowed),
+        "audit_packet_valid": bool(state.get("audit_packet_valid")),
+        "counters": {
+            "user_turns": state.get("user_turns", 0),
+            "tool_preflights": state.get("tool_events", 0),
+            "permission_requests": state.get("permission_requests", 0),
+            "correction_episodes": state.get("correction_episodes", 0),
+            "stop_events": state.get("stop_events", 0),
+            "audit_blocks": state.get("audit_blocks", 0),
+        },
+    }
+    if action == "audit" and not summary["did_audit_block"]:
+        if mode != "audit":
+            summary["suppressed_by"] = "observe_mode"
+        elif not block_allowed:
+            summary["suppressed_by"] = "higher_precedence_or_holdout"
+    if action == "duplicate":
+        summary["replayed_action"] = decision.get("replayed_action")
+        summary["replayed_blocked"] = bool(decision.get("replayed_blocked"))
+    return summary
+
+
 def handle(args: argparse.Namespace) -> int:
     try:
         data = read_input(args)
@@ -1143,17 +1295,110 @@ def handle(args: argparse.Namespace) -> int:
         print(f"hook input error: {exc}", file=sys.stderr)
         return 2
     hook_event = str(data.get("hook_event_name") or "")
+    if hook_event not in SUPPORTED_HOOK_EVENTS:
+        print(f"hook input error: unsupported hook_event_name {hook_event!r}", file=sys.stderr)
+        return 2
     if hook_event == "Stop":
+        run_dir = current_run_dir(args, data)
+        if args.ledger is None and run_dir is not None and run_dir_has_passing_turn_finalize(run_dir):
+            print(json.dumps({
+                "continue": True,
+                "systemMessage": "Agent output evidence is already finalized for this session and turn.",
+            }, sort_keys=True))
+            return 0
+        active_loop_before_guard = active_loop_has_guard_precedence(data)
+        recovery_holdout_arm = _holdout_arm(str(data.get("session_id") or "")) if measurement_enabled(data) else ""
+        recovery_block_allowed = not active_loop_before_guard and not (
+            measurement_enabled(data) and recovery_holdout_arm == "off"
+        )
+        recovery_guard = observe_recovery_guard(
+            data,
+            block_allowed=recovery_block_allowed,
+            consume_audit=not active_loop_before_guard,
+        )
+        if recovery_guard is not None and recovery_guard.get("would_audit") and not recovery_guard.get("did_audit_block"):
+            if active_loop_before_guard:
+                recovery_guard["suppressed_by"] = "active_loop"
+            elif measurement_enabled(data) and recovery_holdout_arm == "off":
+                recovery_guard["suppressed_by"] = "measurement_holdout"
+        recovery_extra: dict[str, Any] = {}
+        if recovery_guard is not None:
+            recovery_extra["recovery_guard"] = recovery_guard
+            if measurement_enabled(data):
+                recovery_extra.update({
+                    "holdout_arm": recovery_holdout_arm,
+                    "recovery_would_audit": bool(recovery_guard.get("would_audit")),
+                    "recovery_did_block": bool(recovery_guard.get("did_audit_block")),
+                })
+        if recovery_guard is not None and recovery_guard.get("did_audit_block"):
+            recovery_extra["recovery_audit_instruction_chars"] = len(RECOVERY_AUDIT_TEMPLATE)
+            record_event(args, data, "warn", recovery_extra, "turn_finalize_attempt")
+            print(json.dumps({
+                "decision": "block",
+                "reason": RECOVERY_AUDIT_TEMPLATE,
+            }, sort_keys=True))
+            return 0
+        if (
+            recovery_guard is not None
+            and recovery_guard.get("action") == "duplicate"
+            and recovery_guard.get("replayed_action") == "audit"
+            and recovery_guard.get("replayed_blocked")
+        ):
+            print(json.dumps({
+                "decision": "block",
+                "reason": RECOVERY_AUDIT_TEMPLATE,
+            }, sort_keys=True))
+            return 0
+        if (
+            recovery_guard is not None
+            and recovery_guard.get("action") == "duplicate"
+            and recovery_guard.get("replayed_action") == "handoff"
+        ):
+            print(json.dumps({
+                "continue": True,
+                "systemMessage": "Duplicate recovery handoff ignored; the existing awaiting-user state is unchanged.",
+            }, sort_keys=True))
+            return 0
+        if (
+            recovery_guard is not None
+            and recovery_guard.get("action") == "handoff"
+        ):
+            record_event(args, data, "warn", recovery_extra, "turn_finalize_attempt")
+            print(json.dumps({
+                "continue": True,
+                "systemMessage": "Recovery audit handed to the user; wait for the next user instruction before resuming work.",
+            }, sort_keys=True))
+            return 0
         agent_run_finalize = maybe_finalize_agent_run(args, data)
         validation_code, validation_output = run_agent_output_validation(args, data, "pre-finalize")
-        status = validation_status(validation_code, validation_output)
-        attempt_extra: dict[str, Any] = {"agent_output_validation": validation_output}
+        finalize_extra: dict[str, Any] = {
+            "agent_output_validation": validation_output,
+            **recovery_extra,
+        }
         if agent_run_finalize is not None:
-            attempt_extra["agent_run_finalize"] = agent_run_finalize
-        record_event(args, data, status, attempt_extra, "turn_finalize_attempt")
-        finalize_extra: dict[str, Any] = dict(attempt_extra)
-        if validation_code == 0 and not validation_skipped(validation_output):
-            run_dir = current_run_dir(args, data)
+            finalize_extra["agent_run_finalize"] = agent_run_finalize
+        loop_evaluation = maybe_evaluate_active_loop(data, validation_code)
+        loop_context: dict[str, Any] | None = None
+        if loop_evaluation is not None:
+            finalize_extra["loop_evaluation"] = loop_evaluation
+            loop_decision = loop_evaluation.get("decision") if isinstance(loop_evaluation.get("decision"), dict) else {}
+            loop_context = {
+                "loop_run_id": loop_evaluation.get("loop_run_id"),
+                "action": loop_decision.get("action"),
+                "reason_code": loop_decision.get("reason_code"),
+            }
+            if loop_decision.get("action") in TERMINAL_LOOP_ACTIONS:
+                deactivated = _deactivate_session_pointer(
+                    str(data.get("session_id") or ""),
+                    loop_evaluation.get("loop_run_dir"),
+                    str(loop_decision.get("action")),
+                )
+                if deactivated is not None:
+                    finalize_extra["loop_pointer_deactivated"] = deactivated
+        output = loop_stop_output(loop_evaluation, data) if loop_evaluation is not None else None
+        output = output or stop_output(data, validation_code, validation_output)
+        blocked = stop_decision_blocks(output)
+        if validation_code == 0 and not validation_skipped(validation_output) and not blocked:
             final_candidate = (
                 None
                 if run_dir is not None and run_dir_has_passing_turn_finalize(run_dir)
@@ -1169,6 +1414,9 @@ def handle(args: argparse.Namespace) -> int:
                 validation_code = post_code
                 validation_output = post_output
                 finalize_extra["agent_output_validation"] = validation_output
+                if loop_evaluation is None:
+                    output = stop_output(data, validation_code, validation_output)
+                    blocked = stop_decision_blocks(output)
         if measurement_enabled(data):
             # Tagged after post-finalize re-validation so would_fire/did_block match
             # the final block decision in stop_output (not the pre-finalize state).
@@ -1181,35 +1429,16 @@ def handle(args: argparse.Namespace) -> int:
             finalize_extra["holdout_arm"] = arm
             finalize_extra["would_fire"] = bool(would_fire)
             finalize_extra["did_block"] = bool(would_fire and arm == "on")
-        loop_evaluation = maybe_evaluate_active_loop(data, validation_code)
-        loop_context: dict[str, Any] | None = None
-        if loop_evaluation is not None:
-            finalize_extra["loop_evaluation"] = loop_evaluation
-            _decision = loop_evaluation.get("decision") if isinstance(loop_evaluation.get("decision"), dict) else {}
-            loop_context = {
-                "loop_run_id": loop_evaluation.get("loop_run_id"),
-                "action": _decision.get("action"),
-                "reason_code": _decision.get("reason_code"),
-            }
-            if _decision.get("action") in TERMINAL_LOOP_ACTIONS:
-                deactivated = _deactivate_session_pointer(
-                    str(data.get("session_id") or ""),
-                    loop_evaluation.get("loop_run_dir"),
-                    str(_decision.get("action")),
-                )
-                if deactivated is not None:
-                    finalize_extra["loop_pointer_deactivated"] = deactivated
-        kanboard_post_session = maybe_record_kanboard_post_session(data, validation_code, loop_context)
+        kanboard_post_session = (
+            None if blocked else maybe_record_kanboard_post_session(data, validation_code, loop_context)
+        )
         if kanboard_post_session is not None:
             finalize_extra["kanboard_post_session"] = kanboard_post_session
         notifications: dict[str, Any] = {}
         if loop_evaluation is not None:
             # Loop turns notify per iteration (its decision already conveys success/continue/recover).
             notifications["loop_iteration"] = notify_loop_iteration(data, loop_evaluation)
-        else:
-            # Ordinary non-loop Stop completion. Send the finish cue even when
-            # validation is unverified/failed; attention alerts are added below.
-            label = notify_label(data)
+        elif not blocked:
             notifications["turn_complete"] = run_desktop_notify(
                 data,
                 event="turn-complete",
@@ -1236,29 +1465,36 @@ def handle(args: argparse.Namespace) -> int:
             )
         if notifications:
             finalize_extra["desktop_notifications"] = notifications
-        if validation_code == 0:
+        if validation_code == 0 and not validation_skipped(validation_output) and not blocked:
+            record_event(
+                args,
+                data,
+                "pass",
+                finalize_extra,
+                "turn_finalize",
+            )
+        else:
             record_event(
                 args,
                 data,
                 validation_status(validation_code, validation_output),
                 finalize_extra,
-                "turn_finalize",
+                "turn_finalize_attempt",
             )
-        elif kanboard_post_session is not None or notifications:
-            status = "warn" if validation_code == 4 else "fail"
-            record_event(args, data, status, finalize_extra, "turn_finalize_attempt")
-        output = loop_stop_output(loop_evaluation, data) if loop_evaluation is not None else None
-        print(json.dumps(output or stop_output(data, validation_code, validation_output), sort_keys=True))
+        print(json.dumps(output, sort_keys=True))
         return 0
+    recovery_guard = observe_recovery_guard(data, block_allowed=False)
     extra = maybe_bootstrap_agent_run(args, data)
-    extra = {"agent_run_bootstrap": extra} if extra is not None else None
+    extra = {"agent_run_bootstrap": extra} if extra is not None else {}
+    if recovery_guard is not None:
+        extra["recovery_guard"] = recovery_guard
     if hook_event == "PermissionRequest":
-        extra = {**(extra or {}), "desktop_notification": notify_permission_request(data)}
+        extra = {**extra, "desktop_notification": notify_permission_request(data)}
     elif hook_event == "SessionStart":
         autosync = maybe_autosync_kanboard(data)
         if autosync is not None:
-            extra = {**(extra or {}), "kanboard_autosync": autosync}
-    record_event(args, data, classify_status(data), extra)
+            extra = {**extra, "kanboard_autosync": autosync}
+    record_event(args, data, classify_status(data), extra or None)
     return 0
 
 

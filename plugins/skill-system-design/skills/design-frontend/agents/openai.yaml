@@ -1,7 +1,7 @@
 interface:
   display_name: "Design Frontend"
   short_description: "Implement design artifacts as production UI source code"
-  default_prompt: "Use $design-frontend to implement the supplied design artifact as real source code in this repository, reuse existing project patterns, integrate it into the correct screen/route/component/view, and validate visually when possible."
+  default_prompt: "Use $design-frontend to implement the supplied design artifact as real source code in this repository. Select only the matching mobile, dashboard, section-web, or general profile; reuse project patterns and validate visually when possible."
 
 policy:
   allow_implicit_invocation: false

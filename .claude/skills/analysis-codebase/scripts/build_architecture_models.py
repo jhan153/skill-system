@@ -1381,7 +1381,7 @@ def build_static_scenarios(
                 "title": str(entrypoint.get("label") or entrypoint.get("symbol") or component_nodes[start_component]["label"]),
                 "entrypoint_id": entrypoint.get("id"),
                 "source": "static-entrypoint",
-                "fallback": False,
+                "fallback": True,
                 "participants": list(dict.fromkeys(participants)),
                 "steps": steps,
                 "evidence_refs": sorted({ref for ref in evidence_refs if ref}),
@@ -1967,16 +1967,18 @@ def main() -> int:
     scenarios = dedupe_scenarios(scenarios, max_scenarios=max_scenarios)
 
     decision_candidates = []
-    if len(container_nodes) > 1:
+    if container_relations:
         decision_candidates.append(
             {
                 "title": "컨테이너 간 계약 명시",
                 "type": "boundary",
-                "confidence": 0.82,
-                "summary": "복수 컨테이너가 관찰되어 통신 계약과 책임 경계를 명시할 필요가 있습니다.",
+                "status": "verification-needed",
+                "evidence_basis": "static-relation",
+                "confidence": 0.62,
+                "summary": "컨테이너 간 정적 의존이 관찰되었습니다. 실제 통신 방식과 책임 경계는 trace 또는 계약 테스트로 확인해야 합니다.",
+                "verification": "대표 경계 호출을 trace하거나 계약 테스트로 입력, 출력, 오류, 부작용을 확인",
                 "evidence_refs": sorted(
                     {ref for rel in container_relations for ref in rel.get("evidence_refs", [])}
-                    or {ref for node in container_nodes.values() for ref in node.get("evidence_refs", [])}
                 )[:12],
             }
         )
@@ -1985,8 +1987,11 @@ def main() -> int:
             {
                 "title": "데이터/메시징 경계 소유권 정리",
                 "type": "data-boundary",
-                "confidence": 0.78,
-                "summary": "데이터 저장소나 메시징 인터페이스가 관찰되어 소유권과 일관성 전략이 필요합니다.",
+                "status": "verification-needed",
+                "evidence_basis": "static-signal",
+                "confidence": 0.58,
+                "summary": "데이터 저장소나 메시징 사용 신호가 관찰되었습니다. 소유권, 일관성, 실패 동작은 실행 증거로 확인해야 합니다.",
+                "verification": "대표 쓰기/실패 시나리오에서 상태 전이, 재시도, 중복, 롤백 동작을 확인",
                 "evidence_refs": sorted({ref for item in interface_items if item.get("kind") in {"database", "cache", "messaging"} for ref in item.get("evidence_refs", [])})[:12],
             }
         )
@@ -1995,30 +2000,29 @@ def main() -> int:
             {
                 "title": "배포 단위와 런타임 책임 명시",
                 "type": "deployment",
-                "confidence": 0.84,
-                "summary": "배포 관련 파일이 관찰되어 실행 단위와 운영 경계를 문서화할 필요가 있습니다.",
+                "status": "verification-needed",
+                "evidence_basis": "static-config",
+                "confidence": 0.64,
+                "summary": "배포 관련 파일이 관찰되었습니다. 실제 실행 단위, 환경, 운영 책임은 배포 상태나 런타임 증거로 확인해야 합니다.",
+                "verification": "배포 manifest와 실제 런타임/환경 상태를 대조",
                 "evidence_refs": sorted({ref for node in deployment_nodes for ref in node.get("evidence_refs", [])})[:12],
             }
         )
-    language_count = Counter(node["ext"] for node in file_records.values())
-    if len(language_count) > 1:
-        decision_candidates.append(
-            {
-                "title": "다중 언어 경계 계약 표준화",
-                "type": "runtime-contract",
-                "confidence": 0.74,
-                "summary": "여러 언어/런타임이 동시에 존재해 인터페이스 계약과 관측성을 표준화할 필요가 있습니다.",
-                "evidence_refs": sorted(file_records)[:12],
-            }
-        )
-    top_coupled_components = sorted(sorted_components, key=lambda item: safe_int(item["coupling_score"]), reverse=True)[:3]
+    top_coupled_components = [
+        item
+        for item in sorted(sorted_components, key=lambda item: safe_int(item["coupling_score"]), reverse=True)
+        if safe_int(item.get("coupling_score"), 0) > 0
+    ][:3]
     if top_coupled_components:
         decision_candidates.append(
             {
                 "title": "고결합 컴포넌트 경계 분해",
                 "type": "maintainability",
-                "confidence": 0.71,
-                "summary": "상위 컴포넌트의 결합도가 높아 책임 분리 또는 인터페이스 역전이 필요할 수 있습니다.",
+                "status": "verification-needed",
+                "evidence_basis": "static-metric",
+                "confidence": 0.55,
+                "summary": "정적 결합도 상위 컴포넌트입니다. 변경 전파와 caller 지식이 실제 문제인지 확인한 뒤 경계 변경 여부를 결정해야 합니다.",
+                "verification": "대표 변경/호출 경로와 관련 테스트를 확인해 결합도 수치가 실제 변경 마찰을 나타내는지 검증",
                 "evidence_refs": sorted({ref for node in top_coupled_components for ref in node.get("evidence_refs", [])})[:12],
             }
         )
@@ -2125,12 +2129,21 @@ def main() -> int:
         ],
     }
 
+    trace_backed_count = len([item for item in scenarios if item.get("source") == "trace"])
+    fallback_static_count = len([item for item in scenarios if item.get("fallback")])
+    if not scenarios:
+        scenario_status = "Unverified"
+    elif trace_backed_count == len(scenarios):
+        scenario_status = "ok"
+    else:
+        scenario_status = "verification-needed"
+
     scenario_payload = {
-        "status": "ok" if scenarios else "Unverified",
+        "status": scenario_status,
         "summary": {
             "scenarios": len(scenarios),
-            "trace_backed": len([item for item in scenarios if item.get("source") == "trace"]),
-            "fallback_static": len([item for item in scenarios if item.get("fallback")]),
+            "trace_backed": trace_backed_count,
+            "fallback_static": fallback_static_count,
         },
         "scenarios": scenarios,
         "provenance": [

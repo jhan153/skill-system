@@ -1,0 +1,12 @@
+`CORPUS.md`에서 가장 근거가 강한 후속 후보는 “entity-description length가 query expansion의 recall–precision 효과를 조절한다”는 가설입니다.
+
+| 순위 | 후보 가설 | 근거 및 구분 | 예측 / 반증 조건 |
+|---|---|---|---|
+| 1 | **설명 길이 조절 효과**: 긴 entity description은 구체적인 확장어를 제공하지만, 짧은 description은 모호한 확장어를 만들어 precision을 낮춥니다. | [paper] Study D는 20 tokens 초과에서만 recall 향상, 짧은 설명에서 precision −2점을 보고했습니다. [paper] Study A의 집계 효과는 recall +6.1, precision −0.4점입니다. **관찰된 boundary-condition gap**입니다. ([CORPUS.md:5](/private/tmp/skill-system-solar-910-20260710/research/CORPUS.md:5), [CORPUS.md:8](/private/tmp/skill-system-solar-910-20260710/research/CORPUS.md:8)) | 설명 길이가 증가할수록 recall 이득과 precision 보존이 개선되어야 합니다. 길이와 효과 간 상호작용이 없으면 반증됩니다. |
+| 2 | **benchmark 구성 효과**: 보고된 평균 이득은 benchmark 내 장문-description entity 비율에 의해 좌우됩니다. | [dataset] A와 C는 같은 benchmark를 사용하며 독립성이 불분명합니다. [paper] D는 다른 domain에서 조건부 효과를 보고했습니다. [assumption] benchmark별 설명 길이 분포가 다릅니다. **관찰된 일반화·독립성 gap + 추정 메커니즘**입니다. ([CORPUS.md:7](/private/tmp/skill-system-solar-910-20260710/research/CORPUS.md:7), [CORPUS.md:8](/private/tmp/skill-system-solar-910-20260710/research/CORPUS.md:8)) | 장문-description 비율이 높은 benchmark일수록 평균 recall 이득이 커져야 합니다. 구성 차이를 고려한 뒤에도 효과가 동일하면 반증됩니다. |
+| 3 | **expansion-policy 조절 효과**: Study A와 B의 불일치는 expansion policy의 구체성 또는 보수성 차이에서 발생합니다. | [paper] A는 개선, B는 개선 없음으로 결과가 충돌합니다. [paper] B에는 policy·dataset·seed 정보가 없습니다. [assumption] policy 차이가 실제로 존재합니다. **관찰된 결과 충돌이지만 메커니즘은 speculative opportunity**입니다. ([CORPUS.md:5](/private/tmp/skill-system-solar-910-20260710/research/CORPUS.md:5), [CORPUS.md:6](/private/tmp/skill-system-solar-910-20260710/research/CORPUS.md:6)) | 구체성이 높은 policy에서만 rare-entity recall이 개선되어야 합니다. policy와 무관하게 효과가 같으면 반증됩니다. |
+| 4 | **언어별 효과 이질성**: 형태론적 특성이나 entity-description 관행에 따라 recall–precision trade-off가 달라집니다. | [paper] A는 한 언어만 다룹니다. [assumption] 언어적 특성이 expansion 품질에 영향을 줍니다. 이는 **coverage gap**이며 field-wide novelty 근거는 아닙니다. ([CORPUS.md:5](/private/tmp/skill-system-solar-910-20260710/research/CORPUS.md:5)) | 효과 크기나 precision 손실이 언어 특성에 따라 달라져야 합니다. 언어 간 효과가 안정적이면 반증됩니다. |
+
+순위는 근거의 직접성, 조절변수의 식별 가능성, 정보 획득 가치, 불확실성 위험을 기준으로 했습니다. 특히 Study B의 상세 방법, A/C 결과의 독립성, benchmark별 description-length 분포가 부족합니다. 체계적 문헌 검색이 없으므로 어떤 후보도 신규성으로 주장할 수 없으며, 요청대로 active hypothesis는 선택하지 않았습니다.
+
+결과 상태: `agent-verified` — 후보와 구분은 제공된 corpus에만 근거합니다.

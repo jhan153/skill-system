@@ -10,238 +10,98 @@ description: Mode-based execution control for evidence-first implementation, sco
 - intent_signature:
   - `strict-evidence`, `strict-reporting`, `execution-strict`, `evidence-workflow`, `실행통제`
 - use_when:
-  - implementation, refactor, behavior-changing docs/config updates, or medium/high-risk changes need stronger evidence and validation discipline.
-  - destructive, auth/security, schema/data, infra, external-side-effect, or cross-module changes are in scope.
+  - implementation, refactor, behavior-changing config/docs, or medium/high-risk changes need stronger proof and checker separation.
+  - destructive, auth/security, schema/data, infra, external-side-effect, or cross-module work is in scope.
 - do_not_use_when:
-  - pure Q&A, brainstorming, small harmless edits, or formal output formatting without execution risk.
+  - pure Q&A, brainstorming, harmless edits, or output formatting without execution risk.
+  - the primary workflow already provides equivalent risk-specific gates and the user did not request extra rigor.
 - expected_inputs:
   - selected primary workflow
-  - change scope and risk boundary
-  - validation contract or command purpose
+  - change scope, consequence/coupling risk, and intended success signal
+  - available validation and review surfaces
 - expected_outputs:
-  - selected rigor mode, evidence, changed files, split validation, review status, remaining uncertainty
+  - selected mode and risk basis
+  - decisive evidence, split validation, required review, and remaining uncertainty
 - context_targets:
   must_read:
-    - current request and selected primary skill output
-    - changed files or planned write scope when implementation is active
+    - current request and primary workflow scope
+    - planned or actual changed files when implementation is active
   read_if_needed:
-    - repo validation contract
-    - risk-specific policy or module docs
-    - failing output for recovery
+    - risk-specific policy, validation contract, or failing output
   do_not_load_by_default:
-    - full repo
-    - full memory bank
-    - unrelated plans or reports
+    - full repo, full memory bank, unrelated plans, reports, or generic policy copies
 - risk_profile:
   reads:
     - targeted evidence for the selected mode
   writes:
-    - WRITE_CODEBASE only after scope and validation context are clear
+    - none directly; the primary workflow owns mutation
   tools:
-    - CALL_PROCESS for targeted checks only
+    - targeted checks and read-only review tied to material risk
   sensitive_resources:
-    - credentials default deny; network and destructive actions require explicit boundary review
+    - credentials default deny; runtime policy owns approvals and side-effect permission
 - entry_scene:
   - PREPARE
 
-## Related Skills
-- `report-qualitative`: owns concise user-facing response structure.
-- `analysis-router`: owns repro and root-cause analysis when the failure mode is unclear or recurring.
-- `plan-short-term-docs`: owns docs/plan synchronization and plan-state tracking when a planning conversation is active.
-- `report-critical`: can serve as an optional QA gate for medium/high-risk plans or outputs.
+## Modifier Contract
+- Attach rigor requirements to the primary workflow; do not re-plan or reimplement its task.
+- Runtime approval, sandbox, network, and protected-path policy remain authoritative. This skill controls proof depth, checker separation, and completion claims only.
+- Select mode from consequence, coupling, reversibility, and verification difficulty—not file count or task duration.
+- Add only checks that can expose a realistic failure mode. Equivalent gates already supplied by a specialist are reused, not duplicated.
 
-## Purpose
-- This skill is a thin execution-control and reporting layer for implementation work.
-- It strengthens evidence, validation, review, and blocked reporting without duplicating runtime approval policy.
-- It is most useful for medium/high-risk changes, not every trivial edit.
+## Modes
 
-## Hard Controls vs Soft Rules
-- Hard controls belong to system/runtime policy: approval policy, sandbox mode, network access, protected paths, and destructive-action permissions.
-- Soft rules belong to this skill: mode selection, evidence quality, validation split, review expectations, and blocked reporting.
-- Never invent approval phrase whitelists when runtime policy already governs mutation.
+| mode | choose when | added gate |
+| --- | --- | --- |
+| `lite` | local, reversible, low-coupling change with an observable success signal | focused check; diff review only if uncertainty remains |
+| `standard` | meaningful behavior change, moderate coupling, or non-trivial regression surface | explicit regression check plus self-review or independent review |
+| `strict` | destructive work, auth/security, schema/data migration, infra, external writes, broad refactor, or explicit highest rigor | independent read-only review when available, plus rollback/readback evidence where relevant |
 
-## When To Apply
-- Bug fixes, refactors, feature work, and behavior-changing docs/config updates.
-- Especially useful for destructive changes, auth/security, infra, schema/data changes, external side effects, or cross-module edits.
-- Skip for information-only requests, pure brainstorming, or trivial wording-only edits unless the user explicitly asks for strict execution discipline.
+Escalate when new evidence widens consequence or coupling. De-escalate when discovery proves the risk local; do not keep `strict` merely because the work is large.
 
-## Trigger Shortcuts
-- `strict-evidence`
-- `strict-reporting`
-- `execution-strict`
-- `evidence-workflow`
-- `실행통제`
+## Checkpoints
+At the primary workflow's existing checkpoints, attach only these decisions:
 
-## Trigger Guard (Do Not Trigger)
-- Information-only Q&A with no requested implementation.
-- High-level brainstorming with no decision to execute.
-- Pure rewrite/polish tasks with no behavior change.
-- Small harmless edits where the extra workflow would add more cost than risk reduction.
+1. `prepare`: select mode, name material risks, define observable success and required evidence.
+2. `before side effect`: identify the applicable runtime approval and the rollback/readback signal; do not invent a parallel approval policy.
+3. `validate`: run the narrow behavior check and the smallest risk-specific regression check.
+4. `review`: perform the mode's required review against the diff and observed results; the implementation owner resolves or explicitly carries findings.
+5. `finalize`: compare every completion claim with decisive evidence and report remaining uncertainty.
 
-## Activation Rules
-- Activate directly when the skill is explicitly requested.
-- Activate for medium/high-risk implementation tasks where stronger evidence and validation discipline are warranted.
-- Do not auto-activate from vague keywords alone such as `탐색해` or `제대로`.
-- If the task is low-risk, prefer `lite` mode or stay inactive unless explicitly requested.
+For `strict`, use an independent read-only reviewer when available and genuinely useful. The implementation owner retains integration and does not leak its expected verdict into the review prompt.
 
-## Rule Priority
-1. Higher-level system/project/runtime safety policy
-2. `analysis-router` analysis procedure when active
-3. This skill's mode, evidence, validation, and review contracts
-4. `report-qualitative` user-facing response schema when active
+## Evidence Gate
+- Accept observed diffs, command results, validator/verifier output, rendered behavior, or connector readback.
+- Prefer a few decisive proofs over transcripts; name the surface each check covers.
+- Separate `validation_agent` (actually observed) from `validation_user` (manual/runtime work still needed, or `N/A` with reason).
+- A pass cannot override a conflicting diff, failed check, missing artifact, stale result, or uncovered required condition.
+- GUI, credentialed, private-service, or unavailable-environment checks remain `user-verification-needed` or `unverified` until observed.
+- Mark accepted risk only with approver, reason, affected condition, and revisit point.
 
-## Cross-Skill Resolution
-- `analysis-router` decides repro and root cause.
-- `plan-short-term-docs` decides plan artifact location, synchronization, and plan-state sections when planning is active.
-- This skill decides execution rigor, evidence requirements, and completion gates.
-- `report-critical` may run as an optional QA gate after planning or implementation when the user requests review.
-- `report-qualitative` decides how the final answer is presented to the user.
-- If all three are active, use this order: DAW analysis -> evidence-driven execution -> SRQ final presentation.
+## Escalation and Stop
+- If the same stable failure survives an intervention, hand the failing slice to `workflow-recovery`; do not stack speculative patches.
+- Stop when the next required proof needs missing access, approval, external state, or user-only observation.
+- When blocked, return the exact blocked condition, up to three attempted steps, and one next action.
+- Never downgrade contradictory or missing evidence to completion because a lower-scope check passed.
 
-## Default Flow
-1. Select mode from actual risk and scope.
-2. Gather only the evidence needed to justify the change.
-3. Check runtime approval/sandbox requirements before mutating.
-4. Implement with scope discipline.
-5. Run split validation.
-6. Perform a review pass when the selected mode requires it.
-7. Report only the required fields with explicit `Unverified` markers where needed.
+## Output Contract
+Return fields, not a second workflow narrative:
 
-## Mode Selection
-### Lite
-- Use for local low-risk edits, usually within 1-3 files, with no destructive action, no external side effect, and low regression surface.
-- Required fields: `mode`, `scope`, `changed_files`, `risks`, `evidence`, `validation_agent`, `validation_user`.
-- Review pass is optional unless regression risk remains unclear.
+- all modes: `mode`, `risk_basis`, `scope`, `changed_files`, `decisive_evidence`, `validation_agent`, `validation_user`
+- `standard` and `strict`: `review_pass`
+- `strict` when relevant: `rollback_or_readback`, `remaining_uncertainty`
+- blocked only: `blocked_condition`, `attempted_steps`, `next_action`
 
-### Standard
-- Use for normal implementation work with moderate coupling or meaningful regression risk.
-- Required fields: `mode`, `scope`, `changed_files`, `risks`, `evidence`, `validation_agent`, `validation_user`, `review_pass`.
-- Use when behavior changes span multiple modules or require non-trivial verification.
+Omit empty optional fields. A separately requested report skill may shape presentation without changing these evidence requirements.
 
-### Strict
-- Use for destructive changes, schema/data migration, auth/security, infra, external side effects, multi-package refactors, or when the user explicitly asks for highest rigor.
-- Required fields: `mode`, `scope`, `changed_files`, `risks`, `evidence`, `validation_agent`, `validation_user`, `review_pass`, `remaining_uncertainty`.
-- Prefer read-only parallel exploration/review/test-design agents when subagents are available; final writes stay with the main agent.
+## Context Boundary
+- Read only changed/implicated code, the applicable validation contract, and risk-specific policy.
+- If evidence is insufficient, expand one layer to the nearby module rule, source outline, or failing output; never load all repo docs, memory, or skills as recovery.
+- This modifier cannot grant permission, create missing evidence, replace a specialist verifier, or prove behavior outside observed checks.
 
-## Collaboration Rules
-- Parallel exploration, risk review, and test-design work may be delegated when tooling supports subagents.
-- Read-only sidecar agents are preferred for `strict` mode; the main agent owns final file edits, integration, and the closing report.
-- Subagents must not revert or overwrite another agent's work.
-- If subagents are unavailable, keep the same separation conceptually rather than faking collaboration.
-
-## Planning Contract
-- Plan depth must match the selected mode.
-- Include changed files or modules, core change intent, key risks, and validation strategy for non-trivial work.
-- If `plan-short-term-docs` is active, do not override its file location or plan-state sections; add only the evidence and validation depth required by the selected mode.
-- Use a Mermaid diagram only when runtime interaction, control flow, concurrency, component boundary, class design, or data model structure is materially relevant, or when the user explicitly asks for one.
-- Plan lifecycle, approval flow, and agent workflow are not default plan diagrams; a requested workflow diagram must be scoped explicitly as an artifact about agent process, not silently inserted into implementation plans.
-- Do not force `sequenceDiagram` for every plan.
-
-## Evidence Contract
-- For exploration, cite the decisive file paths and line numbers.
-- For changes, cite the decisive diff, snippet, or command output that supports the claim.
-- Prefer a few high-signal proofs over exhaustive transcripts.
-- Mark missing or incomplete proof as `Unverified`.
-- Completion rests on observed evidence — command exit code, validator/verifier result, the applied diff, rendered/observed output, or connector readback — not on the assistant's claim that the work succeeded. A result labeled `agent-verified` whose observed evidence contradicts it (nonzero exit, failed check, missing evidence file) is not complete. (Runtime enforcement is the Codex Stop-hook strict agent-output gate; this contract is the source of its expectations.)
-
-## Validation Contract
-- Always split validation into two tracks:
-  - `validation_agent`: checks the agent actually executed
-  - `validation_user`: runtime/manual checks still needed from the user, or `N/A` with reason
-- Never treat assumptions as a passed validation result.
-- If GUI, credentials, or environment limits block a check, mark that item `Unverified`.
-
-## Implementation Completion Gate
-- For implementation, bug fix, refactor, UI implementation, or test repair requests, completion requires at least one non-documentation implementation artifact:
-  - source code diff
-  - test diff
-  - runtime config or build diff directly required for behavior
-  - generated executable scaffold or entry point
-- Markdown-only, plan-only, spec-only, report-only, memory-only, or planning-manifest-only diffs do not satisfy implementation completion unless the user explicitly requested documentation/spec work only.
-- Active plans are task input and optional status trackers; they are not implementation output.
-- If target source files, test locations, or validation commands cannot be identified, continue targeted discovery first.
-- If no non-documentation implementation diff is possible after targeted discovery, report `blocked` or analysis-only with the exact blocker and next action.
-
-## Review Contract
-- `standard` and `strict` mode require a self-review or review pass before completion whenever feasible.
-- Review should focus on regression risk, behavior drift, missing tests, data-loss/security exposure, and scope creep.
-- If a review pass was not feasible, mark it `Unverified` and explain why.
-
-## Approval and Permission Rules
-- Runtime approval policy and sandbox policy are the source of truth for whether a mutating action can run.
-- Before approval, read/search, repro definition, static checks, dry runs, and non-mutating observations are allowed unless runtime policy says otherwise.
-- Do not hardcode approval phrases as the policy.
-- For destructive or high-side-effect actions, surface the risk and ask once if user intent is still ambiguous.
-
-## Resource and Risk Boundary
-- Reads: targeted code, docs, logs, diffs, and validation contracts tied to the active change.
-- Writes: only the requested scope; READ-only analysis does not imply WRITE permission.
-- Tool/process calls: require a clear purpose, non-destructive check, and validation relevance.
-- Network access: require data boundary awareness and explicit need.
-- Credential access: default deny.
-- Generated artifacts: only requested implementation/report artifacts and validation outputs.
-- Destructive actions: require explicit user intent and runtime approval policy.
-- Required checkpoints: before WRITE, DELETE, CALL_PROCESS, NETWORK, CREDENTIALS, GIT_PUSH, or broad report generation.
-
-## Recovery and Context Expansion
-- If repo structure is unclear, read repo source outline first.
-- If test command is unclear, read repo validation contract.
-- If architecture boundary is unclear, read architecture rules or nearby module docs.
-- If user goal is unclear, state the assumption rather than loading unrelated context.
-- If verification fails, read the failing output and changed hunk before expanding wider.
-- If execution rigor is not the right concern, return to scheduling and use a primary or output skill instead.
-- Never recover by loading all memory, all repo docs, or all skills at once.
-
-## Reporting Fields
-- Treat these as required fields, not a rigid template.
-- Use concise prose or bullets as appropriate, but ensure the selected mode's fields are present.
-- Core fields:
-  - `mode`
-  - `scope`
-  - `changed_files`
-  - `risks`
-  - `evidence`
-  - `validation_agent`
-  - `validation_user`
-- Additional required fields:
-  - `review_pass` for `standard` and `strict`
-  - `remaining_uncertainty` for `strict`
-- Optional when applicable:
-  - `blocked_reason`
-  - `next_action`
-
-## Completion Criteria
-- Do not report completion unless the selected mode's required fields are present.
-- For implementation-class requests, do not report completion unless the Implementation Completion Gate is satisfied or the result is explicitly reported as `blocked`/analysis-only.
-- A passed test alone is insufficient.
-- If required proof or validation is missing, keep the gap explicit as `Unverified`, or report `blocked` when the next step is external.
-- A blocking issue may be closed as `accepted_risk` only with explicit user or project-policy approval, a stated reason, and a review/revisit point; otherwise it stays `blocked` or `Unverified`. Never silently downgrade a blocker to completion.
-
-## Blocked Report Contract
-- When blocked, report only:
-  - `exact_blocked_point`
-  - `attempted_steps` (max 3)
-  - `blocked_reason`
-  - `next_action`
-- Keep the next action singular and concrete.
-
-## Repeated Failure Control
-- If the same symptom repeats twice:
-  1. Stop branching the solution space.
-  2. Reduce scope and simplify the logic path.
-  3. Change one suspected cause at a time.
-  4. Record what was disproven before trying the next cause.
-
-## Prohibited
-- Fabricated facts, logs, outputs, system state, or completion claims
-- Test-passing-only fake fixes
-- Completion claims without evidence
-- Scope drift beyond the active request
-- User-facing `metrics:` line injection unless the user explicitly asks for metrics
-- Fake collaboration claims when no delegated review/exploration actually occurred
-
-## Known Limits
-- This modifier cannot create missing evidence; it only enforces evidence handling.
-- Validation commands can be blocked by permissions or tooling and must remain `Unverified` when not run.
-- It does not override the primary skill scope or artifact contract.
-- Generated-code semantics still require tests, runtime checks, or review evidence.
+## Validation
+- Mode matches consequence, coupling, reversibility, and verification difficulty.
+- Added checks target material failure modes and do not duplicate specialist gates.
+- Agent and user validation are separated, with contradictions kept visible.
+- `standard`/`strict` review and relevant `strict` rollback/readback evidence are present or explicitly unavailable.
+- Completion claims do not exceed the surfaces actually observed.
+- Primary workflow scope and runtime permission policy remain unchanged.

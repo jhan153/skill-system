@@ -78,7 +78,8 @@ description: Validate, review, and maintain Wiki Bank source/claim/edge stores a
 5. For loop feedback, separate verifier-backed facts from process lessons, rejected shortcuts, temporary failures, and untrusted observations.
 6. Apply only the explicitly approved Knowledge Store change.
 7. Regenerate projection artifacts after accepted knowledge changes.
-8. Report changed claims/edges/sources, validation evidence, and remaining review risks.
+8. Re-run store and projection validation after the mutation; a pre-write pass is not post-write evidence.
+9. Report changed claims/edges/sources, per-item provenance/decision, validation evidence, and remaining review risks.
 
 ## Stop Policy
 - `success`: requested validation or maintenance action completes, accepted/proposed changes are listed, and projections are regenerated or explicitly out of scope.
@@ -95,10 +96,15 @@ description: Validate, review, and maintain Wiki Bank source/claim/edge stores a
 - On repeated validation failures, stop and report the failing command and affected ids instead of rewriting unrelated claims.
 
 ## Output Contract
+For one validation or claim decision, report the affected IDs, evidence, decision, and remaining risk directly. Use the full structured shape only for an explicit maintenance artifact or multi-item review; omit empty fields.
+
 ```yaml
 knowledge_maintenance:
+  status:
+  stop_reason:
   action:
   reviewed_items: []
+  item_decisions: []
   accepted_changes: []
   rejected_changes: []
   loop_feedback_reviewed: []

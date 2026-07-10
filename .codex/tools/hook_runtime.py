@@ -179,6 +179,59 @@ def show(args: argparse.Namespace) -> int:
     return 0
 
 
+def verify(args: argparse.Namespace) -> int:
+    if not args.ledger.exists():
+        print(f"FAIL: hook ledger not found: {args.ledger}")
+        return 2
+    errors: list[str] = []
+    count = 0
+    previous_seq = 0
+    previous_hash = ZERO_HASH
+    run_id = ""
+    for line_no, line in enumerate(
+        args.ledger.read_text(encoding="utf-8", errors="replace").splitlines(), start=1
+    ):
+        if not line.strip():
+            continue
+        count += 1
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError as exc:
+            errors.append(f"line {line_no}: invalid JSON: {exc}")
+            continue
+        if not isinstance(event, dict):
+            errors.append(f"line {line_no}: expected JSON object")
+            continue
+        if event.get("event_hash") != event_hash(event):
+            errors.append(f"line {line_no}: event_hash mismatch")
+        if event.get("schema_version") == 2:
+            seq = event.get("seq")
+            current_run_id = event.get("run_id")
+            if not isinstance(seq, int) or seq != previous_seq + 1:
+                errors.append(f"line {line_no}: seq must increment from {previous_seq}")
+            if event.get("prev_event_hash") != previous_hash:
+                errors.append(f"line {line_no}: prev_event_hash mismatch")
+            if not isinstance(current_run_id, str) or not current_run_id:
+                errors.append(f"line {line_no}: schema v2 requires run_id")
+            elif run_id and current_run_id != run_id:
+                errors.append(f"line {line_no}: run_id changed within ledger")
+            else:
+                run_id = current_run_id
+            if isinstance(seq, int):
+                previous_seq = seq
+            if isinstance(event.get("event_hash"), str):
+                previous_hash = event["event_hash"]
+    if not count:
+        errors.append("ledger has no events")
+    if errors:
+        print("FAIL")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+    print(f"PASS: hook ledger entries={count} hash_chain=valid")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
@@ -196,6 +249,9 @@ def main() -> int:
     show_parser = sub.add_parser("show")
     show_parser.add_argument("--ledger", type=Path, default=default_ledger())
     show_parser.set_defaults(func=show)
+    verify_parser = sub.add_parser("verify")
+    verify_parser.add_argument("--ledger", type=Path, default=default_ledger())
+    verify_parser.set_defaults(func=verify)
     args = parser.parse_args()
     try:
         return args.func(args)

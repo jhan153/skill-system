@@ -1,6 +1,6 @@
 ---
 name: plan-long-term-package
-description: Create explicit multi-document phase/package plans for cross-session work; Agentic HLD-level planning.
+description: Create a validated multi-document phase/package plan for a large rewrite, migration, or cross-session handoff. Use only when the user explicitly requests package-style planning; use plan-short-term-docs for a single active plan.
 ---
 
 # Plan Long Term Package
@@ -8,193 +8,127 @@ description: Create explicit multi-document phase/package plans for cross-sessio
 ## Routing Card
 - role: heavy_artifact_generator
 - intent_signature:
-  - explicit `phase 플랜`
-  - explicit `서브 플랜`
-  - explicit `플랜 패키지`
-  - large rewrite package
-  - migration package
+  - explicit phase/subplan/package artifact
+  - large rewrite or migration package
   - cross-session handoff package
 - use_when:
-  - the user explicitly requests a multi-document phase/group planning package.
-  - the user explicitly asks for docs that future agents can continue from across sessions.
-  - the task is too large for one dated plan document and the user wants package-style planning.
+  - the user explicitly requests a multi-document phase/group package.
+  - the work needs canonical contracts plus resumable execution decomposition.
 - do_not_use_when:
-  - the user wants a simple plan doc, small local fix, single bug diagnosis, or one-off implementation plan.
-  - the request only contains trigger-like words such as phase, migration, rewrite, plan, or handoff without asking for a package.
-  - the user asks for direct implementation, a short TODO list, a summary, or a next-step recommendation.
+  - one dated plan is sufficient.
+  - the request is direct implementation, a local fix, a TODO, a summary, or a casual mention of plan/phase/migration.
+  - research ideation does not explicitly request a multi-phase experiment package.
 - expected_inputs:
-  - large task scope
-  - repo context and prior reports/plans when available
-  - archetype/modifier selection inputs
+  - package objective, scope, constraints, and available repo evidence
+  - archetype/modifier decision inputs
 - expected_outputs:
-  - canonical dated plan, package README, phase/group docs, required spec contracts, validation results
+  - canonical dated plan, package README, phase/group docs, selected canonical specs, and validation result
 - context_targets:
   must_read:
     - current package request
-    - archetype catalog when task type is not obvious
-    - existing active plan or prior report if explicitly relevant
   read_if_needed:
-    - prior `docs/plan` packages
-    - `docs/spec` contracts
+    - matched rows in `references/archetype-catalog.md`
+    - `references/package-core-invariants.md` after package intent is confirmed
+    - explicitly relevant active plan, report, or prior package
     - source outline and validation contract
+    - `.codex/docs/planning_state_model.md` when state names or release gates could drift
   do_not_load_by_default:
-    - full repo
-    - full memory bank
-    - unrelated codebase-intel artifacts
+    - full repo or memory bank
+    - all prior plans or codebase-intel artifacts
+    - the entire `references/` tree
 - risk_profile:
   reads:
-    - repo docs and prior reports can be broad
+    - selected repo evidence and references can still be broad
   writes:
-    - WRITE_LOCAL_FS high: creates many docs under `docs/plan` and `docs/spec`
+    - WRITE_LOCAL_FS high: many requested docs under `docs/plan` and `docs/spec`
   tools:
-    - CALL_PROCESS for package scripts and validators
+    - CALL_PROCESS for bundled init, ingest, and validation scripts
   sensitive_resources:
-    - credentials default deny; network normally not required
+    - credentials default deny; network normally unnecessary
 - entry_scene:
   - PREPARE
 
-## Purpose
-- Create a planning **package**, not a single plan file.
-- Separate product contracts from execution decomposition.
-- Keep one source of truth for scope, one for UI state, one for release thresholds, and one for execution status.
-- Produce docs that both AI agents and humans can edit safely across sessions.
+## Objective And State Boundary
+- Create a package, not production code or a single plan file.
+- Create the `package_planned` overlay only after the package has one canonical authority map and measurable release gates.
+- Keep scope/contracts in `docs/spec/`, execution status in the canonical dated plan, and navigation/phase docs derived.
+- Do not treat `package_planned` as `implementation_ready` or execution approval.
 
-## Trigger
-Use only for explicit heavy artifact intent such as:
-- `phase 플랜을 docs package로 만들어줘`
-- `서브 플랜 패키지를 만들어줘`
-- `플랜 패키지로 작성해줘`
-- `다른 세션 에이전트가 이어받을 수 있게 문서 패키지로 만들어줘`
-- `multi-phase rewrite plan package`
+## Staged Context Admission
+Admit one layer at a time and stop when the next decision is supported:
 
-Do not trigger from a keyword alone.
+1. **Intent** — Read only the request. Require explicit multi-document package intent; otherwise route to `plan-short-term-docs` or the task owner.
+2. **Evidence index** — Inspect named reports/plans and a repo source outline before opening raw content. Admit only sources that can change scope, dependencies, contracts, or gates.
+3. **Archetype index** — Search `references/archetype-catalog.md` for task terms. Read the matching archetype row, selection rule, and relevant modifier rows; read the full catalog only when no match is reliable or the task genuinely spans archetypes.
+4. **Manifest** — Read `references/package-core-invariants.md`, create the claim ledger and authority map, then freeze the artifact manifest before opening templates. Read `references/package-authoring-rules.md` only for scaffold/update mechanics and `references/source-of-truth-policy.md` only when ownership is ambiguous or conflicting.
+5. **Artifact batch** — Load only the 1-3 templates needed for the next canonical artifact batch. Extract their constraints into the manifest; do not carry unrelated template prose forward.
+6. **Decomposition/final review** — Read `references/decomposition-rules.md` only when splitting phases and `references/review-checklist.md` only for the final gate.
 
-## When To Use
-- Large rewrites, migrations, or multi-phase implementations.
-- Work that must outlive the current chat and be resumed by later agents.
-- Tasks where product scope, algorithms, UI states, integration boundaries, and release criteria all need explicit docs.
+If validation fails, inspect the validator message and failing document first. Never recover by sweeping the repo, memory, prior plans, or template library.
 
-## When Not To Use
-- Small local edits.
-- Single-bug fixes.
-- One-off implementation plans that fit cleanly in a single dated plan file.
-- Any casual `플랜` mention without explicit package, phase/group, rewrite, migration, or handoff intent.
-- Any casual phase, migration, rewrite, handoff, objective, or goal mention without explicit multi-document package intent.
-- A short TODO list, summary, translation, naming question, or next-step recommendation.
-- Ordinary research brainstorming, hypothesis triage, paper-idea shaping, loss design, or ablation planning unless the user explicitly asks for a multi-phase experiment package, migration package, or cross-session handoff package.
+## Deterministic Package Workflow
+1. Record one `archetype`, zero or more modifiers, package slug, current planning state, and a claim ledger that grades each scope-shaping statement.
+2. Compute the required contract set as the de-duplicated union of archetype docs, modifier docs, and universal docs. Record it before generation; do not add contracts merely because a template exists.
+3. Build an authority map for scope, state names, interfaces, release gates, and execution status. Give each concern exactly one canonical owner.
+4. Ingest only cited, relevant analysis or prior plans. Mark the ingest summary as derived evidence and retain source pointers.
+5. Scaffold with `scripts/init_phase_plan_package.py`; then replace placeholders from admitted evidence.
+6. Fill canonical specs before derived README/phase text. Generate in manifest order and keep stable IDs/paths when updating an existing package.
+7. Decompose by independently verifiable concern, not document count. Make hard predecessors explicit.
+8. Reconcile every derived statement to its canonical owner, then validate and report remaining unknowns as `Unverified` or blockers.
 
-## Resource and Risk Boundary
-- Reads: current request, repo source outline, prior reports/plans, and selected templates.
-- Writes: many local docs under `docs/plan` and `docs/spec`; never write production code by default.
-- Tool/process calls: package init, ingest, validation, and quality-lint scripts only when their purpose is clear.
-- Network access: none by default.
-- Credential access: default deny.
-- Generated artifacts: high; all generated docs must remain inside the requested package/spec scope.
-- Destructive actions: out of scope.
-- Required checkpoints: explicit heavy artifact intent, archetype/modifier selection, source-of-truth hierarchy, validation command before finalizing package.
+## Required Artifact Manifest
+Freeze these entries before content generation:
 
-## Recovery and Context Expansion
-- If task type is unclear, read `references/archetype-catalog.md` before expanding to repo docs.
-- If prior analysis is needed, ingest only cited reports or plan packages relevant to this package.
-- If repo structure is unclear, read repo source outline first.
-- If validation fails, read validator output and the failing generated doc before expanding wider.
-- If the user only needs a lightweight active plan, return to scheduling and use `plan-short-term-docs`.
-- Never recover by loading all repo docs, all memory, or all codebase-intel artifacts at once.
+- `canonical_plan`: `docs/plan/YYYY-MM-DD-<task>.md`
+- `package_root`: `docs/plan/<PlanPackage>/README.md`
+- `phase_docs`: concern-based phase/group paths with stable order and dependencies
+- `contract_docs`: selected canonical `docs/spec/` paths and owning concerns
+- `domain_ingest_summary`: required when relevant prior analysis or plans exist
+- `claim_ledger`: canonical-plan section mapping material claims to grade, source, impact, and unresolved decision
+- `validation_modes`: default plus any justified `strict`, `strict-handoff`, or `quality-lint`
 
-## Required Outputs
-You must create or update all of the following:
+The canonical dated plan must include changed files, what/why, risks, validation, `질의`, status-bearing TODOs, implementation-transition status/marker, and progress log. Every generated planning document must include `doc_type`, `canonical`, `status`, `last_validated`, `source_of_truth_for`, and `derived_from`; phase/group docs also carry dependency and ownership metadata defined by the authoring rules.
 
-1. Canonical dated plan under `docs/plan/YYYY-MM-DD-<task>.md`
-2. Plan package root:
-   - `docs/plan/<PlanPackage>/README.md`
-3. Phase/group docs under the package
-4. Canonical spec docs under `docs/spec/` required by the chosen archetype plus modifiers
-5. Domain ingest summary when existing analysis, report, or prior plan docs are available:
-   - `docs/plan/<PlanPackage>/domain-ingest-summary.md`
+## Implementation-Ready Phase Contract
+Require every phase/group to state:
 
-## Existing Analysis Ingest
-Read `references/package-authoring-rules.md` before creating or refilling a package. It owns ingest commands, scaffold-only rules, validation modes, and reporting shape.
+- bounded outcome and non-goals
+- target files/components or an explicit discovery task
+- canonical contract links, without redefining them
+- hard/soft predecessors and blocking decisions
+- concrete first step and implementation digest
+- acceptance rows with `Contract`, `Evidence`, `Test command`, and `Blocking`
+- a behavior oracle for logic, parity, lifecycle, performance, or UX claims; static presence checks are sufficient only for structural requirements
+- exit gate and rollback/fallback when the phase is risky
 
-## Archetype Selection
-Select one archetype and zero or more modifiers before generating the package. Read `references/archetype-catalog.md` for the archetype list, aliases, required docs, modifiers, and release-blocking contract rules.
+Do not finalize scaffold-only prose, empty placeholders, vague verbs, or acceptance criteria without observable evidence. Unknown critical interfaces belong in a canonical integration contract and block dependents until resolved or explicitly waived.
 
-## Source Of Truth Hierarchy
-Read `references/source-of-truth-policy.md` before editing package docs. Canonical contracts live in `docs/spec/`; execution status lives in the dated plan; README and phase/group docs are derived.
+## Quality Gates
+- **Admission:** explicit package intent and bounded scope are present.
+- **Manifest:** one archetype is selected; modifier/universal unions match the artifact set; every canonical concern has one owner.
+- **Evidence:** every scope-shaping claim is graded in the claim ledger; inferred or unavailable facts cannot silently become requirements.
+- **Execution:** each phase satisfies the implementation-ready contract, has no untracked hard predecessor, and closes its blocking behavior oracles rather than merely creating documents.
+- **Anti-drift:** UI states, global status, approval, interfaces, and release gates are defined only by their canonical owners.
+- **Release:** thresholds, datasets, regression evidence, and rollback triggers are measurable where applicable; every P0 capability links to a contract or an explicit downgrade.
+- **Validation:** bundled validation passes at the strength required by the intended handoff.
 
-## Hard Anti-Drift Rules
-- UI state names live only in the UI state contract.
-- Global progress and approval live only in the canonical dated plan.
-- Release gates need numeric thresholds, datasets, regression matrices, and rollback triggers.
-- P0 capabilities need contract links or explicit downgrade decisions.
-- Hard predecessors gate implementation until complete or waived.
-- Unresolved critical interfaces belong in integration contracts, not phase notes.
+## Validation
+Run `scripts/validate_phase_plan_package.py` after every package update. Add:
 
-## Package Structure
-Use this default structure:
+- `--strict` for release-critical semantic readiness.
+- `--strict-handoff` for an implementation handoff.
+- `--quality-lint` for executable/readable phase content.
+- `--write-validation-stamp` only after a passing run.
 
-```text
-docs/plan/<PlanPackage>/
-  README.md
-  Phase*/
-docs/spec/
-  <slug>-capability-map.md
-  <slug>-<required-contract>.md
-docs/plan/YYYY-MM-DD-<task>.md
-```
-
-## Machine-Readable Metadata
-Every generated planning document should include front matter. Required: `doc_type`, `canonical`, `status`, `last_validated`, `source_of_truth_for`, `derived_from`. Phase/group docs should also include dependency and ownership metadata from `references/package-authoring-rules.md`.
-
-## Phase Decomposition Rule
-Use phase/group decomposition by concern, not arbitrary document count. Read `references/decomposition-rules.md` for phase/group selection and drift smells.
-
-## Implementation Density Rules
-The package must be safe and implementation-oriented. Use ingest evidence, concrete implementation digests, structured acceptance criteria, dependency metadata, and `--quality-lint` as described in `references/package-authoring-rules.md`.
-
-## Canonical Spec Requirements
-The exact spec set comes from the archetype and modifiers. Use the dedicated `references/*-template.md` files for specialized contracts and `references/generic-contract-template.md` for other concerns. Do not copy template content into this SKILL.md.
-
-## Canonical Plan Requirements
-The canonical dated plan must always include:
-- changed file list
-- change summary
-- risks
-- validation procedure
-- 질의
-- TODO with status
-- implementation transition status
-- implementation transition marker
-- progress log
-
-## Phase/Group Doc Requirements
-Each phase/group doc may discuss algorithms, UI, integration, or validation, but it must reference canonical contracts instead of redefining them. It must never claim source-of-truth ownership for a canonical contract.
-
-## Validation Rules
-Run `scripts/validate_phase_plan_package.py` after package updates. Use `--strict`, `--strict-handoff`, and `--quality-lint` when release readiness, handoff readiness, or implementation readability matters. Validation mode details live in `references/package-authoring-rules.md`.
-
-## Bundled Resources
-- Read [source-of-truth-policy.md](references/source-of-truth-policy.md) before editing package docs.
-- Read [archetype-catalog.md](references/archetype-catalog.md) before selecting an archetype or modifiers.
-- Read [decomposition-rules.md](references/decomposition-rules.md) when choosing phases/groups.
-- Read [package-authoring-rules.md](references/package-authoring-rules.md) for ingest, required outputs, validation modes, and reporting.
-- Read [review-checklist.md](references/review-checklist.md) before final validation.
-- Use the templates in `references/` to generate package docs consistently.
-- Use `scripts/init_phase_plan_package.py` to scaffold new packages.
-- Use `scripts/validate_phase_plan_package.py` after updates.
-- Use `scripts/validate_phase_plan_package.py --write-validation-stamp` only after validation passes and you want to mark docs as freshly validated.
-- Use `scripts/self_test_phase_plan_package.py` after modifying the skill internals.
-- The init script should generate a package that is validator-passable immediately after scaffolding.
+Run `scripts/self_test_phase_plan_package.py` only after changing this skill's scripts, schema, catalog, or templates. Do not report runtime behavior as validated from document checks alone.
 
 ## Reporting Contract
-When finishing a package update:
-- state the canonical plan path first
-- list the package root
-- list the spec docs created or updated
-- report validation outcome
-- mark any remaining ambiguity as `Unverified`
+Report, in order:
 
-## Known Limits
-- Planning packages do not validate runtime behavior without separate execution evidence.
-- Cross-session docs can go stale; source and validation context must be rechecked.
-- This heavy artifact generator does not own production code writes.
-- Use `plan-short-term-docs` instead when a lightweight active plan is enough.
+1. canonical plan path and `package_planned` state/evidence
+2. package root and selected archetype/modifiers
+3. created/updated spec and phase paths
+4. validation commands and outcomes
+5. blockers, residual risks, or `Unverified` items
+
+Keep the report as an index; do not reproduce the package contents.

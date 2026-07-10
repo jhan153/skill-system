@@ -1,6 +1,6 @@
 ---
 name: evaluation-usage-tracker
-description: "Aggregate metadata-only skill invocation records into usage summaries and improvement candidates; complements evaluation-harness and field-feedback YAML records without storing raw prompts or transcripts."
+description: Aggregate metadata-only skill invocation records into usage, outcome, and over/under-trigger summaries. Use when a local sanitized ledger or summary exists; never ingest raw prompts, transcripts, secrets, or private logs, and never convert counts directly into maturity or release decisions.
 ---
 
 # Evaluation Usage Tracker
@@ -8,140 +8,66 @@ description: "Aggregate metadata-only skill invocation records into usage summar
 ## Routing Card
 - role: primary
 - intent_signature:
-  - `usage tracking`
-  - `호출 통계`
-  - `사용량 요약`
-  - `invocation metrics`
-  - `usage summary`
-  - metadata-only skill telemetry
+  - skill invocation metrics, usage summary, over/under-trigger telemetry, 호출 통계
 - use_when:
-  - the user wants invocation counts, low/high-use skills, over/under-trigger patterns, or maturity-upgrade candidates from a local metadata ledger.
-  - the user asks for a no-data status for skill invocation logging.
-  - summarized usage records, not raw prompts/transcripts, are available for aggregation.
+  - the user wants metadata-only invocation/outcome aggregation or an explicit no-data status.
 - do_not_use_when:
-  - the user wants release governance, readiness signoff, automatic maturity changes, or package validation.
-  - the request requires reading raw prompts, transcripts, private logs, secrets, or full conversation text.
-  - the user wants eval-case quality review rather than invocation counts; use `evaluation-harness`.
+  - the task is eval-case review (`evaluation-harness`), release/readiness verdict, raw conversation analysis, or automatic maturity change.
 - expected_inputs:
-  - local invocation ledger path or summarized usage records (metadata only)
-  - optional skill registry or field-feedback YAML records for review context
+  - local sanitized ledger path or summarized records
 - expected_outputs:
-  - usage count summary, low/high-use skills, over/under-trigger candidates, suggested registry/eval updates, or no-data status
+  - measured usage/outcome summary, evidence-backed routing candidates, privacy status, or no-data result
 - context_targets:
   must_read:
-    - local invocation ledger path or summarized records when available
+    - requested ledger/summary source and its field contract
   read_if_needed:
-    - `skill_registry.md`
-    - `field-feedback/*.yaml` records
-    - `references/usage-summary-template.md` for output shape only
+    - selected registry/eval/field-feedback records needed to test a candidate
+    - `references/usage-summary-template.md` for an explicit artifact shape
+    - `references/harness-measurement-protocol.md` only for holdout/gate measurement
   do_not_load_by_default:
-    - full repo
-    - raw conversation transcripts
-    - raw prompts
-    - private logs
-    - credentials
+    - full repo, raw prompts/transcripts, private logs, or unrelated feedback
 - risk_profile:
   reads:
-    - READ_LOCAL_FS for private/local metadata ledger or sanitized summary records only
+    - sanitized metadata records only
   writes:
-    - WRITE_LOCAL_FS only for a requested usage summary; metadata only, never raw prompts
+    - requested metadata-only summary; no raw content
   tools:
-    - local aggregation and focused search only
+    - local aggregation and focused lookup
   sensitive_resources:
-    - never store raw prompts, secrets, private logs, or full conversation text
+    - reject sources containing raw prompts, transcripts, secrets, or private full-text logs
 - entry_scene:
   - PREPARE
 
-## Related Skills
-- `evaluation-harness`: reviews eval-case quality and manual observed-behavior captures.
-- `field-feedback/*.yaml`: qualitative observation and correction records.
-- `report-critical`: release/readiness/QA verdicts.
+## Input Gate
+Accept records containing only fields such as timestamp, primary/supporting skill IDs, family, trigger type, request class, outcome, validation status, and explicit over/under-trigger labels. Free-text notes must already be sanitized.
 
-## Trigger Guard
-Positive:
-- `스킬 호출 통계 요약해줘`
-- `usage tracking ledger 집계해줘`
-- `low-use/high-use skill 후보 정리해줘`
+If no suitable ledger exists, report `no_data` and stop. Do not copy sample values from a template or infer counts from repository files.
 
-Negative:
-- Release governance, readiness scoring, or finality decisions.
-- Raw prompt/transcript analysis.
-- Eval-case review without invocation counts.
+## Workflow
+1. Verify source location, scope, time window, and metadata-only status.
+2. Aggregate by skill, family, trigger type, outcome, and validation status.
+3. Distinguish observed counts from rates; state the denominator and missing/unknown records.
+4. Identify candidate over/under-trigger patterns from outcomes and explicit labels.
+5. Cross-check a candidate against field feedback or a routing eval when available.
+6. Recommend the smallest review-gated registry/eval/skill-text change; never mutate maturity automatically.
 
-## Goal
-Turn metadata-only invocation records into actionable, review-gated improvement candidates without exposing private prompts or transcripts.
+## Interpretation Rules
+- Low use may mean a narrow valuable skill, missing alias, no exposure, or missing telemetry.
+- High use may be expected for an entry router; inspect outcome/reroute rates before calling it over-triggering.
+- Counts without exposure/denominator data do not establish selection quality.
+- Shared holdout arms or correlated interventions do not establish causal attribution.
+- Structural ledger validity does not establish that the recorded classification was correct.
 
-## Ledger (metadata only)
-Use this as a schema shape, not a blank output template.
+## Output
+For one question, return the measured number and its denominator/source limitation directly. For an explicit summary artifact, include usage/outcome breakdown, low/high-use observations, over/under-trigger candidates with corroborating evidence, recommended review actions, privacy status, and no-data gaps. Omit empty sections.
 
-```yaml
-timestamp:
-primary_skill:
-supporting_skills:
-family:
-trigger_type: explicit | implicit | router | support
-request_class:
-outcome: completed | blocked | rerouted | skipped
-validation_status:
-over_triggered: []
-under_triggered: []
-notes:
-```
-
-- Raw usage logs stay private/local.
-- The public bundle includes schema, summary template, and guidance only.
-- If no metadata ledger exists, report no data and stop; do not invent metrics.
-
-## Aggregation Workflow
-1. Confirm a local invocation ledger path or summarized metadata records exist.
-2. If no ledger/records exist, return the no-data output shape and stop.
-3. Confirm the records are metadata-only; if a source contains raw prompts/transcripts/private logs, refuse that source rather than ingest it.
-4. Aggregate counts by `primary_skill`, `family`, `trigger_type`, and `outcome`.
-5. Separate over-trigger candidates from under-trigger candidates.
-6. Cross-check candidates against field-feedback YAML records or eval cases when available.
-7. Propose review-gated improvement candidates only; never change maturity automatically.
-
-## Over/Under Trigger Rule
-- A raw count alone never changes maturity or routing.
-- Treat a skill as an improvement candidate only when counts combine with field feedback or an eval case showing a real over/under-trigger pattern.
-- Low use may mean a missing alias/routing gap, not low value; flag for review rather than deprecation.
-- High use may reflect a broad entry router rather than over-triggering; check outcomes before judging.
-
-## Reference
-- Read `references/usage-summary-template.md` for input ledger sample, output summary sample, redaction checklist, and no-data output shape.
-- Read `references/harness-measurement-protocol.md` only when the user asks about harness gate measurement or holdout/sunset analysis.
-
-## Output Contract
-Return only the sections needed:
-1. Usage count summary by skill and family
-2. Low-use and high-use skills
-3. Over/under-trigger candidates
-4. Suggested registry/eval/skill-text updates, review-gated
-5. Privacy/redaction status
-6. No-data status when no metadata ledger exists
-
-Do not output sample counts from the reference unless they are clearly labeled as examples.
-
-## Resource and Risk Boundary
-- Reads: local metadata ledger/summary only, plus selected registry/eval/field-feedback context when needed.
-- Writes: local summary only; metadata-only; never raw prompts.
-- Network/credentials: none.
-- Destructive actions: none.
-
-## Anti-Patterns
-- Storing or analyzing raw prompts, secrets, transcripts, or private logs.
-- Auto-changing maturity without human review.
-- Treating counts as package readiness.
-- Copying sample output numbers as if they were measured.
-- Reporting no-data as failure when the ledger is intentionally private/local.
+## Behavior Cases
+- Positive: “이 sanitized invocation ledger에서 reroute율과 under-trigger 후보를 집계해줘.”
+- Negative: “원문 대화를 읽고 어떤 스킬이 맞았는지 분석해줘.” → reject raw transcript ingestion.
+- Edge: no exposure denominator exists → report counts only; do not call a low count an under-trigger rate.
 
 ## Validation
-- Confirm every input source is metadata-only before aggregation.
-- Confirm no raw prompt, transcript, secret, private log, or full file content is copied into output.
-- Confirm sample/template numbers are not mixed with measured counts.
-- Confirm no-data output is used when no local ledger exists.
-
-## Known Limits
-- Counts are evidence, not verdicts; maturity changes still require review.
-- Without a ledger, this skill reports there is no data rather than inventing metrics.
-- Local invocation ledgers are intentionally private and may not be shipped in the bundle.
+- Every number traces to the selected source and time window.
+- Sample/template data are excluded from measured results.
+- Raw private text is absent from input and output.
+- Recommendations remain candidates pending qualitative review.

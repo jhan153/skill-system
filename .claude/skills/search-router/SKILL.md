@@ -25,86 +25,57 @@ description: "Route cross-domain evidence-search requests (papers, code, runtime
   must_read:
     - request intent and evidence domain hints
   read_if_needed:
-    - registry Group Alias Map
-    - `.codex/research-routing.md` for the paper lane
+    - `references/evidence-lane-matrix.md` when two lanes remain plausible
+    - `.codex/research-routing.md` when paper search may actually be a research-lifecycle request
   do_not_load_by_default:
     - full repo
     - full memory bank
 - risk_profile:
   reads:
-    - READ_CODEBASE only to identify the correct lane
+    - request and artifact hints only
   writes:
     - none
   tools:
-    - none beyond routing selection
+    - none; lane owners perform acquisition
   sensitive_resources:
     - credentials default deny
 - entry_scene:
   - ROUTE
 
-## Related Skills
-- `search-paper-evidence`: paper/source evidence lane and ledger owner.
-- `search-deep-evidence`: deep multi-angle sweep across lanes with adversarial verification; use when a single lane is insufficient and a verified evidence set is needed.
-- `research-router`: owns the research lifecycle when the task is a scientific claim, not just evidence.
-- `analysis-codebase`, `analysis-bug`: codebase evidence lanes.
-- `design-visual-regression`, `design-a11y-audit`: visual evidence lanes.
-- `memory-bank-harness`, `memory-bank-maintenance`: memory evidence lanes.
-- `knowledge-context-harness`, `knowledge-base-maintenance`: project knowledge evidence lanes.
-
-## Trigger
-- `검색 스킬군`, `evidence search`, `근거/소스/증거 찾아줘`, `evidence ledger`
-
-## Trigger Guard (Do Not Trigger)
-- Bare `분석`/`검토`/`보고` without explicit evidence/source/proof intent.
-- Requests whose actual goal is implementation, synthesis, or a publishability decision.
-
-## Goal
-- Pick the correct evidence lane and hand off; never own final synthesis or implementation.
+## Decision Contract
+1. Require explicit evidence intent: search, source, proof, citation, verification, or ledger. Bare domain words and ordinary implementation do not qualify.
+2. Identify the final task owner (implementation, planning, analysis, research, design, or report). Keep that skill primary.
+3. Select exactly one lane from the table. Use `search-deep-evidence` only when multiple independent lanes are necessary to establish the same claim.
+4. Return the selected owner, admitted inputs, exclusions, and handoff. Do not collect evidence, synthesize findings, call tools, or write files.
 
 ## Evidence Lanes
-- paper/source evidence -> `search-paper-evidence`
-- deep multi-angle / adversarially-verified evidence set across several lanes -> `search-deep-evidence` (escalate here when one lane cannot establish the claim and a verified evidence set is required before report/synthesis)
-- paper evidence for implementation planning -> `search-paper-evidence` as support; implementation/planning skill stays primary
-- codebase evidence -> `analysis-codebase` or `analysis-bug` evidence phase
-- runtime evidence -> `workflow-rigor` evidence phase
-- visual evidence -> `design-visual-regression` / `design-a11y-audit`
-- memory evidence -> `memory-bank-harness` / `memory-bank-maintenance`
-- project knowledge evidence -> `knowledge-context-harness` for read-only Runtime Projection context, `knowledge-base-maintenance` for explicit Knowledge Store review
+| evidence needed | lane owner | routing note |
+| --- | --- | --- |
+| papers, citations, literature | `search-paper-evidence` | support an implementation/plan; use `research-router` as primary only for scientific claim/experiment/manuscript decisions |
+| multi-angle cross-domain verification | `search-deep-evidence` | require a stated reason one lane is insufficient |
+| codebase behavior or structure | `analysis-codebase` | use `analysis-bug` instead for a concrete failure/RCA signal |
+| runtime/test/change evidence | active implementation workflow with `workflow-rigor` as needed | do not turn execution into a search artifact |
+| screenshots or rendered UI | `design-visual-regression` | use `design-a11y-audit` for keyboard/semantic/contrast evidence |
+| accepted project memory | `memory-bank-harness` | use `memory-bank-maintenance` only for explicit state review/mutation |
+| Wiki/Runtime Projection knowledge | `knowledge-context-harness` | use `knowledge-base-maintenance` only for explicit store review/mutation |
 
-## Router Decision Steps
-1. Confirm explicit evidence intent (evidence/source/proof/근거/조사/ledger). If absent, defer to the normal Route Matrix — do not trigger.
-2. Identify the final owner of the task (implementation, planning, analysis, research, design). The owner stays primary; this router only opens an evidence lane.
-3. Select exactly one evidence lane from Evidence Lanes and hand off; do not own synthesis, implementation, reporting, or the research lifecycle. Escalate to `search-deep-evidence` when one lane cannot establish the claim and a multi-angle, adversarially-verified evidence set is required.
-4. For paper evidence used in implementation/planning, attach `search-paper-evidence` as support and keep the implementation/planning skill primary; route the whole task to `research-router` only for a scientific claim/experiment/manuscript/publishability decision.
-
-## Validation
-- Confirm the request has explicit evidence/source/proof/search/ledger intent.
-- Confirm the selected lane matches the evidence domain: paper, codebase, runtime, visual, memory, or project knowledge.
-- Confirm the final task owner remains separate from the evidence lane owner.
-- Confirm this router did not produce final synthesis, implementation, report, or research lifecycle decisions.
-- Negative check: bare `분석`, `검토`, `보고`, `설명`, or implementation requests without evidence intent must not route here.
-- Negative check: scientific claim, experiment, manuscript, or publishability decisions must route to `research-router`, with search as support only when evidence acquisition is needed.
-
-## Reference
-- Read `references/evidence-lane-matrix.md` for the full lane matrix, ambiguous and router-vs-router examples, and paper-evidence-for-implementation examples.
+If lane choice remains ambiguous after reading the request, consult `references/evidence-lane-matrix.md` or ask one question that changes the lane. Do not open several lanes speculatively.
 
 ## Output Contract
-1. Detected evidence intent and domain
-2. Selected lane and owning skill
-3. Handoff note (what the owner should produce)
-4. Explicit `Unverified` for any missing inputs
+Return only:
+- `evidence_intent_and_domain`
+- `final_task_owner`
+- `selected_lane` and why it is sufficient
+- `handoff` (inputs, expected evidence, exclusions, and `Unverified` gaps)
 
-## Resource and Risk Boundary
-- Reads: only enough to choose a lane.
-- Writes: none. This is a router; it must not mutate files or produce final artifacts.
-- Tools/process calls: none beyond selection.
-- Network/credentials: none by default; credential access default deny.
-
-## Anti-Patterns
-- Owning evidence collection or synthesis itself.
-- Routing the whole task to the research cluster when the user only wanted evidence.
-- Triggering on bare domain words without evidence framing.
+## Validation and Stop Rules
+- Confirm explicit evidence intent exists and the selected lane matches the evidence type.
+- Confirm one lane is selected, or justify `search-deep-evidence` with a real cross-lane need.
+- Confirm the final task owner remains separate from the evidence owner.
+- Stop and defer to normal routing when evidence intent is absent.
+- Stop after handoff; this router performs no search, network access, synthesis, implementation, report generation, or research-stage decision.
+- Never invent tool availability, sources, citations, results, or evidence quality.
 
 ## Known Limits
-- A router cannot confirm evidence quality; the owning lane skill does that.
-- If no evidence intent is present, defer to the normal Route Matrix.
+- This router cannot assess evidence quality or availability; the lane owner does.
+- Ambiguous requests may require one decision-bearing clarification.

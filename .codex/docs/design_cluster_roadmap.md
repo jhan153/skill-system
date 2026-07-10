@@ -1,6 +1,6 @@
 # Design Cluster Roadmap
 
-The design cluster is a long-term specialist area, similar in shape to the research cluster. It should grow through narrow skills with clear routing boundaries, not one broad design mega-skill.
+The design cluster grows through distinct analysis/evidence skills and conditionally loaded implementation profiles. A profile is not a skill when it shares the same implementation owner, write boundary, and completion oracle.
 
 ## Current Skills
 
@@ -13,9 +13,6 @@ The design cluster is a long-term specialist area, similar in shape to the resea
 | `design-a11y-audit` | `experimental` | Review keyboard, focus, semantic, contrast, target-size, and responsive readability evidence. |
 | `design-ui-decomposer` | `experimental` | Decompose UI references into implementation-ready structure without writing code. |
 | `design-layout-translator` | `experimental` | Translate Auto Layout, flex/grid, sizing, overflow, and breakpoint constraints into code-ready rules. |
-| `design-mobile-screen` | `experimental` | Apply mobile/native screen constraints as an explicit-only surface specialist. |
-| `design-dashboard` | `experimental` | Apply dashboard UI constraints as an explicit-only surface specialist. |
-| `design-section-web` | `experimental` | Apply section-based web page constraints as an explicit-only surface specialist. |
 
 ## Three-Stage Growth Direction
 
@@ -31,9 +28,9 @@ Stage 2: orchestration and limited analysis.
 - Surface guidance lives under `design-frontend/references/`, not as primary skills.
 
 Stage 3: field-trial expansion.
-- Surface-specific implementation skills now exist as active `experimental` explicit-only specialists.
-- Expansion now means implicit invocation or stronger primary ownership, not merely creating the files.
-- Stronger expansion requires route cases, negative cases, and field feedback.
+- `design-frontend` selects `mobile`, `dashboard`, `section-web`, or `general` and loads one profile reference.
+- Promote a profile to a skill only after field evidence proves it needs a distinct owner, write boundary, or validation oracle.
+- Expansion requires route cases, negative cases, and field feedback.
 
 ## Planned Candidates
 
@@ -52,12 +49,12 @@ These are roadmap candidates only; they are not active registry skills yet.
 - Do not generate marketing-style pages when the user asks for an app, tool, or operational interface.
 - Do not treat screenshots alone as proof of implementation quality.
 - Keep specialist skills narrow and add negative routing cases before adding more design skills.
-- Keep `allow_implicit_invocation: false` for new, recently hardened, and surface-specific design skills until route smoke tests and field feedback justify broader routing.
-- Surface-specific implementation skills are operational, but should not displace `design-frontend` for generic design-to-code requests.
+- Keep `allow_implicit_invocation: false` for new and recently hardened design skills until route smoke tests and field feedback justify broader routing.
+- Do not create a surface skill when a conditional `design-frontend` reference is sufficient.
 
 ## Improvement Track
 
 - Add field feedback for the four evidence gates after real projects.
 - Add field feedback for `design-ui-decomposer` and `design-layout-translator` before allowing implicit invocation.
-- Track dashboard/mobile/section field usage before enabling implicit invocation.
+- Track dashboard/mobile/section profile quality, incorrect multi-profile loading, and missing surface constraints.
 - Track over-trigger and under-trigger events before changing primary ownership rules.

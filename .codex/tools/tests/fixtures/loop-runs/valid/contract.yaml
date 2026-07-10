@@ -1,21 +1,22 @@
-schema_version: 1
+schema_version: 2
 contract_id: LC-20260623-010
 activation: explicit
 goal:
   statement: "Make the bounded verification loop fixture pass its primary verifier."
   success_conditions:
     - id: SC-001
-      statement: "Primary command verifier exits zero."
+      statement: "Primary completion artifact exists."
       required: true
       verifier:
-        type: command_exit
-        command: "pytest tests/test_loop.py -q"
-        expected_exit_code: 0
+        type: artifact_exists
+        owner: agent:codex
+        path: "artifacts/primary.ok"
     - id: SC-002
       statement: "Release notes artifact exists."
       required: false
       verifier:
         type: artifact_exists
+        owner: agent:codex
         path: "docs/release-notes.md"
 control:
   max_iterations: 3

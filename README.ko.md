@@ -12,9 +12,9 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 9.0.2 스킬 번들
+## 9.1.0 스킬 번들
 
-이 저장소에는 9.0.2 기준으로 정리한 스킬 번들이 포함되어 있습니다(7.3.1 번들은 아래 9.x 방향 설명대로 호환 기준선으로 유지됩니다). 주요 구성은 다음과 같습니다.
+이 저장소에는 9.1.0 기준으로 정리한 스킬 번들이 포함되어 있습니다(7.3.1 번들은 아래 9.x 방향 설명대로 호환 기준선으로 유지됩니다). 주요 구성은 다음과 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
 * `docs`: 스킬 목록, 사용 기준, 운영 참고 문서
@@ -25,7 +25,7 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 ## 9.x 방향: Neutral Source & Plugin Packaging
 
-현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 maintenance cut은 `9.0.2 — Legacy Template Cleanup`이며 `9.0.1 — Dev Plugin Skill Expansion` 다음 릴리스입니다.
+현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 릴리스는 `9.1.0 — Canonical Quality, Harness Hardening & Skill Consolidation`이며, 실제 최신 배포 태그인 `v9.0.2` 다음 릴리스입니다.
 
 `7.4.x Context Assurance`는 현재 구현 목표가 아니라 legacy label이자 전환 흔적입니다. 7.3.1 스킬 번들은 기존 호출을 위한 호환 기준선으로 유지하고, 8.0 방향에서는 context 모델을 바꿉니다. evidence를 claim과 relation으로 만들고, 이를 Wiki Bank page로 projection한 뒤, 저맥락 Runtime Projection card를 Context Pack으로 컴파일해 실행에 공급합니다.
 
@@ -107,16 +107,13 @@ Design 스킬은 시각적 의도를 구현 가능한 UI 작업이나 검증 가
 
 | 스킬                         | 역할                                                                                            |
 | -------------------------- | --------------------------------------------------------------------------------------------- |
-| `design-frontend`          | 구체적인 시각 디자인을 실제 프론트엔드 코드로 구현합니다. 대상 저장소의 기존 프레임워크, 컴포넌트, 토큰, 자산을 재사용하고 가능한 경우 렌더링 결과를 검증합니다.  |
+| `design-frontend`          | 구체적인 시각 디자인을 실제 프론트엔드 코드로 구현합니다. mobile, dashboard, section-web, general 중 한 profile만 선택하고 저장소의 컴포넌트·토큰·자산을 재사용해 렌더링 결과를 검증합니다. |
 | `design-ui-decomposer`     | 스크린샷, Figma 내보내기, 목업, AI 이미지 같은 UI 참조물을 계층, 레이아웃, 반복 패턴, 컴포넌트·토큰 후보, 상태, 검증 항목으로 분해합니다.       |
 | `design-layout-translator` | Auto Layout, flex/grid, 크기 조정, 오버플로, 브레이크포인트 제약을 코드로 옮길 수 있는 레이아웃 규칙으로 번역합니다.                 |
 | `design-tokens`            | 디자인 토큰 소스를 정규화하고 플랫폼 값에 매핑합니다. 값을 임의로 만들지 않고, 누락·충돌·드리프트가 있는 토큰을 근거와 함께 보고합니다.                |
 | `design-component-mapper`  | 디자인 컴포넌트, 변형, 상태, 슬롯, 이벤트를 저장소의 기존 컴포넌트와 연결하고, 아직 해결되지 않은 구현 간극을 식별합니다.                       |
 | `design-visual-regression` | 렌더링된 UI 스크린샷을 캡처하거나 검토하고, 빈 화면 여부, 프레이밍, 오버플로, 화면 크기별 시각 차이를 보고합니다.                           |
 | `design-a11y-audit`        | 구현된 UI의 접근성 근거를 검토합니다. 키보드 도달성, 포커스 표시, 의미 구조, 대비, 대상 크기, 반응형 가독성을 포함합니다.                     |
-| `design-mobile-screen`     | 안전 영역, 내비게이션·탭 바, 키보드 오버레이, 터치 대상, 스크롤·고정 영역, 플랫폼 상태, 모바일 접근성 같은 모바일/네이티브 화면 제약을 적용합니다.       |
-| `design-dashboard`         | KPI 위계, 필터, 검색, 날짜 범위, 차트, 표, 정보 밀도, 비동기·빈 상태·오류·로딩 상태, 운영용 접근성처럼 대시보드에 필요한 제약을 적용합니다.        |
-| `design-section-web`       | 랜딩, 제품, 문서, 포트폴리오, 마케팅 페이지처럼 섹션 기반 웹페이지에서 히어로, 섹션 구조, CTA 흐름, 반응형 순서, 미디어 배치, 첫 화면 신호를 점검합니다. |
 
 ### Report
 
@@ -127,7 +124,6 @@ Report 스킬은 근거, 검토, 변경 내용, 작업 산출물을 사용자가
 | `report-qualitative`        | 명시적 기준, 근거, 해석, 판단, 권고를 갖춘 정성 평가 보고서를 만듭니다.             |
 | `report-critical`           | 산출물, 계획, 출력, 대화에 대해 블로커 우선 비판 검토, 위험 검토, QA식 판정을 수행합니다. |
 | `report-diff`               | 실제 변경된 줄이나 검증된 전후 스냅샷만을 읽기 쉬운 묶음형 diff 형식으로 제시합니다.      |
-| `report-artifact-inventory` | 한 작업에서 나온 산출물, 실행 명령, 검증 기록, 남은 확인 사항을 요약합니다.           |
 
 ### Workflow
 
@@ -172,10 +168,9 @@ Planning 스킬은 실제 구현을 대신하지 않고, 계획·명세 산출�
 
 Coordination 스킬은 영구적인 워크플로 장치를 만들지 않고, 작업 분할과 인계를 위한 가벼운 구조를 제공합니다.
 
-| 스킬                         | 역할                                                        |
-| -------------------------- | --------------------------------------------------------- |
-| `coordination-brief`       | 기존 계획이나 작업 목록에서 목표 브리프, 작업 DAG 조각, 인계 메모, 잠금 범위 개요를 만듭니다. |
-| `coordination-multi-agent` | 명시적인 멀티 에이전트 작업을 작업 카드, 소유권 메모, 잠금 범위, 인계 경계로 나눕니다.       |
+| 스킬                       | 역할                                                                                   |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| `coordination-handoff`     | 명시적인 목표 브리프, 작업 DAG, 멀티 에이전트·세션 인계, 잠금 범위, 검증 소유권, 작업별 산출물 목록을 만듭니다. |
 
 ### Research
 
@@ -227,11 +222,11 @@ Evaluation 스킬은 사례와 사용 관찰을 통해 스킬 시스템 자체�
 
 ### Skill System
 
-Skill System 스킬은 스킬 번들 자체를 만들고 유지보수합니다.
+Skill System 스킬은 작성된 스킬을 이 저장소에 통합하고 생성된 번들을 유지보수합니다.
 
-| 스킬                  | 역할                                              |
-| ------------------- | ----------------------------------------------- |
-| `create-skill-pack` | 사용자 정의 스킬과 메타데이터를 만들고, 강화하고, 이전하고, 폐기하고, 등록합니다. |
+| 스킬                        | 역할                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------- |
+| `skill-system-repo-adapter` | 승인된 스킬 의미를 canonical source, routing, manifest, generated target에 연결하고 번들을 검증합니다. |
 
 ## 설계 타임라인
 
@@ -253,17 +248,18 @@ Skill System 스킬은 스킬 번들 자체를 만들고 유지보수합니다.
 | 8.1.0 | Bounded verification loops | `/goal`과 명시적 loop 실행 전 readiness 판정, `plan-loop-term` 계약, verifier mapping, 최소 LoopRun runtime을 추가합니다. loop schema, state/checkpoint, progress/stall 판정, Stop-hook continuation, recovery handoff, 검증 근거, idempotency note, loop governance metric, Wiki feedback candidate, 실행 인계 문구를 다룹니다. |
 | 8.3.0 | Bounded loop 하드닝 | LoopRun 무결성 격차를 닫습니다: 세션 스코프 activation bridge(`activate_loop_run.py`/`deactivate_loop_run.py` + Stop hook이 `session_id`로 run 해석, generic agent-run manifest와 디커플링), 단조 iteration·terminal 불변·멱등 replay, `iterations/` 감사기록, precedence 반영 종료 + wall-time 집행, confirmed-only `search-deep-evidence` 수렴 검증기, 런타임 스키마 유효 `plan-loop-term` 계약을 포함합니다. |
 | 8.3.1 | 평가 프레이밍 정리 | 평가를 왜곡하는 배포/autonomy-negative 표현을 제거하고, runtime/hygiene 문서를 host-managed asset 언어로 정리하며, 검증 실행 후 cache cleanup이 안정적으로 유지되도록 합니다. |
+| 8.3.2 | 검증 범위 정리 | 번들 검증을 커밋·배포 콘텐츠로 한정합니다. source-registry·research-ledger·knowledge-store 검증기가 local-only 소스-프로젝트 경로(`docs/`, `.github/`, `.kanboard-plan`) 존재를 더는 요구하지 않고, local-only context-compounding 릴리즈 게이트를 `core`에서 제거합니다. 글로벌 작업 규칙을 Claude 측 `.claude/CLAUDE.md`로 매핑합니다. |
+| 8.4.0 | Fable 하네스 강화 | Fable 계열 하네스 규율(FableCodex, fablize)을 코드가 아닌 개념으로 도입합니다. `workflow-rigor`의 관찰-증거 완료 + `accepted_risk` 종결, `analysis-bug` 가설 사다리, `workflow-recovery` capability-ceiling escalation, 검증-접지/노이즈-제어 eval 케이스, harness-paradox holdout 측정 reference, `adoption_decisions` 출처 원장(`SRC-FABLECODEX` AGPL-3.0, `SRC-FABLIZE` MIT), Codex hook과 동일한(observational) opt-in Claude hook 어댑터를 포함합니다. |
 | 8.4.1 | Checkpointed 실행 + 하네스 패리티 | Claude strict-block 패리티(opt-in 전사 기반 observed-vs-claimed Stop 게이트), `workflow-task-ledger` checkpointed 실행 스킬(관찰-증거 `evidence_refs` step/finding 원장 + `accepted_risk` 종결 + findings 완료 게이트), out-of-band harness-paradox 측정(`analyze_harness_measurement.py`: 80/20 holdout, arm별 fire/block/finalize-fail율, fail delta, sunset)을 추가합니다. 전부 opt-in·기본 off. 여기서 "harness parity"는 Claude/Codex contradiction-gate 패리티이며 fablize 2.1 observation-gate 기능 패리티가 아닙니다. |
+| 8.4.2 | Runtime capability closure | opt-in live agent-run manifest bootstrap, tool/permission 운영 카탈로그, orchestration capability contract를 추가해 hook, permission, host scheduler를 패키지 암시 동작이 아니라 evidence-bound capability로 기록합니다. |
+| 8.4.3 | Live manifest finalization hardening | structured final report의 `result_label`과 `C-###` task claim을 `run.yaml`로 동기화하도록 live bootstrap finalization을 보강해, bootstrap placeholder claim drift를 줄이면서 opt-in·evidence-bound 경계를 유지합니다. |
+| 8.4.4 | Activation surface & feedback hardening | `invocation_surface` policy metadata와 검증, report-only context-surface 분석, optional harness-improvement field feedback, friction-signal maturity guidance를 추가합니다. WorkItem lifecycle은 8.5.0 horizon concept으로 남기며, 이 cut에서는 queue runtime을 도입하지 않습니다. |
+| 8.5.0 | WorkItem lifecycle governance | triage/explore/ready/implement/verify/review/closed를 따르는 schema-bound WorkItem 상태 모델, 검증 도구, execution-assurance coverage, TaskRun의 optional `work_item_ref` 연결을 추가합니다. 이는 lifecycle governance이며 queue runtime, scheduler, Kanboard source of truth, LoopRun replacement가 아닙니다. |
 | 8.5.1 | Work horizon routing clarification | Work Horizon 모델과 plan/workflow 스킬의 `work_horizon`, `planning_altitude`, `execution_mode` metadata를 추가합니다. one-shot, task/ticket, short-plan, long-plan, loop-overlay 라우팅을 명확히 하며 queue/runtime 동작은 추가하지 않습니다. |
 | 9.0.0 | Neutral source & plugin packaging | 중립 canonical `source/` 트리를 단일 소스로 두고 `.codex`/`.claude` 런타임 타깃을 거기서 byte-identical로 생성합니다(verbatim 공유 payload, mirror-from-canonical, platform overlay). generated-only cutover와 재생성 기반 무결성 게이트를 적용하고, 플랫폼 무관 schema 정의를 Claude 타깃에 공유하며, 직군형 Codex plugin 패키지(`skill-system-{core,dev,design,research,quality,maintainer}`)를 58개 skill 완전·중복 없는 분배로 추가합니다. |
 | 9.0.1 | Dev plugin skill expansion | 초기 9.0.0 컷 이후 `skill-system-dev` 엔지니어링 직군을 구체 실행 owner·분석 스킬로 확장합니다(`analysis-architecture-deepening`, `analysis-codebase-design`, `analysis-domain-modeling`, `analysis-performance`, `workflow-implementation`, `workflow-bug-fix`, `workflow-dependency-upgrade`, `workflow-refactor-safely`, `workflow-source-maintenance`, `workflow-comment-maintenance`). `source_maintenance_execution`/`comment_maintenance_execution` work-horizon 모드와 라우팅·레지스트리·runtime/negative eval 커버리지를 추가합니다. skill 수 58 → 68, 타깃 재생성·무결성 검증 완료. |
 | 9.0.2 | Legacy template cleanup | 9.0.1 이후 template hygiene·출력 품질 maintenance cut: short-term plan 템플릿과 `plan-short-term-docs` evidence 규칙에서 toy C++ before/after 예시를 제거하고, `plan-short-term-docs` 다이어그램 정책을 `workflow-rigor`·`report-critical`로 전파하며(plan lifecycle/approval/agent workflow는 기본 다이어그램 아님), long-term `ui-state-contract` 전이 다이어그램을 실제 전이가 있을 때만 그리도록 conditional 처리하고, `analysis-codebase` `report.py`의 unverified fallback 다이어그램(subsystem/path/class/metric)을 text notice로 변경합니다. 번들 버전 9.0.2로 상향, 타깃 재생성·무결성 검증 완료. |
-| 8.5.0 | WorkItem lifecycle governance | triage/explore/ready/implement/verify/review/closed를 따르는 schema-bound WorkItem 상태 모델, 검증 도구, execution-assurance coverage, TaskRun의 optional `work_item_ref` 연결을 추가합니다. 이는 lifecycle governance이며 queue runtime, scheduler, Kanboard source of truth, LoopRun replacement가 아닙니다. |
-| 8.4.4 | Activation surface & feedback hardening | `invocation_surface` policy metadata와 검증, report-only context-surface 분석, optional harness-improvement field feedback, friction-signal maturity guidance를 추가합니다. WorkItem lifecycle은 8.5.0 horizon concept으로 남기며, 이 cut에서는 queue runtime을 도입하지 않습니다. |
-| 8.4.3 | Live manifest finalization hardening | structured final report의 `result_label`과 `C-###` task claim을 `run.yaml`로 동기화하도록 live bootstrap finalization을 보강해, bootstrap placeholder claim drift를 줄이면서 opt-in·evidence-bound 경계를 유지합니다. |
-| 8.4.2 | Runtime capability closure | opt-in live agent-run manifest bootstrap, tool/permission 운영 카탈로그, orchestration capability contract를 추가해 hook, permission, host scheduler를 패키지 암시 동작이 아니라 evidence-bound capability로 기록합니다. |
-| 8.4.0 | Fable 하네스 강화 | Fable 계열 하네스 규율(FableCodex, fablize)을 코드가 아닌 개념으로 도입합니다. `workflow-rigor`의 관찰-증거 완료 + `accepted_risk` 종결, `analysis-bug` 가설 사다리, `workflow-recovery` capability-ceiling escalation, 검증-접지/노이즈-제어 eval 케이스, harness-paradox holdout 측정 reference, `adoption_decisions` 출처 원장(`SRC-FABLECODEX` AGPL-3.0, `SRC-FABLIZE` MIT), Codex hook과 동일한(observational) opt-in Claude hook 어댑터를 포함합니다. |
-| 8.3.2 | 검증 범위 정리 | 번들 검증을 커밋·배포 콘텐츠로 한정합니다. source-registry·research-ledger·knowledge-store 검증기가 local-only 소스-프로젝트 경로(`docs/`, `.github/`, `.kanboard-plan`) 존재를 더는 요구하지 않고, local-only context-compounding 릴리즈 게이트를 `core`에서 제거합니다. 글로벌 작업 규칙을 Claude 측 `.claude/CLAUDE.md`로 매핑합니다. |
+| 9.1.0 | Canonical quality, harness hardening & skill consolidation | canonical 스킬 표면을 71개에서 66개로 통합하고, schema-v2 hook evidence와 observe-default Recovery Guard를 강화하며, planning determinism과 token-cost 제어를 추가하고 `v9.0.2` 이후 release identity를 정합화합니다. Claude standalone 호환성 보완은 9.1.1로 연기합니다. |
 
 ## 라이선스
 

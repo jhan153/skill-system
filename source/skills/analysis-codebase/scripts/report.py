@@ -8,7 +8,7 @@ import json
 import math
 import re
 from collections import Counter, defaultdict
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 SEVERITY_TO_IMPACT = {
@@ -34,6 +34,67 @@ QUADRANT_CANONICAL_PREFIX = [
 QUADRANT_DATA_LINE_RE = re.compile(
     r"^[A-Za-z_][A-Za-z0-9_]*:\s*\[\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\]$"
 )
+
+SEMANTIC_CONTRACT_DIMENSIONS = {
+    "output",
+    "state",
+    "error",
+    "side_effect",
+    "ordering",
+    "timing",
+    "precision",
+    "permission",
+}
+
+IMPLEMENTATION_ONLY_DIMENSIONS = {
+    "framework",
+    "language",
+    "toolkit",
+    "runtime",
+    "platform",
+    "library",
+    "dependency",
+    "build_system",
+    "architecture",
+    "type",
+    "symbol",
+    "file_layout",
+    "control_flow",
+}
+
+BEHAVIORAL_EVIDENCE_KINDS = {
+    "runtime",
+    "trace",
+    "test_result",
+    "contract_test_result",
+    "characterization_test_result",
+    "manual_observation",
+}
+
+BEHAVIORAL_RESULT_SUFFIXES = {
+    ".json",
+    ".jsonl",
+    ".xml",
+    ".txt",
+    ".log",
+    ".yaml",
+    ".yml",
+    ".csv",
+    ".tsv",
+    ".tap",
+    ".trx",
+    ".har",
+    ".trace",
+    ".otlp",
+    ".pb",
+    ".html",
+    ".md",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".webp",
+    ".pdf",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -430,11 +491,20 @@ def quality_attribute_for_profile(profile: str, policy: dict[str, Any]) -> str:
 def evidence_grade_for_finding(churn: float, complexity: float, architecture: float, refs: list[str]) -> str:
     if not refs:
         return "U"
+    # Churn, complexity, and coupling are independent static signals, but they
+    # do not prove runtime impact or behavioral correctness. Static hotspot
+    # findings therefore cannot receive the top evidence grade.
     if churn > 0 and complexity > 0 and architecture > 0:
-        return "A"
-    if churn > 0 and complexity > 0:
         return "B"
-    return "C"
+    if churn > 0 and complexity > 0:
+        return "C"
+    return "D"
+
+
+def cap_static_severity(severity: str) -> str:
+    if severity in {"critical", "high"}:
+        return "medium"
+    return severity
 
 
 def summarize_numeric_signals(*, churn: float, complexity: float, coupling: float) -> str:
@@ -453,34 +523,34 @@ def build_improvement_plan(
     signal_summary = summarize_numeric_signals(churn=churn, complexity=complexity, coupling=coupling)
 
     if profile == "algorithm":
-        title = f"{file_name} 분기/반복 로직 단순화"
+        title = f"{file_name} 복잡도 후보 검증"
         detail = (
-            f"{file_path}에서 고복잡도 분기 경로를 단계별 함수로 분리하고 중복 조건을 통합합니다. "
-            f"핫패스 기준 신호: {signal_summary}."
+            f"확인 필요: {file_path}의 대표 입력과 경계 조건을 characterization test로 고정하고, "
+            f"분기 비용 또는 오류 위험이 확인될 때만 로직 단순화를 진행합니다. 정적 후보 신호: {signal_summary}."
         )
     elif profile == "architecture":
-        title = f"{file_name} 의존 경계 분리"
+        title = f"{file_name} 경계 변경 마찰 확인"
         detail = (
-            f"{file_path}의 호출 책임을 경계 모듈로 분리해 fan-in/fan-out 결합을 낮춥니다. "
-            f"구조 기준 신호: {signal_summary}."
+            f"확인 필요: {file_path}의 대표 caller, 변경 전파, 소유권, 경계 부작용을 먼저 확인하고, "
+            f"실제 변경 마찰이 입증될 때만 의존 경계를 조정합니다. 정적 후보 신호: {signal_summary}."
         )
     elif profile == "performance":
-        title = f"{file_name} 핫패스 성능 최적화"
+        title = f"{file_name} 런타임 병목 확인"
         detail = (
-            f"{file_path}의 반복 호출 구간을 캐시/배치 처리 중심으로 정리해 호출 비용을 줄입니다. "
-            f"성능 기준 신호: {signal_summary}."
+            f"확인 필요: {file_path}를 대표 워크로드로 profile/benchmark해 실제 병목과 기울기를 측정한 뒤, "
+            f"관측된 병목에만 최적화를 적용합니다. 정적 후보 신호: {signal_summary}."
         )
     elif profile == "security":
-        title = f"{file_name} 보안 취약 구간 보완"
+        title = f"{file_name} 보안 스캔 후보 확인"
         detail = (
-            f"{file_path}의 입력/의존성 취약 지점을 재검증하고 방어 로직을 추가합니다. "
-            f"보안 기준 신호: {signal_summary}."
+            f"확인 필요: {file_path}의 scanner rule/advisory 적용 가능성, reachable source/sink 또는 배포 버전을 "
+            f"확인하고 실제 노출이 입증된 경우에만 최소 방어/업그레이드를 적용합니다. 정적 후보 신호: {signal_summary}."
         )
     else:
-        title = f"{file_name} 유지보수 리팩토링"
+        title = f"{file_name} 변경 마찰 확인"
         detail = (
-            f"{file_path}의 책임 경계를 재배치하고 긴 함수 단위를 분해합니다. "
-            f"리팩토링 기준 신호: {signal_summary}."
+            f"확인 필요: {file_path}의 현재 동작을 characterization test로 고정하고 실제 변경 마찰을 확인한 뒤, "
+            f"필요한 최소 책임만 재배치합니다. 정적 후보 신호: {signal_summary}."
         )
 
     return {
@@ -545,7 +615,8 @@ def build_hotspot_findings(
             priority_score *= 1.08
         priority_score = round(priority_score, 3)
 
-        severity = severity_from_priority(priority_score, severity_thresholds)
+        estimated_severity = severity_from_priority(priority_score, severity_thresholds)
+        severity = cap_static_severity(estimated_severity)
 
         impact = SEVERITY_TO_IMPACT.get(severity, 3)
         likelihood = max(1, int(math.ceil(max(churn_norm, complexity_norm) * 5)))
@@ -574,6 +645,7 @@ def build_hotspot_findings(
                 "finding_id": f"F-{today.year}-{index:03d}",
                 "quality_attribute": quality_attribute_for_profile(profile, policy),
                 "severity": severity,
+                "estimated_severity": estimated_severity,
                 "risk_score": risk_score,
                 "priority_score": priority_score,
                 "evidence_grade": evidence_grade_for_finding(churn, complexity, architecture, evidence_refs),
@@ -585,9 +657,11 @@ def build_hotspot_findings(
                     "commit_range": commit_range,
                 },
                 "decision": {
+                    "status": "verification-needed",
+                    "evidence_basis": "static-hotspot",
                     "summary": (
-                        f"churn={churn:.1f}, complexity={complexity:.1f}, coupling={architecture:.1f}, "
-                        f"dominant_profile={profile}"
+                        f"정적 후보이며 동작/영향 확인이 필요합니다. churn={churn:.1f}, "
+                        f"complexity={complexity:.1f}, coupling={architecture:.1f}, dominant_profile={profile}"
                     ),
                 },
                 "score_breakdown": {
@@ -737,7 +811,7 @@ def build_security_findings(
                 "severity": severity,
                 "risk_score": int(risk_score),
                 "priority_score": round(priority_score, 3),
-                "evidence_grade": "A",
+                "evidence_grade": "B",
                 "evidence_refs": [str(item.get("evidence_ref", "Unverified"))],
                 "scope": {
                     "module": module_from_path(str(item.get("file", "security"))),
@@ -746,7 +820,12 @@ def build_security_findings(
                     "commit_range": commit_range,
                 },
                 "decision": {
-                    "summary": str(item.get("summary", "Security finding detected"))[:220],
+                    "status": "verification-needed",
+                    "evidence_basis": "static-security-scan",
+                    "summary": (
+                        "스캐너가 후보를 보고했습니다. 실제 적용 가능성/도달성/배포 버전을 확인해야 합니다: "
+                        + str(item.get("summary", "Security finding detected"))
+                    )[:220],
                 },
                 "score_breakdown": {
                     "weighted": round(priority_score, 3),
@@ -832,6 +911,8 @@ def evaluate_quality_gate(
 
     security_critical_max = safe_int(gate.get("security_critical_max"), 0)
     security_high_max = safe_int(gate.get("security_high_max"), 0)
+    semantic_contract_critical_max = safe_int(gate.get("semantic_contract_critical_max"), 0)
+    semantic_contract_high_max = safe_int(gate.get("semantic_contract_high_max"), 0)
     expired_exceptions_max = safe_int(gate.get("expired_exceptions_max"), 0)
     unverified_warn_ratio = safe_float(gate.get("unverified_warn_ratio"), 0.2)
     unverified_fail_ratio = safe_float(gate.get("unverified_fail_ratio"), 0.35)
@@ -847,14 +928,20 @@ def evaluate_quality_gate(
 
     security_critical = 0
     security_high = 0
+    semantic_contract_critical = 0
+    semantic_contract_high = 0
     for finding in findings:
-        if finding.get("quality_attribute") != "security":
-            continue
         sev = str(finding.get("severity", "medium"))
-        if sev == "critical":
-            security_critical += 1
-        elif sev == "high":
-            security_high += 1
+        if finding.get("quality_attribute") == "security":
+            if sev == "critical":
+                security_critical += 1
+            elif sev == "high":
+                security_high += 1
+        if str(finding.get("scope", {}).get("category", "")) == "semantic-contract":
+            if sev == "critical":
+                semantic_contract_critical += 1
+            elif sev == "high":
+                semantic_contract_high += 1
 
     today = dt.date.today()
     expired_exceptions = 0
@@ -872,7 +959,8 @@ def evaluate_quality_gate(
             continue
 
     finding_count = len(findings)
-    unverified_ratio = round(len(unverified_items) / finding_count, 3) if finding_count else 0.0
+    review_item_count = finding_count + len(unverified_items)
+    unverified_ratio = round(len(unverified_items) / review_item_count, 3) if review_item_count else 0.0
 
     top10 = sorted(findings, key=lambda x: safe_float(x.get("priority_score", 0.0)), reverse=True)[:10]
     missing_top10_plan = 0
@@ -888,6 +976,15 @@ def evaluate_quality_gate(
         category = str(finding.get("scope", {}).get("category", "unknown"))
         if category == "test":
             test_findings_top10 += 1
+
+    static_only_findings = len(
+        [
+            finding
+            for finding in findings
+            if isinstance(finding.get("decision"), dict)
+            and str(finding.get("decision", {}).get("evidence_basis", "")).startswith("static")
+        ]
+    )
 
     required_views = {"context", "container", "component", "runtime", "deployment"}
     present_views = {
@@ -921,6 +1018,12 @@ def evaluate_quality_gate(
         reasons.append(f"security_critical={security_critical} > {security_critical_max}")
     if security_high > security_high_max:
         reasons.append(f"security_high={security_high} > {security_high_max}")
+    if semantic_contract_critical > semantic_contract_critical_max:
+        reasons.append(
+            f"semantic_contract_critical={semantic_contract_critical} > {semantic_contract_critical_max}"
+        )
+    if semantic_contract_high > semantic_contract_high_max:
+        reasons.append(f"semantic_contract_high={semantic_contract_high} > {semantic_contract_high_max}")
     if expired_exceptions > expired_exceptions_max:
         reasons.append(f"expired_exceptions={expired_exceptions} > {expired_exceptions_max}")
     if unverified_ratio > unverified_fail_ratio:
@@ -931,6 +1034,10 @@ def evaluate_quality_gate(
         reasons.append("top10_plan_fields_missing")
     if test_findings_top10 > max_test_findings_top10:
         reasons.append(f"test_findings_top10={test_findings_top10} > {max_test_findings_top10}")
+    if static_only_findings:
+        warnings.append(
+            f"static_only_findings={static_only_findings}: applicability or behavioral verification required before implementation"
+        )
     if missing_architecture_views > max_missing_architecture_views:
         reasons.append(f"missing_architecture_views={missing_architecture_views} > {max_missing_architecture_views}")
     if fallback_diagrams > max_fallback_diagrams:
@@ -953,10 +1060,13 @@ def evaluate_quality_gate(
         "metrics": {
             "security_critical": security_critical,
             "security_high": security_high,
+            "semantic_contract_critical": semantic_contract_critical,
+            "semantic_contract_high": semantic_contract_high,
             "expired_exceptions": expired_exceptions,
             "unverified_ratio": unverified_ratio,
             "missing_top10_plan": missing_top10_plan,
             "test_findings_top10": test_findings_top10,
+            "static_only_findings": static_only_findings,
             "missing_architecture_views": missing_architecture_views,
             "fallback_diagrams": fallback_diagrams,
             "diagrams_without_provenance": diagrams_without_provenance,
@@ -1688,6 +1798,332 @@ def dedupe_refs(refs: list[Any], max_items: int = 12) -> list[str]:
     return seen
 
 
+def normalize_comparison_dimension(value: Any) -> str:
+    text = str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
+    return re.sub(r"_+", "_", text).strip("_")
+
+
+def comparison_value_text(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, (dict, list)):
+        return json.dumps(value, ensure_ascii=False, sort_keys=True)
+    return str(value).strip()
+
+
+def normalize_evidence_kind(value: Any) -> str:
+    return normalize_comparison_dimension(value)
+
+
+def is_behavioral_result_evidence(
+    kind: str,
+    refs: list[str],
+    *,
+    evidence_root: Path | None = None,
+) -> bool:
+    if kind not in BEHAVIORAL_EVIDENCE_KINDS:
+        return False
+    allowed_prefixes = (
+        ("artifacts/manual/",)
+        if kind == "manual_observation"
+        else (
+            "artifacts/dynamic/",
+            "artifacts/runtime/",
+            "artifacts/results/",
+            "artifacts/test-results/",
+            "artifacts/tests/",
+            "artifacts/traces/",
+        )
+    )
+    for raw_ref in refs:
+        normalized = raw_ref.replace("\\", "/")
+        if normalized.startswith("./"):
+            normalized = normalized[2:]
+        path = PurePosixPath(normalized)
+        if path.is_absolute() or ".." in path.parts:
+            continue
+        if not normalized.startswith(allowed_prefixes):
+            continue
+        if path.suffix.lower() not in BEHAVIORAL_RESULT_SUFFIXES:
+            continue
+        if evidence_root is not None and not (evidence_root / Path(*path.parts)).is_file():
+            continue
+        return True
+    return False
+
+
+def classify_contract_comparison(
+    item: dict[str, Any],
+    *,
+    evidence_root: Path | None = None,
+) -> dict[str, Any]:
+    """Classify a paired contract comparison without promoting stack vocabulary.
+
+    Static code can nominate a comparison, but only paired behavioral evidence
+    may establish equivalence or a semantic difference.
+    """
+
+    if not isinstance(item, dict):
+        return {
+            "classification": "unverified",
+            "include_in_semantic_table": True,
+            "finding_eligible": False,
+            "status": "Unverified",
+            "reason": "comparison record is not an object",
+        }
+
+    explicit_status = normalize_comparison_dimension(item.get("status"))
+    if item.get("comparable") is False or explicit_status == "not_comparable":
+        return {
+            "classification": "not-comparable",
+            "include_in_semantic_table": False,
+            "finding_eligible": False,
+            "status": "not-comparable",
+            "reason": str(item.get("reason") or "no shared capability, input fixture, or oracle"),
+        }
+
+    dimension = normalize_comparison_dimension(item.get("dimension"))
+    if dimension in IMPLEMENTATION_ONLY_DIMENSIONS:
+        return {
+            "classification": "implementation-only",
+            "include_in_semantic_table": False,
+            "finding_eligible": False,
+            "status": "excluded",
+            "reason": "implementation vocabulary is not an observable contract dimension",
+        }
+
+    if dimension not in SEMANTIC_CONTRACT_DIMENSIONS:
+        return {
+            "classification": "invalid-dimension",
+            "include_in_semantic_table": False,
+            "finding_eligible": False,
+            "status": "invalid-dimension",
+            "reason": f"unsupported or missing semantic dimension: {dimension or 'none'}",
+        }
+
+    scenario = str(item.get("scenario") or item.get("capability") or "").strip()
+    pair_key = str(item.get("pair_key") or "").strip()
+    baseline = item.get("baseline", {}) if isinstance(item.get("baseline"), dict) else {}
+    candidate = item.get("candidate", {}) if isinstance(item.get("candidate"), dict) else {}
+    baseline_value = comparison_value_text(baseline.get("value"))
+    candidate_value = comparison_value_text(candidate.get("value"))
+    baseline_refs = dedupe_refs(list(baseline.get("evidence_refs", []))) if isinstance(baseline.get("evidence_refs"), list) else []
+    candidate_refs = dedupe_refs(list(candidate.get("evidence_refs", []))) if isinstance(candidate.get("evidence_refs"), list) else []
+    baseline_kind = normalize_evidence_kind(baseline.get("evidence_kind"))
+    candidate_kind = normalize_evidence_kind(candidate.get("evidence_kind"))
+
+    missing: list[str] = []
+    if not scenario:
+        missing.append("same capability/input scenario")
+    if not pair_key:
+        missing.append("shared capability/input/oracle pair_key")
+    if not baseline_value or not candidate_value:
+        missing.append("paired observable values")
+    if not baseline_refs or not candidate_refs:
+        missing.append("paired evidence refs")
+    if not is_behavioral_result_evidence(
+        baseline_kind, baseline_refs, evidence_root=evidence_root
+    ) or not is_behavioral_result_evidence(
+        candidate_kind, candidate_refs, evidence_root=evidence_root
+    ):
+        missing.append("paired behavioral result artifacts")
+
+    if missing:
+        return {
+            "classification": "unverified",
+            "include_in_semantic_table": True,
+            "finding_eligible": False,
+            "status": "Unverified",
+            "reason": "missing " + ", ".join(dict.fromkeys(missing)),
+        }
+
+    if baseline_value == candidate_value:
+        return {
+            "classification": "equivalent",
+            "include_in_semantic_table": False,
+            "finding_eligible": False,
+            "status": "equivalent",
+            "reason": "paired behavioral evidence shows the same observable result",
+        }
+
+    intentional = bool(item.get("intentional") or item.get("expected_or_intentional"))
+    intentionality_ref = str(item.get("intentionality_ref") or item.get("decision_ref") or "").strip()
+    if intentional and intentionality_ref:
+        return {
+            "classification": "intentional",
+            "include_in_semantic_table": True,
+            "finding_eligible": False,
+            "status": "intentional",
+            "reason": "paired behavioral evidence shows an accepted intentional delta",
+        }
+
+    return {
+        "classification": "behavior-difference",
+        "include_in_semantic_table": True,
+        "finding_eligible": True,
+        "status": "different",
+        "reason": "paired behavioral evidence shows an observable semantic delta",
+    }
+
+
+def build_contract_comparison_rows(
+    comparison_model: dict[str, Any],
+    *,
+    evidence_root: Path | None = None,
+) -> tuple[list[list[str]], dict[str, int], list[dict[str, str]]]:
+    comparisons = comparison_model.get("comparisons", []) if isinstance(comparison_model, dict) else []
+    if not isinstance(comparisons, list):
+        comparisons = []
+
+    rows: list[list[str]] = []
+    counts: Counter[str] = Counter()
+    gaps: list[dict[str, str]] = []
+    for raw in comparisons:
+        if not isinstance(raw, dict):
+            raw = {}
+        verdict = classify_contract_comparison(raw, evidence_root=evidence_root)
+        classification = str(verdict.get("classification", "unverified"))
+        counts[classification] += 1
+        if classification in {"unverified", "invalid-dimension"}:
+            gaps.append(
+                {
+                    "scenario": str(raw.get("scenario") or raw.get("capability") or "Unverified"),
+                    "reason": str(verdict.get("reason", "paired behavior evidence is missing")),
+                }
+            )
+        if not verdict.get("include_in_semantic_table"):
+            continue
+
+        baseline = raw.get("baseline", {}) if isinstance(raw.get("baseline"), dict) else {}
+        candidate = raw.get("candidate", {}) if isinstance(raw.get("candidate"), dict) else {}
+        baseline_value = comparison_value_text(baseline.get("value")) or "Unverified"
+        candidate_value = comparison_value_text(candidate.get("value")) or "Unverified"
+        baseline_refs = dedupe_refs(list(baseline.get("evidence_refs", [])), max_items=3) if isinstance(baseline.get("evidence_refs"), list) else []
+        candidate_refs = dedupe_refs(list(candidate.get("evidence_refs", [])), max_items=3) if isinstance(candidate.get("evidence_refs"), list) else []
+        baseline_kind = normalize_evidence_kind(baseline.get("evidence_kind")) or "Unverified"
+        candidate_kind = normalize_evidence_kind(candidate.get("evidence_kind")) or "Unverified"
+        paired_refs = "; ".join(
+            [
+                f"baseline({baseline_kind})=" + (", ".join(baseline_refs) or "Unverified"),
+                f"candidate({candidate_kind})=" + (", ".join(candidate_refs) or "Unverified"),
+            ]
+        )
+
+        if classification in {"behavior-difference", "intentional"}:
+            delta = f"{verdict.get('status')}: {baseline_value} → {candidate_value}"
+        else:
+            delta = f"Unverified: {verdict.get('reason', 'paired verification required')}"
+
+        scenario = str(raw.get("scenario") or raw.get("capability") or "Unverified")
+        pair_key = str(raw.get("pair_key") or "").strip()
+        comparison_label = f"{scenario} [pair_key={pair_key}]" if pair_key else scenario
+        rows.append(
+            [
+                comparison_label,
+                normalize_comparison_dimension(raw.get("dimension")) or "Unverified",
+                baseline_value,
+                candidate_value,
+                delta,
+                paired_refs,
+                str(raw.get("verification") or "paired characterization test required"),
+            ]
+        )
+
+    counts["total"] = len(comparisons)
+    return rows, dict(counts), gaps
+
+
+def build_contract_findings(
+    comparison_model: dict[str, Any],
+    *,
+    policy: dict[str, Any],
+    commit_range: str,
+    start_index: int,
+    evidence_root: Path | None = None,
+) -> list[dict[str, Any]]:
+    comparisons = comparison_model.get("comparisons", []) if isinstance(comparison_model, dict) else []
+    if not isinstance(comparisons, list):
+        return []
+
+    findings: list[dict[str, Any]] = []
+    today = dt.date.today()
+    owner = str(policy.get("owners", {}).get("default") or "Unverified")
+    for raw in comparisons:
+        if not isinstance(raw, dict):
+            continue
+        verdict = classify_contract_comparison(raw, evidence_root=evidence_root)
+        if not verdict.get("finding_eligible"):
+            continue
+
+        severity = str(raw.get("severity") or "medium").lower()
+        if severity not in SEVERITY_TO_IMPACT:
+            severity = "medium"
+        impact = SEVERITY_TO_IMPACT.get(severity, 3)
+        scenario = str(raw.get("scenario") or raw.get("capability") or "Unverified")
+        pair_key = str(raw.get("pair_key") or "Unverified")
+        baseline = raw.get("baseline", {}) if isinstance(raw.get("baseline"), dict) else {}
+        candidate = raw.get("candidate", {}) if isinstance(raw.get("candidate"), dict) else {}
+        baseline_value = comparison_value_text(baseline.get("value")) or "Unverified"
+        candidate_value = comparison_value_text(candidate.get("value")) or "Unverified"
+        evidence_refs = dedupe_refs(
+            list(baseline.get("evidence_refs", [])) + list(candidate.get("evidence_refs", []))
+        )
+        related_files = raw.get("related_files", [])
+        if not isinstance(related_files, list):
+            related_files = []
+        related_files = [str(item) for item in related_files if str(item).strip()]
+        scope_file = related_files[0] if related_files else "artifacts/manual/contract-comparisons.json"
+        verification = str(raw.get("verification") or "replay the paired fixture and assert the expected contract")
+        finding_number = start_index + len(findings)
+
+        findings.append(
+            {
+                "finding_id": f"F-{today.year}-C{finding_number:03d}",
+                "quality_attribute": str(raw.get("quality_attribute") or "correctness"),
+                "severity": severity,
+                "risk_score": impact * 9,
+                "priority_score": round(float(impact) + 2.0, 3),
+                "evidence_grade": "A",
+                "evidence_refs": evidence_refs,
+                "scope": {
+                    "module": str(raw.get("module") or "semantic-comparison"),
+                    "file": scope_file,
+                    "category": "semantic-contract",
+                    "commit_range": commit_range,
+                },
+                "decision": {
+                    "status": "confirmed-difference",
+                    "evidence_basis": "paired-behavior",
+                    "summary": f"{scenario} [{pair_key}]: {baseline_value} → {candidate_value}",
+                },
+                "score_breakdown": {
+                    "weighted": round(float(impact) + 2.0, 3),
+                    "category_bias": 0.0,
+                    "rank_boost": 0.0,
+                    "signals": {"paired_behavior": 1.0},
+                },
+                "action": {
+                    "profile": "semantic-contract",
+                    "owner": str(raw.get("owner") or owner),
+                    "due": due_date_for_severity(severity, policy),
+                    "title": str(raw.get("action_title") or f"{scenario} 의미 계약 정렬"),
+                    "summary": "관찰된 비의도 동작 차이의 기대 계약을 결정하고 한쪽 구현을 정렬합니다.",
+                },
+                "improvement_plan": {
+                    "title": str(raw.get("action_title") or f"{scenario} 의미 계약 정렬"),
+                    "detail": (
+                        f"paired evidence에서 {baseline_value} → {candidate_value} 차이가 확인됐습니다. "
+                        f"기대 계약을 명시한 뒤 최소 구현을 정렬하고 동일 fixture로 재검증합니다."
+                    ),
+                    "related_files": related_files or [scope_file],
+                },
+                "verification_plan": [verification],
+                "exception": {"approved": False, "expires_on": None},
+            }
+        )
+    return findings
+
+
 def collect_provenance_refs(model: dict[str, Any], max_items: int = 12) -> list[str]:
     refs: list[Any] = []
     if not isinstance(model, dict):
@@ -2065,7 +2501,7 @@ def build_crosscutting_rows(crosscutting_model: dict[str, Any]) -> list[list[str
 def build_decision_rows(decision_model: dict[str, Any]) -> list[list[str]]:
     candidates = decision_model.get("candidates", []) if isinstance(decision_model, dict) else []
     if not isinstance(candidates, list) or not candidates:
-        return [["Unverified", "Unverified", "Unverified", "Unverified"]]
+        return [["Unverified", "Unverified", "Unverified", "Unverified", "Unverified", "Unverified"]]
 
     rows: list[list[str]] = []
     for item in candidates[:8]:
@@ -2075,11 +2511,13 @@ def build_decision_rows(decision_model: dict[str, Any]) -> list[list[str]]:
             [
                 str(item.get("title", "Unverified")),
                 str(item.get("type", "Unverified")),
+                str(item.get("status", "verification-needed")),
                 str(item.get("summary", "Unverified")),
+                str(item.get("verification", "Unverified")),
                 ", ".join(dedupe_refs(list(item.get("evidence_refs", [])), max_items=4)),
             ]
         )
-    return rows or [["Unverified", "Unverified", "Unverified", "Unverified"]]
+    return rows or [["Unverified", "Unverified", "Unverified", "Unverified", "Unverified", "Unverified"]]
 
 
 def build_architecture_view_rows(diagram_views: list[dict[str, Any]]) -> list[list[str]]:
@@ -2100,11 +2538,14 @@ def build_architecture_view_rows(diagram_views: list[dict[str, Any]]) -> list[li
 
 
 def to_markdown_table(headers: list[str], rows: list[list[str]]) -> str:
+    def cell(value: Any) -> str:
+        return str(value).replace("|", "\\|").replace("\r\n", "<br>").replace("\n", "<br>")
+
     if not rows:
-        return "| " + " | ".join(headers) + " |\n| " + " | ".join(["---"] * len(headers)) + " |\n| Unverified |" + " Unverified |" * (len(headers) - 1)
-    line1 = "| " + " | ".join(headers) + " |"
+        return "| " + " | ".join(cell(header) for header in headers) + " |\n| " + " | ".join(["---"] * len(headers)) + " |\n| Unverified |" + " Unverified |" * (len(headers) - 1)
+    line1 = "| " + " | ".join(cell(header) for header in headers) + " |"
     line2 = "| " + " | ".join(["---"] * len(headers)) + " |"
-    body = ["| " + " | ".join(row) + " |" for row in rows]
+    body = ["| " + " | ".join(cell(value) for value in row) + " |" for row in rows]
     return "\n".join([line1, line2] + body)
 
 
@@ -2146,6 +2587,8 @@ def build_report(
     interface_rows: list[list[str]],
     crosscutting_rows: list[list[str]],
     decision_rows: list[list[str]],
+    contract_comparison_rows: list[list[str]],
+    contract_comparison_summary: dict[str, int],
     static_metric_charts: list[dict[str, str]],
     class_diagram: str,
     class_detail_rows: list[dict[str, Any]],
@@ -2155,6 +2598,12 @@ def build_report(
 
     top_findings = sorted(findings, key=lambda x: safe_float(x.get("priority_score", 0.0)), reverse=True)
     high_critical = [f for f in findings if str(f.get("severity", "")).lower() in {"high", "critical"}]
+    static_only_candidates = [
+        finding
+        for finding in findings
+        if isinstance(finding.get("decision"), dict)
+        and str(finding.get("decision", {}).get("evidence_basis", "")).startswith("static")
+    ]
 
     quality_attr_counter = Counter(str(f.get("quality_attribute", "unknown")) for f in top_findings[:10])
     module_counter = Counter(str(f.get("scope", {}).get("module", "unknown")) for f in findings)
@@ -2165,6 +2614,7 @@ def build_report(
     summary_rows = [
         ["총 Finding", str(len(findings))],
         ["High/Critical", str(len(high_critical))],
+        ["Static-only 확인 후보", str(len(static_only_candidates))],
         ["Quality Gate", str(gate.get("status", "Unverified"))],
         ["Unverified 항목", str(len(unverified_items))],
         ["엔트리포인트 수", str(entrypoint_summary.get("count", architecture_counts.get("entrypoints", "Unverified")))],
@@ -2373,8 +2823,8 @@ def build_report(
     lines.append("### Crosscutting Concepts")
     lines.append(to_markdown_table(["개념", "증거 수", "대표 근거"], crosscutting_rows))
     lines.append("")
-    lines.append("### Architecture Decisions")
-    lines.append(to_markdown_table(["결정 후보", "유형", "요약", "대표 근거"], decision_rows))
+    lines.append("### Architecture Decision Candidates")
+    lines.append(to_markdown_table(["결정 후보", "유형", "상태", "요약", "확인 방법", "대표 근거"], decision_rows))
     lines.append("")
     lines.append("### 결합도 상위 파일(보조 근거)")
     lines.append("")
@@ -2407,6 +2857,39 @@ def build_report(
     lines.append("### Interface Contracts")
     lines.append(to_markdown_table(["Source Component", "Kind", "Target", "Evidence"], interface_rows))
     lines.append("")
+    if safe_int(contract_comparison_summary.get("total"), 0) > 0:
+        lines.append("### End-to-end 의미 계약 비교")
+        lines.append(
+            "- 구현체/언어/프레임워크 차이는 의미 비교에서 제외하며, 동일 capability/input의 관찰 가능한 동작만 표시합니다."
+        )
+        lines.append(
+            "- 분류: "
+            f"verified-difference={contract_comparison_summary.get('behavior-difference', 0)}, "
+            f"intentional={contract_comparison_summary.get('intentional', 0)}, "
+            f"equivalent={contract_comparison_summary.get('equivalent', 0)}, "
+            f"Unverified={contract_comparison_summary.get('unverified', 0)}, "
+            f"implementation-only-excluded={contract_comparison_summary.get('implementation-only', 0)}, "
+            f"not-comparable-excluded={contract_comparison_summary.get('not-comparable', 0)}, "
+            f"invalid-dimension-excluded={contract_comparison_summary.get('invalid-dimension', 0)}"
+        )
+        if contract_comparison_rows:
+            lines.append(
+                to_markdown_table(
+                    [
+                        "Capability / Input / Pair Key",
+                        "Dimension",
+                        "Baseline Observable",
+                        "Candidate Observable",
+                        "Semantic Delta / Status",
+                        "Paired Evidence",
+                        "Validation",
+                    ],
+                    contract_comparison_rows,
+                )
+            )
+        else:
+            lines.append("- 의미 차이 또는 확인 필요 행 없음; implementation-only/equivalent 행은 접어서 제외했습니다.")
+        lines.append("")
     lines.append("### Code-Level Detail (Optional)")
     lines.append(class_diagram)
     lines.append("")
@@ -2498,6 +2981,11 @@ def build_report(
             "대표 시나리오가 실제 entrypoint/trace와 연결되는지",
             "trace-backed 여부와 runtime entrypoint linkage 확인",
         ],
+        [
+            "Semantic Comparison",
+            "동일 capability/input의 output, state, error, side effect 차이에 paired evidence가 있는지",
+            "implementation vocabulary를 제외하고 material delta 또는 Unverified 검증 과제만 확정",
+        ],
     ]
     lines.append(to_markdown_table(["영역", "수동 검토 포인트", "활용 목적"], manual_rows))
     lines.append("")
@@ -2576,6 +3064,9 @@ def main() -> int:
     deployment_model = load_json(artifacts_dir / "architecture" / "deployment-model.json", {})
     crosscutting_model = load_json(artifacts_dir / "architecture" / "crosscutting-model.json", {})
     decision_model = load_json(artifacts_dir / "architecture" / "decision-candidates.json", {})
+    contract_comparison_model = load_json(
+        artifacts_dir / "manual" / "contract-comparisons.json", {}
+    )
     previous_metrics = load_json(artifacts_dir / "previous_metrics.json", {})
 
     classification = parse_classification_map(artifacts_dir / "static" / "path-classification.tsv")
@@ -2609,7 +3100,15 @@ def main() -> int:
         start_index=len(hotspot_findings) + 1,
     )
 
-    findings = hotspot_findings + security_findings
+    contract_findings = build_contract_findings(
+        contract_comparison_model if isinstance(contract_comparison_model, dict) else {},
+        policy=policy,
+        commit_range=commit_range,
+        start_index=len(hotspot_findings) + len(security_findings) + 1,
+        evidence_root=artifacts_dir.parent,
+    )
+
+    findings = hotspot_findings + security_findings + contract_findings
     findings.sort(key=lambda f: safe_float(f.get("priority_score", 0.0)), reverse=True)
 
     exceptions = load_json(artifacts_dir / "exceptions.json", [])
@@ -2619,6 +3118,18 @@ def main() -> int:
     unverified_items = index.get("unverified", [])
     if not isinstance(unverified_items, list):
         unverified_items = []
+
+    contract_comparison_rows, contract_comparison_summary, comparison_gaps = build_contract_comparison_rows(
+        contract_comparison_model if isinstance(contract_comparison_model, dict) else {},
+        evidence_root=artifacts_dir.parent,
+    )
+    for gap in comparison_gaps:
+        unverified_items.append(
+            {
+                "section": f"semantic-comparison:{gap.get('scenario', 'Unverified')}",
+                "reason": gap.get("reason", "paired behavior evidence is missing"),
+            }
+        )
 
     branch_rows = read_tsv(artifacts_dir / "git" / "branches.tsv")
     branch_summary = summarize_branches(branch_rows)
@@ -2699,6 +3210,8 @@ def main() -> int:
         interface_rows=interface_rows,
         crosscutting_rows=crosscutting_rows,
         decision_rows=decision_rows,
+        contract_comparison_rows=contract_comparison_rows,
+        contract_comparison_summary=contract_comparison_summary,
         static_metric_charts=static_metric_charts,
         class_diagram=class_diagram,
         class_detail_rows=class_detail_rows,

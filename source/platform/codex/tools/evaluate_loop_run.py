@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -15,6 +16,8 @@ from _validation import load_json_file, load_yaml_file, validate_schema
 from loop_policy import (
     append_jsonl,
     canonical_hash,
+    contained_path,
+    contract_runtime_errors,
     condition_map,
     control_value,
     elapsed_seconds,
@@ -24,6 +27,7 @@ from loop_policy import (
     passed_required_count,
     required_condition_ids,
     state_fingerprint,
+    structured_evidence_errors,
     utc_now,
     write_yaml,
 )
@@ -51,6 +55,7 @@ def merge_iteration_result(contract: dict[str, Any], state: dict[str, Any], resu
             "condition_id": item["condition_id"],
             "status": item.get("status", "unverified"),
             "evidence_refs": item.get("evidence_refs", []) if isinstance(item.get("evidence_refs"), list) else [],
+            "evidence": item.get("evidence", []) if isinstance(item.get("evidence"), list) else [],
             **({"failure_fingerprint": item["failure_fingerprint"]} if isinstance(item.get("failure_fingerprint"), str) else {}),
         }
     state["condition_results"] = list(merged.values())
@@ -131,21 +136,6 @@ def continuation_prompt(action: str, reason_code: str, contract: dict[str, Any],
     )
 
 
-def evidenceless_passes(contract: dict[str, Any], state: dict[str, Any]) -> list[str]:
-    """Required conditions reported as pass but lacking any verifier evidence.
-
-    A pass with no evidence is a reward-hacking / premature-completion signal: it
-    must not be counted toward loop success.
-    """
-    results = condition_map(state)
-    violations: list[str] = []
-    for condition_id in required_condition_ids(contract):
-        result = results.get(condition_id, {})
-        if result.get("status") == "pass" and not result.get("evidence_refs"):
-            violations.append(condition_id)
-    return violations
-
-
 # Default ordering when (or where) the contract's termination.precedence is silent.
 # Reserved states (unsafe/fatal/approval_required/stalled) have no auto-emit path
 # yet; they stay in the vocabulary so a future verifier signal resolves correctly.
@@ -160,17 +150,21 @@ def termination_precedence(contract: dict[str, Any]) -> list[str]:
     return [item for item in raw if isinstance(item, str)] if isinstance(raw, list) else []
 
 
-def decide(contract: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
+def decide(
+    contract: dict[str, Any],
+    state: dict[str, Any],
+    evidence_errors: list[str] | None = None,
+) -> dict[str, Any]:
     failed = failed_required_conditions(contract, state)
     progress = state.get("progress", {}) if isinstance(state.get("progress"), dict) else {}
     budgets = state.get("budgets", {}) if isinstance(state.get("budgets"), dict) else {}
     target = failed[0]["condition_id"] if failed else None
 
-    # Hard governance guards win regardless of contract precedence: an evidence-less
-    # required pass, or an explicitly blocked condition, is never overridden.
-    evidence_violations = evidenceless_passes(contract, state)
-    if evidence_violations:
-        return {"action": "blocked", "reason_code": "pass_without_evidence", "target_condition": evidence_violations[0]}
+    # Hard governance guards win regardless of contract precedence: malformed,
+    # mismatched, missing, or stale verifier receipts can never be overridden.
+    if evidence_errors:
+        target_condition = evidence_errors[0].split(":", 1)[0]
+        return {"action": "blocked", "reason_code": "invalid_verifier_evidence", "target_condition": target_condition}
     if any(item.get("status") == "blocked" for item in failed):
         return {"action": "blocked", "reason_code": "required_condition_blocked", "target_condition": target}
 
@@ -218,7 +212,9 @@ def load_state_and_contract(loop_dir: Path) -> tuple[dict[str, Any], dict[str, A
     state = load_yaml(loop_dir / "state.yaml")
     if not isinstance(state, dict):
         raise ValueError("state.yaml must be a mapping")
-    contract_path = loop_dir / str(state.get("contract_ref", "contract.yaml"))
+    contract_path = contained_path(loop_dir, str(state.get("contract_ref", "contract.yaml")))
+    if contract_path is None or not contract_path.is_file():
+        raise ValueError("contract_ref must resolve to a file contained by the LoopRun directory")
     contract = load_yaml(contract_path)
     if not isinstance(contract, dict):
         raise ValueError("contract must be a mapping")
@@ -245,6 +241,51 @@ def _evaluate(args: argparse.Namespace) -> int:
         print(f"FAIL: {exc}")
         return 2
 
+    preflight_errors: list[str] = []
+    state_schema = load_json_file(ROOT / ".codex" / "schemas" / "loop" / "loop-run.schema.json")
+    contract_schema = load_json_file(ROOT / ".codex" / "schemas" / "loop" / "loop-contract.schema.json")
+    preflight_errors.extend(f"state: {error}" for error in validate_schema(state, state_schema))
+    preflight_errors.extend(f"contract: {error}" for error in validate_schema(contract, contract_schema))
+    preflight_errors.extend(f"contract: {error}" for error in contract_runtime_errors(contract))
+    if state.get("schema_version") != 2:
+        preflight_errors.append("state: schema_version 1 is legacy read-only and cannot be evaluated")
+    checkpoint = args.loop_run_dir / "checkpoints" / f"{int(state.get('iteration', 0)):04d}.yaml"
+    if not checkpoint.is_file():
+        preflight_errors.append("state: current checkpoint is missing")
+    else:
+        checkpoint_state = load_yaml(checkpoint)
+        if not isinstance(checkpoint_state, dict) or canonical_hash(checkpoint_state) != canonical_hash(state):
+            preflight_errors.append("state: current checkpoint does not exactly match state.yaml")
+    if state.get("progress", {}).get("state_hash") != state_fingerprint(contract, state):
+        preflight_errors.append("state: progress.state_hash does not match current condition state")
+    if preflight_errors:
+        print("FAIL")
+        for error in preflight_errors:
+            print(f"- preflight: {error}")
+        return 3
+    integrity = subprocess.run(
+        [sys.executable, str(Path(__file__).with_name("validate_loop_run.py")), str(args.loop_run_dir)],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    if integrity.returncode != 0:
+        print("FAIL: LoopRun integrity validation failed before evaluation")
+        print(integrity.stdout.rstrip())
+        return 3
+    persisted_evidence_errors = structured_evidence_errors(
+        contract,
+        state,
+        state.get("condition_results", []),
+        args.loop_run_dir,
+    )
+    if persisted_evidence_errors:
+        print("FAIL")
+        for error in persisted_evidence_errors:
+            print(f"- persisted_evidence: {error}")
+        return 3
+
     recorded_iteration: int | None = None
     if args.iteration_result:
         schema = load_json_file(ROOT / ".codex" / "schemas" / "loop" / "iteration-result.schema.json")
@@ -253,6 +294,10 @@ def _evaluate(args: argparse.Namespace) -> int:
             print("FAIL: iteration result must be a mapping")
             return 2
         errors = validate_schema(result, schema)
+        if result.get("schema_version") != 2:
+            errors.append("iteration result schema_version 1 is legacy read-only")
+        if result.get("schema_version") != state.get("schema_version"):
+            errors.append("iteration result schema_version does not match state")
         if result.get("loop_run_id") != state.get("loop_run_id"):
             errors.append("iteration result loop_run_id does not match state")
         if errors:
@@ -287,6 +332,18 @@ def _evaluate(args: argparse.Namespace) -> int:
                 print("- replay: true")
             return 0
 
+        evidence_errors = structured_evidence_errors(
+            contract,
+            state,
+            result.get("condition_results", []),
+            args.loop_run_dir,
+        )
+        if evidence_errors:
+            print("FAIL")
+            for error in evidence_errors:
+                print(f"- iteration_result: {error}")
+            return 1
+
         # Terminal immutability: terminal LoopRuns reject new results.
         if state.get("status") != "active":
             print(f"FAIL: loop is terminal (status={state.get('status')}); use resume_loop_run.py to reopen")
@@ -314,7 +371,13 @@ def _evaluate(args: argparse.Namespace) -> int:
     # enforce control.max_wall_time_seconds.
     state.setdefault("budgets", {})["wall_time_seconds"] = elapsed_seconds(state.get("started_at", ""), utc_now())
 
-    decision = decide(contract, state)
+    state_evidence_errors = structured_evidence_errors(
+        contract,
+        state,
+        state.get("condition_results", []),
+        args.loop_run_dir,
+    )
+    decision = decide(contract, state, state_evidence_errors)
     if decision["action"] in {"continue", "recover"}:
         budgets = state["budgets"]
         if int(budgets.get("stop_continuations_used", 0)) >= int(budgets.get("max_stop_continuations", 0)):
@@ -358,6 +421,11 @@ def _evaluate(args: argparse.Namespace) -> int:
         write_yaml(args.loop_run_dir / "iterations" / f"{recorded_iteration:04d}.decision.yaml", decision)
     write_yaml(args.loop_run_dir / "state.yaml", state)
     write_yaml(args.loop_run_dir / "checkpoints" / f"{int(state.get('iteration', 0)):04d}.yaml", state)
+    if recorded_iteration is not None:
+        write_yaml(
+            args.loop_run_dir / "iterations" / f"{recorded_iteration:04d}.checkpoint.yaml",
+            state,
+        )
     append_jsonl(
         args.loop_run_dir / "loop-events.jsonl",
         {

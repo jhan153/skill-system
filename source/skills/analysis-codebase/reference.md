@@ -8,6 +8,7 @@
 - decision summary
 - improvement backlog row (`파인딩/액션/Severity/Priority/구체적인 개선 내용/관련 파일`)
 - Unverified 명시
+- static metric은 후보 선택에만 사용하며 behavior/parity 결론은 paired evidence로 검증
 
 ## 2) Artifact Layout
 ```text
@@ -51,6 +52,8 @@
       trace-artifacts.json
     notes/
       unverified.tsv
+    manual/
+      contract-comparisons.json  # port/migration comparison only
   logs/
 ```
 
@@ -110,6 +113,7 @@
   - fallback diagram 개수
   - provenance 없는 diagram 개수
   - entrypoint에 연결되지 않은 runtime scenario 개수
+  - static-only finding/candidate 수와 필요한 behavior verification
 
 ## 7) Permission-Blocked Policy
 - 권한/보안 제한으로 도구가 실패하면 `PASS`로 가정하지 않습니다.
@@ -121,3 +125,5 @@
 - HLD를 단일 호출쌍으로 축약하지 않습니다.
 - 개선 백로그에 템플릿 문구만 반복하지 않습니다.
 - 권한 실패를 성공으로 가정하지 않습니다.
+- 언어/framework/toolkit/runtime/platform/architecture 차이를 그 자체로 end-to-end 의미 차이로 보고하지 않습니다.
+- 정적 topology만으로 `different` 또는 `equivalent`를 확정하지 않습니다.

@@ -1,6 +1,6 @@
 ---
 name: research-experiment-blueprint
-description: Creates experiment blueprint artifacts from one selected hypothesis or research plan, with checkpoint-first evaluation, matched datasets/metrics, ablation ladder, loss budget, and falsification criteria.
+description: Turn one selected research hypothesis into an identifiable experiment blueprint with matched baselines, controls, datasets, metrics, ablations, compute bounds, falsification criteria, and reproducibility requirements. Use after hypothesis selection; do not generate code or claim results.
 ---
 
 # Research Experiment Blueprint
@@ -8,138 +8,87 @@ description: Creates experiment blueprint artifacts from one selected hypothesis
 ## Routing Card
 - role: primary
 - intent_signature:
-  - experiment blueprint
-  - experiment_blueprint.json
-  - 실험 설계
-  - benchmark design
-  - dataset baseline metric ablation
-  - selected hypothesis experiment
+  - experiment blueprint, benchmark design, selected-hypothesis experiment, 실험 설계서
 - use_when:
-  - the user asks for an experiment blueprint from a selected hypothesis or research plan.
-  - datasets, baselines, metrics, ablations, compute, reproducibility, and stop/go criteria need structured planning.
+  - one primary hypothesis is selected and the user needs an executable scientific design.
 - do_not_use_when:
-  - code scaffold generation; use research-experiment-scaffold.
-  - literature review or hypothesis ideation.
-  - raw user claim planning without selected hypothesis; use research-hypothesis-planning.
+  - the claim is still being formed (`research-hypothesis-planning` or `research-literature-ideation`).
+  - code scaffold or experiment execution is requested (`research-experiment-scaffold`).
 - expected_inputs:
-  - selected hypothesis
-  - research plan
-  - evidence references
-  - baseline/checkpoint availability
-  - dataset and metric constraints
+  - selected hypothesis, mechanism, evidence status, constraints, and available baseline/checkpoint
 - expected_outputs:
-  - selected hypothesis
-  - evidence references
-  - checkpoint-first plan
-  - datasets with license/access notes
-  - baselines with references
-  - metrics
-  - minimal core experiment
-  - ablation ladder
-  - loss budget
-  - compute/timeline
-  - stop/go criteria
-  - falsification conditions
-  - reproducibility plan
+  - identifying experiment, controls, data/metrics, baseline, ablations, stop/go/refute criteria, compute and reproducibility plan
 - context_targets:
   must_read:
-    - one selected hypothesis or research plan
-    - constraints and target metrics
+    - selected hypothesis and claimed mechanism
+    - target outcome and constraints
   read_if_needed:
-    - evidence_ledger.json
-    - ideation_output.json
-    - research_plan.json
-    - speech-enhancement-research for speech/audio research
+    - evidence ledger, existing checkpoints/results, dataset cards, metric definitions, and relevant prior protocol
   do_not_load_by_default:
-    - code scaffold
-    - statistical claims
-    - manuscript writing
+    - full literature corpus, code scaffold, manuscript, or unrelated experiments
 - risk_profile:
   reads:
-    - research plan
-    - ideation output
-    - evidence ledger
-    - domain references
+    - selected research artifacts and targeted data/metric/baseline evidence
   writes:
-    - `papers/experiment_blueprint.json` only when requested
+    - blueprint artifact only when explicitly requested
   tools:
-    - none by default
-  network:
-    - none by default
-  credentials:
-    - none
-  generated_artifacts:
-    - experiment blueprint only if requested
-  destructive_actions:
-    - none
+    - none by default; no downloads, installs, training, or result generation
+  sensitive_resources:
+    - credentials and private datasets default deny
 - entry_scene:
   - PREPARE
 
-## Purpose
-Creates experiment blueprint artifacts from one selected hypothesis or research plan, with checkpoint-first evaluation, matched datasets/metrics, ablation ladder, loss budget, and falsification criteria.
+## Experimental Identification Standard
+A blueprint is good only if its outcome can distinguish the primary claim from credible alternatives.
 
-## When To Apply
-- the user asks for an experiment blueprint from a selected hypothesis or research plan.
-- datasets, baselines, metrics, ablations, compute, reproducibility, and stop/go criteria need structured planning.
+1. Rewrite the selected hypothesis as intervention → mechanism → observable outcome, with scope and falsifier.
+2. Define the experimental unit, sampling unit, treatment, control, frozen factors, and leakage risks.
+3. Reuse an existing checkpoint or baseline when it can test the claim; new training is justified only by an identified gap.
+4. Choose datasets and metrics because they expose the claimed mechanism, not because they are conventional.
+5. Include a simple baseline and the strongest comparable baseline that fits the same data/evaluation contract.
+6. Define the smallest core experiment that changes one causal factor.
+7. Add ablations only when each one separates mechanisms or boundary conditions; an ablation checklist is not evidence.
+8. Predeclare support, refute, inconclusive, stop, and escalation conditions.
 
-## When Not To Apply
-- code scaffold generation; use research-experiment-scaffold.
-- literature review or hypothesis ideation.
-- raw user claim planning without selected hypothesis; use research-hypothesis-planning.
+## Blueprint Decisions
+Cover only decisions material to the claim:
 
-## Workflow
-1. PREPARE - confirm exactly one selected hypothesis.
-2. CHECKPOINT-FIRST - identify checkpoint, pretrained, baseline inference, metric-only, or label audit options before training.
-3. DATASET/METRIC - select only datasets and metrics that match the hypothesis.
-4. BASELINES - include a simple baseline and a strong baseline when possible.
-5. CORE - define the smallest discriminating experiment.
-6. ABLATION - add one factor at a time.
-7. STOP/GO - define support, refute, inconclusive, and stop criteria.
+- dataset provenance, license/access, split integrity, representativeness, and contamination risk
+- metric definition, direction, uncertainty, human/deployment relevance, and failure cases
+- baseline comparability and checkpoint provenance
+- randomization, seeds/repeats, variance sources, exclusion/missing-data policy, and statistical plan
+- compute/time budget and early termination
+- artifacts required to reproduce configuration, code revision, environment, data version, and outputs
 
-## Resource and Risk Boundary
-Summary:
-- Reads research plans, ideation output, evidence ledgers, and targeted domain references.
-- Writes `papers/experiment_blueprint.json` only when explicitly requested.
-- Uses no tools or network by default.
-- Performs no code writes, dataset downloads, dependency installs, or training.
-- Required checkpoints: one selected hypothesis, checkpoint-first plan, matched datasets/metrics, ablation ladder, and artifact intent.
+Do not claim a dataset, metric, license, checkpoint, or expected effect is suitable without evidence; mark it `Unverified` and name the check.
 
-## Recovery and Context Expansion
-- If the request belongs to development/implementation, return to scheduling instead of forcing research routing.
-- If required inputs are missing, ask one focused question or produce a non-writing plan with missing evidence marked.
-- Expand from must-read to read-if-needed one layer at a time.
-- Do not load the full repo, full memory bank, `.system`, or unrelated research cluster skills by default.
-- Do not invent citations, datasets, metrics, results, or file artifacts to fill gaps.
+## Output
+For a narrow design question, return the decisive experimental choice and its falsification check. For an explicit blueprint artifact, include:
 
-## Output Contract
-1. Selected hypothesis
-2. Evidence references
-3. Checkpoint-first plan
-4. Dataset plan
-5. Baseline plan
-6. Metric plan
-7. Minimal core experiment
-8. Ablation ladder
-9. Loss budget
-10. Compute/timeline
-11. Stop/go and falsification
-12. Reproducibility plan
+- hypothesis/mechanism and evidence status
+- experimental unit, treatment, controls, and frozen factors
+- dataset/metric/baseline contracts
+- minimal core experiment and mechanism-focused ablations
+- uncertainty/statistical plan
+- support/refute/inconclusive and stop/go rules
+- compute, provenance, and reproducibility plan
+
+Omit empty boilerplate and do not fabricate precise sample sizes without a power/precision basis.
+
+## Boundary
+- `research-hypothesis-planning` selects and sharpens the claim.
+- `research-experiment-scaffold` projects an approved blueprint into code.
+- `research-statistical-analysis` analyzes real results or writes a no-data analysis plan.
+- A blueprint never counts as completed experimentation.
+
+## Behavior Cases
+- Positive: “선정된 hypothesis H1을 검증할 dataset, control, metric, ablation과 stop/go가 있는 blueprint로 만들어줘.”
+- Negative: “이 아이디어가 연구 가설이 될지 봐줘.” → `research-hypothesis-planning`.
+- Edge: no suitable checkpoint exists → record the gap and cheapest prerequisite; do not jump straight to a large training program.
 
 ## Validation
-- Confirm `.codex/skills/.system` was not touched.
-- Confirm user intent matches this skill, not ordinary development.
-- Confirm required evidence or artifact inputs are present or explicitly marked missing.
-- Confirm no secrets, credentials, hardcoded single-host paths, fabricated citations, or fabricated results are introduced.
-- Confirm artifact writes happen only when explicitly requested.
-
-## Anti-Patterns
-- Installing or invoking monolithic `codex-research-lifecycle`.
-- Treating search keywords as conclusions.
-- Collapsing evidence search, ideation, blueprint, scaffold, analysis, writing, and review into one step.
-- Creating custom transcribe/speech skills from research source material.
-- Weakening development/implementation routing because a request mentions model, metric, loss, experiment, or training.
-
-## Known Limits
-- A blueprint does not guarantee experimental success.
-- Dataset licenses and availability must be verified before use.
-- Metric selection can still miss human or deployment relevance.
+- The core experiment can refute the claim and isolates the claimed factor.
+- Baselines share a comparable data/metric contract.
+- Every ablation has a distinct prediction and frozen factors.
+- Missing data, variance, leakage, and reproducibility risks are explicit.
+- No result is implied before execution.

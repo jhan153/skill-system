@@ -20,7 +20,7 @@ description: Create or update formal product/software lifecycle artifact package
   - a traceability matrix is needed across requirements, acceptance criteria, WBS, design, tests, security, release, and retrospective items.
 - do_not_use_when:
   - the user wants direct implementation, casual planning, small TODOs, active `docs/plan` status sync, validation execution alone, critique-only review, or memory promotion.
-  - the user only wants changed files and validation notes; use `report-artifact-inventory`.
+  - the user only wants changed files and validation notes; use `coordination-handoff`.
   - the user wants blocker-first QA critique; use `report-critical`.
   - evidence for result artifacts is unavailable and the user expects completion claims.
 - expected_inputs:
@@ -123,7 +123,7 @@ Prefer stable IDs:
 - `plan-short-term-docs` owns active `docs/plan` implementation design and status sync.
 - `workflow-plan-runner` owns executing approved plans/specs.
 - `workflow-validation` owns validation strategy and validation execution.
-- `report-artifact-inventory` owns small task-local artifact inventories.
+- `coordination-handoff` owns small task-local artifact inventories.
 - `report-critical` owns blocker-first QA critique.
 
 ## Known Limits

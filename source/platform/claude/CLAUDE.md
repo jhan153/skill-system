@@ -1,6 +1,6 @@
 # Global CLAUDE
 
-> Claude-side global working rules for the Skill System bundle (9.0.2). This file maps the
+> Claude-side global working rules for the Skill System bundle (9.1.0). This file maps the
 > bundle's global working rules (`.codex/AGENTS.md`) to the Claude runtime. It diverges from the
 > Codex source only where Claude feature names differ (`settings.json` / permission modes,
 > `.claude/` paths, `/loop`); the working principles are identical. The rest of the Claude side
@@ -37,7 +37,7 @@
 
 ## Integrity
 - Do not present unverified information as confirmed.
-- Mark unverified claims as `Unverified`.
+- State material uncertainty explicitly; reserve lowercase `unverified` for the final task-result label.
 - Do not state assumptions as facts.
 - Surface assumptions briefly when they affect implementation or conclusions.
 
@@ -68,7 +68,8 @@
 - Continue until success conditions are verified, user verification is required, or a concrete blocker or stop boundary is reached.
 - A normal `change -> validation` cycle remains ordinary task execution; it does not by itself activate `/loop` or a formal `LoopRun`.
 - Documentation, plan, status, or synchronization-only edits are not implementation completion unless explicitly requested.
-- Implementation completion requires a source, test, runtime config/build, executable scaffold change, or a `blocked`/analysis-only report explaining why no such change is possible.
+- Implementation completion requires a source, test, runtime config/build, or executable scaffold change tied to the requested behavior.
+- `blocked` and analysis-only reports are distinct outcomes, not implementation completion.
 - Do not claim completion when the success conditions are unclear or unsupported by evidence.
 - Before finalizing, if the closing response promises an action that is still part of the current request, perform it now or report the exact blocker; do not end on an unfulfilled "I will…" promise.
 

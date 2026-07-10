@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -29,6 +30,17 @@ def main() -> int:
     args = parser.parse_args()
 
     with loop_lock(args.loop_run_dir):
+        integrity = subprocess.run(
+            [sys.executable, str(Path(__file__).with_name("validate_loop_run.py")), str(args.loop_run_dir)],
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            check=False,
+        )
+        if integrity.returncode != 0:
+            print("FAIL: LoopRun integrity validation failed; resume refused")
+            print(integrity.stdout.rstrip())
+            return 3
         state_path = args.loop_run_dir / "state.yaml"
         if not state_path.is_file():
             print(f"FAIL: no state.yaml: {state_path}")
@@ -50,6 +62,7 @@ def main() -> int:
         state["updated_at"] = now
         state.setdefault("resumes", []).append({"from": str(status), "reason": args.reason, "resumed_at": now})
         write_yaml(state_path, state)
+        write_yaml(args.loop_run_dir / "checkpoints" / f"{int(state.get('iteration', 0)):04d}.yaml", state)
         append_jsonl(
             args.loop_run_dir / "loop-events.jsonl",
             {

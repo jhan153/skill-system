@@ -1,10 +1,8 @@
 interface:
   display_name: "Research Router"
-  short_description: "Route scientific research requests"
+  short_description: "Route scientific research stages"
   default_prompt: |
-    Use $research-router only for its narrow Research Cluster role. Do not activate for ordinary development, implementation, bug fixing, repo planning, casual explanation, or unrelated research stages.
-
-    Do not install or invoke a monolithic codex-research-lifecycle skill. Do not touch .codex/skills/.system.
+    Route an unclear or multi-stage scientific decision to the narrowest owner sequence; send explicit paper-only acquisition directly to search-paper-evidence, ambiguous evidence lanes to search-router, and ordinary development outside the research cluster.
 
 policy:
   invocation_surface: selective_router

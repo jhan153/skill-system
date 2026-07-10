@@ -5,7 +5,7 @@
   "type": "object",
   "required": ["schema_version", "loop_run_id", "iteration", "condition_results"],
   "properties": {
-    "schema_version": { "enum": [1] },
+    "schema_version": { "enum": [1, 2] },
     "loop_run_id": {
       "type": "string",
       "pattern": "^LR-[0-9]{8}-[0-9]{3}$"
@@ -29,6 +29,80 @@
           "evidence_refs": {
             "type": "array",
             "items": { "type": "string" }
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "verifier_owner", "observed_at", "outcome"],
+              "properties": {
+                "kind": {
+                  "enum": ["command_exit", "artifact_exists", "manual_acceptance", "diff_scope"]
+                },
+                "verifier_owner": { "type": "string", "minLength": 1 },
+                "observed_at": { "type": "string", "format": "date-time" },
+                "outcome": {
+                  "enum": ["pass", "fail", "unverified", "blocked", "user-verification-needed"]
+                },
+                "artifact_ref": { "type": "string", "minLength": 1 },
+                "artifact_scope": { "enum": ["loop_run", "workspace"] },
+                "artifact_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                "command": { "type": "string", "minLength": 1 },
+                "exit_code": { "type": "integer" },
+                "actor": { "type": "string", "minLength": 1 },
+                "actor_type": { "enum": ["user"] },
+                "accepted_scope": { "type": "string", "minLength": 1 },
+                "accepted": { "enum": [true] },
+                "checked_path": { "type": "string", "minLength": 1 }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "required": ["kind"],
+                    "properties": { "kind": { "const": "command_exit" } }
+                  },
+                  "then": {
+                    "required": ["artifact_ref", "artifact_scope", "artifact_sha256", "command", "exit_code"]
+                  }
+                },
+                {
+                  "if": {
+                    "required": ["kind"],
+                    "properties": { "kind": { "const": "artifact_exists" } }
+                  },
+                  "then": {
+                    "required": ["artifact_ref", "artifact_scope", "artifact_sha256"]
+                  }
+                },
+                {
+                  "if": {
+                    "required": ["kind"],
+                    "properties": { "kind": { "const": "diff_scope" } }
+                  },
+                  "then": {
+                    "required": ["artifact_ref", "artifact_scope", "artifact_sha256"]
+                  }
+                },
+                {
+                  "if": {
+                    "required": ["kind"],
+                    "properties": { "kind": { "const": "manual_acceptance" } }
+                  },
+                  "then": {
+                    "required": [
+                      "artifact_ref",
+                      "artifact_scope",
+                      "artifact_sha256",
+                      "actor",
+                      "actor_type",
+                      "accepted_scope",
+                      "accepted"
+                    ]
+                  }
+                }
+              ],
+              "additionalProperties": false
+            }
           },
           "failure_fingerprint": { "type": "string" }
         },

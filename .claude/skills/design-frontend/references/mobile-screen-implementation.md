@@ -1,6 +1,6 @@
 # Design Mobile Screen Reference
 
-Use this reference from `design-frontend` when the requested UI is a mobile or native screen. For explicit mobile surface work, use `$design-mobile-screen`; generic design-to-code remains owned by `design-frontend`.
+Load only for the `mobile` profile of `design-frontend`: a mobile/native screen where safe areas, navigation, keyboard, touch, or fixed/scroll regions materially affect implementation.
 
 ## Checkpoints
 
@@ -11,6 +11,8 @@ Use this reference from `design-frontend` when the requested UI is a mobile or n
 - Plan loading, empty, error, disabled, focused, selected, and validation states when visible or required.
 - Keep copy readable on narrow widths and avoid text clipping inside controls.
 - Use platform-native accessibility primitives where possible.
+- Verify focused inputs and primary actions remain visible when the keyboard is open.
+- Keep scroll content clear of fixed headers, bottom actions, tabs, and home indicators.
 
 ## Handoff
 

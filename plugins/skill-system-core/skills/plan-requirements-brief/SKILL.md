@@ -1,6 +1,6 @@
 ---
 name: plan-requirements-brief
-description: Distill requirements discovery notes, stakeholder answers, or decision logs into a requirements contract or PRD/SRS-lite with goals, scope, non-goals, user stories, acceptance criteria, assumptions, risks, and handoff notes. Use only when explicitly requested.
+description: Distill discovery notes or decisions into a concise requirements contract/PRD with bounded scope, non-goals, observable acceptance criteria, assumptions, risks, and handoff notes. Use only when explicitly requested.
 ---
 
 # Plan Requirements Brief
@@ -8,86 +8,63 @@ description: Distill requirements discovery notes, stakeholder answers, or decis
 ## Routing Card
 - role: primary
 - intent_signature:
-  - requirements brief
-  - requirements contract
-  - PRD
-  - SRS-lite
-  - 요구사항 계약
-  - 요구사항 정리
+  - requirements contract, PRD, SRS-lite, or interview distillation
 - use_when:
-  - the user explicitly asks to turn discovery notes, answers, or decisions into a requirements brief, PRD, or SRS-lite.
-  - requirements must be stabilized before HLD, LLD, active planning, or implementation.
-  - scope, non-goals, user stories, and acceptance criteria need a reusable contract.
+  - the user explicitly asks to stabilize supplied requirements before planning.
 - do_not_use_when:
-  - requirements still need interactive elicitation; use `plan-requirements-discovery`.
-  - the user wants active `docs/plan` synchronization; use `plan-short-term-docs`.
-  - the user wants a heavy phase/package plan; use `plan-long-term-package`.
-  - the user wants direct implementation, validation execution, lifecycle reporting, or critique-only review.
+  - elicitation is still needed, or the request is active-plan sync, packaging, implementation, validation, or lifecycle reporting.
 - expected_inputs:
-  - discovery record, stakeholder answers, decision log, rough requirements, or product notes
-  - target product/feature/workflow and known constraints
-  - intended handoff target when available
+  - discovery/decision evidence, constraints, and intended handoff
 - expected_outputs:
-  - requirements-contract or feature-requirements-brief
-  - goals, scope, non-goals, user stories, acceptance criteria, assumptions, risks, open questions, and handoff notes
+  - traceable requirements contract with scope, criteria, risks, unknowns, and status
 - context_targets:
   must_read:
-    - current brief request
-    - provided discovery notes, decision logs, or rough requirements
+    - current request and supplied requirements evidence
   read_if_needed:
-    - `references/requirements-contract-template.md`
-    - `references/acceptance-criteria-template.md`
-    - narrow repo docs only when the requirements contract must match an existing product surface
+    - `references/requirements-contract-template.md` for structured/persisted output
+    - `references/acceptance-criteria-template.md` for vague or numerous criteria
+    - narrow repo docs for required compatibility claims
   do_not_load_by_default:
-    - full repo
-    - full memory bank
-    - unrelated plan packages
-    - validation logs unless the user asks to include evidence status
+    - full repo/memory, plan packages, represented raw transcripts, or unrelated logs
 - risk_profile:
   reads:
-    - user-provided requirements artifacts and narrow referenced docs
+    - supplied evidence and narrow referenced docs
   writes:
-    - none by default; write a requirements artifact only when explicitly requested
+    - none by default; write only when requested
   tools:
     - none by default
   sensitive_resources:
-    - credentials default deny; do not include secrets in requirements artifacts
+    - omit credentials and secrets
 - entry_scene:
   - PREPARE
 
-## Purpose
-- Convert raw discovery into a stable requirements contract.
-- Preserve non-goals and assumptions so later planning does not expand scope silently.
-- Hand off to HLD/LLD-style planning or implementation without pretending the brief is executable code work.
+## State Boundary
+- Own `discovery -> requirements_contract` through `distill_requirements` only when goals, scope, non-goals, assumptions, and observable criteria need no invented decisions.
+- Keep the result `proposed` until accepted or explicitly referenced downstream.
+- Never report it as `active_plan`, `implementation_ready`, feasibility proof, or implementation approval.
 
-## Brief Rules
-- Keep the brief decision-grounded, not aspirational.
-- Include non-goals and deferred scope.
-- Acceptance criteria must be observable.
-- Mark unresolved questions explicitly instead of inventing product decisions.
-- Separate product success criteria from implementation validation commands.
+## Distillation Workflow
+1. Prefer the compact decision record over a raw transcript. Separate `decided`, `assumed`, `open`, and contradictory statements.
+2. Normalize one problem, goals, actors, scope, non-goals, and deferred work; preserve source wording when meaning is sensitive.
+3. Create only value-bearing user stories. Assign stable story/criterion ids and merge near-duplicates.
+4. Link each material goal/story to an observable acceptance criterion or explicit deferral.
+5. Move unresolved facts to assumptions, risks, or open questions with impact/blocking status; never decide speculatively.
+6. Read narrow repo evidence only for compatibility claims; mark unsupported behavior or feasibility `Unverified`.
+7. Select a downstream owner only after the Quality Gate passes.
 
-## Output Contract
-Return only the sections needed:
-- `problem`
-- `goals`
-- `target_users`
-- `scope`
-- `non_goals`
-- `user_stories`
-- `acceptance_criteria`
-- `assumptions`
-- `risks`
-- `open_questions`
-- `handoff_notes`
+Each criterion must name actor/context, condition, observable result, relevant boundary, and evidence/verification hint. Keep product acceptance separate from implementation commands. Replace vague qualities with a threshold or named reviewer check.
 
-## Handoff
-- Use `plan-long-term-package` for phase/package architecture planning after the requirements contract is accepted.
-- Use `plan-short-term-docs` for current-horizon implementation design records.
-- Use `workflow-plan-runner` only after an executable plan/spec slice exists.
-- Use `report-lifecycle-artifacts` when the brief should be packaged into a formal SDLC artifact set.
+## Quality Gate
+- Every product decision traces to supplied evidence; contradictions remain visible.
+- Scope, non-goals, deferrals, and assumptions prevent silent expansion.
+- Every material goal/story has acceptance coverage or explicit deferral.
+- Each criterion has a decidable pass/fail outcome and evidence path/manual check.
+- Terms, actors, ids, and criteria are consistent and non-duplicative.
+- Blockers and required approval are explicit; downstream planning does not need the raw transcript.
 
-## Known Limits
-- A requirements brief is not an implementation plan.
-- It does not validate feasibility without source inspection or implementation evidence.
-- It should not replace user approval for product decisions.
+If a missing product decision fails the gate, return only the blocking questions or route to `plan-requirements-discovery`.
+
+## Output And Handoff
+For structured output, read `references/requirements-contract-template.md` and populate only relevant problem, goals, users, scope/non-goals, stories, criteria, assumptions, risks, questions, handoff, and `proposed|accepted` status. Keep source pointers only for decisions or conflicts.
+
+Route accepted current-horizon work to `plan-short-term-docs`, explicit phase/package work to `plan-long-term-package`, executable slices to `workflow-plan-runner`, and explicit formal SDLC packaging to `report-lifecycle-artifacts`. Report the state event, status, blockers, and one next owner.

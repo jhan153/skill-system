@@ -31,6 +31,9 @@
         "null"
       ]
     },
+    "expected_route_class": {
+      "type": "string"
+    },
     "expected_supporting_skills": {
       "type": "array",
       "items": {
@@ -78,6 +81,15 @@
       "items": {
         "type": "object"
       }
+    },
+    "legacy_alias": {
+      "type": "string"
+    },
+    "expected_mode": {
+      "type": "string"
+    },
+    "direct_invocation": {
+      "type": "boolean"
     },
     "source_feedback_ids": {
       "type": "array",

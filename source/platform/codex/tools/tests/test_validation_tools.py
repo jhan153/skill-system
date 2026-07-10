@@ -20,6 +20,7 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, str(ROOT / ".codex" / "tools"))
 
 from _validation import resolve_bundle_path  # noqa: E402
+from recovery_guard import state_path_for_session  # noqa: E402
 
 
 def bundle_path(rel: str) -> Path:
@@ -30,12 +31,30 @@ def bundle_path(rel: str) -> Path:
 
 
 class ValidationToolTests(unittest.TestCase):
-    def run_tool(self, *args: str) -> subprocess.CompletedProcess[str]:
+    def setUp(self) -> None:
+        self._guard_state_tmp = tempfile.TemporaryDirectory(dir="/private/tmp")
+        self._previous_guard_state_dir = os.environ.get("SKILL_SYSTEM_RECOVERY_GUARD_STATE_DIR")
+        os.environ["SKILL_SYSTEM_RECOVERY_GUARD_STATE_DIR"] = self._guard_state_tmp.name
+
+    def tearDown(self) -> None:
+        if self._previous_guard_state_dir is None:
+            os.environ.pop("SKILL_SYSTEM_RECOVERY_GUARD_STATE_DIR", None)
+        else:
+            os.environ["SKILL_SYSTEM_RECOVERY_GUARD_STATE_DIR"] = self._previous_guard_state_dir
+        self._guard_state_tmp.cleanup()
+
+    def run_tool_env(self, extra_env: dict[str, str | None], *args: str) -> subprocess.CompletedProcess[str]:
         env = dict(os.environ)
         env["PYTHONDONTWRITEBYTECODE"] = "1"
         env["SKILL_SYSTEM_DESKTOP_NOTIFY"] = "dry-run"
+        env["SKILL_SYSTEM_RECOVERY_GUARD"] = "off"
         env.setdefault("CODEX_MODEL", "gpt-5.5")
         env.setdefault("CODEX_MODEL_REASONING_EFFORT", "xhigh")
+        for name, value in extra_env.items():
+            if value is None:
+                env.pop(name, None)
+            else:
+                env[name] = value
         return subprocess.run(
             [sys.executable, *args],
             cwd=ROOT,
@@ -46,6 +65,9 @@ class ValidationToolTests(unittest.TestCase):
             check=False,
             timeout=30,
         )
+
+    def run_tool(self, *args: str) -> subprocess.CompletedProcess[str]:
+        return self.run_tool_env({}, *args)
 
     def temp_ledger(self, name: str) -> Path:
         fd, path = tempfile.mkstemp(prefix=f"skill-system-test-{name}-", suffix=".jsonl", dir="/private/tmp")
@@ -59,9 +81,22 @@ class ValidationToolTests(unittest.TestCase):
         hooks_config = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))
         return hooks_config["hooks"][event_name][0]["hooks"][0]["command"]
 
+    def test_hooks_json_event_and_launcher_invariants(self) -> None:
+        hooks = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))["hooks"]
+        expected = {
+            "UserPromptSubmit", "SessionStart", "PreToolUse", "PermissionRequest",
+            "PostToolUse", "Stop", "PreCompact", "PostCompact",
+        }
+        self.assertEqual(set(hooks), expected)
+        commands = {spec[0]["hooks"][0]["command"] for spec in hooks.values()}
+        self.assertEqual(len(commands), 1, "all hook events must use one trusted adapter launcher")
+        for event_name, spec in hooks.items():
+            timeout = spec[0]["hooks"][0]["timeout"]
+            self.assertEqual(timeout, 45 if event_name == "Stop" else 30)
+
     def write_loop_contract(self, path: Path, max_iterations: int = 3, same_failure_limit: int = 2) -> None:
         path.write_text(
-            f"""schema_version: 1
+            f"""schema_version: 2
 contract_id: LC-20260623-001
 activation: explicit
 goal:
@@ -71,9 +106,9 @@ goal:
       statement: "Primary verifier passes."
       required: true
       verifier:
-        type: command_exit
-        command: "pytest tests/test_loop.py -q"
-        expected_exit_code: 0
+        type: artifact_exists
+        owner: "agent:codex"
+        path: "artifacts/sc-001.ok"
 control:
   max_iterations: {max_iterations}
   max_wall_time_seconds: 3600
@@ -236,9 +271,23 @@ termination:
                 "--policy",
                 str(bundle_path(".codex/skills/analysis-codebase/references/policy-default.json")),
             )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(
+                result.returncode,
+                2,
+                "static-only architecture views must render but fail the default fallback gate\n"
+                + result.stdout
+                + result.stderr,
+            )
             report_text = report.read_text(encoding="utf-8")
             self.assertIn("c_cpp_lizard_status", report_text)
+            gate = json.loads(
+                (output / "artifacts" / "quality-gate-result.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(gate.get("status"), "FAIL")
+            self.assertTrue(
+                any(str(reason).startswith("fallback_diagrams=") for reason in gate.get("reasons", [])),
+                gate,
+            )
 
     def test_knowledge_store_missing_source_ref_fails(self) -> None:
         with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
@@ -368,6 +417,23 @@ termination:
         self.assertRegex(event["event_hash"], r"^[a-f0-9]{64}$")
         ledger.unlink()
 
+    def test_hook_runtime_verify_detects_hash_tamper(self) -> None:
+        ledger = self.temp_ledger("hook-verify")
+        self.assert_passes(
+            ".codex/tools/hook_runtime.py", "record",
+            "--event", "request_received",
+            "--host", "codex",
+            "--host-event", "UserPromptSubmit",
+            "--support-level", "native",
+            "--ledger", str(ledger),
+            "--run-id", "AR-TEST-VERIFY",
+        )
+        self.assert_passes(".codex/tools/hook_runtime.py", "verify", "--ledger", str(ledger))
+        ledger.write_text(ledger.read_text(encoding="utf-8").replace('"status": "pass"', '"status": "fail"'), encoding="utf-8")
+        result = self.run_tool(".codex/tools/hook_runtime.py", "verify", "--ledger", str(ledger))
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("event_hash mismatch", result.stdout)
+
 
 
 
@@ -378,6 +444,48 @@ termination:
             "--schema",
             ".codex/schemas/harness/agent-run.schema.json",
         )
+
+    def test_agent_verified_rejects_self_referential_manual_check(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            run_dir = Path(tmp) / "current-run"
+            shutil.copytree(FIXTURES / "agent-runs" / "current-run", run_dir)
+            manifest_path = run_dir / "run.yaml"
+            manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+            manifest["outputs"]["claims"][0]["support"] = {
+                "type": "manual_check",
+                "evidence_ref": "final-report.md",
+            }
+            manifest["validations"] = [{"type": "manual_check", "evidence_ref": "final-report.md"}]
+            manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+            result = self.run_tool(
+                ".codex/tools/validate_agent_run_artifact.py",
+                str(run_dir),
+                "--schema", ".codex/schemas/harness/agent-run.schema.json",
+            )
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("cannot rely on manual_check", result.stdout)
+            self.assertIn("cannot use final_report as its own evidence", result.stdout)
+
+    def test_schema_v2_command_claim_requires_hook_receipt(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            run_dir = Path(tmp) / "current-run"
+            shutil.copytree(FIXTURES / "agent-runs" / "current-run", run_dir)
+            manifest_path = run_dir / "run.yaml"
+            manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+            fake_command = "python3 fake_verifier.py"
+            manifest["outputs"]["claims"][0]["support"]["command"] = fake_command
+            manifest["validations"][0]["command"] = fake_command
+            manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8")
+            (run_dir / "artifacts" / "verification.txt").write_text(
+                f"$ {fake_command}\nPASS\n", encoding="utf-8"
+            )
+            result = self.run_tool(
+                ".codex/tools/validate_agent_run_artifact.py",
+                str(run_dir),
+                "--schema", ".codex/schemas/harness/agent-run.schema.json",
+            )
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("no matching PreToolUse/PostToolUse receipt", result.stdout)
 
 
 
@@ -455,7 +563,7 @@ termination:
                 ".codex/tools/init_loop_run.py",
                 str(contract),
                 "--workspace-root",
-                str(ROOT),
+                str(tmp_path),
                 "--output-root",
                 str(output_root),
             )
@@ -464,7 +572,7 @@ termination:
 
             failed = tmp_path / "iteration-1.yaml"
             failed.write_text(
-                """schema_version: 1
+                """schema_version: 2
 loop_run_id: LR-20260623-001
 iteration: 1
 agent_run_id: AR-20260623-001
@@ -488,9 +596,14 @@ condition_results:
             self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
             self.assertEqual(json.loads(first.stdout)["decision"]["action"], "continue")
 
+            target = tmp_path / "artifacts" / "sc-001.ok"
+            target.parent.mkdir()
+            target.write_text("complete\n", encoding="utf-8")
+            target_digest = hashlib.sha256(target.read_bytes()).hexdigest()
+            observed_at = yaml.safe_load((loop_dir / "state.yaml").read_text(encoding="utf-8"))["started_at"]
             passed = tmp_path / "iteration-2.yaml"
             passed.write_text(
-                """schema_version: 1
+                f"""schema_version: 2
 loop_run_id: LR-20260623-001
 iteration: 2
 agent_run_id: AR-20260623-002
@@ -498,7 +611,15 @@ condition_results:
   - condition_id: SC-001
     status: pass
     evidence_refs:
-      - artifacts/sc-001-iteration-2.txt
+      - artifacts/sc-001.ok
+    evidence:
+      - kind: artifact_exists
+        verifier_owner: agent:codex
+        observed_at: '{observed_at}'
+        outcome: pass
+        artifact_ref: artifacts/sc-001.ok
+        artifact_scope: workspace
+        artifact_sha256: {target_digest}
 """,
                 encoding="utf-8",
             )
@@ -524,7 +645,7 @@ condition_results:
                 ".codex/tools/init_loop_run.py",
                 str(contract),
                 "--workspace-root",
-                str(ROOT),
+                str(tmp_path),
                 "--output-root",
                 str(output_root),
             )
@@ -533,7 +654,7 @@ condition_results:
             for iteration in [1, 2]:
                 result_file = tmp_path / f"iteration-{iteration}.yaml"
                 result_file.write_text(
-                    f"""schema_version: 1
+                    f"""schema_version: 2
 loop_run_id: LR-20260623-001
 iteration: {iteration}
 agent_run_id: AR-20260623-00{iteration}
@@ -565,7 +686,7 @@ condition_results:
         )
 
 
-    def test_loop_run_pass_without_evidence_is_blocked(self) -> None:
+    def test_loop_run_pass_without_structured_evidence_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
             tmp_path = Path(tmp)
             contract = tmp_path / "contract.yaml"
@@ -573,13 +694,13 @@ condition_results:
             self.write_loop_contract(contract)
             init = self.run_tool(
                 ".codex/tools/init_loop_run.py", str(contract),
-                "--workspace-root", str(ROOT), "--output-root", str(output_root),
+                "--workspace-root", str(tmp_path), "--output-root", str(output_root),
             )
             self.assertEqual(init.returncode, 0, init.stdout + init.stderr)
             loop_dir = Path(json.loads(init.stdout)["loop_run_dir"])
             hacked = tmp_path / "iteration-1.yaml"
             hacked.write_text(
-                """schema_version: 1
+                """schema_version: 2
 loop_run_id: LR-20260623-001
 iteration: 1
 agent_run_id: AR-20260623-001
@@ -594,10 +715,11 @@ condition_results:
                 ".codex/tools/evaluate_loop_run.py", str(loop_dir),
                 "--iteration-result", str(hacked), "--format", "json",
             )
-            self.assertEqual(evaluation.returncode, 0, evaluation.stdout + evaluation.stderr)
-            decision = json.loads(evaluation.stdout)["decision"]
-            self.assertEqual(decision["action"], "blocked")
-            self.assertEqual(decision["reason_code"], "pass_without_evidence")
+            self.assertEqual(evaluation.returncode, 1, evaluation.stdout + evaluation.stderr)
+            self.assertIn("structured evidence receipt", evaluation.stdout)
+            state = yaml.safe_load((loop_dir / "state.yaml").read_text(encoding="utf-8"))
+            self.assertEqual(state["status"], "active")
+            self.assertEqual(state["iteration"], 0)
 
 
 
@@ -727,6 +849,362 @@ condition_results:
         self.assertEqual(event["status"], "pass")
         ledger.unlink()
 
+    def test_codex_hook_adapter_event_mapping_matrix(self) -> None:
+        cases = [
+            ("userpromptsubmit.json", "request_received", "pass", "native"),
+            ("sessionstart.json", "context_loaded", "pass", "approximate"),
+            ("pretooluse.json", "tool_preflight", "pass", "native"),
+            ("permissionrequest.json", "permission_requested", "pass", "native"),
+            ("posttooluse-fail.json", "tool_result", "fail", "native"),
+            ("precompact.json", "compact_before", "pass", "native"),
+            ("postcompact.json", "compact_after", "pass", "native"),
+        ]
+        for fixture, neutral_event, status, support_level in cases:
+            with self.subTest(fixture=fixture):
+                ledger = self.temp_ledger(f"mapping-{fixture}")
+                result = self.run_tool(
+                    ".codex/hooks/codex_hook_adapter.py",
+                    "--input-file", str(FIXTURES / "hooks" / fixture),
+                    "--ledger", str(ledger),
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[0])
+                self.assertEqual(event["neutral_event"], neutral_event)
+                self.assertEqual(event["status"], status)
+                self.assertEqual(event["support_level"], support_level)
+                if fixture == "sessionstart.json":
+                    self.assertNotIn("kanboard_autosync", event["evidence"])
+
+    def test_codex_hook_adapter_rejects_unknown_event_without_ledger(self) -> None:
+        ledger = self.temp_ledger("unknown-event")
+        result = self.run_tool(
+            ".codex/hooks/codex_hook_adapter.py",
+            "--input-file", str(FIXTURES / "hooks" / "unknown-event.json"),
+            "--ledger", str(ledger),
+        )
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertFalse(ledger.exists())
+        self.assertIn("unsupported hook_event_name", result.stderr)
+
+    def test_recovery_guard_observes_long_session_risk_without_blocking_by_default(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            ledger = tmp_path / "events.jsonl"
+            session_id = "session-recovery-observe"
+
+            def invoke(
+                name: str,
+                payload: dict[str, object],
+                mode: str = "audit",
+            ) -> subprocess.CompletedProcess[str]:
+                path = tmp_path / f"{name}.json"
+                path.write_text(json.dumps(payload), encoding="utf-8")
+                return self.run_tool_env(
+                    {"SKILL_SYSTEM_RECOVERY_GUARD": None},
+                    ".codex/hooks/codex_hook_adapter.py",
+                    "--input-file", str(path),
+                    "--ledger", str(ledger),
+                )
+
+            base = {"session_id": session_id, "cwd": str(ROOT), "permission_mode": "workspace-write"}
+            self.assertEqual(invoke("compact", {**base, "hook_event_name": "PostCompact", "turn_id": "t1"}).returncode, 0)
+            self.assertEqual(invoke("correction", {
+                **base,
+                "hook_event_name": "UserPromptSubmit",
+                "turn_id": "t2",
+                "prompt": "그게 아니잖아. 런타임 로직을 비교해줘.",
+            }).returncode, 0)
+            result = invoke("stop", {
+                **base,
+                "hook_event_name": "Stop",
+                "turn_id": "t2",
+                "last_assistant_message": "맞습니다. 이제 다시 시작하겠습니다.",
+            })
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            output = json.loads(result.stdout)
+            self.assertTrue(output["continue"])
+            event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[-1])
+            guard = event["evidence"]["recovery_guard"]
+            self.assertTrue(guard["armed"])
+            self.assertTrue(guard["would_audit"])
+            self.assertFalse(guard["did_audit_block"])
+            self.assertEqual(guard["suppressed_by"], "observe_mode")
+
+    def test_recovery_guard_environment_off_overrides_payload_audit(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            ledger = tmp_path / "events.jsonl"
+            session_id = "session-recovery-emergency-off"
+            payload = {
+                "hook_event_name": "Stop",
+                "session_id": session_id,
+                "turn_id": "t1",
+                "cwd": str(ROOT),
+                "permission_mode": "workspace-write",
+                "skill_system_recovery_guard": "audit",
+                "last_assistant_message": "맞습니다. 이제 다시 시작하겠습니다.",
+            }
+            inp = tmp_path / "stop.json"
+            inp.write_text(json.dumps(payload), encoding="utf-8")
+            result = self.run_tool(
+                ".codex/hooks/codex_hook_adapter.py",
+                "--input-file", str(inp),
+                "--ledger", str(ledger),
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertTrue(json.loads(result.stdout)["continue"])
+            self.assertFalse(
+                state_path_for_session(session_id, Path(self._guard_state_tmp.name)).exists()
+            )
+            recorded = json.loads(ledger.read_text(encoding="utf-8").splitlines()[-1])
+            self.assertNotIn("recovery_guard", recorded["evidence"])
+
+    def test_recovery_guard_audit_blocks_once_then_hands_packet_to_user(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            ledger = tmp_path / "events.jsonl"
+            session_id = "session-recovery-audit"
+
+            def invoke(
+                name: str,
+                payload: dict[str, object],
+                mode: str = "audit",
+            ) -> subprocess.CompletedProcess[str]:
+                path = tmp_path / f"{name}.json"
+                path.write_text(json.dumps(payload), encoding="utf-8")
+                return self.run_tool_env(
+                    {"SKILL_SYSTEM_RECOVERY_GUARD": mode},
+                    ".codex/hooks/codex_hook_adapter.py",
+                    "--input-file", str(path),
+                    "--ledger", str(ledger),
+                )
+
+            base = {"session_id": session_id, "cwd": str(ROOT), "permission_mode": "workspace-write"}
+            invoke("compact", {**base, "hook_event_name": "PostCompact", "turn_id": "t1"})
+            invoke("correction", {
+                **base,
+                "hook_event_name": "UserPromptSubmit",
+                "turn_id": "t2",
+                "prompt": "그게 아니잖아. 실제 로직 차이를 확인해줘.",
+            })
+            blocked = invoke("stop-risk", {
+                **base,
+                "hook_event_name": "Stop",
+                "turn_id": "t2",
+                "stop_hook_active": False,
+                "last_assistant_message": "맞습니다. 앞으로는 로직을 중심으로 다시 하겠습니다.",
+            })
+            self.assertEqual(blocked.returncode, 0, blocked.stdout + blocked.stderr)
+            blocked_output = json.loads(blocked.stdout)
+            self.assertEqual(blocked_output["decision"], "block")
+            self.assertIn("recovery_audit", blocked_output["reason"])
+            ledger_after_block = ledger.read_bytes()
+            replayed_block = invoke("stop-risk-replay", {
+                **base,
+                "hook_event_name": "Stop",
+                "turn_id": "t2",
+                "stop_hook_active": False,
+                "last_assistant_message": "맞습니다. 앞으로는 로직을 중심으로 다시 하겠습니다.",
+            })
+            self.assertEqual(json.loads(replayed_block.stdout)["decision"], "block")
+            self.assertEqual(ledger.read_bytes(), ledger_after_block)
+
+            near_duplicate = invoke("stop-risk-near-duplicate", {
+                **base,
+                "hook_event_name": "Stop",
+                "turn_id": "t2",
+                "stop_hook_active": False,
+                "last_assistant_message": "맞습니다. 앞으로는 로직을 중심으로 다시 하겠습니다.",
+                "hook_source": "near-duplicate",
+            })
+            self.assertEqual(json.loads(near_duplicate.stdout)["decision"], "block")
+            guard_state = json.loads(
+                state_path_for_session(session_id, Path(self._guard_state_tmp.name)).read_text(encoding="utf-8")
+            )
+            self.assertEqual(guard_state["phase"], "audit_requested")
+            self.assertEqual(guard_state["audit_responses"], 0)
+            self.assertEqual(guard_state["audit_blocks"], 1)
+
+            packet = """recovery_audit:
+  goal_anchor: compare runtime logic
+  latest_user_delta: ignore framework labels
+  observed_changes: []
+  verified_progress: []
+  open_gap_and_next_action: inspect the behavioral contract
+"""
+            handed = invoke("stop-audit", {
+                **base,
+                "hook_event_name": "Stop",
+                "turn_id": "t2",
+                "stop_hook_active": True,
+                "last_assistant_message": packet,
+            }, mode="observe")
+            self.assertEqual(handed.returncode, 0, handed.stdout + handed.stderr)
+            handed_output = json.loads(handed.stdout)
+            self.assertTrue(handed_output["continue"])
+            self.assertIn("handed to the user", handed_output["systemMessage"])
+            events = [json.loads(line) for line in ledger.read_text(encoding="utf-8").splitlines()]
+            stop_events = [event for event in events if event["neutral_event"] == "turn_finalize_attempt"]
+            self.assertEqual(len(stop_events), 3)
+            self.assertTrue(stop_events[0]["evidence"]["recovery_guard"]["did_audit_block"])
+            self.assertIn(
+                "awaiting_active_audit_response",
+                stop_events[1]["evidence"]["recovery_guard"]["reason_codes"],
+            )
+            self.assertEqual(stop_events[2]["evidence"]["recovery_guard"]["action"], "handoff")
+            self.assertTrue(stop_events[2]["evidence"]["recovery_guard"]["audit_packet_valid"])
+            self.assertNotIn("agent_run_finalize", stop_events[0]["evidence"])
+            self.assertNotIn("desktop_notifications", stop_events[2]["evidence"])
+            ledger_after_handoff = ledger.read_bytes()
+            replayed_handoff = invoke("stop-audit-replay", {
+                **base,
+                "hook_event_name": "Stop",
+                "turn_id": "t2",
+                "stop_hook_active": True,
+                "last_assistant_message": packet,
+            })
+            self.assertTrue(json.loads(replayed_handoff.stdout)["continue"])
+            self.assertEqual(ledger.read_bytes(), ledger_after_handoff)
+
+    def test_recovery_guard_does_not_arm_on_short_correction(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            ledger = tmp_path / "events.jsonl"
+            base = {
+                "session_id": "session-recovery-short",
+                "turn_id": "t1",
+                "cwd": str(ROOT),
+                "permission_mode": "workspace-write",
+            }
+            user = tmp_path / "user.json"
+            user.write_text(json.dumps({
+                **base,
+                "hook_event_name": "UserPromptSubmit",
+                "prompt": "그게 아니잖아. 다시 봐줘.",
+            }), encoding="utf-8")
+            self.run_tool_env(
+                {"SKILL_SYSTEM_RECOVERY_GUARD": "audit"},
+                ".codex/hooks/codex_hook_adapter.py", "--input-file", str(user), "--ledger", str(ledger),
+            )
+            stop = tmp_path / "stop.json"
+            stop.write_text(json.dumps({
+                **base,
+                "hook_event_name": "Stop",
+                "last_assistant_message": "맞습니다. 이제 다시 수정하겠습니다.",
+            }), encoding="utf-8")
+            result = self.run_tool_env(
+                {"SKILL_SYSTEM_RECOVERY_GUARD": "audit"},
+                ".codex/hooks/codex_hook_adapter.py", "--input-file", str(stop), "--ledger", str(ledger),
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertTrue(json.loads(result.stdout)["continue"])
+            event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[-1])
+            self.assertFalse(event["evidence"]["recovery_guard"]["armed"])
+
+    def test_recovery_guard_corrupt_state_fails_open(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            ledger = tmp_path / "events.jsonl"
+            session_id = "session-recovery-corrupt"
+            state_path = state_path_for_session(session_id, Path(self._guard_state_tmp.name))
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text('{"prompt":"must-not-be-trusted"}', encoding="utf-8")
+            inp = tmp_path / "user.json"
+            inp.write_text(json.dumps({
+                "hook_event_name": "UserPromptSubmit",
+                "session_id": session_id,
+                "turn_id": "t1",
+                "cwd": str(ROOT),
+                "permission_mode": "workspace-write",
+                "prompt": "continue normally",
+            }), encoding="utf-8")
+            result = self.run_tool_env(
+                {"SKILL_SYSTEM_RECOVERY_GUARD": "observe"},
+                ".codex/hooks/codex_hook_adapter.py", "--input-file", str(inp), "--ledger", str(ledger),
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[-1])
+            self.assertEqual(event["evidence"]["recovery_guard"]["status"], "error")
+
+    def test_recovery_guard_is_shadow_only_when_loop_is_explicitly_active(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            ledger = tmp_path / "events.jsonl"
+            loop_dir = tmp_path / "active-loop"
+            shutil.copytree(FIXTURES / "loop-runs" / "valid", loop_dir)
+            session_id = "session-recovery-loop"
+
+            def invoke(name: str, payload: dict[str, object]) -> subprocess.CompletedProcess[str]:
+                path = tmp_path / f"{name}.json"
+                path.write_text(json.dumps(payload), encoding="utf-8")
+                return self.run_tool_env(
+                    {"SKILL_SYSTEM_RECOVERY_GUARD": "audit"},
+                    ".codex/hooks/codex_hook_adapter.py", "--input-file", str(path), "--ledger", str(ledger),
+                )
+
+            base = {"session_id": session_id, "cwd": str(ROOT), "permission_mode": "workspace-write"}
+            invoke("compact", {**base, "hook_event_name": "PostCompact", "turn_id": "t1"})
+            invoke("correction", {
+                **base,
+                "hook_event_name": "UserPromptSubmit",
+                "turn_id": "t2",
+                "prompt": "그게 아니잖아. 실제 동작을 확인해줘.",
+            })
+            result = invoke("stop", {
+                **base,
+                "hook_event_name": "Stop",
+                "turn_id": "t2",
+                "skill_system_loop_run_dir": str(loop_dir),
+                "skill_system_loop_continuation": "observe",
+                "last_assistant_message": "맞습니다. 이제 다시 시작하겠습니다.",
+            })
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertTrue(json.loads(result.stdout)["continue"])
+            event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[-1])
+            guard = event["evidence"]["recovery_guard"]
+            self.assertTrue(guard["would_audit"])
+            self.assertFalse(guard["did_audit_block"])
+            self.assertEqual(guard["suppressed_by"], "active_loop")
+
+    def test_terminal_loop_path_does_not_suppress_recovery_guard(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            ledger = tmp_path / "events.jsonl"
+            loop_dir = tmp_path / "terminal-loop"
+            shutil.copytree(FIXTURES / "loop-runs" / "valid", loop_dir)
+            state_path = loop_dir / "state.yaml"
+            state_path.write_text(
+                state_path.read_text(encoding="utf-8").replace("status: active", "status: terminal", 1),
+                encoding="utf-8",
+            )
+            session_id = "session-recovery-terminal-loop"
+
+            def invoke(name: str, payload: dict[str, object]) -> subprocess.CompletedProcess[str]:
+                path = tmp_path / f"{name}.json"
+                path.write_text(json.dumps(payload), encoding="utf-8")
+                return self.run_tool_env(
+                    {"SKILL_SYSTEM_RECOVERY_GUARD": "audit"},
+                    ".codex/hooks/codex_hook_adapter.py", "--input-file", str(path), "--ledger", str(ledger),
+                )
+
+            base = {"session_id": session_id, "cwd": str(ROOT), "permission_mode": "workspace-write"}
+            invoke("compact", {**base, "hook_event_name": "PostCompact", "turn_id": "t1"})
+            invoke("correction", {
+                **base,
+                "hook_event_name": "UserPromptSubmit",
+                "turn_id": "t2",
+                "prompt": "그게 아니잖아. 실제 동작을 확인해줘.",
+            })
+            result = invoke("stop", {
+                **base,
+                "hook_event_name": "Stop",
+                "turn_id": "t2",
+                "skill_system_loop_run_dir": str(loop_dir),
+                "last_assistant_message": "맞습니다. 이제 다시 시작하겠습니다.",
+            })
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(json.loads(result.stdout)["decision"], "block")
+
 
 
     def test_codex_hook_adapter_notifies_turn_complete_on_plain_stop(self) -> None:
@@ -775,6 +1253,30 @@ condition_results:
         self.assertIn("command_hash", event["evidence"])
         ledger.unlink()
 
+    def test_codex_hook_adapter_redacts_env_assignment_category_and_url_userinfo(self) -> None:
+        env_ledger = self.temp_ledger("live-hook-env-secret")
+        self.assert_passes(
+            ".codex/hooks/codex_hook_adapter.py",
+            "--input-file", str(FIXTURES / "hooks" / "pretooluse-env-assignment.json"),
+            "--ledger", str(env_ledger),
+        )
+        env_raw = env_ledger.read_text(encoding="utf-8")
+        self.assertNotIn("OPENAI_API_KEY", env_raw)
+        self.assertNotIn("short-secret", env_raw)
+        env_event = json.loads(env_raw.splitlines()[0])
+        self.assertEqual(env_event["evidence"]["command_category"], "<redacted>")
+
+        url_ledger = self.temp_ledger("live-hook-url-secret")
+        self.assert_passes(
+            ".codex/hooks/codex_hook_adapter.py",
+            "--input-file", str(FIXTURES / "hooks" / "posttooluse-redaction.json"),
+            "--ledger", str(url_ledger),
+        )
+        url_raw = url_ledger.read_text(encoding="utf-8")
+        self.assertNotIn("alice", url_raw)
+        self.assertNotIn("shortpass", url_raw)
+        self.assertIn("example.com", url_raw)
+
 
 
     def test_codex_hook_adapter_stop_finalizes_same_run_ledger_without_cycle(self) -> None:
@@ -795,7 +1297,6 @@ condition_results:
             output = json.loads(result.stdout)
             self.assertTrue(output["continue"])
             events = [json.loads(line) for line in hook_file.read_text(encoding="utf-8").splitlines()]
-            self.assertEqual(events[-2]["neutral_event"], "turn_finalize_attempt")
             self.assertEqual(events[-1]["neutral_event"], "turn_finalize")
             self.assertEqual(events[-1]["prev_event_hash"], events[-2]["event_hash"])
             self.assert_passes(
@@ -876,10 +1377,25 @@ condition_results:
             events = [json.loads(line) for line in ledger.read_text(encoding="utf-8").splitlines()]
             self.assertEqual(events[0]["neutral_event"], "turn_finalize_attempt")
             self.assertEqual(events[0]["status"], "skip")
-            self.assertEqual(events[-1]["neutral_event"], "turn_finalize")
-            self.assertEqual(events[-1]["status"], "skip")
-            note = events[-1]["evidence"]["desktop_notifications"]["turn_complete"]
+            self.assertEqual(len(events), 1)
+            note = events[0]["evidence"]["desktop_notifications"]["turn_complete"]
             self.assertEqual(note["status"], "dry_run")
+
+    def test_codex_hook_adapter_stop_is_idempotent_after_finalize(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            run_dir = Path(tmp) / "current-run"
+            shutil.copytree(FIXTURES / "agent-runs" / "current-run", run_dir)
+            hook_file = run_dir / "hook-events.jsonl"
+            before = hook_file.read_bytes()
+            result = self.run_tool(
+                ".codex/hooks/codex_hook_adapter.py",
+                "--input-file", str(FIXTURES / "hooks" / "stop.json"),
+                "--run-dir", str(run_dir),
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            output = json.loads(result.stdout)
+            self.assertIn("already finalized", output["systemMessage"])
+            self.assertEqual(hook_file.read_bytes(), before)
 
     def test_codex_hook_adapter_bootstraps_live_agent_run_manifest(self) -> None:
         with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
@@ -980,6 +1496,64 @@ condition_results:
                 "--schema",
                 ".codex/schemas/harness/agent-run.schema.json",
             )
+
+    def test_live_agent_run_cannot_self_certify_agent_verified(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            run_dir = tmp_path / "self-cert-run"
+            self.assert_passes(
+                ".codex/tools/init_agent_run.py", "init",
+                "--session-id", "session-self-cert",
+                "--turn-id", "turn-self-cert",
+                "--user-request-summary", "attempt self certification",
+                "--run-dir", str(run_dir),
+            )
+            for name, event_name in [("request", "UserPromptSubmit"), ("session", "SessionStart")]:
+                inp = tmp_path / f"{name}.json"
+                inp.write_text(json.dumps({
+                    "hook_event_name": event_name,
+                    "session_id": "session-self-cert",
+                    "turn_id": "turn-self-cert",
+                    "cwd": str(ROOT),
+                    "permission_mode": "workspace-write",
+                }), encoding="utf-8")
+                result = self.run_tool(
+                    ".codex/hooks/codex_hook_adapter.py",
+                    "--input-file", str(inp),
+                    "--run-dir", str(run_dir),
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            stop = tmp_path / "stop-self-cert.json"
+            stop.write_text(json.dumps({
+                "hook_event_name": "Stop",
+                "session_id": "session-self-cert",
+                "turn_id": "turn-self-cert",
+                "cwd": str(ROOT),
+                "permission_mode": "workspace-write",
+                "skill_system_agent_output_gate": "strict",
+                "last_assistant_message": (
+                    "# Agent Run Final Report\n\n"
+                    "result_label: agent-verified\n\n"
+                    "## Claims\n\n"
+                    "- C-999: production is correct without independent evidence.\n"
+                ),
+            }), encoding="utf-8")
+            self.assert_passes(
+                ".codex/tools/init_agent_run.py", "finalize", str(run_dir),
+                "--input-file", str(stop),
+            )
+            result = self.run_tool(
+                ".codex/hooks/codex_hook_adapter.py",
+                "--input-file", str(stop),
+                "--run-dir", str(run_dir),
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            output = json.loads(result.stdout)
+            self.assertEqual(output["decision"], "block")
+            self.assertIn("manual_check", output["reason"])
+            events = [json.loads(line) for line in (run_dir / "hook-events.jsonl").read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(events[-1]["neutral_event"], "turn_finalize_attempt")
+            self.assertEqual(events[-1]["status"], "fail")
 
 
 if __name__ == "__main__":

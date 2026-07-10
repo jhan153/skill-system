@@ -1,6 +1,6 @@
 ---
 name: memory-bank-ingestion
-description: "Promote approved plan/goal/phase-plan closeout packets and proposal candidates into durable long-term memory with append-only ingestion events and archive linkage."
+description: Promote an explicitly approved closeout packet or proposal into durable memory with append-only ingestion events and source-artifact archive links. Use only when promotion approval and a concrete packet exist; never ingest raw plans, transcripts, or secrets directly.
 ---
 
 # Memory Bank Ingestion
@@ -8,118 +8,71 @@ description: "Promote approved plan/goal/phase-plan closeout packets and proposa
 ## Routing Card
 - role: memory_operation
 - intent_signature:
-  - `memory ingestion`, `기억 승격`, `closeout promotion`, `archive into memory`
+  - memory ingestion, closeout promotion, archive into memory, 기억 승격
 - use_when:
-  - an approved closeout packet or memory proposal candidate must be promoted into durable memory.
-  - raw plan/goal/phase-plan artifacts must be linked into archive pointers with append-only events.
+  - an approved closeout packet contains durable candidates that must enter long-term memory.
 - do_not_use_when:
-  - memory-bank initialization, direct goal/rule update, correction capture, or read-only maintenance.
-  - no explicit user approval for persistent memory mutation exists.
+  - approval/packet is missing or the task is init, direct update, correction capture, or read-only maintenance.
 - expected_inputs:
-  - approved closeout packet
-  - source artifact pointer
-  - proposal candidates
-  - target memory-bank path
-  - explicit user approval for memory mutation
+  - approved packet, source artifact pointer, target bank, and explicit mutation approval
 - expected_outputs:
-  - appended ingestion event, accepted memory entries, archive pointers, validation status
+  - classified candidates, append-only ingestion event, accepted entries, archive pointers, and validation status
 - context_targets:
   must_read:
-    - approved closeout packet and proposal candidates
-    - target memory-bank current/archive/meta state
+    - approved packet and target current/archive/meta state
+    - `.codex/docs/memory_mutation_contract.md` before admission or write
   read_if_needed:
-    - source plan/goal/phase-plan artifact being archived
+    - only the source artifact slices needed to verify a candidate or archive pointer
   do_not_load_by_default:
-    - full repo
-    - unrelated memory entries
+    - full plan history, full repo, unrelated memory, or raw transcripts
 - risk_profile:
   reads:
-    - READ_MEMORY_BANK for current/archive/meta state
+    - approved packet, target bank, and selected source evidence
   writes:
-    - WRITE_MEMORY_BANK only after explicit user approval for persistent mutation
+    - append-only memory changes after explicit approval
   tools:
-    - none beyond memory-bank file operations
+    - safe file and schema validation
   sensitive_resources:
-    - mask secrets, credentials, and private content before ingestion
+    - redact secrets, PII, and raw private content before admission
 - entry_scene:
   - PREPARE
 
-## Related Skills
-- `plan-spec-curator`: produces proposal-only closeout packets; does not mutate memory.
-- `memory-bank-update`: direct persistent goal/rule mutation.
-- `memory-bank-maintenance`: validate, consolidate, and resolve conflicts after ingestion.
-- `memory-bank-correction-capture`: recurring correction candidate capture.
+## Admission Gate
+All are required:
 
-## Trigger
-- `memory ingestion`, `closeout를 기억으로 승격`, `archive pointer 반영`
+1. explicit approval for persistent mutation;
+2. a packet identifying source artifact, durable candidates, transient exclusions, sensitivity check, and target bank;
+3. source-grounded candidates with operational value beyond the closed task;
+4. no unresolved conflict that requires `memory-bank-maintenance` first.
 
-## Trigger Guard (Do Not Trigger)
-- Plain memory init/update/maintenance/correction-capture requests.
-- Any promotion without an approved packet and explicit mutation approval.
+The packet proposes; it does not self-authorize. Raw artifact text is archived by pointer, not copied wholesale into current memory.
 
-## Goal
-- Promote durable items into accepted long-term memory with append-only semantics and archive linkage, never bypassing approval.
+## Workflow
+1. Validate approval, packet shape, target bank, and sensitivity screening.
+2. Reclassify each candidate as durable, transient, conflicting, or insufficiently supported.
+3. Map every admitted candidate to a canonical entity/item ID; any unresolved mapping or conflict makes the whole batch a no-write outcome.
+4. Apply accepted entries, the canonical ingestion event, archive pointers, and metadata through the shared stable-operation transaction.
+5. Post-validate the new ledger state before handing later consolidation work to `memory-bank-maintenance`.
 
-## Mandatory Sequence
-1. Confirm an approved closeout packet and explicit mutation approval; otherwise stop as `blocked`.
-2. Classify proposal candidates into durable vs transient.
-3. Append durable items as accepted memory entries with an ingestion event.
-4. Link the raw artifact into archive pointers.
-5. Hand validation/consolidation to `memory-bank-maintenance`.
-
-## Approved Packet Schema
+## Compact Packet Contract
 ```yaml
 closeout_packet:
-  source_artifact:        # plan/goal/phase-plan pointer
-  approval_evidence:      # explicit user approval for memory mutation
-  durable_candidates: []  # entries proposed for long-term memory
-  transient_excluded: []  # entries to drop, with reason
-  sensitivity_check:      # secrets/PII screened before ingestion
-  target_memory_path:
-  maintenance_handoff:    # what memory-bank-maintenance should validate next
-```
-
-## Append-only Event Schema
-```yaml
-ingestion_event:
-  timestamp:
   source_artifact:
-  accepted_entries: []
-  excluded_entries: []
-  approval_pointer:
-  validation_status: agent-verified | user-verification-needed | unverified | blocked
+  approval_evidence:
+  durable_candidates: []
+  transient_excluded: []
+  sensitivity_check:
+  target_memory_path:
 ```
-- Events are append-only; never rewrite or delete prior entries.
 
-## Blocked Cases
-Report `blocked` (do not mutate memory) when any holds:
-- no explicit user approval for persistent memory mutation
-- no approved closeout packet
-- raw secrets/credentials/PII present and not yet redacted
-- target memory path unknown
-- a conflict requires `memory-bank-maintenance` to resolve first
+## Output
+Report admitted and excluded candidate IDs with reasons, archive/event pointers, validation status, and remaining maintenance needs. Omit empty categories.
 
-## Reference
-- Read `references/ingestion-packet-schema.md` for a closeout-packet example, an ingestion-event example, and a blocked-output example.
-
-## Output Contract
-1. Approval and packet check
-2. Accepted memory entries
-3. Archive pointers
-4. Appended ingestion event
-5. Validation status / remaining checks
-
-## Resource and Risk Boundary
-- Reads: memory-bank state and the approved packet only.
-- Writes: memory-bank only after explicit approval; append-only, never destructive rewrite.
-- Network/credentials: none; mask sensitive content before ingestion.
-- Destructive actions: never; ingestion is additive.
-
-## Anti-Patterns
-- Promoting without approval or without a closeout packet.
-- Overwriting or deleting existing memory instead of appending.
-- Ingesting raw secrets, credentials, or private transcripts.
+## Behavior Cases
+- Positive: “이 승인된 closeout packet의 두 policy를 장기 메모리로 승격해줘.”
+- Negative: “이 전체 plan을 알아서 기억해.” → no approved packet, blocked.
+- Edge: packet is approved but contains a secret → block admission until redacted.
 
 ## Known Limits
-- Ingestion does not validate long-term consistency; `memory-bank-maintenance` does.
-- Without an approved packet, this skill reports `blocked` rather than guessing.
+- Ingestion validates admission and ledger consistency, not long-term truth or conflict freedom.
+- Later consolidation and conflict resolution belong to `memory-bank-maintenance`.

@@ -74,6 +74,7 @@ hook_events: hook-events.jsonl
 - Every claim must have a stable `claim_id`, and the final report must mention that id.
 - Command-backed claims must point to evidence that contains the command and a matching pass/fail marker.
 - Command-backed claims must match a record in `validations`.
+- Schema-v2 command records must also match a `PreToolUse` command hash and the corresponding `PostToolUse` exit code for the same `tool_use_id`; a text file containing `PASS` is not an execution receipt by itself.
 - Schema v2 runs must include a run-local immutable `context/context-pack.yaml` reference and a matching SHA-256 hash.
 - `context_support.claim_ids` must reference claim IDs admitted by the run's context pack record.
 - `source_support.source_refs` must reference source snapshots recorded by the run context.
@@ -86,6 +87,7 @@ hook_events: hook-events.jsonl
 - Failed or unverified `Stop` records are `turn_finalize_attempt`, not terminal `turn_finalize`, so later repair work remains valid.
 - The end of the hook ledger must not contain unfinished tool calls.
 - `agent-verified` cannot contain nonzero command validations or failed hook events except recoverable `turn_finalize_attempt` records.
+- `agent-verified` cannot rely on `manual_check` or use `final_report` as its own evidence. Live finalization captures assistant claims but does not promote those claims into independent proof.
 
 ## Commands
 Validate recorded agent runs:
@@ -115,10 +117,12 @@ New live records are schema v2 hash-chain records. Existing schema v1 fixtures r
 
 `Stop` validates only the current session/turn run directory. It does not treat static sample runs as evidence for the current turn, and it does not run source-repo validation, behavior evals, release profiles, plan synchronization, or repository-wide repair.
 
-- current run exists and is valid: `pass`
+- current run exists and is valid: one passing `turn_finalize`
 - current run exists and is invalid: `turn_finalize_attempt` plus non-blocking continuation by default
-- current run is missing in notification-only mode: `turn_finalize_attempt` with `SKIP`/`skip`, not pass
+- current run is missing in notification-only mode: one `turn_finalize_attempt` with `SKIP`/`skip`, not pass
 - current run is missing under strict gate, explicit `--run-dir`, explicit `--ledger`, or opt-in bootstrap: `turn_finalize_attempt` with `UNVERIFIED`/`warn`, not pass
+
+A Recovery Guard audit/handoff and a blocking LoopRun continuation are also nonterminal `turn_finalize_attempt` records. Recovery audit paths do not finalize the agent-run report. Post-session external side effects run only after the Stop decision is known and never before a blocking continuation or recovery handoff.
 
 ## Loop Governance Packets
 

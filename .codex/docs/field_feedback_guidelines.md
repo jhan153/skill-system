@@ -71,7 +71,7 @@ Do not use this field to turn every bug fix, correction, or weak output into a n
 
 ## Current Field-Tuning Watchlist
 
-- `coordination-brief`: watch for trigger ambiguity around goal/목표.
+- `coordination-handoff`: watch for trigger ambiguity around goal/목표.
 - `plan-long-term-package`: watch for keyword-only over-trigger from phase, migration, rewrite, or handoff.
 - `design-tokens`: collect real token-source cases before raising maturity.
 - `design-component-mapper`: collect real Figma-to-code mapping cases before raising maturity.

@@ -1,6 +1,6 @@
 interface:
   display_name: "Workflow Dependency Upgrade"
-  short_description: "Upgrade dependencies, lockfiles, runtimes, and compatibility fixes"
+  short_description: "Upgrade dependencies and required compatibility code"
   default_prompt: "Use $workflow-dependency-upgrade to update dependency, package, runtime, framework, SDK, or lockfile versions with bounded scope, required migration fixes, lockfile review, validation, and rollback/fallback notes."
 
 policy:

@@ -1,0 +1,105 @@
+version: "9.1.0"
+purpose: "Fresh gpt-5.6-sol forward-evaluation cases for the 9.1.0 release gate."
+cases:
+  - case_id: solar-910-codebase-semantic-001
+    schema_version: 2
+    user_request: "작은 legacy Qt/candidate .NET 저장소의 전체 비교 보고서를 만들고, end-to-end 계약 차이를 판단해줘."
+    expected_primary_skill: analysis-codebase
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-bug, analysis-codebase-design]
+    expected_context: [paired_implementation, shared_fixture, paired_runtime_results, static_only_candidate]
+    expected_output_shape: "integrated report with semantic comparison and evidence-qualified backlog"
+    quality_notes: "Observable behavior owns parity; technology vocabulary is context only."
+    friction_risk: "framework or control-flow differences promoted as contract gaps"
+    expected_behaviors:
+      - compare_same_fixture_and_oracle
+      - report_observable_error_contract_delta
+      - exclude_implementation_vocabulary_from_parity_findings
+      - mark_static_only_comparison_unverified
+    forbidden_behaviors:
+      - report_framework_difference_as_contract_gap
+      - emit_bare_difference_status
+      - confirm_runtime_behavior_from_static_source
+    required_evidence:
+      - type: route_match
+        expected: analysis-codebase
+      - type: model_identity
+        expected: gpt-5.6-sol
+      - type: qualitative_review
+        expected: pass
+
+  - case_id: solar-910-long-term-package-001
+    schema_version: 2
+    user_request: "세 릴리스에 걸친 결제 엔진 교체를 여러 세션에서 이어갈 수 있는 phase/package 계획으로 작성해줘."
+    expected_primary_skill: plan-long-term-package
+    expected_supporting_skills: []
+    should_not_trigger: [plan-short-term-docs]
+    expected_context: [explicit_package_intent, repository_outline, migration_constraints, release_oracles]
+    expected_output_shape: "bounded package manifest, canonical ownership, phases, and measurable gates"
+    quality_notes: "Load only selected contracts and keep planning evidence distinct from runtime proof."
+    friction_risk: "template explosion or documentation treated as implementation readiness"
+    expected_behaviors:
+      - admit_explicit_package_scope
+      - select_contracts_proportionally
+      - define_single_authority_and_behavior_oracles
+      - define_measurable_phase_and_release_gates
+    forbidden_behaviors:
+      - instantiate_entire_template_library
+      - claim_runtime_validation_from_documents
+      - claim_implementation_complete
+    required_evidence:
+      - type: route_match
+        expected: plan-long-term-package
+      - type: model_identity
+        expected: gpt-5.6-sol
+      - type: qualitative_review
+        expected: pass
+
+  - case_id: solar-910-research-sparse-001
+    schema_version: 2
+    user_request: "상충하는 소규모 문헌 묶음에서 후속 연구 후보만 도출하고 아직 하나를 고르지 마."
+    expected_primary_skill: research-literature-ideation
+    expected_supporting_skills: []
+    should_not_trigger: [research-hypothesis-planning, research-experiment-blueprint]
+    expected_context: [sparse_corpus, conflicting_evidence, exploration_only]
+    expected_output_shape: "evidence-proportional candidate gaps with selection pending"
+    quality_notes: "Small-corpus absence is a coverage gap, not field-wide novelty."
+    friction_risk: "forced active hypothesis or unsupported novelty claim"
+    expected_behaviors:
+      - label_sparse_evidence_as_coverage_gap
+      - preserve_unresolved_conflict
+      - preserve_candidate_only_state
+    forbidden_behaviors:
+      - claim_field_wide_novelty
+      - force_active_hypothesis
+      - invent_missing_study_results
+    required_evidence:
+      - type: route_match
+        expected: research-literature-ideation
+      - type: model_identity
+        expected: gpt-5.6-sol
+      - type: qualitative_review
+        expected: pass
+
+  - case_id: solar-910-simple-direct-001
+    schema_version: 2
+    user_request: "VERSION 파일의 값만 알려줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-codebase, plan-long-term-package, workflow-rigor]
+    expected_context: [single_local_file]
+    expected_output_shape: "one direct value"
+    quality_notes: "A trivial read should not trigger planning, delegation, or a heavyweight skill."
+    friction_risk: "over-routing and verbose process narration"
+    expected_behaviors:
+      - answer_with_requested_value
+      - avoid_heavyweight_workflow
+    forbidden_behaviors:
+      - create_plan_for_trivial_read
+      - spawn_subagents_for_trivial_read
+      - add_unrequested_explanation
+    required_evidence:
+      - type: model_identity
+        expected: gpt-5.6-sol
+      - type: qualitative_review
+        expected: pass

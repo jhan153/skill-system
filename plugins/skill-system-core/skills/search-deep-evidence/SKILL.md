@@ -1,6 +1,6 @@
 ---
 name: search-deep-evidence
-description: Runs a deep multi-angle evidence sweep across search lanes with adversarial verification and citation-status labels, producing a verified evidence set for report or synthesis skills to consume without owning final synthesis.
+description: Gather and cross-check evidence for a claim across multiple relevant lanes such as papers, official code/docs, runtime observations, visual artifacts, memory, or project knowledge. Use for explicit multi-angle investigation or fact-checking; return an evidence set with verification records, not a final report or majority-vote verdict.
 ---
 
 # Search Deep Evidence
@@ -8,96 +8,71 @@ description: Runs a deep multi-angle evidence sweep across search lanes with adv
 ## Routing Card
 - role: primary
 - intent_signature:
-  - deep research
-  - multi-source evidence
-  - cross-check sources
-  - fact-check
-  - 심층 조사
-  - 교차검증
-  - evidence sweep
+  - deep evidence sweep, multi-source fact-check, cross-lane verification, 심층 조사, 교차검증
 - use_when:
-  - the user wants a broad, multi-angle investigation of a topic or claim with explicit fact-checking across more than one evidence lane.
-  - a downstream report or synthesis skill needs a verified, citation-labeled evidence set before it can write.
+  - the user explicitly wants multiple evidence types or a downstream owner identifies a cross-lane evidence gap.
 - do_not_use_when:
-  - the request is a single paper/citation lane only; use `search-paper-evidence`.
-  - the user wants the final written report or literature synthesis; that is owned by `report-critical`/`report-qualitative`/`research-literature-synthesis`.
-  - bare `분석`/`검토` with no evidence/source intent, or ordinary implementation.
+  - one paper/citation lane is sufficient (`search-paper-evidence`).
+  - the primary goal is final synthesis, critique, implementation, or ordinary analysis without source intent.
 - expected_inputs:
-  - topic or claim
-  - evidence lane hints (paper, code, runtime, visual, memory, project knowledge, web)
-  - existing artifacts or prior ledgers when available
+  - claim/question, scope, freshness needs, allowed lanes, and existing evidence
 - expected_outputs:
-  - decomposed search angles
-  - per-lane evidence ledger entries
-  - adversarial verification verdicts per claim
-  - citation_status labels
-  - verified evidence set + handoff note to the owning report/synthesis skill
+  - claim–evidence matrix, source status, contradictions, unresolved gaps, and synthesis handoff
 - context_targets:
   must_read:
-    - current request
-    - topic or claim
+    - target claim/question and source constraints
   read_if_needed:
-    - prior evidence ledger
-    - `references/deep-evidence-method.md`
+    - prior ledger and `references/deep-evidence-method.md`
+    - `references/evidence-ledger-v2.md` only for an explicit ledger artifact or legacy-ledger migration
   do_not_load_by_default:
-    - full repo
-    - full memory bank
+    - full repo, full memory bank, unrelated lanes, or downstream report templates
 - risk_profile:
   reads:
-    - user topic or claim
-    - optional search results across lanes
+    - scoped read-only evidence from relevant lanes
   writes:
-    - verified evidence set only when explicitly requested
+    - evidence artifact only when explicitly requested
   tools:
-    - lane search tools when available and permitted
-  network:
-    - allowed only for evidence acquisition and only when permitted
-  credentials:
-    - none
-  forbidden_by_default:
-    - final report/synthesis ownership
-    - dataset downloads, dependency installs, training
+    - lane-specific search/read tools within the user's and host's existing authority
+  sensitive_resources:
+    - credentials default deny; this skill never expands tool or mutation permission
 - entry_scene:
   - PREPARE
 
-## Purpose
-Brings the deep-research harness shape (fan out angles, gather, adversarially verify, label confidence) into the bundle as a `search`-family specialist, while respecting the search↔synthesis boundary: it produces a verified, citation-labeled evidence set and hands final synthesis to report/research skills.
+## Evidence Model
+Do not overload one `verified` label. Record separate axes:
 
-## Method
-1. DECOMPOSE - split the topic/claim into 3-6 distinct search angles so one search blind spot does not hide evidence.
-2. ROUTE - for each angle pick an evidence lane via `search-router` (paper, code, runtime, visual, memory, project knowledge, web).
-3. GATHER - build an evidence ledger per lane reusing `search-paper-evidence` ledger discipline (no fabricated citations/DOIs/results).
-4. VERIFY - for each falsifiable claim, run adversarial N-vote refutation (default 2 of 3 refutes kills the claim); record the verdict.
-5. LABEL - tag every ledger entry `citation_status: verified | unverified | fabricated-risk` (shared vocabulary with `search-paper-evidence`).
-6. HANDOFF - output the verified evidence set with a note naming the report/synthesis skill that should own the writeup.
+- `acquisition_status`: `acquired | partial | inaccessible | not_acquired`
+- `source_status`: `verified_identity | metadata_partial | duplicate_version | corrected | retracted | unverified`
+- `claim_relation`: `supports | contradicts | mixed | mentions | not_assessed`
+- `evidence_basis`: exact basis such as full text/table, official documentation, source code, runtime observation, screenshot, accepted memory, or user-provided artifact
+- `locator`: URL, file/line, artifact ID, table/section, or observation receipt
 
-## Boundary
-- This skill does NOT write the final report, literature review, or synthesis prose. It stops at a verified evidence set and hands off.
-- It is broader than `search-paper-evidence` (multi-lane sweep + adversarial verification), not a replacement for the single paper lane.
+Source existence does not verify a claim. User-provided is provenance, not truth status.
 
-## Output Contract
-1. Search date (`YYYY-MM-DD`)
-2. Decomposed angles
-3. Per-lane evidence ledger entries (claim, source, role)
-4. Adversarial verification verdicts (confirmed | refuted | partial, with vote tally)
-5. `citation_status` per entry (verified | unverified | fabricated-risk)
-6. Verified evidence set + handoff target skill
-7. Missing evidence and `Unverified` markers
+## Workflow
+1. Break the question into only the claims or angles whose evidence requirements differ.
+2. Select lanes by expected discriminating evidence; do not fan out to a fixed count.
+3. Gather sources with the owning lane's rules. Read-only search does not authorize runtime execution, external writes, or memory mutation.
+4. Build a claim–evidence matrix with provenance, directness, authority, independence, recency, and limitations.
+5. Search for disconfirming evidence and alternative explanations.
+6. Reconcile duplicate/dependent sources before weighing apparent agreement.
+7. Preserve unresolved disagreement. One strong direct contradiction can outweigh many derivative mentions; no majority vote decides truth.
+8. Return the evidence set and name the downstream synthesis/review owner when one exists.
+
+## Output
+For a focused fact-check, return the claim, strongest supporting/contradicting evidence, verdict limits, and links. Use a full ledger only for an explicit deep-evidence artifact or multiple claims. For that artifact, read `references/evidence-ledger-v2.md` and validate the result with `check_evidence_ledger.py`. The evidence set may be `supported`, `contradicted`, `mixed`, or `insufficient`, but retain the underlying records and uncertainty.
+
+## Behavior Cases
+- Positive: “이 공개 성능 주장을 논문, 공식 구현, 실제 runtime evidence로 교차검증해줘.”
+- Negative: “이 주제 최신 논문 세 편만 찾아줘.” → `search-paper-evidence`.
+- Edge: two lanes share the same upstream source and one independent runtime result disagrees → do not count the dependent sources as two votes; report the unresolved conflict.
 
 ## Validation
-- Confirm explicit multi-source evidence/fact-check intent (not a single paper lane, not bare analysis).
-- Confirm each retained claim has at least one source and a verification verdict.
-- Confirm no fabricated citations, DOIs, datasets, metrics, or results were introduced.
-- Confirm this skill did not produce the final report/synthesis; a handoff target is named.
-
-## Anti-Patterns
-- Owning the final synthesis or written report.
-- Collapsing into `search-paper-evidence` (single lane) or duplicating `report-*`.
-- Treating an unverified search hit as a conclusion.
+- Every retained claim relation has an exact evidence locator and basis.
+- Source identity/metadata status is separate from claim support.
+- Contradictory and unavailable lanes remain visible.
+- No final report, implementation, or permission-expanding action is performed by this skill.
 
 ## Known Limits
-- Lane search tools may be unavailable; mark evidence `not_acquired` and fill the angle plan only.
-- Adversarial verification reduces but does not eliminate false claims.
-
-## Reference
-- Read `references/deep-evidence-method.md` for the angle decomposition, lane mapping, and adversarial-verification rubric.
+- Cross-lane coverage reduces blind spots but cannot guarantee truth or completeness.
+- Some runtime/private evidence may remain unavailable; do not replace it with agent consensus.

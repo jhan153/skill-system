@@ -1,6 +1,6 @@
 ---
 name: research-experiment-scaffold
-description: Generates minimal experiment code skeletons from approved experiment blueprints, with explicit write gates, no dataset downloads, no dependency installs, and no training runs.
+description: Project an approved experiment blueprint into a minimal runnable code scaffold with configuration, provenance, synthetic fixtures, tests, and safe smoke validation. Use only for explicit scaffold/code intent; do not download datasets, install dependencies, train models, or claim experimental results.
 ---
 
 # Research Experiment Scaffold
@@ -8,133 +8,67 @@ description: Generates minimal experiment code skeletons from approved experimen
 ## Routing Card
 - role: heavy_artifact_generator
 - intent_signature:
-  - experiment scaffold
-  - experiments/
-  - code skeleton
-  - run.py
-  - evaluate.py
-  - 실험 코드 스켈레톤
-  - blueprint로 코드
+  - experiment scaffold, experiments directory, run/evaluate skeleton, blueprint to code, 실험 코드 스켈레톤
 - use_when:
-  - the user explicitly asks for code scaffold or an `experiments/` directory.
-  - an approved `experiment_blueprint.json` exists or is provided and target directory is clear.
+  - the user explicitly asks to create experiment code from an approved blueprint or equivalent complete contract.
 - do_not_use_when:
-  - literature review, hypothesis generation, research planning, blueprint creation, paper evidence search, manuscript writing, or statistical analysis.
-  - requests without approved blueprint or write boundary.
+  - the hypothesis/blueprint is not settled, or the task is search, synthesis, statistics, writing, or training execution.
 - expected_inputs:
-  - approved experiment_blueprint.json
-  - target directory
-  - language/framework constraints
-  - write approval
-  - smoke test preference
+  - blueprint, target repository/directory, existing project conventions, and validation boundary
 - expected_outputs:
-  - experiments/ README
-  - configs/default.yaml
-  - data/README.md
-  - src/
-  - tests/
-  - run.py
-  - evaluate.py
-  - requirements.txt or pyproject.toml
+  - minimal runnable scaffold, config/provenance contract, synthetic tests, smoke result, and explicit unimplemented boundaries
 - context_targets:
   must_read:
-    - approved blueprint
-    - target directory
-    - explicit scaffold request
+    - approved blueprint or equivalent experiment contract
+    - target directory and repository instructions
+    - nearest existing experiment/test pattern
   read_if_needed:
-    - repo validation contract
-    - existing experiment directory
-    - research-output-contracts reference
+    - build/test contract, package manifest, and existing data/config interfaces
   do_not_load_by_default:
-    - paper search
-    - hypothesis ideation
-    - training execution
-    - dataset download
+    - full literature corpus, real datasets, unrelated training code, or manuscript artifacts
 - risk_profile:
   reads:
-    - approved experiment blueprint
-    - target directory constraints
+    - blueprint and narrow target-repository patterns
   writes:
-    - `experiments/` scaffold only when explicitly requested
+    - scaffold files within the requested target
   tools:
-    - optional safe smoke tests only when requested
-  network:
-    - none
-  credentials:
-    - none
-  generated_artifacts:
-    - scaffold files only within accepted write boundary
-  destructive_actions:
-    - none
-  forbidden_by_default:
-    - dataset downloads unless explicitly approved
-    - dependency installs unless explicitly approved
-    - training
+    - safe local syntax/unit/smoke checks; no implicit network, install, data download, or training
+  sensitive_resources:
+    - credentials and private datasets default deny
 - entry_scene:
   - PREPARE
 
-## Purpose
-Generates minimal experiment code skeletons from approved experiment blueprints, with explicit write gates, no dataset downloads, no dependency installs, and no training runs.
+## Projection Rules
+1. Map each blueprint decision to an explicit interface: config field, dataset adapter, model/baseline adapter, metric, runner, evaluator, or provenance record.
+2. Reuse repository structure and dependencies. Do not introduce a parallel framework when a local pattern exists.
+3. Implement the thinnest end-to-end synthetic path that proves config → data → method → metric → result serialization.
+4. Keep real dataset access and training bodies as explicit adapters or guarded TODOs only when the blueprint cannot supply them.
+5. Record seed, config, code revision hook, data/version placeholders, device/environment, and output location.
+6. Make invalid or missing inputs fail clearly; never silently substitute fake research data in a real run.
+7. Run the narrowest safe syntax/unit/smoke validation by default when the local environment supports it. If unavailable, report the exact gap.
 
-## When To Apply
-- the user explicitly asks for code scaffold or an `experiments/` directory.
-- an approved `experiment_blueprint.json` exists or is provided and target directory is clear.
+## Minimum Useful Scaffold
+Select files from the blueprint and repository rather than forcing a universal tree. A typical scaffold may include:
 
-## When Not To Apply
-- literature review, hypothesis generation, research planning, blueprint creation, paper evidence search, manuscript writing, or statistical analysis.
-- requests without approved blueprint or write boundary.
+- one config with documented fields
+- data/model/baseline/metric interfaces needed by the core experiment
+- a runner and evaluator
+- deterministic synthetic fixture
+- tests for config validation and one end-to-end synthetic pass
+- provenance/result schema and concise usage note
 
-## Workflow
-1. PREPARE - verify explicit scaffold intent, approved blueprint, target directory, and write boundary.
-2. DESIGN - map blueprint to minimal directories, configs, fixtures, and interfaces.
-3. SCAFFOLD - create skeleton files only within target scope.
-4. SMOKE - optionally add synthetic fixture tests; CALL_PROCESS only if requested.
-5. FINALIZE - report files and state that no training/results were run.
+Do not create empty directories, placeholder modules, requirements files, or broad abstractions with no immediate experiment role.
 
-## Resource and Risk Boundary
-Summary:
-- Reads an approved experiment blueprint and target directory constraints.
-- Writes `experiments/` scaffold files only after explicit scaffold request and accepted write boundary.
-- May run optional safe smoke tests only when requested.
-- Uses no network and no credentials.
-- Dataset downloads, dependency installs, and training are forbidden unless separately approved where applicable.
-- Required checkpoints: approved blueprint, WRITE_LOCAL_FS/WRITE_CODEBASE boundary, requirements-file decision, and what was not run.
+## Output
+Report the blueprint source, changed files, runnable entry point, smoke/test evidence, intentionally unimplemented real-data/training pieces, and remaining user/environment checks. Scaffold existence is not an experiment result.
 
-## Recovery and Context Expansion
-- If the request belongs to development/implementation, return to scheduling instead of forcing research routing.
-- If required inputs are missing, ask one focused question or produce a non-writing plan with missing evidence marked.
-- Expand from must-read to read-if-needed one layer at a time.
-- Do not load the full repo, full memory bank, `.system`, or unrelated research cluster skills by default.
-- Do not invent citations, datasets, metrics, results, or file artifacts to fill gaps.
-
-## Output Contract
-1. Blueprint source
-2. Target directory
-3. Files to create/update
-4. Risk gates
-5. Scaffold layout
-6. Synthetic smoke-test plan
-7. Provenance logging fields
-8. What was not run
-
-## Workspace Initializer Script
-`scripts/init_research_workspace.py` is a placeholder research artifact workspace initializer, not a lifecycle executor. It may create empty/template `papers/`, `experiments/`, `analysis/`, `review/`, and `manifest.json` files only after explicit user request. It does not search, download datasets, install dependencies, run training, run evaluation, or imply that the research lifecycle is complete.
+## Behavior Cases
+- Positive: “이 approved blueprint를 기존 PyTorch repo 패턴에 맞춘 최소 runnable scaffold로 구현해줘.”
+- Negative: “새 연구 아이디어를 제안해줘.” → research ideation/planning.
+- Edge: required dependency is absent → do not install automatically; keep the adapter boundary and report the blocked smoke check.
 
 ## Validation
-- Confirm `.codex/skills/.system` was not touched.
-- Confirm user intent matches this skill, not ordinary development.
-- Confirm required evidence or artifact inputs are present or explicitly marked missing.
-- Confirm no secrets, credentials, hardcoded single-host paths, fabricated citations, or fabricated results are introduced.
-- Confirm artifact writes happen only when explicitly requested.
-
-## Anti-Patterns
-- Installing or invoking monolithic `codex-research-lifecycle`.
-- Treating search keywords as conclusions.
-- Collapsing evidence search, ideation, blueprint, scaffold, analysis, writing, and review into one step.
-- Creating custom transcribe/speech skills from research source material.
-- Weakening development/implementation routing because a request mentions model, metric, loss, experiment, or training.
-
-## Known Limits
-- Scaffold code is not validated research output.
-- Generated scaffolds need user/project adaptation.
-- No results can be claimed until experiments are run and analyzed.
+- A synthetic end-to-end path runs or the exact blocker is shown.
+- Config and result/provenance shapes match the blueprint.
+- No dataset download, dependency installation, training, or fabricated result occurred implicitly.
+- Generated code stays inside the accepted target and follows repository conventions.

@@ -177,6 +177,8 @@ sources:
     local_consumers:
       - .codex/skills/workflow-recovery/SKILL.md
       - .codex/skills/evaluation-usage-tracker/references/harness-measurement-protocol.md
+      - .codex/tools/recovery_guard.py
+      - .codex/hooks/codex_hook_adapter.py
       - .codex/eval/runtime_usage_cases.yaml
     local_modifications: summarized
 adoption_decisions:
@@ -209,6 +211,14 @@ adoption_decisions:
       - .codex/hooks/codex_hook_adapter.py
       - .claude/hooks/claude_hook_adapter.py
     rationale: "Out-of-band 80/20 holdout + sunset implemented (8.4.1): analyze_harness_measurement.py aggregates adapter-tagged turn_finalize events; the off arm is a gate-off baseline. observed-runs remain replay fixtures, not an outcome source; automated revert/reinstruction collection is a follow-up."
+  - concept: context-pressure-recovery-guard
+    decision: adapted
+    upstream_reference: SRC-FABLIZE
+    local_surface:
+      - .codex/tools/recovery_guard.py
+      - .codex/hooks/codex_hook_adapter.py
+      - .codex/harness/README.md
+    rationale: "Local state-machine adaptation with no upstream code: always-on derived observation, long-context arming, independent correction/rhetoric/progress signals, one bounded Stop audit per episode, session-hashed state, and observe-by-default rollout. Tool denial and transcript parsing are intentionally excluded."
   - concept: checkpointed-execution-task-ledger
     decision: adapted
     upstream_reference: SRC-FABLECODEX

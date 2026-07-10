@@ -124,7 +124,7 @@ Use `manual_capture` only when observation data is available. Otherwise, say whi
 - `evaluation-usage-tracker` owns metadata-only invocation count summaries.
 - `report-critical` owns release/readiness/QA verdicts.
 - `workflow-validation` owns validation plans for implementation changes.
-- `create-skill-pack` owns lifecycle edits after eval findings identify a concrete skill/package change.
+- System `skill-creator` owns skill authoring changes after eval findings; attach `skill-system-repo-adapter` only for canonical Skill-System repository integration, generation, and bundle validation.
 - `report-qualitative` owns formal qualitative reports; this skill stays case-review oriented.
 
 ## Validation

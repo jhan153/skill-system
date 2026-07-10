@@ -1,6 +1,6 @@
 ---
 name: search-paper-evidence
-description: Searches or plans searches for paper/reference evidence and builds evidence ledgers without hallucinating citations, papers, datasets, metrics, DOIs, or results.
+description: Acquire and verify paper/reference evidence for an explicit literature, citation, or current-research request, or a downstream paper-evidence gap. Return traceable sources and claim relations without inventing papers, identifiers, metadata, datasets, metrics, or results.
 ---
 
 # Search Paper Evidence
@@ -8,152 +8,77 @@ description: Searches or plans searches for paper/reference evidence and builds 
 ## Routing Card
 - role: primary
 - intent_signature:
-  - latest research
-  - paper evidence
-  - citation search
-  - literature evidence
-  - related work evidence
-  - claim support contradiction
-  - arXiv
-  - Semantic Scholar
-  - OpenAlex
-  - Crossref
-  - 최신 논문
-  - 문헌 근거
+  - paper/citation search, latest research, literature evidence, arXiv/DOI references, 최신 논문, 문헌 근거
 - use_when:
-  - the user asks for latest research, papers, references, citations, literature evidence, or source-grounded research maps.
-  - a research claim needs support, contradiction, baseline, dataset, metric, failure mode, survey, method, benchmark, or open-problem evidence.
+  - the user explicitly asks to find papers/citations or verify a literature-backed claim.
+  - a research/report owner identifies a concrete paper-evidence gap.
 - do_not_use_when:
-  - the user says to use only provided papers.
-  - an evidence ledger is already sufficient for the requested downstream work.
-  - ordinary implementation or bug fixing.
-  - single-paper summarization without broader evidence mapping.
+  - only provided papers may be used, one supplied paper only needs summarization, or the task is ordinary implementation/analysis.
 - expected_inputs:
-  - topic or claim
-  - domain
-  - time range
-  - source preference
-  - provided papers
-  - desired evidence roles
+  - topic/claim, date range, source constraints, desired evidence role, and provided papers when any
 - expected_outputs:
-  - search_date
-  - date_range
-  - sources
-  - query_plan
-  - retrieved_papers
-  - evidence_ledger
-  - missing_evidence
-  - do_not_assume
-  - search_limitations
+  - date-stamped search result or query plan, retrievable sources, claim relations, missing evidence, and limitations
 - context_targets:
   must_read:
-    - current request
-    - topic or claim
-    - source constraints
+    - search question and source/date constraints
   read_if_needed:
-    - provided papers
-    - prior evidence ledger
-    - domain reference such as speech-enhancement-research
+    - provided papers and prior evidence ledger
   do_not_load_by_default:
-    - full repo
-    - full memory bank
-    - experiment scaffold
-    - manuscript writing
+    - full repo, full memory bank, experiment scaffold, or manuscript templates
 - risk_profile:
   reads:
-    - user topic or claim
-    - provided papers
-    - optional search results
+    - user request, provided papers, and acquired source metadata/content
   writes:
-    - evidence artifacts only when explicitly requested
+    - evidence artifact only when explicitly requested
   tools:
-    - web or paper search when available and required
-  network:
-    - allowed only for evidence acquisition and only when permitted
-  credentials:
-    - none
-  generated_artifacts:
-    - `papers/evidence_ledger.json` or evidence tables only if requested
-  destructive_actions:
-    - none
-  forbidden_by_default:
-    - dataset downloads
-    - dependency installs
-    - training
+    - authoritative web/paper search and source opening when evidence acquisition is needed
+  sensitive_resources:
+    - credentials default deny; no dataset download, dependency install, or training
 - entry_scene:
   - PREPARE
 
-## Purpose
-Searches or plans searches for paper/reference evidence and builds evidence ledgers without hallucinating citations, papers, datasets, metrics, DOIs, or results.
+## Acquisition and Claim Model
+Track separate fields:
 
-## When To Apply
-- the user asks for latest research, papers, references, citations, literature evidence, or source-grounded research maps.
-- a research claim needs support, contradiction, baseline, dataset, metric, failure mode, survey, method, benchmark, or open-problem evidence.
+- `acquisition_status`: `acquired | partial | inaccessible | not_acquired`
+- `source_status`: `verified_identity | metadata_partial | duplicate_version | corrected | retracted | unverified`
+- `claim_relation`: `supports | contradicts | mixed | mentions | not_assessed`
+- `evidence_basis`: `title | abstract | full_text | table | supplement | metadata_only`
+- `locator`: direct URL/identifier plus section, page, table, or passage when a claim relation is assessed
 
-## When Not To Apply
-- the user says to use only provided papers.
-- an evidence ledger is already sufficient for the requested downstream work.
-- ordinary implementation or bug fixing.
-- single-paper summarization without broader evidence mapping.
+`user_provided` belongs in provenance. A confirmed DOI/title proves source identity, not that the paper supports the requested claim.
 
 ## Workflow
-1. PREPARE - define topic, claim, time range, domains, and source constraints.
-2. QUERY DESIGN - split queries by method, dataset, metric, baseline, failure mode, survey, and contradiction.
-3. ACQUIRE - use available search tools when literature-backed claims require it; if unavailable, produce query plan only.
-4. NORMALIZE - capture title, authors when available, year, venue/source, URL/identifier, and relevance.
-5. DEDUP/RANK - remove duplicates and classify evidence role.
-6. FINALIZE - return an evidence ledger or draft artifact only when explicitly requested.
+1. Define the claim/topic, date range, inclusion boundary, and evidence roles.
+2. Design the smallest query set that can find supporting, contradicting, baseline, dataset/metric, survey, and failure-mode evidence relevant to the question.
+3. Search current authoritative sources when recency matters; record the search date.
+4. Verify paper identity and open the strongest accessible source before assigning claim relation.
+5. Deduplicate preprint/published versions and check correction/retraction status when material.
+6. Record evidence basis and exact locator; abstract-only access cannot support a full-text-specific claim.
+7. Rank by relevance, directness, study quality, and independence—not keyword frequency.
+8. Return missing evidence and search limitations explicitly.
 
-## Resource and Risk Boundary
-Summary:
-- Reads the user topic or claim, provided papers, and optional search results.
-- Uses web/paper search only when evidence acquisition is required and permitted.
-- Writes `papers/evidence_ledger.json` or evidence tables only when explicitly requested.
-- Uses no credentials and performs no dataset downloads, dependency installs, or training.
-- Required checkpoints: search scope, search date, source list, artifact intent, and evidence-not-acquired state when tools are unavailable.
+## Output
+Match depth to the request:
 
-## Recovery and Context Expansion
-- If the request belongs to development/implementation, return to scheduling instead of forcing research routing.
-- If required inputs are missing, ask one focused question or produce a non-writing plan with missing evidence marked.
-- Expand from must-read to read-if-needed one layer at a time.
-- Do not load the full repo, full memory bank, `.system`, or unrelated research cluster skills by default.
-- Do not invent citations, datasets, metrics, results, or file artifacts to fill gaps.
+- Simple paper list: concise citations/links, relevance, access/evidence limitation, and search date.
+- Claim verification: supporting and contradicting records with evidence basis and locators.
+- Explicit ledger artifact: structured acquisition/source/claim fields, query plan, missing evidence, and limitations.
 
-## Output Contract
-1. Search date (`YYYY-MM-DD`)
-2. Date range, such as `2023-2026` or user-specified
-3. Sources searched or planned (`arXiv`, `Semantic Scholar`, `OpenAlex`, `Crossref`, `web`, `user_provided`)
-4. Query plan
-5. Retrieved papers with title, authors, year, venue, DOI, arXiv ID, URL, source, finding query, relevance, and evidence role when available
-6. Evidence ledger entries with claim, label, supporting papers, contradicting papers, confidence, verification status, and notes
-7. Missing evidence
-8. Do not assume
-9. Search limitations
+Do not force a nine-section ledger around a request for two references.
 
-## Evidence Ledger Rules
-- No citation without a source.
-- Do not hallucinate DOI, arXiv ID, venue, dataset, metric, or paper existence.
-- Search date is mandatory for latest/current/recent research requests.
-- Label each ledger entry `citation_status: verified | unverified | fabricated-risk` (shared vocabulary with `search-deep-evidence`): `verified` only when a real, retrievable source is confirmed; `fabricated-risk` when an identifier cannot be confirmed to exist; otherwise `unverified`.
-- Current-source check: for latest/current/recent claims, re-confirm each entry against a fresh `search_date` before labeling it `verified`.
-- If search tools are unavailable, fill the query plan and search limitations, then mark evidence as `not_acquired`.
+## Behavior Cases
+- Positive: “2024년 이후 이 claim을 지지하거나 반박하는 논문과 직접 링크를 찾아줘.”
+- Negative: “첨부한 PDF 하나만 요약해줘.” → direct paper reading/summarization, not this search lane.
+- Edge: a paywalled abstract and its published/preprint duplicate exist → deduplicate, label partial evidence, and do not claim full-text support.
 
 ## Validation
-- Confirm `.codex/skills/.system` was not touched.
-- Confirm user intent matches this skill, not ordinary development.
-- Confirm required evidence or artifact inputs are present or explicitly marked missing.
-- Confirm no secrets, credentials, hardcoded single-host paths, fabricated citations, or fabricated results are introduced.
-- Confirm artifact writes happen only when explicitly requested.
-
-## Anti-Patterns
-- Installing or invoking monolithic `codex-research-lifecycle`.
-- Treating search keywords as conclusions.
-- Collapsing evidence search, ideation, blueprint, scaffold, analysis, writing, and review into one step.
-- Creating custom transcribe/speech skills from research source material.
-- Weakening development/implementation routing because a request mentions model, metric, loss, experiment, or training.
+- No source is returned without a retrievable locator.
+- Current/latest claims have a fresh search date.
+- Source identity, provenance, and claim relation remain separate.
+- Corrections/retractions and duplicate versions are not silently ignored.
+- Missing access or tools yields a query plan/`not_acquired`, never fabricated evidence.
 
 ## Known Limits
-- Search tools may be unavailable or incomplete.
-- Retrieved metadata may omit authors, year, or venue.
-- Evidence ledgers organize sources; they do not prove claims by themselves.
-- Current literature claims require date-stamped search context.
+- Search coverage and metadata can be incomplete.
+- Evidence organization does not by itself establish causal or field-wide truth.

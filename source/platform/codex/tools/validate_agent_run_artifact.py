@@ -275,6 +275,39 @@ def validate_command_record(run_dir: Path, record: dict[str, Any], label: str) -
     return errors
 
 
+def validate_command_hook_receipt(
+    record: dict[str, Any], events: list[dict[str, Any]], label: str
+) -> list[str]:
+    """Bind a schema-v2 command claim to the observed tool lifecycle."""
+    command = record.get("command")
+    exit_code = record.get("exit_code")
+    if not isinstance(command, str) or not isinstance(exit_code, int):
+        return []  # shape errors are reported by validate_command_record.
+    command_hash = hashlib.sha256(command.encode("utf-8", errors="replace")).hexdigest()
+    preflights: dict[str, str] = {}
+    results: dict[str, int] = {}
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        evidence = event.get("evidence") if isinstance(event.get("evidence"), dict) else {}
+        tool_use_id = event.get("tool_use_id") or evidence.get("tool_use_id")
+        if not isinstance(tool_use_id, str) or not tool_use_id:
+            continue
+        if event.get("neutral_event") == TOOL_START and isinstance(evidence.get("command_hash"), str):
+            preflights[tool_use_id] = evidence["command_hash"]
+        if event.get("neutral_event") == TOOL_END:
+            tool_result = evidence.get("tool_result") if isinstance(evidence.get("tool_result"), dict) else {}
+            observed_exit = tool_result.get("exit_code")
+            if isinstance(observed_exit, int):
+                results[tool_use_id] = observed_exit
+    if any(
+        observed_hash == command_hash and results.get(tool_use_id) == exit_code
+        for tool_use_id, observed_hash in preflights.items()
+    ):
+        return []
+    return [f"{label}: command_exit has no matching PreToolUse/PostToolUse receipt"]
+
+
 def validate_support_record(
     run_dir: Path,
     record: dict[str, Any],
@@ -429,11 +462,19 @@ def validate_run_file(
     for rel in outputs.get("artifact_refs", []) or []:
         if not isinstance(rel, str) or not repo_relative(rel) or not (run_dir / rel).exists():
             errors.append(f"{run_id}: artifact_ref not found or not run-relative: {rel!r}")
+    hook_events_rel = data.get("hook_events")
+    hook_events: list[dict[str, Any]] = []
+    if isinstance(hook_events_rel, str) and repo_relative(hook_events_rel):
+        hook_events, _ = load_hook_events(run_dir / hook_events_rel)
     validations = data.get("validations", []) if isinstance(data.get("validations"), list) else []
     validation_keys = {validation_key(record) for record in validations if isinstance(record, dict)}
     for idx, record in enumerate(validations):
         if isinstance(record, dict):
             errors.extend(validate_command_record(run_dir, record, f"{run_id}: validations[{idx}]"))
+            if data.get("schema_version") == 2 and record.get("type") == "command_exit":
+                errors.extend(
+                    validate_command_hook_receipt(record, hook_events, f"{run_id}: validations[{idx}]")
+                )
     for idx, claim in enumerate(outputs.get("claims", []) or []):
         if not isinstance(claim, dict):
             continue
@@ -462,7 +503,6 @@ def validate_run_file(
                     errors.append(f"{run_id}: {claim_id}.source_support references unknown source snapshot {source_ref}")
                 if context_pack is not None and source_ref not in pack_source_ids:
                     errors.append(f"{run_id}: {claim_id}.source_support references source outside context pack {source_ref}")
-    hook_events_rel = data.get("hook_events")
     if isinstance(hook_events_rel, str):
         errors.extend(
             f"{run_id}: {error}"
@@ -472,7 +512,16 @@ def validate_run_file(
         nonzero = [record for record in validations if isinstance(record, dict) and record.get("type") == "command_exit" and record.get("exit_code") != 0]
         if nonzero:
             errors.append(f"{run_id}: agent-verified result has nonzero command validation")
-        hook_events, _ = load_hook_events(run_dir / str(hook_events_rel)) if isinstance(hook_events_rel, str) else ([], [])
+        if any(isinstance(record, dict) and record.get("type") == "manual_check" for record in validations):
+            errors.append(f"{run_id}: agent-verified result cannot rely on manual_check validation")
+        for claim in outputs.get("claims", []) or []:
+            if not isinstance(claim, dict) or not isinstance(claim.get("support"), dict):
+                continue
+            support = claim["support"]
+            if support.get("type") == "manual_check":
+                errors.append(f"{run_id}: agent-verified claim {claim.get('claim_id')} cannot rely on manual_check")
+            if isinstance(final_report_rel, str) and support.get("evidence_ref") == final_report_rel:
+                errors.append(f"{run_id}: agent-verified claim {claim.get('claim_id')} cannot use final_report as its own evidence")
         if any(event.get("status") == "fail" and event.get("neutral_event") != "turn_finalize_attempt" for event in hook_events):
             errors.append(f"{run_id}: agent-verified result has failed hook event")
     assistant_message = data.get("assistant_message")

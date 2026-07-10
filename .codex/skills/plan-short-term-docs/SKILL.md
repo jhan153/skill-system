@@ -1,6 +1,6 @@
 ---
 name: plan-short-term-docs
-description: Create or update active docs/plan artifacts for current-horizon implementation design and status sync.
+description: Create or synchronize a persisted docs/plan artifact for the current executable design horizon, including scope, files, risks, validation, decisions, TODOs, and implementation-transition state. Use only when the user requests a plan artifact or an active plan already owns the task.
 ---
 
 # Plan Short Term Docs
@@ -8,171 +8,117 @@ description: Create or update active docs/plan artifacts for current-horizon imp
 ## Routing Card
 - role: primary
 - intent_signature:
-  - persisted docs/plan artifact, active plan document, 플랜 문서 생성/갱신, 플랜 구현 전환 관리
+  - create or update a persisted `docs/plan` artifact
+  - synchronize an active plan, decisions, TODOs, or transition state
 - use_when:
-  - the user asks to create or update a persisted plan document under `docs/plan`.
-  - an active planning conversation already owns a plan artifact.
+  - the user requests a current-horizon plan document under `docs/plan`.
+  - an explicitly referenced active plan already owns the planning conversation.
 - do_not_use_when:
-  - `플랜` is a casual mention without artifact intent.
-  - the user asks to execute or implement an active plan without requesting plan artifact synchronization; use the task-specific implementation workflow and treat this skill as secondary status tracking only when needed.
-  - the task is a small local edit, one-off conceptual explanation, or heavy phase package request.
+  - `plan` is only a casual word.
+  - the user asks for direct implementation without plan synchronization; execution remains task-workflow-owned.
+  - the task is a small local edit, conceptual answer, task ledger, or multi-phase package.
 - expected_inputs:
-  - planning goal
-  - repo root and active plan path when available
-  - questions, decisions, TODOs, risks, validation strategy
+  - planning objective, active plan path when available, decisions, risks, tasks, and validation strategy
 - expected_outputs:
-  - updated plan artifact, synchronized Q&A/TODO/status, implementation transition state
+  - one synchronized active plan and an evidence-backed implementation-transition verdict
 - context_targets:
   must_read:
-    - active plan file or plan template
     - current planning request
+    - active plan or `references/plan-template.md` for a new plan
   read_if_needed:
-    - repo source outline for code-impacting plans
-    - relevant memory cards
-    - validation contract
+    - affected source outline and target slices
+    - relevant memory cards and validation contract
+    - `.codex/docs/planning_state_model.md` when state admission is ambiguous
   do_not_load_by_default:
-    - phase package templates
-    - full memory bank
-    - full repo
+    - full repo, memory bank, all plans, or phase-package templates
 - risk_profile:
   reads:
-    - active plan and targeted repo context
+    - active plan and narrow implementation evidence
   writes:
-    - docs/plan artifacts only before implementation transition
+    - `docs/plan` only before an accepted implementation transition
   tools:
-    - none by default
+    - targeted file discovery or validation lookup only when needed
   sensitive_resources:
     - credentials default deny
 - entry_scene:
   - PREPARE
 
-## Core Objective
-- Use `docs/plan` as the single source of truth during planning conversations.
-- Keep the plan document synchronized with user feedback and newly discovered work.
-- Enforce implementation start only after clear current-task approval and runtime permission.
+## State And Horizon Boundary
+- Treat short term as the current executable design horizon, not a calendar duration.
+- Admit `create_active_plan` only when the user requests a persisted plan or an active plan already owns the task.
+- Own synchronization of `active_plan` and the `approve_implementation` gate to `implementation_ready`.
+- Do not execute production work. After approval, hand implementation to `workflow-plan-runner` or the task-specific workflow and remain only a secondary status tracker.
+- Use `plan-long-term-package` when one plan cannot safely hold the cross-session phases/contracts; use `workflow-task-ledger` when only lightweight next-turn state is needed.
 
-## Activation
-- Activate when the user requests a persisted plan artifact, asks to create/update `docs/plan`, or continues an active plan document.
-- Do not activate from a casual `플랜` mention unless the surrounding request asks for a real plan artifact or active plan synchronization.
-- Continue using this workflow for plan synchronization until the user clearly closes or switches scope.
-- After clear implementation transition, this workflow becomes a support tracker; it must not displace the task-specific implementation workflow.
+## Staged Context Admission
+1. Read the request and explicit plan pointer. If absent, inspect only `docs/plan` names/metadata for a matching active plan; do not open every plan.
+2. For a new plan, read `references/plan-template.md`. For an existing plan, load only that plan and preserve its stable task/state identifiers.
+3. Read the source outline, target files, or validation contract only to resolve affected boundaries, file paths, risks, or checks.
+4. Admit memory or historical plans only when a current decision depends on them; prefer a summary over raw text.
 
-## Related Skills
-- `workflow-rigor`: owns runtime approval/sandbox compliance, execution rigor, validation, and review when implementation starts.
-- `report-qualitative`: owns the final formal report shape when the user explicitly asks for it.
-- `report-critical`: use as a QA gate for plan artifacts when the user asks for review.
-- `research-hypothesis-planning`: owns research hypothesis, experiment, ablation, loss, and training-plan content before this skill writes a persisted `docs/plan` artifact.
+If the goal stays ambiguous, record one focused question or a marked assumption. Never recover by loading the full repo, memory bank, or plan history.
 
-## Research Plan Boundary
-- If the requested plan is a research hypothesis, experiment, ablation, loss, or training plan, `research-hypothesis-planning` owns the plan content.
-- Use this skill only as the persisted artifact writer when the user explicitly asks to store the research plan under `docs/plan`. Research Cluster artifact chains remain owned by their narrow research skills.
-- If the user asks for an implementation plan for already chosen development work, do not route to `research-hypothesis-planning` merely because the plan mentions model, metric, experiment, or loss.
+## Plan Authoring Workflow
+1. State objective, bounded scope, non-goals, current state, and observable success conditions.
+2. List concrete target files/components. When unknown, create a bounded discovery TODO instead of guessing paths.
+3. Describe what changes and why, then connect each change to risks, validation evidence, and an ordered TODO.
+4. Record decisions and open questions with source/evidence and blocking status.
+5. Define validation commands or manual scenarios with expected signals; mark unavailable checks `Unverified`.
+6. Record the planning-state transition block and progress log.
+7. Run the Plan Quality Gate before reporting the plan path and next action.
+
+## Required Plan Contract
+Create or update `docs/plan/YYYY-MM-DD-<task-slug>.md` with at least:
+
+- objective, scope, and non-goals
+- changed-file/component list
+- change summary (`what` / `why`)
+- current versus target state where materially useful
+- risks and mitigations
+- validation procedure and expected evidence
+- `질의` with answer/decision status
+- ordered TODOs with `todo`, `doing`, `done`, or `blocked`
+- implementation-transition record
+- progress log
+
+Reuse the existing active file for the same task. Keep sections consistent; do not let TODO, status, approval, and progress claims contradict each other.
+
+## Plan Quality Gate
+- **Scope:** the plan fits one current execution horizon; deferred work is explicit.
+- **Traceability:** every material change maps to a file/component or discovery task, a TODO, a risk, and acceptance evidence.
+- **Actionability:** each TODO has an outcome, dependencies/blocker, and completion signal; the first executable item is obvious.
+- **Validation:** checks address the success conditions and name expected pass signals, not only commands.
+- **Decisions:** unresolved product/interface decisions are visible and block dependent TODOs when necessary.
+- **Evidence:** planned facts come from admitted source; guesses are assumptions or `Unverified`.
+- **State:** the transition block records `current_state`, attempted event, approval phrase/evidence, accepted or rejected result, and next state.
+
+Do not pad the plan with placeholder code or diagrams. Include real before/after code in separate language-matched blocks only when it materially clarifies a planned change. Add a diagram only for runtime interaction, component/class boundary, concurrency, or data-model structure—not agent workflow or approval flow.
 
 ## Implementation Transition Gate
-- Use clear current-task implementation intent as the transition signal from planning to implementation.
-- Common examples include:
-  - `구현 시작`
-  - `플랜 구현해`
-  - `플랜 작업해`
-  - `플랜 승인 후 구현`
-  - `이 플랜대로 구현 시작`
-- These are task-local intent markers, not the source of runtime permission by themselves.
-- Avoid treating one-word replies such as `승인`, `작업해`, `구현해` as sufficient by themselves unless the active plan scope is explicitly restated in the surrounding context.
-- Before transition:
-  - Do not edit production code.
-  - Update only plan artifacts.
-- When implementation is requested:
-  - Verify runtime approval and sandbox policy before mutating files or state.
-  - Hand execution to the task-specific implementation workflow; use the active plan as input.
-  - Start implementation only for the active plan scope.
-  - Do not satisfy the implementation request by only editing `docs/plan`, TODO status, questions, or transition metadata.
-  - Keep logging additional findings and follow-up tasks back into the plan TODO list as secondary bookkeeping.
-  - Completion requires source, test, runtime config/build, or executable scaffold changes tied to the plan, unless the user explicitly narrowed the request to documentation only or a blocker prevents implementation.
+Accept `approve_implementation` only when:
 
-## Plan File Rules
-- Create or update a task plan file under `docs/plan/`.
-- Prefer filename format: `docs/plan/YYYY-MM-DD-<task-slug>.md`.
-- Reuse the existing active plan file for the same task.
-- Keep all plan sections current; never leave contradictory states between sections.
+1. the plan is currently `active_plan`;
+2. its scope is explicit and current;
+3. wording such as `이 플랜대로 구현 시작`, `플랜 구현해`, or an equivalent instruction clearly applies to this task; and
+4. runtime/sandbox policy permits the requested mutation.
 
-## Mandatory Plan Content
-- Include these sections at minimum:
-  - Changed file list
-  - Change summary (`what` and `why`)
-  - Risks
-  - Validation procedure
-  - Questions and answers (`질의`)
-  - TODO list with status
-  - Implementation transition status
-- Use a Mermaid diagram only when runtime interaction, control flow, concurrency, component boundary, class design, or data model structure is materially relevant.
-- Do not add a default diagram for the plan lifecycle, approval flow, or agent workflow.
-- If a sequence diagram is included for LLD, it must describe runtime interactions rather than agent workflow steps.
+Reject a one-word `승인`, `작업해`, or `구현해` when surrounding context does not identify the active scope. Reject completed, closed-out, archived, superseded, or merely historical plans unless the user explicitly re-admits one for the current task.
 
-## Evidence Rules
-- Always show current state and planned next state for meaningful changes.
-- For code changes, always use two separate markdown code blocks.
-- Never merge code before/after into one block.
+Before acceptance, edit plan artifacts only. On acceptance:
 
-When code evidence is materially relevant, present it as two consecutive fenced blocks in the change's actual language: a `### 변경 전` block with the real current code and a `### 변경 후` block with the real changed code. Do not insert placeholder or toy code.
+- record timestamp, approval evidence, and `current_state: implementation_ready` before or with the first implementation update;
+- freeze the accepted plan baseline;
+- hand execution to the implementation owner in TODO order;
+- keep plan TODO/status updates as secondary bookkeeping;
+- never report implementation complete from a plan-only diff unless the request was documentation-only.
 
-For formula changes, separate old/new formulas clearly:
+Implementation completion requires source, test, runtime config/build, or executable scaffold evidence, or an exact blocker/analysis-only result.
 
-### 수식 변경 전
-$$f_{old}(x) = x^2 + 1$$
+## Research Boundary
+Let `research-hypothesis-planning` own hypothesis, experiment, ablation, loss, or training-plan content. Use this skill only to persist that accepted content under `docs/plan`. Do not route ordinary development planning to research merely because it mentions a model, metric, experiment, or loss.
 
-### 수식 변경 후
-$$f_{new}(x) = x^2 + 2$$
+## Conversation Synchronization
+On each planning turn, update decisions, `질의`, TODOs, risks, validation, and transition state in the plan—not only in chat. During implementation, append newly discovered ambiguity or scope as a question/TODO and keep status synchronized without taking execution ownership.
 
-For structural changes, recommend suitable diagrams by context:
-- Class design change: class diagram
-- Interaction flow change: sequence diagram
-- System boundary/component change: architecture diagram
-- Data model change: ERD
-- Planning-only workflow or approval state: no diagram by default
-
-Recommendation is context-driven, not a hard requirement for every minor edit.
-
-## Conversation Update Loop
-- On each planning turn:
-  - Capture new user questions in `질의`.
-  - Provide detailed answers in the plan document, not only in chat.
-  - Add discovered implementation tasks into TODO with owner/status.
-  - Reflect decisions and constraints immediately.
-- During implementation:
-  - If new ambiguity or additional scope appears, append TODO and related question item.
-  - Request user direction through updated plan items.
-
-## Resource and Risk Boundary
-- Reads: active plan, plan template, narrow repo source outline, relevant memory cards, and validation contract when needed.
-- Writes: `docs/plan` artifacts only until clear implementation transition; production code writes belong to the implementation workflow.
-- Tool/process calls: none by default; validation commands require command purpose and repo validation context.
-- Network access: none by default.
-- Credential access: default deny.
-- Generated artifacts: single active plan file unless the user requests a broader package.
-- Destructive actions: out of scope.
-- Required checkpoints: artifact intent before plan writes, implementation intent before code writes, runtime policy before mutation.
-
-## Recovery and Context Expansion
-- If active plan path is unclear, search only `docs/plan` for the relevant current plan.
-- If repo structure is unclear, read repo source outline first.
-- If validation command is unclear, read repo validation contract.
-- If user goal is unclear, state the assumption or ask one focused question rather than loading unrelated context.
-- If the task needs multi-phase cross-session package docs, return to scheduling and use `plan-long-term-package`.
-- Never recover by loading the full repo, full memory bank, or all planning packages at once.
-
-## Implementation Transition
-- When clear current-task implementation approval is detected and runtime policy allows mutation:
-  - Mark the transition as approved with timestamp.
-  - Freeze current plan baseline.
-  - Start the corresponding source, test, runtime config/build, or executable scaffold work in TODO order.
-  - Continue to update TODO statuses (`todo`, `doing`, `done`, `blocked`).
-
-## Reference
-- Use `references/plan-template.md` as the default skeleton.
-
-## Known Limits
-- Plan artifacts reflect known decisions; they do not prove implementation feasibility without validation.
-- Casual `플랜` mentions do not activate this workflow by themselves.
-- Active plan context may be stale; confirm the current task scope before implementation transition.
-- Return to scheduling for phase packages, repo-wide reports, or implementation ownership.
-- Markdown-only plan edits are not implementation completion unless the user explicitly requested plan/document work only.
+## Reporting And Limits
+Report the active plan path, current state, accepted/rejected event with evidence, changed plan sections, and exactly one next action. A plan is design evidence, not proof of feasibility or runtime correctness; mark stale or unavailable evidence accordingly.

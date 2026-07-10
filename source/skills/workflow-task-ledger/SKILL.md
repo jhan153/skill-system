@@ -1,6 +1,6 @@
 ---
 name: workflow-task-ledger
-description: Resume-safe checkpoint ledger for multi-turn tasks between one-shot work and a full LoopRun. Track steps and accepted findings with observed evidence, and gate completion on open findings. Use when work spans turns/sessions and findings must not be lost, but repeated verifier-feedback convergence (LoopRun) is not needed.
+description: Keep accepted findings and step evidence resume-safe when work is explicitly expected to cross a turn, session, or handoff boundary. Use between one-shot execution and a LoopRun; do not create a ledger merely because an ordinary task has several steps.
 ---
 
 # Workflow Task Ledger
@@ -8,109 +8,64 @@ description: Resume-safe checkpoint ledger for multi-turn tasks between one-shot
 ## Routing Card
 - role: execution_modifier
 - intent_signature:
-  - checkpointed task
-  - resume-safe task state
-  - 멀티턴 작업 추적
-  - findings gate
-  - task ledger
+  - resume-safe task state, checkpointed task, findings gate, 멀티턴 작업 추적
 - use_when:
-  - work has 2+ dependent steps that may be resumed across turns or sessions.
-  - accepted findings must not be lost before completion.
-  - the task is heavier than one-shot but does not need repeated verifier-feedback convergence (a LoopRun).
+  - the user requests durable resumption, a handoff/session boundary is expected, or interruption would lose accepted findings.
 - do_not_use_when:
-  - one-shot work, simple edits, or pure explanation.
-  - repeated verifier feedback should change the next action; use `plan-loop-term` + `workflow-loop-runner`.
-  - the user wants a broad multi-document planning package; use `plan-long-term-package`.
+  - work can reasonably finish now, including ordinary multi-step change→validation work.
+  - repeated verifier feedback must choose the next action (`plan-loop-term` + `workflow-loop-runner`).
 - expected_inputs:
-  - objective and the dependent steps
-  - observed evidence per step (command exit, verifier result, file/artifact, readback)
-  - accepted findings with severity and evidence
+  - objective, resumable steps, current ledger when any, and observed evidence/findings
 - expected_outputs:
-  - resume-safe step/finding ledger with observed `evidence_refs`
-  - completion decision gated on open findings and final verification
-  - one next action or the exact blocker
+  - durable step/finding state, completion-gate decision, and one next action/blocker
 - context_targets:
   must_read:
-    - current objective and step list
-    - current ledger state when resuming
+    - objective and current ledger state
   read_if_needed:
-    - changed files or validation output tied to a step
-    - the task-run schema for field shape
+    - only evidence tied to the active step/finding and the task-run schema
   do_not_load_by_default:
-    - full repo
-    - full memory bank
-    - unrelated plans or LoopRun state
+    - full repo, memory bank, unrelated plans, or LoopRun state
 - risk_profile:
   reads:
-    - the task-run ledger and step-tied evidence
+    - task ledger and referenced evidence
   writes:
-    - WRITE_LOCAL_FS only for the task-run ledger (runtime state, not the bundle)
+    - runtime `task-run.yaml` state only
   tools:
-    - CALL_PROCESS for `task_ledger.py` ledger operations only
+    - `.codex/tools/task_ledger.py` operations and the owning task's evidence producers
   sensitive_resources:
-    - credentials default deny; the ledger redacts nothing, so keep secrets out of evidence text
+    - credentials default deny; never copy secrets into evidence text
 - entry_scene:
   - PREPARE
 
-## Related Skills
-- `loop-readiness-router`: classifies a request as `checkpointed_task` and hands off here.
-- `workflow-rigor`: owns execution rigor and the completion gate vocabulary (observed evidence, `accepted_risk`).
-- `workflow-loop-runner` / `plan-loop-term`: own iterative verifier-feedback loops. This skill is NOT a loop.
+## Activation Gate
+Use a TaskRun only when durable resumption has concrete value. Step count, task difficulty, or the word “plan” is not enough. Add the ledger at the first real resumption boundary rather than speculatively at task start.
 
-## Purpose
-- Keep multi-turn work resumable by fixing step and finding state in an external ledger, not in model memory.
-- Refuse completion while accepted findings are open or blocked.
-- Use observed evidence references, never free-text claims.
+A TaskRun is not a LoopRun: it has no Stop continuation, convergence budget, retry policy, or verifier-driven next-action loop. Escalate when repeated verifier feedback controls execution.
 
-## WorkItem Boundary
-- WorkItem is the broader lifecycle state model (`triage -> explore -> ready -> implement -> verify -> review -> closed`).
-- TaskRun is the narrower checkpoint ledger for an execution slice inside a WorkItem.
-- Use `work_item_ref` to link a TaskRun to a WorkItem when the parent item exists.
-- Closing a TaskRun does not close the WorkItem; the WorkItem still needs its own lifecycle evidence gate.
-- Do not treat WorkItem as a queue runtime, scheduler, Kanboard source of truth, or LoopRun replacement.
+## State And Evidence
+See `.codex/schemas/task/task-run.schema.json`.
 
-## TaskRun is not a LoopRun
-- No repeated verifier-feedback convergence, no Stop-hook continuation, no budgets/idempotency/retry governance.
-- If the next action depends on repeated verifier feedback, escalate to `plan-loop-term` + `workflow-loop-runner` instead.
+- Steps: `pending -> in_progress -> complete | failed | blocked`; `complete` needs observed `evidence_refs`.
+- Findings: `open -> resolved | rejected | accepted_risk`.
+- `resolved` needs both a resolution and new verification evidence; discovery evidence alone cannot close it.
+- `accepted_risk` needs accepter, reason, and review time.
+- Evidence records use structured command/verifier/file/artifact/readback/user-approval fields and `kind: discovery | resolution | verification`.
+- If ledger state conflicts with current files/runtime, re-observe the source of truth before claiming progress.
 
-## State (see `.codex/schemas/task/task-run.schema.json`)
-- `task-run.yaml`: optional `work_item_ref`, objective, workspace (root + revision), status, steps, findings, final_verification.
-- Steps: `pending -> in_progress -> complete | failed | blocked`. A `complete` step requires non-empty observed `evidence_refs`.
-- Findings: `open -> resolved | rejected | accepted_risk`. `resolved` needs resolution + evidence; `accepted_risk` needs `accepted_by`, `reason`, `review_at`.
-- Resume priority: when the ledger conflicts with current files, prefer current files and re-confirm before claiming progress.
+## Completion Gate
+Close only when all required steps are complete, `final_verification.status == pass`, and no finding is open/blocked. Closing a TaskRun does not close a parent WorkItem; link it with `work_item_ref` when one exists.
 
-## Evidence model (observed, not strings)
-- Each `evidence_ref` is a structured observation: `{type: command, command, exit_code}` / `{type: verifier, verifier_id, result}` / `{type: file, locator}` / `{type: artifact, locator}` / `{type: readback, locator}` / `{type: user_approval, note}`.
-- Reuse existing runtime evidence; do not invent free-text "looks done" evidence.
+## CLI
+Use `.codex/tools/task_ledger.py <dir>` with `init`, `add-step`, `checkpoint`, `finding-add`, `finding-resolve`, `finding-accept-risk`, `final-verify`, `status`, and `close`. Reuse actual runtime evidence; do not write free-text “looks done” receipts.
 
-## Completion contract (findings gate)
-TaskRun closes only when all three hold:
-1. every required step is `complete`,
-2. `final_verification.status == pass`,
-3. zero `open`/`blocked` findings (residual risk closed only as `accepted_risk`).
+## Output
+Return current status, changed step/finding IDs, decisive evidence refs, completion blockers, and exactly one next action. Do not restate the whole ledger unless the user requests a handoff artifact.
 
-## Finding evidence types
-Keep finding evidence distinct so admission and closure are not conflated:
-- **admission / discovery**: the observed evidence that the finding is real (what was seen) — required to add a finding.
-- **resolution**: what changed to address it (the diff or action taken).
-- **verification**: the observed re-check that the fix holds (command exit, re-run, readback) — distinct from the discovery evidence.
-A finding becomes `resolved` only with both a resolution and verification evidence (not just the original discovery); `accepted_risk` instead records why it is not resolved. The CLI enforces this: `finding-resolve` requires a non-empty `--resolution` plus new `--evidence` (the verification, distinct from the admission/discovery evidence). Mark each `evidence_ref` with `kind` (`discovery` | `resolution` | `verification`) so discovery is not mistaken for verification.
-
-## CLI (`.codex/tools/task_ledger.py <dir> ...`)
-- `init` — create a task-run; pass `--work-item-ref WI-YYYYMMDD-001` when linking to a WorkItem.
-- `add-step` — append a step.
-- `checkpoint --step --status [--evidence ...]` — transition a step (complete requires evidence).
-- `finding-add` / `finding-resolve` / `finding-accept-risk` — manage findings.
-- `final-verify --status pass [--evidence ...]` — record final verification.
-- `close` — evaluate the completion gate (exit 0 = closed, non-zero = blocked with reasons); `status` — summary.
-
-## Anti-Patterns
-- Creating a ledger for one-shot or trivial work.
-- Free-text evidence instead of observed references.
-- Using the ledger as a LoopRun (verifier-feedback convergence).
-- Marking a step `complete` or closing the run while findings are open.
+## Behavior Cases
+- Positive: “이 작업은 다음 세션까지 이어지니 findings와 검증 상태를 ledger로 남겨줘.”
+- Negative: “파일 두 개 고치고 테스트해줘.” → ordinary execution, no ledger.
+- Edge: a long task is likely to finish now and has no accepted findings → start without a ledger; add one only if a real resumption boundary appears.
 
 ## Known Limits
-- The ledger records decisions; it does not run verifications. Evidence must come from real tool output.
-- Runtime ledger state lives outside the distributable bundle.
-- Promotion past `experimental` waits on deployed field cases proving the one-shot↔LoopRun gap.
+- The ledger records evidence; it does not execute or independently verify checks.
+- Runtime ledger state is not a distributable bundle artifact.
