@@ -6,7 +6,7 @@ The harness records execution evidence; it does not prove user success, grant pe
 
 | mode | activation | effect |
 | --- | --- | --- |
-| observation | default | write redacted lifecycle metadata to the configured or temporary ledger; Stop remains non-blocking |
+| observation | default | write redacted lifecycle metadata to the configured exact file or durable per-run ledger; Stop remains non-blocking |
 | recovery observation | default (`SKILL_SYSTEM_RECOVERY_GUARD=observe`) | maintain compact session counters and record `would_audit` without prompt injection or blocking |
 | recovery audit | `SKILL_SYSTEM_RECOVERY_GUARD=audit` | after context pressure, block at most one Stop per correction episode (three per session) only for correction + rhetoric-only recovery + missing progress evidence |
 | recovery emergency off | `SKILL_SYSTEM_RECOVERY_GUARD=off` | disable observation and blocking; the environment switch overrides per-event audit mode |
@@ -19,6 +19,8 @@ Kanboard autosync and post-session reflection are disabled unless their own `dry
 ## Runtime State
 
 Live run output is stored under `.codex/harness/agent-runs/<session>/<turn>/` and excluded from release evidence. Synthetic fixtures live under `.codex/tools/tests/fixtures/agent-runs/`.
+
+When no agent-run manifest and no `SKILL_SYSTEM_HOOK_LEDGER` exact-file override are present, observational events are stored under `${CODEX_HOME:-~/.codex}/harness/hook-ledgers/<run-key>/hook-events.jsonl`. `<run-key>` is a stable SHA-256 key, so the raw run/session ID is not exposed in the path. Each fallback file contains one `run_id` and can be checked with the existing single-run verifier. The former global temp path is no longer selected implicitly; existing files there are not migrated automatically.
 
 Recovery Guard state is session-scoped under `${CODEX_HOME:-~/.codex}/harness/recovery-guard/sessions/<session-hash>.json`. It stores counters, booleans, signal codes, and event hashes only; raw prompts, assistant messages, commands, and session IDs are not persisted. State updates use a lock and atomic replacement. `SessionEnd`/TTL garbage collection is not implemented yet, so old files require periodic operator cleanup.
 
@@ -36,10 +38,13 @@ An assistant report may declare claims, but it cannot serve as its own `agent-ve
 ## Commands
 
 ```bash
+python3 .codex/tools/hook_runtime.py status
 python3 .codex/tools/hook_runtime.py show --ledger <hook-events.jsonl>
 python3 .codex/tools/hook_runtime.py verify --ledger <hook-events.jsonl>
 python3 .codex/tools/validate_agent_run_artifact.py <run-dir>
 python3 .codex/tools/verify_bundle.py --profile agent-output --format text
 ```
+
+`status` reports `agent_output_gate_mode` and `recovery_guard_mode` independently. A strict output gate and Recovery Guard audit/off state are separate controls and must not be collapsed into one observational/active label.
 
 Use the first failed invariant as the repair scope. Do not widen a hook or harness failure into plan synchronization, release validation, memory mutation, or repository-wide repair.

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
-from pathlib import Path
+import tempfile
 import unittest
+from pathlib import Path
+from unittest import mock
 
 
 def load_pipeline():
@@ -17,6 +19,20 @@ def load_pipeline():
             spec.loader.exec_module(module)
             return module
     raise RuntimeError("could not locate run_verification_pipeline.py")
+
+
+def load_bundle_verifier():
+    test_path = Path(__file__).resolve()
+    for parent in test_path.parents:
+        candidate = parent / "verify_bundle.py"
+        if candidate.is_file():
+            spec = importlib.util.spec_from_file_location("bundle_verifier_under_test", candidate)
+            if spec is None or spec.loader is None:
+                break
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            return module
+    raise RuntimeError("could not locate verify_bundle.py")
 
 
 class VerificationPipelineTests(unittest.TestCase):
@@ -46,7 +62,7 @@ class VerificationPipelineTests(unittest.TestCase):
         minimal = self.report("execution", {"hook_runtime_smoke"})
         error = self.pipeline.validate_profile_report(minimal, "execution", release=True)
         self.assertIn("missing required checks", error or "")
-        self.assertIn("solar_forward_eval_9_1_0", error or "")
+        self.assertIn("solar_forward_eval_9_1_1", error or "")
 
     def test_normal_profile_mirrors_optional_failure_semantics(self) -> None:
         report = {
@@ -80,6 +96,63 @@ class VerificationPipelineTests(unittest.TestCase):
             release=False,
         )
         self.assertIn("profile identity", error or "")
+
+
+class IntegrationCheckSelectionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.verifier = load_bundle_verifier()
+
+    def make_root(self, tmp: str) -> tuple[Path, Path]:
+        root = Path(tmp)
+        integration = root / "integrations" / "kanboard-plan-sync"
+        integration.mkdir(parents=True)
+        return root, integration
+
+    def test_missing_pytest_uses_required_unittest_fallback(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            root, integration = self.make_root(tmp)
+            with mock.patch.object(
+                self.verifier.subprocess,
+                "run",
+                return_value=mock.Mock(returncode=1),
+            ):
+                checks = self.verifier.integrations_checks(root)
+
+        self.assertEqual(len(checks), 1)
+        self.assertTrue(checks[0].required)
+        self.assertEqual(checks[0].cwd, integration)
+        self.assertEqual(
+            checks[0].cmd[1:],
+            ["-m", "unittest", "discover", "-s", "tests", "-q"],
+        )
+
+    def test_available_pytest_remains_the_preferred_runner(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            root, _ = self.make_root(tmp)
+            with mock.patch.object(
+                self.verifier.subprocess,
+                "run",
+                return_value=mock.Mock(returncode=0),
+            ):
+                checks = self.verifier.integrations_checks(root)
+
+        self.assertTrue(checks[0].required)
+        self.assertEqual(
+            checks[0].cmd[1:],
+            ["-m", "pytest", "-q", "-p", "no:cacheprovider"],
+        )
+
+    def test_missing_integration_payload_remains_an_optional_skip(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            checks = self.verifier.integrations_checks(Path(tmp))
+
+        self.assertEqual(len(checks), 1)
+        self.assertFalse(checks[0].required)
+        self.assertIn(
+            "SKIP: integrations/kanboard-plan-sync not present",
+            checks[0].cmd[-1],
+        )
 
 
 if __name__ == "__main__":

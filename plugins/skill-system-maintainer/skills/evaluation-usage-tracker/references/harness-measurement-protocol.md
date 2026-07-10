@@ -58,8 +58,8 @@ outcome values when the local hook/event ledger does not contain them.
 - Enable strict evidence-gate measurement: `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict SKILL_SYSTEM_HARNESS_MEASUREMENT=1`.
 - Enable Recovery Guard audit measurement on Codex: `SKILL_SYSTEM_RECOVERY_GUARD=audit SKILL_SYSTEM_HARNESS_MEASUREMENT=1`.
 - Adapters tag each `turn_finalize` event with `holdout_arm` (deterministic 80/20 by session id), `would_fire`, and `did_block`; the off arm records `would_fire` but never blocks (gate-off baseline).
-- Aggregate: `python3 .codex/tools/analyze_harness_measurement.py [--ledger PATH]`.
-- Verify the source ledger first with `python3 .codex/tools/hook_runtime.py verify --ledger PATH`; the analyzer is an aggregator and does not establish ledger integrity.
+- Aggregate the default durable ledger family with `python3 .codex/tools/analyze_harness_measurement.py`. Use `--ledger PATH` for one exact/legacy file or `--ledger-root PATH` for another per-run family.
+- Verify each `hook-events.jsonl` source first with `python3 .codex/tools/hook_runtime.py verify --ledger PATH`; the analyzer aggregates every per-run file under the selected root but does not establish ledger integrity.
 
 ## Boundaries
 - `eval/observed-runs/*` are **replay fixtures** for behavior evals, not a

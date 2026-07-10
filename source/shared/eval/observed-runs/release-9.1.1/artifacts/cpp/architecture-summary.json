@@ -1,0 +1,17 @@
+{
+  "status": "ok",
+  "counts": {
+    "entrypoints": 2,
+    "containers": 2,
+    "components": 2,
+    "interfaces": 0,
+    "scenarios": 2,
+    "deployment_nodes": 0,
+    "crosscutting": 0,
+    "decision_candidates": 0
+  },
+  "warnings": [
+    "trace-backed scenario 없음",
+    "deployment evidence 없음"
+  ]
+}

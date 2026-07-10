@@ -7,13 +7,23 @@ import tempfile
 import re
 from pathlib import Path
 
-from phase_plan_schema import ARCHETYPES, MODIFIERS, UNIVERSAL_REQUIRED_SPECS, required_specs_for
+from phase_plan_schema import (
+    ARCHETYPES,
+    DEFAULT_ARTIFACT_CAP,
+    MODIFIERS,
+    UNIVERSAL_REQUIRED_SPECS,
+    required_specs_for,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 INIT = SCRIPT_DIR / "init_phase_plan_package.py"
 VALIDATE = SCRIPT_DIR / "validate_phase_plan_package.py"
 CATALOG = SCRIPT_DIR.parent / "references" / "archetype-catalog.md"
+PAYMENT_MODIFIERS = (
+    "strict-behavior-parity,legacy-parity,rollback-required,"
+    "cross-session-handoff,data-sensitive,security-sensitive"
+)
 
 
 def run(args: list[str], expect_ok: bool = True) -> subprocess.CompletedProcess[str]:
@@ -48,9 +58,16 @@ def common_args(root: str, package: str, slug: str, archetype: str, modifiers: s
     return args
 
 
-def init_and_validate(tmp: str, package: str, slug: str, archetype: str, modifiers: str = "") -> list[str]:
+def init_and_validate(
+    tmp: str,
+    package: str,
+    slug: str,
+    archetype: str,
+    modifiers: str = "",
+    init_extra: list[str] | None = None,
+) -> list[str]:
     args = common_args(tmp, package, slug, archetype, modifiers)
-    run(["python3", str(INIT), *args])
+    run(["python3", str(INIT), *args, *(init_extra or [])])
     run(["python3", str(VALIDATE), *args])
     return args
 
@@ -444,6 +461,199 @@ def test_catalog_schema_consistency() -> None:
             )
 
 
+def test_default_artifact_cap_accepts_normal_package() -> None:
+    with tempfile.TemporaryDirectory(prefix="phase-subplan-selftest-budget-positive-") as tmp:
+        init_and_validate(
+            tmp,
+            "Plan-PaymentMigration",
+            "paymentmigration",
+            "migration-modernization",
+            PAYMENT_MODIFIERS,
+        )
+        artifacts = sorted((Path(tmp) / "docs").rglob("*.md"))
+        if len(artifacts) != 19:
+            raise SystemExit(f"payment migration should project/materialize 19 artifacts, got {len(artifacts)}")
+        plan = Path(tmp) / "docs" / "plan" / "2026-04-24-paymentmigration.md"
+        text = plan.read_text(encoding="utf-8")
+        assert_contains(text, f"default_artifact_cap: `{DEFAULT_ARTIFACT_CAP}`", "default artifact cap record")
+        assert_contains(text, "projected_artifact_count: `19`", "projected artifact count record")
+        assert_contains(
+            text,
+            "| `legacy-parity` | `absorbed-by-archetype` | none | none |",
+            "absorbed modifier record",
+        )
+
+
+def test_backend_modifier_explosion_rejected_before_write() -> None:
+    with tempfile.TemporaryDirectory(prefix="phase-subplan-selftest-budget-reject-") as tmp:
+        args = common_args(tmp, "Plan-BackendExplosion", "backendexplosion", "backend-service", PAYMENT_MODIFIERS)
+        failed = run(["python3", str(INIT), *args], expect_ok=False)
+        assert_contains(
+            failed.stderr + failed.stdout,
+            "projected artifact count 25 exceeds cap 20",
+            "default artifact cap rejection",
+        )
+        if (Path(tmp) / "docs").exists():
+            raise SystemExit("artifact preflight rejection must happen before docs mkdir/write")
+
+
+def test_artifact_cap_override_requires_reason() -> None:
+    with tempfile.TemporaryDirectory(prefix="phase-subplan-selftest-budget-reason-") as tmp:
+        args = common_args(tmp, "Plan-OverrideReason", "overridereason", "backend-service", PAYMENT_MODIFIERS)
+        failed = run(["python3", str(INIT), *args, "--artifact-cap", "25"], expect_ok=False)
+        assert_contains(
+            failed.stderr + failed.stdout,
+            "artifact cap override above default 20 requires a nonempty --artifact-cap-reason",
+            "override reason rejection",
+        )
+        if (Path(tmp) / "docs").exists():
+            raise SystemExit("reason rejection must happen before docs mkdir/write")
+
+
+def test_artifact_cap_override_preserves_full_contract() -> None:
+    with tempfile.TemporaryDirectory(prefix="phase-subplan-selftest-budget-override-") as tmp:
+        reason = "payment migration explicitly requires all backend risk contracts"
+        args = common_args(tmp, "Plan-Override", "override", "backend-service", PAYMENT_MODIFIERS)
+        run(["python3", str(INIT), *args, "--artifact-cap", "25", "--artifact-cap-reason", reason])
+        run(["python3", str(VALIDATE), *args])
+        spec_dir = Path(tmp) / "docs" / "spec"
+        for suffix in required_specs_for("backend-service", PAYMENT_MODIFIERS.split(",")):
+            if not (spec_dir / f"override-{suffix}.md").exists():
+                raise SystemExit(f"cap override silently dropped selected contract {suffix}")
+        artifacts = sorted((Path(tmp) / "docs").rglob("*.md"))
+        if len(artifacts) != 25:
+            raise SystemExit(f"backend override should materialize all 25 artifacts, got {len(artifacts)}")
+        plan = Path(tmp) / "docs" / "plan" / "2026-04-24-override.md"
+        text = plan.read_text(encoding="utf-8")
+        assert_contains(text, "effective_artifact_cap: `25`", "effective cap record")
+        assert_contains(text, f"artifact_cap_override_reason: `{reason}`", "cap reason record")
+        assert_contains(text, "`docs/spec/override-security-contract.md`", "projected path record")
+
+
+def test_staged_materialization_preserves_canonical_artifacts() -> None:
+    with tempfile.TemporaryDirectory(prefix="phase-subplan-selftest-staged-") as tmp:
+        args = common_args(tmp, "Plan-Staged", "staged", "migration-modernization")
+        run(["python3", str(INIT), *args, "--canonical-only"])
+        root = Path(tmp)
+        plan = root / "docs" / "plan" / "2026-04-24-staged.md"
+        canonical_spec = root / "docs" / "spec" / "staged-migration-map.md"
+        handoff = root / "docs" / "spec" / "staged-agent-handoff-index.md"
+        package = root / "docs" / "plan" / "Plan-Staged"
+        if not plan.exists() or not canonical_spec.exists():
+            raise SystemExit("canonical-only did not materialize canonical owners")
+        if handoff.exists() or (package / "README.md").exists() or list(package.rglob("Group*.md")):
+            raise SystemExit("canonical-only materialized a derived view")
+        plan_before = plan.read_text(encoding="utf-8")
+        spec_before = canonical_spec.read_text(encoding="utf-8")
+
+        run(["python3", str(INIT), *args, "--derived-only"])
+        run(["python3", str(VALIDATE), *args])
+        if plan.read_text(encoding="utf-8") != plan_before or canonical_spec.read_text(encoding="utf-8") != spec_before:
+            raise SystemExit("derived-only overwrote a canonical artifact")
+        if not handoff.exists() or not (package / "README.md").exists() or not list(package.rglob("Group*.md")):
+            raise SystemExit("derived-only did not materialize all derived views")
+
+
+def test_derived_stage_rejects_canonical_topology_and_identity_drift() -> None:
+    with tempfile.TemporaryDirectory(prefix="phase-subplan-selftest-stage-topology-") as tmp:
+        args = common_args(tmp, "Plan-StageTopology", "stagetopology", "migration-modernization")
+        run(["python3", str(INIT), *args, "--canonical-only"])
+        failed = run(
+            [
+                "python3",
+                str(INIT),
+                *args,
+                "--phase-names",
+                "Alpha,Beta,Gamma,Delta",
+                "--derived-only",
+            ],
+            expect_ok=False,
+        )
+        assert_contains(
+            failed.stderr + failed.stdout,
+            "projected artifact manifest does not match the canonical plan record",
+            "derived topology drift rejection",
+        )
+        if (Path(tmp) / "docs" / "plan" / "Plan-StageTopology" / "Alpha").exists():
+            raise SystemExit("topology drift rejection must happen before derived mkdir/write")
+
+    with tempfile.TemporaryDirectory(prefix="phase-subplan-selftest-stage-identity-") as tmp:
+        canonical_args = common_args(
+            tmp,
+            "Plan-StageIdentity",
+            "stageidentity",
+            "migration-modernization",
+            "legacy-parity",
+        )
+        run(["python3", str(INIT), *canonical_args, "--canonical-only"])
+        drifted_args = common_args(tmp, "Plan-StageIdentity", "stageidentity", "migration-modernization")
+        failed = run(["python3", str(INIT), *drifted_args, "--derived-only"], expect_ok=False)
+        assert_contains(
+            failed.stderr + failed.stdout,
+            "budget arguments do not match the canonical plan record",
+            "derived modifier identity rejection",
+        )
+
+
+def test_staged_ingest_restores_bound_sources_and_rejects_new_inputs() -> None:
+    with tempfile.TemporaryDirectory(prefix="phase-subplan-selftest-stage-ingest-") as tmp:
+        root = Path(tmp)
+        report = root / "docs" / "reports" / "domain.md"
+        report.parent.mkdir(parents=True)
+        report.write_text(
+            "# Product capability report\n"
+            "The user workflow exports a source file through the integration boundary.\n",
+            encoding="utf-8",
+        )
+        args = common_args(tmp, "Plan-StageIngest", "stageingest", "application-product")
+        ingest_args = ["--ingest-report", str(report)]
+        run(["python3", str(INIT), *args, *ingest_args, "--canonical-only"])
+        run(["python3", str(INIT), *args, *ingest_args, "--derived-only"])
+        run(["python3", str(VALIDATE), *args])
+        group = next((root / "docs" / "plan" / "Plan-StageIngest").rglob("Group1-*.md"))
+        text = group.read_text(encoding="utf-8")
+        assert_contains(text, "Existing analysis inputs already contain these signals:", "staged ingest signal")
+        assert_contains(text, "docs/reports/domain.md", "staged ingest source binding")
+        if "No strong matching signal was extracted" in text:
+            raise SystemExit("derived stage lost canonical-stage ingest evidence")
+
+        new_report = root / "docs" / "reports" / "new-domain.md"
+        new_report.write_text("A new unbound product capability.\n", encoding="utf-8")
+        failed = run(
+            [
+                "python3",
+                str(INIT),
+                *args,
+                "--ingest-report",
+                str(new_report),
+                "--derived-only",
+            ],
+            expect_ok=False,
+        )
+        assert_contains(
+            failed.stderr + failed.stdout,
+            "ingest inputs are not bound by the canonical-stage summary",
+            "unbound staged ingest rejection",
+        )
+
+
+def test_no_input_omits_ingest_summary() -> None:
+    with tempfile.TemporaryDirectory(prefix="phase-subplan-selftest-no-ingest-") as tmp:
+        init_and_validate(tmp, "Plan-NoIngest", "noingest", "backend-service")
+        root = Path(tmp)
+        summary = root / "docs" / "plan" / "Plan-NoIngest" / "domain-ingest-summary.md"
+        if summary.exists():
+            raise SystemExit("no-input package must not generate an empty ingest summary")
+        plan = root / "docs" / "plan" / "2026-04-24-noingest.md"
+        assert_contains(plan.read_text(encoding="utf-8"), "domain_context: `none (no admitted ingest input)`", "no-ingest plan record")
+        readme = root / "docs" / "plan" / "Plan-NoIngest" / "README.md"
+        assert_contains(
+            readme.read_text(encoding="utf-8"),
+            "No domain ingest summary was generated",
+            "no-ingest README notice",
+        )
+
+
 def test_every_archetype() -> None:
     with tempfile.TemporaryDirectory(prefix="phase-subplan-selftest-archetypes-") as tmp:
         for archetype in sorted(ARCHETYPES):
@@ -461,7 +671,14 @@ def test_every_modifier() -> None:
         for modifier in sorted(MODIFIERS):
             slug = modifier.replace("-", "")
             package = f"Plan-{slug}"
-            init_and_validate(tmp, package, slug, "backend-service", modifier)
+            init_and_validate(
+                tmp,
+                package,
+                slug,
+                "backend-service",
+                modifier,
+                ["--artifact-cap", "30", "--artifact-cap-reason", "exercise every modifier contract"],
+            )
             for suffix in required_specs_for("backend-service", [modifier]):
                 path = Path(tmp) / "docs" / "spec" / f"{slug}-{suffix}.md"
                 if not path.exists():
@@ -525,6 +742,7 @@ def test_mesh_processing_modifier_and_group_density() -> None:
             "mesh",
             "application-product",
             "mesh-processing-heavy,cross-session-handoff",
+            ["--artifact-cap", "30", "--artifact-cap-reason", "mesh package exercises expanded contract union"],
         )
         spec_dir = Path(tmp) / "docs" / "spec"
         for suffix in ["mesh-ops-contract", "tolerance-contract", "gap-registry"]:
@@ -570,6 +788,7 @@ def test_strict_fails_on_empty_contracts() -> None:
             "app",
             "application-product",
             "local-device-runtime,rendering-heavy,performance-critical",
+            ["--artifact-cap", "30", "--artifact-cap-reason", "strict fixture intentionally spans runtime rendering and performance"],
         )
         failed = run(["python3", str(VALIDATE), *args, "--strict"], expect_ok=False)
         assert_contains(failed.stdout, "strict mode requires", "strict empty contract rejection")
@@ -783,6 +1002,8 @@ def test_auto_ingest_existing_reports() -> None:
         summary = Path(tmp) / "docs" / "plan" / "Plan-Ingest" / "domain-ingest-summary.md"
         if not summary.exists():
             raise SystemExit("missing domain-ingest-summary.md")
+        plan = Path(tmp) / "docs" / "plan" / "2026-04-24-ingest.md"
+        assert_contains(plan.read_text(encoding="utf-8"), "projected_artifact_count: `19`", "ingest budget increment")
         text = summary.read_text(encoding="utf-8")
         assert_contains(text, "LibrarySelection", "ingested capability signal")
         assert_contains(text, "Cylinder cut", "ingested mesh ops signal")
@@ -792,6 +1013,14 @@ def test_auto_ingest_existing_reports() -> None:
 
 def main() -> None:
     test_catalog_schema_consistency()
+    test_default_artifact_cap_accepts_normal_package()
+    test_backend_modifier_explosion_rejected_before_write()
+    test_artifact_cap_override_requires_reason()
+    test_artifact_cap_override_preserves_full_contract()
+    test_staged_materialization_preserves_canonical_artifacts()
+    test_derived_stage_rejects_canonical_topology_and_identity_drift()
+    test_staged_ingest_restores_bound_sources_and_rejects_new_inputs()
+    test_no_input_omits_ingest_summary()
     test_every_archetype()
     test_every_modifier()
     test_aliases()

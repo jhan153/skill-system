@@ -284,6 +284,66 @@ def parse_classification_map(path: Path) -> dict[str, dict[str, Any]]:
     return mapping
 
 
+C_CPP_EXTENSIONS = frozenset(
+    {
+        ".c",
+        ".cc",
+        ".cpp",
+        ".cxx",
+        ".h",
+        ".hh",
+        ".hpp",
+        ".hxx",
+        ".ipp",
+        ".ixx",
+        ".mpp",
+    }
+)
+
+
+def assess_c_cpp_structural_evidence(
+    classification: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    """Fail closed when C/C++ structure is represented only by fallback parsing.
+
+    The current architecture collector recognizes includes and entrypoints, but it
+    does not emit a compilation-aware symbol/class/call index. Keep this explicit
+    until such an artifact is produced and validated instead of treating file-level
+    coupling as semantic evidence.
+    """
+
+    matched = [
+        file_path
+        for file_path, meta in classification.items()
+        if isinstance(meta, dict)
+        and bool(meta.get("included", False))
+        and str(meta.get("ext", "")).lower() in C_CPP_EXTENSIONS
+    ]
+    if not matched:
+        return {
+            "required": False,
+            "status": "not_applicable",
+            "file_count": 0,
+            "extensions": [],
+        }
+
+    return {
+        "required": True,
+        "status": "not_evidenced",
+        "file_count": len(matched),
+        "extensions": sorted(
+            {
+                str(classification[file_path].get("ext", "")).lower()
+                for file_path in matched
+            }
+        ),
+        "reason": (
+            "Not evidenced: C/C++ symbol, class, and call-graph structure requires "
+            "a compilation-aware extractor; include/build hints are file-level only."
+        ),
+    }
+
+
 def parse_complexity_payload(complexity: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], float]:
     rows: dict[str, dict[str, Any]] = {}
     max_complexity = 0.0
@@ -906,6 +966,7 @@ def evaluate_quality_gate(
     policy: dict[str, Any],
     risk_model: str,
     architecture_views: list[dict[str, Any]],
+    structural_evidence: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     gate = policy.get("quality_gates", {}).get(risk_model, {})
 
@@ -1010,6 +1071,10 @@ def evaluate_quality_gate(
             and not view.get("meta", {}).get("entrypoint_id")
         ]
     )
+    structural_evidence = structural_evidence or {}
+    c_cpp_structural_required = bool(structural_evidence.get("required", False))
+    c_cpp_structural_status = str(structural_evidence.get("status", "not_applicable"))
+    c_cpp_file_count = safe_int(structural_evidence.get("file_count"), 0)
 
     reasons: list[str] = []
     warnings: list[str] = []
@@ -1050,6 +1115,8 @@ def evaluate_quality_gate(
         reasons.append(
             f"runtime_views_without_entrypoint={runtime_views_without_entrypoint} > {max_runtime_views_without_entrypoint}"
         )
+    if c_cpp_structural_required and c_cpp_structural_status != "evidenced":
+        reasons.append(f"c_cpp_structural_evidence={c_cpp_structural_status}")
 
     status = "FAIL" if reasons else "PASS"
 
@@ -1071,6 +1138,8 @@ def evaluate_quality_gate(
             "fallback_diagrams": fallback_diagrams,
             "diagrams_without_provenance": diagrams_without_provenance,
             "runtime_views_without_entrypoint": runtime_views_without_entrypoint,
+            "c_cpp_structural_evidence": c_cpp_structural_status,
+            "c_cpp_file_count": c_cpp_file_count,
         },
         "applied_thresholds": gate,
     }
@@ -3118,6 +3187,29 @@ def main() -> int:
     unverified_items = index.get("unverified", [])
     if not isinstance(unverified_items, list):
         unverified_items = []
+    else:
+        unverified_items = list(unverified_items)
+
+    c_cpp_structural_evidence = assess_c_cpp_structural_evidence(classification)
+    c_cpp_unverified_section = "architecture.c_cpp_semantic_depth"
+    has_c_cpp_unverified = any(
+        isinstance(item, dict) and item.get("section") == c_cpp_unverified_section
+        for item in unverified_items
+    )
+    if (
+        c_cpp_structural_evidence.get("required")
+        and c_cpp_structural_evidence.get("status") != "evidenced"
+        and not has_c_cpp_unverified
+    ):
+        unverified_items.append(
+            {
+                "section": c_cpp_unverified_section,
+                "reason": c_cpp_structural_evidence.get(
+                    "reason",
+                    "Not evidenced: C/C++ semantic structure was not collected.",
+                ),
+            }
+        )
 
     contract_comparison_rows, contract_comparison_summary, comparison_gaps = build_contract_comparison_rows(
         contract_comparison_model if isinstance(contract_comparison_model, dict) else {},
@@ -3175,6 +3267,7 @@ def main() -> int:
         policy=policy,
         risk_model=args.risk_model,
         architecture_views=architecture_views,
+        structural_evidence=c_cpp_structural_evidence,
     )
 
     static_metric_charts = build_static_metric_charts(complexity if isinstance(complexity, dict) else {})

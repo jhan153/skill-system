@@ -1,0 +1,11 @@
+{
+  "canonical_count": 12,
+  "derived_count": 7,
+  "final_count": 19,
+  "artifact_cap": 20,
+  "ingest_count": 0,
+  "canonical_stage_before_derived": true,
+  "derived_arguments_exactly_bound_to_canonical_manifest": true,
+  "legacy_parity_status": "absorbed-by-archetype",
+  "implementation_status": "planning-only"
+}

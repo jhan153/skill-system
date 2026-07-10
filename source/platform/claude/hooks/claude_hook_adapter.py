@@ -2,9 +2,9 @@
 """Claude Code lifecycle hook adapter for Skill-System execution assurance.
 
 Claude-side counterpart of .codex/hooks/codex_hook_adapter.py. It records Claude
-Code lifecycle events into the SAME hash-chained evidence ledger
-(.codex/tools/hook_runtime.py) so observed-evidence parity holds across both
-runtimes. The shared discipline contract lives in the byte-mirrored skills
+Code lifecycle events through the same hash-chained evidence backend
+(.codex/tools/hook_runtime.py), using one durable fallback file per session. The
+shared discipline contract lives in the byte-mirrored skills
 (workflow-rigor, analysis-bug, ...); this adapter is only the Claude runtime
 wiring.
 
@@ -224,7 +224,7 @@ def main() -> int:
         },
     }
     try:
-        write_event(payload, default_ledger(), session_id)
+        write_event(payload, default_ledger(session_id), session_id)
     except Exception:
         return 0
 

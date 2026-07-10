@@ -89,7 +89,7 @@ derived_from:
 ## Acceptance Criteria
 - [ ] Relevant canonical contracts are updated with evidence-backed, domain-specific rows for this group.
   - Contract: `{{PRIMARY_CONTRACT}}`
-  - Evidence: `docs/plan/{{PACKAGE_DIR_NAME}}/domain-ingest-summary.md`
+  - Evidence: `{{GROUP_EVIDENCE_PATH}}`
   - Test command: `{{GROUP_VALIDATION_COMMAND}}`
   - Blocking: true
 
@@ -97,5 +97,5 @@ derived_from:
 {{PROHIBITED_SHORTCUTS}}
 
 ## TODO
-- [ ] Replace derived ingest bullets with verified source-backed contract rows where this group owns the work.
+- [ ] Replace scaffold or derived-evidence bullets with verified source-backed contract rows where this group owns the work.
 - [ ] Add or update one evidence artifact path for each release-blocking acceptance criterion.

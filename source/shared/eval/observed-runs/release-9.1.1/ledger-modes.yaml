@@ -1,0 +1,75 @@
+run_id: solar-911-ledger-modes-20260710t183330z
+case_id: solar-911-ledger-modes-001
+host: codex
+host_version: codex-cli 0.144.0-alpha.4
+model: gpt-5.6-sol
+model_version: gpt-5.6-sol
+bundle_version: "9.1.1"
+started_at: "2026-07-10T18:33:30Z"
+observed_route: workflow-validation
+observed_behaviors:
+  - create_distinct_durable_ledgers_for_distinct_runs
+  - verify_each_single_run_hash_chain
+  - aggregate_default_ledger_family
+  - report_output_gate_and_recovery_guard_modes_independently
+artifacts:
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes-output.md
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes/invocation-receipt.json
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes/measurement.json
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes/verification.txt
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes/status-audit.json
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes/status-off.json
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/qualitative-review-b.md
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/freshness-receipt.json
+verification:
+  - type: route_match
+    value: workflow-validation
+    checked_at: "2026-07-10T18:53:06Z"
+  - type: model_identity
+    value: gpt-5.6-sol
+    checked_at: "2026-07-10T18:53:06Z"
+  - type: command_exit
+    command: python3 .codex/tools/hook_runtime.py verify --ledger each-hook-events.jsonl
+    exit_code: 0
+    checked_at: "2026-07-10T18:34:12Z"
+  - type: ledger_count
+    value: 2
+    checked_at: "2026-07-10T18:53:06Z"
+  - type: mode_separation
+    value: pass
+    checked_at: "2026-07-10T18:53:06Z"
+  - type: fresh_artifact_set
+    value: pass
+    checked_at: "2026-07-10T18:53:06Z"
+  - type: qualitative_review
+    value: pass
+    reviewer: /root/review_forward_b
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes-output.md
+    reviewed_sha256: c9dc2f792fae25ab7dd9419585f18c16fd1e9af4088b1f47720f5f45aa63359e
+    review_artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/qualitative-review-b.md
+    checked_at: "2026-07-10T18:53:06Z"
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes-output.md
+    sha256: c9dc2f792fae25ab7dd9419585f18c16fd1e9af4088b1f47720f5f45aa63359e
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes/invocation-receipt.json
+    sha256: c1e2c6d32722e4ce0130be4e36a8d25788e75a73c1ea89e9b93241f3fad58bc7
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes/measurement.json
+    sha256: 2701aa8f0a3e16ae9c7e32499d346714ad83b01f04faf304da50af15720c3e16
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes/verification.txt
+    sha256: 237dc3cd8eff011b229c0cbe608515cfa0d24556191a13b61f6de88995a53a53
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes/status-audit.json
+    sha256: 89414b8bd1eebcc7b0ad9948d79e6251a74897a239c303b3c4465cab519f31fc
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/ledger-modes/status-off.json
+    sha256: e3629b0bcfdabc23f7e26c01f7341e83cb468a562252a91bcac0e5113e584885
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/qualitative-review-b.md
+    sha256: bd04bf029f9251b15822e70255cd8eadd5e6beb4a7acc344a1f02d203959fa8a
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/freshness-receipt.json
+    sha256: 0ca0474c693bffff21bd193a1b863356605914c1c19263f2c91929eef09b2c4f
+result: pass

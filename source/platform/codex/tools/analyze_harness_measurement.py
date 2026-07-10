@@ -2,10 +2,10 @@
 """Out-of-band harness measurement for the observed-evidence gate.
 
 Answers the harness-paradox question: does the strict gate help, hurt, or do
-nothing vs a gate-off baseline? Reads the hash-chained hook event ledger
-(hook_runtime), groups `turn_finalize` events by holdout arm, and reports
-per-arm evidence-gate and Recovery Guard fire/block rates, finalize-fail rates,
-and a sunset recommendation.
+nothing vs a gate-off baseline? Reads one hash-chained hook event ledger or the
+default per-run ledger family (hook_runtime), groups `turn_finalize` events by
+holdout arm, and reports per-arm evidence-gate and Recovery Guard fire/block
+rates, finalize-fail rates, and a sunset recommendation.
 
 Read-only: never writes, never touches the gate. Pure functions (`holdout_arm`,
 `stratified_compare`, `sunset_status`) are unit-testable without I/O. Holdout
@@ -126,18 +126,46 @@ def load_events(path: Path) -> list:
     return out
 
 
+def discover_ledgers(root: Path) -> list[Path]:
+    if not root.is_dir():
+        return []
+    return sorted(path for path in root.rglob("hook-events.jsonl") if path.is_file())
+
+
+def load_events_from_root(root: Path) -> list:
+    events: list = []
+    for ledger in discover_ledgers(root):
+        events.extend(load_events(ledger))
+    return events
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ledger", type=Path, default=None)
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--ledger", type=Path, default=None)
+    source.add_argument("--ledger-root", type=Path, default=None)
     args = parser.parse_args()
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from hook_runtime import configured_ledger, default_ledger_root  # noqa: PLC0415
+
     ledger = args.ledger
-    if ledger is None:
-        sys.path.insert(0, str(Path(__file__).resolve().parent))
-        from hook_runtime import default_ledger  # noqa: PLC0415
-        ledger = default_ledger()
-    events = load_events(ledger)
+    ledger_root = args.ledger_root
+    if ledger is None and ledger_root is None:
+        ledger = configured_ledger()
+        if ledger is None:
+            ledger_root = default_ledger_root()
+
+    if ledger is not None:
+        ledgers = [ledger] if ledger.is_file() else []
+        events = load_events(ledger)
+    else:
+        assert ledger_root is not None
+        ledgers = discover_ledgers(ledger_root)
+        events = load_events_from_root(ledger_root)
     print(json.dumps({
-        "ledger": str(ledger),
+        "ledger": str(ledger) if ledger is not None else None,
+        "ledger_root": str(ledger_root) if ledger_root is not None else None,
+        "ledger_count": len(ledgers),
         "stratified_compare": stratified_compare(events),
         "sunset_status": sunset_status(events),
     }, ensure_ascii=True, indent=2))

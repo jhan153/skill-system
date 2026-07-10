@@ -179,6 +179,6 @@ Do not load all references or script source by default; prefer tool help, summar
 - Write only report artifacts under the approved output directory; destructive actions are out of scope.
 - Do not fetch external data or inspect secrets unless separately authorized and bounded.
 - On permission/tool failure, record the exact lane and reason in `notes/unverified.tsv` and keep it out of PASS assumptions.
-- Static models may miss runtime/generated semantics; C/C++ semantic depth remains limited without compilation metadata and suitable tools.
+- Static models may miss runtime/generated semantics. Until a compilation-aware C/C++ symbol/class/call index is collected, the report records that structural lane as `Not evidenced` and the quality gate fails closed; include/build hints alone do not prove semantic depth.
 - Route a point bug to `analysis-bug`, one structural decision to `analysis-codebase-design`, and a ranked opportunity scan to `analysis-architecture-deepening`.
 - Let implementation workflows own code changes. Load review/report formatting skills only when explicitly requested after artifact generation.

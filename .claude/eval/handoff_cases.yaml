@@ -1,4 +1,4 @@
-version: "9.1.0"
+version: "9.1.1"
 purpose: "Lightweight handoff and coordination cases."
 cases:
   - case_id: handoff-001

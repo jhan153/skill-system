@@ -1,0 +1,3 @@
+alpha: PASS: hook ledger entries=1 hash_chain=valid
+beta: PASS: hook ledger entries=1 hash_chain=valid
+command_exit: 0

@@ -573,6 +573,65 @@ class SemanticContractRegressionTests(unittest.TestCase):
         self.assertEqual(gate.get("metrics", {}).get("unverified_ratio"), 1.0)
         self.assertEqual(gate.get("status"), "FAIL")
 
+    def test_cpp_without_semantic_index_fails_quality_gate(self) -> None:
+        evidence = self.report.assess_c_cpp_structural_evidence(
+            {
+                "src/main.cpp": {
+                    "category": "code",
+                    "included": True,
+                    "reason": "test-fixture",
+                    "ext": ".cpp",
+                }
+            }
+        )
+        views = [
+            {
+                "view_type": view_type,
+                "fallback": False,
+                "provenance": ["artifact.json"],
+                "meta": {"entrypoint_id": "entry"} if view_type == "runtime" else {},
+            }
+            for view_type in ["context", "container", "component", "runtime", "deployment"]
+        ]
+        gate = self.report.evaluate_quality_gate(
+            findings=[],
+            unverified_items=[],
+            exceptions=[],
+            policy={
+                "quality_gates": {
+                    "default": {
+                        "require_top10_plan_fields": False,
+                        "max_missing_architecture_views": 0,
+                        "max_fallback_diagrams": 0,
+                        "max_diagrams_without_provenance": 0,
+                        "max_runtime_views_without_entrypoint": 0,
+                    }
+                }
+            },
+            risk_model="default",
+            architecture_views=views,
+            structural_evidence=evidence,
+        )
+
+        self.assertEqual(evidence.get("status"), "not_evidenced")
+        self.assertEqual(gate.get("status"), "FAIL")
+        self.assertIn("c_cpp_structural_evidence=not_evidenced", gate.get("reasons", []))
+
+    def test_non_cpp_repo_does_not_require_cpp_semantic_index(self) -> None:
+        evidence = self.report.assess_c_cpp_structural_evidence(
+            {
+                "src/main.py": {
+                    "category": "code",
+                    "included": True,
+                    "reason": "test-fixture",
+                    "ext": ".py",
+                }
+            }
+        )
+
+        self.assertIs(evidence.get("required"), False)
+        self.assertEqual(evidence.get("status"), "not_applicable")
+
     def test_critical_semantic_contract_finding_fails_quality_gate(self) -> None:
         findings = self.report.build_contract_findings(
             {

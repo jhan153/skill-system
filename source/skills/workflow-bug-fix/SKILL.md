@@ -1,6 +1,6 @@
 ---
 name: workflow-bug-fix
-description: Implementation workflow for fixing concrete software failures. Use when the user asks Codex to fix a bug, failing test, build error, runtime exception, regression, or broken behavior by reproducing the signal, diagnosing enough to change code, applying one targeted fix, and verifying the original failure.
+description: Implementation workflow for fixing concrete software failures. Use when the user requests a fix for a bug, failing test, build error, runtime exception, regression, or broken behavior by reproducing the signal, diagnosing enough to change code, applying one targeted fix, and verifying the original failure.
 ---
 
 # Workflow Bug Fix

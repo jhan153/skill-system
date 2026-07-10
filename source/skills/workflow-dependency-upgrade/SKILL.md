@@ -1,6 +1,6 @@
 ---
 name: workflow-dependency-upgrade
-description: Implementation workflow for dependency, package, runtime, framework, SDK, or lockfile upgrades. Use when Codex must update versions, handle breaking changes, migrate APIs/config, refresh lockfiles, and validate compatibility without turning the task into a broad rewrite.
+description: Implementation workflow for dependency, package, runtime, framework, SDK, or lockfile upgrades. Use when a task requires version updates, breaking-change handling, API/config migration, lockfile refresh, and compatibility validation without turning the task into a broad rewrite.
 ---
 
 # Workflow Dependency Upgrade

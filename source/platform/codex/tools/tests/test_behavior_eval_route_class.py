@@ -53,7 +53,7 @@ class BehaviorEvalRouteClassTests(unittest.TestCase):
             "host_version": "test",
             "model": "test",
             "model_version": "test",
-            "bundle_version": "9.1.0",
+            "bundle_version": "9.1.1",
             "started_at": "2026-07-09T00:00:00Z",
             "observed_route": None,
             "observed_route_class": observed_route_class,
@@ -70,7 +70,7 @@ class BehaviorEvalRouteClassTests(unittest.TestCase):
                 run_path,
                 {"external-skill-route": case},
                 root,
-                "9.1.0",
+                "9.1.1",
             )
         return errors
 
@@ -107,7 +107,7 @@ class BehaviorEvalRouteClassTests(unittest.TestCase):
             "host_version": "unknown",
             "model": "unknown",
             "model_version": "unknown",
-            "bundle_version": "9.1.0",
+            "bundle_version": "9.1.1",
             "started_at": "2026-07-10T00:00:00Z",
             "observed_route": "analysis-codebase",
             "observed_behaviors": ["semantic_delta"],
@@ -123,7 +123,7 @@ class BehaviorEvalRouteClassTests(unittest.TestCase):
                 run_path,
                 {"solar-release": case},
                 root,
-                "9.1.0",
+                "9.1.1",
                 strict_host_assisted=True,
                 required_model="gpt-5.6-sol",
             )
@@ -159,7 +159,7 @@ class BehaviorEvalRouteClassTests(unittest.TestCase):
                 "host_version": "0.144.0-alpha.4",
                 "model": "gpt-5.6-sol",
                 "model_version": "gpt-5.6-sol",
-                "bundle_version": "9.1.0",
+                "bundle_version": "9.1.1",
                 "started_at": "2026-07-10T13:30:56Z",
                 "observed_route": "analysis-codebase",
                 "observed_behaviors": ["semantic_delta"],
@@ -186,7 +186,7 @@ class BehaviorEvalRouteClassTests(unittest.TestCase):
                 run_path,
                 {"solar-release": case},
                 root,
-                "9.1.0",
+                "9.1.1",
                 strict_host_assisted=True,
                 required_model="gpt-5.6-sol",
                 not_before=self.runner.parse_iso_datetime("2026-07-10T00:00:00Z"),

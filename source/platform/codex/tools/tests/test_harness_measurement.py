@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
-"""Unit tests for analyze_harness_measurement (pure functions, no I/O).
+"""Unit tests for analyze_harness_measurement decisions and ledger discovery.
 
 Run: python3 .codex/tools/tests/test_harness_measurement.py
 """
 
 from __future__ import annotations
 
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from analyze_harness_measurement import holdout_arm, stratified_compare, sunset_status  # noqa: E402
+from analyze_harness_measurement import (  # noqa: E402
+    discover_ledgers,
+    holdout_arm,
+    load_events_from_root,
+    stratified_compare,
+    sunset_status,
+)
 
 
 def finalize(
@@ -98,6 +106,23 @@ class SunsetTests(unittest.TestCase):
         st = sunset_status(events, horizon=50)
         self.assertTrue(st["expired"])
         self.assertIn("remove", st["recommendation"])
+
+
+class LedgerRootTests(unittest.TestCase):
+    def test_discovers_and_aggregates_per_run_ledgers(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            root = Path(tmp) / "hook-ledgers"
+            expected = []
+            for index, arm in enumerate(("on", "off")):
+                ledger = root / f"run-{index}" / "hook-events.jsonl"
+                ledger.parent.mkdir(parents=True)
+                event = finalize(f"session-{index}", arm)
+                expected.append(event)
+                ledger.write_text(json.dumps(event) + "\n", encoding="utf-8")
+            (root / "ignored.jsonl").write_text(json.dumps(finalize("ignored", "on")), encoding="utf-8")
+
+            self.assertEqual(len(discover_ledgers(root)), 2)
+            self.assertEqual(load_events_from_root(root), expected)
 
 
 if __name__ == "__main__":

@@ -1,9 +1,10 @@
 # Claude hooks (opt-in)
 
 `claude_hook_adapter.py` is the Claude-side counterpart of the Codex
-`hooks.json` adapter. It records Claude Code lifecycle events into the same
-hash-chained evidence ledger as Codex (`.codex/tools/hook_runtime.py`), so the
-observed-evidence trail is the same across both runtimes. The discipline
+`hooks.json` adapter. It records Claude Code lifecycle events through the same
+hash-chained evidence backend as Codex (`.codex/tools/hook_runtime.py`). Default
+storage is a durable per-session ledger family, so each file remains a
+single-run verifier input. The discipline
 contract itself lives in the byte-mirrored skills (`workflow-rigor`, etc.); this
 file is only the runtime wiring.
 
@@ -53,5 +54,8 @@ Notes:
   use `$CLAUDE_PROJECT_DIR/.claude/hooks/claude_hook_adapter.py`.
 - Requires the Codex tools to be co-deployed (the adapter imports
   `hook_runtime` from a sibling `.codex/tools`). Without it, the adapter no-ops.
-- The ledger path follows `hook_runtime.default_ledger()` (honors
-  `SKILL_SYSTEM_HOOK_LEDGER`); runtime state is never written into the bundle.
+- The ledger path follows `hook_runtime.default_ledger(session_id)`. An explicit
+  `SKILL_SYSTEM_HOOK_LEDGER` remains an exact-file override; otherwise the path
+  is `${CODEX_HOME:-~/.codex}/harness/hook-ledgers/<run-key>/hook-events.jsonl`.
+  `<run-key>` is a stable SHA-256 key and does not expose the raw session ID;
+  runtime state is never written into the bundle.

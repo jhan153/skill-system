@@ -1,6 +1,6 @@
 # Global CLAUDE
 
-> Claude-side global working rules for the Skill System bundle (9.1.0). This file maps the
+> Claude-side global working rules for the Skill System bundle (9.1.1). This file maps the
 > bundle's global working rules (`.codex/AGENTS.md`) to the Claude runtime. It diverges from the
 > Codex source only where Claude feature names differ (`settings.json` / permission modes,
 > `.claude/` paths, `/loop`); the working principles are identical. The rest of the Claude side
@@ -117,7 +117,7 @@
 - Preserve existing runtime settings unless the user explicitly requests replacement.
 - Project-local hooks may run after project trust and hook approval. They operate under permission modes and settings policy.
 - Review `settings.json` permissions, and any project-local `.claude/settings.json`, against local policy before applying.
-- The bundle ships an optional, observational evidence-recording hook at `.claude/hooks/claude_hook_adapter.py` (Claude-side counterpart of the Codex `hooks.json` adapter). It is not auto-installed: enable it by adding it to `settings.json` per `.claude/hooks/README.md`. It records lifecycle events to the shared evidence ledger and is observational by default; under an opt-in strict gate (`SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict`) it blocks a stop when the final message claims `agent-verified` but the transcript shows an unrecovered tool failure.
+- The bundle ships an optional, observational evidence-recording hook at `.claude/hooks/claude_hook_adapter.py` (Claude-side counterpart of the Codex `hooks.json` adapter). It is not auto-installed: enable it by adding it to `settings.json` per `.claude/hooks/README.md`. It records lifecycle events through the shared evidence backend into a durable per-session ledger by default and is observational by default; under an opt-in strict gate (`SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict`) it blocks a stop when the final message claims `agent-verified` but the transcript shows an unrecovered tool failure.
 - `.claude/skills/.system` is app-managed; replacing it requires explicit user intent.
 
 ### Harness And Stop Boundary

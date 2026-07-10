@@ -494,7 +494,7 @@ def hook_ledger_path(args: argparse.Namespace, data: dict[str, Any]) -> Path:
         return run_dir / "hook-events.jsonl"
     from hook_runtime import default_ledger  # noqa: PLC0415
 
-    return default_ledger()
+    return default_ledger(run_id_for_event(args, data))
 
 
 def load_run_manifest(path: Path) -> Any:
@@ -516,10 +516,10 @@ def run_id_for_event(args: argparse.Namespace, data: dict[str, Any]) -> str:
             manifest = {}
         if isinstance(manifest, dict) and isinstance(manifest.get("run_id"), str):
             return manifest["run_id"]
-    if isinstance(data.get("run_id"), str):
+    if isinstance(data.get("run_id"), str) and data["run_id"]:
         return data["run_id"]
-    session_id = sanitize_id(data.get("session_id"), "unknown-session")
-    turn_id = sanitize_id(data.get("turn_id"), "unknown-turn")
+    session_id = str(data.get("session_id") or "unknown-session")
+    turn_id = str(data.get("turn_id") or "unknown-turn")
     return f"{session_id}:{turn_id}"
 
 

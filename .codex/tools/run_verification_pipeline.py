@@ -24,6 +24,7 @@ RELEASE_REQUIRED_CHECK_IDS = {
         "invocation_surface_policy",
         "work_horizon_policy",
         "work_item_lifecycle",
+        "release_identity",
         "generated_mirrors",
         "validator_unit_tests",
     },
@@ -31,7 +32,7 @@ RELEASE_REQUIRED_CHECK_IDS = {
         "execution_assurance_artifacts",
         "hook_runtime_smoke",
         "behavior_replay",
-        "solar_forward_eval_9_1_0",
+        "solar_forward_eval_9_1_1",
     },
     "agent-output": {
         "agent_run_current_fixture",

@@ -280,10 +280,13 @@ termination:
             )
             report_text = report.read_text(encoding="utf-8")
             self.assertIn("c_cpp_lizard_status", report_text)
+            self.assertIn("architecture.c_cpp_semantic_depth", report_text)
+            self.assertIn("Not evidenced: C/C++ symbol, class, and call-graph structure", report_text)
             gate = json.loads(
                 (output / "artifacts" / "quality-gate-result.json").read_text(encoding="utf-8")
             )
             self.assertEqual(gate.get("status"), "FAIL")
+            self.assertIn("c_cpp_structural_evidence=not_evidenced", gate.get("reasons", []))
             self.assertTrue(
                 any(str(reason).startswith("fallback_diagrams=") for reason in gate.get("reasons", [])),
                 gate,
@@ -433,6 +436,271 @@ termination:
         result = self.run_tool(".codex/tools/hook_runtime.py", "verify", "--ledger", str(ledger))
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("event_hash mismatch", result.stdout)
+
+    def test_codex_hook_fallback_is_durable_per_run_and_hides_run_ids(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            codex_home = tmp_path / "codex-home"
+            session_a = f"session-fallback-a-{os.getpid()}"
+            turn_a = f"turn-fallback-a-{os.getpid()}"
+            session_b = f"session-fallback-b-{os.getpid()}"
+            turn_b = f"turn-fallback-b-{os.getpid()}"
+            payloads = [
+                {
+                    "hook_event_name": "UserPromptSubmit",
+                    "session_id": session_a,
+                    "turn_id": turn_a,
+                    "cwd": str(ROOT),
+                    "permission_mode": "workspace-write",
+                    "prompt": "first run request",
+                },
+                {
+                    "hook_event_name": "PreCompact",
+                    "session_id": session_a,
+                    "turn_id": turn_a,
+                    "cwd": str(ROOT),
+                    "permission_mode": "workspace-write",
+                },
+                {
+                    "hook_event_name": "UserPromptSubmit",
+                    "session_id": session_b,
+                    "turn_id": turn_b,
+                    "cwd": str(ROOT),
+                    "permission_mode": "workspace-write",
+                    "prompt": "second run request",
+                },
+            ]
+            for index, payload in enumerate(payloads):
+                input_path = tmp_path / f"hook-{index}.json"
+                input_path.write_text(json.dumps(payload), encoding="utf-8")
+                result = self.run_tool_env(
+                    {
+                        "CODEX_HOME": str(codex_home),
+                        "SKILL_SYSTEM_HOOK_LEDGER": None,
+                        "SKILL_SYSTEM_RUN_ID": None,
+                        "SKILL_SYSTEM_AGENT_RUN_BOOTSTRAP": None,
+                        "SKILL_SYSTEM_AGENT_OUTPUT_GATE": None,
+                    },
+                    ".codex/hooks/codex_hook_adapter.py",
+                    "--input-file", str(input_path),
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            root = codex_home / "harness" / "hook-ledgers"
+            ledgers = sorted(root.glob("*/hook-events.jsonl"))
+            self.assertEqual(len(ledgers), 2)
+            events_by_run: dict[str, list[dict[str, object]]] = {}
+            for ledger in ledgers:
+                events = [json.loads(line) for line in ledger.read_text(encoding="utf-8").splitlines()]
+                run_ids = {event["run_id"] for event in events}
+                self.assertEqual(len(run_ids), 1)
+                events_by_run[next(iter(run_ids))] = events
+                self.assert_passes(".codex/tools/hook_runtime.py", "verify", "--ledger", str(ledger))
+                relative = ledger.relative_to(root).as_posix()
+                for raw_id in (session_a, turn_a, session_b, turn_b):
+                    self.assertNotIn(raw_id, relative)
+
+            run_a = f"{session_a}:{turn_a}"
+            run_b = f"{session_b}:{turn_b}"
+            self.assertEqual(set(events_by_run), {run_a, run_b})
+            self.assertEqual([event["seq"] for event in events_by_run[run_a]], [1, 2])
+            self.assertEqual(events_by_run[run_a][1]["prev_event_hash"], events_by_run[run_a][0]["event_hash"])
+            self.assertEqual([event["seq"] for event in events_by_run[run_b]], [1])
+
+    def test_codex_hook_fallback_does_not_merge_sanitize_collisions(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            codex_home = tmp_path / "codex-home"
+            raw_runs = [("session/a", "turn?one"), ("session?a", "turn/one")]
+            for index, (session_id, turn_id) in enumerate(raw_runs):
+                input_path = tmp_path / f"collision-{index}.json"
+                input_path.write_text(
+                    json.dumps(
+                        {
+                            "hook_event_name": "UserPromptSubmit",
+                            "session_id": session_id,
+                            "turn_id": turn_id,
+                            "cwd": str(ROOT),
+                            "permission_mode": "workspace-write",
+                            "prompt": f"collision run {index}",
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                result = self.run_tool_env(
+                    {
+                        "CODEX_HOME": str(codex_home),
+                        "SKILL_SYSTEM_HOOK_LEDGER": None,
+                        "SKILL_SYSTEM_RUN_ID": None,
+                        "SKILL_SYSTEM_AGENT_RUN_BOOTSTRAP": None,
+                        "SKILL_SYSTEM_AGENT_OUTPUT_GATE": None,
+                    },
+                    ".codex/hooks/codex_hook_adapter.py",
+                    "--input-file",
+                    str(input_path),
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            root = codex_home / "harness" / "hook-ledgers"
+            ledgers = sorted(root.glob("*/hook-events.jsonl"))
+            self.assertEqual(len(ledgers), 2)
+            observed_run_ids = {
+                json.loads(path.read_text(encoding="utf-8").splitlines()[0])["run_id"]
+                for path in ledgers
+            }
+            self.assertEqual(
+                observed_run_ids,
+                {f"{session_id}:{turn_id}" for session_id, turn_id in raw_runs},
+            )
+            for ledger in ledgers:
+                relative = ledger.relative_to(root).as_posix()
+                for session_id, turn_id in raw_runs:
+                    self.assertNotIn(session_id, relative)
+                    self.assertNotIn(turn_id, relative)
+
+    def test_hook_runtime_default_record_uses_the_explicit_run_id_path(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            codex_home = Path(tmp) / "codex-home"
+            for run_id in ("CLI-RUN-A", "CLI-RUN-B"):
+                result = self.run_tool_env(
+                    {
+                        "CODEX_HOME": str(codex_home),
+                        "SKILL_SYSTEM_HOOK_LEDGER": None,
+                        "SKILL_SYSTEM_RUN_ID": None,
+                    },
+                    ".codex/tools/hook_runtime.py",
+                    "record",
+                    "--event", "request_received",
+                    "--host", "codex",
+                    "--host-event", "UserPromptSubmit",
+                    "--support-level", "native",
+                    "--run-id", run_id,
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            ledgers = sorted((codex_home / "harness" / "hook-ledgers").glob("*/hook-events.jsonl"))
+            self.assertEqual(len(ledgers), 2)
+            self.assertEqual(
+                {json.loads(path.read_text(encoding="utf-8"))["run_id"] for path in ledgers},
+                {"CLI-RUN-A", "CLI-RUN-B"},
+            )
+
+    def test_hook_fallback_preserves_exact_file_override_and_manifest_priority(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            codex_home = tmp_path / "codex-home"
+            configured = tmp_path / "configured.jsonl"
+            input_path = tmp_path / "request.json"
+            input_path.write_text(
+                json.dumps({
+                    "hook_event_name": "UserPromptSubmit",
+                    "session_id": "session-configured",
+                    "turn_id": "turn-configured",
+                    "cwd": str(ROOT),
+                    "permission_mode": "workspace-write",
+                    "prompt": "configured ledger",
+                }),
+                encoding="utf-8",
+            )
+            result = self.run_tool_env(
+                {
+                    "CODEX_HOME": str(codex_home),
+                    "SKILL_SYSTEM_HOOK_LEDGER": str(configured),
+                    "SKILL_SYSTEM_AGENT_RUN_BOOTSTRAP": None,
+                },
+                ".codex/hooks/codex_hook_adapter.py",
+                "--input-file", str(input_path),
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertTrue(configured.is_file())
+            self.assertFalse((codex_home / "harness" / "hook-ledgers").exists())
+
+            run_dir = tmp_path / "manifest-run"
+            shutil.copytree(FIXTURES / "agent-runs" / "current-run", run_dir)
+            run_ledger = run_dir / "hook-events.jsonl"
+            run_ledger.unlink()
+            configured.unlink()
+            result = self.run_tool_env(
+                {
+                    "SKILL_SYSTEM_HOOK_LEDGER": str(configured),
+                    "SKILL_SYSTEM_AGENT_RUN_BOOTSTRAP": None,
+                },
+                ".codex/hooks/codex_hook_adapter.py",
+                "--input-file", str(input_path),
+                "--run-dir", str(run_dir),
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertTrue(run_ledger.is_file())
+            self.assertFalse(configured.exists())
+
+    def test_claude_hook_fallback_is_session_scoped(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            tmp_path = Path(tmp)
+            codex_home = tmp_path / "codex-home"
+            session_ids = ["claude/session-a", "claude-session-b"]
+            env = {
+                **os.environ,
+                "CODEX_HOME": str(codex_home),
+                "PYTHONDONTWRITEBYTECODE": "1",
+            }
+            env.pop("SKILL_SYSTEM_HOOK_LEDGER", None)
+            env.pop("SKILL_SYSTEM_RUN_ID", None)
+            for session_id in session_ids:
+                result = subprocess.run(
+                    [sys.executable, ".claude/hooks/claude_hook_adapter.py"],
+                    cwd=ROOT,
+                    env=env,
+                    input=json.dumps({
+                        "hook_event_name": "UserPromptSubmit",
+                        "session_id": session_id,
+                        "cwd": str(ROOT),
+                        "permission_mode": "workspace-write",
+                    }),
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    check=False,
+                    timeout=30,
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            root = codex_home / "harness" / "hook-ledgers"
+            ledgers = sorted(root.glob("*/hook-events.jsonl"))
+            self.assertEqual(len(ledgers), 2)
+            observed = set()
+            for ledger in ledgers:
+                event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[0])
+                observed.add(event["run_id"])
+                self.assertEqual(event["host"], "claude")
+                self.assert_passes(".codex/tools/hook_runtime.py", "verify", "--ledger", str(ledger))
+                for raw_id in session_ids:
+                    self.assertNotIn(raw_id, ledger.relative_to(root).as_posix())
+            self.assertEqual(observed, set(session_ids))
+
+    def test_hook_runtime_status_reports_gate_modes_independently(self) -> None:
+        result = self.run_tool_env(
+            {
+                "SKILL_SYSTEM_AGENT_OUTPUT_GATE": "strict",
+                "SKILL_SYSTEM_RECOVERY_GUARD": "off",
+            },
+            ".codex/tools/hook_runtime.py", "status",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report["agent_output_gate_mode"], "strict")
+        self.assertEqual(report["recovery_guard_mode"], "off")
+
+        result = self.run_tool_env(
+            {
+                "SKILL_SYSTEM_AGENT_OUTPUT_GATE": None,
+                "SKILL_SYSTEM_RECOVERY_GUARD": "audit",
+            },
+            ".codex/tools/hook_runtime.py", "status",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report["agent_output_gate_mode"], "observe")
+        self.assertEqual(report["recovery_guard_mode"], "audit")
 
 
 

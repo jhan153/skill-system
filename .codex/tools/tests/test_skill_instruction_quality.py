@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import unittest
 from pathlib import Path
 
@@ -17,6 +18,7 @@ def find_bundle_root() -> Path:
 
 ROOT = find_bundle_root()
 SOURCE = ROOT / "source"
+HOST_PRODUCT_PATTERN = re.compile(r"\b(?:Codex|Claude|ChatGPT)\b", re.IGNORECASE)
 
 
 def canonical(relative: str) -> Path:
@@ -42,6 +44,28 @@ class SkillInstructionQualityTests(unittest.TestCase):
                 if line.strip().startswith("short_description:"):
                     value = line.split(":", 1)[1].strip().strip('"')
                     self.assertLessEqual(len(value), 64, skill.parent.name)
+
+    def test_skill_frontmatter_metadata_is_complete_and_host_neutral(self) -> None:
+        for skill in sorted((SOURCE / "skills").glob("*/SKILL.md")):
+            with self.subTest(skill=skill.parent.name):
+                text = skill.read_text(encoding="utf-8")
+                self.assertTrue(text.startswith("---\n"), skill.parent.name)
+                parts = text.split("---", 2)
+                self.assertEqual(len(parts), 3, skill.parent.name)
+                metadata = yaml.safe_load(parts[1])
+                self.assertIsInstance(metadata, dict, skill.parent.name)
+                if not isinstance(metadata, dict):
+                    continue
+                self.assertEqual(metadata.get("name"), skill.parent.name)
+                description = metadata.get("description")
+                self.assertIsInstance(description, str, skill.parent.name)
+                if not isinstance(description, str):
+                    continue
+                self.assertTrue(description.strip(), skill.parent.name)
+                self.assertIsNone(
+                    HOST_PRODUCT_PATTERN.search(description),
+                    f"{skill.parent.name}: frontmatter description must be host-neutral",
+                )
 
     def test_every_current_skill_has_positive_and_negative_routing_coverage(self) -> None:
         skills = {path.parent.name for path in (SOURCE / "skills").glob("*/SKILL.md")}

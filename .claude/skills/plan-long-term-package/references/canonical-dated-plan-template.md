@@ -27,6 +27,19 @@ derived_from: []
 - modifiers: `{{MODIFIERS}}`
 - domain_context: `{{DOMAIN_CONTEXT_PATH}}`
 
+### Artifact Budget
+- default_artifact_cap: `{{DEFAULT_ARTIFACT_CAP}}`
+- effective_artifact_cap: `{{ARTIFACT_CAP}}`
+- projected_artifact_count: `{{PROJECTED_ARTIFACT_COUNT}}`
+- artifact_cap_override_reason: `{{ARTIFACT_CAP_REASON}}`
+- projected_artifacts:
+{{PROJECTED_ARTIFACTS}}
+
+### Modifier Admission
+| Modifier | Status | Artifact Delta | Release-Blocking Delta |
+| --- | --- | --- | --- |
+{{MODIFIER_ADMISSION_ROWS}}
+
 ## 2) Changed File List
 - [ ] `<path>`
 

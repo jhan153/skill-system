@@ -223,6 +223,7 @@ def core_checks(root: Path) -> list[Check]:
             [py, ".codex/tools/validate_work_item.py", ".codex/schemas/workitem/examples/work-item.example.yaml"],
             root,
         ),
+        Check("release_identity", [py, ".codex/tools/check_release_identity.py", "--root", str(root)], root),
         Check("generated_mirrors", [py, ".codex/tools/sync_generated_mirrors.py", "--check"], root),
         Check(
             "validator_unit_tests",
@@ -275,7 +276,7 @@ def execution_checks(root: Path) -> list[Check]:
             root,
         ),
         Check(
-            "solar_forward_eval_9_1_0",
+            "solar_forward_eval_9_1_1",
             [
                 py,
                 ".codex/tools/run_behavior_evals.py",
@@ -286,16 +287,16 @@ def execution_checks(root: Path) -> list[Check]:
                 "--eval-schema",
                 ".codex/eval/eval-case.schema.json",
                 "--observed-runs",
-                ".codex/eval/observed-runs/release-9.1.0",
+                ".codex/eval/observed-runs/release-9.1.1",
                 "--bundle-version",
-                "9.1.0",
+                "9.1.1",
                 "--required-model",
                 "gpt-5.6-sol",
                 "--require-all-cases",
                 "--not-before",
-                "2026-07-10T00:00:00Z",
+                "2026-07-10T18:00:00Z",
                 "--not-after",
-                "2026-07-11T00:00:00Z",
+                "2026-07-12T00:00:00Z",
             ],
             root,
         ),
@@ -469,19 +470,15 @@ def integrations_checks(root: Path) -> list[Check]:
         check=False,
         timeout=10,
     )
-    if pytest_probe.returncode != 0:
-        return [
-            Check(
-                "kanboard_integration",
-                [py, "-c", "print('SKIP: pytest unavailable locally; last reviewed state says 91 passed; expires_at=2026-07-20')"],
-                root,
-                False,
-            )
-        ]
+    command = (
+        [py, "-m", "pytest", "-q", "-p", "no:cacheprovider"]
+        if pytest_probe.returncode == 0
+        else [py, "-m", "unittest", "discover", "-s", "tests", "-q"]
+    )
     return [
         Check(
             "kanboard_integration",
-            [py, "-m", "pytest", "-q", "-p", "no:cacheprovider"],
+            command,
             integration,
             True,
             env,

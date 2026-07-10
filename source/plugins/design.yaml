@@ -1,6 +1,6 @@
 # source/plugins/design.yaml — plugin membership manifest (hand-authored input).
 name: skill-system-design
-version: "9.1.0"
+version: "9.1.1"
 description: 'Skill System design — UI/UX, design system, visual QA, layout/component mapping for the design role.'
 skills:
   - design-a11y-audit

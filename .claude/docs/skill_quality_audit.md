@@ -1,10 +1,10 @@
 # Skill Quality Audit
 
-Date: 2026-07-09
-Bundle: 9.1.0
+Date: 2026-07-10
+Bundle: 9.1.1
 Scope: the 66 current canonical `source/skills/*/SKILL.md` packages.
 
-This is a maintenance record, not routing context. Do not load it during normal skill selection. App-managed system skills and seven pre-commit skills already removed by consolidation are outside scope. Earlier evidence-complete revisions were credited and revalidated rather than rewritten.
+This is a maintenance record, not routing context. Do not load it during normal skill selection. App-managed system skills and seven pre-commit skills already removed by consolidation are outside scope. The 9.1.1 patch revalidated the full metadata surface and the behavior-changing subset; unchanged 9.1.0 evidence-complete decisions were retained rather than rewritten.
 
 ## Audit Standard
 
@@ -19,7 +19,7 @@ Each current skill was checked for:
 7. positive, negative, or edge regression coverage;
 8. repository metadata and generated-target consistency.
 
-`revised` means the current pass changed semantic instructions, runtime contracts, or context/output cost. `prior + revalidated` means an earlier revision in the 9.1.0 pass was retained and included in focused/core validation. `retained` means the file was read and no semantic change was justified; metadata may still have been shortened.
+`revised` means the current pass changed semantic instructions, runtime contracts, or context/output cost. `prior + revalidated` means an earlier revision in the 9.1.0 pass was retained and included in focused/core validation for 9.1.1. `retained` means the file was read and no semantic change was justified; metadata may still have been corrected.
 
 ## Per-Skill Decisions
 
@@ -31,9 +31,9 @@ Each current skill was checked for:
 | `analysis-architecture-deepening` | prior + revalidated | Narrow candidate-ranking owner remains distinct from targeted design and full reports. |
 | `analysis-bug` | revised | Hypothesis depth and fix comparison are conditional; static leads cannot self-confirm runtime causes. |
 | `analysis-codebase-design` | prior + revalidated | Targeted boundary/deep-module decisions remain separate from full report generation. |
-| `analysis-codebase` | prior + revalidated | Semantic comparison requires runtime/contract evidence; framework-name differences do not count as logic differences. |
+| `analysis-codebase` | revised | Semantic comparison remains evidence-bound; C/C++ structure now records `Not evidenced` and fails closed until a compilation-aware symbol/class/call index exists. |
 | `analysis-domain-modeling` | retained | Domain language, invariant, and state-model ownership is distinct and already proportional. |
-| `analysis-performance` | retained | Measurement-first bottleneck selection is distinct; UI metadata was shortened. |
+| `analysis-performance` | retained | Measurement-first bottleneck selection is distinct; routing metadata is host-neutral. |
 | `analysis-router` | prior + revalidated | Specialist and hybrid routing boundaries remain explicit. |
 
 ### Coordination And Design
@@ -77,7 +77,7 @@ Each current skill was checked for:
 
 | skill | decision | audit result |
 | --- | --- | --- |
-| `plan-long-term-package` | prior + revalidated | Explicit package intent, claim ledger, behavior oracles, and conditional archetype loading remain required. |
+| `plan-long-term-package` | revised | Final manifests default to a 20-artifact preflight cap, explicit reasoned escalation, canonical-first staged materialization, and no empty ingest artifact. |
 | `plan-loop-term` | prior + revalidated | Loop completion terms remain distinct from broad planning and execution. |
 | `plan-requirements-brief` | prior + revalidated | Requirements contract remains distinct from discovery and implementation. |
 | `plan-requirements-discovery` | prior + revalidated | Human-in-loop elicitation remains conditional on real requirement uncertainty. |
@@ -110,15 +110,15 @@ Each current skill was checked for:
 | skill | decision | audit result |
 | --- | --- | --- |
 | `skill-system-repo-adapter` | prior + revalidated | Repository projection remains support-only; semantic authoring stays with the primary owner. |
-| `workflow-bug-fix` | retained | Direct failure repair remains distinct from RCA-only and recovery; metadata was shortened. |
+| `workflow-bug-fix` | retained | Direct failure repair remains distinct from RCA-only and recovery; routing metadata is host-neutral. |
 | `workflow-comment-maintenance` | retained | Comment/docstring-only behavior-preserving scope and public-contract guard are distinct. |
-| `workflow-dependency-upgrade` | retained | Manifest/lockfile/migration scope and network/lifecycle boundaries are distinct; metadata was shortened. |
-| `workflow-implementation` | retained | Direct implementation owner remains goal-first and proportionally validated. |
+| `workflow-dependency-upgrade` | retained | Manifest/lockfile/migration scope and network/lifecycle boundaries are distinct; routing metadata is host-neutral. |
+| `workflow-implementation` | retained | Direct implementation owner remains goal-first and proportionally validated; routing metadata is host-neutral. |
 | `workflow-loop-runner` | prior + revalidated | Accepted LoopRun execution remains verifier/checkpoint/stop governed. |
 | `workflow-minimal-implementation` | prior + revalidated | YAGNI pressure remains a conditional modifier, not a correctness owner. |
 | `workflow-plan-runner` | prior + revalidated | Batch, phase, and plan completion remain separate and evidence-gated. |
 | `workflow-recovery` | prior + revalidated | Repeated same-signature failure uses one active hypothesis and original success signal. |
-| `workflow-refactor-safely` | retained | Behavior contract and characterization batches remain distinct; metadata was shortened. |
+| `workflow-refactor-safely` | retained | Behavior contract and characterization batches remain distinct; routing metadata is host-neutral. |
 | `workflow-rigor` | prior + revalidated | Lite/standard/strict evidence depth remains a modifier and does not reimplement work. |
 | `workflow-source-maintenance` | retained | Evidence-backed safe deletion remains distinct from structural refactor and feature work. |
 | `workflow-task-ledger` | revised | Explicit resumption risk—not step count—now controls activation. |

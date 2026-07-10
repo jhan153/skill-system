@@ -1,0 +1,11 @@
+{
+  "checked_at": "2026-07-10T20:24:49Z",
+  "algorithm": "sha256",
+  "old_artifact_root": "source/shared/eval/observed-runs/release-9.1.0/artifacts",
+  "new_artifact_root": "source/shared/eval/observed-runs/release-9.1.1/artifacts",
+  "old_unique_sha256_count": 15,
+  "new_unique_sha256_count_before_this_receipt": 38,
+  "sha256_intersection_count": 0,
+  "release_9_1_0_artifacts_reused": false,
+  "scope_note": "This receipt excludes its own bytes from the new-set count."
+}

@@ -1,0 +1,14 @@
+{
+  "case_id": "solar-911-ledger-modes-001",
+  "host": "codex",
+  "host_version": "codex-cli 0.144.0-alpha.4",
+  "model": "gpt-5.6-sol",
+  "bundle_version": "9.1.1",
+  "started_at": "2026-07-10T18:33:30Z",
+  "finished_at": "2026-07-10T18:34:12Z",
+  "outer_exit": 0,
+  "fixture": "source/shared/eval/forward-fixtures/9.1.1/harness/VALIDATION_BRIEF.md",
+  "output": "source/shared/eval/observed-runs/release-9.1.1/artifacts/ledger-modes-output.md",
+  "temporary_codex_home": "/private/tmp/codex-home-9.1.1-forward.bX4cwa",
+  "release_9_1_0_artifacts_reused": false
+}

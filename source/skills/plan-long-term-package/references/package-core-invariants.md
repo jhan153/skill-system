@@ -27,6 +27,18 @@ Record every statement that changes scope, architecture, dependency order, accep
 
 Freeze the selected archetype/modifiers, canonical dated plan, package root, phase docs, canonical contracts, ingest summary, and validation modes before loading templates. Generate only the de-duplicated archetype/modifier/universal contract set.
 
+## Artifact Budget
+
+- Default to at most 20 paths in the complete final manifest, including derived views that have not been materialized yet.
+- Count one ingest summary only when at least one real report or prior-plan input is admitted.
+- Compute each modifier's artifact and release-blocking delta against the archetype. A `0/0` modifier is `absorbed-by-archetype`; it does not justify another artifact.
+- Do not weaken the selected modifier union to meet the cap. A higher cap requires a nonempty accepted reason plus the projected count and complete path list in the canonical plan.
+- Complete this preflight before any package mkdir or write.
+
+## Materialization Order
+
+Freeze the full manifest first, materialize canonical owners in bounded batches, then generate README, phase/group docs, and the procedural handoff index once from the stable canonical state. Until those derived views exist and full validation passes, keep the state below `package_planned`.
+
 ## Phase Readiness
 
 A phase is implementation-ready only when each blocking outcome has:

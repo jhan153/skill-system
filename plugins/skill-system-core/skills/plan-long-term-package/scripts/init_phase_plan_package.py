@@ -9,10 +9,13 @@ from pathlib import Path
 from ingest_analysis_reports import discover_reports, expand_inputs, ingest, render_markdown
 from phase_plan_schema import (
     ARCHETYPES,
+    DEFAULT_ARTIFACT_CAP,
+    DERIVED_VIEW_SPECS,
     MODIFIERS,
     SPEC_DOC_TYPES,
     GroupSpec,
     canonical_archetype,
+    modifier_deltas_for,
     release_blocking_specs_for,
     required_specs_for,
     slugify_title,
@@ -155,20 +158,62 @@ def render_domain_context(
     root: Path,
     package: Path,
     package_name: str,
-    reports: list[str],
-    auto_ingest: bool,
-    max_files: int,
+    paths: list[Path],
 ) -> tuple[str, str, object | None]:
-    paths = expand_inputs(reports, root, max_files)
-    if auto_ingest:
-        paths.extend(discover_reports(root, max_files))
-    paths = sorted(set(paths), key=lambda p: str(p))[:max_files]
+    if not paths:
+        return "", "", None
     result = ingest(paths)
     out = package / "domain-ingest-summary.md"
     out.write_text(render_markdown(result, root), encoding="utf-8")
     rel = f"docs/plan/{package_name}/domain-ingest-summary.md"
     derived_line = f'  - "{rel}"'
     return rel, derived_line, result
+
+
+def resolve_domain_inputs(root: Path, reports: list[str], auto_ingest: bool, max_files: int) -> list[Path]:
+    paths = expand_inputs(reports, root, max_files)
+    if auto_ingest:
+        paths.extend(discover_reports(root, max_files))
+    return sorted(set(paths), key=lambda p: str(p))[:max_files]
+
+
+def bound_domain_inputs(root: Path, summary: Path) -> list[Path]:
+    """Restore the exact source files recorded by a canonical-stage ingest summary."""
+    lines = summary.read_text(encoding="utf-8").splitlines()
+    try:
+        start = lines.index("derived_from:") + 1
+    except ValueError as exc:
+        raise SystemExit(f"existing ingest summary has no derived_from binding: {summary}") from exc
+    raw_sources: list[str] = []
+    for line in lines[start:]:
+        if line == "---":
+            break
+        if not line.startswith("  "):
+            break
+        item = line.strip()
+        if item == "[]":
+            continue
+        if item.startswith("- "):
+            raw_sources.append(item[2:].strip().strip('"').strip("'"))
+    if not raw_sources:
+        raise SystemExit(f"existing ingest summary has no bound source files: {summary}")
+    sources: list[Path] = []
+    missing: list[Path] = []
+    for raw in raw_sources:
+        source = Path(raw).expanduser()
+        if not source.is_absolute():
+            source = root / source
+        source = source.resolve()
+        if not source.is_file():
+            missing.append(source)
+        else:
+            sources.append(source)
+    if missing:
+        raise SystemExit(
+            "existing ingest summary references missing source files: "
+            + ", ".join(str(path) for path in missing)
+        )
+    return sorted(set(sources), key=lambda path: str(path))
 
 
 def pick_domain_buckets(title: str) -> list[str]:
@@ -217,9 +262,14 @@ def render_group_purpose(spec: GroupSpec, relevant_specs: list[str]) -> str:
     )
 
 
-def render_group_current_state(spec: GroupSpec, snippets: list[str], domain_context_path: str) -> str:
+def render_group_current_state(spec: GroupSpec, snippets: list[str], domain_context_path: str | None) -> str:
     if snippets:
         return "\n".join(["Existing analysis inputs already contain these signals:"] + [f"- {item}" for item in snippets])
+    if not domain_context_path:
+        return (
+            "No prior analysis report was admitted for this package. "
+            "Inspect the source and evidence named by the canonical plan before implementation."
+        )
     return (
         f"Domain ingest source: `{domain_context_path}`. "
         "No strong matching signal was extracted for this group; inspect the source reports before implementation."
@@ -234,9 +284,11 @@ def render_group_target_state(spec: GroupSpec, relevant_specs: list[str]) -> str
     )
 
 
-def render_before_structure(snippets: list[str], domain_context_path: str) -> str:
+def render_before_structure(snippets: list[str], domain_context_path: str | None) -> str:
     if snippets:
         return "\n".join(snippets[:3])
+    if not domain_context_path:
+        return "No admitted prior report; inspect current source evidence before defining the target structure."
     return f"Existing reports are summarized in {domain_context_path}; inspect them before coding."
 
 
@@ -326,6 +378,117 @@ def render_upstream_gate_rows(slug: str, required_specs: list[str], release_bloc
     return "\n".join(rows)
 
 
+def group_relative_path(index: int, spec: GroupSpec) -> str:
+    filename = f"Group{index}-{slugify_title(spec.title).replace('-', ' ').title().replace(' ', '-')}.md"
+    return f"{spec.phase}/{filename}"
+
+
+def projected_artifact_paths(
+    root: Path,
+    package_name: str,
+    slug: str,
+    dated_plan: Path,
+    required_specs: list[str],
+    group_specs: list[GroupSpec],
+    include_ingest: bool,
+) -> list[str]:
+    paths = [relative_to_root(dated_plan, root)]
+    paths.extend(spec_path(slug, suffix) for suffix in required_specs)
+    if include_ingest:
+        paths.append(f"docs/plan/{package_name}/domain-ingest-summary.md")
+    paths.extend(
+        f"docs/plan/{package_name}/{group_relative_path(index, spec)}"
+        for index, spec in enumerate(group_specs, start=1)
+    )
+    paths.append(f"docs/plan/{package_name}/README.md")
+    return paths
+
+
+def normalize_cap_reason(raw: str) -> str:
+    return " ".join(raw.split()).replace("`", "'")
+
+
+def validate_artifact_budget(cap: int, reason: str, paths: list[str]) -> None:
+    if cap < 1:
+        raise SystemExit("artifact cap must be a positive integer")
+    if cap > DEFAULT_ARTIFACT_CAP and not reason:
+        raise SystemExit(
+            f"artifact cap override above default {DEFAULT_ARTIFACT_CAP} requires a nonempty --artifact-cap-reason"
+        )
+    if len(paths) > cap:
+        rendered = "\n".join(f"- {path}" for path in paths)
+        raise SystemExit(
+            f"projected artifact count {len(paths)} exceeds cap {cap}; "
+            "select a narrower archetype/modifier set or provide an explicit higher cap with a nonempty reason\n"
+            f"projected artifacts:\n{rendered}"
+        )
+
+
+def render_projected_artifacts(paths: list[str]) -> str:
+    return "\n".join(f"  - `{path}`" for path in paths)
+
+
+def render_modifier_admission_rows(archetype: str, modifiers: list[str]) -> tuple[str, list[str]]:
+    if not modifiers:
+        return "| none | not-selected | none | none |", []
+    rows: list[str] = []
+    absorbed: list[str] = []
+    for modifier in modifiers:
+        artifact_delta, release_delta = modifier_deltas_for(archetype, modifier)
+        status = "admitted"
+        if not artifact_delta and not release_delta:
+            status = "absorbed-by-archetype"
+            absorbed.append(modifier)
+        artifact_text = ", ".join(artifact_delta) if artifact_delta else "none"
+        release_text = ", ".join(release_delta) if release_delta else "none"
+        rows.append(f"| `{modifier}` | `{status}` | {artifact_text} | {release_text} |")
+    return "\n".join(rows), absorbed
+
+
+def validate_existing_budget_record(
+    dated_plan: Path,
+    cap: int,
+    reason: str,
+    archetype: str,
+    modifiers: list[str],
+    projected_paths: list[str],
+) -> None:
+    if not dated_plan.exists():
+        raise SystemExit(f"--derived-only requires existing canonical plan: {dated_plan}")
+    text = dated_plan.read_text(encoding="utf-8")
+    reason_record = reason or "none"
+    expected = [
+        f"default_artifact_cap: `{DEFAULT_ARTIFACT_CAP}`",
+        f"effective_artifact_cap: `{cap}`",
+        f"projected_artifact_count: `{len(projected_paths)}`",
+        f"artifact_cap_override_reason: `{reason_record}`",
+        f"- archetype: `{archetype}`",
+        f"- modifiers: `{', '.join(modifiers) if modifiers else 'none'}`",
+    ]
+    missing = [line for line in expected if line not in text]
+    if missing:
+        raise SystemExit(
+            "--derived-only budget arguments do not match the canonical plan record: " + "; ".join(missing)
+        )
+    _, budget_marker, budget_tail = text.partition("### Artifact Budget")
+    budget_body, modifier_marker, _ = budget_tail.partition("### Modifier Admission")
+    if not budget_marker or not modifier_marker:
+        raise SystemExit("--derived-only requires canonical Artifact Budget and Modifier Admission sections")
+    recorded_paths: list[str] = []
+    in_projected_paths = False
+    for line in budget_body.splitlines():
+        if line == "- projected_artifacts:":
+            in_projected_paths = True
+            continue
+        if in_projected_paths and line.startswith("  - `") and line.endswith("`"):
+            recorded_paths.append(line[len("  - `") : -1])
+    if recorded_paths != projected_paths:
+        raise SystemExit(
+            "--derived-only projected artifact manifest does not match the canonical plan record: "
+            f"recorded={recorded_paths!r}; requested={projected_paths!r}"
+        )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Initialize a phase subplan package")
     parser.add_argument("--root", required=True, help="Repo root")
@@ -339,15 +502,17 @@ def main() -> None:
     parser.add_argument("--auto-ingest", action="store_true", help="Auto-discover existing analysis reports under docs/ and create a domain ingest summary")
     parser.add_argument("--ingest-report", action="append", default=[], help="Report file or directory to ingest; may be repeated")
     parser.add_argument("--ingest-max-files", type=int, default=40, help="Maximum report files to ingest")
+    stage = parser.add_mutually_exclusive_group()
+    stage.add_argument("--canonical-only", action="store_true", help="Materialize only the canonical plan, canonical specs, and admitted ingest evidence")
+    stage.add_argument("--derived-only", action="store_true", help="Materialize derived README, phase/group docs, and handoff view from existing canonical artifacts")
+    parser.add_argument("--artifact-cap", type=int, default=DEFAULT_ARTIFACT_CAP, help=f"Maximum final manifest artifacts (default: {DEFAULT_ARTIFACT_CAP})")
+    parser.add_argument("--artifact-cap-reason", default="", help="Required nonempty reason when overriding the default artifact cap upward")
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
     package = root / "docs" / "plan" / args.package
     spec_dir = root / "docs" / "spec"
     dated_plan = root / args.dated_plan
-    package.mkdir(parents=True, exist_ok=True)
-    spec_dir.mkdir(parents=True, exist_ok=True)
-    dated_plan.parent.mkdir(parents=True, exist_ok=True)
 
     modifiers = [x.strip() for x in args.modifiers.split(",") if x.strip()]
     unknown_modifiers = [m for m in modifiers if m not in MODIFIERS]
@@ -357,27 +522,102 @@ def main() -> None:
     canonical = canonical_archetype(args.archetype)
     required_specs = required_specs_for(canonical, modifiers)
     release_blocking_specs = release_blocking_specs_for(canonical, modifiers)
-    derived_from_specs = render_derived_from_specs(args.slug, required_specs)
-    read_order = render_read_order(args.slug, required_specs)
-    checklist = render_checklist(args.slug, required_specs)
-    canonical_docs_table = render_canonical_docs_table(args.slug, required_specs, args.dated_plan)
-    validation_commands = render_validation_commands(args.package, args.slug, dated_plan, canonical, modifiers)
-    domain_context_path, domain_context_derived, domain_result = render_domain_context(
-        root,
-        package,
-        args.package,
-        args.ingest_report,
-        args.auto_ingest,
-        args.ingest_max_files,
-    )
     group_specs = build_group_specs(
         args.archetype,
         [x.strip() for x in args.phase_names.split(",") if x.strip()] if args.phase_names else None,
         args.phases,
     )
 
-    # Create phase directories
-    phase_order = unique_phase_names(group_specs)
+    write_canonical = not args.derived_only
+    write_derived = not args.canonical_only
+    ingest_path = package / "domain-ingest-summary.md"
+    domain_result = None
+    if args.derived_only:
+        if not ingest_path.exists():
+            domain_inputs = []
+        else:
+            domain_inputs = bound_domain_inputs(root, ingest_path)
+            explicitly_requested = [
+                path.resolve()
+                for path in resolve_domain_inputs(root, args.ingest_report, False, args.ingest_max_files)
+            ]
+            unbound = sorted(set(explicitly_requested) - set(domain_inputs), key=lambda path: str(path))
+            if unbound:
+                raise SystemExit(
+                    "--derived-only ingest inputs are not bound by the canonical-stage summary: "
+                    + ", ".join(str(path) for path in unbound)
+                )
+            domain_result = ingest(domain_inputs)
+        if (args.auto_ingest or args.ingest_report) and not domain_inputs:
+            raise SystemExit(
+                "--derived-only cannot introduce a new ingest summary; run --canonical-only with the ingest inputs first"
+            )
+    else:
+        domain_inputs = resolve_domain_inputs(root, args.ingest_report, args.auto_ingest, args.ingest_max_files)
+    include_ingest = bool(domain_inputs)
+    projected_paths = projected_artifact_paths(
+        root,
+        args.package,
+        args.slug,
+        dated_plan,
+        required_specs,
+        group_specs,
+        include_ingest,
+    )
+    cap_reason = normalize_cap_reason(args.artifact_cap_reason)
+    validate_artifact_budget(args.artifact_cap, cap_reason, projected_paths)
+
+    modifier_admission_rows, absorbed_modifiers = render_modifier_admission_rows(canonical, modifiers)
+    print(f"ARTIFACT_BUDGET_OK projected={len(projected_paths)} cap={args.artifact_cap}")
+    for modifier in absorbed_modifiers:
+        print(f"MODIFIER_ABSORBED_BY_ARCHETYPE {modifier}")
+
+    if args.derived_only:
+        validate_existing_budget_record(
+            dated_plan,
+            args.artifact_cap,
+            cap_reason,
+            canonical,
+            modifiers,
+            projected_paths,
+        )
+        missing_canonical = [
+            spec_dir / f"{args.slug}-{suffix}.md"
+            for suffix in required_specs
+            if suffix not in DERIVED_VIEW_SPECS and not (spec_dir / f"{args.slug}-{suffix}.md").exists()
+        ]
+        if missing_canonical:
+            raise SystemExit(
+                "--derived-only requires existing canonical specs: "
+                + ", ".join(str(path) for path in missing_canonical)
+            )
+
+    derived_from_specs = render_derived_from_specs(args.slug, required_specs)
+    read_order = render_read_order(args.slug, required_specs)
+    checklist = render_checklist(args.slug, required_specs)
+    canonical_docs_table = render_canonical_docs_table(args.slug, required_specs, args.dated_plan)
+    validation_commands = render_validation_commands(args.package, args.slug, dated_plan, canonical, modifiers)
+    domain_context_path = f"docs/plan/{args.package}/domain-ingest-summary.md" if include_ingest else ""
+    domain_context_derived = f'  - "{domain_context_path}"' if include_ingest else ""
+
+    # The budget check above is deliberately the last gate before any mkdir/write.
+    if write_canonical:
+        spec_dir.mkdir(parents=True, exist_ok=True)
+        dated_plan.parent.mkdir(parents=True, exist_ok=True)
+        if domain_inputs:
+            package.mkdir(parents=True, exist_ok=True)
+            domain_context_path, domain_context_derived, domain_result = render_domain_context(
+                root,
+                package,
+                args.package,
+                domain_inputs,
+            )
+    if write_derived:
+        package.mkdir(parents=True, exist_ok=True)
+
+    # Create phase directories only when materializing derived views.
+    rendered_group_specs = group_specs if write_derived else []
+    phase_order = unique_phase_names(rendered_group_specs)
     phase_orders = {phase: idx for idx, phase in enumerate(phase_order, start=1)}
     for phase in phase_order:
         (package / phase).mkdir(exist_ok=True)
@@ -387,9 +627,8 @@ def main() -> None:
     group_entries: list[str] = []
     phase_index_lines: list[str] = []
     grouped_for_index: OrderedDict[str, list[str]] = OrderedDict((phase, []) for phase in phase_order)
-    for idx, spec in enumerate(group_specs, start=1):
-        fname = f"Group{idx}-{slugify_title(spec.title).replace('-', ' ').title().replace(' ', '-')}.md"
-        rel = f"{spec.phase}/{fname}"
+    for idx, spec in enumerate(rendered_group_specs, start=1):
+        rel = group_relative_path(idx, spec)
         path = package / rel
         group_paths.append(path)
         grouped_for_index[spec.phase].append(rel)
@@ -427,6 +666,7 @@ def main() -> None:
                 "CRITICAL_GAP": spec.critical_gap or "Critical gap to be identified.",
                 "FIRST_STEP": spec.first_step or "Inspect the relevant canonical contracts and current code assets.",
                 "PRIMARY_CONTRACT": primary_contract,
+                "GROUP_EVIDENCE_PATH": domain_context_path or args.dated_plan,
                 "GROUP_VALIDATION_COMMAND": validation_commands.splitlines()[2],
                 "PROHIBITED_SHORTCUTS": markdown_list(spec.prohibited_shortcuts or ["Do not bypass canonical contracts to make the group appear complete."]),
             },
@@ -439,8 +679,13 @@ def main() -> None:
         phase_index_lines.append(f"- `{phase}`\n{bullets}")
 
     # Spec docs
-    spec_entries: list[str] = []
+    spec_entries = [f"`{spec_path(args.slug, suffix)}`" for suffix in required_specs]
     for suffix in required_specs:
+        is_derived_view = suffix in DERIVED_VIEW_SPECS
+        if is_derived_view and not write_derived:
+            continue
+        if not is_derived_view and not write_canonical:
+            continue
         template_name = {
             "capability-map": "capability-map-template.md",
             "algorithm-inventory": "algorithm-inventory-template.md",
@@ -519,58 +764,87 @@ def main() -> None:
             },
         )
         path.write_text(text, encoding="utf-8")
-        spec_entries.append(f"`docs/spec/{path.name}`")
 
     # README
-    active_group = "group-1"
-    active_spec = group_specs[0] if group_specs else GroupSpec("Phase1", "Active Group")
-    active_relevant = filter_relevant_specs(active_spec, required_specs)
-    readme_text = render(
-        load_template("package-readme-template.md"),
-        {
-            "PACKAGE_TITLE": args.package,
-            "PACKAGE_DIR_NAME": args.package,
-            "CANONICAL_PLAN_PATH": args.dated_plan,
-            "ARCHETYPE": canonical,
-            "MODIFIERS": ", ".join(modifiers) if modifiers else "none",
-            "VALIDATION_MODIFIERS_ARG": f' --modifiers "{",".join(modifiers)}"' if modifiers else "",
-            "SLUG": args.slug,
-            "PHASE_INDEX": "\n".join(phase_index_lines),
-            "GROUP_INDEX": markdown_list(group_entries),
-            "DEPENDENCY_GRAPH": render_dependency_graph(group_specs),
-            "SPEC_INDEX": markdown_list(spec_entries),
-            "DATED_PLAN_BASENAME": dated_plan.name,
-            "DERIVED_FROM_SPECS": derived_from_specs,
-            "DOMAIN_INGEST_DERIVED_FROM": domain_context_derived,
-            "CANONICAL_DOCS_TABLE": canonical_docs_table,
-            "READ_ORDER": read_order,
-            "VALIDATION_COMMANDS": validation_commands,
-            "DOMAIN_CONTEXT_PATH": domain_context_path,
-            "ACTIVE_GROUP": active_group,
-            "ACTIVE_GOAL": active_spec.title,
-            "ACTIVE_MUST_READ": ", ".join(spec_path(args.slug, suffix) for suffix in active_relevant),
-            "ACTIVE_BLOCKING_CONTRACTS": ", ".join(spec_path(args.slug, suffix) for suffix in active_relevant if suffix in release_blocking_specs),
-            "ACTIVE_FIRST_FILE": "inspect current code assets referenced by the active group",
-            "ACTIVE_FIRST_ARTIFACT": "group-specific evidence artifact named in Acceptance Criteria",
-            "ACTIVE_STOP_CONDITION": "stop if a required contract, dependency, or blocking interface is unresolved",
-            "TARGET_MODULE_STRUCTURE": render_target_module_structure(canonical),
-        },
-    )
-    (package / "README.md").write_text(readme_text, encoding="utf-8")
+    if write_derived:
+        active_group = "group-1"
+        active_spec = group_specs[0] if group_specs else GroupSpec("Phase1", "Active Group")
+        active_relevant = filter_relevant_specs(active_spec, required_specs)
+        if domain_context_path:
+            domain_context_purpose = f"- Domain ingest summary: `{domain_context_path}`"
+            domain_context_quickstart = (
+                f"5. If domain details look thin, open `{domain_context_path}` before editing contracts."
+            )
+            domain_context_section = "\n".join(
+                [
+                    f"- Derived ingest summary: `{domain_context_path}`",
+                    "- This file is derived evidence, not canonical truth.",
+                    "- Use it to fill Purpose, Current State, Target State, Acceptance Criteria, and TODOs with domain-specific content.",
+                ]
+            )
+        else:
+            domain_context_purpose = "- No domain ingest summary was generated because no report input was admitted."
+            domain_context_quickstart = (
+                "5. If domain details look thin, inspect the source/evidence named by the canonical plan."
+            )
+            domain_context_section = (
+                "- No derived ingest summary is part of this manifest; add one only when an actual report input is admitted."
+            )
+        readme_text = render(
+            load_template("package-readme-template.md"),
+            {
+                "PACKAGE_TITLE": args.package,
+                "PACKAGE_DIR_NAME": args.package,
+                "CANONICAL_PLAN_PATH": args.dated_plan,
+                "ARCHETYPE": canonical,
+                "MODIFIERS": ", ".join(modifiers) if modifiers else "none",
+                "VALIDATION_MODIFIERS_ARG": f' --modifiers "{",".join(modifiers)}"' if modifiers else "",
+                "SLUG": args.slug,
+                "PHASE_INDEX": "\n".join(phase_index_lines),
+                "GROUP_INDEX": markdown_list(group_entries),
+                "DEPENDENCY_GRAPH": render_dependency_graph(group_specs),
+                "SPEC_INDEX": markdown_list(spec_entries),
+                "DATED_PLAN_BASENAME": dated_plan.name,
+                "DERIVED_FROM_SPECS": derived_from_specs,
+                "DOMAIN_INGEST_DERIVED_FROM": domain_context_derived,
+                "CANONICAL_DOCS_TABLE": canonical_docs_table,
+                "READ_ORDER": read_order,
+                "VALIDATION_COMMANDS": validation_commands,
+                "DOMAIN_CONTEXT_PURPOSE": domain_context_purpose,
+                "DOMAIN_CONTEXT_QUICKSTART": domain_context_quickstart,
+                "DOMAIN_CONTEXT_SECTION": domain_context_section,
+                "ACTIVE_GROUP": active_group,
+                "ACTIVE_GOAL": active_spec.title,
+                "ACTIVE_MUST_READ": ", ".join(spec_path(args.slug, suffix) for suffix in active_relevant),
+                "ACTIVE_BLOCKING_CONTRACTS": ", ".join(spec_path(args.slug, suffix) for suffix in active_relevant if suffix in release_blocking_specs),
+                "ACTIVE_FIRST_FILE": "inspect current code assets referenced by the active group",
+                "ACTIVE_FIRST_ARTIFACT": "group-specific evidence artifact named in Acceptance Criteria",
+                "ACTIVE_STOP_CONDITION": "stop if a required contract, dependency, or blocking interface is unresolved",
+                "TARGET_MODULE_STRUCTURE": render_target_module_structure(canonical),
+            },
+        )
+        (package / "README.md").write_text(readme_text, encoding="utf-8")
 
     # Canonical dated plan
-    dated_plan_text = render(
-        load_template("canonical-dated-plan-template.md"),
-        {
-            "PLAN_TITLE": args.package,
-            "PACKAGE_PATH": f"docs/plan/{args.package}",
-            "ARCHETYPE": canonical,
-            "MODIFIERS": ", ".join(modifiers) if modifiers else "none",
-            "VALIDATION_COMMANDS": validation_commands,
-            "DOMAIN_CONTEXT_PATH": domain_context_path,
-        },
-    )
-    dated_plan.write_text(dated_plan_text, encoding="utf-8")
+    if write_canonical:
+        dated_plan_text = render(
+            load_template("canonical-dated-plan-template.md"),
+            {
+                "PLAN_TITLE": args.package,
+                "PACKAGE_PATH": f"docs/plan/{args.package}",
+                "ARCHETYPE": canonical,
+                "MODIFIERS": ", ".join(modifiers) if modifiers else "none",
+                "VALIDATION_COMMANDS": validation_commands,
+                "DOMAIN_CONTEXT_PATH": domain_context_path or "none (no admitted ingest input)",
+                "DEFAULT_ARTIFACT_CAP": str(DEFAULT_ARTIFACT_CAP),
+                "ARTIFACT_CAP": str(args.artifact_cap),
+                "PROJECTED_ARTIFACT_COUNT": str(len(projected_paths)),
+                "ARTIFACT_CAP_REASON": cap_reason or "none",
+                "PROJECTED_ARTIFACTS": render_projected_artifacts(projected_paths),
+                "MODIFIER_ADMISSION_ROWS": modifier_admission_rows,
+            },
+        )
+        dated_plan.write_text(dated_plan_text, encoding="utf-8")
 
     print(package)
     print(dated_plan)

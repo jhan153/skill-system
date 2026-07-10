@@ -1,0 +1,3 @@
+command: python3 <installed-skill>/scripts/validate_phase_plan_package.py --root . --package PaymentEngineReplacement --slug payment-engine-replacement --dated-plan docs/plan/2026-07-10-payment-engine-replacement.md --archetype migration-modernization --modifiers strict-behavior-parity,rollback-required,data-sensitive,security-sensitive,cross-session-handoff,legacy-parity
+stdout: VALIDATION_OK
+exit_code: 0

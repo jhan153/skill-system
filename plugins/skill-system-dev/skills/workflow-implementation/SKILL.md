@@ -1,6 +1,6 @@
 ---
 name: workflow-implementation
-description: Primary workflow for direct software implementation. Use when the user asks Codex to build, change, add tests, wire APIs, update scripts, or make repo code/config changes from current requirements. Do not use for behavior-preserving refactors, concrete bug fixes, approved plan execution, or repeated failure recovery.
+description: Primary workflow for direct software implementation. Use when the user requests building, changing, adding tests, wiring APIs, updating scripts, or making repo code/config changes from current requirements. Do not use for behavior-preserving refactors, concrete bug fixes, approved plan execution, or repeated failure recovery.
 ---
 
 # Workflow Implementation

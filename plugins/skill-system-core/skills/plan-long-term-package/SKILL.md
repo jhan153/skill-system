@@ -66,13 +66,21 @@ Admit one layer at a time and stop when the next decision is supported:
 
 If validation fails, inspect the validator message and failing document first. Never recover by sweeping the repo, memory, prior plans, or template library.
 
+## Artifact Budget And Modifier Gate
+- The default cap is 20 artifacts in the final manifest. Count the canonical plan, every required `docs/spec/` artifact, README, every phase/group doc, and one ingest summary only when at least one real report/plan input is admitted. Delayed artifacts still count.
+- Run the manifest preflight before any package mkdir or write. A higher cap is valid only when the canonical plan records the projected count, complete projected path list, and a nonempty explicit override reason.
+- For every modifier, cite the claim-ledger IDs that justify it and compute both its artifact delta and release-blocking delta against the selected archetype. When both are zero, record `absorbed-by-archetype`; do not invent a new document or gate.
+- Prefer the archetype that directly owns the primary work and required risk contracts when two candidates fit. Do not choose a narrow artifact set by dropping a requested parity, rollback, security, data, or handoff condition.
+- Once a modifier is selected, keep the full `required_specs_for` union and final validator contract. Never omit a modifier-required document merely to fit the cap.
+- If the projected manifest still exceeds 20, reconsider the archetype/modifier evidence first. Otherwise stop before writing until the user request or an accepted decision explicitly authorizes a higher cap and states why each added artifact is needed.
+
 ## Deterministic Package Workflow
 1. Record one `archetype`, zero or more modifiers, package slug, current planning state, and a claim ledger that grades each scope-shaping statement.
-2. Compute the required contract set as the de-duplicated union of archetype docs, modifier docs, and universal docs. Record it before generation; do not add contracts merely because a template exists.
+2. Compute modifier deltas, the de-duplicated archetype/modifier/universal contract union, and the complete final-manifest budget. Pass the default-cap or explicit-override preflight before any mkdir/write.
 3. Build an authority map for scope, state names, interfaces, release gates, and execution status. Give each concern exactly one canonical owner.
 4. Ingest only cited, relevant analysis or prior plans. Mark the ingest summary as derived evidence and retain source pointers.
-5. Scaffold with `scripts/init_phase_plan_package.py`; then replace placeholders from admitted evidence.
-6. Fill canonical specs before derived README/phase text. Generate in manifest order and keep stable IDs/paths when updating an existing package.
+5. Scaffold the canonical plan, canonical specs, and any admitted ingest evidence with `scripts/init_phase_plan_package.py --canonical-only`; then replace placeholders from admitted evidence in 1-3 artifact batches.
+6. After canonical owners, IDs, and gates are stable, materialize README, phase/group docs, and the procedural handoff view once with `--derived-only`. Reuse the exact archetype, modifiers, phase topology, ingest binding, artifact cap, and projected manifest recorded by the canonical stage; drift must fail before a derived write. The no-flag full scaffold remains a compatibility path, not the default authoring path.
 7. Decompose by independently verifiable concern, not document count. Make hard predecessors explicit.
 8. Reconcile every derived statement to its canonical owner, then validate and report remaining unknowns as `Unverified` or blockers.
 
@@ -84,6 +92,7 @@ Freeze these entries before content generation:
 - `phase_docs`: concern-based phase/group paths with stable order and dependencies
 - `contract_docs`: selected canonical `docs/spec/` paths and owning concerns
 - `domain_ingest_summary`: required when relevant prior analysis or plans exist
+- `artifact_budget`: default/effective cap, projected count, complete projected paths, modifier deltas, and override reason or `none`
 - `claim_ledger`: canonical-plan section mapping material claims to grade, source, impact, and unresolved decision
 - `validation_modes`: default plus any justified `strict`, `strict-handoff`, or `quality-lint`
 
@@ -106,6 +115,7 @@ Do not finalize scaffold-only prose, empty placeholders, vague verbs, or accepta
 ## Quality Gates
 - **Admission:** explicit package intent and bounded scope are present.
 - **Manifest:** one archetype is selected; modifier/universal unions match the artifact set; every canonical concern has one owner.
+- **Budget:** final-manifest preflight passes before writes; any cap increase has an explicit nonempty reason, and absorbed modifiers add neither docs nor gates.
 - **Evidence:** every scope-shaping claim is graded in the claim ledger; inferred or unavailable facts cannot silently become requirements.
 - **Execution:** each phase satisfies the implementation-ready contract, has no untracked hard predecessor, and closes its blocking behavior oracles rather than merely creating documents.
 - **Anti-drift:** UI states, global status, approval, interfaces, and release gates are defined only by their canonical owners.
@@ -121,6 +131,8 @@ Run `scripts/validate_phase_plan_package.py` after every package update. Add:
 - `--write-validation-stamp` only after a passing run.
 
 Run `scripts/self_test_phase_plan_package.py` only after changing this skill's scripts, schema, catalog, or templates. Do not report runtime behavior as validated from document checks alone.
+
+Canonical-only staging is not a validated package and cannot create `package_planned`. Run the normal full-package validator only after derived materialization is complete.
 
 ## Reporting Contract
 Report, in order:

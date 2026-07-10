@@ -1,4 +1,4 @@
-version: "9.1.0"
+version: "9.1.1"
 purpose: "Requests that should not trigger heavy or wrong skills."
 cases:
   - case_id: neg-001

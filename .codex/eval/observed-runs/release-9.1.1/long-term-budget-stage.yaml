@@ -1,0 +1,83 @@
+run_id: 019f4dae-4cc6-73c1-ace3-ac1893716449
+case_id: solar-911-long-term-budget-stage-001
+host: codex
+host_version: codex-cli 0.144.0-alpha.4
+model: gpt-5.6-sol
+model_version: gpt-5.6-sol
+bundle_version: "9.1.1"
+started_at: "2026-07-10T20:18:16Z"
+observed_route: plan-long-term-package
+observed_behaviors:
+  - select_migration_archetype_for_engine_replacement
+  - keep_projected_manifest_within_default_cap
+  - record_absorbed_modifier_delta
+  - materialize_canonical_before_derived
+  - omit_empty_ingest_summary
+artifacts:
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/final-output.md
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/invocation-receipt.json
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/stage-receipt.md
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/canonical-plan.md
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/package-readme.md
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/artifact-inventory.json
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/validator-receipt.txt
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/qualitative-review-long-term.md
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/freshness-receipt.json
+verification:
+  - type: route_match
+    value: plan-long-term-package
+    checked_at: "2026-07-10T20:23:03Z"
+  - type: model_identity
+    value: gpt-5.6-sol
+    checked_at: "2026-07-10T20:23:03Z"
+  - type: command_exit
+    command: python3 plan-long-term-package/scripts/validate_phase_plan_package.py --root . --package PaymentEngineReplacement --slug payment-engine-replacement --dated-plan docs/plan/2026-07-10-payment-engine-replacement.md --archetype migration-modernization --modifiers strict-behavior-parity,rollback-required,data-sensitive,security-sensitive,cross-session-handoff,legacy-parity
+    exit_code: 0
+    checked_at: "2026-07-10T20:20:19Z"
+  - type: artifact_count
+    value: 19
+    checked_at: "2026-07-10T20:23:03Z"
+  - type: ingest_count
+    value: 0
+    checked_at: "2026-07-10T20:23:03Z"
+  - type: stage_order
+    value: pass
+    checked_at: "2026-07-10T20:23:03Z"
+  - type: fresh_artifact_set
+    value: pass
+    checked_at: "2026-07-10T20:23:03Z"
+  - type: qualitative_review
+    value: pass
+    reviewer: /root/review_longterm_911
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/final-output.md
+    reviewed_sha256: 19c0c53c19950403eddb4f6fb47ceb94dd69f1cf4cc22e80d5591ff3cfcbd6af
+    review_artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/qualitative-review-long-term.md
+    checked_at: "2026-07-10T20:23:03Z"
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/final-output.md
+    sha256: 19c0c53c19950403eddb4f6fb47ceb94dd69f1cf4cc22e80d5591ff3cfcbd6af
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/invocation-receipt.json
+    sha256: 7f313e4e66ea1edc09d35a17419cc69ee8225c5d76b0b5c0e5914d9773a76a63
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/stage-receipt.md
+    sha256: ed89dbd01b6cf8059fc100833e6f054773d1ccb0f31a7e798da50361db0a3d79
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/canonical-plan.md
+    sha256: c8c47f9904a7f040a2ca301ab465428f2fcd8b570d9984a93f31da3c3ab169d9
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/package-readme.md
+    sha256: 3f98cbff1dd2c96ced2b8680b14a791988016d011cc282d1f30c7f50601b5f8b
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/artifact-inventory.json
+    sha256: 825558a7b3ffa69fb96605c183e8f315cb3d041ebb7308e491cfdffab49cdd99
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/long-term/validator-receipt.txt
+    sha256: 480fcbc72b423062ec03a0f535384969f70d2c244ddf1fb5a0825c0cfeb4650b
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/qualitative-review-long-term.md
+    sha256: 4d2093b9a4086256844986d75cf120ecd1271606fe9f9589c58a08e97acb30d2
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/freshness-receipt.json
+    sha256: 0ca0474c693bffff21bd193a1b863356605914c1c19263f2c91929eef09b2c4f
+result: pass

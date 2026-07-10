@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.1.0 Skill Bundle
+## 9.1.1 Skill Bundle
 
-This repository includes the skill bundle organized for version 9.1.0 (the 7.3.1 bundle remains the compatibility baseline; see the 9.x direction note below). Its main components are:
+This repository includes the skill bundle organized for version 9.1.1 (the 7.3.1 bundle remains the compatibility baseline; see the 9.x direction note below). Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -25,7 +25,7 @@ This repository includes the skill bundle organized for version 9.1.0 (the 7.3.1
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current release is `9.1.0 — Canonical Quality, Harness Hardening & Skill Consolidation`, following the latest published tag, `v9.0.2`.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current release is `9.1.1 — Patch Safety & Evidence Hardening`, following the published `v9.1.0` tag.
 
 `7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 skill bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
 
@@ -260,6 +260,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.0.1 | Dev plugin skill expansion | Expands the `skill-system-dev` engineering role beyond the initial 9.0.0 cut with concrete execution-owner and analysis skills (`analysis-architecture-deepening`, `analysis-codebase-design`, `analysis-domain-modeling`, `analysis-performance`, `workflow-implementation`, `workflow-bug-fix`, `workflow-dependency-upgrade`, `workflow-refactor-safely`, `workflow-source-maintenance`, `workflow-comment-maintenance`), adding `source_maintenance_execution` / `comment_maintenance_execution` work-horizon modes plus routing, registry, and runtime/negative eval coverage. Skill count 58 → 68; targets regenerated and integrity-verified. |
 | 9.0.2 | Legacy template cleanup | Template-hygiene and output-quality maintenance cut after 9.0.1: removes toy C++ before/after examples from the short-term plan template and `plan-short-term-docs` evidence rule, propagates the `plan-short-term-docs` diagram policy to `workflow-rigor` and `report-critical` (no default plan-lifecycle/approval/agent-workflow diagrams), makes the long-term `ui-state-contract` transition diagram conditional on real transitions, and converts `analysis-codebase` `report.py` unverified fallback diagrams (subsystem/path/class/metric) to plain text notices. Bundle version bumped to 9.0.2; targets regenerated and integrity-verified. |
 | 9.1.0 | Canonical quality, harness hardening & skill consolidation | Consolidates the canonical surface from 71 to 66 skills, hardens schema-v2 hook evidence and the observe-default Recovery Guard, adds planning determinism and token-cost controls, and aligns the release identity after `v9.0.2`. Claude-specific standalone compatibility follow-up is deferred to 9.1.1. |
+| 9.1.1 | Patch safety & evidence hardening | Makes dev routing metadata host-neutral, moves hook evidence to durable per-run ledgers, fails C/C++ reports closed without semantic structure evidence, caps and stages long-term packages, removes the Kanboard pytest-absence SKIP, and reports Recovery Guard/output-gate modes independently. Compatibility changes are called out in `CHANGELOG.md`. |
 
 ## License
 

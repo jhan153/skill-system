@@ -1,0 +1,66 @@
+run_id: 019f4d54-21a8-7cf3-9b4f-3b731d261d83
+case_id: solar-911-cpp-fail-closed-001
+host: codex
+host_version: codex-cli 0.144.0-alpha.4
+model: gpt-5.6-sol
+model_version: gpt-5.6-sol
+bundle_version: "9.1.1"
+started_at: "2026-07-10T18:39:47Z"
+observed_route: analysis-codebase
+observed_behaviors:
+  - report_cpp_semantic_depth_not_evidenced
+  - fail_quality_gate_for_missing_cpp_structural_evidence
+  - preserve_include_and_build_hints_as_file_level_only
+artifacts:
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/cpp/final-output.md
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/cpp/invocation-receipt.json
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/cpp/quality-gate-result.json
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/cpp/codebase-analysis-report.md
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/qualitative-review-a.md
+  - .codex/eval/observed-runs/release-9.1.1/artifacts/freshness-receipt.json
+verification:
+  - type: route_match
+    value: analysis-codebase
+    checked_at: "2026-07-10T18:52:50Z"
+  - type: model_identity
+    value: gpt-5.6-sol
+    checked_at: "2026-07-10T18:52:50Z"
+  - type: command_exit
+    command: python3 analysis-codebase/scripts/report.py --input-dir report-output --output report-output/codebase-analysis-report.md
+    exit_code: 2
+    checked_at: "2026-07-10T18:46:23Z"
+  - type: cpp_semantic_depth
+    value: not_evidenced
+    checked_at: "2026-07-10T18:52:50Z"
+  - type: gate_status
+    value: FAIL
+    checked_at: "2026-07-10T18:52:50Z"
+  - type: fresh_artifact_set
+    value: pass
+    checked_at: "2026-07-10T18:52:50Z"
+  - type: qualitative_review
+    value: pass
+    reviewer: /root/review_forward_a
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/cpp/final-output.md
+    reviewed_sha256: ba35c061b1e5ec0217d5b53fc16291ec3a010777faf22d706e8351ba70e14dd2
+    review_artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/qualitative-review-a.md
+    checked_at: "2026-07-10T18:52:50Z"
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/cpp/final-output.md
+    sha256: ba35c061b1e5ec0217d5b53fc16291ec3a010777faf22d706e8351ba70e14dd2
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/cpp/invocation-receipt.json
+    sha256: abe11ed965614300cc5743ed74728d0bf229dc957b3d1223e2b27a12a47c3ac6
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/cpp/quality-gate-result.json
+    sha256: 14ae3b99c075ba336cc43440b009fd879dd9280ba3c664e96d37e81f3db36930
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/cpp/codebase-analysis-report.md
+    sha256: 7c6e32f7de15ed693b3ca86712ddb631f27999540ca4fc70fa14c0d478a4ed86
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/qualitative-review-a.md
+    sha256: 82c5220d1a7022dafdf6a83d6436a332db61e9d6bebcf460c2d83a749dccd82e
+  - type: artifact_sha256
+    artifact: .codex/eval/observed-runs/release-9.1.1/artifacts/freshness-receipt.json
+    sha256: 0ca0474c693bffff21bd193a1b863356605914c1c19263f2c91929eef09b2c4f
+result: pass

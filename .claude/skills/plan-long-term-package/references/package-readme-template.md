@@ -19,7 +19,7 @@ derived_from:
 ## Purpose
 - Planning package entrypoint for `{{PACKAGE_TITLE}}`
 - Navigation only
-- Domain ingest summary: `{{DOMAIN_CONTEXT_PATH}}`
+{{DOMAIN_CONTEXT_PURPOSE}}
 
 ## Derived Status Notice
 - This README is a **derived navigation document**.
@@ -31,13 +31,11 @@ derived_from:
 2. Read the Active Implementation Card.
 3. Open the active phase/group doc.
 4. Open only the relevant specs listed by that group.
-5. If domain details look thin, open `{{DOMAIN_CONTEXT_PATH}}` before editing contracts.
+{{DOMAIN_CONTEXT_QUICKSTART}}
 6. Use Canonical Read Order when changing scope, state, interfaces, or gates.
 
 ## Domain Context Inputs
-- Derived ingest summary: `{{DOMAIN_CONTEXT_PATH}}`
-- This file is derived evidence, not canonical truth.
-- Use it to fill Purpose, Current State, Target State, Acceptance Criteria, and TODOs with domain-specific content.
+{{DOMAIN_CONTEXT_SECTION}}
 
 ## Canonical Documents
 {{CANONICAL_DOCS_TABLE}}

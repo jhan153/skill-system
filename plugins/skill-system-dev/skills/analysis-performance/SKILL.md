@@ -1,6 +1,6 @@
 ---
 name: analysis-performance
-description: Performance analysis for software systems. Use when Codex must diagnose latency, throughput, memory, CPU, query, bundle, rendering, startup, or algorithmic bottlenecks with measurements or scoped evidence before recommending or applying optimizations.
+description: Performance analysis for software systems. Use when a task requires diagnosing latency, throughput, memory, CPU, query, bundle, rendering, startup, or algorithmic bottlenecks with measurements or scoped evidence before recommending or applying optimizations.
 ---
 
 # Analysis Performance

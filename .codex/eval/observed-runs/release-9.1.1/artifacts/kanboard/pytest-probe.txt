@@ -1,0 +1,5 @@
+interpreter=/opt/homebrew/opt/python@3.14/bin/python3.14
+pytest_probe=ModuleNotFoundError: No module named 'pytest'
+pytest_probe_exit_status=1
+yaml_version=6.0.3
+yaml_import_exit_status=0

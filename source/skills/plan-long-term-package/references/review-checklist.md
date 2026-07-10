@@ -10,6 +10,10 @@
 - [ ] skill-internal changes pass `scripts/self_test_phase_plan_package.py`
 - [ ] every planning doc has required front matter
 - [ ] every generated group doc has numeric `phase_order`
+- [ ] final-manifest count is at or below 20, or the canonical plan records the explicit higher cap, nonempty reason, projected count, and complete path list
+- [ ] every modifier records artifact/release-blocking deltas; `0/0` modifiers are marked `absorbed-by-archetype`
+- [ ] no empty ingest summary exists when no report/prior-plan input was admitted
+- [ ] derived views were materialized after canonical owners and full validation ran only after both stages
 
 ## Anti-Drift
 - [ ] UI states are defined only once

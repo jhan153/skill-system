@@ -1,6 +1,6 @@
 ---
 name: workflow-refactor-safely
-description: Behavior-preserving refactoring workflow. Use when Codex must rename, move, extract, collapse, simplify, or restructure code while preserving observable behavior, with characterization checks, small batches, and validation before any feature or bug-fix changes.
+description: Behavior-preserving refactoring workflow. Use when a task requires renaming, moving, extracting, collapsing, simplifying, or restructuring code while preserving observable behavior, with characterization checks, small batches, and validation before any feature or bug-fix changes.
 ---
 
 # Workflow Refactor Safely

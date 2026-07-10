@@ -50,6 +50,7 @@
 12. 보안 스캔 후보: upstream severity는 보수적 triage를 위해 유지할 수 있으나 단일 정적 스캔은 grade `B`, `verification-needed`이며 적용 가능성/도달성/배포 버전을 확인함
 13. `Unverified` 비율: `unverified / (confirmed findings + unverified review items)`로 계산하여 finding이 0인 비교 공백도 0으로 숨기지 않음
 14. 확인된 의미 계약 차이: non-intentional `semantic-contract` finding의 high/critical 수가 전용 임계값을 넘으면 migration/release gate를 FAIL
+15. C/C++ 구조 근거 게이트: 포함된 C/C++ 파일이 있지만 compilation-aware symbol/class/call index가 없으면 `c_cpp_structural_evidence=not_evidenced`로 FAIL. include/build coupling은 파일 수준 힌트일 뿐 구조 근거로 승격하지 않음
 
 ## 권한 차단/실행 실패 처리
 - 권한 문제로 수집이 차단되면 해당 트랙은 `Unverified`로 계산합니다.
@@ -74,7 +75,9 @@
     "missing_architecture_views": 0,
     "fallback_diagrams": 1,
     "diagrams_without_provenance": 0,
-    "runtime_views_without_entrypoint": 0
+    "runtime_views_without_entrypoint": 0,
+    "c_cpp_structural_evidence": "not_applicable",
+    "c_cpp_file_count": 0
   },
   "applied_thresholds": {
     "security_critical_max": 0,

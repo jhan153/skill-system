@@ -9,6 +9,14 @@ Read this when creating, refilling, or validating a long-term planning package.
 - Required `docs/spec/` contracts from the chosen archetype plus modifiers
 - `docs/plan/<PlanPackage>/domain-ingest-summary.md` when existing analysis, report, or prior plan docs are available
 
+## Budget Preflight And Staging
+- Default to 20 paths in the complete final manifest. Count the canonical plan, required spec union, README, every group, and an ingest summary only when real source inputs were admitted.
+- Run the preflight before any mkdir/write. Increase `--artifact-cap` only with a nonempty `--artifact-cap-reason`; preserve that reason, projected count, and projected paths in the canonical plan.
+- Use `--canonical-only` first. It writes the canonical plan, canonical specs, and admitted ingest evidence but not README, groups, or the procedural handoff index.
+- Fill and reconcile canonical owners, then use `--derived-only` with the same selection and budget arguments. The initializer must exact-match the canonical archetype, modifiers, projected path order, phase topology, ingest presence, cap, and override reason before the first derived write; it must not overwrite canonical artifacts.
+- When the canonical stage admitted report inputs, derive group evidence by restoring the exact source paths bound in `domain-ingest-summary.md`. Reject missing, empty, stale, or newly supplied unbound sources instead of silently degrading to generic group text.
+- The no-flag command remains a full-scaffold compatibility path. It still uses the same final-manifest budget.
+
 ## Existing Analysis Ingest
 Before generating or refilling a package, ingest only relevant existing analysis reports and prior planning docs.
 
@@ -21,6 +29,7 @@ python3 scripts/init_phase_plan_package.py ... --ingest-report docs/codebase-int
 
 Rules:
 - Treat the ingest summary as derived evidence, not canonical truth.
+- Do not create an empty ingest summary when no input report or prior plan was admitted.
 - Use cited source lines from `domain-ingest-summary.md` to fill canonical specs and group Purpose/Current State/Target State/Acceptance Criteria.
 - If existing reports are available but generated package sections remain empty or generic, report the package as scaffold-only.
 - Run `--quality-lint` when handoff readability matters.

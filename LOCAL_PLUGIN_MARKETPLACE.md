@@ -40,7 +40,7 @@ each asset class is delivered. The rule holds for both ecosystems:
 | Plugin manifest | `.codex-plugin/plugin.json` | `.claude-plugin/plugin.json` | generated per package |
 | Marketplace catalog | `.agents/plugins/marketplace.json` | `plugins/.claude-plugin/marketplace.json` | generated |
 | Hooks | `.codex/hooks.json` + `.codex/hooks/` | `.claude/hooks/claude_hook_adapter.py` | **Runtime companion** — `settings.json`, opt-in, NOT via plugin install |
-| Hook evidence ledger | `.codex/tools/hook_runtime.py` | Claude adapter imports the same `hook_runtime` | shared hash-chained ledger |
+| Hook evidence ledger | `.codex/tools/hook_runtime.py` | Claude adapter imports the same `hook_runtime` | shared hash-chained backend; durable per-run files by default |
 | Runtime docs / rules / schemas | `.codex/...` | `.claude/...` | runtime companion |
 | MCP integration | `integrations/kanboard-plan-sync` | same (MCP is runtime-agnostic) | separate integration, not in plugins |
 | Slash commands / subagents | — | supported by Claude, unused here | bundle expresses everything as skills |
@@ -274,9 +274,9 @@ and must be reviewed before they run, exactly like the Codex side.
 The Claude hook is `.claude/hooks/claude_hook_adapter.py`, the counterpart of the
 Codex `hooks.json` adapter:
 
-- **Observational by default** — records lifecycle events into the *same*
-  hash-chained evidence ledger as Codex (`.codex/tools/hook_runtime.py`), then
-  always allows stop.
+- **Observational by default** — records lifecycle events through the same
+  hash-chained evidence backend as Codex (`.codex/tools/hook_runtime.py`) into a
+  durable per-session fallback file, then always allows stop.
 - **Opt-in strict block** — set `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict` to block a
   stop when the final message claims `agent-verified` but a tool result errored
   with no later success (transcript-derived, fail-open).

@@ -1,0 +1,10 @@
+section	reason
+git.commit_range	Unable to resolve commit range automatically
+git.churn	Commit range unresolved
+git.recent_commits	Failed to collect recent commits
+static.coverage	Coverage file not found (coverage.xml or coverage/lcov.info)
+static.semgrep	semgrep command not found
+static.sca	dependency-check.sh not found
+dynamic.workload	CBIR_WORKLOAD_CMD not set
+dynamic.trace	CBIR_TRACE_FILE not provided
+dynamic.latency	CBIR_LATENCY_CSV not provided

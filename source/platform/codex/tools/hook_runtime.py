@@ -8,7 +8,6 @@ import hashlib
 import json
 import os
 import sys
-import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -37,17 +36,53 @@ NEUTRAL_EVENTS = {
 SUPPORT_LEVELS = {"native", "approximate", "unsupported"}
 STATUSES = {"pass", "warn", "fail", "skip"}
 ZERO_HASH = "0" * 64
+FALLBACK_LEDGER_NAME = "hook-events.jsonl"
+STANDALONE_RUN_ID = "standalone"
+RECOVERY_GUARD_DISABLED = {"0", "false", "off", "no", "none", "disabled"}
+RECOVERY_GUARD_AUDIT = {"audit", "strict", "block"}
 
 
-def default_ledger() -> Path:
+def configured_ledger() -> Path | None:
     configured = os.environ.get("SKILL_SYSTEM_HOOK_LEDGER")
     if configured:
         return Path(configured)
-    return Path(tempfile.gettempdir()) / "skill-system-hook-events.jsonl"
+    return None
+
+
+def default_ledger_root() -> Path:
+    codex_home = os.environ.get("CODEX_HOME") or str(Path.home() / ".codex")
+    return Path(codex_home).expanduser() / "harness" / "hook-ledgers"
+
+
+def stable_run_key(run_id: str) -> str:
+    value = str(run_id or "") or STANDALONE_RUN_ID
+    return hashlib.sha256(value.encode("utf-8", errors="replace")).hexdigest()
+
+
+def default_ledger(run_id: str = "") -> Path:
+    configured = configured_ledger()
+    if configured is not None:
+        return configured
+    effective_run_id = run_id or os.environ.get("SKILL_SYSTEM_RUN_ID", "") or STANDALONE_RUN_ID
+    return default_ledger_root() / stable_run_key(effective_run_id) / FALLBACK_LEDGER_NAME
 
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def agent_output_gate_mode() -> str:
+    value = os.environ.get("SKILL_SYSTEM_AGENT_OUTPUT_GATE", "").strip().lower()
+    return "strict" if value == "strict" else "observe"
+
+
+def recovery_guard_mode() -> str:
+    value = os.environ.get("SKILL_SYSTEM_RECOVERY_GUARD", "observe").strip().lower()
+    if value in RECOVERY_GUARD_DISABLED:
+        return "off"
+    if value in RECOVERY_GUARD_AUDIT:
+        return "audit"
+    return "observe"
 
 
 def parse_json_object(raw: str, label: str) -> dict[str, Any]:
@@ -121,12 +156,24 @@ def write_event_unlocked(payload: dict[str, Any], ledger: Path, run_id: str = ""
         handle.write(json.dumps(payload, sort_keys=True, ensure_ascii=True) + "\n")
         handle.flush()
         os.fsync(handle.fileno())
+    try:
+        ledger.chmod(0o600)
+    except OSError:
+        pass
     return payload
 
 
 def write_event(payload: dict[str, Any], ledger: Path, run_id: str = "") -> dict[str, Any]:
     ledger.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        ledger.parent.chmod(0o700)
+    except OSError:
+        pass
     with lock_path_for(ledger).open("a", encoding="utf-8") as lock_handle:
+        try:
+            lock_path_for(ledger).chmod(0o600)
+        except OSError:
+            pass
         if fcntl is not None:
             fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
         try:
@@ -161,8 +208,9 @@ def record(args: argparse.Namespace) -> int:
         "status": args.status,
         "evidence": evidence,
     }
-    write_event(payload, args.ledger, args.run_id)
-    print(f"PASS: recorded {args.event} to {args.ledger}")
+    ledger = args.ledger if args.ledger is not None else default_ledger(args.run_id)
+    write_event(payload, ledger, args.run_id)
+    print(f"PASS: recorded {args.event} to {ledger}")
     return 0
 
 
@@ -176,6 +224,14 @@ def show(args: argparse.Namespace) -> int:
             if line.strip():
                 count += 1
     print(f"PASS: hook ledger entries={count}")
+    return 0
+
+
+def status(_args: argparse.Namespace) -> int:
+    print(json.dumps({
+        "agent_output_gate_mode": agent_output_gate_mode(),
+        "recovery_guard_mode": recovery_guard_mode(),
+    }, sort_keys=True))
     return 0
 
 
@@ -243,12 +299,14 @@ def main() -> int:
     record_parser.add_argument("--tool-id", default="")
     record_parser.add_argument("--status", default="pass")
     record_parser.add_argument("--evidence", default="{}")
-    record_parser.add_argument("--ledger", type=Path, default=default_ledger())
+    record_parser.add_argument("--ledger", type=Path, default=None)
     record_parser.add_argument("--run-id", default="")
     record_parser.set_defaults(func=record)
     show_parser = sub.add_parser("show")
     show_parser.add_argument("--ledger", type=Path, default=default_ledger())
     show_parser.set_defaults(func=show)
+    status_parser = sub.add_parser("status")
+    status_parser.set_defaults(func=status)
     verify_parser = sub.add_parser("verify")
     verify_parser.add_argument("--ledger", type=Path, default=default_ledger())
     verify_parser.set_defaults(func=verify)

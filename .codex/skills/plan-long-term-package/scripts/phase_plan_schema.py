@@ -20,6 +20,13 @@ README_HEADINGS = [
     "## Notes",
 ]
 
+DEFAULT_ARTIFACT_CAP = 20
+
+# These files live under docs/spec for package compatibility, but they are
+# generated from canonical owners and must not be materialized in the
+# canonical-first stage.
+DERIVED_VIEW_SPECS = frozenset({"agent-handoff-index"})
+
 REQUIRED_FRONT_MATTER = [
     "doc_type",
     "canonical",
@@ -1108,6 +1115,18 @@ def release_blocking_specs_for(archetype: str, modifiers: list[str] | None = Non
         if suffix in required_specs and suffix not in specs:
             specs.append(suffix)
     return specs
+
+
+def modifier_deltas_for(archetype: str, modifier: str) -> tuple[list[str], list[str]]:
+    """Return artifact and release-gate deltas relative to the archetype alone."""
+    canonical = canonical_archetype(archetype)
+    base_specs = required_specs_for(canonical)
+    modifier_specs = required_specs_for(canonical, [modifier])
+    base_release_specs = release_blocking_specs_for(canonical)
+    modifier_release_specs = release_blocking_specs_for(canonical, [modifier])
+    artifact_delta = [suffix for suffix in modifier_specs if suffix not in base_specs]
+    release_delta = [suffix for suffix in modifier_release_specs if suffix not in base_release_specs]
+    return artifact_delta, release_delta
 
 
 def slugify_title(title: str) -> str:
