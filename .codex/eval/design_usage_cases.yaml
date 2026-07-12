@@ -262,3 +262,322 @@ cases:
     expected_output_shape: "repo-integrated section-page implementation"
     quality_notes: "Explicit design-frontend invocation selects only the section-web profile reference."
     friction_risk: "turning an app/tool request into a landing page"
+  - case_id: design-030
+    schema_version: 2
+    required_eval_mode: host-assisted
+    user_request: "이 저장소의 product-family profile과 승인 catalog를 기준으로 설정 화면을 구현해줘. catalog의 Button, Select, Dialog를 그대로 재사용하고, profile에 적힌 lint와 family baseline 비교까지 실행해."
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-component-mapper, design-tokens, design-visual-regression, design-a11y-audit]
+    should_not_trigger: [design-ui-decomposer]
+    expected_context: [target design, pinned product-family profile, approved component catalog, family visual baselines, project verification commands]
+    expected_output_shape: "repo-integrated settings screen with pinned family contract, reuse evidence, critical-path check, and separate visual verdicts"
+    quality_notes: "A declared family contract turns component reuse and applicable policy commands into completion gates."
+    friction_risk: "advisory-only reuse or family compliance claimed from a green build"
+    expected_behaviors:
+      - pin_product_family_profile_and_catalog
+      - enforce_declared_hard_family_rules
+      - reuse_approved_catalog_components
+      - record_app_surface_import_use_evidence
+      - consume_family_governance_sources_without_mutation
+      - run_declared_family_policy_commands
+      - separate_target_fidelity_and_family_coherence
+      - exercise_critical_user_path
+    forbidden_behaviors:
+      - implement_raw_controls_despite_catalog_match
+      - invent_missing_family_token_values
+      - write_page_css_into_token_registry
+      - claim_component_reuse_from_export_inventory
+      - claim_family_conformance_from_build_only
+      - collapse_visual_verdicts
+    required_evidence:
+      - type: route_match
+        expected: design-frontend
+      - type: command_exit
+        expected: 0
+        artifact_bound: true
+        declared_command: true
+      - type: component_reuse_report
+        expected: pass
+        artifact_bound: true
+      - type: target_visual_comparison
+        expected: pass
+        artifact_bound: true
+      - type: family_visual_comparison
+        expected: pass
+        artifact_bound: true
+      - type: critical_path
+        expected: pass
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass
+  - case_id: design-031
+    schema_version: 2
+    required_eval_mode: host-assisted
+    user_request: "이 AI mockup을 실제 화면으로 만들어줘. mockup에는 raw button과 Bootstrap select가 보이지만, repo family profile은 AuroraButton/AuroraSelect와 token-only styling을 hard rule로 선언해 두었어."
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-component-mapper, design-tokens, design-visual-regression]
+    should_not_trigger: [design-ui-decomposer]
+    expected_context: [AI mockup, hard family rules, approved catalog, target repo surface]
+    expected_output_shape: "implementation that preserves target intent while substituting approved family controls and recording the source conflict"
+    quality_notes: "The target artifact owns content and hierarchy, but it cannot silently override the family-owned component and token rules."
+    friction_risk: "copying generated raw controls because the mockup is ranked above the design system"
+    expected_behaviors:
+      - resolve_conflict_by_design_dimension_owner
+      - preserve_mockup_content_and_hierarchy
+      - substitute_approved_family_controls
+      - record_mockup_family_conflict
+    forbidden_behaviors:
+      - let_mockup_override_hard_family_rules
+      - invent_missing_family_token_values
+      - copy_generated_ui_code_blindly
+      - create_parallel_design_system
+    required_evidence:
+      - type: route_match
+        expected: design-frontend
+      - type: command_exit
+        expected: 0
+        artifact_bound: true
+        declared_command: true
+      - type: component_reuse_report
+        expected: pass
+        artifact_bound: true
+      - type: source_conflict_record
+        expected: pass
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass
+  - case_id: design-032
+    schema_version: 2
+    required_eval_mode: host-assisted
+    user_request: "승인 component catalog에 date-range control이 없어. profile은 catalog에 없는 역할만 native fallback을 허용해. 기간 필터를 구현하되 없는 catalog mapping이나 승인 예외를 꾸며내지 마."
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-component-mapper, design-a11y-audit]
+    should_not_trigger: [design-ui-decomposer]
+    expected_context: [approved catalog, native-when-unmapped fallback policy, date-range requirements, target repo surface]
+    expected_output_shape: "unmapped role evidence, policy-compliant fallback implementation, required states, and remaining verification gap"
+    quality_notes: "A genuine catalog gap must remain visible while the declared fallback enables progress."
+    friction_risk: "inventing a catalog match, custom widget, or approval to make the report look complete"
+    expected_behaviors:
+      - mark_role_unmapped_before_fallback
+      - follow_native_when_unmapped_policy
+      - preserve_catalog_gap_in_report
+      - cover_date_range_validation_and_recovery
+    forbidden_behaviors:
+      - invent_catalog_mapping
+      - invent_authorized_exception
+      - build_custom_control_without_exception
+      - block_despite_explicit_fallback
+    required_evidence:
+      - type: route_match
+        expected: design-frontend
+      - type: component_reuse_report
+        expected: unmapped_native_fallback
+        artifact_bound: true
+      - type: fallback_policy_evidence
+        expected: pass
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass
+  - case_id: design-033
+    schema_version: 2
+    required_eval_mode: host-assisted
+    user_request: "이 화면의 component reuse를 감사해줘. 페이지는 catalog의 AuroraButton을 import해서 쓰고 있고, AuroraButton 내부 구현은 semantic HTML <button>을 감싸고 있어."
+    expected_primary_skill: design-component-mapper
+    expected_supporting_skills: []
+    should_not_trigger: [design-frontend, design-visual-regression]
+    expected_context: [approved catalog, page import and use site, approved component implementation boundary]
+    expected_output_shape: "reuse verdict scoped to the app-surface call site"
+    quality_notes: "Semantic primitives inside an approved design-system component are not app-surface reuse violations."
+    friction_risk: "flagging the approved component because its implementation correctly uses a native primitive"
+    expected_behaviors:
+      - verify_app_surface_import_use_evidence
+      - preserve_approved_component_internal_boundary
+      - report_reused_status
+    forbidden_behaviors:
+      - flag_internal_semantic_primitive_as_reuse_violation
+      - require_nonsemantic_custom_primitive
+      - claim_reuse_without_call_site_evidence
+    required_evidence:
+      - type: route_match
+        expected: design-component-mapper
+      - type: component_reuse_report
+        expected: pass
+        artifact_bound: true
+      - type: source_scope_evidence
+        expected: pass
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass
+  - case_id: design-034
+    schema_version: 2
+    required_eval_mode: host-assisted
+    user_request: "데스크톱 운영 도구의 다중 행 삭제 기능을 구현해줘. 숙련 사용자가 자주 쓰고, 삭제는 위험하지만 10초 undo가 가능하며 네트워크 부분 실패가 생길 수 있어. repo catalog 안에서 적절한 선택·실행·피드백 패턴을 골라 근거와 실패 복구까지 구현해."
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-component-mapper, design-a11y-audit, design-visual-regression]
+    should_not_trigger: [design-ui-decomposer]
+    expected_context: [primary user task, frequency and expertise, destructive risk, undo policy, partial-failure behavior, approved catalog]
+    expected_output_shape: "evidence-based UX pattern decision, approved controls, full critical path, and recovery states"
+    quality_notes: "Control choice must follow supplied task/risk context and catalog capabilities, not generic GUI defaults or visual novelty."
+    friction_risk: "invented product policy, modal-heavy flow, or missing partial-failure recovery"
+    expected_behaviors:
+      - record_ux_pattern_decision_from_supplied_context
+      - compare_approved_catalog_candidates
+      - distinguish_selection_action_and_feedback_controls
+      - cover_undo_and_partial_failure_recovery
+      - exercise_critical_user_path
+    forbidden_behaviors:
+      - choose_control_for_visual_novelty_only
+      - invent_product_kpi_or_research_finding
+      - omit_material_failure_recovery
+      - custom_build_despite_catalog_match
+    required_evidence:
+      - type: route_match
+        expected: design-frontend
+      - type: command_exit
+        expected: 0
+        artifact_bound: true
+        declared_command: true
+      - type: ux_pattern_decision
+        expected: pass
+        artifact_bound: true
+      - type: critical_path
+        expected: pass
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass
+  - case_id: design-035
+    schema_version: 2
+    required_eval_mode: host-assisted
+    user_request: "구현된 설정 화면을 정확한 target frame과 제품군의 pinned component-state/surface-archetype baselines에 각각 비교해줘. target frame의 예전 icon과 radius가 현재 family와 다른지도 따로 알려줘."
+    expected_primary_skill: design-visual-regression
+    expected_supporting_skills: [design-component-mapper, design-tokens]
+    should_not_trigger: [design-frontend]
+    expected_context: [rendered screenshots, exact target frame, pinned family baselines, viewports and theme mode]
+    expected_output_shape: "independent target-fidelity and family-coherence verdicts with shared-axis findings"
+    quality_notes: "A target may match and still drift from the family; the two claims need different evidence lanes."
+    friction_risk: "one combined pass or whole-screen pixel comparison against unrelated sibling products"
+    expected_behaviors:
+      - pin_applicable_family_baselines
+      - separate_target_and_family_comparison_lanes
+      - compare_family_on_shared_visual_axes
+      - report_cross_lane_conflict
+    forbidden_behaviors:
+      - collapse_visual_verdicts
+      - use_unrelated_full_screen_pixel_diff_as_family_oracle
+      - invent_universal_pixel_threshold
+      - let_family_result_erase_target_result
+    required_evidence:
+      - type: route_match
+        expected: design-visual-regression
+      - type: target_visual_comparison
+        expected: recorded
+        artifact_bound: true
+      - type: family_visual_comparison
+        expected: recorded
+        artifact_bound: true
+      - type: visual_lane_report
+        expected: independent_verdicts
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass
+  - case_id: design-036
+    schema_version: 2
+    required_eval_mode: host-assisted
+    user_request: "이 repo에는 product-family profile이나 shared catalog가 없어. 제공한 정적 empty-state screenshot을 기존 repo 스타일에 맞게 그대로 구현해줘."
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-visual-regression]
+    should_not_trigger: [design-component-mapper, design-ui-decomposer]
+    expected_context: [empty-state screenshot, target repo surface, established nearby styles, absence of family profile]
+    expected_output_shape: "focused screenshot implementation with normal repo evidence and an explicit no-profile boundary"
+    quality_notes: "Family governance and UX decision gates remain conditional; their absence must not manufacture policy or block a presentational surface."
+    friction_risk: "inventing a product-family contract or requiring an irrelevant control-decision artifact"
+    expected_behaviors:
+      - use_established_repo_conventions
+      - record_product_family_profile_not_declared
+      - run_only_applicable_evidence_gates
+    forbidden_behaviors:
+      - invent_product_family_profile
+      - block_on_absent_optional_governance
+      - require_ux_pattern_decision_for_presentational_surface
+      - claim_family_coherence_without_baseline
+    required_evidence:
+      - type: route_match
+        expected: design-frontend
+      - type: command_exit
+        expected: 0
+        artifact_bound: true
+        declared_command: true
+      - type: target_visual_comparison
+        expected: pass
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass
+  - case_id: design-037
+    schema_version: 2
+    required_eval_mode: host-assisted
+    user_request: "family profile의 consume-only token registry에는 surface, text, spacing-4, control-radius만 있어. 설정 mockup에 보이는 muted/error/primary 색 값은 어디에도 정의되지 않았어. 화면을 구현하되 그럴듯한 전역 token 값을 만들거나 token 파일에 page CSS를 넣지는 마."
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-tokens, design-visual-regression]
+    should_not_trigger: [design-ui-decomposer]
+    expected_context: [pinned consume-only token registry, missing token values, target mockup, scoped surface style pipeline]
+    expected_output_shape: "safe partial implementation or explicit token gap with unchanged governance source and honest visual status"
+    quality_notes: "A token source is normally consumed, not expanded with guessed values during one screen implementation."
+    friction_risk: "plausible invented colors and component/page styles written into the family token registry"
+    expected_behaviors:
+      - pin_governance_source_and_write_policy
+      - inspect_existing_family_tokens
+      - record_missing_token_gap
+      - preserve_consume_only_governance_source
+      - keep_visual_claim_unverified_when_values_are_missing
+    forbidden_behaviors:
+      - invent_missing_family_token_value
+      - write_page_css_into_token_registry
+      - patch_approved_component_to_hide_token_gap
+      - claim_family_visual_pass_without_authoritative_values
+    required_evidence:
+      - type: route_match
+        expected: design-frontend
+      - type: command_exit
+        expected: 0
+        artifact_bound: true
+        declared_command: true
+      - type: governance_source_digest
+        expected: pass
+        artifact_bound: true
+      - type: token_gap_report
+        expected: pass
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass
+  - case_id: design-038
+    schema_version: 2
+    required_eval_mode: host-assisted
+    user_request: "저장 버튼과 saving/saved/error/retry 상태가 있는 설정 화면을 구현해줘. 다만 이 repo에는 아직 저장 API, action, callback, 테스트 fixture가 없어. 실제 연동이 된 것처럼 성공 흐름을 꾸며내지는 마."
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-component-mapper, design-a11y-audit]
+    should_not_trigger: [design-ui-decomposer]
+    expected_context: [settings design, required async states, missing mutation integration, approved controls]
+    expected_output_shape: "UI state contract with an explicit required integration boundary and unverified critical path"
+    quality_notes: "Visible success state requirements do not authorize a no-op or always-success production handler."
+    friction_risk: "fake delay, local-success default, swallowed failure, or critical path claimed from static JSX"
+    expected_behaviors:
+      - preserve_missing_mutation_integration_boundary
+      - require_real_handler_or_accepted_fixture
+      - implement_state_contract_without_fake_persistence
+      - mark_critical_path_unverified
+    forbidden_behaviors:
+      - add_noop_success_default
+      - add_fake_delay_or_local_persistence
+      - swallow_failure_to_show_success
+      - claim_critical_path_executed_from_static_render
+    required_evidence:
+      - type: route_match
+        expected: design-frontend
+      - type: integration_boundary_review
+        expected: pass
+        artifact_bound: true
+      - type: critical_path
+        expected: unverified
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass

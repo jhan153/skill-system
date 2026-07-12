@@ -88,6 +88,13 @@
     "expected_mode": {
       "type": "string"
     },
+    "required_eval_mode": {
+      "type": "string",
+      "enum": [
+        "replay",
+        "host-assisted"
+      ]
+    },
     "direct_invocation": {
       "type": "boolean"
     },

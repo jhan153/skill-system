@@ -294,6 +294,68 @@ class SkillInstructionQualityTests(unittest.TestCase):
             self.assertNotIn("Include at least three negative route checks", text)
             self.assertIn("omit empty", text.lower())
 
+    def test_design_family_governance_has_behavior_cases_and_fail_closed_boundaries(self) -> None:
+        frontend = canonical("skills/design-frontend/SKILL.md").read_text(encoding="utf-8")
+        family = canonical(
+            "skills/design-frontend/references/product-family-profile.md"
+        ).read_text(encoding="utf-8")
+        ux = canonical(
+            "skills/design-frontend/references/ux-pattern-decision-guide.md"
+        ).read_text(encoding="utf-8")
+        mapper = canonical("skills/design-component-mapper/SKILL.md").read_text(encoding="utf-8")
+        visual = canonical("skills/design-visual-regression/SKILL.md").read_text(encoding="utf-8")
+
+        self.assertIn("resolve governance", frontend)
+        self.assertIn("app-surface import/use evidence", frontend)
+        self.assertIn("Do not invent a profile", frontend)
+        self.assertIn("without a catalog", frontend)
+        self.assertIn("task-bearing interactive route/screen", frontend)
+        self.assertIn("governance sources, not convenient page-style write targets", frontend)
+        self.assertIn("Never add a no-op, timer, local-success default", frontend)
+        self.assertIn("A mutable path alone is not a stable claim", family)
+        self.assertIn("Never claim “100% compliant”", family)
+        for fallback_policy in ("approved_match_required", "native_when_unmapped", "explicit_exception_only"):
+            self.assertIn(fallback_policy, family)
+        self.assertIn("critical success path", ux)
+        self.assertIn("Do not fill them with plausible product assumptions", ux)
+        self.assertIn("Semantic HTML/native primitives", mapper)
+        self.assertIn("export inventory alone cannot pass reuse", mapper)
+        self.assertIn("Keep the verdicts separate", visual)
+        self.assertIn("Do not apply full-screen pixel thresholds between unrelated screens", visual)
+        self.assertIn("user-verification-needed", visual)
+
+        data = yaml.safe_load(
+            canonical("shared/eval/design_usage_cases.yaml").read_text(encoding="utf-8")
+        )
+        cases = {case["case_id"]: case for case in data["cases"]}
+        expected_ids = {f"design-{number:03d}" for number in range(30, 39)}
+        self.assertTrue(expected_ids.issubset(cases))
+        required_evidence_types = {
+            "design-030": {"command_exit", "component_reuse_report", "target_visual_comparison", "family_visual_comparison", "critical_path", "qualitative_review"},
+            "design-031": {"command_exit", "component_reuse_report", "source_conflict_record", "qualitative_review"},
+            "design-032": {"component_reuse_report", "fallback_policy_evidence", "qualitative_review"},
+            "design-033": {"component_reuse_report", "source_scope_evidence", "qualitative_review"},
+            "design-034": {"command_exit", "ux_pattern_decision", "critical_path", "qualitative_review"},
+            "design-035": {"target_visual_comparison", "family_visual_comparison", "visual_lane_report", "qualitative_review"},
+            "design-036": {"command_exit", "target_visual_comparison", "qualitative_review"},
+            "design-037": {"command_exit", "governance_source_digest", "token_gap_report", "qualitative_review"},
+            "design-038": {"integration_boundary_review", "critical_path", "qualitative_review"},
+        }
+        for case_id in expected_ids:
+            case = cases[case_id]
+            self.assertEqual(case.get("schema_version"), 2, case_id)
+            self.assertEqual(case.get("required_eval_mode"), "host-assisted", case_id)
+            self.assertTrue(case.get("expected_behaviors"), case_id)
+            self.assertTrue(case.get("forbidden_behaviors"), case_id)
+            self.assertTrue(case.get("required_evidence"), case_id)
+            observed_types = {item.get("type") for item in case["required_evidence"]}
+            self.assertTrue(required_evidence_types[case_id].issubset(observed_types), case_id)
+            for evidence in case["required_evidence"]:
+                if evidence.get("type") not in {"route_match", "qualitative_review"}:
+                    self.assertIs(evidence.get("artifact_bound"), True, (case_id, evidence))
+                if evidence.get("type") == "command_exit":
+                    self.assertIs(evidence.get("declared_command"), True, (case_id, evidence))
+
 
 if __name__ == "__main__":
     unittest.main()

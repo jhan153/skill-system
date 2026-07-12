@@ -6,10 +6,10 @@ The design cluster grows through distinct analysis/evidence skills and condition
 
 | skill | maturity | role |
 | --- | --- | --- |
-| `design-frontend` | `usable` | High-fidelity implementation from concrete visual design inputs. |
+| `design-frontend` | `usable` | High-fidelity implementation with conditional product-family governance, approved-component reuse, and evidence-based UX control choice. |
 | `design-tokens` | `experimental` | Normalize token sources, platform mappings, gaps, conflicts, and no-fabrication token evidence. |
-| `design-component-mapper` | `experimental` | Map design components, variants, states, slots, events, and responsive behavior to repo components. |
-| `design-visual-regression` | `experimental` | Capture or inspect screenshot, nonblank, framing, viewport, overflow, and visual diff evidence. |
+| `design-component-mapper` | `experimental` | Map component contracts and prove approved app-surface reuse with scoped exceptions or unmapped gaps. |
+| `design-visual-regression` | `experimental` | Capture visual evidence and keep exact-target fidelity separate from product-family coherence. |
 | `design-a11y-audit` | `experimental` | Review keyboard, focus, semantic, contrast, target-size, and responsive readability evidence. |
 | `design-ui-decomposer` | `experimental` | Decompose UI references into implementation-ready structure without writing code. |
 | `design-layout-translator` | `experimental` | Translate Auto Layout, flex/grid, sizing, overflow, and breakpoint constraints into code-ready rules. |
@@ -25,7 +25,7 @@ Stage 1: evidence gate hardening.
 Stage 2: orchestration and limited analysis.
 - `design-frontend` consumes gate outputs.
 - `design-ui-decomposer` and `design-layout-translator` exist as conservative analysis skills.
-- Surface guidance lives under `design-frontend/references/`, not as primary skills.
+- Surface, product-family, and conditional UX decision guidance lives under `design-frontend/references/`, not as primary skills.
 
 Stage 3: field-trial expansion.
 - `design-frontend` selects `mobile`, `dashboard`, `section-web`, or `general` and loads one profile reference.
@@ -48,6 +48,7 @@ These are roadmap candidates only; they are not active registry skills yet.
 - Do not use design specialists for backend-only work.
 - Do not generate marketing-style pages when the user asks for an app, tool, or operational interface.
 - Do not treat screenshots alone as proof of implementation quality.
+- Do not treat a component export inventory as reuse proof or one sibling screenshot as a product-family oracle.
 - Keep specialist skills narrow and add negative routing cases before adding more design skills.
 - Keep `allow_implicit_invocation: false` for new and recently hardened design skills until route smoke tests and field feedback justify broader routing.
 - Do not create a surface skill when a conditional `design-frontend` reference is sufficient.
@@ -57,4 +58,6 @@ These are roadmap candidates only; they are not active registry skills yet.
 - Add field feedback for the four evidence gates after real projects.
 - Add field feedback for `design-ui-decomposer` and `design-layout-translator` before allowing implicit invocation.
 - Track dashboard/mobile/section profile quality, incorrect multi-profile loading, and missing surface constraints.
+- Track product-family profile conflicts, catalog reuse violations/exceptions, target-vs-family verdict divergence, and UX decisions reversed by missing context.
+- Promote UX pattern planning to a distinct skill only after repeated field cases show that the conditional `design-frontend` reference needs a separate owner or oracle.
 - Track over-trigger and under-trigger events before changing primary ownership rules.

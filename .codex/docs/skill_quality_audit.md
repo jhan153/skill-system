@@ -42,12 +42,12 @@ Each current skill was checked for:
 | --- | --- | --- |
 | `coordination-handoff` | prior + revalidated | Consolidated DAG/handoff/lock-scope owner remains support-only; metadata was shortened. |
 | `design-a11y-audit` | revised | Narrow checks no longer force a full audit schema; interaction evidence remains separate from static hints. |
-| `design-component-mapper` | revised | Output is scoped to relevant components/states instead of theoretical exhaustive matrices. |
-| `design-frontend` | prior + revalidated | Mobile/dashboard/section profiles remain conditional inside one implementation owner. |
+| `design-component-mapper` | revised | Output stays scoped while requiring app-surface import/use evidence for approved-catalog reuse and explicit exception boundaries. |
+| `design-frontend` | revised | Surface profiles remain conditional; product-family, component-reuse, and open UX-decision gates now fail closed only when applicable. |
 | `design-layout-translator` | revised | Removed internal routing-governance output and made the layout contract proportional. |
 | `design-tokens` | revised | Single-surface gaps no longer expand into exhaustive token-system artifacts. |
 | `design-ui-decomposer` | revised | Removed governance checklist leakage and made one-screen analysis compact. |
-| `design-visual-regression` | revised | One screenshot/viewport check no longer forces a full fidelity report. |
+| `design-visual-regression` | revised | Narrow checks remain proportional while exact-target fidelity and pinned family-coherence claims use separate evidence lanes. |
 
 ### Evaluation, Kanboard, And Knowledge
 

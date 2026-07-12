@@ -7,7 +7,7 @@ Use this profile for UI, screenshot/Figma implementation, responsive behavior, o
 - implementation: `design-frontend`
 - visual quality: `design-visual-regression`
 - accessibility quality: `design-a11y-audit`
-- optional tokens/states: `design-tokens`, `design-component-mapper`
+- optional tokens/states: `design-tokens`, `design-component-mapper`; make them required for the conditions declared by an applicable product-family profile
 - deterministic build/schema checks: project command or `workflow-validation`
 - loop execution after acceptance: `workflow-loop-runner`
 
@@ -68,6 +68,42 @@ success_conditions:
 
 Replace `<accepting-user>` and each scope with the accepted contract's real owner/scope. Record a real visual/a11y validator command or manual event as audit evidence, but local v2 cannot authenticate either as pass. Semantic conditions remain `unverified` or `user-verification-needed`; the quality report informs the decision but cannot close the condition by existing.
 
+## Conditional Product-Family And UX Conditions
+
+Add only the conditions supported by an applicable pinned profile or a task-bearing interactive requirement. Replace every placeholder with a real project command, baseline, path, or acceptance owner before accepting the loop. For a component/story, replace SC-008 with a scoped interaction/state condition instead of inventing an end-to-end user path.
+
+```yaml
+success_conditions:
+  - id: SC-006
+    statement: "Applicable hard family rules, governance-source write policies, and approved app-surface component reuse requirements pass their declared project checks."
+    runtime_verifier:
+      owner: workflow-validation
+      type: command_exit
+      evidence_target: "<family-policy-command> output and exit code, including pinned consume-only source checks when declared"
+    quality_verifiers:
+      - {owner: design-component-mapper, type: component_contract, evidence_target: "pinned catalog plus app-surface import/use report, exceptions, conflicts, and gaps"}
+
+  - id: SC-007
+    statement: "The target is coherent with each applicable pinned product-family baseline on its shared visual axes."
+    runtime_verifier:
+      owner: "<accepting-user>"
+      type: manual_check
+      evidence_target: "accepted user event scoped to SC-007:family-coherence"
+      acceptance_scope: "SC-007:family-coherence"
+    quality_verifiers:
+      - {owner: design-visual-regression, type: visual, evidence_target: "separate family-coherence verdict with pinned baselines and viewport-specific findings"}
+
+  - id: SC-008
+    statement: "The supplied primary user task completes through its real integration path and material failure/recovery state without simulated success."
+    runtime_verifier:
+      owner: workflow-validation
+      type: command_exit
+      evidence_target: "<critical-path-command> output and exit code"
+    quality_verifiers: []
+```
+
+If SC-006 lacks a real project-specific command, component inventory or a mapper report cannot substitute for deterministic enforcement; keep it `unverified` or use explicit accepted manual scope. If SC-008 lacks an executable user-path oracle, use scoped user acceptance and keep local v2 non-passing without authenticated provenance. Do not add SC-007 when the family has no applicable pinned baseline.
+
 Use `artifact_exists` only when the condition itself is “this exact artifact exists.” It cannot prove framing, fidelity, responsive behavior, accessibility, or any report verdict. If no deterministic or accepted-manual oracle exists, keep the semantic condition `unverified` or `user-verification-needed`.
 
 Use runtime `manual_check` only for explicit user acceptance. Local v2 validates the event shape/digest for audit but keeps it non-passing without host-authenticated provenance.
@@ -76,6 +112,9 @@ Use runtime `manual_check` only for explicit user acceptance. Local v2 validates
 
 - Build success proves build/smoke scope, not visual or accessibility quality.
 - A nonblank screenshot proves render presence, not fidelity.
+- Component catalog membership proves availability, not app-surface reuse; require import/use evidence and the declared policy command where one exists.
+- Exact-target fidelity and product-family coherence are separate claims with separate sources and verdicts.
+- A control-decision record does not prove the critical user task works; exercise the path and its material recovery state.
 - Visual comparison does not prove keyboard, semantics, or screen-reader behavior.
 - Static a11y hints do not prove complete WCAG compliance.
 - A screenshot/report without source, viewport, owner, freshness, and verdict is incomplete evidence.

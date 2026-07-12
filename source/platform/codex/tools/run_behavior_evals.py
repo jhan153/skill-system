@@ -70,6 +70,53 @@ def strict_artifact_path(root: Path, artifact: str) -> Path | None:
     return resolved
 
 
+def load_structured_artifact(path: Path) -> object | None:
+    try:
+        return load_json_file(path) if path.suffix.lower() == ".json" else load_yaml_file(path)
+    except Exception:  # noqa: BLE001 - invalid declaration artifacts fail closed.
+        return None
+
+
+def declared_commands(path: Path) -> set[str]:
+    data = load_structured_artifact(path)
+    commands: set[str] = set()
+
+    def visit(value: object) -> None:
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if key == "command" and isinstance(child, str) and child:
+                    commands.add(child)
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    visit(data)
+    return commands
+
+
+def command_receipt_matches(path: Path, command: str, exit_code: int) -> bool:
+    data = load_structured_artifact(path)
+    matched = False
+
+    def visit(value: object) -> None:
+        nonlocal matched
+        if matched:
+            return
+        if isinstance(value, dict):
+            if value.get("command") == command and value.get("exit_code") == exit_code:
+                matched = True
+                return
+            for child in value.values():
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    visit(data)
+    return matched
+
+
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -97,6 +144,49 @@ def parse_iso_datetime(value: object) -> dt.datetime | None:
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=dt.timezone.utc)
     return parsed.astimezone(dt.timezone.utc)
+
+
+def pinned_command_declarations(run: dict[str, Any], root: Path) -> dict[str, str]:
+    started_at = parse_iso_datetime(run.get("started_at"))
+    raw_inputs = run.get("input_artifacts")
+    if started_at is None or not isinstance(raw_inputs, list):
+        return {}
+
+    pinned: dict[str, str] = {}
+    for item in raw_inputs:
+        if not isinstance(item, dict) or item.get("role") != "command_declaration":
+            continue
+        artifact = item.get("artifact")
+        sha256 = item.get("sha256")
+        captured_at = parse_iso_datetime(item.get("captured_at"))
+        if (
+            not isinstance(artifact, str)
+            or not isinstance(sha256, str)
+            or captured_at is None
+            or captured_at > started_at
+        ):
+            continue
+        path = strict_artifact_path(root, artifact)
+        if path is not None and sha256 == sha256_file(path):
+            pinned[artifact] = sha256
+    return pinned
+
+
+def input_artifact_paths(run: dict[str, Any], root: Path) -> list[Path]:
+    raw_inputs = run.get("input_artifacts")
+    if not isinstance(raw_inputs, list):
+        return []
+    paths: list[Path] = []
+    for item in raw_inputs:
+        if not isinstance(item, dict):
+            continue
+        artifact = item.get("artifact")
+        if not isinstance(artifact, str):
+            continue
+        path = strict_artifact_path(root, artifact)
+        if path is not None:
+            paths.append(path)
+    return paths
 
 
 def timestamp_in_window(
@@ -174,9 +264,19 @@ def load_run(path: Path) -> tuple[dict[str, Any] | None, list[str]]:
     return data, []
 
 
-def validate_verification(run: dict[str, Any], case: dict[str, Any]) -> list[str]:
+def validate_verification(
+    run: dict[str, Any],
+    case: dict[str, Any],
+    root: Path,
+    *,
+    strict_host_assisted: bool = False,
+) -> list[str]:
     errors: list[str] = []
     verification = run.get("verification")
+    artifacts = run.get("artifacts")
+    artifact_names = artifacts if isinstance(artifacts, list) else []
+    command_declarations = pinned_command_declarations(run, root)
+    input_paths = input_artifact_paths(run, root)
     if not isinstance(verification, list) or not verification:
         return ["verification must be a non-empty list of structured evidence records"]
     for idx, record in enumerate(verification):
@@ -202,6 +302,53 @@ def validate_verification(run: dict[str, Any], case: dict[str, Any]) -> list[str
         if not matches:
             errors.append(f"missing required evidence type {evidence_type!r}")
             continue
+        if required.get("artifact_bound") is True:
+            bound_matches: list[dict[str, Any]] = []
+            for record in matches:
+                artifact = record.get("artifact")
+                if not isinstance(artifact, str) or artifact not in artifact_names:
+                    continue
+                if strict_host_assisted:
+                    artifact_path = strict_artifact_path(root, artifact)
+                    if artifact_path is None:
+                        continue
+                    if record.get("artifact_sha256") != sha256_file(artifact_path):
+                        continue
+                bound_matches.append(record)
+            matches = bound_matches
+            if not matches:
+                errors.append(f"missing artifact-bound {evidence_type} evidence")
+                continue
+        if evidence_type == "command_exit" and required.get("declared_command") is True:
+            declared_matches: list[dict[str, Any]] = []
+            for record in matches:
+                declaration = record.get("declaration_artifact")
+                command = record.get("command")
+                exit_code = record.get("exit_code")
+                if not isinstance(declaration, str) or declaration not in artifact_names:
+                    continue
+                declaration_path = strict_artifact_path(root, declaration)
+                receipt_path = strict_artifact_path(root, record["artifact"])
+                if (
+                    declaration_path is None
+                    or receipt_path is None
+                    or declaration not in command_declarations
+                    or not files_are_distinct(declaration_path, receipt_path)
+                    or not all(files_are_distinct(receipt_path, input_path) for input_path in input_paths)
+                    or not isinstance(command, str)
+                    or not isinstance(exit_code, int)
+                ):
+                    continue
+                if command in declared_commands(declaration_path) and command_receipt_matches(
+                    receipt_path, command, exit_code
+                ):
+                    declared_matches.append(record)
+            if not declared_matches:
+                errors.append(
+                    "missing command_exit evidence matching a pinned pre-run declaration and distinct structured receipt"
+                )
+                continue
+            matches = declared_matches
         if evidence_type == "command_exit" and "expected" in required:
             expected = required["expected"]
             if not any(record.get("exit_code") == expected for record in matches):
@@ -220,11 +367,17 @@ def validate_run(
     bundle_version: str,
     *,
     strict_host_assisted: bool = False,
+    evaluation_mode: str | None = None,
     required_model: str | None = None,
     not_before: dt.datetime | None = None,
     not_after: dt.datetime | None = None,
 ) -> tuple[str, list[str]]:
     errors: list[str] = []
+    effective_eval_mode = evaluation_mode or (
+        "host-assisted" if strict_host_assisted else "replay"
+    )
+    if (effective_eval_mode == "host-assisted") != strict_host_assisted:
+        errors.append("host-assisted evaluation mode and strict validation must be enabled together")
     data, load_errors = load_run(path)
     errors.extend(load_errors)
     if data is None:
@@ -237,6 +390,12 @@ def validate_run(
     case = cases.get(case_id) if isinstance(case_id, str) else None
     if case is None:
         errors.append(f"case_id does not resolve to eval case: {case_id!r}")
+    else:
+        required_eval_mode = case.get("required_eval_mode")
+        if isinstance(required_eval_mode, str) and required_eval_mode != effective_eval_mode:
+            errors.append(
+                f"evaluation mode {effective_eval_mode!r} != required_eval_mode {required_eval_mode!r}"
+            )
     result = data.get("result")
     if result not in RESULTS:
         errors.append(f"invalid result {result!r}")
@@ -370,7 +529,14 @@ def validate_run(
         for behavior in forbidden_behaviors:
             if behavior in observed_behaviors:
                 errors.append(f"observed forbidden behavior {behavior!r}")
-        errors.extend(validate_verification(data, case))
+        errors.extend(
+            validate_verification(
+                data,
+                case,
+                root,
+                strict_host_assisted=strict_host_assisted,
+            )
+        )
     return str(run_id), errors
 
 
@@ -432,6 +598,7 @@ def main() -> int:
             root,
             args.bundle_version,
             strict_host_assisted=args.mode == "host-assisted",
+            evaluation_mode=args.mode,
             required_model=args.required_model,
             not_before=not_before,
             not_after=not_after,

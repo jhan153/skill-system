@@ -92,6 +92,192 @@ class BehaviorEvalRouteClassTests(unittest.TestCase):
         self.assertTrue(any("observed_route_class" in error for error in errors), errors)
         self.assertTrue(any("route_class evidence with value" in error for error in errors), errors)
 
+    def test_case_required_eval_mode_rejects_replay_evidence(self) -> None:
+        case = {
+            "case_id": "host-assisted-design",
+            "required_eval_mode": "host-assisted",
+            "expected_primary_skill": "design-frontend",
+            "expected_behaviors": ["reuse_approved_component"],
+            "forbidden_behaviors": [],
+            "required_evidence": [{"type": "route_match", "expected": "design-frontend"}],
+        }
+        payload = {
+            "run_id": "BR-DESIGN-MODE-001",
+            "case_id": "host-assisted-design",
+            "host": "codex",
+            "host_version": "test",
+            "model": "test",
+            "model_version": "test",
+            "bundle_version": "9.1.1",
+            "started_at": "2026-07-11T00:00:00Z",
+            "observed_route": "design-frontend",
+            "observed_behaviors": ["reuse_approved_component"],
+            "artifacts": [],
+            "verification": [{"type": "route_match", "value": "design-frontend"}],
+            "result": "pass",
+        }
+        with tempfile.TemporaryDirectory(prefix="behavior-required-mode-") as tmp:
+            root = Path(tmp)
+            run_path = root / "run.json"
+            run_path.write_text(json.dumps(payload), encoding="utf-8")
+            _, errors = self.runner.validate_run(
+                run_path,
+                {"host-assisted-design": case},
+                root,
+                "9.1.1",
+                evaluation_mode="replay",
+            )
+
+        self.assertTrue(any("required_eval_mode" in error for error in errors), errors)
+
+    def test_material_evidence_binds_artifact_and_declared_command(self) -> None:
+        case = {
+            "required_evidence": [
+                {
+                    "type": "command_exit",
+                    "expected": 0,
+                    "artifact_bound": True,
+                    "declared_command": True,
+                },
+                {
+                    "type": "component_reuse_report",
+                    "expected": "pass",
+                    "artifact_bound": True,
+                },
+            ]
+        }
+        with tempfile.TemporaryDirectory(prefix="behavior-artifact-bound-") as tmp:
+            root = Path(tmp)
+            (root / "profile.yaml").write_text(
+                "command: python3 scripts/check_family.py\n", encoding="utf-8"
+            )
+            (root / "command.yaml").write_text(
+                "command: python3 scripts/check_family.py\nexit_code: 0\n",
+                encoding="utf-8",
+            )
+            (root / "reuse.yaml").write_text("status: reused\n", encoding="utf-8")
+            profile_digest = hashlib.sha256((root / "profile.yaml").read_bytes()).hexdigest()
+            run = {
+                "started_at": "2026-07-11T00:00:00Z",
+                "artifacts": ["profile.yaml", "command.yaml", "reuse.yaml"],
+                "input_artifacts": [
+                    {
+                        "artifact": "profile.yaml",
+                        "role": "command_declaration",
+                        "sha256": profile_digest,
+                        "captured_at": "2026-07-10T23:59:00Z",
+                    }
+                ],
+                "verification": [
+                    {
+                        "type": "command_exit",
+                        "command": "python3",
+                        "exit_code": 0,
+                        "artifact": "command.yaml",
+                        "artifact_sha256": hashlib.sha256(
+                            (root / "command.yaml").read_bytes()
+                        ).hexdigest(),
+                        "declaration_artifact": "profile.yaml",
+                    },
+                    {"type": "component_reuse_report", "value": "pass"},
+                ],
+            }
+            errors = self.runner.validate_verification(
+                run,
+                case,
+                root,
+                strict_host_assisted=True,
+            )
+            self.assertTrue(any("pinned pre-run declaration" in error for error in errors), errors)
+            self.assertTrue(any("artifact-bound component_reuse_report" in error for error in errors), errors)
+
+            run["verification"] = [
+                {
+                    "type": "command_exit",
+                    "command": "python3 scripts/check_family.py",
+                    "exit_code": 0,
+                    "artifact": "command.yaml",
+                    "artifact_sha256": hashlib.sha256(
+                        (root / "command.yaml").read_bytes()
+                    ).hexdigest(),
+                    "declaration_artifact": "profile.yaml",
+                },
+                {
+                    "type": "component_reuse_report",
+                    "value": "pass",
+                    "artifact": "reuse.yaml",
+                    "artifact_sha256": hashlib.sha256(
+                        (root / "reuse.yaml").read_bytes()
+                    ).hexdigest(),
+                },
+            ]
+            self.assertEqual(
+                self.runner.validate_verification(
+                    run,
+                    case,
+                    root,
+                    strict_host_assisted=True,
+                ),
+                [],
+            )
+
+    def test_declared_command_rejects_any_pre_run_input_as_receipt(self) -> None:
+        case = {
+            "required_evidence": [
+                {
+                    "type": "command_exit",
+                    "expected": 0,
+                    "artifact_bound": True,
+                    "declared_command": True,
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory(prefix="behavior-self-declaration-") as tmp:
+            root = Path(tmp)
+            profile = root / "profile.yaml"
+            profile.write_text('command: "true"\n', encoding="utf-8")
+            receipt = root / "command.yaml"
+            receipt.write_text('command: "true"\nexit_code: 0\n', encoding="utf-8")
+            profile_digest = hashlib.sha256(profile.read_bytes()).hexdigest()
+            receipt_digest = hashlib.sha256(receipt.read_bytes()).hexdigest()
+            run = {
+                "started_at": "2026-07-11T00:00:00Z",
+                "artifacts": ["profile.yaml", "command.yaml"],
+                "input_artifacts": [
+                    {
+                        "artifact": "profile.yaml",
+                        "role": "command_declaration",
+                        "sha256": profile_digest,
+                        "captured_at": "2026-07-10T23:59:00Z",
+                    },
+                    {
+                        "artifact": "command.yaml",
+                        "role": "fixture",
+                        "sha256": receipt_digest,
+                        "captured_at": "2026-07-10T23:59:00Z",
+                    }
+                ],
+                "verification": [
+                    {
+                        "type": "command_exit",
+                        "command": "true",
+                        "exit_code": 0,
+                        "artifact": "command.yaml",
+                        "artifact_sha256": receipt_digest,
+                        "declaration_artifact": "profile.yaml",
+                    }
+                ],
+            }
+
+            errors = self.runner.validate_verification(
+                run,
+                case,
+                root,
+                strict_host_assisted=True,
+            )
+
+        self.assertTrue(any("distinct structured receipt" in error for error in errors), errors)
+
     def test_host_assisted_rejects_placeholder_metadata_and_non_pass_result(self) -> None:
         case = {
             "case_id": "solar-release",
