@@ -12,9 +12,9 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 9.1.1 스킬 번들
+## 9.1.2 스킬 번들
 
-이 저장소에는 9.1.1 기준으로 정리한 스킬 번들이 포함되어 있습니다(7.3.1 번들은 아래 9.x 방향 설명대로 호환 기준선으로 유지됩니다). 주요 구성은 다음과 같습니다.
+이 저장소에는 9.1.2로 정리한 미배포 소스 베이스라인이 포함되어 있습니다(7.3.1 번들은 아래 9.x 방향 설명대로 호환 기준선으로 유지됩니다). 주요 구성은 다음과 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
 * `docs`: 스킬 목록, 사용 기준, 운영 참고 문서
@@ -25,7 +25,7 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 ## 9.x 방향: Neutral Source & Plugin Packaging
 
-현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 릴리스는 `9.1.1 — Patch Safety & Evidence Hardening`이며, 배포된 `v9.1.0` 태그 다음 릴리스입니다.
+현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 소스 베이스라인은 `9.1.2 — Design Governance & Pre-Diet Baseline`이며, 최신 배포 릴리스는 여전히 `v9.1.1`입니다. 9.1.2는 9.2.0 행동 비교를 위해 로컬 커밋·태그로만 고정하며 설치·반영·배포·릴리스하지 않습니다.
 
 `7.4.x Context Assurance`는 현재 구현 목표가 아니라 legacy label이자 전환 흔적입니다. 7.3.1 스킬 번들은 기존 호출을 위한 호환 기준선으로 유지하고, 8.0 방향에서는 context 모델을 바꿉니다. evidence를 claim과 relation으로 만들고, 이를 Wiki Bank page로 projection한 뒤, 저맥락 Runtime Projection card를 Context Pack으로 컴파일해 실행에 공급합니다.
 
@@ -261,6 +261,7 @@ Skill System 스킬은 작성된 스킬을 이 저장소에 통합하고 생성�
 | 9.0.2 | Legacy template cleanup | 9.0.1 이후 template hygiene·출력 품질 maintenance cut: short-term plan 템플릿과 `plan-short-term-docs` evidence 규칙에서 toy C++ before/after 예시를 제거하고, `plan-short-term-docs` 다이어그램 정책을 `workflow-rigor`·`report-critical`로 전파하며(plan lifecycle/approval/agent workflow는 기본 다이어그램 아님), long-term `ui-state-contract` 전이 다이어그램을 실제 전이가 있을 때만 그리도록 conditional 처리하고, `analysis-codebase` `report.py`의 unverified fallback 다이어그램(subsystem/path/class/metric)을 text notice로 변경합니다. 번들 버전 9.0.2로 상향, 타깃 재생성·무결성 검증 완료. |
 | 9.1.0 | Canonical quality, harness hardening & skill consolidation | canonical 스킬 표면을 71개에서 66개로 통합하고, schema-v2 hook evidence와 observe-default Recovery Guard를 강화하며, planning determinism과 token-cost 제어를 추가하고 `v9.0.2` 이후 release identity를 정합화합니다. Claude standalone 호환성 보완은 9.1.1로 연기합니다. |
 | 9.1.1 | Patch safety & evidence hardening | dev routing metadata를 host-neutral로 만들고, hook evidence를 durable per-run ledger로 이동하며, C/C++ 구조 근거가 없으면 fail-closed 처리합니다. 장기 패키지 cap/staged 생성, Kanboard pytest-absence SKIP 제거, Recovery Guard/output-gate mode 분리도 포함하며 호환성 영향은 `CHANGELOG.md`에 명시합니다. |
+| 9.1.2 | Design governance & pre-diet baseline | 제품군 규칙 탐색, 승인 컨트롤 재사용, UX 판단, target/family 시각 증거 분리를 강화합니다. 9.2.0 스킬 다이어트 전 강화된 66개 스킬의 행동과 instruction 크기를 고정한 미배포·비반영 비교 베이스라인입니다. |
 
 ## 라이선스
 

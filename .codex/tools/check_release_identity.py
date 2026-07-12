@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed when current release identity surfaces disagree."""
+"""Fail closed when current source-bundle identity surfaces disagree."""
 
 from __future__ import annotations
 
@@ -9,7 +9,9 @@ import re
 from pathlib import Path
 
 
-CURRENT_VERSION = "9.1.1"
+CURRENT_VERSION = "9.1.2"
+HISTORICAL_FORWARD_VERSION = "9.1.1"
+HISTORICAL_FORWARD_CASE_PREFIX = "solar-911-"
 PLUGIN_NAMES = (
     "skill-system-core",
     "skill-system-dev",
@@ -30,7 +32,6 @@ EVAL_MANIFESTS = (
     "knowledge_routing_cases.yaml",
     "memory_usage_cases.yaml",
     "negative_routing_cases.yaml",
-    "release_forward_cases.yaml",
     "research_regression_cases.yaml",
     "routing_cases.yaml",
     "runtime_usage_cases.yaml",
@@ -152,12 +153,30 @@ def check(root: Path) -> list[str]:
 
     forward_path = eval_root / "release_forward_cases.yaml"
     if forward_path.is_file():
-        case_ids = re.findall(r"(?m)^\s*- case_id:\s*(\S+)\s*$", forward_path.read_text(encoding="utf-8"))
+        forward_version = yaml_scalar(forward_path, "version")
+        if forward_version != HISTORICAL_FORWARD_VERSION:
+            errors.append(
+                f"{forward_path.relative_to(root)} historical version {forward_version!r} "
+                f"!= {HISTORICAL_FORWARD_VERSION!r}"
+            )
+        case_ids = re.findall(
+            r"(?m)^\s*- case_id:\s*(\S+)\s*$",
+            forward_path.read_text(encoding="utf-8"),
+        )
         if len(case_ids) != 5:
-            errors.append(f"release_forward_cases.yaml must contain exactly 5 current cases, found {len(case_ids)}")
-        stale = [case_id for case_id in case_ids if not case_id.startswith("solar-911-")]
+            errors.append(
+                "release_forward_cases.yaml must contain exactly 5 historical cases, "
+                f"found {len(case_ids)}"
+            )
+        stale = [
+            case_id
+            for case_id in case_ids
+            if not case_id.startswith(HISTORICAL_FORWARD_CASE_PREFIX)
+        ]
         if stale:
-            errors.append("non-9.1.1 forward case ids: " + ", ".join(stale))
+            errors.append("non-historical forward case ids: " + ", ".join(stale))
+    else:
+        errors.append("missing historical release_forward_cases.yaml")
 
     return errors
 
@@ -172,7 +191,7 @@ def main() -> int:
         for error in errors:
             print(f"- {error}")
         return 1
-    print(f"PASS: release identity {CURRENT_VERSION}")
+    print(f"PASS: bundle identity {CURRENT_VERSION}")
     return 0
 
 

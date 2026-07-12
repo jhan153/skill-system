@@ -1,5 +1,13 @@
 # Changelog
 
+## 9.1.2
+
+- Unpublished, non-deployed source baseline for the 9.2.0 instruction-surface diet. The latest published release and release tag remain `v9.1.1`; this cut is not installed, deployed, pushed, or tagged as `v9.1.2`.
+- Hardened design execution around product-family profile discovery, fail-closed family rules, app-surface proof for approved component reuse, explicit UX decision handling, and rejection of fake or inert interaction mutations.
+- Separated exact-target fidelity from product-family coherence so visual evidence cannot silently substitute one claim for the other, and added nine artifact-bound host-assisted design behavior cases plus focused positive/negative routing coverage.
+- Froze the 66 canonical skill bodies before pruning at 49,502 whitespace-delimited body words and 372,785 UTF-8 body bytes, excluding YAML frontmatter. Full `SKILL.md` files total 52,199 words and 394,611 bytes; Routing Cards account for 15,220 body words. These measurements are comparison surfaces, not billed-token estimates.
+- Advanced active source/plugin/eval defaults to 9.1.2 and regenerated runtime/plugin targets. The historical `release_forward_cases.yaml`, `release-9.1.1` observed runs, 9.1.1 fixtures, and their `solar-911-*` identities remain explicitly 9.1.1 and are rejected if relabeled as 9.1.2 evidence.
+
 ## 9.1.1
 
 - Patch release over `v9.1.0` for routing correctness, evidence durability, and fail-closed validation. The 66-skill partition is unchanged; this release does not add a new feature family.

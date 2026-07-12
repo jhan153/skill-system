@@ -1,10 +1,21 @@
 # Skill Quality Audit
 
-Date: 2026-07-10
-Bundle: 9.1.1
+Date: 2026-07-12
+Bundle: 9.1.2 (unpublished source baseline)
 Scope: the 66 current canonical `source/skills/*/SKILL.md` packages.
 
-This is a maintenance record, not routing context. Do not load it during normal skill selection. App-managed system skills and seven pre-commit skills already removed by consolidation are outside scope. The 9.1.1 patch revalidated the full metadata surface and the behavior-changing subset; unchanged 9.1.0 evidence-complete decisions were retained rather than rewritten.
+This is a maintenance record, not routing context. Do not load it during normal skill selection. App-managed system skills and seven pre-commit skills already removed by consolidation are outside scope. The 9.1.2 source baseline revalidated the strengthened design cluster and the active identity surface; unchanged evidence-complete decisions were retained rather than rewritten. Historical 9.1.1 release-forward evidence remains labeled 9.1.1 and is not evidence of a 9.1.2 release.
+
+## 9.1.2 Pre-Diet Measurements
+
+The 66 canonical `source/skills/*/SKILL.md` files are frozen for later 9.2.0 before/after comparison at:
+
+- 52,199 whitespace-delimited words and 394,611 UTF-8 bytes across complete `SKILL.md` files;
+- 49,502 words and 372,785 bytes after excluding YAML frontmatter;
+- 15,220 body words in the 66 `Routing Card` sections;
+- 18,389 characters and 2,367 whitespace-delimited words in frontmatter descriptions.
+
+Words are counted as non-whitespace spans and bytes as UTF-8 encoded bytes. These are measured instruction surfaces, not tokenization or billing measurements. A smaller 9.2.0 result is acceptable only when the paired positive and negative/edge behavior contracts remain satisfied; moving content into eagerly admitted references does not count as a reduction.
 
 ## Audit Standard
 
@@ -19,7 +30,7 @@ Each current skill was checked for:
 7. positive, negative, or edge regression coverage;
 8. repository metadata and generated-target consistency.
 
-`revised` means the current pass changed semantic instructions, runtime contracts, or context/output cost. `prior + revalidated` means an earlier revision in the 9.1.0 pass was retained and included in focused/core validation for 9.1.1. `retained` means the file was read and no semantic change was justified; metadata may still have been corrected.
+`revised` means the current pass changed semantic instructions, runtime contracts, or context/output cost. `prior + revalidated` means an earlier evidence-complete revision was retained and included in focused/core validation through the 9.1.2 source baseline. `retained` means the file was read and no semantic change was justified; metadata may still have been corrected.
 
 ## Per-Skill Decisions
 
