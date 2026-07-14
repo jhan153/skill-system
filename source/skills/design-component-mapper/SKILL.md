@@ -62,95 +62,43 @@ description: "Map design components, semantic roles, variants, states, slots, ev
 - entry_scene:
   - PREPARE
 
-Use this skill when design-to-code work needs a clear contract between design components and existing code components. It maps planned controls and verifies actual import/use evidence; it does not redesign a component API unless the user asks for API design.
+Use this skill to connect design roles to existing code components without redesigning their API. The gate distinguishes what a catalog offers, what a plan selects, and what the product actually uses.
+
+## Contract
+- Pin each applicable design source, repository surface, and approved catalog by path plus version or digest. Include the catalog's platform/surface scope and declared fallback policy.
+- Map semantic role and required behavior before comparing names or appearance. A selected export or story proves availability; it does not prove implementation.
+- An applicable approved match is required unless a scoped exception or declared fallback authorizes another path.
+- Keep proposed API changes separate. `design-frontend` owns implementation and evidence-based UX choices when several approved components fit.
 
 ## Workflow
-1. Identify and pin component sources:
-   - Design components, variants, component sets, screenshots, specs, Storybook stories, exported props, existing repo components, and any approved catalog/fallback policy.
-   - Record exact source pointers and implementation paths. When a catalog exists, record its version or digest and applicable platform/surface scope.
-2. Build a component inventory:
-   - Include component name, visual role, repo path/export, current usage, and available examples.
-   - If repo components cannot be found, mark `unmapped_design_components`.
-3. Map semantic roles to catalog candidates:
-   - For every affected app-surface control, record semantic role, required behavior, selected catalog id/export/variant, and nearest rejected candidate.
-   - If an approved match exists, mark it `required`; do not treat raw/default/custom implementation as an equivalent mapping.
-   - If none exists, mark it `unmapped` and carry the declared native fallback or exception requirement forward.
-4. Map variants and states:
-   - Track size, tone, emphasis, density, platform, layout, and responsive variants.
-   - Track default, hover, focus, active, selected, disabled, loading, empty, error, success, expanded, collapsed, validation, and destructive states when relevant.
-5. Map slots, events, and composition:
-   - Record required children, icons, labels, helper text, actions, menus, overlays, and event callbacks.
-   - Separate page-specific copy from reusable component API requirements.
-6. Map accessibility and responsive behavior:
-   - Record labels, roles, focus expectations, keyboard behavior, target size, breakpoint behavior, and overflow expectations.
-7. Verify actual reuse after implementation:
-   - Cite the app-surface file and import/use site for each selected approved component. A catalog entry, export list, story, or similar appearance proves availability only.
-   - Record status as `planned`, `reused`, `approved_exception`, `unmapped`, `conflict`, or `unverified`. A planned mapping cannot close the post-implementation reuse gate.
-   - Scope raw/native primitive checks to app-surface call sites. Semantic HTML/native primitives used inside an approved design-system component are not violations.
-8. Hand off gaps:
-   - Feed missing states, unresolved mappings, raw-control conflicts, and exceptions into `design-frontend`, visual review, or accessibility review only when implementation continues.
+1. Establish the inspected scope. Record exact design pointers, target app-surface paths, catalog identity, and the fallback/exception policy. A missing, mutable, or out-of-scope catalog cannot support a conformance claim.
+2. Inventory only relevant candidates. For each affected control, record its semantic role, required behavior, candidate path/export and available examples. If names differ, record an alias rather than renaming automatically.
+3. Select or reject candidates. Cite the selected catalog id/export/variant and the nearest rejected candidate. If no approved match exists, keep the role `unmapped` and apply only the pinned policy; never invent a match or permission.
+4. Compare only required contract dimensions: relevant variants, states, slots, events, responsive behavior, and accessibility expectations. Missing required dimensions remain gaps. Load `references/state-coverage-matrix.md` only for a broad state review.
+5. Classify the mapping as `planned`, `reused`, `approved_exception`, `unmapped`, `conflict`, or `unverified`:
+   - `planned` means a candidate was selected before production use was inspected.
+   - `reused` requires the actual app-surface file and import/use site. A catalog entry, export list, story, lint pass, or visual similarity is insufficient; export inventory alone cannot pass reuse.
+   - `approved_exception` requires the waived rule, exact scope, reason, and authorizing source.
+   - `conflict` applies when an approved match exists but the app surface uses a raw, default, or custom control without an authorized exception.
+6. Hand only unresolved mappings, missing states, conflicts, and scoped implementation gaps to the relevant implementation, visual, or accessibility owner.
+
+## Evidence Rules
+- Actual app-surface source outranks catalog inventory and generic scans for reuse or conflict decisions.
+- Scope raw/native checks to app-surface call sites. Semantic HTML/native primitives inside an approved design-system component are its implementation detail, not an app-surface violation.
+- Interpret `approved_match_required`, `native_when_unmapped`, and `explicit_exception_only` from `references/component-contract-schema.md`. An unmapped role does not imply native or custom permission.
+- Under `native_when_unmapped`, cite the inspected absence of a match plus the actual native call site and its relevant accessibility contract. Keep the catalog mapping `unmapped`.
+- Missing required states stay gaps; never infer them from a default example or enumerate irrelevant theoretical states.
+- Scripts and project-specific checks prove only their documented scope. `scripts/scan_component_exports.py` is a read-only inventory helper, not reuse evidence.
+- Do not invent variants, props, slots, events, approvals, exceptions, fallback policies, or behavior. Mark material missing evidence `unverified`.
 
 ## Output
-For a narrow mapping question, return the mapping, missing contracts, and evidence pointers directly. Use the structured shape only for an explicit mapping artifact or multi-component review; omit empty matrices.
+For a narrow question, return the semantic role, selected or rejected mapping, status, decisive source pointers, and unresolved gaps directly. For an explicitly requested artifact or multi-component review, load `references/component-contract-schema.md` and emit only populated sections; add the state matrix only when state coverage is material.
 
-```yaml
-component_inventory: []
-catalog_identity: {}
-repo_mapping: []
-component_reuse_report: []
-variant_matrix: []
-state_matrix: []
-slot_contracts: []
-event_contracts: []
-responsive_matrix: []
-accessibility_contracts: []
-unmapped_design_components: []
-unimplemented_repo_states: []
-conflicts: []
-approved_exceptions: []
-scope_boundary: []
-unverified: []
-```
-
-## Validation
-- Every mapped repo component must cite a file path, story path, export name, or concrete source pointer.
-- Every `reused` verdict must cite the app-surface import/use evidence; export inventory alone cannot pass reuse.
-- A `planned` mapping is implementation guidance, not reuse proof or a completion verdict.
-- When an applicable approved match exists, raw/default/custom app-surface controls are `conflict`, even if visually similar.
-- An `approved_exception` must cite the waived rule, exact scope, reason, and authorizing source. Do not infer approval from existing drift.
-- An unmapped role stays `unmapped`; follow the product-family fallback policy and never invent a catalog match.
-- Interpret `approved_match_required`, `native_when_unmapped`, and `explicit_exception_only` using `references/component-contract-schema.md`; do not treat every unmapped role as implicit native/custom permission.
-- Do not report primitives internal to an approved component as app-surface violations.
-- Treat project-specific lint/import checks as deterministic only for their documented scope; a generic text scan is inventory evidence, not reuse proof.
-- Missing states remain gaps, not assumed complete.
-- One-off page details must not become reusable component API requirements without justification.
-- If design and repo names differ, report the alias mapping instead of renaming automatically.
-- If a script is used, include the command and treat its output as inventory evidence, not complete contract proof.
-- Do not enumerate every theoretical state when the target component cannot express or require it.
-
-## Recovery
-- If the repo lacks Storybook or component exports, inspect nearby routes/screens that use the component.
-- If design source is unavailable, map from user-provided specs and mark missing design evidence as `Unverified`.
-- If the catalog is missing, mutable without a version/digest, or out of scope for the target, do not claim catalog conformance.
-- If a component has too many variants, split the matrix by component or state family.
-- If implementation is requested after mapping, hand off only the scoped gaps to `design-frontend`.
-
-## Known Limits
-- This skill does not decide visual fidelity by itself.
-- This skill does not decide which UX pattern is best when several approved components satisfy the role; `design-frontend` owns the evidence-based choice.
-- This skill does not prove keyboard or screen-reader behavior; hand off to `design-a11y-audit`.
-- This skill should not trigger for backend data models just because they are called components.
-
-## Do not invent / Unverified policy
-- Do not invent variants, props, slots, events, or state behavior not present in design, code, or user requirements.
-- Do not invent a catalog, approval, exception, or native fallback policy.
-- Mark inferred or missing state coverage as `Unverified`.
-- Keep proposed API improvements separate from confirmed component contracts.
-
-## Optional resources
-- Read `references/component-contract-schema.md` for the contract report shape.
-- Read `references/state-coverage-matrix.md` for state family coverage guidance.
-- Use `scripts/scan_component_exports.py` only as a read-only source inventory helper.
+## Recovery And Limits
+- Without exports or stories, inspect nearby production routes or screens that use the component.
+- Without a design source, map only user-provided requirements and mark the absent design evidence `unverified`.
+- This gate does not prove rendered fidelity, keyboard or screen-reader behavior, token readiness, or repository validation. Use their owning checks when those conditions are material.
+- Do not invoke this skill for backend data models merely because they are called components.
 
 ## Completion Boundary
-Do not mark design implementation complete from this gate alone. This skill verifies contract coverage; rendered visual proof, accessibility evidence, token readiness, and repo validation remain separate gates.
+Do not mark design implementation complete from this mapping alone. Close only the component-contract condition evidenced here; production use, visual fidelity, accessibility, and other material conditions retain their own status.
