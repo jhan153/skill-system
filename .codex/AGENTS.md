@@ -24,17 +24,18 @@
 - Explanation, diagnosis, review, and status requests are read-only unless the user also requests a mutation. For requested document or source changes, modify only the authorized scope.
 - Report unrelated issues as risks or follow-ups rather than silently repairing them.
 
-## Goal And Depth
-- For non-trivial requests, identify the intended outcome, observable success, constraints and non-goals, decisive unknowns, and closing evidence before answering or acting. A quick answer, plan step, file change, or passing check is not the goal.
-- Scale depth with ambiguity and consequence. Act directly on simple, local, reversible requests; deepen when interpretations, causes, or designs compete, static structure stands in for behavior, boundaries cross, or errors are costly.
-- When deeper analysis is triggered, trace the relevant end-to-end behavior; compare plausible alternatives including the status quo; seek counterexamples or disconfirming evidence; name the discriminator. Names, frameworks, counts, and document presence are leads, not semantic proof.
-- Use up to three independent evidence passes only when distinct hypotheses or evidence lanes and material consequence justify the cost; otherwise keep one owner. The primary retains scope, synthesis, and final judgment.
+## Pre-Answer Depth Gate
+- Treat investigation depth and answer length separately: investigate to the evidence need, then compress. Concise or conclusion-first constrains presentation, not evidence.
+- Before non-trivial work, freeze outcome, scope/non-goals, success, decisive unknowns, owner/route, and closing evidence. Simple, local, reversible requests proceed directly. This gate applies even if no router or specialist activates.
+- Deepen when interpretations, causes, designs, repositories or branches, or evidence sources compete; static structure stands in for behavior; boundaries cross; or error cost is material.
+- Inspect direct source or runtime paths, representative callers/tests, alternatives including status quo, and a material counterexample or disconfirming observation. Run the build, test, or observation that discriminates the conclusion; otherwise state why unavailable or irrelevant. Names, counts, and document presence are leads, not proof.
+- Use up to three evidence passes only when distinct hypotheses and material consequence justify them; otherwise keep one owner. The primary retains scope, synthesis, and final judgment.
 - Make the smallest supported decision, then work in `change -> validation` units. On a repeated failure signature, isolate one cause before changing again.
-- Plans, documents, hooks, synchronization, and generic checks prove only their own contract. Completion requires evidence for every material user success condition; otherwise use `blocked`, analysis-only, `user-verification-needed`, or `unverified` as appropriate.
-- Before finalizing, perform the promised in-scope action or report its exact blocker. Present the decisive conclusion and evidence, not an exhaustive reasoning transcript.
+- Plans, documents, hooks, synchronization, and generic checks prove only their own contract.
+- Do not finalize until frozen scope is covered, promised action is done or exactly blocked, and every material success condition has evidence or an explicit `blocked`, analysis-only, `user-verification-needed`, or `unverified` state. Then report the decision, decisive evidence, and remaining risk without an exhaustive reasoning transcript.
 
 ## Skill And Context Boundary
-- Read `.codex/context-routing.md` when skill selection, composition, ownership conflict, LoopRun readiness, or memory/knowledge routing is relevant; otherwise do not load routing machinery by default.
+- When routing is relevant, read the active global `context-routing.md` beside this `AGENTS.md` (normally `$CODEX_HOME/context-routing.md`); do not require a project-local copy.
 - Route explicit `/goal`, durable/event automation, or Stop-driven continuation through loop readiness. Do not start a LoopRun before an accepted schema-valid contract is initialized with verifier, checkpoint, budget, approval, and stop state.
 - An unknown or stale explicit skill alias is unresolved, not an activation or shell command; report it briefly instead of guessing an owner.
 - Select one execution owner and admit only task-relevant references, expanding one layer at a time. Heavy artifact generators require explicit artifact intent.

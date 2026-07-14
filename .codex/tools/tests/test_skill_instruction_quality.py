@@ -90,21 +90,32 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertNotIn("## Skill Alias Interpretation", text)
         self.assertNotIn("### Loop Readiness Gate", text)
         self.assertIn("blocked`, analysis-only", text)
-        self.assertIn(".codex/context-routing.md", text)
+        self.assertIn("$CODEX_HOME/context-routing.md", text)
+        self.assertNotIn("Read `.codex/context-routing.md`", text)
         self.assertIn("Route explicit `/goal`", text)
         self.assertIn("unknown or stale explicit skill alias", text)
 
-    def test_global_agents_requires_goal_first_proportional_depth(self) -> None:
+    def test_global_agents_requires_pre_answer_depth_gate(self) -> None:
         text = canonical("platform/codex/AGENTS.md").read_text(encoding="utf-8")
         self.assertIn("intended outcome before drafting", text)
-        self.assertIn("## Goal And Depth", text)
-        self.assertIn("Scale depth with ambiguity and consequence", text)
-        self.assertIn("trace the relevant end-to-end behavior", text)
-        self.assertIn("counterexamples or disconfirming evidence", text)
-        self.assertIn("are leads, not semantic proof", text)
-        self.assertIn("up to three independent evidence passes", text)
-        self.assertIn("distinct hypotheses or evidence lanes", text)
+        self.assertIn("## Pre-Answer Depth Gate", text)
+        self.assertIn("investigation depth and answer length separately", text)
+        self.assertIn("This gate applies even if no router or specialist activates", text)
+        self.assertIn("direct source or runtime paths", text)
+        self.assertIn("counterexample or disconfirming observation", text)
+        self.assertIn("Do not finalize until", text)
+        self.assertIn("up to three evidence passes", text)
+        self.assertIn("distinct hypotheses and material consequence", text)
         self.assertIn("primary retains scope, synthesis, and final judgment", text.lower())
+
+    def test_analysis_router_treats_brevity_as_output_shape(self) -> None:
+        router = canonical("skills/analysis-router/SKILL.md").read_text(encoding="utf-8")
+        metadata = canonical("skills/analysis-router/agents/openai.yaml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("requested brevity or conclusion-first formatting", router)
+        self.assertNotIn("needs only a quick answer", router)
+        self.assertIn("Treat requested brevity as output shape, not evidence scope", metadata)
 
     def test_routing_docs_do_not_embed_eval_payloads(self) -> None:
         routing = canonical("shared/context-routing.md").read_text(encoding="utf-8")

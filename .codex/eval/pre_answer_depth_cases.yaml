@@ -1,0 +1,86 @@
+version: "9.1.2"
+purpose: "Verify concise output depth with a mapped router owner and without any router, while keeping trivial work direct."
+cases:
+  - case_id: runtime-pre-answer-depth-router-001
+    schema_version: 2
+    user_request: "source/shared/eval/forward-fixtures/9.1.0/codebase에서 candidate-dotnet을 legacy-qt의 checkout replacement로 채택하려면 어떤 boundary/adapter decision이 필요한지 직접 소스와 캡처된 runtime evidence로 분석해 주세요. 최종 답은 세 문장으로 결론부터 써 주세요."
+    expected_primary_skill: analysis-router
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-codebase, workflow-task-ledger]
+    expected_context:
+      - "fixture scope and workspace revision"
+      - "legacy and candidate direct sources"
+      - "create-order runtime captures"
+      - "cancel-order missing capture and replacement boundary decision"
+    expected_output_shape: "concise codebase-design decision after evidence-backed analysis, with verification state"
+    quality_notes: "The request maps to one codebase design decision; requested brevity constrains presentation only."
+    friction_risk: "treating three-sentence output as light Q&A or expanding to a repo-wide report"
+    expected_behaviors:
+      - freeze_scope
+      - select_codebase_design_owner
+      - inspect_direct_sources
+      - compare_status_quo
+      - seek_counterexample
+      - run_checks_or_label_unavailable
+      - compress_after_evidence
+    forbidden_behaviors:
+      - infer_depth_from_brevity
+      - finalize_from_structure_only
+      - invoke_analysis_codebase
+      - create_task_run_without_resumption_boundary
+    required_evidence:
+      - type: route_match
+        expected: analysis-router
+
+  - case_id: runtime-pre-answer-depth-global-001
+    schema_version: 2
+    user_request: "source/platform/codex/AGENTS.md와 source/shared/context-routing.md가 '결론부터 세 문장' 요청에서도 조사 깊이와 final presentation을 별도 축으로 취급하는지 직접 문구와 관련 test를 확인해 주세요. 최종 답은 세 문장으로 써 주세요."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-router, analysis-codebase, workflow-task-ledger]
+    expected_context:
+      - "global AGENTS depth contract"
+      - "context-routing output modifiers"
+      - "instruction-quality test"
+      - "simple-task counterexample"
+    expected_output_shape: "three-sentence policy-contract verdict after direct evidence, with verification state"
+    quality_notes: "A non-specialist policy comparison must still receive the always-on depth gate."
+    friction_risk: "skipping evidence because no analysis specialist owns the request"
+    expected_behaviors:
+      - apply_global_depth_gate_without_router
+      - freeze_scope
+      - inspect_direct_sources
+      - inspect_related_test
+      - seek_counterexample
+      - run_checks_or_label_unavailable
+      - compress_after_evidence
+    forbidden_behaviors:
+      - infer_depth_from_brevity
+      - invoke_analysis_router
+      - invoke_analysis_codebase
+      - finalize_from_structure_only
+      - create_task_run_without_resumption_boundary
+    required_evidence:
+      - type: route_match
+        expected: none
+
+  - case_id: runtime-pre-answer-depth-negative-001
+    schema_version: 2
+    user_request: "source/platform/codex/AGENTS.md 10번째 줄이 하는 일을 한 문장으로 설명해 주세요."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-router, analysis-codebase, workflow-task-ledger]
+    expected_context: ["target file line"]
+    expected_output_shape: "one-sentence direct explanation"
+    quality_notes: "A narrow local explanation remains direct and does not activate the depth workflow."
+    friction_risk: "instruction overload and unnecessary repository scan"
+    expected_behaviors:
+      - answer_directly_and_briefly
+    forbidden_behaviors:
+      - broad_repository_scan
+      - invoke_analysis_router
+      - invoke_analysis_codebase
+      - create_task_run
+    required_evidence:
+      - type: route_match
+        expected: none

@@ -1,6 +1,6 @@
 ---
 name: analysis-router
-description: "Route deep technical analysis to bug diagnosis, algorithm selection, one codebase design decision, architecture-deepening candidate discovery, domain modeling, performance analysis, or a two-stage hybrid. Use when the analysis owner is ambiguous; skip direct implementation, light Q&A, and repo-wide report artifacts."
+description: "Route deep technical analysis to bug diagnosis, algorithm selection, one codebase design decision, architecture-deepening candidate discovery, domain modeling, performance analysis, or a two-stage hybrid. Use when the analysis owner is ambiguous; requested brevity or conclusion-first formatting does not make an otherwise-deep task light. Skip direct implementation, genuinely light Q&A, and repo-wide report artifacts."
 ---
 
 # Analysis Router
@@ -13,7 +13,7 @@ description: "Route deep technical analysis to bug diagnosis, algorithm selectio
   - choose a specialist for deep diagnosis or recommendation before work starts.
   - order two analysis stages when the second decision depends on the first result.
 - do_not_use_when:
-  - the user explicitly invokes a fitting specialist, requests direct implementation, or needs only a quick answer.
+  - the user explicitly invokes a fitting specialist, requests direct implementation, or the underlying task is genuinely light Q&A with no competing interpretation, cause, design, or evidence-dependent decision.
   - the user explicitly requests a repo-wide integrated report artifact; route to `analysis-codebase`.
 - expected_inputs:
   - user request and any supplied symptom, constraint, metric, or decision target
