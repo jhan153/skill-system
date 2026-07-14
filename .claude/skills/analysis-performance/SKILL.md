@@ -1,6 +1,6 @@
 ---
 name: analysis-performance
-description: Performance analysis for software systems. Use when a task requires diagnosing latency, throughput, memory, CPU, query, bundle, rendering, startup, or algorithmic bottlenecks with measurements or scoped evidence before recommending or applying optimizations.
+description: Diagnose a current latency, throughput, CPU, memory, query, rendering, startup, bundle, or complexity symptom on its representative actual path before selecting an optimization.
 ---
 
 # Analysis Performance
@@ -8,114 +8,45 @@ description: Performance analysis for software systems. Use when a task requires
 ## Routing Card
 - role: primary
 - intent_signature:
-  - performance analysis
-  - latency
-  - throughput
-  - memory usage
-  - CPU bottleneck
-  - slow query
-  - 성능 분석
-  - 병목
+  - performance/latency/throughput/CPU/memory/query/render/startup/bundle analysis; 성능 분석; 병목
 - use_when:
-  - the user asks why something is slow, heavy, memory-hungry, or inefficient.
-  - optimization requires identifying a measured or evidence-backed bottleneck first.
-  - the task involves latency, throughput, CPU, memory, query count, rendering cost, startup time, bundle size, or algorithmic complexity.
+  - a current software symptom needs measurement-backed bottleneck diagnosis before an optimization is selected.
 - do_not_use_when:
-  - the task is a correctness bug with failing behavior; use `analysis-bug` or `workflow-bug-fix`.
-  - the user already selected a simple implementation change with no performance uncertainty; use `workflow-implementation`.
-  - the request is broad repo-wide reporting; use `analysis-codebase`.
-  - the user asks for research benchmarking or scientific experiment design.
+  - correctness diagnosis/fix, an already-selected implementation, algorithm choice without a current symptom, repo-wide reporting, or scientific experiment design is primary.
 - expected_inputs:
-  - performance symptom, metric, workload, route, query, function, UI path, or resource concern
-  - baseline numbers, profiler output, logs, traces, tests, or an explicit `Unverified` gap
-  - target environment and acceptable performance goal when available
+  - user-relevant metric and symptom, representative workload/path, target environment/threshold, existing measurements, and material correctness constraints
 - expected_outputs:
-  - performance target, baseline evidence, bottleneck hypothesis, measurement plan/result, optimization options, recommended next change, and validation criteria
+  - scoped target and baseline, actual hot path, discriminated bottleneck, evidence authority/scope, smallest next change or handoff, and unresolved conditions
 - context_targets:
   must_read:
-    - current performance symptom and desired metric
-    - relevant code path, query, component, or workload
-    - existing measurement/log/profile evidence or explicit `Unverified` gap
+    - request, metric/workload/environment, affected actual path, and available baseline/profile/trace
   read_if_needed:
-    - benchmark scripts, test fixtures, logs, traces, package manifests, or observability docs
-    - algorithm/data-size assumptions
-    - recent diffs if the slowdown is a regression
+    - targeted code/query/config, benchmark method, recent regression diff, data-size assumptions, or observability contract
   do_not_load_by_default:
-    - full repo
-    - full memory bank
-    - unrelated logs
-    - broad architecture reports
+    - full repo/memory, unrelated logs/reports, raw production data, or credentials
 - risk_profile:
-  reads:
-    - targeted source, logs, traces, profiler output, tests, configs, and metrics
-  writes:
-    - none by default; WRITE_CODEBASE only after a bottleneck is selected and implementation is requested
-  tools:
-    - CALL_PROCESS for focused benchmarks, profilers, tests, static checks, and measurement scripts
-  sensitive_resources:
-    - credentials default deny; production traces/data require explicit boundary review and redaction
+  reads: targeted path, comparable measurements, profiles/traces, configs, and correctness evidence
+  writes: none; implementation belongs to its workflow after bottleneck selection
+  tools: focused profiling and comparable measurement of the relevant path
+  sensitive_resources: production data/traces require their governing access and redaction boundary
 - entry_scene:
   - PREPARE
 
-## Purpose
-- Avoid optimizing guesses.
-- Separate measurement, bottleneck selection, optimization choice, and validation.
-- Recommend the smallest change that moves the target metric without sacrificing correctness.
-
 ## Workflow
-1. Define the performance target:
-   - metric
-   - workload/input size
-   - environment
-   - acceptable threshold
-2. Establish a baseline from existing evidence or a focused measurement.
-3. Map the hot path or resource path.
-4. Hold 2-3 bottleneck hypotheses only long enough to discriminate them.
-5. Choose one primary bottleneck with evidence.
-6. Compare optimization options:
-   - algorithm/data structure
-   - caching or batching
-   - query/index/IO reduction
-   - concurrency or backpressure
-   - rendering/bundle/startup reduction
-   - configuration/runtime tuning
-7. Recommend or hand off the smallest optimization and its validation.
+1. Bind each material condition: metric, representative workload/input size, environment, acceptable threshold, and correctness, freshness, security, accessibility, or side-effect constraints. Identify when the user condition is itself structural, such as exact emitted bytes.
+2. Establish a baseline and trace the actual user/resource path through relevant code, query, cache, adapter, renderer, bundle, process, or IO boundary. Prefer direct observed behavior; an agent-authored benchmark, fixture, test, or mock proves only its exercised scope.
+3. Hold only enough bottleneck hypotheses to discriminate them with a profile, trace, counterexample, or comparable measurement. Representative actual-path evidence outranks a conflicting helper benchmark; retain any `fail`, `needs_review`, `unverified`, or blocked measurement gap.
+4. Select one primary bottleneck only when evidence separates it from alternatives. Report percentage or before/after improvement only for the same material metric under comparable workload and environment, with required result and side-effect readback.
+5. If the user requested a fix and the bottleneck is verified, hand the smallest optimization and comparable validation target to `workflow-implementation`. Do not imply the optimization ran; after implementation, verify on the same relevant path before claiming improvement.
 
 ## Measurement Rules
-- Prefer direct measurements over static intuition.
-- Mark missing baseline or environment mismatch as `Unverified`.
-- Do not report percentage improvements unless both before and after measurements are comparable.
-- Do not trade correctness, data freshness, security, or accessibility for speed without explicit user acceptance.
-- When measurements cannot run locally, provide the exact command, expected signal, and user-verification gap.
-- If the user explicitly asked to optimize or fix performance and one primary bottleneck is verified within the current scope, hand off to `workflow-implementation` for the smallest optimization instead of stopping at recommendation.
+- Missing baseline, actual-path coverage, or comparable environment makes the user-level claim `unverified`; mock or microbenchmark success cannot fill that gap.
+- A faster result that violates a required material condition is invalid, not an improvement. Change such a condition only through an explicit user decision before evaluating the new contract.
+- Static analysis may identify candidates, not measured impact. When local measurement is unavailable, provide the exact evidence-producing action and keep the claim unresolved.
+- Deterministic artifact evidence can complete an explicitly structural metric when it directly covers the condition; do not infer latency, CPU, memory, or user experience from it.
 
 ## Output Contract
-Return only the sections needed:
-- `performance_target`
-- `baseline_evidence`
-- `hot_path`
-- `bottleneck_hypotheses`
-- `primary_bottleneck`
-- `optimization_options`
-- `recommended_next_change`
-- `implementation_handoff`
-- `validation_plan`
-- `unverified_gaps`
+Return only applicable fields: target/conditions, baseline and evidence scope, actual hot path, hypotheses and discriminating evidence, primary bottleneck, verified conclusion, smallest next change or implementation handoff, comparable validation target, and unresolved gaps. Separate bottleneck identification from optimization success.
 
 ## Cross-Skill Boundaries
-- `workflow-implementation` owns applying the selected optimization in code.
-- `workflow-refactor-safely` owns behavior-preserving refactors that prepare a performance change.
-- `analysis-algorithm` owns pure algorithm/approach selection when no current performance symptom exists.
-- `analysis-bug` owns correctness failures.
-- `analysis-codebase` owns repo-wide performance/security/architecture report artifacts.
-
-## Invocation Examples
-Positive:
-- "이 API가 느린 이유를 병목 중심으로 분석해줘."
-- "메모리 사용량이 커졌는데 어디서 늘어나는지 봐줘."
-- "렌더가 느린데 측정 가능한 개선 옵션을 비교해줘."
-
-Negative:
-- "이 failing test 고쳐줘." -> `workflow-bug-fix`
-- "이 알고리즘 중 뭘 쓸지 비교해줘." -> `analysis-algorithm`
-- "이 최적화 코드를 바로 적용해줘." -> `workflow-implementation` after bottleneck is selected
+- `analysis-bug` diagnoses correctness; `workflow-bug-fix` repairs it; `workflow-implementation` applies a selected optimization; `analysis-algorithm` owns choice without a current symptom; `analysis-codebase` owns repo-wide reports; `research-experiment-blueprint` owns scientific benchmark design; `workflow-refactor-safely` owns preparatory behavior-preserving structure changes.
