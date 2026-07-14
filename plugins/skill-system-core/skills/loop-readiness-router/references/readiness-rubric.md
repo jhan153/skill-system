@@ -69,7 +69,7 @@ This classification says "define terms first"; it does not assert that the event
 
 ### `loop_worthy`
 
-Use only when `feedback_loop_value` is `high` and all are true:
+Use only when `feedback_loop_value` is `high` and these terms are already known or can be stated in the next contract:
 
 - stable success conditions can be stated;
 - a verifier emits pass/fail/unverified/blocked after each batch;
@@ -92,7 +92,7 @@ Typical examples are UI fidelity driven by screenshot/a11y findings, multi-gate 
    - required terms missing -> `contract_needed`;
    - repeated steering plus complete/authorable contract -> `loop_worthy`.
 
-If a candidate is both `contract_needed` and loop-worthy in shape, report `contract_needed` now and note the high feedback value; draft/accept the contract before execution.
+Choose `loop_worthy` when repeated steering is clear and stable conditions plus governance terms can be authored; the next step is still to draft and accept the contract. Choose `contract_needed` when missing information or capability prevents those terms or even the control shape from being safely defined.
 
 ## Anti-Loop Signals
 
