@@ -55,13 +55,10 @@ description: "Produce decision-first, evidence-grounded qualitative evaluations 
 - entry_scene:
   - PREPARE
 
-## Operating Contract
-- Make the result useful for a decision, not merely comprehensive.
-- Lead with the judgment. Keep only findings that could change readiness, priority, adoption, or the next action.
-- Treat three material findings as a ceiling in the default mode, not a quota. Omit low-impact polish and repeated symptoms.
-- Do not implement fixes, run broad validation, or turn the report into a blocker gate.
-
-## Modes
+## Contract And Modes
+- Lead with the decision and keep only findings that could change readiness, priority, adoption, or the next action.
+- In the default mode, return zero to three items; three is a ceiling, not a quota. Merge repeated symptoms and omit low-impact polish.
+- Do not implement fixes, run broad validation, or turn qualitative evaluation into a blocker gate.
 
 | mode | activation | output depth |
 | --- | --- | --- |
@@ -69,78 +66,23 @@ description: "Produce decision-first, evidence-grounded qualitative evaluations 
 | `FullOrScored` | explicit full, scored, rubric, table-heavy, or reusable-report request | detailed evidence map and criterion coverage using the conditional references |
 | `CompactEvidence` | explicit `srq`, `srq로`, formal completion report, or verified handoff report | conclusion, up to three verified facts, action, and relevant verification |
 
-Do not infer `FullOrScored` from the size of the artifact. Do not infer `CompactEvidence` from vague “검토해줘”, “요약해줘”, or “보고해줘”.
-
-## Evaluation Kernel
-Use the user's rubric when present. Otherwise choose only the criteria needed for the decision from:
-
-- purpose fit
-- structural clarity
-- evidence and grounding
-- practical usability
-- risk and failure modes
-- improvement leverage
-
-Use this chain for every material judgment:
-
-`Criterion -> Evidence -> Interpretation -> Judgment -> Recommendation`
-
-Read `references/rubric.md` for detailed scales and domain criteria only in `FullOrScored` mode. Use a 1–5 score only when explicitly requested; avoid decimals.
+Artifact size does not activate `FullOrScored`; vague “검토/요약/보고” does not activate `CompactEvidence`. Read detailed scales from `references/rubric.md` only in `FullOrScored` mode, and use integer 1–5 scores only when explicitly requested.
 
 ## Workflow
-1. Frame the decision: identify the artifact, audience, intended use, constraints, exclusions, and what choice the report should support. Infer safe details and disclose only assumptions that affect the verdict.
-2. Inspect the smallest relevant artifact slice. Capture evidence for both readiness and incompleteness; do not reward static presence when runtime or user-path evidence is what matters.
-3. Build a compact evidence map before judging. Keep it internal in `DecisionBrief`; emit it only when it materially helps or the user requests the full form.
-4. Rank candidate findings by decision impact, evidence strength, and improvement leverage. Merge common causes and retain at most three in `DecisionBrief`.
-5. State the decision first, then findings and actions. Put missing evidence in limitations rather than manufacturing certainty.
+1. Frame the decision: artifact, audience, intended use, constraints, exclusions, and the choice the report supports.
+2. Inspect the smallest relevant slice and capture evidence for readiness and incompleteness; do not reward static presence when runtime or user-path evidence is the condition.
+3. Apply the user's rubric or only the needed criteria: purpose fit, clarity, grounding, usability, failure risk, and improvement leverage. For each material judgment use `Criterion -> Evidence -> Interpretation -> Judgment -> Recommendation`.
+4. Cite sections, files/lines, commands, examples, or provided facts. Separate `Observed`, `Inferred`, `Risk`, and `Recommendation`; mark missing support `Not evidenced` and confidence `High`, `Medium`, `Low`, or `Not assessable`.
+5. Rank by decision impact, evidence strength, and leverage; merge common causes. Put gaps that could change the verdict in limitations rather than manufacturing certainty.
 
-## Evidence Discipline
-- Cite a section, file/line, command result, example, or provided fact for every material finding when available.
-- Separate `Observed`, `Inferred`, `Risk`, and `Recommendation`; mark absent support `Not evidenced`.
-- Use confidence `High`, `Medium`, `Low`, or `Not assessable` according to evidence strength.
-- Do not infer hidden behavior, intent, or requirements, and do not penalize information outside the artifact's stated scope.
-- Label external evidence separately from artifact-grounded evidence.
-- Redact secrets and sensitive personal data; cite the location or evidence class, not the value.
-- A recommendation must address an observed gap, a stated goal, or clearly labeled expert judgment.
+Read `references/evidence_mapping.md` only for a large, multi-source, ambiguous, or unsupported-judgment-prone target. Distinguish external from artifact evidence, redact sensitive values, and never infer hidden intent or requirements outside scope.
 
-Read `references/evidence_mapping.md` only when the target is large, multi-source, ambiguous, or prone to unsupported judgments.
-
-## Output Contracts
-
-### DecisionBrief (default)
-1. `Conclusion`: decision, readiness, and the main reason in one or two sentences.
-2. `Material findings`: zero to three items, ordered by impact. Each item contains judgment, decisive evidence, decision impact, recommended action, and confidence.
-3. `Next action`: the single highest-leverage step; add up to two more only when independent and necessary.
-4. `Limitations`: only missing evidence or assumptions that could change the conclusion.
-
-Do not add separate strengths, weaknesses, evidence-map, or score sections when they would repeat the same findings.
-
-### FullOrScored
-Read `references/report_template.md` and, when scoring or domain criteria are requested, `references/rubric.md`. Cover all requested criteria, but keep the executive decision first and avoid duplicate prose around tables.
-
-### CompactEvidence
-Use only for the explicit aliases above:
-
-1. `Conclusion`: one-line result.
-2. `Evidence`: up to three verified facts with locations.
-3. `Action`: one completed or next action.
-4. `Verification`: only for code, workflow, or delivery tasks.
-
-This compatibility mode does not replace qualitative assessment when the user asks for readiness, strengths/weaknesses, risks, or improvements.
-
-## Boundaries
-- `report-critical` owns blocker diagnosis and QA verdicts.
-- `report-diff` owns changed-line and before/after presentation.
-- `coordination-handoff` owns handoff inventories.
-- `evaluation-harness` and `evaluation-usage-tracker` own eval cases and telemetry.
-- `workflow-validation` owns check design and execution; this skill reports only the meaning of existing results.
-- If a specialized owner is unavailable, return only the qualitative portion and state the limitation.
+## Output
+- `DecisionBrief`: conclusion first; zero to three material findings with decisive evidence, impact, action, and confidence; one highest-leverage next action; material limitations. Do not add duplicate strength/weakness, evidence-map, or score sections.
+- `FullOrScored`: read `references/report_template.md` plus `references/rubric.md` when needed, cover requested criteria, and avoid prose that repeats tables.
+- `CompactEvidence`: one-line conclusion, up to three verified facts with locations, one action, and verification only for code/workflow/delivery. It does not replace a requested readiness or risk evaluation.
 
 ## Validation
-- The conclusion appears before methodology or detail.
-- The default report contains no more than three material findings.
-- Every material judgment is evidence-backed or explicitly uncertain.
-- Recommendations trace to findings and are ordered by decision impact.
-- Scores and detailed rubrics appear only when explicitly requested.
-- Full templates and detailed references were loaded only for the mode that needs them.
-- The response remains an evaluation report, not implementation, validation execution, diff output, or telemetry.
+- Conclusion precedes method; every judgment is evidenced or explicitly uncertain; recommendations trace to findings.
+- Scores, detailed rubrics, and full templates appear only on explicit mode request.
+- The result stays an evaluation, not implementation, validation execution, blocker QA, diff/inventory, handoff inventory, or telemetry.
