@@ -448,6 +448,8 @@ cases:
   - case_id: design-035
     schema_version: 2
     required_eval_mode: host-assisted
+    behavior_contract_owners: [design-visual-regression]
+    scenario_tags: [edge]
     user_request: "구현된 설정 화면을 정확한 target frame과 제품군의 pinned component-state/surface-archetype baselines에 각각 비교해줘. target frame의 예전 icon과 radius가 현재 family와 다른지도 따로 알려줘."
     expected_primary_skill: design-visual-regression
     expected_supporting_skills: [design-component-mapper, design-tokens]
@@ -515,6 +517,8 @@ cases:
   - case_id: design-037
     schema_version: 2
     required_eval_mode: host-assisted
+    behavior_contract_owners: [design-frontend]
+    scenario_tags: [safety]
     user_request: "family profile의 consume-only token registry에는 surface, text, spacing-4, control-radius만 있어. 설정 mockup에 보이는 muted/error/primary 색 값은 어디에도 정의되지 않았어. 화면을 구현하되 그럴듯한 전역 token 값을 만들거나 token 파일에 page CSS를 넣지는 마."
     expected_primary_skill: design-frontend
     expected_supporting_skills: [design-tokens, design-visual-regression]

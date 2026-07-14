@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-skill-diet-local-pilot-accepted-state.schema.json",
+  "title": "Skill Diet Local Pilot Accepted State",
+  "type": "object",
+  "required": ["schema_version", "verification_tier", "baseline", "eval_contract_digest", "entries"],
+  "properties": {
+    "schema_version": {"enum": [1, 2]},
+    "verification_tier": {"const": "agent_reviewed_local_pilot"},
+    "baseline": {
+      "type": "object",
+      "required": ["commit", "skills_tree", "tracked_input_digest"],
+      "properties": {
+        "commit": {"$ref": "#/$defs/git_sha"},
+        "skills_tree": {"$ref": "#/$defs/git_sha"},
+        "tracked_input_digest": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "eval_contract_digest": {"$ref": "#/$defs/sha256"},
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/entry"}
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "git_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "artifact_ref": {
+      "type": "object",
+      "required": ["path", "sha256", "utf8_bytes"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^pilot-evidence/"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "utf8_bytes": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "content_digests": {
+      "type": "object",
+      "required": [
+        "body",
+        "routing_card",
+        "frontmatter_description",
+        "agent_short_description",
+        "agent_default_prompt",
+        "context_targets",
+        "resource_inventory"
+      ],
+      "properties": {
+        "body": {"$ref": "#/$defs/sha256"},
+        "routing_card": {"$ref": "#/$defs/sha256"},
+        "frontmatter_description": {"$ref": "#/$defs/sha256"},
+        "agent_short_description": {"$ref": "#/$defs/sha256"},
+        "agent_default_prompt": {"$ref": "#/$defs/sha256"},
+        "context_targets": {"$ref": "#/$defs/sha256"},
+        "resource_inventory": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "entry": {
+      "type": "object",
+      "required": [
+        "order",
+        "skill_id",
+        "source_sha256",
+        "content_digests",
+        "accepted_candidate_tracked_input_digest",
+        "model",
+        "case_ids",
+        "baseline_evidence",
+        "candidate_evidence",
+        "comparison",
+        "result"
+      ],
+      "properties": {
+        "order": {"type": "integer", "minimum": 1},
+        "skill_id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+        "atomic_dependency_group": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "content_digests": {"$ref": "#/$defs/content_digests"},
+        "accepted_candidate_tracked_input_digest": {"$ref": "#/$defs/sha256"},
+        "model": {"type": "string", "minLength": 1},
+        "case_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "baseline_evidence": {"$ref": "#/$defs/artifact_ref"},
+        "candidate_evidence": {"$ref": "#/$defs/artifact_ref"},
+        "comparison": {"$ref": "#/$defs/artifact_ref"},
+        "result": {
+          "type": "object",
+          "required": ["status", "behavior", "admission", "release_eligible"],
+          "properties": {
+            "status": {"const": "PASS"},
+            "behavior": {"const": "agent-reviewed"},
+            "admission": {"const": "unverified"},
+            "release_eligible": {"const": false}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

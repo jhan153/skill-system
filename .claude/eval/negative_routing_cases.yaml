@@ -11,6 +11,9 @@ cases:
     quality_notes: "Word meaning is not a plan artifact."
     friction_risk: "unrequested document creation"
   - case_id: neg-002
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [analysis-router]
     user_request: "이 개념을 가볍게 탐색해보자."
     expected_primary_skill: null
     expected_supporting_skills: []
@@ -19,6 +22,17 @@ cases:
     expected_output_shape: "brief exploratory conversation"
     quality_notes: "No deep workflow unless requested."
     friction_risk: "over-routing"
+    expected_behaviors:
+      - answer_light_exploration_without_deep_router
+      - avoid_repository_context
+    forbidden_behaviors:
+      - invoke_analysis_router
+      - expand_into_deep_analysis_workflow
+    required_evidence:
+      - type: route_absence
+        expected: analysis-router
+      - type: context_scope
+        expected: no_repository_context
   - case_id: neg-003
     user_request: "간단히 diff 요약해줘."
     expected_primary_skill: report-diff
@@ -137,6 +151,9 @@ cases:
     quality_notes: "Structural split is refactor ownership, not post-development pruning."
     friction_risk: "source maintenance stealing structural refactor requests"
   - case_id: neg-workflow-comment-maintenance-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-comment-maintenance]
     user_request: "주석이랑 docstring이 뭐가 다른 거야?"
     expected_primary_skill: null
     expected_supporting_skills: []
@@ -145,6 +162,18 @@ cases:
     expected_output_shape: "short conceptual explanation"
     quality_notes: "Concept explanation does not start a comment maintenance workflow."
     friction_risk: "triggering comment execution on a terminology question"
+    expected_behaviors:
+      - answer_comment_docstring_concept_directly
+      - avoid_comment_maintenance_workflow
+      - preserve_no_write_scope
+    forbidden_behaviors:
+      - invoke_workflow_comment_maintenance
+      - mutate_codebase
+    required_evidence:
+      - type: route_absence
+        expected: workflow-comment-maintenance
+      - type: mutation_absence
+        expected: pass
   - case_id: neg-workflow-comment-maintenance-002
     user_request: "리팩터링하면서 주석도 같이 맞춰줘."
     expected_primary_skill: workflow-refactor-safely

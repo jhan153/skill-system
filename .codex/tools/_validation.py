@@ -141,19 +141,44 @@ def jsonschema_available() -> bool:
     return Draft202012Validator is not None
 
 
-def validate_schema_subset(instance: Any, schema: dict[str, Any], path: str = "$") -> list[str]:
+def resolve_local_schema_ref(root_schema: dict[str, Any], ref: str) -> dict[str, Any] | None:
+    if not ref.startswith("#/"):
+        return None
+    current: Any = root_schema
+    for raw_part in ref[2:].split("/"):
+        part = raw_part.replace("~1", "/").replace("~0", "~")
+        if not isinstance(current, dict) or part not in current:
+            return None
+        current = current[part]
+    return current if isinstance(current, dict) else None
+
+
+def validate_schema_subset(
+    instance: Any,
+    schema: dict[str, Any],
+    path: str = "$",
+    _root_schema: dict[str, Any] | None = None,
+) -> list[str]:
     """Validate the small JSON Schema subset used by this repository."""
 
     errors: list[str] = []
+    root_schema = _root_schema or schema
+
+    ref = schema.get("$ref")
+    if isinstance(ref, str):
+        resolved = resolve_local_schema_ref(root_schema, ref)
+        if resolved is None:
+            return [f"{path}: unsupported or unresolved schema reference {ref!r}"]
+        return validate_schema_subset(instance, resolved, path, root_schema)
 
     if "allOf" in schema:
         for idx, subschema in enumerate(schema["allOf"]):
-            errors.extend(validate_schema_subset(instance, subschema, f"{path}.allOf[{idx}]"))
+            errors.extend(validate_schema_subset(instance, subschema, f"{path}.allOf[{idx}]", root_schema))
 
     if "if" in schema:
-        if not validate_schema_subset(instance, schema["if"], path):
+        if not validate_schema_subset(instance, schema["if"], path, root_schema):
             if "then" in schema:
-                errors.extend(validate_schema_subset(instance, schema["then"], path))
+                errors.extend(validate_schema_subset(instance, schema["then"], path, root_schema))
         return errors
 
     if "const" in schema and instance != schema["const"]:
@@ -182,7 +207,7 @@ def validate_schema_subset(instance: Any, schema: dict[str, Any], path: str = "$
         elif isinstance(properties, dict):
             for key, subschema in properties.items():
                 if key in instance:
-                    errors.extend(validate_schema_subset(instance[key], subschema, f"{path}.{key}"))
+                    errors.extend(validate_schema_subset(instance[key], subschema, f"{path}.{key}", root_schema))
             if schema.get("additionalProperties") is False:
                 allowed = set(properties)
                 for key in sorted(set(instance) - allowed):
@@ -195,14 +220,14 @@ def validate_schema_subset(instance: Any, schema: dict[str, Any], path: str = "$
         item_schema = schema.get("items")
         if isinstance(item_schema, dict):
             for idx, item in enumerate(instance):
-                errors.extend(validate_schema_subset(item, item_schema, f"{path}[{idx}]"))
+                errors.extend(validate_schema_subset(item, item_schema, f"{path}[{idx}]", root_schema))
 
     if isinstance(instance, str):
         min_length = schema.get("minLength")
         if isinstance(min_length, int) and len(instance) < min_length:
             errors.append(f"{path}: expected minLength {min_length}, got {len(instance)}")
         pattern = schema.get("pattern")
-        if isinstance(pattern, str) and re.fullmatch(pattern, instance) is None:
+        if isinstance(pattern, str) and re.search(pattern, instance) is None:
             errors.append(f"{path}: value {instance!r} does not match pattern {pattern!r}")
         if schema.get("format") == "date" and not is_iso_date(instance):
             errors.append(f"{path}: expected ISO date, got {instance!r}")

@@ -3,10 +3,12 @@ purpose: "Positive routing examples for common requests."
 cases:
   - case_id: route-001
     schema_version: 2
+    behavior_contract_owners: [analysis-router]
+    scenario_tags: [edge]
     user_request: "analysis-bug로 이 장애를 분석해줘."
     expected_primary_skill: analysis-bug
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase]
+    should_not_trigger: [analysis-codebase, analysis-router]
     expected_context: [symptom, repro, logs]
     expected_output_shape: "root cause analysis"
     quality_notes: "Explicit skill invocation wins."
@@ -15,9 +17,12 @@ cases:
       - route_to_analysis_bug
     forbidden_behaviors:
       - route_to_analysis_codebase
+      - route_to_analysis_router
     required_evidence:
       - type: route_match
         expected: analysis-bug
+      - type: route_absence
+        expected: analysis-router
   - case_id: route-002
     schema_version: 2
     user_request: "srq로 검증 결과를 보고해줘."
@@ -315,6 +320,8 @@ cases:
         expected: report-lifecycle-artifacts
   - case_id: route-grp-001
     schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [analysis-router]
     user_request: "분석 스킬군에서 적절한 스킬 골라줘."
     expected_primary_skill: analysis-router
     expected_supporting_skills: []
@@ -326,11 +333,19 @@ cases:
     friction_risk: "selecting a non-entry skill in the family"
     expected_behaviors:
       - select_analysis_family_entry
+      - route_without_repository_inspection
+      - stop_after_group_entry_selection
     forbidden_behaviors:
       - select_non_entry_skill_by_default
+      - inspect_repository_during_routing
+      - execute_specialist_analysis_in_router
     required_evidence:
       - type: route_match
         expected: analysis-router
+      - type: context_scope
+        expected: no_repository_context
+      - type: router_stop
+        expected: family_entry_selected
   - case_id: route-grp-002
     schema_version: 2
     user_request: "보고 스킬군으로 이 결과 검토해줘."

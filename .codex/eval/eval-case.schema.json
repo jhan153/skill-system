@@ -95,6 +95,22 @@
         "host-assisted"
       ]
     },
+    "behavior_contract_owners": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "scenario_tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
     "direct_invocation": {
       "type": "boolean"
     },

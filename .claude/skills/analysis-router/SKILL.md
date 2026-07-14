@@ -76,9 +76,3 @@ description: "Route deep technical analysis to bug diagnosis, algorithm selectio
 - Keep rationale to the decisive signal and any material assumption.
 - Hand the answer to the selected specialist; do not expose router internals unless requested.
 - Mark missing downstream evidence `Unverified` rather than expanding context during routing.
-
-## Boundary Checks
-- Use `analysis-codebase` only for explicit repo-wide report artifacts.
-- Use `workflow-implementation` or `workflow-bug-fix` for writes.
-- Use ordinary Q&A for conceptual explanations, casual exploration, validation-only requests, and obvious local fixes.
-- Do not mutate code, plans, memory, knowledge, or reports from this router.

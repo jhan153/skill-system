@@ -17,6 +17,8 @@ The 66 canonical `source/skills/*/SKILL.md` files are frozen for later 9.2.0 bef
 
 Words are counted as non-whitespace spans and bytes as UTF-8 encoded bytes. These are measured instruction surfaces, not tokenization or billing measurements. A smaller 9.2.0 result is acceptable only when the paired positive and negative/edge behavior contracts remain satisfied; moving content into eagerly admitted references does not count as a reduction.
 
+The reproducible per-skill inventory and comparison rules are defined in `skill_diet_protocol.md` and `.codex/eval/baselines/skill-diet-9.1.2.yaml`. The initial coverage audit records 263 declared eval cases, 77 schema-v2 cases, structured primary contracts for 34 of 66 skills, observable structured-positive candidates for 3 skills, structured-negative candidates for 53 skills, explicit edge ownership for 0 skills, and zero fresh 9.1.2 observed runs. The evidence schema now supports source/oracle/run/output/verifier binding, but behavior and actual admitted context remain explicitly unverified until those missing contracts and receipts are populated.
+
 ## Audit Standard
 
 Each current skill was checked for:

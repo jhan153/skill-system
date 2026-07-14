@@ -197,6 +197,19 @@ def text_output(value: str | bytes | None) -> str:
 
 def core_checks(root: Path) -> list[Check]:
     py = sys.executable
+    skill_diet_command = [
+        py,
+        ".codex/tools/compare_skill_diet.py",
+        "check",
+        "--root",
+        str(root),
+        "--manifest",
+        ".codex/eval/baselines/skill-diet-9.1.2.yaml",
+        "--schema",
+        ".codex/eval/skill-diet-baseline.schema.json",
+    ]
+    if (root / ".git").exists():
+        skill_diet_command.append("--require-git-provenance")
     return [
         Check("doc_freshness", [py, ".codex/tools/check_doc_freshness.py", "."], root),
         Check("tool_requirements", [py, ".codex/tools/check_tool_requirements.py"], root),
@@ -218,6 +231,11 @@ def core_checks(root: Path) -> list[Check]:
         Check("source_registry", [py, ".codex/tools/validate_source_registry.py", ".codex/docs/source_registry.yaml"], root),
         Check("invocation_surface_policy", [py, ".codex/tools/check_invocation_surface_policy.py"], root),
         Check("work_horizon_policy", [py, ".codex/tools/check_work_horizon_policy.py"], root),
+        Check(
+            "skill_diet_baseline",
+            skill_diet_command,
+            root,
+        ),
         Check(
             "work_item_lifecycle",
             [py, ".codex/tools/validate_work_item.py", ".codex/schemas/workitem/examples/work-item.example.yaml"],
