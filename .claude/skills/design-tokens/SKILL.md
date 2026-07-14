@@ -8,29 +8,16 @@ description: "Normalize and audit design token sources for design-to-production 
 ## Routing Card
 - role: design_evidence_gate
 - intent_signature:
-  - design token source
-  - token normalization
-  - platform token export
-  - token gap and conflict audit
-  - color typography spacing radius shadow motion breakpoint tokens
+  - design-token source normalization, platform mapping, or gap/conflict audit
 - use_when:
-  - a design-to-production task needs token source handling before implementation or review.
-  - token transformation evidence must be recorded for visual or component verification.
-  - the user asks to compare design tokens with CSS variables, Tailwind config, theme files, or component styles.
+  - design-to-production work needs token evidence before implementation/review, or the user asks to compare tokens with CSS variables, Tailwind/theme config, or component styles.
 - do_not_use_when:
   - the task only needs component state mapping, screenshot comparison, or accessibility checks.
-  - no design source or token source is available and the user expects invented values.
   - the user asks for direct UI implementation from a concrete visual artifact; use `design-frontend` as primary and this skill only as a supporting gate.
 - expected_inputs:
-  - design token source, style guide, or design reference
-  - target platform or repository styling conventions
-  - expected token categories and output format when available
+  - token/style source, target platform or repo styling conventions, and requested categories/output
 - expected_outputs:
-  - token source pointer
-  - normalized token inventory
-  - platform token mapping
-  - inferred values and unresolved token gaps
-  - conflicts and do-not-generate notes
+  - source-grounded token inventory/mapping plus inferences, gaps, conflicts, and do-not-generate notes
 - context_targets:
   must_read:
     - token source or design reference
@@ -46,43 +33,26 @@ description: "Normalize and audit design token sources for design-to-production 
     - full repo history
     - live credentials
 - risk_profile:
-  reads:
-    - design references, token files, style system files
-  writes:
-    - token artifacts and registry entries only when explicitly requested
-  tools:
-    - local read-only parsing and validation scripts
-  sensitive_resources:
-    - credentials and authenticated live sessions default deny
+  reads: design references, token files, and style-system files
+  writes: token artifacts and registry entries only when explicitly requested
+  tools: local parsing and focused validation
+  sensitive_resources: credentials and authenticated live sessions default deny
 - entry_scene:
   - PREPARE
 
-Use this skill when a design-to-production task needs trustworthy token source handling. Keep it as an evidence gate: it can support implementation, but it does not own UI code changes unless the user explicitly asks for token artifact edits.
+This is a token-evidence gate. It supports implementation but does not own UI code changes unless token artifact edits are explicitly requested.
 
 ## Workflow
-1. Identify the source of truth:
-   - Prefer explicit token files, design-system theme files, exported token tables, or style-guide specs.
-   - Treat screenshot-derived colors, spacing, and typography as inferred candidates, not confirmed tokens.
-   - Record source paths, frame names, URLs, or artifact IDs as `source_pointer`.
-2. Classify token categories:
-   - Use color, typography, spacing, radius, border, shadow/elevation, opacity, motion, breakpoint, z-index, and semantic role categories.
-   - Separate raw values from semantic aliases such as `color.action.primary` or `space.card.padding`.
-3. Normalize names and values:
-   - Preserve existing repo naming style when a platform target exists.
-   - Keep role-based names where possible; avoid only raw-value names like `blue500` when the source clearly encodes intent.
-   - Mark aliases, inherited values, and mode-specific values.
-4. Map to the target platform:
-   - CSS variables, Tailwind config, JS/TS theme objects, native constants, or design-token JSON may be targets.
-   - Do not generate platform exports unless the user explicitly requests file changes.
-5. Detect gaps and conflicts:
-   - Missing values remain `missing_values`.
-   - Conflicting definitions remain `conflicts`.
-   - Inferred values remain `inferred_values` with the inference basis.
-6. Hand off evidence:
-   - Provide token mapping to `design-frontend`, `design-component-mapper`, or visual review when implementation continues.
+1. Identify and record source pointers. Prefer a declared canonical token/design-system source; otherwise use the precedence in `references/token-normalization.md`. Screenshot/rendered values are inferred candidates only.
+2. Freeze source precedence before mapping. If authority is unresolved, keep both values and pointers in `conflicts`; never let a convenient source win. If a declared canonical source wins, still record any displaced live/legacy mismatch in `conflicts`.
+3. Normalize requested categories, separating raw values from semantic aliases and preserving existing repo naming, shape, typing, modes, and platform conventions. Use `references/token-normalization.md` for detailed categories.
+4. Map only to the requested CSS, Tailwind, theme-object, native, or token-JSON target. Do not create exports unless file changes were explicitly requested.
+5. Keep missing values missing and inferred values labeled with their basis. For a required gap, request canonical evidence or an explicit scoped assumption/user decision; do not mark it ready. Use `references/token-gap-policy.md` when names, aliases, modes, priority, or values are incomplete.
+6. For requested edits, inspect the real consumer path and read back the resulting token value/alias/mode from that path. If it resolves another source, keep the condition open, correct selection in the owning module, and repeat the same-path readback. A parser inventory, mock, or generated file presence proves only its own boundary.
+7. Hand the scoped mapping and unresolved items to `design-frontend`, `design-component-mapper`, or visual review; do not claim UI completion from token readiness.
 
 ## Output
-For a narrow token question, return only the source mapping, conflict, or missing value in scope. Use the structured shape for an explicit token inventory/export artifact; omit empty categories.
+For a narrow question, return only the mapping, conflict, or gap in scope. For an explicit inventory/export artifact, omit empty fields from this shape:
 
 ```yaml
 source_pointer: []
@@ -105,35 +75,9 @@ do_not_generate: []
 unverified: []
 ```
 
-## Validation
-- Every confirmed token must cite a source pointer.
-- Every platform token must map to a source token or be marked `inferred`.
-- Missing values must stay gaps; do not silently invent colors, sizes, names, or aliases.
-- If a script is used, include the command and state that it is an inventory aid, not a full design-system proof.
-- If no token source exists, report `user-verification-needed` or `unverified`; do not claim token readiness.
-- Do not expand one surface's token gap into a full design-system redesign or exhaustive token catalog.
-
-## Recovery
-- If token files cannot be parsed, inspect a smaller file or report parser failure with the path and error.
-- If source and repo naming conflict, keep both names and list the proposed bridge mapping.
-- If the repo has no token system, produce an inventory and recommend the smallest local constants needed for the requested UI surface.
-- If multiple themes or modes exist, report mode coverage separately.
-
-## Known Limits
-- Screenshot-derived values are approximate and must remain inferred.
-- NN/g or visual taste is not token evidence.
-- This skill cannot certify full accessibility contrast alone; hand off contrast to `design-a11y-audit`.
-- This skill should not broaden a UI task into full design-system redesign.
-
-## Do not invent / Unverified policy
-- Do not invent missing token values, semantic names, or design-system hierarchy.
-- Mark unavailable sources, inferred measurements, and approximate values as `Unverified`.
-- Keep subjective palette concerns separate from verified source-token mismatches.
-
-## Optional resources
-- Read `references/token-normalization.md` for category and naming guidance.
-- Read `references/token-gap-policy.md` when values, names, aliases, or source priority are incomplete.
-- Use `scripts/inspect_tokens.py` only as a read-only local inventory helper.
-
-## Completion Boundary
-Do not mark design implementation complete from this gate alone. This skill verifies token readiness; visual, accessibility, component-state, and repo validation remain separate gates.
+## Validation And Limits
+- Every confirmed token cites a source pointer; every platform token maps to that source or remains `inferred`. Multiple modes report coverage separately.
+- Never invent a missing value, semantic name, alias, hierarchy, or source priority. No source means `user-verification-needed` or `unverified`, not readiness.
+- Report parser failure with path/error. `scripts/inspect_tokens.py` is a read-only inventory aid, not correctness or design-system proof.
+- Keep subjective palette critique separate from verified mismatch. Screenshot values and visual taste are not token authority.
+- Do not broaden one surface into a redesign or exhaustive catalog. Accessibility contrast belongs to `design-a11y-audit`; visual, component-state, repo, and user-visible validation remain separate gates.
