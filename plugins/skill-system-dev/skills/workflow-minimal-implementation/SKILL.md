@@ -23,7 +23,7 @@ description: Conditional minimal-implementation policy for coding and refactorin
 - expected_outputs:
   - minimum viable change shape and reuse choice
   - skipped complexity with a concrete revisit trigger
-  - focused check for non-trivial logic
+  - decisive check for the requested behavior
   - deletion-focused findings only when the diff shows pressure signals
 - context_targets:
   must_read:
@@ -31,7 +31,7 @@ description: Conditional minimal-implementation policy for coding and refactorin
     - directly relevant source and local patterns
   read_if_needed:
     - dependency manifest when package choice is in scope
-    - touched tests or validation contract for non-trivial logic
+    - validation contract or actual output path for non-trivial behavior
     - current diff when review pressure signals appear
     - adjacent helper API when reuse is plausible
   do_not_load_by_default:
@@ -51,8 +51,9 @@ description: Conditional minimal-implementation policy for coding and refactorin
 ## Decision Contract
 - Constrain solution shape; never replace the primary workflow or its correctness and validation duties.
 - Optimize for the smallest coherent change that satisfies current requirements, not the fewest lines at any cost.
-- Preserve trust-boundary validation, security, data-loss prevention, accessibility, operability, and explicit user scope.
-- Apply the pressure only where a real complexity choice exists; otherwise stay silent.
+- Preserve canonical-source ownership, fail-closed behavior, security, data integrity, accessibility, operability, and explicit scope.
+- Tests, mocks, interfaces, and wrappers do not substitute for the requested production path.
+- Apply this modifier only where a real complexity choice exists.
 
 ## Minimum Ladder
 Stop at the first rung that fully satisfies the current requirement:
@@ -60,43 +61,25 @@ Stop at the first rung that fully satisfies the current requirement:
 1. Remove or defer behavior that is speculative rather than requested.
 2. Use standard-library or native-platform behavior.
 3. Reuse an installed dependency or an existing local helper.
-4. Make the narrowest local implementation and focused test change.
+4. Change the narrowest production owner and observe the affected path.
 5. Add a dependency, file, configuration surface, or abstraction only when the earlier rungs cannot satisfy a current requirement.
 
 When two rungs are equally small, prefer the one that fits established local patterns and handles required edge cases better.
 
 ## Complexity Gate
-Require a current-use justification for each new:
-
-- package or framework;
-- file or generated layer;
-- interface, factory, adapter, registry, or wrapper;
-- configuration option or extension point;
-- generic infrastructure replacing one concrete use.
-
-A possible future use is not a justification. Existing repeated use, a present boundary, or an explicit requirement is. If no justification exists, cut the addition or fold it into the narrow local change.
+Require a current-use justification for every new package, file/layer, interface/adapter/wrapper, configuration option, or generic infrastructure. Future reuse is not justification; use an existing repeated need, present boundary, or explicit requirement. Keep source selection, policy, and fallback in their real owner rather than moving them into a convenience adapter.
 
 ## Attach Points
-- Before the primary workflow writes: identify `minimum_behavior`, the selected ladder rung, and any non-negotiable safeguard.
-- During implementation: re-evaluate only when a pressure signal appears; do not narrate routine small choices.
-- After implementation: run the review pass only if the diff added a dependency, abstraction, config surface, extra file, broad boilerplate, or substantially more churn than the behavior suggests.
-- For non-trivial logic, require one focused runnable check in the repository's existing style. If it cannot run, leave the gap explicit rather than weakening the solution.
+- Before writing, identify `minimum_behavior`, its production owner, the selected rung, and non-negotiable safeguards.
+- Re-evaluate only when the diff adds a dependency, abstraction, config surface, file, boilerplate, or disproportionate churn.
+- Use one decisive runnable check or readback for non-trivial behavior. A regression test is useful after the contract is known, but cannot alone prove a semantic condition or an unexercised production path.
 
 ## Review Pass
 Emit one line only for a meaningful cut:
 
 `<path>:<line>: <tag>: <what to cut>. <replacement>.`
 
-Tags:
-
-- `delete`: unused or speculative behavior.
-- `stdlib`: custom code covered by the standard library.
-- `native`: custom/dependency code covered by the platform.
-- `reuse`: duplicate of an existing helper or installed dependency.
-- `yagni`: layer or option without a current second use or boundary.
-- `shrink`: same behavior with less code and no safety/clarity loss.
-
-If useful, end with `net: -<N> lines possible`; otherwise omit the estimate. If there is nothing material to cut, say `No material minimality cut.` This is not a correctness or release verdict.
+Use `delete`, `stdlib`, `native`, `reuse`, `yagni`, or `shrink`. Optionally end with `net: -<N> lines possible`. If there is no material cut, say `No material minimality cut.` This is not a correctness or release verdict.
 
 ## Output Contract
 Expose only decisions that matter to the user or primary workflow:
@@ -108,17 +91,16 @@ Expose only decisions that matter to the user or primary workflow:
 - `focused_check`
 - optional review findings
 
-Do not produce a long minimalism report for a small diff. Use a `minimal:` code comment only when an intentional shortcut has a known ceiling; name both the ceiling and the condition that should trigger revision.
+Do not produce a long report for a small diff. Use a `minimal:` code comment only for an intentional shortcut with a named ceiling and revision trigger.
 
 ## Recovery and Limits
-- If minimum behavior is ambiguous, choose the smallest safe interpretation and state the assumption, or ask one question when the deliverable would materially differ.
-- If the minimal version fails validation, fix the cause; do not add bypasses or weaken checks to preserve diff size.
-- If the user confirms the broader design, stop challenging its scope and apply minimality only inside that design.
-- This modifier cannot enforce dependency or file budgets and is not a correctness, security, performance, or accessibility review.
+- Ask one question only when competing interpretations materially change the deliverable; otherwise state the smallest safe assumption.
+- Fix the cause of failed validation. Do not add a bypass, silent fallback, weaker check, or mock-only path to preserve diff size.
+- Apply minimality inside a user-confirmed broader design. This modifier is not a correctness, security, performance, or accessibility review.
 
 ## Validation
 - Every added dependency, abstraction, config surface, and extra file has a current-use justification.
 - The chosen rung satisfies all explicit behavior and safeguards.
-- Non-trivial logic has a focused check or an explicit unverified gap.
+- Non-trivial behavior has a decisive check/readback or an explicit unverified gap.
 - The review ran only when a pressure signal existed.
 - The output records skipped complexity and a concrete revisit trigger without duplicating the primary workflow report.

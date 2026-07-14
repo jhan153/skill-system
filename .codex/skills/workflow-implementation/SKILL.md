@@ -1,6 +1,6 @@
 ---
 name: workflow-implementation
-description: Primary workflow for direct software implementation. Use when the user requests building, changing, adding tests, wiring APIs, updating scripts, or making repo code/config changes from current requirements. Do not use for behavior-preserving refactors, concrete bug fixes, approved plan execution, or repeated failure recovery.
+description: Primary workflow for direct software implementation. Use when the user requests production code, API, script, config, build, or explicitly scoped test changes from current requirements. Do not use for behavior-preserving refactors, concrete bug fixes, approved plan execution, repeated failure recovery, or analysis/validation-only work.
 ---
 
 # Workflow Implementation
@@ -28,16 +28,15 @@ description: Primary workflow for direct software implementation. Use when the u
   - relevant repository files and existing local patterns
   - explicit constraints, non-goals, and validation expectations when available
 - expected_outputs:
-  - scoped implementation, changed artifacts, focused validation result, review notes, remaining gaps, and user-verification needs
+  - scoped production-path change, condition-bound evidence, remaining gaps, and user-verification needs
 - context_targets:
   must_read:
     - current implementation request
     - repository instructions such as `AGENTS.md`
     - target files or nearest existing patterns for the requested behavior
   read_if_needed:
-    - package manifests, build/test docs, or validation contract
-    - adjacent helper APIs and call sites
-    - active plan only when the user explicitly references it as task input
+    - adjacent callers, canonical data/source owner, package manifest, or validation contract
+    - active plan only when explicitly referenced as task input
   do_not_load_by_default:
     - full repo
     - full memory bank
@@ -45,7 +44,7 @@ description: Primary workflow for direct software implementation. Use when the u
     - unrelated plans or transcripts
 - risk_profile:
   reads:
-    - targeted source, tests, configs, manifests, and validation output
+    - targeted source, callers, tests, configs, manifests, and observed output
   writes:
     - WRITE_CODEBASE for the requested implementation scope
   tools:
@@ -55,40 +54,26 @@ description: Primary workflow for direct software implementation. Use when the u
 - entry_scene:
   - PREPARE
 
-## Purpose
-- Own ordinary coding work from requirement to verified diff.
-- Keep implementation concrete: source, test, runtime config/build, or executable scaffold changes.
-- Attach analysis, minimality, rigor, validation, or recovery only when their narrower trigger is present.
-
-## Activation
-- Primary for direct "implement", "add", "wire", "update tests", or "change this behavior" requests.
-- Attach `workflow-minimal-implementation` when abstraction, dependency, file-count, or boilerplate pressure appears.
-- Attach `workflow-rigor` for medium/high-risk changes.
-- Attach `workflow-validation` when installed or when the user explicitly asks for a validation matrix; otherwise use the local Validation Rules and mark deeper validation as `user_verification_needed`.
-- Use `workflow-bug-fix` instead when the task starts from a failing behavior that must be fixed.
-- Use `workflow-refactor-safely` instead when the task is behavior-preserving restructuring.
+## Contract
+- Own ordinary coding work from requirement through the production-path change and its evidence.
+- Implementation means the requested source, runtime config/build, or executable behavior. Plans, docs, mocks, interfaces, or tests alone are not completion unless they are the whole requested deliverable.
+- Keep canonical source selection, domain policy, fallback, and failure behavior in the module that owns them. Adapters may translate shape; they must not silently choose those policies.
+- Surface a missing or mismatched required/canonical input as a failing outcome or explicit user decision. Do not catch it into a placeholder, warning, legacy/lower-quality fallback, or success-looking partial result.
 
 ## Workflow
-1. Define the requested behavior and observable success condition.
-2. Inspect the smallest relevant code surface and existing local pattern.
-3. Choose the smallest coherent change shape and validation target.
-4. Edit only files tied to the requested behavior.
-5. Run the focused validation that can catch the realistic failure mode.
-6. Inspect the diff for scope creep, accidental churn, and missed call sites.
-7. Report changed artifacts, validation evidence, user checks, and remaining gaps.
+1. State the observable success condition and one material negative or edge case.
+2. Inspect the smallest real caller-to-output path, including the canonical source or policy owner when selection is involved.
+3. Change that owner path with the smallest coherent diff; reuse local patterns before adding a layer or dependency.
+4. Observe the changed path with the narrowest check that can expose the realistic failure. Add a regression test only after its expected behavior is anchored; do not use a new test to invent the contract.
+5. Inspect the diff for scope creep, accidental churn, missed callers, and policy-owning wrappers.
+6. Report each material condition as evidenced, user-only, or unresolved.
 
-## Implementation Rules
-- Prefer existing helpers, patterns, and repo conventions over new abstractions.
-- Add tests when the behavior is non-trivial, shared, or regression-prone and the repo has a clear test style.
-- Do not treat documentation, TODOs, plans, or reports as implementation completion unless the user explicitly requested only those artifacts.
-- Do not broaden from a local implementation to a framework, package, generated scaffold, or cross-module rewrite without evidence that the current requirement needs it.
-- If a required behavior cannot be implemented safely from the available context, report the missing input rather than inventing it.
-
-## Validation Rules
-- Pick the narrowest meaningful command or manual check for the changed behavior.
-- Prefer targeted tests over broad suites unless the change touches shared behavior or the repo convention requires the broader check.
-- Separate `agent_verified`, `user_verification_needed`, and `unverified` evidence in the final report.
-- If validation fails with the same signature after a targeted fix, hand off to `workflow-recovery`.
+## Evidence Gate
+- Match each completion claim to the condition and surface the evidence actually covers. Structural checks prove structure; mocks prove the mocked boundary; agent-authored tests are regression/self-check evidence, not an independent semantic oracle.
+- Require actual-path readback for source selection, migration, media/data transforms, adapters, and external boundaries. A lower-scope pass cannot replace it.
+- A required `fail`, `needs_review`, `unverified`, or `blocked` condition stays open until evidence from that same condition resolves it.
+- If direct observation needs unavailable GUI, credentials, or external state, return `user_verification_needed` or `unverified`; do not add a surrogate path and call it complete.
+- After the same failure survives a targeted change, hand the failing slice to `workflow-recovery`.
 
 ## Output Contract
 Return only the sections needed:
@@ -99,25 +84,3 @@ Return only the sections needed:
 - `user_verification_needed`
 - `unverified_gaps`
 - `next_step`
-
-## Cross-Skill Boundaries
-- `workflow-plan-runner` owns approved plan/spec/package execution order.
-- `workflow-bug-fix` owns concrete failure repair.
-- `workflow-recovery` owns repeated failure-loop intervention.
-- `analysis-codebase-design` owns module-boundary and deep-module design judgment before or after implementation.
-- `workflow-minimal-implementation` owns YAGNI pressure; it does not replace implementation ownership.
-- `workflow-rigor` owns evidence depth and completion discipline for risky changes.
-- `workflow-validation` owns validation-only work and check matrices when installed or explicitly requested.
-- `design-frontend` owns concrete visual UI implementation when the visual/design surface is primary.
-
-## Invocation Examples
-Positive:
-- "이 API 필드 추가하고 테스트도 맞춰줘."
-- "이 API 라우트를 기존 패턴대로 구현해줘."
-- "스크립트 옵션 하나 추가하고 검증까지 해줘."
-
-Negative:
-- "이 버그 원인만 분석해줘." -> `analysis-bug`
-- "이 모듈을 동작 보존하면서 리팩터링해줘." -> `workflow-refactor-safely`
-- "같은 테스트가 또 실패해. fake fix 말고 격리하자." -> `workflow-recovery`
-- "이 승인된 plan package Phase 2를 실행해." -> `workflow-plan-runner`

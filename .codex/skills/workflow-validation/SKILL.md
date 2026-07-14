@@ -1,6 +1,6 @@
 ---
 name: workflow-validation
-description: Designs or runs focused validation plans for completed or planned changes. Use when the user asks for validation strategy, test/smoke/manual-check selection, verification matrices, or validation-only execution; attach as support during implementation when validation is the narrow concern.
+description: Design or run focused validation for planned or completed changes. Use for validation strategy, check selection, verification matrices, or validation-only execution; support implementation only when evidence selection is non-obvious.
 ---
 
 # Workflow Validation
@@ -15,39 +15,29 @@ description: Designs or runs focused validation plans for completed or planned c
   - 검증만
   - 테스트/스모크/수동확인 매트릭스
 - use_when:
-  - the user asks how to validate an implementation, migration, plan, or changed artifact.
-  - the user asks to run validation only after implementation is already complete.
-  - an active workflow has a non-obvious validation choice, multi-surface risk, or agent/manual evidence split that the primary owner cannot express with one local check.
+  - the user asks how to validate, or to validate an already changed artifact.
+  - an active workflow has non-obvious, multi-surface, or agent/manual evidence choices.
 - do_not_use_when:
-  - the user is asking to implement the change, not design or run validation.
-  - the request is skill-system runtime usage eval; use `evaluation-harness`.
-  - the user asks for critical verdicts, blockers, or risk review; use `report-critical`.
-  - one obvious command is explicitly requested and no validation strategy is needed.
-  - normal implementation validation is already clear from repository instructions and the change's direct test.
+  - the user asks to implement rather than validate.
+  - the request is usage eval (`evaluation-harness`) or a critical verdict (`report-critical`).
+  - one obvious check or normal repository validation already suffices.
 - expected_inputs:
-  - changed files, planned change, or artifact under validation
-  - success criteria, acceptance criteria, or risk boundary
-  - available test/build/lint/smoke commands when known
+  - target artifact/change, success criteria, risk boundary, and available checks
 - expected_outputs:
-  - validation scope, check matrix, command/manual split, expected signal, status, and unverified gaps
+  - condition-to-evidence matrix, oracle authority, status, and unverified gaps
 - context_targets:
   must_read:
     - current validation request
     - changed artifact or plan/spec slice under validation
   read_if_needed:
-    - repo validation contract
-    - package scripts, test docs, or CI config
-    - active plan/spec only when referenced as the validation source
+    - validation contract, package scripts, CI config, or referenced plan/spec
   do_not_load_by_default:
-    - full repo
-    - full memory bank
-    - unrelated test suites
-    - eval cases unrelated to the target artifact
+    - full repo, memory, unrelated suites, or unrelated eval cases
 - risk_profile:
   reads:
-    - target artifact, validation docs, and command output
+    - target artifact, contract, and observed output
   writes:
-    - none by default; only update explicitly requested validation docs or tests
+    - none unless explicitly requested
   tools:
     - CALL_PROCESS for targeted non-destructive checks when command purpose is clear
   sensitive_resources:
@@ -55,58 +45,45 @@ description: Designs or runs focused validation plans for completed or planned c
 - entry_scene:
   - PREPARE
 
-## Activation
-- Primary when the user's actual goal is validation planning or validation-only execution.
-- Support only when `workflow-plan-runner`, `workflow-rigor`, or implementation work has a material validation-selection problem; ordinary focused checks stay with the primary owner.
-- Do not displace the implementation owner.
+## Contract
+- Validate the requested success condition, not the existence of a command or test.
+- Keep implementation ownership with the primary workflow. This skill selects evidence and prevents claims from exceeding its scope.
+- In normal implementation, ordinary focused checks stay with the primary owner.
+- Risk tier controls check breadth, not evidence authority.
 
 ## Workflow
-1. Define the validation target and success criteria.
-2. Classify checks as static, unit, integration, smoke, visual/manual, or environment-dependent.
-3. Pick the smallest check set that gives meaningful confidence for the risk.
-4. Run targeted commands only when safe and relevant.
-5. Record passed, failed, skipped, blocked, and `Unverified` checks separately.
-6. Recommend exactly one next validation action when confidence is still insufficient.
+1. List the material success conditions and classify each as `structural`, `runtime`, `semantic`, or `user-only`.
+2. Bind the expected result to its oracle: user decision, canonical source, external contract, formal invariant, observed behavior, or agent-authored assumption.
+3. Choose the smallest check that can expose the realistic failure on the actual path; run it only when safe.
+4. Record `pass`, `fail`, `needs_review`, `unverified`, and `blocked` per condition without promotion.
+5. Report exactly one next evidence-producing action when a material condition remains open.
+
+## Evidence Authority
+
+| Evidence | Can establish | Cannot establish alone |
+| --- | --- | --- |
+| schema/static/build | declared structure or compilation | runtime or user-visible semantics |
+| agent-authored test | the encoded assumption and regression memory | that the assumption is the user/canonical contract |
+| mock/fixture | behavior inside the mocked boundary | the production integration path |
+| runtime/readback | the observed path in that environment | unobserved environments or user-only judgment |
+| user/external acceptance | the accepted scope | unrelated conditions |
+
+- A semantic condition needs a non-agent oracle and evidence that exercises its material path. Tests may carry that oracle after it is established; they do not create it.
+- Source selection, migrations, media/data transforms, adapters, and external boundaries require actual-path readback. Confirm the selected output and fail-closed missing-source behavior; a placeholder or warning is not resolution unless the user contract accepts it.
+- Structural evidence is sufficient when the requested condition is genuinely structural, such as validating one schema artifact.
 
 ## Risk-Tier Check Sets
-- Low risk: static/schema check or one targeted unit check; no broad suite unless the change touches shared behavior.
-- Medium risk: static plus targeted unit/integration check; add smoke check when runtime behavior changes.
-- High risk: targeted static/unit/integration plus smoke or manual check; require rollback/fallback note for release-affecting changes.
+- Low: one decisive condition-matched check.
+- Medium: direct-path check plus the smallest material regression check.
+- High: direct-path/readback evidence plus relevant rollback, fallback-failure, or user/external observation.
 
 Do not use risk tier to inflate validation. Pick the narrowest set that can detect the realistic failure mode.
 
-## Change-Type Heuristics
-| Change type | Minimum useful checks |
-| --- | --- |
-| Config or schema | schema/config validation, startup smoke, default-value check |
-| API or contract | contract test, integration smoke, caller compatibility check |
-| UI or visual behavior | component/unit check when available, browser smoke, screenshot/manual visual check |
-| Migration or data transform | dry-run or fixture migration, rollback check, data shape assertion |
-| Build/runtime config | build command, startup smoke, environment variable/default check |
-| Test-only change | failing-test reproduction when possible, targeted test run, assertion quality review |
-| Documentation-only change | link/path check or no runtime validation; mark behavior as not exercised |
-
-## Support Handoff
-When attached to `workflow-plan-runner`, return validation results in batch terms:
-- batch id or change intent
-- check selected and why
-- agent-run result
-- user/manual result needed
-- unverified gap
-- next validation action
+## Completion Gate
+- A lower-scope pass never overrides conflicting or missing evidence. Mock success proves only the mock; command exit proves only the command's contract.
+- Required `fail`, `needs_review`, `unverified`, or `blocked` stays open until resolution/readback evidence addresses that same condition.
+- Missing GUI, credentials, external state, or user judgment remains `user_verification_needed` or `unverified`.
+- Passing checks do not imply release readiness unless the release gate explicitly binds the same conditions.
 
 ## Output Contract
-Return only the sections needed:
-- `validation_target`
-- `risk_boundary`
-- `risk_tier`
-- `checks_to_run`
-- `agent_verified`
-- `user_verification_needed`
-- `unverified_gaps`
-- `next_validation_action`
-
-## Known Limits
-- Validation can only confirm the covered behavior and environment.
-- Missing commands, credentials, GUI access, or external services remain `Unverified`.
-- Passing checks do not prove full release readiness unless the release gate explicitly says so.
+Return only applicable fields: `validation_target`, `risk_boundary`, `risk_tier`, `checks_to_run`, `agent_verified`, `user_verification_needed`, `unverified_gaps`, `next_validation_action`.
