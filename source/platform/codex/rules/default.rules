@@ -1,167 +1,37 @@
-# Destructive Git rewrites should not bypass human review.
-prefix_rule(
-    pattern=["git", "reset", "--hard"],
-    decision="forbidden",
-    justification="Use git status, git diff, git log, or a targeted restore/revert instead.",
-)
+# Destructive local operations.
+prefix_rule(pattern=["git", "reset", "--hard"], decision="forbidden", justification="Use a targeted restore or revert instead.")
+prefix_rule(pattern=["git", "clean", ["-fd", "-df", "-fdx", "-xdf", "-dxf"]], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "clean", "-f", "-d"], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "clean", "-f", "-d", "-x"], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
 
-prefix_rule(
-    pattern=["git", "clean", "-fd"],
-    decision="forbidden",
-    justification="Review untracked files first and delete only what you intend to remove.",
-)
+# Operations that still require review.
+prefix_rule(pattern=["rm", ["-rf", "-fr"]], decision="prompt", justification="Review recursive deletion before execution.")
+prefix_rule(pattern=["rm", "-r", "-f"], decision="prompt", justification="Review recursive deletion before execution.")
+prefix_rule(pattern=["rm", "-f", "-r"], decision="prompt", justification="Review recursive deletion before execution.")
+prefix_rule(pattern=[["python", "python3"], "-m", "pip", "install"], decision="prompt", justification="Dependency installation changes the environment.")
+prefix_rule(pattern=["uv", "pip", "install"], decision="prompt", justification="Dependency installation changes the environment.")
+prefix_rule(pattern=[["npm", "pnpm", "yarn", "bun"], ["install", "i", "add"]], decision="prompt", justification="Dependency installation changes the workspace.")
+prefix_rule(pattern=["cargo", "add"], decision="prompt", justification="Adding dependencies changes the manifest and lockfile.")
+prefix_rule(pattern=["git", ["push", "rebase", "merge"]], decision="prompt", justification="Remote publication and branch integration require review.")
+prefix_rule(pattern=[["kill", "pkill", "lldb"]], decision="prompt", justification="Process termination and debugger attachment require review.")
 
-prefix_rule(
-    pattern=["git", "clean", "-df"],
-    decision="forbidden",
-    justification="Review untracked files first and delete only what you intend to remove.",
-)
+# General local read, build, and test approvals.
+prefix_rule(pattern=[["mmdc", "rg", "curl"]], decision="allow")
+prefix_rule(pattern=["zsh", "-lc", 'exec curl "$@"'], decision="allow")
+prefix_rule(pattern=["cmake", ["-S", "--build", "--preset"]], decision="allow")
+prefix_rule(pattern=["ctest", ["--test-dir", "--preset"]], decision="allow")
 
-prefix_rule(
-    pattern=["git", "clean", "-f", "-d"],
-    decision="forbidden",
-    justification="Review untracked files first and delete only what you intend to remove.",
-)
+# User-approved Git workflows.
+prefix_rule(pattern=["git", ["add", "apply", "commit", "fetch", "ls-remote", "merge-tree", "pull", "status", "switch"]], decision="allow")
+prefix_rule(pattern=["git", "branch", ["-D", "-f", "-m"]], decision="allow")
+prefix_rule(pattern=["git", "restore", "--staged"], decision="allow")
+prefix_rule(pattern=["git", "checkout", "--ours"], decision="allow")
+prefix_rule(pattern=["git", "worktree", "add"], decision="allow")
 
-prefix_rule(
-    pattern=["git", "clean", "-fdx"],
-    decision="forbidden",
-    justification="This also removes ignored files. Prefer targeted cleanup instead.",
-)
-
-prefix_rule(
-    pattern=["git", "clean", "-xdf"],
-    decision="forbidden",
-    justification="This also removes ignored files. Prefer targeted cleanup instead.",
-)
-
-prefix_rule(
-    pattern=["git", "clean", "-dxf"],
-    decision="forbidden",
-    justification="This also removes ignored files. Prefer targeted cleanup instead.",
-)
-
-prefix_rule(
-    pattern=["git", "clean", "-f", "-d", "-x"],
-    decision="forbidden",
-    justification="This also removes ignored files. Prefer targeted cleanup instead.",
-)
-
-# Recursive deletion should always be reviewed.
-prefix_rule(
-    pattern=["rm", "-rf"],
-    decision="prompt",
-    justification="Recursive deletion should always be reviewed before execution.",
-)
-
-prefix_rule(
-    pattern=["rm", "-fr"],
-    decision="prompt",
-    justification="Recursive deletion should always be reviewed before execution.",
-)
-
-prefix_rule(
-    pattern=["rm", "-r", "-f"],
-    decision="prompt",
-    justification="Recursive deletion should always be reviewed before execution.",
-)
-
-prefix_rule(
-    pattern=["rm", "-f", "-r"],
-    decision="prompt",
-    justification="Recursive deletion should always be reviewed before execution.",
-)
-
-# Dependency installation and networked environment mutation should be reviewed.
-prefix_rule(
-    pattern=["python", "-m", "pip", "install"],
-    decision="prompt",
-    justification="Dependency installation changes the environment and may require network access.",
-)
-
-prefix_rule(
-    pattern=["python3", "-m", "pip", "install"],
-    decision="prompt",
-    justification="Dependency installation changes the environment and may require network access.",
-)
-
-prefix_rule(
-    pattern=["uv", "pip", "install"],
-    decision="prompt",
-    justification="Dependency installation changes the environment and may require network access.",
-)
-
-prefix_rule(
-    pattern=["npm", "install"],
-    decision="prompt",
-    justification="Package installation changes the workspace and may require network access.",
-)
-
-prefix_rule(
-    pattern=["npm", "i"],
-    decision="prompt",
-    justification="Package installation changes the workspace and may require network access.",
-)
-
-prefix_rule(
-    pattern=["pnpm", "install"],
-    decision="prompt",
-    justification="Package installation changes the workspace and may require network access.",
-)
-
-prefix_rule(
-    pattern=["pnpm", "add"],
-    decision="prompt",
-    justification="Package installation changes the workspace and may require network access.",
-)
-
-prefix_rule(
-    pattern=["yarn", "install"],
-    decision="prompt",
-    justification="Package installation changes the workspace and may require network access.",
-)
-
-prefix_rule(
-    pattern=["yarn", "add"],
-    decision="prompt",
-    justification="Package installation changes the workspace and may require network access.",
-)
-
-prefix_rule(
-    pattern=["bun", "install"],
-    decision="prompt",
-    justification="Package installation changes the workspace and may require network access.",
-)
-
-prefix_rule(
-    pattern=["bun", "add"],
-    decision="prompt",
-    justification="Package installation changes the workspace and may require network access.",
-)
-
-prefix_rule(
-    pattern=["cargo", "add"],
-    decision="prompt",
-    justification="Adding dependencies changes the manifest and lockfile.",
-)
-
-# Low-risk local render/build/check commands may remain allow-listed.
-prefix_rule(
-    pattern=["mmdc"],
-    decision="allow",
-)
-prefix_rule(pattern=["cmake", "--build"], decision="allow", justification="Local build command; no network, live config mutation, or destructive side effect by default.")
-prefix_rule(pattern=["ctest", "--test-dir"], decision="allow", justification="Local test command; no network, live config mutation, or destructive side effect by default.")
-
-# Side-effecting commands require prompt rules under portable runtime policy.
-prefix_rule(pattern=["git", "push"], decision="prompt", justification="Pushing changes transfers repository state to a remote and should require explicit confirmation.")
-prefix_rule(pattern=["git", "add"], decision="prompt", justification="Staging files changes git state and should be intentional in a portable bundle.")
-prefix_rule(pattern=["git", "fetch"], decision="prompt", justification="Network git operations should require explicit confirmation.")
-prefix_rule(pattern=["git", "restore", "--staged"], decision="prompt", justification="Git index mutation should be reviewed before execution.")
-prefix_rule(pattern=["git", "rebase"], decision="prompt", justification="History rewriting should require explicit review.")
-prefix_rule(pattern=["git", "branch", "-D"], decision="prompt", justification="Branch deletion should require explicit review.")
-prefix_rule(pattern=["git", "checkout", "--ours"], decision="prompt", justification="Conflict resolution should be reviewed before execution.")
-prefix_rule(pattern=["curl"], decision="prompt", justification="Network access should require explicit confirmation.")
-prefix_rule(pattern=["kill"], decision="prompt", justification="Process termination should be reviewed before execution.")
-prefix_rule(pattern=["pkill"], decision="prompt", justification="Process termination should be reviewed before execution.")
-prefix_rule(pattern=["lldb"], decision="prompt", justification="Debugger attachment should be reviewed before execution.")
+# Reusable named tools and project executables.
+prefix_rule(pattern=["python3", ["task_ledger.py", "install_runtime.py"]], decision="allow")
+prefix_rule(pattern=["node", "fetch-codex-manual.mjs"], decision="allow")
+prefix_rule(pattern=[["dentca_contract_probe", "SBConverter", "ioconnect", "trucore_testbed", "nightguard"]], decision="allow")
+prefix_rule(pattern=[["codex", "claude"], "plugin"], decision="allow")
+prefix_rule(pattern=["launchctl", "setenv"], decision="allow")
+prefix_rule(pattern=["open", "-R"], decision="allow")
