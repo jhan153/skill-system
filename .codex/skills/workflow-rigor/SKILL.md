@@ -1,6 +1,6 @@
 ---
 name: workflow-rigor
-description: Mode-based execution control for evidence-first implementation, scoped reporting, split validation, and review on medium/high-risk changes.
+description: Risk-proportional evidence, review, and completion control for behavior-changing work.
 ---
 
 # Workflow Rigor
@@ -10,75 +10,64 @@ description: Mode-based execution control for evidence-first implementation, sco
 - intent_signature:
   - `strict-evidence`, `strict-reporting`, `execution-strict`, `evidence-workflow`, `실행통제`
 - use_when:
-  - implementation, refactor, behavior-changing config/docs, or medium/high-risk changes need stronger proof and checker separation.
-  - destructive, auth/security, schema/data, infra, external-side-effect, or cross-module work is in scope.
+  - implementation or another behavior-changing task needs risk-proportional proof, checker separation, rollback, or readback.
 - do_not_use_when:
-  - pure Q&A, brainstorming, harmless edits, or output formatting without execution risk.
-  - the primary workflow already provides equivalent risk-specific gates and the user did not request extra rigor.
+  - pure Q&A, harmless edits, or formatting-only work; or the primary workflow already provides the same gates.
 - expected_inputs:
-  - selected primary workflow
-  - change scope, consequence/coupling risk, and intended success signal
-  - available validation and review surfaces
+  - primary workflow, scope, material conditions/risks, and evidence surfaces
 - expected_outputs:
-  - selected mode and risk basis
-  - decisive evidence, split validation, required review, and remaining uncertainty
+  - mode/risk basis, condition evidence, review, and uncertainty
 - context_targets:
   must_read:
-    - current request and primary workflow scope
-    - planned or actual changed files when implementation is active
+    - request, primary workflow scope, and planned/actual changed files
   read_if_needed:
     - risk-specific policy, validation contract, or failing output
   do_not_load_by_default:
-    - full repo, full memory bank, unrelated plans, reports, or generic policy copies
+    - full repo, memory, unrelated plans/reports, or policy copies
 - risk_profile:
-  reads:
-    - targeted evidence for the selected mode
-  writes:
-    - none directly; the primary workflow owns mutation
-  tools:
-    - targeted checks and read-only review tied to material risk
-  sensitive_resources:
-    - credentials default deny; runtime policy owns approvals and side-effect permission
+  reads: targeted evidence for the selected mode
+  writes: none directly; the primary workflow owns mutation
+  tools: risk-targeted checks, readback, and read-only review
+  sensitive_resources: credentials default deny; runtime policy owns approvals and side effects
 - entry_scene:
   - PREPARE
 
 ## Modifier Contract
 - Attach rigor requirements to the primary workflow; do not re-plan or reimplement its task.
-- Runtime approval, sandbox, network, and protected-path policy remain authoritative. This skill controls proof depth, checker separation, and completion claims only.
+- Runtime policy remains authoritative; this skill controls only proof depth, checker separation, and completion claims.
 - Select mode from consequence, coupling, reversibility, and verification difficulty—not file count or task duration.
-- Add only checks that can expose a realistic failure mode. Equivalent gates already supplied by a specialist are reused, not duplicated.
+- Add only checks that discriminate a realistic material failure. Reuse equivalent specialist gates.
 
 ## Modes
 
 | mode | choose when | added gate |
 | --- | --- | --- |
-| `lite` | local, reversible, low-coupling change with an observable success signal | focused check; diff review only if uncertainty remains |
-| `standard` | meaningful behavior change, moderate coupling, or non-trivial regression surface | explicit regression check plus self-review or independent review |
-| `strict` | destructive work, auth/security, schema/data migration, infra, external writes, broad refactor, or explicit highest rigor | independent read-only review when available, plus rollback/readback evidence where relevant |
+| `lite` | local, reversible, low-coupling change with an observable result | focused direct check; diff review only for remaining uncertainty |
+| `standard` | meaningful behavior change, moderate coupling, or non-trivial regression surface | direct behavior/regression evidence plus self-review or independent review |
+| `strict` | destructive, auth/security, schema/data migration, infra, external-write, broad-refactor, or explicit highest-rigor work | independent read-only review when useful plus rollback/readback evidence where relevant |
 
-Escalate when new evidence widens consequence or coupling. De-escalate when discovery proves the risk local; do not keep `strict` merely because the work is large.
+Escalate when evidence widens risk; de-escalate when it proves risk local. Size alone does not require `strict`.
 
-## Checkpoints
-At the primary workflow's existing checkpoints, attach only these decisions:
+## Workflow
+At the primary workflow's checkpoints:
 
-1. `prepare`: select mode, name material risks, define observable success and required evidence.
-2. `before side effect`: identify the applicable runtime approval and the rollback/readback signal; do not invent a parallel approval policy.
-3. `validate`: run the narrow behavior check and the smallest risk-specific regression check.
-4. `review`: perform the mode's required review against the diff and observed results; the implementation owner resolves or explicitly carries findings.
-5. `finalize`: compare every completion claim with decisive evidence and report remaining uncertainty.
+1. `prepare`: select the mode; name each material condition, realistic failure, and deciding evidence.
+2. `before side effect`: identify the runtime approval plus rollback/readback signal. This skill grants no permission.
+3. `validate`: observe the direct result and smallest risk-specific regression surface.
+4. `review`: inspect the diff/results at the selected mode; the implementation owner resolves or carries findings.
+5. `finalize`: match material claims to deciding evidence and expose unresolved conditions.
 
-For `strict`, use an independent read-only reviewer when available and genuinely useful. The implementation owner retains integration and does not leak its expected verdict into the review prompt.
+For `strict`, use an independent read-only reviewer when useful. Do not seed its verdict; review does not replace condition evidence.
 
-## Evidence Gate
-- Accept observed diffs, command results, validator/verifier output, rendered behavior, or connector readback.
-- Prefer a few decisive proofs over transcripts; name the surface each check covers.
-- Separate `validation_agent` (actually observed) from `validation_user` (manual/runtime work still needed, or `N/A` with reason).
-- A pass cannot override a conflicting diff, failed check, missing artifact, stale result, or uncovered required condition.
-- GUI, credentialed, private-service, or unavailable-environment checks remain `user-verification-needed` or `unverified` until observed.
+## Semantic Evidence Gate
+- Name what each diff, command, validator, render, interaction, or readback proves. It decides only a matching condition.
+- Static checks prove structure; mocks prove their boundary; an agent-authored test is a self-check for its asserted contract, not an independent oracle for an inferred user contract.
+- A lower-scope pass, clean review, or command exit cannot override conflicting runtime evidence, a missing artifact, stale output, or an uncovered required condition. Fix a conflict in its actual production owner and repeat the same deciding observation.
+- Separate `validation_agent` (observed) from `validation_user` (user-only/unavailable, or `N/A` with reason). Name the exact user observation; GUI, credentialed, private-service, and unavailable conditions stay `user-verification-needed` or `unverified`.
 - Mark accepted risk only with approver, reason, affected condition, and revisit point.
 
 ## Escalation and Stop
-- If the same stable failure survives an intervention, hand the failing slice to `workflow-recovery`; do not stack speculative patches.
+- If the same failure survives an intervention, hand its slice to `workflow-recovery`; do not stack speculative patches.
 - Stop when the next required proof needs missing access, approval, external state, or user-only observation.
 - When blocked, return the exact blocked condition, up to three attempted steps, and one next action.
 - Never downgrade contradictory or missing evidence to completion because a lower-scope check passed.
@@ -94,14 +83,6 @@ Return fields, not a second workflow narrative:
 Omit empty optional fields. A separately requested report skill may shape presentation without changing these evidence requirements.
 
 ## Context Boundary
-- Read only changed/implicated code, the applicable validation contract, and risk-specific policy.
-- If evidence is insufficient, expand one layer to the nearby module rule, source outline, or failing output; never load all repo docs, memory, or skills as recovery.
+- Read changed/implicated code, its validation contract, and risk policy. Expand one layer to a nearby owner/rule or failing output only when needed.
 - This modifier cannot grant permission, create missing evidence, replace a specialist verifier, or prove behavior outside observed checks.
-
-## Validation
-- Mode matches consequence, coupling, reversibility, and verification difficulty.
-- Added checks target material failure modes and do not duplicate specialist gates.
-- Agent and user validation are separated, with contradictions kept visible.
-- `standard`/`strict` review and relevant `strict` rollback/readback evidence are present or explicitly unavailable.
-- Completion claims do not exceed the surfaces actually observed.
-- Primary workflow scope and runtime permission policy remain unchanged.
+- Before returning, confirm the mode matches actual risk, checks discriminate material failures without duplicating specialist gates, contradictions remain visible, and claims do not exceed observed surfaces.
