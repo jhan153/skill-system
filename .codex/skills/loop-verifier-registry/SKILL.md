@@ -1,6 +1,6 @@
 ---
 name: loop-verifier-registry
-description: Map loop success conditions to schema-valid runtime verifiers, optional quality verifiers, evidence targets, owners, and unavailable-evidence behavior. Use while drafting a loop contract when verifier ownership or proof is not obvious; this skill maps checks but does not run them.
+description: Map unclear loop success conditions to one schema-valid runtime verifier, scoped oracle/evidence, optional quality checks, and fail-closed unavailable behavior without executing them.
 ---
 
 # Loop Verifier Registry
@@ -8,107 +8,47 @@ description: Map loop success conditions to schema-valid runtime verifiers, opti
 ## Routing Card
 - role: support
 - intent_signature:
-  - verifier registry / verifier map
-  - loop success-condition evidence
-  - 검증 조건 매핑
+  - loop verifier registry/map; success-condition evidence; 검증 조건 매핑
 - use_when:
-  - a `plan-loop-term` contract needs concrete verifier skills, commands, evidence paths, or fallback checks.
-  - success conditions span multiple evidence lanes such as build/test, screenshots, a11y, source search, memory, or knowledge context.
-  - a loop runner needs to know which skill owns each verifier result.
+  - `plan-loop-term` or `workflow-loop-runner` needs an unclear verifier owner, command/path/check, evidence lane, or unavailable rule for one or more `SC-NNN` conditions.
 - do_not_use_when:
-  - the user asks to execute the verifiers now; use the owning verifier skill or `workflow-loop-runner`.
-  - the task only needs one obvious command; keep verification local to the primary skill.
-  - the user asks for loop readiness classification; use `loop-readiness-router`.
+  - execute the verifier, classify loop readiness, or run one obvious check local to the primary workflow.
 - expected_inputs:
-  - contract draft/condition list, target domain, and known evidence paths
+  - contract id and condition slice, target domain, material outcomes, known evidence paths, and current attestation boundary
 - expected_outputs:
-  - verifier map keyed by `contract_id` and `SC-NNN`
-  - one runtime verifier per condition and optional quality verifiers
-  - evidence, ownership, unavailable, and anti-gaming rules
+  - condition-keyed verifier companion with semantic scope/oracle, one runtime verifier, optional quality verifiers, receipt target, and success-blocking gaps
 - context_targets:
   must_read:
-    - draft/accepted runtime contract or its success-condition slice
+    - accepted/draft contract identity and only the relevant success conditions
   read_if_needed:
-    - `references/verifier-catalog.md` for cross-domain, quality, human, or governance checks
-    - relevant design/workflow/search/memory/knowledge skill routing cards
-    - target plan/spec only when success conditions cite it
+    - `references/verifier-catalog.md`, cited plan/spec/oracle, or the narrow owner routing card for unfamiliar/cross-domain evidence
   do_not_load_by_default:
-    - full repo
-    - all design artifacts
-    - all prior validation logs
+    - full repo/history, all design artifacts/logs, raw production data, or credentials
 - risk_profile:
-  reads:
-    - contract and narrow verifier context
-  writes:
-    - none by default
-  tools:
-    - none by default; this maps verifiers but does not run them
-  sensitive_resources:
-    - credentials and live systems are approval gates, not implicit verifier inputs
+  reads: condition slice and narrow verifier/oracle context
+  writes: none
+  tools: none; mapping does not execute or attest a verifier
+  sensitive_resources: credentials and live systems remain explicit approval gates
 - entry_scene:
   - PREPARE
 
-## Purpose
-Turn abstract success conditions into verifiable evidence lanes. This skill does not run checks; it makes the verifier contract precise enough for `workflow-loop-runner` or a task-specific executor.
+## Mapping Workflow
+1. Keep `contract_id` and `SC-NNN`. Split a condition that combines independently failing material outcomes; do not create a second id namespace or give one condition multiple primary runtime verifiers.
+2. In the planning companion, label evidence scope as `structural`, `runtime`, `semantic`, or `user-only`, and oracle origin as user decision, canonical source, external contract, formal invariant, observed production behavior, or agent-authored evidence. These are not new runtime-schema verifier types.
+3. Assign exactly one owner and runtime type: `command_exit`, `artifact_exists`, `manual_check`, or `diff_scope`. Name its real command/path/check, evidence target, pass/fail signals, freshness, and unavailable behavior; otherwise keep the condition `unverified` or `blocked`.
+4. Add a separate quality verifier only when it informs a visual, a11y, state, or review judgment that the runtime verifier cannot make. A report never replaces the condition's owned runtime receipt or user gate.
+5. Match closure authority to the condition. `artifact_exists` closes only exact existence/digest; command exit closes only the commanded contract. Agent-authored tests cannot alone close a semantic rule they invented, and mocks prove only the mocked boundary. Source selection, migration, media/data transforms, external integration, and policy-owning adapters require an authoritative oracle plus representative actual-path readback.
+6. Require canonical iteration-result receipts and preserve every conflicting or missing `fail`, `needs_review`, `unverified`, `blocked`, or `user-verification-needed` state. Free-form refs, maker self-report, easier proxies, or lower-scope passes cannot close it.
 
-## Source-Grounded Principles
-- Prefer outcome evidence and deterministic/artifact checks; transcript quality and maker self-report are not proof.
-- Keep maker/checker separation, and treat external observations as untrusted until admitted.
-- Mark unavailable evidence instead of guessing; add anti-gaming signals only where a metric can be gamed.
-- Keep runtime and quality vocabulary separate. Runtime contracts accept only `command_exit`, `artifact_exists`, `manual_check`, or `diff_scope`; visual, a11y, state, and review checks are optional quality verifiers whose result must feed a runtime evidence receipt.
-- `user-verification-needed` is an open gate, never a pass. Local v2 records manual events only as procedural evidence and cannot close them without host-authenticated provenance.
-- Current local v2 auto-passes only exact `artifact_exists` evidence. Claimed `command_exit`, `manual_check`, and `diff_scope` pass receipts are fail-closed until a host-authenticated producer exists.
-
-## Workflow
-1. Normalize each condition id to `SC-NNN`; do not create a second id namespace.
-2. Assign exactly one runtime verifier type and owner. Name a real command/path/check or mark it `Unverified`.
-3. Add quality verifiers only when the runtime check alone cannot judge the stated outcome. Read the catalog only for unfamiliar or cross-domain lanes.
-4. Define pass, fail, evidence target, freshness, independence, and unavailable behavior. An unavailable required verifier always blocks success.
-5. Require structured evidence receipts from the canonical iteration-result schema; free-form refs or maker self-report cannot prove pass. Mark verifier types above the local attestation ceiling open rather than substituting artifact presence.
-6. Add metric owners and anti-gaming signals only for metrics the contract actually claims.
-7. Return a compact map aligned to the runtime contract.
+## Local V2 Ceiling
+- Local v2 auto-passes only fresh exact `artifact_exists` evidence when exact existence/digest is the whole condition. `command_exit`, `manual_check`, and `diff_scope` stay open without host-authenticated production; unauthenticated manual events are procedural evidence, not user acceptance.
+- An unavailable required verifier blocks success. Record one evidence-producing fallback when one exists; never substitute artifact presence or weaken the condition.
 
 ## Output Contract
-```yaml
-verifier_map:
-  contract_id:
-  loop_run_id: null
-  conditions:
-    - success_condition_id: SC-001
-      runtime_verifier:
-        owner:
-        type: command_exit|artifact_exists|manual_check|diff_scope
-        evidence_target:
-        pass_signal:
-        fail_signal:
-      quality_verifiers:
-        - owner:
-          type: visual|a11y|state_check|review
-          evidence_target:
-      independence: maker|checker|external|human
-      deterministic_first: true
-      evidence_receipt: canonical_iteration_result_schema
-      unavailable:
-        fallback:
-        status: unverified|user-verification-needed|blocked
-        blocks_success: true
-      reward_hacking_watch: []
-  metrics:
-    improvement: []
-    safety: []
-    verifier: []
-    efficiency: []
-    process: []
-    outcome: []
-  global_unavailable_evidence: []
-```
+Return a compact `verifier_map` keyed by `contract_id` and `SC-NNN`. For each condition include companion-only `evidence_scope` and `oracle_origin`; runtime `owner`, schema-valid `type`, evidence target, pass/fail signals; optional quality verifiers; independence; canonical receipt target; unavailable fallback/status/`blocks_success: true`; and only relevant anti-gaming signals or metrics. Do not emit a passing receipt or claim execution.
 
 ## Validation
-- Confirm each required success condition has exactly one primary verifier owner.
-- Confirm every id matches `SC-NNN` and the runtime verifier uses only the four schema types.
-- Confirm quality verifiers are separate and feed evidence into the runtime result rather than replacing it.
-- Confirm unavailable evidence has a fallback and remains success-blocking.
-- Confirm local v2 never reports command/manual/diff evidence as pass without host attestation; a pending `user-verification-needed` label is not success.
-- Confirm verifier output can be observed independently of "agent says done".
-- Confirm metric verifiers cannot be satisfied by weakening success criteria, hiding evidence, or substituting easier proxy metrics.
-- Confirm this skill did not execute the verifier or mutate files.
+- Every material condition has one primary verifier owner/type or an explicit success-blocking gap; quality checks remain separate.
+- Closure evidence directly covers the stated condition and oracle, including actual-path readback where required.
+- Local attestation ceiling, user gate, unresolved status, and maker/checker boundary remain intact.
+- The mapping neither executed a verifier nor mutated files. Execution belongs to the verifier owner or `workflow-loop-runner`; readiness belongs to `loop-readiness-router`.
