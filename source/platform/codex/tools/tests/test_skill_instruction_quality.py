@@ -91,13 +91,15 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertNotIn("### Loop Readiness Gate", text)
         self.assertIn("$CODEX_HOME/context-routing.md", text)
         self.assertNotIn("Read `.codex/context-routing.md`", text)
+        self.assertIn("ambiguous non-trivial routing", text)
+        self.assertNotIn("When routing is relevant", text)
         self.assertIn("Route explicit `/goal`", text)
         self.assertIn("unknown or stale explicit skill alias", text)
 
     def test_global_agents_result_labels_are_consistent(self) -> None:
         text = canonical("platform/codex/AGENTS.md").read_text(encoding="utf-8")
         status_line = next(
-            line for line in text.splitlines() if line.startswith("- Use only `agent-verified`")
+            line for line in text.splitlines() if line.startswith("- Use only these task-result")
         )
         self.assertEqual(
             set(re.findall(r"`([^`]+)`", status_line)),
@@ -105,6 +107,10 @@ class SkillInstructionQualityTests(unittest.TestCase):
         )
         self.assertNotIn("`analysis-only`", text)
         self.assertIn("Analysis-only describes work scope, not a result label", text)
+        self.assertIn("task-level result label", text)
+        self.assertIn("a label never replaces condition evidence", text)
+        self.assertIn("a user-only check", status_line)
+        self.assertIn("unavailable evidence without blocked work", status_line)
 
     def test_global_agents_requires_pre_answer_depth_gate(self) -> None:
         text = canonical("platform/codex/AGENTS.md").read_text(encoding="utf-8")
@@ -115,9 +121,10 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn("direct source or runtime paths", text)
         self.assertIn("counterexample or disconfirming observation", text)
         self.assertIn("Do not finalize until", text)
-        self.assertIn("up to three evidence passes", text)
-        self.assertIn("distinct hypotheses and material consequence", text)
-        self.assertIn("primary retains scope, synthesis, and final judgment", text.lower())
+        self.assertIn("evidence passes do not add owners", text)
+        self.assertIn("up to three passes", text)
+        self.assertIn("distinct hypotheses with material consequences", text)
+        self.assertIn("owner retains scope, synthesis, and final judgment", text.lower())
 
     def test_analysis_router_treats_brevity_as_output_shape(self) -> None:
         router = canonical("skills/analysis-router/SKILL.md").read_text(encoding="utf-8")

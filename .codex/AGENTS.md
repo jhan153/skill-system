@@ -29,15 +29,15 @@
 - Before non-trivial work, establish outcome, scope/non-goals, success, decisive unknowns, owner/route, and closing evidence. Simple, local, reversible requests proceed directly. This gate applies even if no router or specialist activates.
 - Deepen when interpretations, causes, designs, repositories or branches, or evidence sources compete; static structure stands in for behavior; boundaries cross; or error cost is material.
 - When relevant, inspect direct source or runtime paths, representative callers/tests, status quo alternatives, and a material counterexample or disconfirming observation. Use the build, test, or observation that discriminates the conclusion; state when it is unavailable or irrelevant. Names, counts, and document presence are leads, not proof.
-- Use up to three evidence passes only when distinct hypotheses and material consequence justify them; otherwise keep one owner. The primary retains scope, synthesis, and final judgment.
+- Keep one execution owner; evidence passes do not add owners. Use up to three passes only for distinct hypotheses with material consequences. The owner retains scope, synthesis, and final judgment.
 - Work in `change -> validation` units; isolate one cause before changing again after a repeated failure signature. Plans, documents, hooks, synchronization, and generic checks prove only their own contract.
-- Do not finalize until scope is covered, promised action is done or exactly blocked, and each material success condition has evidence or a result label defined below. Analysis-only describes work scope, not a result label. Report the decision, decisive evidence, and remaining risk without an exhaustive reasoning transcript.
+- Do not finalize until scope is covered, promised action is done or exactly blocked, and each material success condition is evidenced or explicitly unresolved. Choose one task-level result label; a label never replaces condition evidence. Analysis-only describes work scope, not a result label. Report the decision, decisive evidence, and remaining risk without an exhaustive reasoning transcript.
 
 ## Skill And Context Boundary
-- When routing is relevant, read the global `context-routing.md` beside this file (normally `$CODEX_HOME/context-routing.md`); do not require a project-local copy.
+- Read the global `context-routing.md` beside this file (normally `$CODEX_HOME/context-routing.md`) for ambiguous non-trivial routing or explicit goal, automation, memory, or accepted-knowledge operations; do not require a project-local copy.
 - Route explicit `/goal`, durable/event automation, or Stop-driven continuation through loop readiness. Start a LoopRun only after an accepted schema-valid contract defines verifier, checkpoint, budget, approval, and stop state.
 - An unknown or stale explicit skill alias is unresolved, not an activation or shell command; report it briefly instead of guessing an owner.
-- Select one execution owner and admit only relevant references, one layer at a time. Heavy artifact generators require explicit artifact intent.
+- Admit only relevant references, one layer at a time. Heavy artifact generators require explicit artifact intent.
 - Treat Wiki Bank, Runtime Projection, Memory Bank, plans, and summaries as context; current instructions and verified evidence outrank them.
 - Persistent memory or accepted-knowledge mutation requires its explicit owning workflow.
 
@@ -48,6 +48,6 @@
 - Hooks, harness records, checkpoints, and verifier receipts are evidence/control surfaces; they do not grant permission or authorize broader repair.
 
 ## Result Reporting
-- Use only `agent-verified`, `user-verification-needed`, `unverified`, or `blocked` for final task-result status when a label is useful. `agent-verified` requires evidence for every material condition.
+- Use only these task-result labels when useful: `agent-verified` when all conditions are evidenced; `user-verification-needed` for a user-only check; `unverified` for unavailable evidence without blocked work; `blocked` when work cannot proceed.
 - Report what changed or was found, decisive validation evidence, and only the remaining risk or user check that matters.
 - If blocked, state the exact blocking point, what evidence-producing attempt was made, and the next single action or decision needed.
