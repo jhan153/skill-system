@@ -69,92 +69,32 @@ description: Post-development source maintenance workflow for behavior-preservin
 - entry_scene:
   - PREPARE
 
-## Purpose
-- Remove code that is safe to remove, not code that only looks unused.
-- Preserve intended behavior while reducing source surface area, stale scaffolding, speculative branches, and maintenance noise.
-- Keep cleanup separate from feature work, bug fixes, broad redesign, and comment-only maintenance.
+## Contract
+- Remove only code proven obsolete while preserving intended user-visible behavior. “No static references” is a lead, not proof.
+- Establish one canonical owner before editing. Generated/runtime projections are never a second source: change the owner, regenerate, and read back the affected projection.
+- Keep source maintenance to deletion and the smallest repair or simplification caused by deletion. Route discovered feature work, structural redesign, or concrete failures to their owners.
 
 ## Workflow
-1. Lock scope:
-   - name the source area, files, or recent implementation slice being maintained.
-   - state that intended behavior is preserved by default.
-   - classify the requested cleanup type: dead code, stale scaffold, unused import/export, shallow wrapper, duplicate helper, speculative abstraction, obsolete branch, debug leftover, or orphaned fixture/example.
-2. Discover candidates with evidence:
-   - search static references and local callers.
-   - inspect exports, package entrypoints, route tables, plugin discovery, framework conventions, dynamic imports, string lookups, reflection, feature flags, migrations, compatibility shims, generated-source markers, fixtures, and examples when relevant.
-   - mark weak evidence as `unclear` instead of deleting.
-3. Classify each candidate:
-   - `safe_delete`
-   - `likely_delete_but_needs_confirmation`
-   - `keep_public_contract`
-   - `keep_dynamic_entrypoint`
-   - `keep_migration_or_compat`
-   - `keep_test_fixture`
-   - `keep_generated_or_external_source`
-   - `unclear`
-4. Plan a small cleanup batch:
-   - delete first.
-   - repair imports/exports/call sites in the same batch.
-   - apply only narrow local simplification needed after deletion.
-   - defer risky candidates.
-5. Apply one coherent batch.
-6. Validate before expanding:
-   - prefer typecheck, build, lint, focused tests, or public-entrypoint smoke checks that can catch missing references.
-   - separate validation that was run from behavior that still needs user verification.
-7. Review the diff:
-   - check for accidental behavior change.
-   - check that public API, routing, generated files, migrations, and compatibility paths were not removed without evidence.
-   - stop and route to `workflow-bug-fix` if cleanup reveals a concrete failure.
+1. Lock the maintenance slice, behavior-preservation boundary, cleanup type, canonical source, and generated or external projections. If ownership is ambiguous, stop before mutation.
+2. Trace production reachability through callers, exports, package/CLI entrypoints, route tables, plugin discovery, framework conventions, dynamic imports, string lookup, reflection, feature flags, migrations, compatibility paths, and source-generation markers as relevant.
+3. When source selection, migration, transforms, adapters, or external boundaries are involved, inspect the actual selected path or readback. Static, mock, or agent-authored-test success cannot override a conflicting production or user-path observation.
+4. Classify candidates as `safe_delete`, `needs_confirmation`, `keep_public_contract`, `keep_dynamic_entrypoint`, `keep_migration_or_compat`, `keep_fixture`, `keep_generated_or_external_source`, or `unclear`.
+5. Apply one coherent batch: delete first, repair imports/exports/callers, regenerate owned projections, and make only deletion-required local simplifications. Defer every uncertain candidate.
+6. Validate the behavior boundary with the narrowest discriminating evidence: affected production/readback path when material, then relevant build/typecheck/lint, public-entry smoke, or existing focused regression checks. Review the diff before expanding.
+
+If cleanup exposes a concrete failing path, preserve the evidence and route repair to `workflow-bug-fix`; do not delete the path or relabel the batch behavior-preserving.
 
 ## Delete Gate
-Delete only when at least one condition is met:
-- Static references are absent and the symbol is not a public export or dynamic entrypoint.
-- All call sites are updated or removed in the same batch.
-- Build, typecheck, lint, or focused tests confirm removal.
-- The code is a shallow wrapper with no independent policy, validation, compatibility, or public API role.
-- The branch, scaffold, or fixture is explicitly obsolete by code, tests, docs, or user statement.
-- The import/export is mechanically unused and validated by compiler, linter, build, or equivalent evidence.
+Delete only when canonical ownership is known, production reachability and contract checks support obsolescence, and no material public, dynamic, migration, compatibility, fixture, or external-source role remains. Valid cases include:
+- an internal symbol with no static or dynamic reachability;
+- call sites removed or updated in the same batch without changing the behavior boundary;
+- a shallow wrapper with no independent source selection, policy, fallback, validation, compatibility, or public API responsibility;
+- an explicitly obsolete branch/scaffold supported by current code, contract, or user decision;
+- a mechanically unused import/export confirmed by the language toolchain.
 
-Do not delete by default when:
-- The symbol is public API or package export.
-- The code may be loaded by reflection, string lookup, framework convention, plugin discovery, routing, or dynamic import.
-- The path is a migration, rollback, compatibility, feature-flag, or deprecation path.
-- The file is generated or the source of truth is elsewhere.
-- Tests are absent and reachability is ambiguous.
-- Comments or stale docs are the only evidence that something is obsolete.
+Builds, linters, and tests validate only what they cover; they do not independently prove semantic obsolescence. Mocks prove the mock boundary. Do not delete when reachability is ambiguous, a generated file's owner lies elsewhere, or stale comments/docs are the only evidence.
 
-## Output Contract
-Return only the sections needed:
-- `maintenance_scope`
-- `candidate_inventory`
-- `delete_plan`
-- `changed_artifacts`
-- `deleted_or_pruned`
-- `simplified`
-- `preserved_with_reason`
-- `validation`
-- `behavior_preservation_evidence`
-- `remaining_risks`
+## Output
+Return only applicable sections: `maintenance_scope`, `candidate_inventory`, `delete_plan`, `changed_artifacts`, `deleted_or_pruned`, `simplified`, `preserved_with_reason`, `validation`, `behavior_preservation_evidence`, and `remaining_risks`.
 
-## Cross-Skill Boundaries
-- `workflow-implementation` owns feature or behavior-changing implementation.
-- `workflow-bug-fix` owns concrete failure repair.
-- `workflow-refactor-safely` owns behavior-preserving structural changes where rename, move, extract, split, or broad restructure is the main task.
-- `workflow-minimal-implementation` attaches as YAGNI pressure but does not own cleanup execution.
-- `analysis-architecture-deepening` and `analysis-codebase-design` own candidate discovery or design judgment before cleanup when the safe target is not selected.
-- `workflow-validation` owns validation-only matrices when installed or explicitly requested.
-- `workflow-dependency-upgrade` owns package, runtime, SDK, framework, and lockfile changes.
-
-## Invocation Examples
-Positive:
-- "1차 개발 끝났으니 소스코드 정리하고 죽은 코드 지워줘."
-- "안 쓰는 export/import와 stale scaffold를 제거해줘."
-- "코드 다이어트해줘. 기능 변화는 없어야 해."
-- "임시 구현 흔적과 shallow wrapper를 증거 확인해서 걷어내줘."
-
-Negative:
-- "새 기능 구현하고 cleanup도 같이 해줘." -> `workflow-implementation` primary, source maintenance as a cleanup substep only if requested.
-- "이 버그 고쳐줘." -> `workflow-bug-fix`
-- "서비스 레이어를 파일 3개로 나눠줘." -> `workflow-refactor-safely`
-- "deep module 후보 찾아줘." -> `analysis-architecture-deepening`
-- "주석 최신화해줘." -> `workflow-comment-maintenance`
+Keep feature implementation with `workflow-implementation`, concrete repair with `workflow-bug-fix`, structural rename/move/extract/split with `workflow-refactor-safely`, and comment-only or dependency work with their dedicated workflows.
