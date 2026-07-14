@@ -1,6 +1,6 @@
 ---
 name: analysis-bug
-description: Diagnose recurring, unclear, or high-risk software failures by locking the repro, testing competing causes, and selecting one evidence-backed root cause. Use for RCA or when diagnosis must precede a fix; use workflow-bug-fix when the primary request is to repair a concrete failure directly.
+description: Diagnose an unclear, recurring, or high-risk failure by discriminating credible causes on the actual path; use workflow-bug-fix when repair is the primary outcome.
 ---
 
 # Analysis Bug
@@ -8,87 +8,51 @@ description: Diagnose recurring, unclear, or high-risk software failures by lock
 ## Routing Card
 - role: primary
 - intent_signature:
-  - root-cause analysis, deep debugging, recurring or unclear failure, 원인 분석
+  - root-cause analysis; deep debugging; recurring/unclear failure; 원인 분석
 - use_when:
-  - the user asks why a failure occurs or explicitly requests RCA.
-  - competing causes must be discriminated before a safe edit is possible.
+  - the user asks why a failure occurs, requests RCA, or a repair owner needs one uncertain cause resolved before editing.
 - do_not_use_when:
-  - the primary request is to fix a concrete failing test/build/runtime signal; use `workflow-bug-fix`.
-  - the approach is known and no causal uncertainty remains.
-  - the question is algorithm selection, architecture design, or broad repository reporting.
+  - direct repair (`workflow-bug-fix`), repeated same-signature recovery, known-cause implementation, algorithm/performance/design selection, or broad repository reporting is primary.
 - expected_inputs:
-  - observed symptom, expected behavior, triggering condition, and available evidence
+  - observed and expected behavior, triggering condition, oracle/canonical source when relevant, repro status, and available evidence
 - expected_outputs:
-  - repro status, decisive evidence, primary root cause, fix direction, and verification target
+  - repro status, decisive and disconfirming evidence, one root cause or leading hypothesis, repair direction, verification target, and remaining gaps
 - context_targets:
   must_read:
-    - symptom and expected behavior
-    - repro steps or an explicit `Unverified` gap
+    - original symptom, material expected condition, and repro or explicit `Unverified` gap
   read_if_needed:
-    - implicated source/tests, logs, call path, state/data flow, timing, and environment
+    - actual call/state/data/source-selection path, logs, tests, timing, environment, and output readback
   do_not_load_by_default:
-    - full repo, full memory bank, unrelated historical failures, or codebase-wide reports
+    - full repo/memory, unrelated history/reports, raw production data, or credentials
 - risk_profile:
-  reads:
-    - targeted code, tests, logs, configs, and repro evidence
-  writes:
-    - none in diagnosis-only work; code only when the user explicitly requested RCA plus implementation
-  tools:
-    - focused repro, diagnostic, and validation commands
-  sensitive_resources:
-    - credentials default deny; redact external-service and production evidence
+  reads: targeted source, tests, logs/config, runtime state, and repro/readback evidence
+  writes: none for diagnosis; implementation authority stays with its primary workflow
+  tools: focused reproduction, tracing, measurement, and non-destructive probes
+  sensitive_resources: deny credentials; redact external-service and production evidence
 - entry_scene:
   - PREPARE
 
 ## Causal Diagnosis Loop
-1. Lock the contract: observed behavior, triggering condition, expected result, and reproducibility.
-2. Trace the smallest relevant end-to-end path across call flow, state/data flow, and timing/environment.
-3. When the cause is not already decisive, keep two or three competing hypotheses temporarily.
-4. Run the cheapest observation that produces different predictions for those hypotheses.
-5. Record disconfirming evidence as well as confirming evidence.
-6. Select one primary root cause. Keep secondary factors only when they change the repair or recurrence risk.
-7. Define the fix direction and the check that reproduces the original signal.
+1. Lock the material condition: observed result, trigger, expected result and its authority, reproducibility, and any unresolved status.
+2. Trace the smallest actual path across entry, production owner, state/data flow, source selection, timing, environment, and one representative readback.
+3. If a direct reproduction already isolates the cause, select it. Otherwise keep two or three credible hypotheses, state their differing predictions, and run the cheapest safe observation that separates them.
+4. Record confirming and disconfirming evidence with its scope. A diagnostic probe can test a prediction; an agent-authored test does not create the user or canonical contract.
+5. Name one root cause only when the observation distinguishes it from credible alternatives. Otherwise report a leading hypothesis as `Unverified` and name the next discriminator.
+6. Define the repair direction, owning implementation workflow, and check/readback for the original signal.
 
-Static inspection can establish possible paths and contract mismatches; it cannot confirm runtime ordering, environment state, frequency, or generated behavior without corresponding evidence.
+Static inspection can establish possible paths and contract mismatches; it cannot confirm runtime ordering, environment state, frequency, generated behavior, or selected output without corresponding observation. Mocks prove only their boundary.
 
-## Depth Rule
-- For an obvious local failure with a direct repro, give the decisive cause and fix direction without forcing multiple hypotheses or fix matrices.
-- For ambiguous, intermittent, concurrent, security-sensitive, or high-impact failures, show the competing predictions and evidence that eliminated them.
-- Compare multiple fixes only when materially different repairs remain after the root cause is known. Do not invent alternatives to fill a template.
+## Evidence And Depth Rules
+- For an obvious local failure with a direct repro, report the decisive cause; do not fabricate three hypotheses or a fix matrix.
+- For ambiguous, intermittent, concurrent, security-sensitive, or high-impact failures, retain predictions and refutations until one cause is discriminated.
+- Source selection, migrations, media/data transforms, adapters, and external boundaries need canonical-source identification and actual selected/output readback. A wrong selection can confirm the cause while the outcome remains open until post-repair same-path readback. Missing or mismatched required input fails closed; never treat silent legacy fallback as causal resolution.
+- A nearby pass cannot override the original condition's `fail`, `needs_review`, `unverified`, or `blocked` state. Do not weaken assertions, skip checks, add bypasses, or widen mocks to remove the signal.
 
 ## Fix Boundary
-- `diagnosis-only`: stop after the causal finding, fix direction, and verification target.
-- `diagnosis+fix`: allowed only when the user explicitly asked for both analysis and implementation; use the smallest change that addresses the selected cause.
-- A direct “fix this failure” request belongs to `workflow-bug-fix`, which may attach this skill when causal uncertainty is broad.
-- If the same failure signature persists after attempted fixes, use `workflow-recovery`.
+- Diagnosis-only stops after the causal finding or scoped hypothesis, repair direction, and verification target; it does not write code.
+- For RCA plus implementation, `workflow-bug-fix` remains the primary write owner and this skill supplies the causal decision. A direct fix routes there immediately; a repeated post-fix signature routes to `workflow-recovery`.
+- Correct-behavior bottleneck analysis routes to `analysis-performance`, a boundary-only decision to `analysis-codebase-design`, and no-failure feature work to `workflow-implementation`.
+- Compare repairs only when materially different choices remain after the cause is known; structural redesign belongs to its design owner.
 
-Never weaken assertions, skip tests, add bypass branches, or broaden mocks merely to remove the signal.
-
-## Output Shape
-Lead with the primary root cause and its evidence. Add only what the case needs:
-
-- repro status
-- decisive observations and refuted hypotheses
-- primary root cause
-- fix direction or implemented change
-- original-signal verification
-- remaining `Unverified` runtime or user checks
-
-Do not turn a narrow RCA into a formal report unless requested.
-
-## Validation
-- A confirmed root cause needs a repro, log, test, trace, measurement, or direct observation that distinguishes it from credible alternatives.
-- Verification must exercise the original failure condition, not only a nearby passing test.
-- Separate checks actually run from user/environment verification still needed.
-- If the repro is unavailable, label the conclusion as a leading hypothesis rather than confirmed fact.
-
-## Behavior Cases
-- Positive: “간헐적으로 중복 결제가 발생하는 원인을 trace와 상태 흐름으로 RCA해줘.”
-- Negative: “이 failing unit test 고쳐줘.” → `workflow-bug-fix`.
-- Edge: a missing null guard directly reproduces the failure → report the direct cause; do not fabricate three hypotheses.
-- Edge: static call graphs differ from observed runtime ordering → runtime evidence outranks the static lead.
-
-## Known Limits
-- No repro or observation means the cause may remain `Unverified`.
-- Environment, concurrency, generated code, and external services can invalidate a source-only conclusion.
-- Broad redesign belongs to the relevant design or implementation owner after diagnosis.
+## Output Contract
+Lead with the root cause and decisive evidence, or explicitly say `Unverified leading hypothesis`. Add only applicable repro status, refuted alternatives, evidence scope, repair owner/direction, original-signal verification target, unresolved runtime/user conditions, and next discriminator. Do not turn a narrow RCA into a formal report.
