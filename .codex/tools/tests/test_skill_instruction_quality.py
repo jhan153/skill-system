@@ -86,14 +86,25 @@ class SkillInstructionQualityTests(unittest.TestCase):
 
     def test_global_agents_stays_thin_and_delegates_routing(self) -> None:
         text = canonical("platform/codex/AGENTS.md").read_text(encoding="utf-8")
-        self.assertLess(len(text.split()), 900)
+        self.assertLessEqual(len(text.split()), 850)
         self.assertNotIn("## Skill Alias Interpretation", text)
         self.assertNotIn("### Loop Readiness Gate", text)
-        self.assertIn("blocked`, analysis-only", text)
         self.assertIn("$CODEX_HOME/context-routing.md", text)
         self.assertNotIn("Read `.codex/context-routing.md`", text)
         self.assertIn("Route explicit `/goal`", text)
         self.assertIn("unknown or stale explicit skill alias", text)
+
+    def test_global_agents_result_labels_are_consistent(self) -> None:
+        text = canonical("platform/codex/AGENTS.md").read_text(encoding="utf-8")
+        status_line = next(
+            line for line in text.splitlines() if line.startswith("- Use only `agent-verified`")
+        )
+        self.assertEqual(
+            set(re.findall(r"`([^`]+)`", status_line)),
+            {"agent-verified", "user-verification-needed", "unverified", "blocked"},
+        )
+        self.assertNotIn("`analysis-only`", text)
+        self.assertIn("Analysis-only describes work scope, not a result label", text)
 
     def test_global_agents_requires_pre_answer_depth_gate(self) -> None:
         text = canonical("platform/codex/AGENTS.md").read_text(encoding="utf-8")
