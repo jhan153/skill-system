@@ -43,82 +43,35 @@ description: Create or synchronize a persisted docs/plan artifact for the curren
 - entry_scene:
   - PREPARE
 
-## State And Horizon Boundary
-- Treat short term as the current executable design horizon, not a calendar duration.
-- Admit `create_active_plan` only when the user requests a persisted plan or an active plan already owns the task.
-- Own synchronization of `active_plan` and the `approve_implementation` gate to `implementation_ready`.
-- Do not execute production work. After approval, hand implementation to `workflow-plan-runner` or the task-specific workflow and remain only a secondary status tracker.
-- Use `plan-long-term-package` when one plan cannot safely hold the cross-session phases/contracts; use `workflow-task-ledger` when only lightweight next-turn state is needed.
+## Contract And Context
+- Short term means one current executable design horizon, not a calendar duration. Activate only for an explicitly requested persisted plan or an already owning active plan.
+- Own `active_plan` synchronization and the gate to `implementation_ready`; never own production execution. After acceptance, hand work to `workflow-plan-runner` or the task workflow and remain a secondary tracker.
+- Use `plan-long-term-package` for cross-session phases/contracts and `workflow-task-ledger` for lightweight next-turn state.
 
-## Staged Context Admission
-1. Read the request and explicit plan pointer. If absent, inspect only `docs/plan` names/metadata for a matching active plan; do not open every plan.
-2. For a new plan, read `references/plan-template.md`. For an existing plan, load only that plan and preserve its stable task/state identifiers.
-3. Read the source outline, target files, or validation contract only to resolve affected boundaries, file paths, risks, or checks.
-4. Admit memory or historical plans only when a current decision depends on them; prefer a summary over raw text.
+Read the explicit plan pointer first. Without one, inspect only `docs/plan` names or metadata for a matching active plan. For a new plan read `references/plan-template.md`; for an existing plan read only that file and preserve stable identifiers. Admit source outlines, validation contracts, memory, or history only when needed to resolve a material path, risk, check, or decision. Record one focused question or marked assumption instead of loading broad context.
 
-If the goal stays ambiguous, record one focused question or a marked assumption. Never recover by loading the full repo, memory bank, or plan history.
+## Author And Synchronize
+1. Create `docs/plan/YYYY-MM-DD-<task-slug>.md` from the template, or reuse the task's active file. The template is the format owner.
+2. Record objective, bounded scope/non-goals, observable success, concrete files/components, what/why, risks, decisions/questions, ordered TODOs, validation, transition state, and progress. Use a bounded discovery TODO instead of guessing paths.
+3. Map every material change to an owner/path or discovery task, TODO, risk, and acceptance evidence. Define expected signals, not commands alone; include actual production or user-path readback when that is the material condition.
+4. Mark unavailable evidence `Unverified`. Structural checks, mocks, and agent-authored tests prove only their stated contracts and cannot override conflicting actual-path evidence. When a material condition fails, keep its TODO unresolved and record the exact resolution plus renewed same-path readback required to close it.
+5. Keep decisions, `질의`, TODO status, risks, validation, transition, and progress consistent in the artifact on every planning turn.
 
-## Plan Authoring Workflow
-1. State objective, bounded scope, non-goals, current state, and observable success conditions.
-2. List concrete target files/components. When unknown, create a bounded discovery TODO instead of guessing paths.
-3. Describe what changes and why, then connect each change to risks, validation evidence, and an ordered TODO.
-4. Record decisions and open questions with source/evidence and blocking status.
-5. Define validation commands or manual scenarios with expected signals; mark unavailable checks `Unverified`.
-6. Record the planning-state transition block and progress log.
-7. Run the Plan Quality Gate before reporting the plan path and next action.
-
-## Required Plan Contract
-Create or update `docs/plan/YYYY-MM-DD-<task-slug>.md` with at least:
-
-- objective, scope, and non-goals
-- changed-file/component list
-- change summary (`what` / `why`)
-- current versus target state where materially useful
-- risks and mitigations
-- validation procedure and expected evidence
-- `질의` with answer/decision status
-- ordered TODOs with `todo`, `doing`, `done`, or `blocked`
-- implementation-transition record
-- progress log
-
-Reuse the existing active file for the same task. Keep sections consistent; do not let TODO, status, approval, and progress claims contradict each other.
+Do not pad plans with placeholder code or diagrams. Follow the template's conditional code/diagram rules.
 
 ## Plan Quality Gate
-- **Scope:** the plan fits one current execution horizon; deferred work is explicit.
-- **Traceability:** every material change maps to a file/component or discovery task, a TODO, a risk, and acceptance evidence.
-- **Actionability:** each TODO has an outcome, dependencies/blocker, and completion signal; the first executable item is obvious.
-- **Validation:** checks address the success conditions and name expected pass signals, not only commands.
-- **Decisions:** unresolved product/interface decisions are visible and block dependent TODOs when necessary.
-- **Evidence:** planned facts come from admitted source; guesses are assumptions or `Unverified`.
-- **State:** the transition block records `current_state`, attempted event, approval phrase/evidence, accepted or rejected result, and next state.
+- Scope fits one execution horizon and deferred work is explicit.
+- The first executable TODO is clear; each TODO has an outcome, dependency/blocker, and completion signal.
+- Material changes trace to evidence and unresolved product/interface decisions block dependent work.
+- Validation covers success conditions with expected signals and calibrated evidence scope.
+- State records the attempted event, approval evidence, accepted/rejected result, and next state without contradicting TODO/progress claims.
 
-Do not pad the plan with placeholder code or diagrams. Include real before/after code in separate language-matched blocks only when it materially clarifies a planned change. Add a diagram only for runtime interaction, component/class boundary, concurrency, or data-model structure—not agent workflow or approval flow.
+Passing this gate proves plan readiness only, not feasibility, implementation, runtime correctness, or user success.
 
-## Implementation Transition Gate
-Accept `approve_implementation` only when:
+## Implementation Transition
+Accept `approve_implementation` only when the plan is `active_plan`, scope is explicit/current, the user's wording unambiguously applies to this task (for example `이 플랜대로 구현 시작`), and runtime policy permits mutation. Reject context-free `승인`, `작업해`, or `구현해`, and reject closed, archived, superseded, or historical plans unless explicitly re-admitted.
 
-1. the plan is currently `active_plan`;
-2. its scope is explicit and current;
-3. wording such as `이 플랜대로 구현 시작`, `플랜 구현해`, or an equivalent instruction clearly applies to this task; and
-4. runtime/sandbox policy permits the requested mutation.
+Before acceptance, edit plan artifacts only. On acceptance, record timestamp and approval evidence, set `current_state: implementation_ready`, freeze the accepted baseline, and hand TODO-ordered execution to its owner. `implementation_ready` is not implementation completion. Never mark a material condition done from a plan-only diff, lower-scope pass, or unresolved `needsReview`; require same-condition source/runtime/readback evidence or record it as unresolved.
 
-Reject a one-word `승인`, `작업해`, or `구현해` when surrounding context does not identify the active scope. Reject completed, closed-out, archived, superseded, or merely historical plans unless the user explicitly re-admits one for the current task.
-
-Before acceptance, edit plan artifacts only. On acceptance:
-
-- record timestamp, approval evidence, and `current_state: implementation_ready` before or with the first implementation update;
-- freeze the accepted plan baseline;
-- hand execution to the implementation owner in TODO order;
-- keep plan TODO/status updates as secondary bookkeeping;
-- never report implementation complete from a plan-only diff unless the request was documentation-only.
-
-Implementation completion requires source, test, runtime config/build, or executable scaffold evidence, or an exact blocker/analysis-only result.
-
-## Research Boundary
-Let `research-hypothesis-planning` own hypothesis, experiment, ablation, loss, or training-plan content. Use this skill only to persist that accepted content under `docs/plan`. Do not route ordinary development planning to research merely because it mentions a model, metric, experiment, or loss.
-
-## Conversation Synchronization
-On each planning turn, update decisions, `질의`, TODOs, risks, validation, and transition state in the plan—not only in chat. During implementation, append newly discovered ambiguity or scope as a question/TODO and keep status synchronized without taking execution ownership.
-
-## Reporting And Limits
-Report the active plan path, current state, accepted/rejected event with evidence, changed plan sections, and exactly one next action. A plan is design evidence, not proof of feasibility or runtime correctness; mark stale or unavailable evidence accordingly.
+## Reporting And Boundaries
+Report the active plan path, current state, accepted/rejected event with evidence, changed sections, and exactly one next action. Let `research-hypothesis-planning` own research design content; this skill only persists accepted content. A plan remains design evidence, and stale or unavailable implementation evidence stays explicit.
