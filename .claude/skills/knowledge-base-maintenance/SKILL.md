@@ -1,6 +1,6 @@
 ---
 name: knowledge-base-maintenance
-description: Validate, review, and maintain Wiki Bank source/claim/edge stores and knowledge feedback packets without direct hook mutation.
+description: Review and maintain accepted Wiki Bank claims against current source evidence; validate stores and projections without treating structural validity as semantic truth.
 ---
 
 # Knowledge Base Maintenance
@@ -8,112 +8,56 @@ description: Validate, review, and maintain Wiki Bank source/claim/edge stores a
 ## Routing Card
 - role: primary
 - intent_signature:
-  - Wiki Bank maintenance
-  - knowledge proposal review
-  - loop feedback packet
-  - promote knowledge feedback
-  - supersede knowledge claim
-  - conflict or trust policy
+  - Wiki Bank validation, proposal review, promotion, rejection, supersession, or conflict reconciliation
 - use_when:
-  - the user explicitly asks to inspect, validate, review, promote, reject, supersede, or reconcile Knowledge Store entries.
-  - a feedback packet needs human-reviewable proposal handling.
-  - a loop runner emits knowledge feedback candidates that need review, rejection, supersession, or promotion.
-  - source, claim, edge, trust, conflict, freshness, or supersession metadata must be checked.
+  - the user explicitly requests maintenance of Knowledge Store items or review of a feedback packet.
+  - source, claim, edge, trust, freshness, conflict, or supersession metadata needs a decision.
 - do_not_use_when:
-  - a task only needs read-only Context Pack compilation; use `knowledge-context-harness`.
-  - the user asks for ordinary Memory Bank mutation; use the matching memory-bank skill.
-  - hooks or agent runs emit a candidate packet but no explicit maintenance/review request exists.
+  - read-only Context Pack compilation (`knowledge-context-harness`), Memory Bank mutation, or unrequested hook/agent-run candidate handling.
 - expected_inputs:
-  - Knowledge Store path
-  - source/claim/edge/context-pack/feedback files
-  - loop checkpoint or `knowledge_feedback_candidates` packet when reviewing loop-derived knowledge
-  - explicit review or maintenance action
-  - validation command
+  - store path, exact item/packet IDs, requested action, relevant source handles, and validation commands
 - expected_outputs:
-  - validation result
-  - proposed accepted/rejected/superseded changes
-  - conflict, trust, freshness, and load-policy notes
-  - no automatic promotion without explicit approval
-  - stop reason when approval, provenance, validation, projection, or conflict requirements are not satisfied
+  - per-item evidence and decision, exact accepted/proposed changes, structural validation results, and unresolved risk
 - context_targets:
   must_read:
-    - target Knowledge Store files
-    - feedback packet or claim IDs under review
-    - `.codex/schemas/knowledge/*.schema.json`
+    - target store items, packet/claim IDs, referenced source spans, and applicable knowledge schemas
   read_if_needed:
-    - generated Wiki Projection
-    - Runtime Projection cards
-    - raw source handles for disputed claims
+    - generated projections, Runtime cards, or current external/private source for the reviewed items
   do_not_load_by_default:
-    - all historical plans
-    - raw chat transcripts
-    - unrelated Memory Bank entries
-    - credentials
+    - historical plans, raw transcripts, unrelated Memory Bank entries, credentials, or the whole store
 - risk_profile:
-  reads:
-    - knowledge store and selected source handles
-  writes:
-    - knowledge store files only after explicit maintenance intent
-  tools:
-    - `.codex/tools/validate_knowledge_store.py`
-    - `.codex/tools/build_context_pack.py --check`
-  sensitive_resources:
-    - external/private source locators require verification before promotion
+  reads: selected store items and source handles
+  writes: explicitly approved Knowledge Store items and regenerated projections only
+  tools: `validate_knowledge_store.py`; `build_context_pack.py --check`
+  sensitive_resources: external/private locators require scoped retrieval and provenance
 - entry_scene:
   - PREPARE
 
-## Policy
-- Accepted knowledge is mutated only through explicit maintenance/review flow.
-- Agent Run output and hooks may produce feedback candidates, not accepted knowledge.
-- Loop runner output may produce knowledge feedback candidates, not accepted Wiki Bank state.
-- Source of Truth remains source evidence; Wiki and Runtime Projection are derived.
-- Runtime Projection drift must be fixed by regenerating from accepted claims, not editing generated cards by hand.
-- Supersession and conflict records must keep source provenance.
+## Authority And Admission
+- Accepted knowledge changes only through an explicit maintenance request and item-level approval. Hook, Agent Run, loop, test, Kanboard, plan, or transcript output is a candidate/source lane, never automatic acceptance.
+- For each material claim, connect the exact statement to current source IDs and spans, authority, freshness, verification state, and conflicts. Schema validity, reference consistency, and projection freshness prove only those contracts; they do not prove the statement true.
+- Missing, stale, superseded, unreadable, or conflicting material evidence blocks acceptance until resolved or surfaced for an explicit user decision. A lower-scope pass cannot erase that state.
+- Accepted claims are canonical for Wiki/Runtime projections, which are regenerated rather than hand-edited. Supersession/conflict records retain the old ID and source provenance.
 
 ## Workflow
-1. Identify the requested maintenance action: validate, review, promote, reject, supersede, reconcile, regenerate, or review loop feedback.
-2. Validate the current store with `validate_knowledge_store.py`.
-3. If projections are in scope, validate them with `--require-projections` and `build_context_pack.py --check`.
-4. For proposal review, inspect evidence refs and source freshness before changing accepted claims.
-5. For loop feedback, separate verifier-backed facts from process lessons, rejected shortcuts, temporary failures, and untrusted observations.
-6. Apply only the explicitly approved Knowledge Store change.
-7. Regenerate projection artifacts after accepted knowledge changes.
-8. Re-run store and projection validation after the mutation; a pre-write pass is not post-write evidence.
-9. Report changed claims/edges/sources, per-item provenance/decision, validation evidence, and remaining review risks.
+1. Scope the requested action and exact source/claim/edge/packet IDs; do not widen a one-item decision into store cleanup.
+2. Validate the pre-state with `validate_knowledge_store.py`; add `--require-projections` and `build_context_pack.py --check` only when projections are in scope.
+3. Read each referenced source span and compare its current digest/freshness/authority with the proposed statement. Separate observed facts from interpretations, process lessons, temporary failures, and rejected shortcuts.
+4. Decide each item as accept, reject, supersede, conflict, or needs user decision. Show the proposed diff and evidence before any accepted-store mutation.
+5. Apply only approved items, preserving stable IDs and provenance. Regenerate derived projections from accepted claims.
+6. Re-run store/projection validation and read back affected IDs. A pre-write pass is not post-write evidence, and a post-write structural pass is not semantic source proof.
+7. Report per-item statement, source span, decision, mutation/readback, validation command/result, and remaining risk.
 
 ## Stop Policy
-- `success`: requested validation or maintenance action completes, accepted/proposed changes are listed, and projections are regenerated or explicitly out of scope.
-- `blocked`: target store, schema, feedback packet, source ref, or validation command is missing.
-- `approval`: accepted knowledge would be promoted, rejected, superseded, deleted, or rewritten without explicit maintenance intent and approval.
-- `idempotency`: claim/source/edge ids are unstable, duplicate, or cannot be mapped to the intended source evidence.
-- `unsafe`: the next action would treat hook output, raw transcript text, generated projection, or external/private source text as accepted knowledge without review.
-- `loop_feedback`: loop feedback lacks source evidence, verifier evidence, or an explicit user decision for promotion.
-- `fatal`: validation tooling, schema, or projection state is inconsistent enough that accepted knowledge cannot be trusted.
-
-## Idempotency
-- Preserve stable source, claim, edge, and feedback ids across retries.
-- Regenerate derived projections from accepted claims; never patch generated Runtime Projection cards as source of truth.
-- On repeated validation failures, stop and report the failing command and affected ids instead of rewriting unrelated claims.
+- `success`: the scoped validation/review is reported; an approved mutation also has affected-item readback and required projection regeneration.
+- `approval`: an accepted item would change without explicit item-level authorization.
+- `blocked`: required store/schema/source/command is missing, or IDs are unstable/duplicate/unmappable.
+- `needs_review`: material evidence is stale, unverified, unreadable, or conflicting; preserve the proposal and request the exact decision/evidence needed.
+- `unsafe`: candidate, generated projection, transcript, or private/external text would be silently accepted; or a generated card would be hand-edited.
+- `fatal`: tool/schema/store inconsistency makes the scoped decision untrustworthy.
 
 ## Output Contract
-For one validation or claim decision, report the affected IDs, evidence, decision, and remaining risk directly. Use the full structured shape only for an explicit maintenance artifact or multi-item review; omit empty fields.
-
-```yaml
-knowledge_maintenance:
-  status:
-  stop_reason:
-  action:
-  reviewed_items: []
-  item_decisions: []
-  accepted_changes: []
-  rejected_changes: []
-  loop_feedback_reviewed: []
-  supersession_or_conflicts: []
-  projection_regenerated: false
-  validation:
-    command:
-    result:
-```
+For each reviewed item, return `id`, `statement/action`, `source evidence`, `decision`, `mutation/readback`, and `remaining risk`. For multi-item artifacts, also separate accepted, rejected, superseded/conflicted, and unresolved items; omit empty sections.
 
 ## Compatibility Boundary
 - Memory Bank skills keep ownership of explicit persistent memory operations.
@@ -121,5 +65,4 @@ knowledge_maintenance:
 - Kanboard and plan documents enter as source records or candidate metadata until separately promoted.
 
 ## Known Limits
-- Current validator covers file-backed source/claim/edge/context-pack/feedback references and generated projection freshness.
-- Trust scoring, dense retrieval, and full conflict-resolution automation are not implemented in this phase.
+- Validators cover file-backed references and generated-projection freshness, not semantic truth. Trust scoring, dense retrieval, and full conflict resolution remain manual.
