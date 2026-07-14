@@ -57,6 +57,23 @@
   logs/
 ```
 
+## 2.1) Integrated Report Contract
+Keep one Markdown report in this order:
+1. 실행 요약
+2. 범위/가정/비목표
+3. 코드베이스 개요
+4. 상위 설계 (HLD)
+5. 상세 설계 (LLD)
+6. 정적 분석 결과
+7. 동적 분석 결과
+8. 수동 리뷰 결과
+9. 우선순위 개선 백로그
+10. 부록
+
+HLD includes Context, Container, Deployment, Crosscutting, and Architecture Decision Candidate views. LLD includes representative runtime scenarios plus Component and Interface views; add class/function detail only for complex core components. Label heuristic items as decision candidates with a verification method, not accepted decisions. Every diagram exposes provenance and fallback status.
+
+The backlog columns are `파인딩`, `액션`, `Severity`, `Priority`, `구체적인 개선 내용`, and `관련 파일`. Static analysis keeps graph-first LOC, complexity, branch, density, and LOC-vs-complexity views; do not replace the quadrant with a table.
+
 ## 3) Priority Model
 정책 파일의 `priority_model`이 단일 소스입니다.
 
