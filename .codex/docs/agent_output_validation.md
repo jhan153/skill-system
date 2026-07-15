@@ -5,6 +5,25 @@ Agent output validation checks artifacts produced by a real Codex agent run. It 
 
 Use this layer when an agent run claims `agent-verified`, `user-verification-needed`, `unverified`, or `blocked` in the final task result.
 
+## Harness Versions
+
+| version | comparison source | Stop contract |
+| --- | --- | --- |
+| 9.1.1 | pinned `v9.1.1` | validate the full agent-run artifact during Stop |
+| 9.1.2 | pinned `baseline/9.2.0-pre-diet` | same hook and validator implementation as 9.1.1 |
+| 9.2.0 | evaluated opt-in candidate | pre-bound receipt authority with blanket post-tool staleness and negative-control pressure |
+| 9.2.1 | current opt-in candidate | current-run receipt plus declared-subject freshness, with bounded evidence and no live test expansion |
+
+Activate the candidate with `SKILL_SYSTEM_HARNESS_VERSION=9.2.1`. Before `UserPromptSubmit`, the host may provide `SKILL_SYSTEM_VERIFIER_CONTRACT` with `contract_id`, one verifier command hash, verifier origin, and workspace-relative subject files. Matching `PostToolUse` events bind the verifier result to the current session, turn, and subject-file content digest. Legacy oracle and negative-control fields are accepted but ignored.
+
+The ordinary 9.2.1 `Stop` path does not execute tests, interpret prose, run the artifact validator, notify through another Python process, or synchronize Kanboard. It checks that the latest matching receipt belongs to the current session/turn and re-hashes only the declared subject files, up to 16 MiB total. Read-only or unrelated later activity is allowed; a changed subject downgrades the label. Insufficient evidence preserves the answer but changes its canonical label to `user-verification-needed`. Under strict gating, a rejected `agent-verified` claim receives one label-only reissue instruction that forbids more tools, edits, tests, and plan expansion. Agent-authored or modified checks remain supporting evidence and do not trigger a negative-control requirement.
+
+Run the current three-version comparison with:
+
+```bash
+python3 .codex/tools/compare_harness_versions.py --samples 7
+```
+
 ## Artifact Layout
 Synthetic examples live under `.codex/tools/tests/fixtures/agent-runs/`.
 Live Codex hooks bind evidence to the current session and turn only when that run directory already has a `run.yaml` manifest:

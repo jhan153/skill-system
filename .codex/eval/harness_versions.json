@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "purpose": "Compare agent-output harness behavior and Stop latency across frozen 9.1.1, frozen 9.1.2, and the bounded-evidence 9.2.1 candidate. Historical 9.2.0 evidence remains in its independent audit artifact.",
+  "versions": [
+    {
+      "version": "9.1.1",
+      "source_ref": "v9.1.1",
+      "commit": "f8c710939035ece6f0f680d2adc4e14933765b25"
+    },
+    {
+      "version": "9.1.2",
+      "source_ref": "baseline/9.2.0-pre-diet",
+      "commit": "d0b0514b4433448cc03e8857df52399150802d58"
+    },
+    {
+      "version": "9.2.1",
+      "source_ref": "worktree",
+      "harness_mode": "9.2.1"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "trusted-verifier-success",
+      "expected_authority": "grant"
+    },
+    {
+      "case_id": "semantic-contradiction-without-trust",
+      "expected_authority": "deny"
+    },
+    {
+      "case_id": "agent-modified-supporting-only",
+      "expected_authority": "deny"
+    },
+    {
+      "case_id": "unrelated-post-verifier-tool-use",
+      "expected_authority": "grant"
+    },
+    {
+      "case_id": "verifier-failure",
+      "expected_authority": "deny"
+    },
+    {
+      "case_id": "ledger-tamper",
+      "expected_authority": "deny"
+    }
+  ],
+  "performance_thresholds": {
+    "stop_subprocesses": 0,
+    "stop_p95_ms": 200
+  }
+}

@@ -73,13 +73,18 @@ classDiagram
 - 대응:
 
 ## 6) 검증 절차
-### Agent 실행 검증
-1. 명령:
-2. 기대 결과:
+### Primary verifier
+- 종류: `existing-repository | direct-observation | smoke | unavailable`
+- 명령/관찰:
+- 기대 결과:
+- 최신 결과: `not-run | pass | fail | user-verification-needed`
+- 근거 요약: (원문 로그나 receipt 이력을 붙이지 않는다)
 
-### User 런타임 검증
-1. 시나리오:
-2. 기대 결과:
+### User 런타임 확인 (필요 시 하나만)
+- 시나리오:
+- 기대 결과:
+
+검증을 위해 새 테스트 프레임워크, mock 계층, fixture 묶음, dependency, LoopRun을 추가하지 않는다. 그것이 사용자 산출물이거나 이미 정의된 실질 회귀 위험을 직접 다루는 경우에만 구현 범위에 포함한다. 검증 수단이 없으면 범위를 늘리지 않고 `user-verification-needed`로 남긴다.
 
 ## 7) 질의 (Questions)
 - Q1:
@@ -99,5 +104,11 @@ classDiagram
 - 승인 시각:
 - 승인자:
 
-## 10) 진행 로그
-- YYYY-MM-DD HH:mm: 변경 사항 요약
+## 10) 현재 진행 스냅샷
+- 갱신 시각:
+- 완료된 구현:
+- 남은 구현:
+- 최신 결정적 검증:
+- 다음 한 단계:
+
+이 섹션은 매번 교체한다. 명령 로그, receipt, 재시도, superseded 결과를 누적하지 않는다.

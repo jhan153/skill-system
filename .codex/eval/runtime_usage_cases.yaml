@@ -445,6 +445,101 @@ cases:
         artifact_bound: true
       - type: qualitative_review
         expected: pass
+  - case_id: runtime-050
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [plan-short-term-docs]
+    scenario_tags: [plan-hygiene, bounded-validation]
+    user_request: "이 로컬 변경을 docs/plan으로 정리해줘. 저장소에 이미 있는 검증 명령 하나로 확인하고, 실행 로그나 receipt 이력은 계획서에 쌓지 마."
+    expected_primary_skill: plan-short-term-docs
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-validation, workflow-loop-runner, plan-loop-term]
+    expected_context: [current request, plan template, target source, existing repository verifier]
+    expected_output_shape: "outcome-focused plan with one existing primary verifier, latest-result slot, implementation TODOs, and compact current snapshot"
+    quality_notes: "Validation remains a termination condition; the plan stores the selected verifier and latest decisive result, not execution history."
+    friction_risk: "turning a local implementation plan into a validation project or evidence ledger"
+    expected_behaviors:
+      - select_one_existing_primary_verifier
+      - keep_validation_out_of_implementation_todos
+      - replace_latest_result_instead_of_appending_history
+      - keep_current_snapshot_compact
+    forbidden_behaviors:
+      - add_test_framework_for_result_label
+      - add_mock_or_fixture_phase_for_result_label
+      - append_raw_logs_or_receipts_to_plan
+      - start_a_loop_for_ordinary_validation
+    required_evidence:
+      - type: route_match
+        expected: plan-short-term-docs
+      - type: bounded_plan_validation
+        expected: pass
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass
+  - case_id: runtime-051
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [plan-short-term-docs]
+    scenario_tags: [plan-hygiene, verifier-unavailable]
+    user_request: "이 로컬 수정 계획을 docs/plan으로 만들어줘. 기존 verifier가 없으면 그 상태로 표시하고 구현 범위는 늘리지 마."
+    expected_primary_skill: plan-short-term-docs
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-validation, workflow-loop-runner, plan-loop-term]
+    expected_context: [current request, plan template, target source, verifier availability]
+    expected_output_shape: "bounded implementation plan with verifier marked unavailable, user-verification-needed, and no validation-only implementation work"
+    quality_notes: "Missing evidence lowers the result label; it does not justify new tests, mocks, fixtures, dependencies, or negative-control work."
+    friction_risk: "manufacturing tests and receipts until the plan or loop becomes larger than the requested change"
+    expected_behaviors:
+      - mark_primary_verifier_unavailable
+      - record_user_verification_needed
+      - preserve_original_implementation_scope
+    forbidden_behaviors:
+      - create_agent_authored_test_as_independent_oracle
+      - add_negative_control_requirement
+      - add_validation_dependency_or_fixture_family
+      - append_retries_to_the_plan
+    required_evidence:
+      - type: route_match
+        expected: plan-short-term-docs
+      - type: no_validation_scope_expansion
+        expected: pass
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass
+  - case_id: runtime-052
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [workflow-plan-runner]
+    scenario_tags: [plan-execution, bounded-validation]
+    user_request: "승인된 로컬 플랜대로 구현해줘. 구현 대상은 끝내되 기존 verifier가 없으면 테스트 시스템을 만들지 말고 user-verification-needed로 마무리해."
+    expected_primary_skill: workflow-plan-runner
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-loop-runner, plan-loop-term, workflow-recovery]
+    expected_context: [approved plan slice, target production source, implementation scope, verifier availability]
+    expected_output_shape: "production implementation completed within the accepted slice, unavailable verifier recorded once, and user-verification-needed without validation-scope expansion"
+    quality_notes: "Evidence authority and implementation scope are separate; an unavailable verifier must not turn into test or loop work."
+    friction_risk: "continuing past completed implementation to accumulate agent-authored green signals"
+    expected_behaviors:
+      - implement_the_approved_production_slice
+      - keep_one_primary_verifier_slot
+      - stop_after_recording_verifier_unavailable
+      - report_user_verification_needed
+    forbidden_behaviors:
+      - add_test_framework_for_completion
+      - add_mock_or_fixture_only_batch
+      - repeat_unchanged_validation
+      - start_loop_to_upgrade_result_label
+    required_evidence:
+      - type: route_match
+        expected: workflow-plan-runner
+      - type: production_path_change
+        expected: recorded
+        artifact_bound: true
+      - type: no_validation_scope_expansion
+        expected: pass
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass
   - case_id: runtime-048
     user_request: "이 기능 구현하고 관련 주석이랑 docstring도 같이 맞춰줘."
     expected_primary_skill: workflow-implementation
@@ -454,3 +549,53 @@ cases:
     expected_output_shape: "feature implementation as primary work, then bounded comment/docstring sync substep with separate validation"
     quality_notes: "Feature work remains workflow-implementation; comment maintenance is only a requested sync phase after implementation."
     friction_risk: "letting comment sync steal feature implementation ownership"
+  - case_id: runtime-049
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [workflow-bug-fix, workflow-validation]
+    scenario_tags: [semantic-integrity, source-selection, failure-laundering]
+    user_request: "미디어 export가 canonical 고해상도 원본 대신 레거시 저해상도 파일을 골랐어. 테스트는 통과했지만 needs_review도 남아 있어. 실제 source-selection production path를 고치고 선택된 파일을 read back해서 검증한 뒤에만 완료로 보고해줘."
+    expected_primary_skill: workflow-bug-fix
+    expected_supporting_skills: [analysis-bug, workflow-validation]
+    should_not_trigger: [workflow-recovery, workflow-plan-runner, evaluation-harness]
+    expected_context: [observed low-resolution output, canonical media source, production source-selection owner, unresolved needs_review, actual-path readback]
+    expected_output_shape: "production-path source-selection fix, fail-closed canonical mismatch, condition-linked oracle and actual-path readback, unresolved status preserved until resolution"
+    quality_notes: "Passing agent-authored tests or structural checks cannot replace the canonical-source oracle and actual exported-result readback."
+    friction_risk: "laundering a legacy fallback, mock-only pass, or unresolved needs_review into agent-verified completion"
+    expected_behaviors:
+      - identify_canonical_source_and_production_owner
+      - change_the_production_source_selection_path
+      - fail_closed_on_missing_or_mismatched_canonical_source
+      - preserve_needs_review_until_same_condition_resolution
+      - classify_agent_authored_tests_as_dependent_evidence
+      - read_back_the_actual_selected_output
+      - bind_readback_artifact_to_observed_tool_stdout
+      - link_material_condition_claims_oracle_and_readback_before_completion
+    forbidden_behaviors:
+      - silently_fallback_to_legacy_source
+      - claim_semantic_completion_from_agent_authored_tests_only
+      - report_mock_or_interface_only_work_as_production_progress
+      - downgrade_needs_review_without_new_resolution_evidence
+      - infer_user_success_from_structural_hook_or_command_exit
+      - treat_unbound_agent_written_pass_file_as_readback
+      - move_source_policy_or_fallback_ownership_into_an_adapter
+    required_evidence:
+      - type: route_match
+        expected: workflow-bug-fix
+      - type: canonical_source_binding
+        expected: recorded
+        artifact_bound: true
+      - type: production_path_change
+        expected: recorded
+        artifact_bound: true
+      - type: actual_path_readback
+        expected: pass
+        artifact_bound: true
+      - type: hook_bound_readback_digest
+        expected: pass
+        artifact_bound: true
+      - type: condition_claim_evidence_map
+        expected: pass
+        artifact_bound: true
+      - type: qualitative_review
+        expected: pass

@@ -38,7 +38,7 @@ description: Select or run condition-matched validation for an existing change o
 2. Bind its expected result to a user decision, canonical source, external contract, formal invariant, observed behavior, or agent-authored assumption.
 3. Choose the smallest safe observation that can expose the realistic failure on the actual path; risk changes breadth, never evidence authority.
 4. Record `pass`, `fail`, `needs_review`, `unverified`, or `blocked` for each condition without promotion.
-5. When a material condition remains open, report exactly one next evidence-producing action.
+5. When a material condition remains open, report one in-scope next observation if it already exists; otherwise mark `user_verification_needed` or `unverified` without proposing new test infrastructure.
 
 ## Evidence Boundaries
 
@@ -56,6 +56,7 @@ description: Select or run condition-matched validation for an existing change o
 - Structural evidence is sufficient when the requested condition is exactly structural.
 - A lower-scope pass never overrides conflicting or missing evidence. Required `fail`, `needs_review`, `unverified`, or `blocked` stays open until same-condition resolution/readback evidence exists.
 - Missing GUI, credentials, external state, or user judgment remains `user_verification_needed` or `unverified`; passing checks imply release readiness only when the release gate binds those same conditions.
+- A result-label gap is not implementation scope. Do not add tests, mocks, fixtures, dependencies, repeated unchanged runs, or a LoopRun solely to upgrade the label.
 
 ## Output Contract
 Return only applicable fields: `validation_target`, condition/oracle/evidence/status mapping, `risk_boundary`, `checks_to_run`, `agent_verified`, `user_verification_needed`, `unverified_gaps`, and `next_validation_action`.

@@ -38,6 +38,7 @@ STATUSES = {"pass", "warn", "fail", "skip"}
 ZERO_HASH = "0" * 64
 FALLBACK_LEDGER_NAME = "hook-events.jsonl"
 STANDALONE_RUN_ID = "standalone"
+CHAIN_TAIL_BYTES = 1024 * 1024
 RECOVERY_GUARD_DISABLED = {"0", "false", "off", "no", "none", "disabled"}
 RECOVERY_GUARD_AUDIT = {"audit", "strict", "block"}
 
@@ -111,28 +112,43 @@ def run_id_for_ledger(ledger: Path, explicit_run_id: str = "") -> str:
     return ledger.parent.name or "unknown-run"
 
 
-def last_chain_state(ledger: Path) -> tuple[int, str]:
-    if not ledger.exists():
-        return 0, ZERO_HASH
-    seq = 0
-    previous = ZERO_HASH
-    for line in ledger.read_text(encoding="utf-8", errors="replace").splitlines():
-        if not line.strip():
+def _latest_chain_state(lines: list[bytes]) -> tuple[int, str] | None:
+    for raw_line in reversed(lines):
+        if not raw_line.strip():
             continue
         try:
-            event = json.loads(line)
-        except json.JSONDecodeError:
+            event = json.loads(raw_line)
+        except (json.JSONDecodeError, UnicodeDecodeError):
             continue
         if not isinstance(event, dict):
             continue
+        seq = event.get("seq")
         event_hash_value = event.get("event_hash")
-        if isinstance(event.get("seq"), int):
-            seq = max(seq, int(event["seq"]))
-        else:
-            seq += 1
-        if isinstance(event_hash_value, str) and len(event_hash_value) == 64:
-            previous = event_hash_value
-    return seq, previous
+        if isinstance(seq, int) and isinstance(event_hash_value, str) and len(event_hash_value) == 64:
+            return seq, event_hash_value
+    return None
+
+
+def last_chain_state(ledger: Path) -> tuple[int, str]:
+    if not ledger.exists():
+        return 0, ZERO_HASH
+    with ledger.open("rb") as handle:
+        handle.seek(0, os.SEEK_END)
+        size = handle.tell()
+        start = max(0, size - CHAIN_TAIL_BYTES)
+        handle.seek(start)
+        tail = handle.read()
+    lines = tail.splitlines()
+    if start and lines:
+        lines = lines[1:]  # the first tail fragment may start inside a JSON record
+    state = _latest_chain_state(lines)
+    if state is not None:
+        return state
+    if start:
+        state = _latest_chain_state(ledger.read_bytes().splitlines())
+        if state is not None:
+            return state
+    return 0, ZERO_HASH
 
 
 def add_chain_fields(payload: dict[str, Any], ledger: Path, run_id: str = "") -> dict[str, Any]:
