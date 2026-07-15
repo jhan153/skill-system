@@ -41,7 +41,7 @@ description: "Map design components, semantic roles, variants, states, slots, ev
     - relevant repo component paths
     - applicable approved component catalog when declared, or the inspected-scope result that none was found
   read_if_needed:
-    - `references/component-contract-schema.md` for a mapping artifact, post-implementation reuse decision, or declared fallback/exception policy
+    - `references/component-contract-schema.md` for a mapping artifact, multi-component matrix, or persisted fallback/exception record
     - `references/state-coverage-matrix.md` for a broad state review
     - design token export
     - visual evidence manifest
@@ -73,14 +73,14 @@ Use this skill to connect design roles to existing code components without redes
 ## Workflow
 1. Establish the inspected scope. Record exact design pointers, target app-surface paths, catalog identity, and the fallback/exception policy. A missing, mutable, or out-of-scope catalog cannot support a conformance claim.
 2. Inventory only relevant candidates. For each affected control, record its semantic role, required behavior, candidate path/export and available examples. If names differ, record an alias rather than renaming automatically.
-3. Select or reject candidates by semantic role and behavior. Cite the selected catalog id/export/variant and nearest rejection. If none matches, keep the role `unmapped` and load the contract schema for the active fallback; never invent a match or permission.
+3. Select or reject candidates by semantic role and behavior. Cite the selected catalog id/export/variant and nearest rejection. If none matches, keep the role `unmapped` and apply only a declared fallback; never invent a match or permission.
 4. Compare only required contract dimensions: relevant variants, states, slots, events, responsive behavior, and accessibility expectations. Missing required dimensions remain gaps. Load `references/state-coverage-matrix.md` only for a broad state review.
-5. Classify with the contract schema. `reused` requires the actual app-surface file and import/use site; export inventory alone cannot pass reuse, and other availability artifacts support only `planned`. Record exceptions and conflicts with their exact rule, scope, and authorizing source.
+5. Classify one mapping or reuse decision directly as `planned`, `reused`, `approved_exception`, `unmapped`, `conflict`, or `unverified`. Load the contract schema only for a mapping artifact, multi-component matrix, or persisted fallback/exception record. `reused` requires the actual app-surface file and import/use site; availability artifacts support only `planned`. Record exceptions and conflicts with their exact rule, scope, and authorizing source.
 6. Hand only unresolved mappings, missing states, conflicts, and scoped implementation gaps to the relevant implementation, visual, or accessibility owner.
 
 ## Evidence Rules
 - Actual app-surface source outranks catalog inventory and generic scans. Scope violations to app-surface call sites; Semantic HTML/native primitives inside an approved component are its implementation detail.
-- Apply the pinned fallback outcome from `references/component-contract-schema.md`; `unmapped` is not permission. Native fallback still needs inspected no-match evidence, the actual native call site, and its relevant accessibility contract.
+- Apply only the pinned fallback outcome from its authorizing source; `unmapped` is not permission. Native fallback still needs inspected no-match evidence, the actual native call site, and its relevant accessibility contract.
 - Missing required states stay gaps; never infer them from a default example or enumerate irrelevant theoretical states.
 - Scripts and project checks prove only their documented scope. `scripts/scan_component_exports.py` inventories availability, not reuse.
 - Do not invent variants, props, slots, events, approvals, exceptions, fallback policies, or behavior. Mark material missing evidence `unverified`.
