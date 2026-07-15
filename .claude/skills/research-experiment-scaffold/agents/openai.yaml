@@ -1,7 +1,7 @@
 interface:
   display_name: "Research Experiment Scaffold"
   short_description: "Build a minimal runnable scaffold from an approved blueprint"
-  default_prompt: "Use $research-experiment-scaffold to project an approved experiment contract into repo-native code, synthetic tests, provenance, and a safe local smoke check without installing, downloading data, or training."
+  default_prompt: "Use $research-experiment-scaffold to project an approved contract into a repo-native production runner, core method and metric, result/provenance path, and synthetic data-boundary smoke without installing, downloading, or training."
 
 policy:
   invocation_surface: explicit_procedure
