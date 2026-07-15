@@ -144,6 +144,7 @@ Use `.codex/docs/planning_state_model.md` when a planning artifact changes state
 
 Design cluster conservative defaults:
 - New or recently hardened design skills keep `allow_implicit_invocation: false` until route smoke tests and field feedback justify broader routing.
+- `design-frontend` is the bounded exception: it may enter implicitly only for concrete UI/design implementation in repository code. Critique, ideation, reuse or visual audits, layout-only translation, and small CSS/text edits remain outside it.
 - `design-ui-decomposer` and `design-layout-translator` are operational `experimental` analysis skills, but should remain explicit or clearly analysis-intent routed until field feedback exists.
 - Mobile, dashboard, and section-web guidance is conditionally loaded from `design-frontend/references/`; select one primary profile instead of attaching surface skills.
 - Each new design skill needs at least three `should_not_trigger` cases before implicit invocation can be reconsidered.
@@ -158,7 +159,7 @@ Canonical positive and negative routing cases live in `.codex/eval/routing_cases
 Use the eval schema and runner for field meanings and replay. A routing change is complete only when its focused positive case and a competing or negative case pass; schema or text presence alone is not routing-quality evidence.
 
 ## Agent Metadata Tradeoff
-Current `agents/openai.yaml` metadata is conservative: specialist skills and heavy artifact generators use `allow_implicit_invocation: false` to prevent broad-trigger overactivation. The only current implicit exceptions are `analysis-router`, `research-router`, and `search-router`, backed by smoke/eval negative cases. Explicit aliases, Routing Cards, and this routing contract remain the primary activation path for all other skills.
+Current `agents/openai.yaml` metadata is conservative: specialist skills and heavy artifact generators use `allow_implicit_invocation: false` to prevent broad-trigger overactivation. The router exceptions are `analysis-router`, `research-router`, and `search-router`; `design-frontend` is the sole execution-owner exception for concrete repo-integrated UI implementation. Explicit aliases, Routing Cards, and this routing contract remain the primary activation path for all other skills.
 
 
 ## Group Alias Routing
@@ -191,6 +192,6 @@ Evidence vs research boundary (mirrored rule; `research-routing.md` is Codex-onl
 - Implementation/plan/algorithm requests that merely mention paper/loss/model/experiment keep their implementation/planning/analysis primary; research attaches only as a support evidence lane.
 
 Phase B note:
-- `analysis-router`, `research-router`, and `search-router` are the only selectively implicit entry routers. Specialist skills remain explicit-only unless future field feedback justifies another exception.
+- `analysis-router`, `research-router`, and `search-router` are the only selectively implicit entry routers. `design-frontend` is the separately bounded implicit execution owner; specialist skills remain explicit-only unless future field feedback justifies another exception.
 - `evaluation-usage-tracker` and `memory-bank-ingestion` remain experimental explicit-only skills.
 - Loop engineering skills remain explicit/routing-controlled: readiness classification, verifier mapping, and loop execution are separate to avoid accidental long-running loops.

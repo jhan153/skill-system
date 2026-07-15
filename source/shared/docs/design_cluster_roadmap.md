@@ -50,7 +50,7 @@ These are roadmap candidates only; they are not active registry skills yet.
 - Do not treat screenshots alone as proof of implementation quality.
 - Do not treat a component export inventory as reuse proof or one sibling screenshot as a product-family oracle.
 - Keep specialist skills narrow and add negative routing cases before adding more design skills.
-- Keep `allow_implicit_invocation: false` for new and recently hardened design skills until route smoke tests and field feedback justify broader routing.
+- Keep `allow_implicit_invocation: false` for new and recently hardened design skills until route evidence and field feedback justify broader routing. `design-frontend` is the bounded exception for concrete repo-integrated UI implementation; analysis and evidence specialists remain explicit.
 - Do not create a surface skill when a conditional `design-frontend` reference is sufficient.
 
 ## Improvement Track
@@ -60,4 +60,4 @@ These are roadmap candidates only; they are not active registry skills yet.
 - Track dashboard/mobile/section profile quality, incorrect multi-profile loading, and missing surface constraints.
 - Track product-family profile conflicts, catalog reuse violations/exceptions, target-vs-family verdict divergence, and UX decisions reversed by missing context.
 - Promote UX pattern planning to a distinct skill only after repeated field cases show that the conditional `design-frontend` reference needs a separate owner or oracle.
-- Track over-trigger and under-trigger events before changing primary ownership rules.
+- Track `design-frontend` over-trigger on critique, audits, layout translation, and small edits, plus under-trigger on concrete implementation, before broadening the exception or changing primary ownership rules.

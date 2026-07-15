@@ -655,6 +655,7 @@ class SkillDietComparisonTests(unittest.TestCase):
             "design-frontend": {
                 "structured": "design-030",
                 "negative": "design-033",
+                "competing": "design-033",
                 "composition": "design-004",
                 "edge": "design-037",
             },

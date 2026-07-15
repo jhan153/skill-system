@@ -54,6 +54,29 @@ class InvocationSurfacePolicyTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("implicit invocation is only allowed", result.stdout)
 
+    def test_approved_implicit_execution_skill_passes(self) -> None:
+        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            root = Path(tmp)
+            skill = root / ".codex" / "skills" / "design-frontend"
+            (skill / "agents").mkdir(parents=True)
+            (skill / "SKILL.md").write_text(
+                "# Design Frontend\n\n## Routing Card\n- role: primary\n",
+                encoding="utf-8",
+            )
+            (skill / "agents" / "openai.yaml").write_text(
+                (
+                    "interface:\n"
+                    "  display_name: Design Frontend\n"
+                    "policy:\n"
+                    "  invocation_surface: explicit_procedure\n"
+                    "  allow_implicit_invocation: true\n"
+                    "  may_own_execution: true\n"
+                ),
+                encoding="utf-8",
+            )
+            result = self.run_tool("--root", str(root))
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()
