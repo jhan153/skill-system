@@ -68,12 +68,6 @@ description: Behavior-preserving comment and docstring maintenance workflow for 
 - entry_scene:
   - PREPARE
 
-## Purpose
-- Synchronize comments, docstrings, inline rationale, and TODO/FIXME markers with what the code actually does.
-- Preserve high-context knowledge that code alone cannot recover, while removing stale, misleading, or noise comments.
-- Keep comment maintenance separate from feature work, bug fixes, structural refactors, source cleanup, and documentation writing.
-- Never change code behavior; hand off to the owning execution skill when a comment exposes a real code problem.
-
 ## Workflow
 1. Lock scope:
    - name the files or comment areas being maintained.
