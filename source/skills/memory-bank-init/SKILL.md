@@ -7,67 +7,25 @@ description: Initialize project-scoped persistent memory by creating the canonic
 
 ## Routing Card
 - role: memory_operation
-- intent_signature:
-  - initialize memory bank, start persistent project memory, 메모리뱅크 초기화
-- use_when:
-  - the user explicitly asks to create project memory or explicitly approves reinitialization.
-- do_not_use_when:
-  - the request is an update, correction capture, maintenance operation, or design discussion.
-- expected_inputs:
-  - project root, target path, and explicit init/reinit intent
-- expected_outputs:
-  - baseline files, project identity, first event, and validation result
-- context_targets:
-  must_read:
-    - project identity and existing target-path state
-    - `.codex/docs/memory_mutation_contract.md` before creating files
-  read_if_needed:
-    - `reference.md` for the canonical schema and project-id rule
-    - `docs/document.md` only for an exceptional failure path
-  do_not_load_by_default:
-    - full repo, other projects' memory, or unrelated history
-- risk_profile:
-  reads:
-    - project identity and target memory path
-  writes:
-    - canonical baseline files only after explicit init/reinit intent
-  tools:
-    - safe filesystem and schema checks
-  sensitive_resources:
-    - credentials default deny
-- entry_scene:
-  - PREPARE
+- intent_signature: initialize memory bank, start persistent project memory, 메모리뱅크 초기화
+- use_when: the user explicitly requests a fresh project bank or explicitly approved reinitialization
+- do_not_use_when: update, correction capture, maintenance, or design discussion is primary
+- expected_inputs: verified project root/identity, target path state, and explicit init/reinit intent
+- expected_outputs: canonical baseline files, first event, stable identity, preservation decision, and readback result
+- context_targets: read project identity and exact target state; before writing load `.codex/docs/memory_mutation_contract.md` and `reference.md`; use `docs/document.md` only for exceptional failure
+- risk_profile: create one canonical bank only after explicit intent; never read unrelated banks or overwrite accepted history silently; credentials denied
+- entry_scene: PREPARE
 
-## Preflight
-1. Resolve the project root and derive `project_id` by the rule in `reference.md`.
-2. Inspect the target path without loading unrelated memory.
-3. If a bank exists, stop unless the user explicitly requested reinitialization.
-4. Treat reinitialization as a migration/backup-sensitive operation: never delete or overwrite accepted history silently.
-5. Confirm the target is writable.
+## Initialization Contract
+Resolve the project root and `project_id` by `reference.md`, record the locator source, and inspect the exact target before writing. A missing/ambiguous identity or unwritable path blocks creation. If any bank exists, ordinary init stops; reinit requires explicit intent plus a safe repository-approved preservation/migration path. Reinitialization must never delete or overwrite accepted history silently; do not replace or merge it as fallback.
 
 ## Workflow
-1. Stage `current.md`, `archive.md`, `events.jsonl`, and `meta.json` for a fresh target under the shared mutation contract.
+1. Stage `current.md`, `archive.md`, `events.jsonl`, and `meta.json` for the verified fresh target under the shared mutation contract.
 2. Append the first `entity=project`, `action=create` event.
 3. Write the baseline current/archive sections and project metadata.
-4. Commit the fresh bank as one unit where possible, then validate all files and stable project identity.
+4. Commit as one unit, then read back all four files, their shared event ID, snapshot version, and stable project identity.
 
-If explicit reinitialization is requested, preserve or archive the existing bank according to repository policy before creating a replacement. If no safe preservation policy exists, report `blocked` instead of deleting it.
-
-## Validation
-- All four files exist and parse.
-- A fresh bank has exactly one init event.
-- `current.md` contains the required baseline sections.
-- `meta.json` records schema/snapshot version and the derived project identity.
-- Existing accepted history was not silently destroyed.
+Any partial creation, parse failure, or identity mismatch remains failed/blocked rather than a successful initialization.
 
 ## Output
-Report created/preserved paths, the project/event IDs, validation status, and any identity or reinit uncertainty.
-
-## Behavior Cases
-- Positive: “이 저장소에 프로젝트 메모리뱅크를 처음 만들어줘.”
-- Negative: “기존 goal 하나 수정해줘.” → `memory-bank-update`.
-- Edge: a bank exists and the user only says “초기화해줘” ambiguously → ask/mark blocked before destructive replacement.
-
-## Known Limits
-- Initialization creates storage, not the substantive long-term memory policy.
-- Path-hash identity is less portable than an explicit or repository-derived identity.
+Report created/preserved paths, project/event IDs, four-file readback, and identity/reinit uncertainty. Initialization creates storage, not substantive memory policy; surface the lower portability of a path-hash identity.
