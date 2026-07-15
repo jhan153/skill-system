@@ -748,7 +748,16 @@ def reference_monitor_enabled(data: dict[str, Any]) -> bool:
     return str(configured).strip() == "9.2.1"
 
 
-def reference_monitor_event_extra(args: argparse.Namespace, data: dict[str, Any]) -> dict[str, Any]:
+def reference_monitor_error_status(error: Exception) -> dict[str, Any]:
+    return {
+        "harness_version": "9.2.1",
+        "receipt_status": "unavailable",
+        "reason_code": "monitor_observation_error",
+        "error_type": type(error).__name__,
+    }
+
+
+def _reference_monitor_event_extra(args: argparse.Namespace, data: dict[str, Any]) -> dict[str, Any]:
     hook_event = str(data.get("hook_event_name") or "")
     if hook_event == "UserPromptSubmit":
         from reference_monitor import configured_contract  # noqa: PLC0415
@@ -780,10 +789,20 @@ def reference_monitor_event_extra(args: argparse.Namespace, data: dict[str, Any]
     return {"verifier_receipt": receipt} if receipt is not None else {}
 
 
-def reference_monitor_status(args: argparse.Namespace, data: dict[str, Any]) -> dict[str, Any]:
-    from reference_monitor import decide  # noqa: PLC0415
+def reference_monitor_event_extra(args: argparse.Namespace, data: dict[str, Any]) -> dict[str, Any]:
+    try:
+        return _reference_monitor_event_extra(args, data)
+    except Exception as error:  # noqa: BLE001 - an observational monitor cannot abort ordinary hook paths.
+        return {"verifier_receipt_status": reference_monitor_error_status(error)}
 
-    return decide(hook_ledger_path(args, data), data)
+
+def reference_monitor_status(args: argparse.Namespace, data: dict[str, Any]) -> dict[str, Any]:
+    try:
+        from reference_monitor import decide  # noqa: PLC0415
+
+        return decide(hook_ledger_path(args, data), data)
+    except Exception as error:  # noqa: BLE001 - status is additive and must not suppress independent paths.
+        return reference_monitor_error_status(error)
 
 
 def agent_run_bootstrap_enabled(data: dict[str, Any]) -> bool:

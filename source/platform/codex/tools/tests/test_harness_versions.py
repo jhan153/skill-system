@@ -222,6 +222,27 @@ class Harness921ReferenceMonitorTests(unittest.TestCase):
         self.assertIn("verifier_receipt_status", monitored_event["evidence"])
         self.assertNotIn("verifier_receipt_status", ordinary_event["evidence"])
 
+    def test_subject_read_failure_is_unavailable_and_ordinary_stop_continues(self) -> None:
+        command = "verify production subject"
+        self.configure_contract(command)
+        self.event("UserPromptSubmit", prompt="verify before the subject becomes unreadable")
+        self.tool(command, 0, "tool-positive")
+        subject = self.work / "subject.txt"
+        subject.chmod(0)
+        try:
+            output = self.stop()
+        finally:
+            subject.chmod(0o600)
+
+        self.assertTrue(output["continue"])
+        last = json.loads(self.ledger.read_text(encoding="utf-8").splitlines()[-1])
+        evidence = last["evidence"]
+        self.assertEqual(evidence["verifier_receipt_status"]["receipt_status"], "unavailable")
+        self.assertEqual(evidence["verifier_receipt_status"]["reason_code"], "monitor_observation_error")
+        self.assertEqual(evidence["verifier_receipt_status"]["error_type"], "PermissionError")
+        self.assertIn("agent_output_validation", evidence)
+        self.assertIn("desktop_notifications", evidence)
+
     def test_monitor_only_session_keeps_otherwise_disabled_validation_skipped(self) -> None:
         ledger = self.work / "monitor-only-hook-events.jsonl"
         input_path = self.work / "monitor-only-stop.json"
