@@ -28,3 +28,21 @@ breakpoint_rule:
   overflow_strategy:
   evidence:
 ```
+
+## Multi-region contract
+
+For an explicit multi-region contract, omit empty fields:
+
+```yaml
+source_reference:
+target_platform:
+layout_hierarchy: []
+sizing_and_spacing_rules: []
+overflow_and_text_rules: []
+breakpoint_rules: []
+implementation_mapping: []
+evidence:
+  confirmed: []
+  inferred: []
+  unverified: []
+```
