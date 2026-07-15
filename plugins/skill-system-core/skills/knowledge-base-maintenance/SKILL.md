@@ -63,6 +63,3 @@ For each reviewed item, return `id`, `statement/action`, `source evidence`, `dec
 - Memory Bank skills keep ownership of explicit persistent memory operations.
 - Knowledge Store may reference Memory Bank as a source lane, but this skill does not rewrite Memory Bank files.
 - Kanboard and plan documents enter as source records or candidate metadata until separately promoted.
-
-## Known Limits
-- Validators cover file-backed references and generated-projection freshness, not semantic truth. Trust scoring, dense retrieval, and full conflict resolution remain manual.
