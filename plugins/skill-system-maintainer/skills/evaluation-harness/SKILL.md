@@ -59,6 +59,3 @@ Return only needed sections: case/success scope, observed behavior, condition ev
 
 ## Validation
 - Keep cases YAML-parseable and preserve exact observation provenance. One dry run may justify a case correction; maturity changes need repeated field feedback or one severe observed failure.
-
-## Known Limits
-- Cases model expected behavior; they do not prove installation or user success. Observations are model/runtime dependent, and qualitative feedback does not automatically change maturity.
