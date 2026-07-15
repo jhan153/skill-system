@@ -1,132 +1,74 @@
 ---
 name: report-lifecycle-artifacts
-description: Create or update formal product/software lifecycle artifact packages by mapping requirements discovery records, requirements contracts, delivery architecture packages, implementation design records, implementation evidence, test/QC/QA artifacts, security review, release readiness, retrospective, and traceability matrices. Use only when explicitly requested.
+description: Package explicitly requested lifecycle artifacts and traceability across requirements, design, implementation, validation, security, release, and retrospective.
 ---
 
 # Report Lifecycle Artifacts
 
 ## Routing Card
 - role: report_primary
-- intent_signature:
-  - lifecycle artifacts
-  - SDLC artifacts
-  - product lifecycle documents
-  - 개발 산출물
-  - 요구사항 WBS HLD LLD QA 보안 릴리즈 회고
-  - traceability matrix
+- intent_signature: lifecycle/SDLC artifacts, 개발 산출물, WBS/HLD/LLD/QA/security/release, traceability matrix
 - use_when:
-  - the user explicitly asks for lifecycle deliverables, SDLC/product-development documents, or evidence-backed artifact packaging.
-  - discovery records, requirements contracts, architecture packages, implementation design records, implementation evidence, validation evidence, or release evidence must be mapped into a formal artifact pack.
-  - a traceability matrix is needed across requirements, acceptance criteria, WBS, design, tests, security, release, and retrospective items.
+  - The user explicitly requests a lifecycle package, planned shells, or evidence-backed normalization.
+  - Lifecycle records must be linked in a formal traceability matrix.
 - do_not_use_when:
-  - the user wants direct implementation, casual planning, small TODOs, active `docs/plan` status sync, validation execution alone, critique-only review, or memory promotion.
-  - the user only wants changed files and validation notes; use `coordination-handoff`.
-  - the user wants blocker-first QA critique; use `report-critical`.
-  - evidence for result artifacts is unavailable and the user expects completion claims.
-- expected_inputs:
-  - one or more lifecycle source artifacts or explicit request to create planned artifact shells
-  - evidence references for implementation, validation, QA, security, or release claims when result status is requested
-  - desired artifact tier or package scope when available
-- expected_outputs:
-  - lifecycle-artifact-pack
-  - lifecycle-traceability-matrix
-  - explicit status labels for planned, not executed, evidence unavailable, user verification needed, or agent-verified items
+  - Do not use for implementation, planning, `docs/plan` sync, validation execution, critique-only review, or memory promotion.
+  - Changed files plus validation notes use `coordination-handoff`; blocker-first QA critique uses `report-critical`.
+  - Missing evidence does not cancel explicit packaging; preserve the unresolved result.
+- expected_inputs: package scope or sources; evidence anchors for result claims
+- expected_outputs: artifact pack, traceability matrix, condition-scoped statuses and gaps
 - context_targets:
   must_read:
-    - current artifact packaging request
-    - provided lifecycle source artifacts or artifact pointers
-    - evidence anchors for any completed result claims
+    - packaging request, included sources, and evidence for claimed results
   read_if_needed:
-    - `references/artifact-tiering.md`
-    - relevant artifact templates under `references/`
-    - narrow plan/spec/validation files explicitly included in the package
+    - `references/artifact-tiering.md` and only the relevant templates
+    - narrow plan, specification, or validation files in scope
   do_not_load_by_default:
-    - full repo
-    - full memory bank
-    - all plan packages
-    - unrelated validation logs
-    - generated runtime mirrors unless packaging generated target evidence is explicitly requested
+    - full repository, memory bank, plan inventory, unrelated logs, or generated mirrors
 - risk_profile:
-  reads:
-    - provided artifacts, approved plans/specs, and evidence anchors
-  writes:
-    - none by default; write lifecycle artifact files only when explicitly requested
-  tools:
-    - local file reads and optional artifact scaffold script when requested
-  sensitive_resources:
-    - credentials default deny; redact secrets from evidence excerpts and artifact outputs
-- entry_scene:
-  - PREPARE
+  reads: provided artifacts and named evidence
+  writes: none by default; lifecycle artifact files only when explicitly requested
+  sensitive_resources: deny credentials; redact secrets
+- entry_scene: PREPARE
 
-## Purpose
-- Normalize product/software lifecycle documents into one coherent artifact package.
-- Preserve traceability from requirements through release and retrospective.
-- Keep evidence-backed result reporting honest.
+## Package Contract
 
-## Artifact Spine
-Use these canonical artifact names when present:
-- `requirements-discovery-record`
-- `requirements-contract`
-- `delivery-architecture-package`
-- `implementation-design-record`
-- `implementation-evidence-record`
-- `verification-and-quality-report`
-- `security-risk-review`
-- `release-readiness-report`
-- `delivery-retrospective`
-- `lifecycle-traceability-matrix`
+Use the smallest requested tier; full packs stay explicit-only. Never execute implementation or validation.
 
-## Evidence Rules
-- Do not mark tests, QC, QA, security, or release readiness as complete without evidence.
-- If evidence is missing, use one of:
-  - `planned`
-  - `not_executed`
-  - `evidence_unavailable`
-  - `user_verification_needed`
-  - `blocked`
-- Separate plan status from result status.
-- Trace every completed result claim to a command, file, artifact, review, or user-provided evidence reference.
+Canonical artifacts, when present: `requirements-discovery-record`, `requirements-contract`, `delivery-architecture-package`, `implementation-design-record`, `implementation-evidence-record`, `verification-and-quality-report`, `security-risk-review`, `release-readiness-report`, `delivery-retrospective`, and `lifecycle-traceability-matrix`.
 
-## Modes
-- `planned_artifacts`: requirements, scope, WBS, milestones, HLD/LLD-style package shells.
-- `design_artifacts`: delivery architecture package and implementation design record normalization.
-- `verification_artifacts`: test, QC, QA, and validation evidence packaging.
-- `closeout_artifacts`: security review, release readiness, known issues, rollback notes, and retrospective.
-- `full_lifecycle_pack`: explicit full package from discovery through retrospective.
+Modes: `planned_artifacts`, `design_artifacts`, `verification_artifacts`, `closeout_artifacts`, and `full_lifecycle_pack`.
 
-## Output Contract
-Return only the sections needed:
-- `artifact_scope`
-- `source_artifacts`
-- `artifact_pack`
-- `traceability_matrix`
-- `evidence_status`
-- `gaps`
-- `handoff_targets`
+## Semantic Completion Gate
 
-## Traceability Contract
-Prefer stable IDs:
-- `REQ-*` requirements
-- `AC-*` acceptance criteria
-- `WBS-*` work breakdown items
-- `HLD-*` architecture/package decisions
-- `LLD-*` implementation design records
-- `TEST-*` test/verification items
-- `SEC-*` security review items
-- `REL-*` release gate items
-- `RETRO-*` retrospective follow-ups
+Report package construction separately from every lifecycle result. For `planned` or `not_executed` results, state: `Package completion does not imply implementation completion.` Other results may remain `evidence_unavailable`, `needs_review`, `user_verification_needed`, `blocked`, or `fail`.
 
-## Cross-Skill Boundaries
-- `plan-requirements-discovery` owns requirements elicitation.
-- `plan-requirements-brief` owns requirements contracts and PRD/SRS-lite distillation.
-- `plan-long-term-package` owns heavy phase/package planning.
-- `plan-short-term-docs` owns active `docs/plan` implementation design and status sync.
-- `workflow-plan-runner` owns executing approved plans/specs.
-- `workflow-validation` owns validation strategy and validation execution.
-- `coordination-handoff` owns small task-local artifact inventories.
-- `report-critical` owns blocker-first QA critique.
+Use `evidence_unavailable` when the required oracle or actual-path evidence is absent despite agent tests or mocks; reserve `not_executed` for intentionally unrun work and `needs_review` for available evidence awaiting judgment.
 
-## Known Limits
-- This skill packages and reports lifecycle artifacts; it does not execute implementation.
-- It cannot prove runtime behavior without validation evidence.
-- Full lifecycle packages are heavy and should remain explicit-only.
+For each material result, record:
+
+- source condition and claim;
+- evidence scope: `structural`, `runtime`, `semantic`, or `user-only`;
+- oracle origin: user decision, canonical source, external contract, formal invariant, observed behavior, or agent-authored;
+- reference, freshness, and status.
+
+Use `agent-verified` only when evidence directly covers the condition at its required scope. Command exits, artifact presence, hooks, schemas, and harnesses prove only their contract. An agent-authored test may preserve an established oracle; it cannot invent one and become independent semantic proof. When only mocks pass, state: `Mocks prove only the mock boundary`, then name the required real path.
+
+Source selection, migration, media/data transforms, external boundaries, and adapters require actual-path execution and material output readback. Preserve canonical-source or required-input mismatches as failure or explicit unresolved decisions; never report silent fallback as success.
+
+Never lower an unresolved status because a narrower check passed. Change the same condition only with resolution/readback evidence or the required user decision.
+
+If the exact condition is structural, such as a matrix with valid stable links, a structural check may close only that condition. Planned-shell delivery may be package-complete while represented results remain planned or not executed.
+
+## Traceability And Output
+
+Prefer stable IDs: `REQ-*`, `AC-*`, `WBS-*`, `HLD-*`, `LLD-*`, `TEST-*`, `SEC-*`, `REL-*`, and `RETRO-*`.
+
+Return only needed sections: `artifact_scope`, `source_artifacts`, `artifact_pack`, `traceability_matrix`, `evidence_status`, `gaps`, and `handoff_targets`. Link completed claims to condition-scoped evidence.
+
+## Owner Boundaries
+
+- `plan-requirements-discovery`: elicitation; `plan-requirements-brief`: requirements contracts.
+- `plan-long-term-package`: heavy phase planning; `plan-short-term-docs`: active implementation design/status sync.
+- `workflow-plan-runner`: plan execution; `workflow-validation`: validation strategy/execution.
+- `coordination-handoff`: small task-local inventories; `report-critical`: blocker-first critique.
