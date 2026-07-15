@@ -1,86 +1,74 @@
 ---
 name: kanboard-plan-rollout
-description: "Onboard a repo's docs/plan to the local Kanboard and bulk register/sync across workspaces (init-workspace, register, sync-all dry-run→apply). Not for ad-hoc single-board ops — use kanboard-plan-ops."
+description: Onboard repository Markdown plans to local Kanboard projections through idempotent registration, reviewed bulk dry-runs, guarded apply, and live readback.
 ---
 
 # Kanboard Plan Rollout
 
 ## Routing Card
 - role: primary
-- intent_signature:
-  - repo plan 도입(adopt docs/plan to Kanboard)
-  - 일괄 등록/동기화(bulk register + sync-all)
-  - multi-workspace onboarding
-  - kanboard rollout / sync-all dry-run→apply
+- intent_signature: first-time plan onboarding, multi-workspace registration, bulk sync dry-run/apply
 - use_when:
-  - the user wants to put a repo's `docs/plan/*.md` onto the local Kanboard for the first time.
-  - the user wants to register multiple workspaces and sync them at once.
-  - the user asks for a dry-run preview of what a sync would create before applying.
+  - a repo's `docs/plan/*.md` must be registered and projected for the first time
+  - several workspaces must be registered or dry-run together
 - do_not_use_when:
-  - the board is already registered and the user only wants ongoing status push/pull/validation; use `kanboard-plan-ops`.
-  - the request is about Kanboard runtime install, themes, or plugins (out of scope).
-  - the user is editing the Markdown plan content itself; use `plan-short-term-docs`.
-- expected_inputs:
-  - workspace/repo path(s) with `docs/plan/*.md`
-  - approval boundary for live writes (dry-run first)
-  - which plans to sync (per-plan `sync` flag)
-- expected_outputs:
-  - workspace config + registry entry, dry-run op summary, applied Kanban-facing projection report, per-repo failure isolation
-  - stop reason when onboarding, secret hygiene, idempotency, or live-write approval requirements are not satisfied
+  - ongoing push/pull/validation on an already registered board: `kanboard-plan-ops`
+  - Markdown plan authoring: `plan-short-term-docs`
+  - concept explanation or Kanboard install/theme/plugin work: no rollout owner
+- expected_inputs: exact workspace/plan selection, config/registry state, live-write boundary
+- expected_outputs: registration and per-workspace dry-run/apply/readback receipts with partial/blocked state
 - context_targets:
   must_read:
-    - target workspace `docs/plan/*.md` and `.kanboard-plan.yml`
-    - current onboarding request
+    - target plans, `.kanboard-plan.yml`, onboarding request
   read_if_needed:
-    - global registry (`workspaces.yml`)
-    - integrations/kanboard-plan-sync README + localhost setup doc
+    - host-local `workspaces.yml`, integration README, localhost setup
   do_not_load_by_default:
-    - full repo
-    - other workspaces' plan bodies
+    - full repos or other workspaces' plan bodies
 - risk_profile:
   reads:
-    - workspace config/plans/state, registry
+    - plans/config/state and host-local registry
   writes:
-    - WRITE_WORKSPACE_CONFIG (`.kanboard-plan.yml`, state) and Kanboard projection via JSON-RPC on apply
+    - WRITE_WORKSPACE_CONFIG for config/state/registry; live Kanboard projection only after its gate
   tools:
-    - CALL_PROCESS for `kanboard_plan_sync` CLI / MCP tools; live apply needs a running Kanboard + token
+    - CALL_PROCESS for CLI/MCP; JSON-RPC for live apply/readback
   sensitive_resources:
-    - API token from env/local DB only; never store secrets in config/state/plan
-- entry_scene:
-  - PREPARE
+    - token from env/local DB only; never config, state, plan, log, or board text
+- entry_scene: PREPARE
 
-## Tools (MCP server: `kanboard-plan-sync`)
-- `register_workspace(workspace_path)`: scaffold `.kanboard-plan.yml` from discovered `docs/plan/*.md` (per-plan `sync` flag) and add it to the global registry.
-- `list_workspaces()`: registered workspaces + config/dir presence.
-- `sync_all(apply=false)`: dry-run across registered workspaces; `apply=true` writes live.
-- CLI equivalent: `python -m kanboard_plan_sync {init-workspace|register|list-workspaces|sync-all [--apply]|status-all|check-secrets}` (`PYTHONPATH=integrations/kanboard-plan-sync/src`).
+## Route Decision
+| Request | Exact owner/action |
+| --- | --- |
+| first-time or multi-workspace onboarding | `kanboard-plan-rollout` |
+| registered-board push/pull/validation | hand off to `kanboard-plan-ops` |
+| Markdown plan authoring | hand off to `plan-short-term-docs` |
+| concept explanation or Kanboard install/theme/plugin | no owner; skip rollout |
+
+Use these exact skill IDs; do not invent an adjacent owner name.
+
+## Source And Tool Truth
+- Markdown is canonical; Kanboard is a projection. Board changes remain candidates until ops validates them.
+- `inspect_workspace(path)` reads config, plans, state, and secret findings without writes.
+- `register_workspace(path, init=true)` may scaffold config/state and ensures host-registry membership. Use `init=false` for valid hand-authored config.
+- `sync_all(apply=false)` previews every registered sync-enabled plan. `apply=true` writes by JSON-RPC and may continue after an error; its aggregate can be partial.
+- CLI equivalents are `init-workspace`, `register`, `list-workspaces`, `sync-all [--apply]`, `status-all`, and `check-secrets` with `PYTHONPATH=integrations/kanboard-plan-sync/src`.
 
 ## Workflow
-1. `inspect_workspace(path)` — read-only: config, discovered plans, state, secret hygiene.
-2. `register_workspace(path)` — init config + register (idempotent; won't clobber a hand-authored config).
-3. `sync_all()` — DRY-RUN first; review planned ops per repo with the user.
-4. On explicit approval: `sync_all(apply=true)` — repo=Project, plan=Swimlane, item=Task, members/assignee auto-set.
-5. Hand ongoing status work to `kanboard-plan-ops`.
+1. Fix the exact workspace/plan set; inspect each workspace before registration or sync.
+2. Stop on missing workspace/plan, secret, corrupt mapping, ambiguous identity, or duplicate key.
+3. Register idempotently. Existing valid config is not a blocker: preserve it with `init=false`, then continue to dry-run. Report registry/config/state writes separately from live writes.
+4. Run `sync_all(apply=false)` and review every error, skip, identity, and operation summary. Dry-run is preview, not completion.
+5. Apply requires a clean reviewed dry-run and explicit approval for the exact current workspace/plan/config/registry set. Any change invalidates review. Errors block bulk apply; reduced scope needs a fresh dry-run and approval.
+6. Run `sync_all(apply=true)` only inside that boundary. Keep per-workspace/plan receipts; success never erases an error or unexpected skip.
+7. Read back affected live objects through pull/ops. A clean command receipt without readback leaves the projection `unverified`.
+8. Hand ongoing status push/pull, validation, and curation to `kanboard-plan-ops`.
 
-## Projection Quality
-- Treat Kanboard as an execution board for end users, not a raw Markdown clone.
-- Generated cards should use concise action-oriented titles and descriptions with source metadata.
-- If a plan item is too broad or ambiguous to become a card, report it as a plan-authoring issue before live apply.
+## Outcome Contract
+- `ready_for_review`: registration and current dry-run finished; no live apply is claimed.
+- `blocked`: a pre-apply gate failed or reviewed inputs became stale.
+- `partial`: requested work mixes applied operations with errors/unexpected skips; enumerate each workspace/plan and next action.
+- `complete`: every requested projection applied and live readback has no unresolved mismatch.
+- Do not downgrade `error`, ambiguous identity, missing live credentials, secret findings, or absent readback to a warning or whole-run success.
 
-## Stop Policy
-- `success`: all requested workspaces are registered or dry-run/applied reports identify isolated per-repo failures.
-- `blocked`: target workspace is unavailable, no eligible `docs/plan` exists, Kanboard is unreachable, or token/config discovery fails.
-- `approval`: `sync_all(apply=true)` is requested without a reviewed dry-run summary and explicit approval.
-- `idempotency`: workspace identity, plan identity, or generated task keys are unstable or would duplicate existing board objects.
-- `unsafe`: the next action would store secrets, overwrite hand-authored config without confirmation, write SQLite directly, or apply a bulk sync with unresolved dry-run errors.
-- `fatal`: global registry or local state is corrupted enough that workspace mapping cannot be trusted.
-
-## Idempotency
-- `register_workspace(path)` must be treated as idempotent and must not clobber hand-authored config.
-- Bulk sync retries must start with a fresh dry-run and compare repo/project/plan/task keys before apply.
-- Isolate failures by workspace; do not apply unrelated workspaces when one workspace has ambiguous identity or unsafe state.
-
-## Safety
-- Dry-run before any apply; get approval for live writes.
-- Token only from env (`KANBOARD_API_TOKEN`) or the local Kanboard DB. Run `check-secrets` when unsure.
-- Requires the local Kanboard running (see the localhost setup doc). JSON-RPC only; never write SQLite.
+## Projection And Safety
+- Generate concise source-traced cards; return broad/ambiguous items to plan authoring.
+- Dry-run every retry and compare workspace/plan/task identities. Use JSON-RPC only, never SQLite; run `check-secrets` when needed.
