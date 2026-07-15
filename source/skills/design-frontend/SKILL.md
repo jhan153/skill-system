@@ -114,15 +114,7 @@ Record conflicts by dimension and stop or request the one missing decision when 
 - Use semantic HTML or native accessibility primitives, accessible names, logical focus/keyboard behavior, visible focus, and usable targets. Never sacrifice readability or operability for screenshot fidelity.
 
 ## Product-Family Gate
-When the repo declares a product-family profile, load `references/product-family-profile.md` and fail closed for its declared hard rules:
-1. Pin the profile and referenced catalog/baseline versions or digests.
-2. Pin each applicable governance source and obey its declared write policy; a mutable path is not approval to edit it.
-3. Resolve each target-vs-family conflict by source ownership; do not silently prefer the mockup.
-4. Require a component reuse report for affected app-surface controls.
-5. Run every applicable declared verification command and record what each command actually proves.
-6. Require separate target-fidelity and family-coherence visual verdicts when family baselines exist.
-
-If the profile, catalog, baseline, or verifier is missing or stale, continue only where repo evidence makes the implementation safe and mark the affected conformance claim `unverified` or `user-verification-needed`. Do not claim near-total rule compliance from prose review, a build, or a single screenshot.
+When the repo declares a product-family profile, load `references/product-family-profile.md` before editing. Apply its applicability, stable pinning, source ownership, write policy, fallback, exception, verification, and conformance rules; fail closed for declared hard rules and leave any claim affected by a missing or stale profile, catalog, baseline, or verifier `unverified` or `user-verification-needed`. Use `design-tokens` for applicable token rules or gaps, `design-component-mapper` for catalog reuse, `design-visual-regression` for separate target/family verdicts, and `design-a11y-audit` for accessibility.
 
 ## Assets, Dependencies, and Generated Code
 - Search the repo before adding icons, images, fonts, tokens, or packages.
