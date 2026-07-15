@@ -12,9 +12,9 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 9.2.1 개발 번들
+## 9.2.1 번들
 
-이 저장소는 변경하지 않는 로컬 `v9.2.0` 컷에서 갈라진 9.2.1 개발 라인에 있습니다(7.3.1 번들은 아래 9.x 방향 설명대로 호환 기준선으로 유지됩니다). 주요 구성은 다음과 같습니다.
+이 소스 트리는 변경하지 않는 로컬 `v9.2.0` 컷을 기반으로 한 9.2.1 번들 라인입니다(7.3.1 번들은 아래 9.x 방향 설명대로 호환 기준선으로 유지됩니다). 주요 구성은 다음과 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
 * `docs`: 스킬 목록, 사용 기준, 운영 참고 문서
@@ -25,7 +25,7 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 ## 9.x 방향: Neutral Source & Plugin Packaging
 
-현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 개발 라인은 로컬 `v9.2.0` 전체 다이어트 컷을 기반으로 한 `9.2.1 — Conditional Reference Disclosure`이며, 최신 배포 릴리스는 여전히 `v9.1.1`입니다. 이 저장소 작업은 9.2.0이나 9.2.1을 설치·반영·배포·push하지 않습니다. 번들 9.2.1과 같은 번호의 opt-in 하네스 프로토콜 9.2.1은 서로 독립된 버전 identity입니다.
+현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인은 로컬 `v9.2.0` 전체 다이어트 컷을 기반으로 한 `9.2.1 — Conditional Reference Disclosure`이며, 최신 배포 릴리스는 여전히 `v9.1.1`입니다. 이 저장소 작업은 두 로컬 컷을 설치·반영·배포·publish·push하지 않습니다. 번들 9.2.1과 같은 번호의 opt-in 하네스 프로토콜 9.2.1은 서로 독립된 버전 identity입니다.
 
 `7.4.x Context Assurance`는 현재 구현 목표가 아니라 legacy label이자 전환 흔적입니다. 7.3.1 스킬 번들은 기존 호출을 위한 호환 기준선으로 유지하고, 8.0 방향에서는 context 모델을 바꿉니다. evidence를 claim과 relation으로 만들고, 이를 Wiki Bank page로 projection한 뒤, 저맥락 Runtime Projection card를 Context Pack으로 컴파일해 실행에 공급합니다.
 
@@ -263,7 +263,7 @@ Skill System 스킬은 작성된 스킬을 이 저장소에 통합하고 생성�
 | 9.1.1 | Patch safety & evidence hardening | dev routing metadata를 host-neutral로 만들고, hook evidence를 durable per-run ledger로 이동하며, C/C++ 구조 근거가 없으면 fail-closed 처리합니다. 장기 패키지 cap/staged 생성, Kanboard pytest-absence SKIP 제거, Recovery Guard/output-gate mode 분리도 포함하며 호환성 영향은 `CHANGELOG.md`에 명시합니다. |
 | 9.1.2 | Design governance & pre-diet baseline | 제품군 규칙 탐색, 승인 컨트롤 재사용, UX 판단, target/family 시각 증거 분리를 강화합니다. 9.2.0 스킬 다이어트 전 강화된 66개 스킬의 행동과 instruction 크기를 고정한 미배포·비반영 비교 베이스라인입니다. |
 | 9.2.0 | Full skill diet & bounded evidence | canonical 스킬 66개 본문을 49,513단어에서 39,820단어로 줄이고(-19.58%), merge/delete 후보 38건을 32건 병합·6건 삭제로 모두 판정했습니다. 레퍼런스 이동 없이 fail-closed 설계와 adapter 소유권 교정을 보존했으며, 품질 주장은 실제 실행한 점검과 forward evidence 범위로 제한합니다. 하네스 프로토콜 9.2.0(과거)과 9.2.1(현재 opt-in)은 이 번들 버전과 독립적으로 유지합니다. |
-| 9.2.1 | Conditional reference disclosure | 다이어트 이후 progressive disclosure를 시작합니다. 각 스킬 본문에는 selector와 fail-closed 판단을 남기고, 상세 schema나 policy는 필요한 작업에서만 기존 reference를 읽습니다. 첫 단위는 `design-visual-regression`의 중복 visual-diff schema를 제거하면서 단일 screenshot 직접 응답과 target/family 독립 판정을 보존합니다. |
+| 9.2.1 | Conditional reference disclosure | 6개 디자인 스킬에 bounded progressive disclosure를 적용하되 routing selector, evidence ceiling, fail-closed 판단은 본문에 유지합니다. `v9.2.0` 대비 본문은 646단어/4,775 UTF-8 bytes, 본문+Markdown reference 표면은 472단어/3,339 bytes 감소했습니다. fresh admission 관찰은 `design-visual-regression`과 `design-frontend`만 덮으며 나머지 4개 스킬은 universal behavior-preserved가 아니라 admission-unverified입니다. opt-in harness monitor는 verifier receipt freshness만 다루며 task result-label 권한이 없습니다. |
 
 ## 라이선스
 

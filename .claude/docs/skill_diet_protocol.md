@@ -20,6 +20,12 @@ freeze baseline
 
 Do not count a moved rule as deleted, a linked reference as admitted, or an unchanged static test as proof of unchanged model behavior.
 
+## Post-9.2.0 Conditional Reference Disclosure
+
+`v9.2.0` completed the 66-skill body diet with zero reference moves. Bundle 9.2.1 is a bounded follow-up: keep routing selectors, semantic decisions, evidence ceilings, ownership, and fail-closed handling in each main body, and select existing specialist detail only when the task needs it. Apply the measurement contract below to both the main-body delta and the main-plus-reference delta; relocation alone is not deletion.
+
+This bounded lane does not grant the comparator's strongest claims. Without source/model/oracle-bound behavioral evidence, report `behavior: unverified`, not `preserved`. Without a verified host admission receipt, report `admission: unverified` with a null observation, not `improved` or zero. Structural checks, generated parity, existing tests, and scoped agent-authored forward observations stay within their own contracts and do not make a six-skill universal-equivalence or user-quality claim. A bounded patch may close with those claim ceilings; the independent-signed/PKI campaign is required only when claiming its strict release-comparison verdict, not as a substitute for honest bounded evidence.
+
 ## Frozen Baseline
 
 The authoritative final pre-diet baseline is the Git object, not a movable branch or working tree:
