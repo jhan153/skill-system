@@ -141,13 +141,6 @@ When invoked as a loop verifier:
 - If a screenshot is blank, first verify target URL, app server, route, loading state, viewport, and console/build errors.
 - If mobile and desktop disagree, report separate viewport findings instead of averaging them.
 
-## Known Limits
-- Nonblank checks do not prove fidelity.
-- Pixel diff thresholds are project-specific and should not be invented as universal pass/fail.
-- Family coherence across different surface archetypes is a shared-axis judgment, not necessarily a whole-image pixel diff.
-- Screenshots cannot prove keyboard accessibility or screen-reader semantics.
-- Authenticated pages may require user-provided screenshots if session access is unavailable.
-
 ## Do not invent / Unverified policy
 - Do not invent source reference details that are not visible.
 - Mark missing source references, screenshots, fonts, assets, or viewports as `Unverified`.
