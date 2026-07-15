@@ -7,61 +7,23 @@ description: Add, change, or deprecate an explicitly persistent project goal or 
 
 ## Routing Card
 - role: memory_operation
-- intent_signature:
-  - persistent goal or rule mutation, 메모리 goal/rule 수정
-- use_when:
-  - the user explicitly wants a goal or rule to persist across sessions.
-- do_not_use_when:
-  - persistence is ambiguous, the bank is missing, or the operation is correction capture/maintenance.
-- expected_inputs:
-  - target goal/rule, mutation (`create`, `update`, `deprecate`), and explicit persistent intent
-- expected_outputs:
-  - append-only event, reflected current/archive state, affected IDs, and validation status
-- context_targets:
-  must_read:
-    - relevant meta/event state and the target current item
-    - `.codex/docs/memory_mutation_contract.md` before a write
-  read_if_needed:
-    - `reference.md` for canonical schema and matching archive history for conflict resolution
-  do_not_load_by_default:
-    - full memory bank, unrelated project memory, or correction history
-- risk_profile:
-  reads:
-    - targeted memory item and ledger state
-  writes:
-    - goal/rule event plus current/archive/meta reflection
-  tools:
-    - safe file and schema validation
-  sensitive_resources:
-    - credentials default deny; summarize private evidence
-- entry_scene:
-  - PREPARE
+- intent_signature: persistent goal or rule mutation, 메모리 goal/rule 수정
+- use_when: the user explicitly wants an identifiable project goal or rule to persist across sessions
+- do_not_use_when: persistence/target is ambiguous, the bank is absent, or init/correction/maintenance is primary
+- expected_inputs: exact goal/rule, `create|update|deprecate`, existing bank state, and explicit persistent intent
+- expected_outputs: append-only event/current/archive/meta reflection, affected IDs, and readback status
+- context_targets: read targeted meta/event/current state and matching archive only; before writing load `.codex/docs/memory_mutation_contract.md` and `reference.md`
+- risk_profile: mutate only the targeted goal/rule under a stable operation; credentials denied and private evidence summarized
+- entry_scene: PREPARE
 
 ## Mutation Gate
-Write only when the target is a `goal` or `rule`, the bank exists, and the user clearly intends persistence. A temporary instruction such as “이번 작업에서만” must not become memory.
-
-Deletes become `status=deprecated`; never remove accepted history. Ambiguous targets require user verification before mutation.
+Write only when the named canonical bank exists, the target is one identifiable `goal` or `rule`, and the user clearly intends persistence. Temporary instructions and inferred preferences never become memory. Ambiguous/missing targets or source mismatch require user verification or block; never initialize or select a stale bank as fallback. Deprecation sets `status=deprecated` and preserves accepted history.
 
 ## Workflow
 1. Resolve the target item and latest snapshot version.
 2. Confirm the operation belongs here rather than init, correction capture, or maintenance.
 3. Build the canonical event and expected current/archive/meta result under one stable operation ID.
-4. Apply the shared staging/replay contract and validate cross-file consistency before reporting success.
-
-## Validation
-- The event, current state, and archive entry agree on IDs and final state.
-- A deprecation preserves history.
-- Only the targeted goal/rule changed.
-- Persistent intent is recorded without copying raw conversation text.
+4. Apply the shared staging/replay contract, then read back event/current/archive/meta agreement, snapshot advancement, history preservation, and that only the target changed. Partial reflection remains failed/blocked.
 
 ## Output
-Report affected item/event IDs, final status, validation evidence, and unresolved conflict or user check. Do not emit the full bank.
-
-## Behavior Cases
-- Positive: “앞으로 모든 세션에서 release 전 smoke test를 필수 rule로 기억해줘.”
-- Negative: “이번 턴에서는 smoke test를 생략해.” → temporary instruction, no memory write.
-- Edge: the user names a rule ambiguously and two items match → `user-verification-needed`, no write.
-
-## Known Limits
-- Explicit persistence can still overfit a single event; the user owns the policy decision.
-- Consistency validation does not establish that the new rule is objectively correct.
+Report gate decision, affected item/event IDs, final status, cross-file readback, and unresolved conflict/user check without emitting the full bank or raw conversation. Explicit persistence is the user's policy decision; consistency validation does not establish that the rule is objectively correct.
