@@ -2,13 +2,15 @@
 
 Use this reference when a token source exists and the task needs a normalized token inventory or platform mapping.
 
-## Source priority
+## Source classes
 
-1. Explicit design token file or design-system source.
-2. Repository theme, CSS variables, Tailwind config, or native constants.
-3. Figma-exported token table or style guide.
-4. Design spec values tied to a named component or frame.
-5. Screenshot-derived candidates, marked inferred.
+Use declared authority; this list is not precedence. Without declared authority, keep conflicts unresolved.
+
+- Explicit design token file or design-system source.
+- Repository theme, CSS variables, Tailwind config, or native constants.
+- Figma-exported token table or style guide.
+- Design spec values tied to a named component or frame.
+- Screenshot-derived candidates, marked inferred.
 
 ## Categories
 
