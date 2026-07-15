@@ -18,8 +18,9 @@ description: Integrate accepted skill behavior or pre-authored runtime companion
 
 ## Integration Contract
 - `skill-creator` or the task implementation owner retains skill semantics, canonical input selection, domain policy, and fallback behavior. This adapter owns only repository placement and projection.
+- Personal or app-managed skill work stays with system `skill-creator`; do not attach this repository adapter.
 - Require an identifiable accepted source and owner. If either is missing or disagrees with the requested projection, fail closed and return the decision; never reconstruct semantics or substitute stale input.
-- When another valid owner can continue, return a handoff rather than marking the whole task blocked. Reserve `blocked` for missing/conflicting integration input or denied live mutation.
+- When semantics are undecided, return a `skill-creator` handoff with authoring quality `unverified`. Reserve `blocked` for missing/conflicting integration input or denied live mutation.
 - Change canonical `source/` and required repository metadata only. Never hand-edit generated targets to manufacture consistency.
 - After generation, read back the affected canonical and generated paths. A successful command or generic bundle pass does not replace source-to-target agreement or authoring evidence.
 
