@@ -46,6 +46,8 @@ description: Compile a budgeted task-specific Context Pack from a live generated
 - Do not promote, edit, or delete accepted knowledge from this skill.
 - `memory-bank-harness` remains the read-only accepted-memory context compiler.
 
+A maintenance handoff does not complete the requested mutation; keep that request `unverified` or `blocked` until the owning workflow returns mutation readback.
+
 ## Workflow
 1. Fix owner, mode, anchors, store, pack ID, and budget.
 2. Check only projection freshness: `.codex/tools/build_context_pack.py <store> --rebuild-projections --check`.
@@ -58,8 +60,3 @@ In `optional` mode, no relevant claim is a valid no-op. In `required` mode, no-h
 
 ## Output
 Return only mode, budget/actual size, admitted/excluded IDs with reasons, relevant card/pack/expansion refs, validation, and no-hit/stale reason. Omit empty fields; a full YAML artifact is conditional on explicit audit/persistence need.
-
-## Known Limits
-- Generated projections are not sources of truth.
-- Test fixtures validate tooling and must never supply live task knowledge.
-- Dense retrieval and automatic Kanboard anchoring are not implemented.
