@@ -7,41 +7,17 @@ description: Aggregate metadata-only skill invocation records into usage, outcom
 
 ## Routing Card
 - role: primary
-- intent_signature:
-  - skill invocation metrics, usage summary, over/under-trigger telemetry, 호출 통계
-- use_when:
-  - the user wants metadata-only invocation/outcome aggregation or an explicit no-data status.
-- do_not_use_when:
-  - the task is eval-case review (`evaluation-harness`), release/readiness verdict, raw conversation analysis, or automatic maturity change.
-- expected_inputs:
-  - local sanitized ledger path or summarized records
-- expected_outputs:
-  - measured usage/outcome summary, evidence-backed routing candidates, privacy status, or no-data result
-- context_targets:
-  must_read:
-    - requested ledger/summary source and its field contract
-  read_if_needed:
-    - selected registry/eval/field-feedback records needed to test a candidate
-    - `references/usage-summary-template.md` for an explicit artifact shape
-    - `references/harness-measurement-protocol.md` only for holdout/gate measurement
-  do_not_load_by_default:
-    - full repo, raw prompts/transcripts, private logs, or unrelated feedback
-- risk_profile:
-  reads:
-    - sanitized metadata records only
-  writes:
-    - requested metadata-only summary; no raw content
-  tools:
-    - local aggregation and focused lookup
-  sensitive_resources:
-    - reject sources containing raw prompts, transcripts, secrets, or private full-text logs
-- entry_scene:
-  - PREPARE
+- intent_signature: skill invocation metrics, usage summary, over/under-trigger telemetry, 호출 통계
+- use_when: a local sanitized metadata ledger or summary can answer an invocation/outcome aggregation question
+- do_not_use_when: eval-case review, release/readiness judgment, raw conversation analysis, or automatic maturity change is primary
+- expected_inputs: selected sanitized source, field contract, scope, and time window
+- expected_outputs: traceable counts/rates, routing candidates, privacy/no-data status, and review actions
+- context_targets: read the selected source contract; load only candidate-specific registry/eval/feedback, the summary template for an artifact, or the measurement protocol for holdout/gate analysis
+- risk_profile: metadata-only local aggregation; reject raw prompts, transcripts, secrets, identifiers, or private full-text logs
+- entry_scene: PREPARE
 
 ## Input Gate
-Accept records containing only fields such as timestamp, primary/supporting skill IDs, family, trigger type, request class, outcome, validation status, and explicit over/under-trigger labels. Free-text notes must already be sanitized.
-
-If no suitable ledger exists, report `no_data` and stop. Do not copy sample values from a template or infer counts from repository files.
+Accept only sanitized metadata fields such as time, skill IDs, request/trigger class, outcome, validation status, and explicit routing labels. If the named source is missing, unsafe, or unsuitable, return `no_data` or the privacy block and stop; never substitute templates, replay fixtures, repository inventory, or a stale ledger.
 
 ## Workflow
 1. Verify source location, scope, time window, and metadata-only status.
@@ -55,19 +31,9 @@ If no suitable ledger exists, report `no_data` and stop. Do not copy sample valu
 - Low use may mean a narrow valuable skill, missing alias, no exposure, or missing telemetry.
 - High use may be expected for an entry router; inspect outcome/reroute rates before calling it over-triggering.
 - Counts without exposure/denominator data do not establish selection quality.
+- `completed`, `agent-verified`, or another ledger label is an observed field value, not independent proof of semantic correctness or user success.
 - Shared holdout arms or correlated interventions do not establish causal attribution.
 - Structural ledger validity does not establish that the recorded classification was correct.
 
 ## Output
-For one question, return the measured number and its denominator/source limitation directly. For an explicit summary artifact, include usage/outcome breakdown, low/high-use observations, over/under-trigger candidates with corroborating evidence, recommended review actions, privacy status, and no-data gaps. Omit empty sections.
-
-## Behavior Cases
-- Positive: “이 sanitized invocation ledger에서 reroute율과 under-trigger 후보를 집계해줘.”
-- Negative: “원문 대화를 읽고 어떤 스킬이 맞았는지 분석해줘.” → reject raw transcript ingestion.
-- Edge: no exposure denominator exists → report counts only; do not call a low count an under-trigger rate.
-
-## Validation
-- Every number traces to the selected source and time window.
-- Sample/template data are excluded from measured results.
-- Raw private text is absent from input and output.
-- Recommendations remain candidates pending qualitative review.
+For one question, return the measured value with denominator, source/time window, and the limitation that changes its meaning. For an explicit artifact, use `references/usage-summary-template.md` and include only populated breakdowns, corroborated routing candidates, review actions, privacy/no-data status, and unresolved evidence gaps. Every number must trace to the selected source; recommendations remain candidates pending qualitative review.
