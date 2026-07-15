@@ -1,6 +1,6 @@
 {
   "name": "skill-system-maintainer",
-  "version": "9.2.0",
+  "version": "9.2.1",
   "description": "Skill System maintainer — routing eval, usage telemetry, repository integration, and bundle validation.",
   "author": {
     "name": "Skill System Maintainers"

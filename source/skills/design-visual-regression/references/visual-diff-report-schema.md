@@ -1,6 +1,6 @@
 # Visual Diff Report Schema
 
-Use this schema when reporting rendered UI differences against an exact design reference and, when declared, pinned product-family baselines.
+Use this schema when reporting rendered UI differences against an exact design reference and, when declared, pinned product-family baselines. Omit inapplicable fields.
 
 ```yaml
 visual_diff_report:

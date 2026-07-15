@@ -1,5 +1,13 @@
 # Changelog
 
+## 9.2.1 (in progress)
+
+- Started conditional reference disclosure from the immutable local `v9.2.0` cut. Main skill bodies retain routing selectors, semantic decisions, and fail-closed behavior; existing detail references are loaded only for applicable tasks.
+- Replaced the duplicated inline YAML report shape in `design-visual-regression` with a conditional pointer to its existing `references/visual-diff-report-schema.md`. Single screenshot or viewport questions still answer directly, while explicit regression and multi-viewport artifacts load the schema and retain separate target-fidelity/family-coherence verdicts plus unverified missing evidence. The default skill file falls from 1,125 to 1,095 words and from 8,526 to 8,154 bytes; the skill-plus-schema owned surface also falls from 1,358 to 1,331 words and from 10,594 to 10,248 bytes.
+- Fresh read-only forward tasks exercised the actual admission boundary: the explicit desktop/mobile regression loaded the report schema and returned independent target-pass/family-fail verdicts; the source-only component audit loaded no visual-regression body or reference; the single-view no-render edge loaded only viewport policy, omitted the report schema, and kept fidelity unverified. These are agent-authored scoped observations, not an independent user oracle.
+- Added no new test suite, schema, skill, or adapter for this change. Existing behavior cases remain regression surfaces rather than an independent user-quality oracle.
+- Advanced active bundle identity to 9.2.1 without relabeling the separately versioned harness. The current opt-in harness protocol also named 9.2.1 and the historical harness 9.2.0 keep their existing protocol meanings.
+
 ## 9.2.0
 
 - Local release cut for the completed instruction-surface diet. The release commit is tagged `v9.2.0` locally; neither the tag nor the bundle is pushed, installed, or deployed by this cut.

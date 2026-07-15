@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.2.0 Skill Bundle
+## 9.2.1 Development Bundle
 
-This repository includes the local 9.2.0 release cut (the 7.3.1 bundle remains the compatibility baseline; see the 9.x direction note below). Its main components are:
+This repository is on the local 9.2.1 development line based on the immutable `v9.2.0` cut (the 7.3.1 bundle remains the compatibility baseline; see the 9.x direction note below). Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -25,7 +25,7 @@ This repository includes the local 9.2.0 release cut (the 7.3.1 bundle remains t
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current local release cut is `9.2.0 — Full Skill Diet & Bounded Evidence`, following the unpublished 9.1.2 pre-diet baseline and the latest published release, `v9.1.1`. The `v9.2.0` tag is local unless explicitly pushed; this cut is not installed or deployed.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current development line is `9.2.1 — Conditional Reference Disclosure`, based on the local `v9.2.0` full-diet cut; the latest published release remains `v9.1.1`. Neither 9.2.0 nor 9.2.1 is installed, deployed, or pushed by this repository work. Bundle 9.2.1 and the opt-in harness protocol named 9.2.1 are separate version identities.
 
 `7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 skill bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
 
@@ -263,6 +263,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.1.1 | Patch safety & evidence hardening | Makes dev routing metadata host-neutral, moves hook evidence to durable per-run ledgers, fails C/C++ reports closed without semantic structure evidence, caps and stages long-term packages, removes the Kanboard pytest-absence SKIP, and reports Recovery Guard/output-gate modes independently. Compatibility changes are called out in `CHANGELOG.md`. |
 | 9.1.2 | Design governance & pre-diet baseline | Hardens product-family rule discovery, approved component reuse, UX decision handling, and separate target/family visual evidence lanes. Freezes the strengthened 66-skill source surface and measured instruction size before 9.2.0 skill-diet work; this is an unpublished, non-deployed comparison baseline rather than a release. |
 | 9.2.0 | Full skill diet & bounded evidence | Reduces all 66 canonical skill bodies from 49,513 to 39,820 words (-19.58%) and resolves 38 merge/delete candidates as 32 merges plus 6 deletions, without moving detail into references. Preserves fail-closed design and adapter ownership corrections while keeping quality claims scoped to the checks and forward evidence that actually ran. Harness protocol 9.2.0 (historical) and 9.2.1 (current opt-in) remain independent of this bundle version. |
+| 9.2.1 | Conditional reference disclosure | Starts a post-diet progressive-disclosure pass: keep selectors and fail-closed decisions in each main skill body, and load existing detailed schemas or policies only for tasks that need them. The first unit removes the duplicated visual-diff schema from `design-visual-regression` while preserving direct single-screenshot answers and separate target/family verdicts. |
 
 ## License
 

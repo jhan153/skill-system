@@ -38,12 +38,13 @@ description: "Capture, verify, and compare rendered UI screenshots for design ev
     - rendered target URL, artifact path, or screenshot path
     - source visual reference or acceptance criteria
   read_if_needed:
-    - `references/viewport-policy.md`
-    - `references/visual-diff-report-schema.md`
+    - `references/viewport-policy.md` only when viewport dimensions, capture rules, or framing policy must be selected
+    - `references/visual-diff-report-schema.md` only for an explicit regression artifact or multi-viewport comparison
     - design token export
     - component contract mapping
     - accessibility evidence report
   do_not_load_by_default:
+    - the visual-diff report schema for a single-view check or unavailable rendered result
     - unrelated routes
     - full repo history
     - live credentials
@@ -90,28 +91,7 @@ Use this skill for visual evidence, not for implementation ownership. It can sup
    - Focus/keyboard/contrast/target-size issues go to `design-a11y-audit`.
 
 ## Output
-For one screenshot or viewport question, lead with confirmed visual differences and the evidence path. Use the structured shape only for an explicit regression artifact or multi-viewport comparison; omit empty fields.
-
-```yaml
-target:
-source_reference:
-family_baselines: []
-comparison_lanes: []
-viewports: []
-screenshots: []
-capture_method:
-nonblank_result:
-framing_result:
-visual_differences: []
-family_coherence_findings: []
-target_fidelity_verdict:
-family_coherence_verdict:
-overflow_or_clipping: []
-responsive_findings: []
-unavailable_evidence: []
-unresolved_visual_gaps: []
-unverified: []
-```
+Return single-view findings, evidence paths, and scoped status directly. Structured regression or multi-viewport artifacts follow the conditionally loaded schema; keep lane verdicts separate and missing evidence explicit.
 
 ## Validation
 - Provide screenshot paths or explicit unavailable reasons.
@@ -121,7 +101,7 @@ unverified: []
 - Do not collapse target fidelity and family coherence into one pass/fail verdict.
 - A family-coherence verdict requires an applicable pinned baseline and like-for-like comparison axes; an unrelated screen or mutable path is insufficient.
 - Do not invent a universal pixel threshold for coherence. Use project-declared thresholds when present and reasoned shared-axis findings otherwise.
-- If a script is used, include the command and mark it as a nonblank/framing aid only.
+- If `scripts/check_screenshot_nonblank.py` is used, include the command and mark it as a nonblank/framing aid only.
 - Do not turn a single clipping or blank-render check into a full fidelity review.
 
 ## Loop Contract Consumption
@@ -146,11 +126,6 @@ When invoked as a loop verifier:
 - Mark missing source references, screenshots, fonts, assets, or viewports as `Unverified`.
 - Mark missing or unpinned family baselines as `Unverified` and preserve the independent target-fidelity result.
 - Keep subjective visual polish separate from confirmed visual mismatch.
-
-## Optional resources
-- Read `references/viewport-policy.md` before choosing viewports.
-- Read `references/visual-diff-report-schema.md` before producing a visual diff report.
-- Use `scripts/check_screenshot_nonblank.py` only as a read-only screenshot sanity helper.
 
 ## Completion Boundary
 Do not mark design implementation complete from this gate alone. Visual evidence must be combined with token, component contract, accessibility, and repo validation gates.
