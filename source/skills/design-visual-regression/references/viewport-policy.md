@@ -26,3 +26,4 @@ Use this reference before capturing or comparing UI screenshots.
 - Text should not overlap controls or adjacent content.
 - Important controls should not be clipped or off-canvas.
 - Empty screenshots, loading-only screenshots, and auth/login redirects are not valid visual proof unless that state is the requested target.
+- For a blank capture, verify the URL, server, route, loading state, viewport, and console/build errors before retrying.

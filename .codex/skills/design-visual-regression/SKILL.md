@@ -101,6 +101,8 @@ Return single-view findings, evidence paths, and scoped status directly. Structu
 - Do not collapse target fidelity and family coherence into one pass/fail verdict.
 - A family-coherence verdict requires an applicable pinned baseline and like-for-like comparison axes; an unrelated screen or mutable path is insufficient.
 - Do not invent a universal pixel threshold for coherence. Use project-declared thresholds when present and reasoned shared-axis findings otherwise.
+- Missing source, screenshot, font, asset, viewport, or baseline evidence prevents a pass in the affected lane.
+- If only the user can supply or judge it, use `user-verification-needed`; otherwise use `unverified`.
 - If `scripts/check_screenshot_nonblank.py` is used, include the command and mark it as a nonblank/framing aid only.
 - Do not turn a single clipping or blank-render check into a full fidelity review.
 
@@ -113,18 +115,8 @@ When invoked as a loop verifier:
 - Treat unchanged screenshot failures as no-progress signals for `workflow-loop-runner`.
 - Do not verify accessibility, source-code correctness, or build readiness from screenshots alone.
 
-## Recovery
-- If browser tooling is unavailable, use provided screenshots and mark capture unavailable.
-- If source reference is unavailable, compare against user acceptance criteria and mark fidelity as `user-verification-needed`.
-- If family baselines are absent, stale, or not applicable, omit that lane and mark any requested family-coherence claim `unverified`; do not synthesize a family style from one convenient screen.
-- If an applicable family baseline exists but only the user can access or judge it, keep the family lane `user-verification-needed` rather than collapsing it into target fidelity or claiming it passed.
-- If a screenshot is blank, first verify target URL, app server, route, loading state, viewport, and console/build errors.
-- If mobile and desktop disagree, report separate viewport findings instead of averaging them.
-
 ## Do not invent / Unverified policy
 - Do not invent source reference details that are not visible.
-- Mark missing source references, screenshots, fonts, assets, or viewports as `Unverified`.
-- Mark missing or unpinned family baselines as `Unverified` and preserve the independent target-fidelity result.
 - Keep subjective visual polish separate from confirmed visual mismatch.
 
 ## Completion Boundary
