@@ -41,3 +41,29 @@ Use this reference when a token source exists and the task needs a normalized to
 - Inferred tokens include the inference basis.
 - Missing values stay missing.
 - Conflicts list both values and their source pointers.
+- Report mode coverage separately.
+
+## Inventory report shape
+
+Use this shape only for an explicit inventory or export artifact, and omit empty fields:
+
+```yaml
+source_pointer: []
+source_format: token-json | css-variables | tailwind-config | theme-object | figma-export | style-guide | screenshot-inferred | mixed
+target_platform: css | tailwind | js-theme | native | unknown
+normalized_tokens:
+  color: []
+  typography: []
+  spacing: []
+  radius: []
+  shadow: []
+  motion: []
+  breakpoint: []
+platform_mapping: []
+aliases: []
+inferred_values: []
+missing_values: []
+conflicts: []
+do_not_generate: []
+unverified: []
+```
