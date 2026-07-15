@@ -1673,6 +1673,7 @@ condition_results:
                 **os.environ,
                 "PYTHONDONTWRITEBYTECODE": "1",
                 "SKILL_SYSTEM_AGENT_RUN_BOOTSTRAP": "1",
+                "SKILL_SYSTEM_HARNESS_VERSION": "9.2.1",
                 "SKILL_SYSTEM_DESKTOP_NOTIFY": "dry-run",
                 "CODEX_MODEL": "gpt-5.5",
                 "CODEX_MODEL_REASONING_EFFORT": "xhigh",

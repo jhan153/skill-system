@@ -30,7 +30,9 @@ def finalize(
     status="pass",
     recovery_would_audit=False,
     recovery_did_block=False,
+    receipt_status=None,
 ):
+    receipt = {"receipt_status": receipt_status} if receipt_status else None
     return {
         "neutral_event": "turn_finalize",
         "session_id": session_id,
@@ -41,6 +43,7 @@ def finalize(
             "did_block": did_block,
             "recovery_would_audit": recovery_would_audit,
             "recovery_did_block": recovery_did_block,
+            **({"verifier_receipt_status": receipt} if receipt is not None else {}),
         },
     }
 
@@ -93,6 +96,20 @@ class StratifiedCompareTests(unittest.TestCase):
         self.assertEqual(cmp["on"]["recovery_block_rate"], 0.5)
         self.assertEqual(cmp["off"]["recovery_would_audit_rate"], 1.0)
         self.assertEqual(cmp["off"]["recovery_block_rate"], 0.0)
+
+    def test_reports_receipt_status_without_treating_it_as_a_gate(self) -> None:
+        events = [
+            finalize("s1", "on", receipt_status="current_for_declared_subjects"),
+            finalize("s2", "off", receipt_status="missing"),
+            finalize("s3", "on", receipt_status="missing"),
+        ]
+        cmp = stratified_compare(events)
+        self.assertEqual(cmp["receipt_status_counts"], {
+            "current_for_declared_subjects": 1,
+            "missing": 2,
+        })
+        self.assertEqual(cmp["on"]["would_fire_rate"], 0.0)
+        self.assertEqual(cmp["off"]["would_fire_rate"], 0.0)
 
 
 class SunsetTests(unittest.TestCase):

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the same authority and Stop-latency probes against harness versions."""
+"""Compare historical authority gates with the 9.2.1 receipt-only monitor."""
 
 from __future__ import annotations
 
@@ -266,22 +266,15 @@ def reference_case(version_root: Path, case_id: str, case_root: Path) -> dict[st
         "hook_event_name": "Stop",
         **common,
         "skill_system_agent_output_gate": "strict",
-        "last_assistant_message": "result_label: agent-verified\n",
+        "last_assistant_message": "Harness comparison stop.\n",
     }
     output, elapsed = invoke_hook(version_root, stop_payload, case_root / "stop.json", ledger=ledger, env=env)
     last_event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[-1])
-    authority = last_event.get("evidence", {}).get("verification_authority", {})
-    granted = authority.get("authorization") == "granted"
-    recovery_allowed = granted
-    if not granted:
-        downgraded = dict(stop_payload)
-        downgraded["last_assistant_message"] = "result_label: user-verification-needed\n"
-        second, _ = invoke_hook(version_root, downgraded, case_root / "stop-downgraded.json", ledger=ledger, env=env)
-        recovery_allowed = bool(second.get("continue"))
+    receipt = last_event.get("evidence", {}).get("verifier_receipt_status", {})
     return {
-        "authority": "grant" if granted else "deny",
-        "reason": authority.get("reason_code"),
-        "response_allowed_after_downgrade": recovery_allowed,
+        "receipt_status": receipt.get("receipt_status"),
+        "reason": receipt.get("reason_code"),
+        "response_continues": bool(output.get("continue")),
         "stop_ms": round(elapsed, 1),
     }
 
@@ -303,7 +296,8 @@ def benchmark_stop(version: str, version_root: Path, samples: int, benchmark_roo
         "p95_ms": round(percentile(values, 0.95), 1),
         "min_ms": round(min(values), 1),
         "max_ms": round(max(values), 1),
-        "harness_validator_subprocesses": 0 if version == REFERENCE_VERSION else 2,
+        "monitor_added_subprocesses": 0 if version == REFERENCE_VERSION else None,
+        "latency_gate": "advisory",
     }
 
 
@@ -411,8 +405,12 @@ def main() -> int:
                     else legacy_case(version_root, case_id, case_root)
                 )
                 observed["case_id"] = case_id
-                observed["expected_authority"] = case["expected_authority"]
-                observed["passed"] = observed["authority"] == case["expected_authority"]
+                if version == REFERENCE_VERSION:
+                    observed["expected_receipt_status"] = case["expected_receipt_status"]
+                    observed["passed"] = observed["receipt_status"] == case["expected_receipt_status"]
+                else:
+                    observed["expected_authority"] = case["expected_authority"]
+                    observed["passed"] = observed["authority"] == case["expected_authority"]
                 case_results.append(observed)
             hook = version_root / ".codex" / "hooks" / "codex_hook_adapter.py"
             validator = version_root / ".codex" / "tools" / "validate_agent_run_artifact.py"
@@ -447,7 +445,7 @@ def main() -> int:
                 "performance": performance,
             })
     report = {
-        "schema_version": 1,
+        "schema_version": 2,
         "manifest": args.manifest.as_posix(),
         "versions": results,
         "historical_harness_code_identical": (

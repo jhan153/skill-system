@@ -780,36 +780,10 @@ def reference_monitor_event_extra(args: argparse.Namespace, data: dict[str, Any]
     return {"verifier_receipt": receipt} if receipt is not None else {}
 
 
-def reference_monitor_validation(
-    args: argparse.Namespace, data: dict[str, Any]
-) -> tuple[int, str, dict[str, Any]]:
-    from reference_monitor import VERSION, decide  # noqa: PLC0415
+def reference_monitor_status(args: argparse.Namespace, data: dict[str, Any]) -> dict[str, Any]:
+    from reference_monitor import decide  # noqa: PLC0415
 
-    decision = decide(hook_ledger_path(args, data), data.get("last_assistant_message"), data)
-    authorization = decision["authorization"]
-    code = 0 if authorization == "granted" else 1 if authorization == "integrity_error" else 4
-    prefix = "PASS" if code == 0 else "FAIL" if code == 1 else "UNVERIFIED"
-    return code, f"{prefix}: harness {VERSION} result-label authority {authorization}: {decision['reason_code']}", decision
-
-
-def reference_monitor_stop_output(data: dict[str, Any], decision: dict[str, Any]) -> dict[str, Any]:
-    from reference_monitor import VERSION  # noqa: PLC0415
-
-    if decision.get("authorization") == "granted":
-        return {"continue": True, "systemMessage": f"Harness {VERSION}: result_label=agent-verified authorized."}
-    message = f"Harness {VERSION}: result_label=user-verification-needed ({decision.get('reason_code')})."
-    holdout = measurement_enabled(data) and _holdout_arm(str(data.get("session_id") or "")) == "off"
-    if decision.get("claimed_result_label") == "agent-verified" and strict_gate_enabled(data) and not holdout:
-        return {
-            "decision": "block",
-            "reason": (
-                f"The response content may be preserved, but harness {VERSION} did not authorize result_label: "
-                "agent-verified. Do not run tools, edit files, add tests, or expand the plan. Re-emit the same "
-                "scoped answer with result_label: user-verification-needed. "
-                f"Reason: {decision.get('reason_code')}."
-            ),
-        }
-    return {"continue": True, "systemMessage": message}
+    return decide(hook_ledger_path(args, data), data)
 
 
 def agent_run_bootstrap_enabled(data: dict[str, Any]) -> bool:
@@ -1441,19 +1415,15 @@ def handle(args: argparse.Namespace) -> int:
             }, sort_keys=True))
             return 0
         use_reference_monitor = reference_monitor_enabled(data)
-        reference_decision: dict[str, Any] | None = None
-        if use_reference_monitor:
-            agent_run_finalize = None
-            validation_code, validation_output, reference_decision = reference_monitor_validation(args, data)
-        else:
-            agent_run_finalize = maybe_finalize_agent_run(args, data)
-            validation_code, validation_output = run_agent_output_validation(args, data, "pre-finalize")
+        reference_status = reference_monitor_status(args, data) if use_reference_monitor else None
+        agent_run_finalize = maybe_finalize_agent_run(args, data)
+        validation_code, validation_output = run_agent_output_validation(args, data, "pre-finalize")
         finalize_extra: dict[str, Any] = {
             "agent_output_validation": validation_output,
             **recovery_extra,
         }
-        if reference_decision is not None:
-            finalize_extra["verification_authority"] = reference_decision
+        if reference_status is not None:
+            finalize_extra["verifier_receipt_status"] = reference_status
         if agent_run_finalize is not None:
             finalize_extra["agent_run_finalize"] = agent_run_finalize
         loop_evaluation = maybe_evaluate_active_loop(data, validation_code)
@@ -1475,16 +1445,11 @@ def handle(args: argparse.Namespace) -> int:
                 if deactivated is not None:
                     finalize_extra["loop_pointer_deactivated"] = deactivated
         output = loop_stop_output(loop_evaluation, data) if loop_evaluation is not None else None
-        monitor_output = (
-            reference_monitor_stop_output(data, reference_decision)
-            if reference_decision is not None
-            else stop_output(data, validation_code, validation_output)
-        )
-        output = monitor_output if stop_decision_blocks(monitor_output) else output or monitor_output
+        ordinary_output = stop_output(data, validation_code, validation_output)
+        output = ordinary_output if stop_decision_blocks(ordinary_output) else output or ordinary_output
         blocked = stop_decision_blocks(output)
         if (
-            not use_reference_monitor
-            and validation_code == 0
+            validation_code == 0
             and not validation_skipped(validation_output)
             and not blocked
         ):
@@ -1509,35 +1474,24 @@ def handle(args: argparse.Namespace) -> int:
         if measurement_enabled(data):
             # Tagged after post-finalize re-validation so would_fire/did_block match
             # the final block decision in stop_output (not the pre-finalize state).
-            if reference_decision is not None:
-                would_fire = (
-                    strict_gate_enabled(data)
-                    and reference_decision.get("claimed_result_label") == "agent-verified"
-                    and reference_decision.get("authorization") != "granted"
-                )
-            else:
-                would_fire = (
-                    strict_gate_enabled(data)
-                    and validation_code not in (0, 4)
-                    and has_blocking_validation_failure(validation_output)
-                )
+            would_fire = (
+                strict_gate_enabled(data)
+                and validation_code not in (0, 4)
+                and has_blocking_validation_failure(validation_output)
+            )
             arm = _holdout_arm(str(data.get("session_id") or ""))
             finalize_extra["holdout_arm"] = arm
             finalize_extra["would_fire"] = bool(would_fire)
             finalize_extra["did_block"] = bool(would_fire and arm == "on")
         kanboard_post_session = (
             None
-            if blocked or use_reference_monitor
+            if blocked
             else maybe_record_kanboard_post_session(data, validation_code, loop_context)
         )
         if kanboard_post_session is not None:
             finalize_extra["kanboard_post_session"] = kanboard_post_session
         notifications: dict[str, Any] = {}
-        if use_reference_monitor:
-            # 9.2.1 keeps ordinary Stop free of notification subprocesses. A host
-            # UI may notify from the returned decision without another Python start.
-            pass
-        elif loop_evaluation is not None:
+        if loop_evaluation is not None:
             # Loop turns notify per iteration (its decision already conveys success/continue/recover).
             notifications["loop_iteration"] = notify_loop_iteration(data, loop_evaluation)
         elif not blocked:
@@ -1548,7 +1502,7 @@ def handle(args: argparse.Namespace) -> int:
                 title="Codex task complete",
                 message=notify_completion_message(data),
             )
-        if not use_reference_monitor and validation_code not in (0, 4):
+        if validation_code not in (0, 4):
             first_line = validation_output.splitlines()[0] if validation_output else "validation failed"
             notifications["stop_failure"] = run_desktop_notify(
                 data,
@@ -1558,8 +1512,7 @@ def handle(args: argparse.Namespace) -> int:
                 message=f"agent output validation: {truncate(first_line, 120)}",
             )
         if (
-            not use_reference_monitor
-            and kanboard_post_session is not None
+            kanboard_post_session is not None
             and kanboard_post_session.get("status")
         ):
             notifications["kanboard_sync"] = run_desktop_notify(
@@ -1571,9 +1524,7 @@ def handle(args: argparse.Namespace) -> int:
             )
         if notifications:
             finalize_extra["desktop_notifications"] = notifications
-        if (use_reference_monitor and not blocked) or (
-            validation_code == 0 and not validation_skipped(validation_output) and not blocked
-        ):
+        if validation_code == 0 and not validation_skipped(validation_output) and not blocked:
             record_event(
                 args,
                 data,
@@ -1593,7 +1544,7 @@ def handle(args: argparse.Namespace) -> int:
         return 0
     recovery_guard = observe_recovery_guard(data, block_allowed=False)
     use_reference_monitor = reference_monitor_enabled(data)
-    bootstrap = None if use_reference_monitor else maybe_bootstrap_agent_run(args, data)
+    bootstrap = maybe_bootstrap_agent_run(args, data)
     extra = {"agent_run_bootstrap": bootstrap} if bootstrap is not None else {}
     if recovery_guard is not None:
         extra["recovery_guard"] = recovery_guard

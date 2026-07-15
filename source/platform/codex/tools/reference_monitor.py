@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Small result-label authority monitor for the opt-in 9.2.1 harness."""
+"""Declared-subject receipt monitor for the opt-in 9.2.1 harness."""
 
 from __future__ import annotations
 
@@ -20,7 +20,6 @@ VERIFIER_ORIGINS = TRUSTED_VERIFIERS | {"agent_modified"}
 MAX_SUBJECT_REFS = 32
 MAX_SUBJECT_BYTES = 16 * 1024 * 1024
 SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
-RESULT_LABEL_RE = re.compile(r"(?m)^\s*result_label:\s*([A-Za-z0-9_-]+)\s*$")
 
 def digest(value: object) -> str:
     raw = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
@@ -207,31 +206,27 @@ def observe_receipt(
     return receipt
 
 
-def claimed_label(message: object) -> str | None:
-    match = RESULT_LABEL_RE.search(message) if isinstance(message, str) else None
-    return match.group(1) if match else None
+def decide(ledger: Path, data: dict[str, Any]) -> dict[str, Any]:
+    """Report receipt state without interpreting or controlling task completion."""
+    base = {"harness_version": VERSION}
 
-
-def decide(ledger: Path, message: object, data: dict[str, Any]) -> dict[str, Any]:
-    base = {
-        "harness_version": VERSION,
-        "claimed_result_label": claimed_label(message),
-        "canonical_result_label": "user-verification-needed",
-    }
-
-    def deny(reason: str, integrity: bool = False) -> dict[str, Any]:
-        return {**base, "authorization": "integrity_error" if integrity else "downgraded", "reason_code": reason}
+    def result(receipt_status: str, reason_code: str, **extra: Any) -> dict[str, Any]:
+        return {**base, "receipt_status": receipt_status, "reason_code": reason_code, **extra}
 
     events, errors = read_events(ledger)
     if errors:
-        return {**deny("ledger_integrity_error", True), "integrity_errors": errors[:5]}
+        return result("integrity_error", "ledger_integrity_error", integrity_errors=errors[:5])
     contract, binding_event, contract_error = bound_contract(events)
     if contract_error:
-        return deny("contract_integrity_error", True)
+        return result("integrity_error", "contract_integrity_error")
     if contract is None or binding_event is None:
-        return deny("missing_prebound_contract")
+        return result("missing", "missing_prebound_contract")
+    contract_fields = {
+        "contract_id": contract["contract_id"],
+        "contract_digest": contract["contract_digest"],
+    }
     if not same_run(binding_event, data):
-        return deny("contract_run_mismatch")
+        return result("unavailable", "contract_run_mismatch", **contract_fields)
     contract_receipts = [
         (event["evidence"]["verifier_receipt"], int(event.get("seq", 0)), event)
         for event in events
@@ -241,38 +236,63 @@ def decide(ledger: Path, message: object, data: dict[str, Any]) -> dict[str, Any
     ]
     receipts = [entry for entry in contract_receipts if same_run(entry[2], data)]
     if contract_receipts and not receipts:
-        return deny("receipt_run_mismatch")
+        return result("unavailable", "receipt_run_mismatch", **contract_fields)
     positives = [(receipt, seq) for receipt, seq, _event in receipts if receipt.get("kind") == "positive"]
     if not positives:
-        return deny("missing_positive_receipt")
+        return result("missing", "missing_positive_receipt", **contract_fields)
     positive, positive_seq = positives[-1]
+    receipt_fields = {
+        **contract_fields,
+        "receipt_seq": positive_seq,
+        "receipt_subject_digest": positive.get("subject_digest"),
+        "receipt_subject_bytes": positive.get("subject_bytes"),
+    }
     session_id, turn_id = run_binding(data)
+    if positive.get("observed_result") == "fail":
+        return result("failed", "verifier_failed", **receipt_fields)
     if (
         positive.get("observed_result") != "pass" or not positive.get("subject_digest")
         or not positive.get("tool_use_id") or not isinstance(positive.get("output_digest"), str)
         or not SHA256_RE.fullmatch(positive["output_digest"])
         or positive.get("session_id") != session_id or positive.get("turn_id") != turn_id
     ):
-        return deny("verifier_failed_or_subject_unbound")
-    if contract.get("verifier_origin") == "agent_modified":
-        return deny("agent_modified_verifier_is_supporting_evidence")
-    elif contract.get("verifier_origin") not in TRUSTED_VERIFIERS:
-        return deny("untrusted_verifier_origin")
+        return result("unavailable", "receipt_or_subject_unbound", **receipt_fields)
     current_digest, current_bytes, subject_error = subject_snapshot(contract, data.get("cwd"))
     if subject_error is not None:
-        return {**deny("subject_unavailable_at_stop"), "subject_error": subject_error}
+        return result(
+            "unavailable",
+            "subject_unavailable_at_stop",
+            **receipt_fields,
+            subject_error=subject_error,
+        )
     if current_digest != positive["subject_digest"]:
-        return {
-            **deny("subject_changed_after_verifier"),
-            "receipt_subject_digest": positive["subject_digest"],
-            "current_subject_digest": current_digest,
-            "current_subject_bytes": current_bytes,
-        }
-    return {
-        **base,
-        "authorization": "granted",
-        "canonical_result_label": "agent-verified",
-        "reason_code": "current_subject_trusted_verifier_receipt",
-        "contract_id": contract["contract_id"],
-        "positive_receipt_seq": positive_seq,
-    }
+        return result(
+            "stale",
+            "subject_changed_after_verifier",
+            **receipt_fields,
+            current_subject_digest=current_digest,
+            subject_bytes=current_bytes,
+        )
+    if contract.get("verifier_origin") == "agent_modified":
+        return result(
+            "supporting_only",
+            "agent_modified_verifier",
+            **receipt_fields,
+            current_subject_digest=current_digest,
+            subject_bytes=current_bytes,
+        )
+    if contract.get("verifier_origin") not in TRUSTED_VERIFIERS:
+        return result(
+            "untrusted_origin",
+            "untrusted_verifier_origin",
+            **receipt_fields,
+            current_subject_digest=current_digest,
+            subject_bytes=current_bytes,
+        )
+    return result(
+        "current_for_declared_subjects",
+        "trusted_receipt_matches_declared_subjects",
+        **receipt_fields,
+        current_subject_digest=current_digest,
+        subject_bytes=current_bytes,
+    )

@@ -89,19 +89,19 @@ class Harness921ReferenceMonitorTests(unittest.TestCase):
             tool_response={"exit_code": exit_code, "stdout": "PASS" if exit_code == 0 else "FAIL"},
         )
 
-    def stop(self, label: str = "agent-verified", **extra: object) -> dict[str, object]:
+    def stop(self, message: str = "Harness monitor observation.\n", **extra: object) -> dict[str, object]:
         return self.event(
             "Stop",
             skill_system_agent_output_gate="strict",
-            last_assistant_message=f"result_label: {label}\n",
+            last_assistant_message=message,
             **extra,
         )
 
-    def last_authority(self) -> dict[str, object]:
+    def last_receipt_status(self) -> dict[str, object]:
         last = json.loads(self.ledger.read_text(encoding="utf-8").splitlines()[-1])
-        return last["evidence"]["verification_authority"]
+        return last["evidence"]["verifier_receipt_status"]
 
-    def test_trusted_fresh_verifier_authorizes_agent_verified(self) -> None:
+    def test_trusted_fresh_verifier_records_current_declared_subjects(self) -> None:
         command = "verify production subject"
         self.configure_contract(command)
         self.event("UserPromptSubmit", prompt="verify the production subject")
@@ -110,37 +110,38 @@ class Harness921ReferenceMonitorTests(unittest.TestCase):
         output = self.stop()
 
         self.assertTrue(output["continue"])
-        self.assertEqual(self.last_authority()["authorization"], "granted")
-        self.assertEqual(self.last_authority()["canonical_result_label"], "agent-verified")
+        status = self.last_receipt_status()
+        self.assertEqual(status["receipt_status"], "current_for_declared_subjects")
+        self.assertNotIn("authorization", status)
+        self.assertNotIn("claimed_result_label", status)
+        self.assertNotIn("canonical_result_label", status)
         last = json.loads(self.ledger.read_text(encoding="utf-8").splitlines()[-1])
-        self.assertNotIn("desktop_notifications", last["evidence"])
+        self.assertIn("desktop_notifications", last["evidence"])
 
-    def test_missing_contract_downgrades_label_without_rejecting_response(self) -> None:
+    def test_missing_contract_is_metadata_and_does_not_rewrite_response(self) -> None:
         self.event("UserPromptSubmit", prompt="no trusted verifier is available")
 
-        first = self.stop("agent-verified")
-        second = self.stop("user-verification-needed")
+        first = self.stop("result_label: agent-verified\n")
+        first_status = self.last_receipt_status()
+        second = self.stop("result_label: blocked\n")
+        second_status = self.last_receipt_status()
 
-        self.assertEqual(first["decision"], "block")
-        self.assertIn("Re-emit the same scoped answer", first["reason"])
-        self.assertIn("Do not run tools", first["reason"])
+        self.assertTrue(first["continue"])
         self.assertTrue(second["continue"])
-        self.assertEqual(self.last_authority()["reason_code"], "missing_prebound_contract")
+        self.assertEqual(first_status["receipt_status"], "missing")
+        self.assertEqual(second_status["receipt_status"], "missing")
+        self.assertNotIn("re-emit", json.dumps(first).lower())
 
-    def test_agent_modified_verifier_downgrades_without_requesting_more_tests(self) -> None:
+    def test_agent_modified_verifier_is_supporting_only(self) -> None:
         positive = "run agent modified tests"
         self.configure_contract(positive, verifier_origin="agent_modified")
         self.event("UserPromptSubmit", prompt="verify an agent-modified test")
         self.tool(positive, 0, "tool-positive")
 
-        denied = self.stop()
+        output = self.stop()
 
-        self.assertEqual(denied["decision"], "block")
-        self.assertEqual(
-            self.last_authority()["reason_code"],
-            "agent_modified_verifier_is_supporting_evidence",
-        )
-        self.assertIn("Do not run tools", denied["reason"])
+        self.assertTrue(output["continue"])
+        self.assertEqual(self.last_receipt_status()["receipt_status"], "supporting_only")
 
     def test_unrelated_tool_use_after_verifier_keeps_receipt_current(self) -> None:
         command = "verify production subject"
@@ -152,9 +153,9 @@ class Harness921ReferenceMonitorTests(unittest.TestCase):
         output = self.stop()
 
         self.assertTrue(output["continue"])
-        self.assertEqual(self.last_authority()["authorization"], "granted")
+        self.assertEqual(self.last_receipt_status()["receipt_status"], "current_for_declared_subjects")
 
-    def test_subject_change_after_verifier_downgrades_receipt(self) -> None:
+    def test_subject_change_after_verifier_marks_receipt_stale(self) -> None:
         command = "verify production subject"
         self.configure_contract(command)
         self.event("UserPromptSubmit", prompt="verify then change the production subject")
@@ -163,10 +164,10 @@ class Harness921ReferenceMonitorTests(unittest.TestCase):
 
         output = self.stop()
 
-        self.assertEqual(output["decision"], "block")
-        self.assertEqual(self.last_authority()["reason_code"], "subject_changed_after_verifier")
+        self.assertTrue(output["continue"])
+        self.assertEqual(self.last_receipt_status()["receipt_status"], "stale")
 
-    def test_receipt_from_another_run_cannot_authorize_current_stop(self) -> None:
+    def test_receipt_from_another_run_is_unavailable_for_current_stop(self) -> None:
         command = "verify production subject"
         self.configure_contract(command)
         self.event("UserPromptSubmit", prompt="verify in the original run")
@@ -174,10 +175,10 @@ class Harness921ReferenceMonitorTests(unittest.TestCase):
 
         output = self.stop(session_id="session-other")
 
-        self.assertEqual(output["decision"], "block")
-        self.assertEqual(self.last_authority()["reason_code"], "contract_run_mismatch")
+        self.assertTrue(output["continue"])
+        self.assertEqual(self.last_receipt_status()["receipt_status"], "unavailable")
 
-    def test_failed_verifier_downgrades_label(self) -> None:
+    def test_failed_verifier_records_failed_status(self) -> None:
         command = "verify production subject"
         self.configure_contract(command)
         self.event("UserPromptSubmit", prompt="observe a verifier failure")
@@ -185,10 +186,10 @@ class Harness921ReferenceMonitorTests(unittest.TestCase):
 
         output = self.stop()
 
-        self.assertEqual(output["decision"], "block")
-        self.assertEqual(self.last_authority()["reason_code"], "verifier_failed_or_subject_unbound")
+        self.assertTrue(output["continue"])
+        self.assertEqual(self.last_receipt_status()["receipt_status"], "failed")
 
-    def test_tampered_ledger_denies_success_authority(self) -> None:
+    def test_tampered_ledger_records_integrity_error_without_label_authority(self) -> None:
         command = "verify production subject"
         self.configure_contract(command)
         self.event("UserPromptSubmit", prompt="verify ledger integrity")
@@ -199,8 +200,60 @@ class Harness921ReferenceMonitorTests(unittest.TestCase):
 
         output = self.stop()
 
-        self.assertEqual(output["decision"], "block")
-        self.assertEqual(self.last_authority()["authorization"], "integrity_error")
+        self.assertTrue(output["continue"])
+        self.assertEqual(self.last_receipt_status()["receipt_status"], "integrity_error")
+
+    def test_monitor_opt_in_does_not_replace_ordinary_stop_validation(self) -> None:
+        self.event("UserPromptSubmit", prompt="monitor-on ordinary validation")
+        monitored = self.stop()
+        monitored_event = json.loads(self.ledger.read_text(encoding="utf-8").splitlines()[-1])
+
+        self.ledger = self.work / "ordinary-hook-events.jsonl"
+        self.env.pop("SKILL_SYSTEM_HARNESS_VERSION", None)
+        self.event("UserPromptSubmit", prompt="monitor-off ordinary validation")
+        ordinary = self.stop()
+        ordinary_event = json.loads(self.ledger.read_text(encoding="utf-8").splitlines()[-1])
+
+        self.assertEqual(monitored, ordinary)
+        self.assertEqual(
+            monitored_event["evidence"]["agent_output_validation"],
+            ordinary_event["evidence"]["agent_output_validation"],
+        )
+        self.assertIn("verifier_receipt_status", monitored_event["evidence"])
+        self.assertNotIn("verifier_receipt_status", ordinary_event["evidence"])
+
+    def test_monitor_only_session_keeps_otherwise_disabled_validation_skipped(self) -> None:
+        ledger = self.work / "monitor-only-hook-events.jsonl"
+        input_path = self.work / "monitor-only-stop.json"
+        input_path.write_text(json.dumps({
+            "hook_event_name": "Stop",
+            "session_id": "session-monitor-only",
+            "turn_id": "turn-monitor-only",
+            "cwd": str(self.work),
+            "permission_mode": "workspace-write",
+            "last_assistant_message": "Monitor-only observation.\n",
+        }), encoding="utf-8")
+        env = dict(self.env)
+        env["SKILL_SYSTEM_HOOK_LEDGER"] = str(ledger)
+        env.pop("SKILL_SYSTEM_AGENT_OUTPUT_GATE", None)
+
+        result = subprocess.run(
+            [sys.executable, str(HOOK), "--input-file", str(input_path)],
+            cwd=ROOT,
+            env=env,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=10,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        output = json.loads(result.stdout)
+        self.assertTrue(output["continue"])
+        self.assertIn("SKIP: agent output validation skipped", output["systemMessage"])
+        event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[-1])
+        self.assertEqual(event["evidence"]["verifier_receipt_status"]["receipt_status"], "missing")
 
 
 if __name__ == "__main__":

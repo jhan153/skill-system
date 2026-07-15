@@ -4,8 +4,9 @@
 Answers the harness-paradox question: does the strict gate help, hurt, or do
 nothing vs a gate-off baseline? Reads one hash-chained hook event ledger or the
 default per-run ledger family (hook_runtime), groups `turn_finalize` events by
-holdout arm, and reports per-arm evidence-gate and Recovery Guard fire/block
-rates, finalize-fail rates, and a sunset recommendation.
+holdout arm, and reports per-arm ordinary evidence-gate and Recovery Guard
+fire/block rates, receipt-status counts, finalize-fail rates, and a sunset
+recommendation. Receipt status is observational and never a task-label gate.
 
 Read-only: never writes, never touches the gate. Pure functions (`holdout_arm`,
 `stratified_compare`, `sunset_status`) are unit-testable without I/O. Holdout
@@ -63,6 +64,7 @@ def stratified_compare(events: list) -> dict:
     recovery_block = {a: 0 for a in ARMS}
     fail = {a: 0 for a in ARMS}
     total = {a: 0 for a in ARMS}
+    receipt_status_counts: dict[str, int] = {}
     for e in _finalize_events(events):
         ev = e.get("evidence") or {}
         arm = ev.get("holdout_arm")
@@ -80,6 +82,10 @@ def stratified_compare(events: list) -> dict:
             recovery_block[arm] += 1
         if e.get("status") == "fail":
             fail[arm] += 1
+        receipt = ev.get("verifier_receipt_status")
+        receipt_status = receipt.get("receipt_status") if isinstance(receipt, dict) else None
+        if isinstance(receipt_status, str) and receipt_status:
+            receipt_status_counts[receipt_status] = receipt_status_counts.get(receipt_status, 0) + 1
     res: dict[str, Any] = {}
     for a in ARMS:
         t = total[a]
@@ -94,6 +100,7 @@ def stratified_compare(events: list) -> dict:
         }
     on_f, off_f = res["on"]["finalize_fail_rate"], res["off"]["finalize_fail_rate"]
     res["harness_paradox_fail_delta"] = None if on_f is None or off_f is None else on_f - off_f
+    res["receipt_status_counts"] = dict(sorted(receipt_status_counts.items()))
     return res
 
 

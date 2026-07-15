@@ -15,7 +15,7 @@
 
 ## Validation Scope And Evidence Budget
 - Verification is a termination condition, not a deliverable. Prefer one existing verifier, direct observation, or focused smoke check; rerun only after its subject changed or the observation was inconclusive.
-- Keep plans outcome-focused and store only the intended verifier plus latest decisive result, not logs, receipts, retries, or repeated passes. A Stop downgrade permits the same answer with `user-verification-needed`, not more work.
+- Keep plans outcome-focused and store only the intended verifier plus latest decisive result, not logs, receipts, retries, or repeated passes. An output-gate denial permits the same answer with the lower label required by current evidence, not more work; use `user-verification-needed` only for a genuinely user-only check and `unverified` when required evidence is unavailable.
 
 ## Decision And Edit Boundary
 - Ask when an unresolved interpretation materially changes deliverables, write scope, safety, or validation. Otherwise make the smallest sufficient reversible change without unrequested features, abstractions, dependencies, or configurability.
