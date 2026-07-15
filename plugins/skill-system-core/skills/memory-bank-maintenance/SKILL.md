@@ -7,67 +7,27 @@ description: Validate, report, conflict-check, or consolidate an existing projec
 
 ## Routing Card
 - role: memory_operation
-- intent_signature:
-  - memory-bank status, validate, consolidate, conflict-check, stale-entry review
-- use_when:
-  - the user or an authorized automation explicitly asks to inspect or maintain existing memory state.
-- do_not_use_when:
-  - initialization, goal/rule mutation, or capture of a new recurring correction is the actual task.
-- expected_inputs:
-  - target bank and operation: `report`, `validate`, `conflict-check`, or `consolidate`
-- expected_outputs:
-  - evidence-backed status/conflicts and, only when requested, append-only consolidation changes
-- context_targets:
-  must_read:
-    - relevant `meta.json`, `events.jsonl`, and affected `current.md` sections
-    - `.codex/docs/memory_mutation_contract.md` before `consolidate`
-  read_if_needed:
-    - matching `archive.md` history and `reference.md` schema/consolidation rules
-  do_not_load_by_default:
-    - all memory banks, unrelated project memory, or full repository context
-- risk_profile:
-  reads:
-    - targeted ledger files and affected history
-  writes:
-    - none for report/validate; append-only consolidation changes only when explicitly requested
-  tools:
-    - safe schema, consistency, and file validation
-  sensitive_resources:
-    - credentials default deny
-- entry_scene:
-  - PREPARE
+- intent_signature: memory-bank status, validate, consolidate, conflict-check, stale-entry review
+- use_when: the user or authorized automation explicitly requests maintenance of an existing target bank
+- do_not_use_when: initialization, goal/rule mutation, or new correction capture is primary
+- expected_inputs: exact bank and `report`, `validate`, `conflict-check`, or `consolidate` operation
+- expected_outputs: evidence-backed status/conflicts and only requested append-only consolidation changes
+- context_targets: read targeted meta/events/current state and only matching archive evidence; before consolidation load `.codex/docs/memory_mutation_contract.md` and `reference.md`
+- risk_profile: report/validate/conflict-check are byte-read-only; consolidate writes append-only after explicit request; credentials denied
+- entry_scene: PREPARE
 
-## Operation Gate
-- `report`: summarize current state; no writes.
-- `validate`: check schema and cross-file integrity; no repair unless separately requested.
-- `conflict-check`: inspect only the affected current/archive evidence; no mutation by default.
-- `consolidate`: merge only evidence-backed duplicates or superseded candidates and append a consolidation event.
-
-If the bank is missing, report `blocked`; do not silently initialize it. Goal/rule changes route to `memory-bank-update`, and new repeated corrections route to `memory-bank-correction-capture`.
+## Maintenance Contract
+- `report` summarizes, `validate` checks schema/cross-file integrity, and `conflict-check` inspects affected evidence; all remain byte-read-only and never auto-repair.
+- `consolidate` writes only when evidence establishes equivalence or valid supersession; uncertainty preserves distinct items and returns `unverified`.
+- A missing/mismatched bank or invalid schema is surfaced, never initialized or replaced as fallback. Route goal/rule mutations to `memory-bank-update` and new recurring corrections to `memory-bank-correction-capture`.
 
 ## Workflow
 1. Confirm the bank and requested operation.
 2. Parse `meta.json`, `events.jsonl`, and affected current items.
 3. Check stable IDs, schema, event/current/archive consistency, conflicts, and stale/superseded state.
 4. In read-only modes, stop after evidence-backed findings.
-5. In `consolidate`, preserve distinct items unless evidence establishes equivalence; apply the shared stable-operation transaction to event/current/archive/meta state.
-6. Revalidate and report exact affected IDs.
-
-## Validation
-- Read-only operations leave files byte-unchanged.
-- Consolidation has discovery, decision, and post-change verification evidence.
-- `snapshot_version` and timestamps change only after a successful write.
-- No hard deletion or history rewrite occurs.
-- Goal/rule conflicts produce an update proposal rather than an implicit policy mutation.
+5. In `consolidate`, stage discovery, decision, one event, and current/archive/meta reflections under the shared stable operation; never hard-delete or rewrite history.
+6. Read back every affected file. Advance snapshot/timestamps only after successful validation; partial writes remain failed/blocked.
 
 ## Output
-Lead with the requested operation's result. Include affected IDs, conflicts or consolidation decisions, validation evidence, and remaining uncertainty; omit empty maintenance categories.
-
-## Behavior Cases
-- Positive: “candidate 실수 두 개가 같은 항목인지 검증하고 통합해줘.”
-- Negative: “새 persistent rule을 추가해줘.” → `memory-bank-update`.
-- Edge: two similar candidates lack shared evidence → keep separate and report `unverified`.
-
-## Known Limits
-- Consolidation can erase meaningful distinctions when evidence is weak; uncertainty blocks the merge.
-- Validation proves ledger consistency, not that every accepted memory claim is currently true.
+Lead with the requested operation result and include exact affected IDs, conflict/consolidation decisions, byte/readback evidence, and remaining uncertainty. A consistency pass proves ledger structure and references only, not that every accepted memory claim remains true.
