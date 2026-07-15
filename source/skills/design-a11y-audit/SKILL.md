@@ -23,8 +23,9 @@ description: "Accessibility evidence for implemented UI — keyboard reachabilit
   must_read:
     - target UI surface/artifact and scoped acceptance criteria
   read_if_needed:
-    - `references/wcag-checklist.md`
-    - `references/keyboard-focus-procedure.md`
+    - `references/wcag-checklist.md` for contrast, target size, reflow, or scoped WCAG checks
+    - `references/keyboard-focus-procedure.md` for rendered keyboard/focus and APG widget interaction
+    - `references/audit-report-schema.md` only for an audit artifact or several tracked conditions
     - component contract mapping
     - visual evidence manifest
     - accessibility test output
@@ -42,31 +43,13 @@ This is an evidence gate. `design-frontend` owns requested UI fixes; this skill 
 
 ## Workflow
 1. Record the route/component/artifact, viewport, interaction states, and only the success conditions in scope. List relevant controls, landmarks, forms, status messages, and dynamic regions.
-2. Choose evidence per condition:
-   - Source and `scripts/a11y_static_scan.py` provide structural hints only. Runtime DOM/accessibility-tree readback can verify rendered roles, names, labels, associations, landmarks, and live regions.
-   - Screenshots can show visible focus, clipping, or measurable pixels, but cannot prove keyboard reachability, tab order, accessible names, or dynamic behavior.
-   - Browser interaction verifies reachability, order, focus movement/visibility, escape/close, activation, and selected-versus-focused behavior. Use `references/keyboard-focus-procedure.md` and APG for composite widgets.
-   - Contrast, target size, reflow, and overflow require measured rendered values at the relevant viewport/zoom. Use the scoped criteria in `references/wcag-checklist.md`.
+2. Match each condition to direct evidence: source and `scripts/a11y_static_scan.py` are hints; DOM/tree verifies rendered roles, names, and associations; screenshots verify only visible pixels; browser interaction verifies keyboard/focus; rendered measurements verify quantitative criteria. Load only the matching procedure or checklist.
 3. Report each condition from its direct evidence. A clean scan or passing lower-scope check cannot overrule conflicting rendered or interaction evidence and is never a full WCAG pass.
 4. For requested fixes, identify the actual component/owner, then repeat the same rendered interaction or measurement after the production change. Mock/source/test success alone leaves the condition open.
 5. Hand missing visual proof to `design-visual-regression`, state coverage to `design-component-mapper`, token values to `design-tokens`, and implementation to `design-frontend`.
 
 ## Output
-Lead with confirmed high-impact gaps and the next missing evidence. Use this shape only for an audit artifact or several tracked conditions; omit empty fields.
-
-```yaml
-target:
-keyboard_result:
-focus_result:
-semantics_result:
-contrast_result:
-target_size_result:
-responsive_readability_result:
-manual_checks_needed: []
-static_scan_hints: []
-unresolved_gaps: []
-unverified: []
-```
+Lead with confirmed high-impact gaps and the next missing evidence. For an audit artifact or several tracked conditions, use `references/audit-report-schema.md`.
 
 ## Loop Contract Consumption
 When invoked as a loop verifier:
@@ -75,7 +58,6 @@ When invoked as a loop verifier:
 - Do not weaken a finding for visual fidelity or let one accessibility condition imply another.
 
 ## Validation And Limits
-- Every result cites its DOM/tree, source, screenshot, measurement, or interaction evidence; unavailable evidence remains `unverified`, `user-verification-needed`, or `blocked` as appropriate.
-- Never invent roles, labels, ratios, dimensions, or keyboard behavior. Separate WCAG/APG criteria from heuristic polish.
-- Keep a single focus, label, contrast, or overflow request scoped. No rendered UI means source/static hints plus explicit manual checks, not compliance.
-- This gate cannot prove visual fidelity or complete design implementation; visual, token, component, repo, and other user conditions remain separate.
+- Cite direct evidence per result; unavailable evidence remains `unverified`, `user-verification-needed`, or `blocked`. Never invent roles, labels, ratios, dimensions, or behavior, or conflate WCAG/APG criteria with polish.
+- Keep conditions scoped. Without rendered UI, report source/static hints and manual checks, not compliance.
+- This gate proves neither visual fidelity nor complete implementation; keep other user conditions separate.
