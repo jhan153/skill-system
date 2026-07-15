@@ -1,86 +1,71 @@
 ---
 name: research-hypothesis-planning
-description: Turn a raw research premise, paper idea, loss/ablation concept, or training proposal into one scoped falsifiable primary claim and a minimal evidence plan. Use before a formal experiment blueprint; do not intercept implementation of an already selected method.
+description: Narrow a raw research premise into one falsifiable claim and the cheapest discriminating evidence plan before blueprinting or implementation.
 ---
 
 # Research Hypothesis Planning
 
 ## Routing Card
 - role: primary
-- intent_signature:
-  - research hypothesis, paper idea, novel method, ablation/loss/training plan, 연구 계획
+- intent_signature: raw premise, mechanism, loss/ablation idea, or hypothesis validation
 - use_when:
-  - a premise or mechanism must be tested, narrowed, or turned into a research direction.
+  - a premise must become one testable research decision
 - do_not_use_when:
-  - the user asks to implement an already selected algorithm or code change.
-  - literature evidence already exists and the goal is gap-derived ideation (`research-literature-ideation`).
-  - one hypothesis is selected and a full protocol is needed (`research-experiment-blueprint`).
-- expected_inputs:
-  - premise, claimed mechanism, scope, constraints, evidence, and baseline/checkpoint availability
-- expected_outputs:
-  - premise triage, primary claim, non-assumptions, Stage-0 evidence check, minimal discriminating experiment, and backlog
+  - selected-method implementation or a later literature, protocol, scaffold, analysis, or manuscript stage
+- expected_inputs: premise, mechanism, scope, evidence status, constraints, and baseline/checkpoint availability
+- expected_outputs: premise status, one claim/falsifier, Stage 0, minimal discriminator, outcomes, and backlog
 - context_targets:
   must_read:
-    - current premise and claimed mechanism
-    - provided evidence or explicit evidence gap
+    - premise/mechanism and supplied evidence or gap
   read_if_needed:
-    - evidence ledger, selected papers, checkpoint/baseline notes, and dataset/metric definitions
+    - selected evidence, checkpoint/baseline, dataset/metric definitions
   do_not_load_by_default:
-    - full repo, implementation files, broad phase templates, or unrelated research artifacts
+    - full repo/corpus, implementation, templates, unrelated artifacts
 - risk_profile:
   reads:
-    - premise and targeted research evidence
+    - scoped premise and research evidence
   writes:
-    - none by default; a plan artifact only when explicitly requested
+    - plan artifact only when explicitly requested
   tools:
-    - none by default; current literature verification routes to evidence search
+    - none by default; current literature claims route to evidence search
   sensitive_resources:
     - credentials default deny
-- entry_scene:
-  - PREPARE
+- entry_scene: PREPARE
 
-## Claim-First Workflow
-1. Decide whether the user is asking about research validity or direct implementation. Concrete implementation stays with development workflows even if it mentions models, metrics, losses, or training.
-2. Split the premise into:
-   - evidence-backed fact
-   - user hypothesis
-   - plausible but unverified assumption
-   - overgeneralization or potentially false claim
-   - claim needing literature evidence
-3. Select one primary decision target with scope, intervention, mechanism, observable outcome, and falsifier. If two rival explanations cannot yet be separated, retain both only long enough to design the discriminating observation instead of choosing arbitrarily.
-4. State what must not be assumed, especially broad field, dataset, or model claims.
-5. Prefer the cheapest Stage-0 discriminator: existing checkpoint evaluation, baseline inference, re-scoring, error analysis, or dataset/label audit.
-6. Propose the smallest experiment that changes one causal factor.
-7. Put secondary ideas in an ablation backlog; do not combine architecture, data, schedule, and multiple objectives in the core test.
-8. Define support, refute, and inconclusive signals.
+## Exact Stage Route
+| Request | Owner |
+| --- | --- |
+| raw premise, mechanism, loss, or ablation validity | `research-hypothesis-planning` |
+| hypotheses derived from an evidence ledger | `research-literature-ideation` |
+| current paper evidence acquisition | `search-paper-evidence` |
+| selected claim to full protocol | `research-experiment-blueprint` |
+| approved blueprint to runnable code | `research-experiment-scaffold` |
+| real result analysis | `research-statistical-analysis` |
+| selected method implementation | `workflow-implementation` |
 
-## Loss and Ablation Discipline
-- Separate training objective, auxiliary loss, regularizer, evaluation metric, and diagnostic metric.
-- Start with one primary objective. Add an auxiliary term only when it tests a specific mechanism and has its own ablation.
-- Each ablation names the changed factor, frozen factors, expected signal, and failure interpretation.
-- “More losses” or “more training” is not a research mechanism.
+Use the exact owner. Research vocabulary inside coding work does not change the route.
+
+## Workflow
+1. Label each premise `supported`, `user_hypothesis`, `unverified`, `overgeneralized`, or `needs_current_evidence`; never invent literature, novelty, or results.
+2. Define one target with scope, intervention, mechanism, observable prediction, and falsifier. Request missing essentials instead of emitting a large plan.
+3. Keep two rival explanations until one observation separates their predictions. Mark broad field/dataset/model claims as non-assumptions and route current evidence acquisition to `search-paper-evidence`.
+4. Choose the cheapest Stage-0 discriminator: checkpoint/baseline evaluation, re-scoring, error analysis, or dataset/label audit. Train only for a gap Stage 0 cannot resolve.
+5. If needed, change one causal factor, freeze the rest, and defer architecture, data, schedule, and extra objectives.
+6. Predefine metric plus support, refute, and inconclusive signals.
+
+## Loss And Ablation Discipline
+- Separate primary objective, auxiliary loss, regularizer, evaluation metric, and diagnostic metric; “more training/losses” is not a mechanism.
+- An auxiliary term needs a mechanism and its own ablation.
+- Each ablation names changed and frozen factors, predicted signal, and failure interpretation.
 
 ## Output
-For a small premise check, lead with whether the claim is testable and the cheapest falsifier. For a full research plan, include:
+For a small premise, lead with testability and the cheapest falsifier. An explicit plan includes only:
 
-- premise classification and evidence gaps
-- primary falsifiable claim and non-assumptions
-- checkpoint/baseline Stage 0
-- minimal core experiment
-- metrics and support/refute/inconclusive criteria
-- ablation/loss backlog and deferred ideas
+- premise status and evidence gaps
+- claim/mechanism/scope/falsifier and non-assumptions
+- Stage-0 baseline/checkpoint check
+- one-factor core, frozen factors, metric, three outcomes, and deferred backlog
 
-Do not force a long plan when the premise fails a basic evidence or falsifiability gate.
-
-## Behavior Cases
-- Positive: “이 loss 아이디어를 검증 가능한 한 개의 claim과 최소 ablation plan으로 좁혀줘.”
-- Negative: “선택한 loss를 training loop에 구현해줘.” → `workflow-implementation`.
-- Edge: the premise depends on “all existing models fail” without evidence → narrow the claim and route current evidence acquisition to `search-paper-evidence`.
-- Edge: two plausible causal mechanisms predict different subgroup behavior → preserve both predictions and make the subgroup check the first discriminator.
-
-## Validation
-- The primary claim is narrower than unsupported premises and can be refuted.
-- Stage 0 considers existing evidence before new training.
-- The core test changes the fewest causal factors possible.
-- Metrics are not confused with loss terms.
-- No literature or experimental result is invented.
+## Completion Boundary
+- Complete only when the claim is narrower than unsupported premises, falsifiable, and paired with the cheapest discriminator.
+- Hypothesis planning does not prove the claim, complete experimentation, write implementation, or authorize a positive conclusion.
