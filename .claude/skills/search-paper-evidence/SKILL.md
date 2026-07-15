@@ -1,84 +1,67 @@
 ---
 name: search-paper-evidence
-description: Acquire and verify paper/reference evidence for an explicit literature, citation, or current-research request, or a downstream paper-evidence gap. Return traceable sources and claim relations without inventing papers, identifiers, metadata, datasets, metrics, or results.
+description: Acquire traceable paper evidence for an explicit literature/citation request or downstream paper gap. Separate source identity, access, and claim relation; never invent papers, metadata, datasets, metrics, or results.
 ---
 
 # Search Paper Evidence
 
 ## Routing Card
 - role: primary
-- intent_signature:
-  - paper/citation search, latest research, literature evidence, arXiv/DOI references, 최신 논문, 문헌 근거
+- intent_signature: paper/citation search, latest research, literature evidence, arXiv/DOI, 최신 논문, 문헌 근거
 - use_when:
-  - the user explicitly asks to find papers/citations or verify a literature-backed claim.
-  - a research/report owner identifies a concrete paper-evidence gap.
+  - the user explicitly requests papers/citations or literature-backed claim verification
+  - a downstream owner states a concrete paper-evidence gap
 - do_not_use_when:
-  - only provided papers may be used, one supplied paper only needs summarization, or the task is ordinary implementation/analysis.
-- expected_inputs:
-  - topic/claim, date range, source constraints, desired evidence role, and provided papers when any
-- expected_outputs:
-  - date-stamped search result or query plan, retrievable sources, claim relations, missing evidence, and limitations
+  - only supplied papers may be used, one paper needs summarization, or the task lacks source intent
+- expected_inputs: topic/claim, date range, source constraints, evidence role, supplied papers
+- expected_outputs: date-stamped result or query plan, retrievable sources, claim relations, gaps, limits
 - context_targets:
   must_read:
     - search question and source/date constraints
   read_if_needed:
     - provided papers and prior evidence ledger
   do_not_load_by_default:
-    - full repo, full memory bank, experiment scaffold, or manuscript templates
+    - full repo/memory, experiment scaffold, manuscript templates
 - risk_profile:
-  reads:
-    - user request, provided papers, and acquired source metadata/content
-  writes:
-    - evidence artifact only when explicitly requested
-  tools:
-    - authoritative web/paper search and source opening when evidence acquisition is needed
-  sensitive_resources:
-    - credentials default deny; no dataset download, dependency install, or training
-- entry_scene:
-  - PREPARE
+  reads: request, supplied papers, acquired metadata/content
+  writes: evidence artifact only when explicitly requested
+  tools: authoritative paper/web search and source opening when needed
+  sensitive_resources: credentials default deny; no dataset download, install, or training
+- entry_scene: PREPARE
 
 ## Acquisition and Claim Model
-Track separate fields:
+Track separate fields; never collapse them into `verified`:
 
 - `acquisition_status`: `acquired | partial | inaccessible | not_acquired`
 - `source_status`: `verified_identity | metadata_partial | duplicate_version | corrected | retracted | unverified`
 - `claim_relation`: `supports | contradicts | mixed | mentions | not_assessed`
 - `evidence_basis`: `title | abstract | full_text | table | supplement | metadata_only`
-- `locator`: direct URL/identifier plus section, page, table, or passage when a claim relation is assessed
+- `locator`: retrievable URL/identifier plus section/page/table/passage for assessed relations
 
-`user_provided` belongs in provenance. A confirmed DOI/title proves source identity, not that the paper supports the requested claim.
+`user_provided` is provenance. A confirmed DOI/title proves source identity, not claim support.
+`acquired` requires content sufficient for the recorded basis; identity/landing-page/metadata-only access is `partial` with a limitation.
 
 ## Workflow
-1. Define the claim/topic, date range, inclusion boundary, and evidence roles.
-2. Design the smallest query set that can find supporting, contradicting, baseline, dataset/metric, survey, and failure-mode evidence relevant to the question.
-3. Search current authoritative sources when recency matters; record the search date.
-4. Verify paper identity and open the strongest accessible source before assigning claim relation.
-5. Deduplicate preprint/published versions and check correction/retraction status when material.
-6. Record evidence basis and exact locator; abstract-only access cannot support a full-text-specific claim.
-7. Rank by relevance, directness, study quality, and independence—not keyword frequency.
-8. Return missing evidence and search limitations explicitly.
+1. Define claim/topic, date/inclusion boundary, source constraints, and needed evidence roles.
+2. Use the smallest query set that can discriminate support, contradiction, baselines, datasets/metrics, and failure modes.
+3. Search authoritative current sources when recency matters and record the search date.
+4. Verify identity and open the strongest accessible source before assigning a claim relation.
+5. Deduplicate preprint/published versions; surface corrections and retractions.
+6. Record basis and exact locator. Abstract-only access cannot support a full-text/table-specific claim; a keyword mention is not support.
+7. Rank by relevance, directness, study quality, and independence, not frequency.
+8. Return unavailable/missing evidence and limitations; without search/access, return a query plan with `not_acquired`.
 
 ## Output
-Match depth to the request:
+Match depth to intent:
+- Simple list: concise citations/links, relevance, access limit, search date.
+- Claim check: supporting/contradicting records with basis and locators.
+- Explicit ledger: structured acquisition/source/claim fields, query plan, gaps, limits.
 
-- Simple paper list: concise citations/links, relevance, access/evidence limitation, and search date.
-- Claim verification: supporting and contradicting records with evidence basis and locators.
-- Explicit ledger artifact: structured acquisition/source/claim fields, query plan, missing evidence, and limitations.
-
-Do not force a nine-section ledger around a request for two references.
-
-## Behavior Cases
-- Positive: “2024년 이후 이 claim을 지지하거나 반박하는 논문과 직접 링크를 찾아줘.”
-- Negative: “첨부한 PDF 하나만 요약해줘.” → direct paper reading/summarization, not this search lane.
-- Edge: a paywalled abstract and its published/preprint duplicate exist → deduplicate, label partial evidence, and do not claim full-text support.
+Never force a full ledger around a short reference request.
 
 ## Validation
 - No source is returned without a retrievable locator.
-- Current/latest claims have a fresh search date.
+- Current/latest results have a fresh search date.
 - Source identity, provenance, and claim relation remain separate.
-- Corrections/retractions and duplicate versions are not silently ignored.
-- Missing access or tools yields a query plan/`not_acquired`, never fabricated evidence.
-
-## Known Limits
-- Search coverage and metadata can be incomplete.
-- Evidence organization does not by itself establish causal or field-wide truth.
+- Corrections, retractions, duplicates, partial access, and missing evidence stay visible.
+- Never infer causal or field-wide truth from organized papers alone.
