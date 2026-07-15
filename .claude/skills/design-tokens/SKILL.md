@@ -23,7 +23,7 @@ description: "Normalize and audit design token sources for design-to-production 
     - token source or design reference
     - target styling conventions
   read_if_needed:
-    - `references/token-normalization.md` for source precedence, category normalization, platform mapping, or an inventory/export artifact
+    - `references/token-normalization.md` for multi-category normalization, alias/mode/naming normalization, platform export shape, or an explicit inventory/export artifact
     - `references/token-gap-policy.md` when names, values, aliases, modes, or source priority are incomplete
     - component contract mapping
     - visual evidence manifest
@@ -43,8 +43,8 @@ description: "Normalize and audit design token sources for design-to-production 
 This is a token-evidence gate. It supports implementation but does not own UI code changes unless token artifact edits are explicitly requested.
 
 ## Workflow
-1. Pin source pointers and authority. Use a declared canonical source; otherwise load `references/token-normalization.md` and apply its precedence. Retain every conflicting candidate and pointer. Screenshot/rendered values remain inferred; a canonical winner does not erase a displaced live/legacy mismatch.
-2. Load that reference for requested category and target mapping, preserving repo naming, shape, typing, modes, and platform conventions. Create no export unless file changes were requested.
+1. Pin source pointers and declared authority. Use a declared canonical source; otherwise keep the conflict unresolved without inventing precedence. Screenshot/rendered values remain inferred, and a canonical winner does not erase displaced live/legacy mismatches.
+2. Answer narrow authority, conflict, gap, or same-system mappings directly. Load `references/token-normalization.md` only for multi-category, alias/mode/naming, platform-export, or explicit inventory/export work. Preserve repo naming, shape, typing, modes, and platform conventions; create no unrequested export.
 3. For incomplete names, values, aliases, modes, or priority, load `references/token-gap-policy.md`. Keep gaps missing and inferences labeled; a required gap needs canonical evidence or an explicit scoped user decision before readiness.
 4. For requested edits, read the resulting value, alias, and mode through the real consumer path. If it resolves another source, keep the condition open, correct selection in the owning module, and repeat the same-path readback. A parser inventory, mock, or generated file proves only its boundary.
 5. Hand the scoped mapping and unresolved items to `design-frontend`, `design-component-mapper`, or visual review; do not claim UI completion from token readiness.
