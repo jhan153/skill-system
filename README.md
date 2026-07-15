@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.1.2 Skill Bundle
+## 9.2.0 Skill Bundle
 
-This repository includes the unpublished source baseline organized as version 9.1.2 (the 7.3.1 bundle remains the compatibility baseline; see the 9.x direction note below). Its main components are:
+This repository includes the local 9.2.0 release cut (the 7.3.1 bundle remains the compatibility baseline; see the 9.x direction note below). Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -25,7 +25,7 @@ This repository includes the unpublished source baseline organized as version 9.
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current source baseline is `9.1.2 — Design Governance & Pre-Diet Baseline`; the latest published release remains `v9.1.1`. Version 9.1.2 is committed and tagged locally for 9.2.0 behavior comparisons, but is not installed, deployed, or published as a release.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current local release cut is `9.2.0 — Full Skill Diet & Bounded Evidence`, following the unpublished 9.1.2 pre-diet baseline and the latest published release, `v9.1.1`. The `v9.2.0` tag is local unless explicitly pushed; this cut is not installed or deployed.
 
 `7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 skill bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
 
@@ -262,6 +262,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.1.0 | Canonical quality, harness hardening & skill consolidation | Consolidates the canonical surface from 71 to 66 skills, hardens schema-v2 hook evidence and the observe-default Recovery Guard, adds planning determinism and token-cost controls, and aligns the release identity after `v9.0.2`. Claude-specific standalone compatibility follow-up is deferred to 9.1.1. |
 | 9.1.1 | Patch safety & evidence hardening | Makes dev routing metadata host-neutral, moves hook evidence to durable per-run ledgers, fails C/C++ reports closed without semantic structure evidence, caps and stages long-term packages, removes the Kanboard pytest-absence SKIP, and reports Recovery Guard/output-gate modes independently. Compatibility changes are called out in `CHANGELOG.md`. |
 | 9.1.2 | Design governance & pre-diet baseline | Hardens product-family rule discovery, approved component reuse, UX decision handling, and separate target/family visual evidence lanes. Freezes the strengthened 66-skill source surface and measured instruction size before 9.2.0 skill-diet work; this is an unpublished, non-deployed comparison baseline rather than a release. |
+| 9.2.0 | Full skill diet & bounded evidence | Reduces all 66 canonical skill bodies from 49,513 to 39,820 words (-19.58%) and resolves 38 merge/delete candidates as 32 merges plus 6 deletions, without moving detail into references. Preserves fail-closed design and adapter ownership corrections while keeping quality claims scoped to the checks and forward evidence that actually ran. Harness protocol 9.2.0 (historical) and 9.2.1 (current opt-in) remain independent of this bundle version. |
 
 ## License
 

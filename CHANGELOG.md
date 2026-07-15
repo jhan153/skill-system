@@ -1,5 +1,15 @@
 # Changelog
 
+## 9.2.0
+
+- Local release cut for the completed instruction-surface diet. The release commit is tagged `v9.2.0` locally; neither the tag nor the bundle is pushed, installed, or deployed by this cut.
+- Reduced all 66 canonical skill bodies from 49,513 whitespace-delimited words to 39,820 (-9,693, -19.58%) and from 372,882 UTF-8 bytes to 310,450 (-62,432, -16.74%). These measurements exclude YAML frontmatter and are instruction-surface measurements, not billed-token estimates.
+- Resolved all 38 T9 merge/delete candidates as 32 merges and 6 deletions, with zero reference moves and zero retained-unverified dispositions. The broader owned inventory, including existing references, moved from 132,280 to 122,482 words and from 1,196,415 to 1,133,065 bytes.
+- Kept `design-frontend` implicit activation bounded to applicable product-interface work, and restored the repository adapter handoff boundary so translation does not absorb source, policy, or fallback ownership.
+- Kept quality claims bounded: generated-target agreement, release/core checks, and the recorded forward comparisons prove only their covered contracts, not universal equivalence for every skill or user task.
+- Preserved harness protocol identity independently from bundle identity. Harness 9.2.0 remains the prior evaluated candidate, while harness 9.2.1 remains the current opt-in verifier-authority candidate; this bundle release does not relabel either protocol.
+- Advanced the active canonical plugin/eval/runtime identity to 9.2.0. Historical 9.1.1 release evidence, the unpublished 9.1.2 pre-diet baseline, and harness-version fixtures retain their original identities.
+
 ## 9.1.2
 
 - Unpublished, non-deployed source baseline for the 9.2.0 instruction-surface diet. The latest published release and release tag remain `v9.1.1`; this cut is not installed, deployed, pushed, or tagged as `v9.1.2`.

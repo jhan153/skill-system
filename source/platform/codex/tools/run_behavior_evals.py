@@ -546,7 +546,7 @@ def main() -> int:
     parser.add_argument("--eval-path", type=Path, default=Path(".codex/eval"))
     parser.add_argument("--eval-schema", type=Path)
     parser.add_argument("--observed-runs", type=Path, default=Path(".codex/eval/observed-runs"))
-    parser.add_argument("--bundle-version", default="9.1.2")
+    parser.add_argument("--bundle-version", default="9.2.0")
     parser.add_argument("--required-model")
     parser.add_argument("--require-all-cases", action="store_true")
     parser.add_argument("--not-before", help="reject evidence recorded before this ISO datetime")

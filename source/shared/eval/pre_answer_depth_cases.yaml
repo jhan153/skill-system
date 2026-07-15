@@ -1,4 +1,4 @@
-version: "9.1.2"
+version: "9.2.0"
 purpose: "Verify concise output depth with a mapped router owner and without any router, while keeping trivial work direct."
 cases:
   - case_id: runtime-pre-answer-depth-router-001

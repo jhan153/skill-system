@@ -1,12 +1,20 @@
 # Skill Quality Audit
 
-Date: 2026-07-12
-Bundle: 9.1.2 (unpublished source baseline)
+Date: 2026-07-15
+Bundle: 9.2.0 (local release cut)
 Scope: the 66 current canonical `source/skills/*/SKILL.md` packages.
 
-This is a maintenance record, not routing context. Do not load it during normal skill selection. App-managed system skills and seven pre-commit skills already removed by consolidation are outside scope. The 9.1.2 source baseline revalidated the strengthened design cluster and the active identity surface; unchanged evidence-complete decisions were retained rather than rewritten. Historical 9.1.1 release-forward evidence remains labeled 9.1.1 and is not evidence of a 9.1.2 release.
+This is a maintenance record, not routing context. Do not load it during normal skill selection. App-managed system skills and seven pre-commit skills already removed by consolidation are outside scope. Historical 9.1.1 release-forward evidence and the unpublished 9.1.2 pre-diet baseline retain their original labels; neither is relabeled as 9.2.0 evidence.
 
-## 9.1.2 Pre-Diet Measurements
+## 9.2.0 Skill Diet Result
+
+All 66 canonical skill bodies were reduced from 49,513 to 39,820 whitespace-delimited words (-9,693, -19.58%) and from 372,882 to 310,450 UTF-8 bytes (-62,432, -16.74%), excluding YAML frontmatter. The wider owned inventory, including existing references, fell from 132,280 to 122,482 words and from 1,196,415 to 1,133,065 bytes.
+
+The T9 disposition pass resolved 38 merge/delete candidates as 32 merges and 6 deletions. No candidate was counted as reduced by moving text into a reference, and none remained `retained-unverified`. Generated-target agreement, core validation, focused behavior evidence, and recorded reviewer receipts remain scoped evidence: they do not establish universal output equivalence for every skill or unseen task.
+
+The campaign figures use the frozen Git-object baseline at `7484956`. The earlier 9.1.2 audit measurement below predates the subsequent `analysis-router` depth-boundary clarification, so its 49,502-word/372,785-byte body total is retained as historical audit data rather than silently rewritten.
+
+## 9.1.2 Pre-Diet Baseline
 
 The 66 canonical `source/skills/*/SKILL.md` files are frozen for later 9.2.0 before/after comparison at:
 
@@ -34,7 +42,9 @@ Each current skill was checked for:
 
 `revised` means the current pass changed semantic instructions, runtime contracts, or context/output cost. `prior + revalidated` means an earlier evidence-complete revision was retained and included in focused/core validation through the 9.1.2 source baseline. `retained` means the file was read and no semantic change was justified; metadata may still have been corrected.
 
-## Per-Skill Decisions
+## Pre-Diet Per-Skill Decisions
+
+The table below preserves the 9.1.2 ownership and behavior audit. The 9.2.0 size and merge/delete dispositions are recorded separately above and in the skill-diet protocol artifacts; this table is not retroactively rewritten into per-skill semantic-equivalence proof.
 
 ### Analysis
 
