@@ -1,98 +1,68 @@
 ---
 name: report-diff
-description: Present verified changed lines in intent-grouped diff blocks with short Korean summaries. Use only when the user explicitly wants changed-lines-only, readable diff, or before/after presentation; this skill does not provide review or root-cause judgment.
+description: Present verified changed lines in intent-grouped diff blocks with concise Korean summaries. Use only for explicit changed-lines, readable-diff, or before/after requests; do not use for review or diagnosis.
 ---
 
 # Report Diff
 
 ## Routing Card
 - role: output_modifier
-- intent_signature:
-  - `diff 요약`, `readable-diff`, `바뀐부분만`, changed-lines-only, before/after comparison
-- use_when:
-  - the user explicitly wants readable changed-line presentation or grouped before/after comparison.
+- intent_signature: `diff 요약`, `readable-diff`, `바뀐부분만`, changed-lines-only, before/after
+- use_when: the user explicitly requests readable changed lines or grouped before/after presentation
 - do_not_use_when:
-  - the user wants root-cause analysis, architecture explanation, ordinary review verdicts, or full raw patches.
-- expected_inputs:
-  - verified diff, changed file list, or before/after snapshots
-- expected_outputs:
-  - grouped changed-lines-only diff blocks with concise Korean summaries
+  - Root cause belongs to `analysis-bug`; blocker-first QA/release verdicts belong to `report-critical`.
+  - Implementation belongs to `workflow-implementation`; changed-file/validation-command inventories belong to `coordination-handoff`.
+  - Full raw or machine-readable patches stay on the normal diff/tool path.
+- expected_inputs: verified diff or verified snapshots; current snapshot only for explicitly unverified presentation
+- expected_outputs: intent-grouped changed-line blocks, source labels, concise Korean summaries, and calibrated evidence notes
 - context_targets:
   must_read:
-    - verified diff or snapshot baseline
+    - supplied diff/baseline and requested presentation scope
   read_if_needed:
-    - changed file list
-    - up to two context lines when changed lines are unreadable
+    - changed-file list, symbol label, or at most two context lines
   do_not_load_by_default:
-    - full repo
-    - full memory bank
-    - unrelated source files
+    - full repository, memory, unrelated source, generated mirrors, or unrelated logs
 - risk_profile:
-  reads:
-    - diff and narrow snapshots only
-  writes:
-    - none
-  tools:
-    - safe diff/status commands only
-  sensitive_resources:
-    - credentials default deny
-- entry_scene:
-  - FINALIZE
+  reads: verified diff and narrow snapshots
+  writes: none
+  tools: safe diff/status commands only
+  sensitive_resources: deny credentials
+- entry_scene: FINALIZE
 
-## Operating Rules
-- Apply only to explicit diff-presentation intent; this modifier never supplies review, diagnosis, or implementation judgment.
-- Use real `git diff`, `diff`, or verified snapshots as the baseline. Never infer removed lines from current content.
-- Group by change intent rather than raw file order. Keep one intent per unit and identify each file or symbol.
-- Show only `+`/`-` lines by default. Add at most two unchanged context lines only when a signature, terse config, or long one-line change is otherwise unreadable.
-- Preserve exact changed lines. Explain field-level meaning below a long line instead of reformatting it as if the reformatted text were the diff.
+## Baseline And Modes
 
-## Modes
-- `VerifiedDiff`: a real diff or verified before/after pair exists; additions and removals may be shown.
-- `ContextAssist`: the verified change needs at most two context lines or a symbol label.
-- `UnverifiedSnapshot`: no baseline exists; mark the unit `Unverified`, show confirmed current lines only, and never invent removals.
+Use real `git diff`, `diff`, or an authoritative before/after pair. Never infer prior or removed text from current content.
 
-If the user asked for a full raw or machine-readable patch, return that request to the normal diff/tool path instead of applying this readability format.
+- `VerifiedDiff`: additions and removals are verified.
+- `ContextAssist`: a verified unit needs a symbol or at most two unchanged lines.
+- `UnverifiedSnapshot`: no baseline exists; label it `Unverified`, show current lines separately—not as verified additions—show no removals, and mark any effect `not_established`.
+
+If verified changes are required from an unverified snapshot, request the missing baseline. A readable-diff request is itself structural: exact verified lines can satisfy it without runtime evidence.
+
+## Evidence And Meaning
+
+Keep three layers distinct in every summary:
+
+1. `change_fact`: exact added, removed, renamed, moved, generated, binary, or formatting evidence;
+2. `intent`: user/source-stated intent, or explicitly labeled inference;
+3. `observed_effect`: only a condition directly established by an authoritative oracle plus scope-matched actual-path/readback evidence.
+
+A diff alone proves textual change, not correctness, fix completion, release readiness, or user success. When an authoritative oracle and actual-path/readback directly match, the modifier may state that exact `observed_effect` with semantic scope. This is an evidence-linked fact, not a correctness/release verdict or claim on unobserved scope.
+
+Agent-authored tests may preserve an established oracle but cannot invent independent semantic authority. State that mocks prove only their boundary and name the missing real path. A generated-target diff does not prove canonical behavior; identify canonical-source drift and request canonical inspection/regeneration. Preserve conflicting `fail`, `needs_review`, unverified, or blocked status despite narrower passes.
+
+Label rename/move-only and whitespace-only changes without implying behavior change. Collapse generated, lock, vendored, and binary changes to file-level facts unless raw lines were requested.
 
 ## Workflow
-1. Establish the baseline and select a mode.
-2. Exclude unchanged material and identify effective additions, removals, renames/moves, binaries, and generated/vendor churn.
-3. Group remaining lines by logical intent; split unrelated edits in one file and combine same-intent edits across files.
-4. Order units by behavior/API, schema/config, refactor/rename, tests, then docs/comments unless user priority differs.
-5. Render each unit with its label, fenced `diff` block, and one short Korean explanation of effect or purpose.
-6. End with at most three bullets only when a cross-unit summary adds value.
 
-## Output Contract
-Start with a one-line conclusion, then for each unit emit:
+1. Select the baseline/mode and exclude unchanged material.
+2. Identify effective changes and evidence scope; split mixed intent and combine same-intent edits across files.
+3. Order behavior/API, schema/config, refactor/rename, tests, then docs/comments unless user priority differs.
+4. Preserve exact `+`/`-` lines. Add minimal context only when necessary; explain long-line fields below the block instead of rewriting the diff.
+5. Render each unit with intent title, path/symbol, fenced `diff` block, one Korean summary, and any required evidence limitation.
 
-1. numbered intent title;
-2. file path or symbol label;
-3. one or more fenced `diff` blocks containing verified changed lines;
-4. one short Korean summary directly after the unit.
+## Output And Validation
 
-When there is no effective change, say so and emit no fabricated diff block. If a review skill is also active, show its findings/verdict first unless the user explicitly asked for diff only.
+Start with one conclusion. Emit only needed units and at most three cross-unit bullets. If review is separately active, put its verdict first unless the user requested diff only.
 
-## Special Cases
-- Rename/move only: label `이름변경만` or `이동만`; do not imply behavior change.
-- Whitespace only: label `공백/정렬만 변경`.
-- Generated, lock, or vendored file: collapse to a file-level summary unless raw lines were requested.
-- Binary file: report the file-level change; never fabricate line content.
-- Mixed intent: split into separate units even when edits share a file.
-- Missing baseline: use `UnverifiedSnapshot`; do not guess prior text.
-
-## Recovery and Boundaries
-- If a changed line is unclear, read only its symbol label or up to two context lines.
-- If the user asks for verdict, root cause, or architecture meaning, hand back to the owning review/analysis skill; use this only for the optional diff layer.
-- Read only the verified diff and minimal labels. Do not expand to the full repo or unrelated files.
-- Write no files and perform no destructive, network, or credential operations.
-
-## Validation
-- Confirm every displayed addition/removal exists in the baseline evidence.
-- Confirm `Unverified` units contain no invented removed lines.
-- Confirm each unit has one intent, a source label, and a concise summary.
-- Confirm moves, formatting, generated files, and binaries are not overstated as behavior changes.
-- Confirm the response stays changed-lines-first rather than becoming a prose review or full-file dump.
-
-## Known Limits
-- Without a verified baseline, only current lines can be shown.
-- Generated, lock, vendored, and binary changes may support only file-level summaries.
-- This modifier cannot establish correctness or explain root cause.
+Before returning, confirm that every displayed addition/removal exists in the baseline, unverified snapshots invent none, each unit has one intent/source label, special cases are not overstated, and the response remains changed-lines-first. When there is no effective change, say so and emit no fabricated block.
