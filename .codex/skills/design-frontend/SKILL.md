@@ -176,8 +176,3 @@ Lead with status, then report only applicable items:
 - `ux_decisions`: critical task, selected control/pattern, rejected alternatives, required recovery states
 - `validation`: commands/results, preview target, screenshot paths, exact viewports, comparison notes
 - `remaining_gaps`: substitutions, inferred measurements, unavailable states/evidence, and user checks
-
-## Known Limits
-- Flat screenshots do not reveal every interaction, breakpoint, or semantic requirement.
-- Visual evidence does not prove backend data correctness or complete accessibility.
-- Exact fidelity may remain user-verification-needed when source assets, fonts, private states, or device behavior are unavailable.
