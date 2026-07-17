@@ -1,6 +1,6 @@
 # Loop Governance Contract
 
-Use this reference when a loop contract must cover reliability, safety, runtime, Wiki Bank, metrics, and anti-failure controls beyond ordinary success conditions.
+Use this reference when a loop contract must cover reliability, safety, runtime, metrics, and anti-failure controls beyond ordinary success conditions.
 
 Apply only rows triggered by the target loop. Keep `contract_id` and every `SC-NNN` aligned with the runtime contract; `loop_run_id` is added by the runner.
 
@@ -10,11 +10,10 @@ Apply only rows triggered by the target loop. Keep `contract_id` and every `SC-N
 | --- | --- | --- |
 | Stop-hook loop evaluation | `finalization.stop_hook_expectation` and `finalization.loop_stop_packet_required` | Mark runtime gate `unverified`; do not claim hook-level loop evaluation. |
 | Progress metric/heuristic | `progress.accepted_progress_signals` and `progress.rejected_progress_signals` | Mark `contract_needed`; runner cannot distinguish progress from activity. |
-| Wiki Bank connection | `knowledge_feedback.policy`, `candidate_packet`, and `maintenance_handoff` | Do not mutate Wiki Bank; emit no accepted knowledge claim. |
 | Trusted termination | `termination_evidence.required_before_success` | Success cannot be claimed. |
 | Durable execution | `durability.checkpoint_schema` and `resume_policy` | Treat durable/resume support as `unverified`. |
 | Event-driven runtime | `runtime_trigger.support_level` | Do not claim scheduled, webhook, queue, or event runtime exists. |
-| Improvement loop | `knowledge_feedback.candidate_packet` and `metrics.improvement` | Do not promote lessons or maturity changes. |
+| Persistent context mutation | explicit Memory/Knowledge owner and approval | Keep observations in the loop checkpoint only. |
 | Loop-improvement metric | `metrics.improvement` | Improvement claims remain `unverified`. |
 | Safety metric | `metrics.safety` | Unsafe boundary cannot be monitored. |
 | Verifier metric | `metrics.verifier` | Verifier health/coverage cannot be evaluated. |
@@ -74,19 +73,12 @@ governance:
       - side_effect_journal
       - admitted_observations
       - ignored_untrusted_instructions
-      - knowledge_feedback_candidates
     resume_policy: "Resume only from the latest checkpoint with matching contract_id, loop_run_id, and verifier map."
 
   runtime_trigger:
     support_level: manual|automation|webhook|queue|cron|unsupported
     external_runtime_required: false
     trigger_source:
-
-  knowledge_feedback:
-    policy: "Loop output may produce Wiki Bank feedback candidates, never accepted knowledge."
-    candidate_packet:
-    maintenance_handoff: knowledge-base-maintenance
-    context_pack_refresh: knowledge-context-harness
 
   metrics:
     improvement: []
@@ -151,6 +143,6 @@ governance:
 - `unverified`: the contract names the capability but no current evidence exists.
 - `unsupported`: the current skill/runtime layer does not provide this capability.
 
-Do not mark event-driven runtime, durable execution, Wiki mutation, or Stop-hook loop evaluation as `agent-verified` unless current run evidence proves it.
+Do not mark event-driven runtime, durable execution, persistent context mutation, or Stop-hook loop evaluation as `agent-verified` unless current run evidence proves it.
 
 `user-verification-needed` is never a success substitute. Local v2 keeps manual event evidence non-passing because actor provenance is not host-authenticated.

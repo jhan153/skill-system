@@ -141,7 +141,7 @@ entries:
     class: codex-only
     generation: codex-native
     confidence: confirmed
-    notes: "Codex hook config; the Claude equivalent is settings.json hook entries, not a mirrored file."
+    notes: "Empty default Codex hook config. The adapter remains packaged as an explicit opt-in diagnostic asset; the Claude equivalent is opt-in settings.json entries."
 
   - path: "tools/hook_runtime.py"
     present_in: [codex]
@@ -184,7 +184,7 @@ entries:
 # Default bucket is codex-only until policy approves neutralization, because
 # making these shared-neutral materially changes what the Claude runtime is.
 # ---------------------------------------------------------------------------
-  - path: "tools/ loop engine: init_loop_run.py, activate_loop_run.py, resume_loop_run.py, deactivate_loop_run.py, evaluate_loop_run.py, loop_policy.py, emit_loop_feedback.py"
+  - path: "tools/ loop engine: init_loop_run.py, activate_loop_run.py, resume_loop_run.py, deactivate_loop_run.py, evaluate_loop_run.py, loop_policy.py"
     present_in: [codex]
     class: codex-only
     generation: codex-native
@@ -192,15 +192,6 @@ entries:
     gap: missing-in-claude
     phase_1b_decision: "codex-only for v1."
     decision_rationale: "Moving the loop engine would materially expand the Claude runtime. Keep Codex as the primary loop runtime until there is explicit Claude-side runtime demand and validation."
-
-  - path: "tools/ knowledge engine: knowledge_policy.py, build_context_pack.py"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: provisional
-    gap: missing-in-claude
-    phase_1b_decision: "codex-only for v1."
-    decision_rationale: "Knowledge runtime tools are executable runtime logic. Do not silently grow the Claude runtime before there is a Claude-side usage contract."
 
   - path: "tools/task_ledger.py"
     present_in: [codex]
@@ -264,21 +255,21 @@ entries:
     class: maintainer-only
     generation: tooling
     confidence: confirmed
-    notes: "bundle gate; profiles core/integrations/execution/research/agent-output/knowledge/loop."
+    notes: "bundle gate; profiles core/integrations/execution/research/agent-output/loop."
 
   - path: "tools/validate_*.py"
     present_in: [codex]
     class: maintainer-only
     generation: tooling
     confidence: confirmed
-    notes: "validate_agent_run_artifact, _eval_cases, _field_feedback, _knowledge_store, _loop_run, _research_ledger, _source_registry, _task_run, _work_item (9)."
+    notes: "validate_agent_run_artifact, _eval_cases, _loop_run, _research_ledger, _source_registry, _task_run, _work_item (7)."
 
   - path: "tools/check_*.py"
     present_in: [codex]
     class: maintainer-only
     generation: tooling
     confidence: confirmed
-    notes: "check_doc_freshness, _evidence_ledger, _execution_assurance, _invocation_surface_policy, _memory_explicit_contract, _reference_targets, _tool_requirements, _work_horizon_policy (8)."
+    notes: "check_doc_freshness, _evidence_ledger, _execution_assurance, _invocation_surface_policy, _reference_targets, _release_identity, _tool_requirements, _work_horizon_policy (8)."
 
   - path: "tools/run_*.py"
     present_in: [codex]
@@ -287,7 +278,7 @@ entries:
     confidence: confirmed
     notes: "run_behavior_evals, run_validator_unit_tests, run_verification_pipeline (3)."
 
-  - path: "tools/ analysis+report: analyze_context_surface.py, analyze_harness_measurement.py, generate_field_feedback_report.py, _validation.py"
+  - path: "tools/ analysis+report: analyze_context_surface.py, analyze_harness_measurement.py, _validation.py"
     present_in: [codex]
     class: maintainer-only
     generation: tooling
@@ -313,13 +304,6 @@ entries:
     generation: tooling
     confidence: confirmed
     notes: "agent-run replay fixtures for run_behavior_evals; present in BOTH targets (verified: diff -qr eval shows no dir-presence diff)."
-
-  - path: "field-feedback/ (FF-*.yaml, field-feedback.schema.json, gate.yaml)"
-    present_in: [codex]
-    class: maintainer-only
-    generation: tooling
-    confidence: confirmed
-    notes: "bundle self-improvement telemetry; not end-user runtime."
 
 # ---------------------------------------------------------------------------
 # local-only / ignored
@@ -360,5 +344,5 @@ phase_scope:
       - "tools/notify_desktop.py -> platform-native (NOT shared/drift): legitimate per-platform divergence incl. a notify_linux signature difference"
       - "harness/README.md -> codex-only (NOT shared): documents .codex/harness/ paths; Claude has its own hooks/README.md"
     decisions_recorded_codex_only_for_v1:
-      - "loop engine tools, knowledge engine tools, task_ledger.py, init_agent_run.py, research/ ledger+schema, tools/requirements.txt, rules/default.rules"
-    review_record: "Phase 1b claude diff = + .claude/schemas/ (24 files) only. Verified: .codex byte-identical (no regression), .claude/schemas has 0 .codex refs, verify_bundle core/knowledge/loop PASS. Post-cutover the gate (live==source) replaces a separate allowlist file; the reviewable diff is git-visible (+ .claude/schemas)."
+      - "loop engine tools, task_ledger.py, init_agent_run.py, research/ ledger+schema, tools/requirements.txt, rules/default.rules"
+    review_record: "Phase 1b claude diff = + .claude/schemas/ (24 files) only. Verified at that cut: .codex byte-identical, .claude/schemas had no .codex refs, and core/loop profiles passed. Post-cutover the gate (live==source) replaces a separate allowlist file."

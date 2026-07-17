@@ -130,7 +130,7 @@ python3 .codex/tools/run_verification_pipeline.py --profiles core execution agen
 ```
 
 ## Live Codex Hook Wiring
-`.codex/hooks.json` wires `UserPromptSubmit`, `SessionStart`, `PreToolUse`, `PermissionRequest`, `PostToolUse`, `Stop`, `PreCompact`, and `PostCompact` to `.codex/hooks/codex_hook_adapter.py`.
+The default `.codex/hooks.json` contains no hook commands. If a user explicitly enables diagnostics, supported lifecycle events may be wired to `.codex/hooks/codex_hook_adapter.py`; Claude requires an equivalent explicit `settings.json` configuration.
 
 The adapter records hook events to an explicit `--ledger` first. Otherwise, when Codex provides `session_id` and `turn_id` and the current run manifest already exists, it writes to `.codex/harness/agent-runs/<session-id>/<turn-id>/hook-events.jsonl`. `SKILL_SYSTEM_HOOK_LEDGER`, when set, remains an exact-file override for events without that manifest-bound path. If neither path applies, the default notification-only path writes to `${CODEX_HOME:-~/.codex}/harness/hook-ledgers/<run-key>/hook-events.jsonl`, where `<run-key>` is a stable SHA-256 of the run/session-turn identity. This keeps runtime state outside release packages, hides the raw identity from the path, and keeps one `run_id` per verifier input. The former global temp path is no longer selected implicitly, and existing legacy files are not migrated automatically.
 
@@ -167,4 +167,4 @@ Codex still requires project trust and hook trust before these project-local hoo
 
 The `7.3.1` RC2 hook behavior is the historical compatibility baseline. Current live-hook limits are documented rather than expanded into a broader Stop-hook project: hooks only run after project trust, missing current-run manifests are `skip` in notification-only mode and `UNVERIFIED`/`warn` only when validation is explicitly requested, and permission events may be approximate when Codex does not provide a `tool_use_id`.
 
-The 8.0 branch policy is to preserve the external compatibility interface while moving the internal operating layer to `8.0.0 — Context Compounding / Wiki Bank Architecture`. Run Trace Integrity remains the execution evidence gate that supports the 8.0 Knowledge Store and Context Pack layers.
+Historical Agent Run Context Pack linkage remains an execution-artifact compatibility surface only. It is not the project Knowledge Base, an LLM Wiki, or a default context-loading path.

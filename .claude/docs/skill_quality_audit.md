@@ -2,7 +2,7 @@
 
 Date: 2026-07-15
 Bundle: 9.2.0 (local release cut)
-Scope: the 66 current canonical `source/skills/*/SKILL.md` packages.
+Scope: the 66 canonical `source/skills/*/SKILL.md` packages in the 9.2.0 cut.
 
 This is a maintenance record, not routing context. Do not load it during normal skill selection. App-managed system skills and seven pre-commit skills already removed by consolidation are outside scope. Historical 9.1.1 release-forward evidence and the unpublished 9.1.2 pre-diet baseline retain their original labels; neither is relabeled as 9.2.0 evidence.
 
@@ -76,12 +76,17 @@ The table below preserves the 9.1.2 ownership and behavior audit. The 9.2.0 size
 
 | skill | decision | audit result |
 | --- | --- | --- |
-| `evaluation-harness` | prior + revalidated | Case-quality review remains separate from usage telemetry and release verdicts. |
-| `evaluation-usage-tracker` | revised | Sanitized metadata, denominators, no-data behavior, and non-causal count interpretation are explicit. |
+| `evaluation-harness` | prior + revalidated | Case-quality review remains separate from field quality and release verdicts. |
 | `kanboard-plan-ops` | retained | Existing-board push/pull/validation ownership remains distinct; metadata was shortened. |
 | `kanboard-plan-rollout` | retained | Onboarding/bulk-sync ownership remains distinct; metadata was shortened. |
-| `knowledge-base-maintenance` | revised | Per-item decisions and post-write projection/store validation are required. |
-| `knowledge-context-harness` | revised | Live task store replaces test fixtures; exact CLI inputs, actual mode, no-hit behavior, and measured pack size are explicit. |
+| `knowledge-base-init` | added | Explicitly creates only a minimal Markdown store and its project-context manifest entry. |
+| `knowledge-base-read` | added | Reads an index-first, artifact-anchored slice and prefers matching local rules over generic patterns. |
+| `knowledge-base-update` | added | Updates, supersedes, deprecates, or relinks existing records without crossing into Memory or Wiki mutation. |
+| `knowledge-base-maintenance` | revised | Maintains generic Markdown records and direct artifact links without claim graphs, projections, or scores. |
+| `knowledge-plan-sync` | added | Admits only accepted durable plan decisions, never the whole plan or implementation chronology. |
+| `knowledge-*-record` | added | Five explicit domain, design, algorithm, architecture, and recurring code-review owners share one small record envelope. |
+| `llm-wiki-context` | added | Uses one explicitly selected Wiki's own navigation method and returns a minimum read-only task context. |
+| `project-context-checkpoint` | added | Classifies clear current-task durable items at explicit commit/closeout boundaries; Stop hooks and implicit collection are excluded. |
 
 ### Loop And Memory
 
@@ -89,12 +94,11 @@ The table below preserves the 9.1.2 ownership and behavior audit. The 9.2.0 size
 | --- | --- | --- |
 | `loop-readiness-router` | prior + revalidated | One-shot/checkpoint/LoopRun readiness remains a routing decision, not an executor. |
 | `loop-verifier-registry` | prior + revalidated | Verifier mapping remains fail-closed and cannot self-pass from artifact presence. |
-| `memory-bank-correction-capture` | revised | Only recurring project mistakes are captured; stored goal/rule correction routes to update. |
-| `memory-bank-harness` | revised | Global guides became conditional; inline/no-write default and measured context size are explicit. |
-| `memory-bank-ingestion` | revised | Approved packets map all candidates to canonical entities through one all-or-no-write transaction. |
-| `memory-bank-init` | revised | Fresh init is atomic; reinitialization cannot silently destroy accepted history. |
-| `memory-bank-maintenance` | revised | Read-only modes and write-producing mistake consolidation are separated. |
-| `memory-bank-update` | revised | Goal/rule mutation uses stable operation IDs, replay, and cross-file post-validation. |
+| `memory-bank-correction-capture` | revised | Only explicitly persistent project mistakes enter as unverified candidates; complaints alone authorize no write. |
+| `memory-bank-harness` | revised | Reads only the manifest-declared bank and a small task-relevant slice of compact current state. |
+| `memory-bank-init` | revised | Fresh init creates the four-file bank and updates only the manifest's Memory path. |
+| `memory-bank-maintenance` | revised | Report, validation, conflict, consolidation, and compact-current modes use no maturity/confidence scores. |
+| `memory-bank-update` | revised | Cross-session goals, rules, and proven practices use one append-only event plus current/archive/meta reflection. |
 
 ### Planning And Reporting
 
@@ -149,7 +153,7 @@ The table below preserves the 9.1.2 ownership and behavior audit. The 9.2.0 size
 
 ## Remaining Field Risks
 
-- Static and replay tests cannot establish every model-output improvement; real forward runs remain the maturity signal.
+- Static and replay tests cannot establish field quality. Only problems or outcomes the user explicitly reports can inform later field-driven changes; this bundle does not collect them automatically.
 - Memory Bank writers now share a transaction contract, but a dedicated executable Memory Bank transaction/validator runtime is still a future hardening opportunity.
 - Research/search evidence schemas now resist confirmation-only convergence; legacy external ledgers require migration to schema v2.
 - Context surface measurements are advisory characters/words/heuristics, not billed-token telemetry.

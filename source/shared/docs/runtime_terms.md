@@ -24,13 +24,17 @@ Runtime configuration and automation assets, including `.codex/config.toml` and 
 
 Review `.codex/rules/default.rules` against local policy before copying it.
 
+The default Codex hook map is empty. Optional hook adapters require explicit project/runtime enablement.
+
+## project context manifest
+
+The nearest `project-context.yaml` declares repository-relative locations for optional Memory Bank, Knowledge Base, plans, skill roots, and named LLM Wikis. Missing entries are unavailable and do not trigger home or adjacent-repository discovery.
+
+Memory Bank stores cross-session goals, rules, recurring mistakes, and proven practices. Knowledge Base stores accepted project knowledge linked to real code or design artifacts. An LLM Wiki is a separately named read-only context source selected explicitly and navigated through its own conventions.
+
 ## app-managed system skills
 
 `.codex/skills/.system` is app-managed. Optional snapshots belong under `optional-system-skills-snapshot/` and require explicit user intent before replacing an existing runtime `.system` folder.
-
-## skill maturity
-
-Maturity is a conservative use-readiness label. Allowed values are `skeleton`, `usable`, `field_tuned`, `experimental`, and `deprecated`.
 
 ## improvement track
 
@@ -38,11 +42,11 @@ Improvement track is the next specific work needed to improve a skill. It is not
 
 ## runtime usage eval
 
-Runtime usage eval cases are examples for observing skill behavior in real use and collecting improvement evidence.
+Runtime usage eval cases are authored regression examples. They can check their declared syntax and routing contract, but they are not field-quality evidence.
 
 ## field feedback
 
-Field feedback is real-use observation collected for future skill text, routing, maturity, or eval updates.
+Field feedback means only a behavior or problem the user explicitly reports in conversation. The bundle does not automatically collect or persist prompts, transcripts, usage, or user identifiers.
 
 ## WorkItem lifecycle
 
@@ -56,7 +60,7 @@ Work horizon is the 8.5.1 model for choosing between direct one-shot work, task/
 
 ## Core Runtime Scope
 
-The core runtime scope keeps skills, routing docs, maturity docs, usage cases, feedback guidance, source registry, generated mirror checks, and small sanity checkers.
+The core runtime scope keeps skills, routing docs, usage cases, source registry, generated mirror checks, and small sanity checkers.
 
 Host-managed assets include runtime config such as `.codex/config.toml`, automations, deployment/signoff workflows, rollback operations, app-managed system skills, and local third-party runtimes.
 

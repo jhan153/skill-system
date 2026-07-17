@@ -32,7 +32,12 @@ EVIDENCE_GATE_ROLES = {
     "review_gate",
 }
 NON_OWNER_SURFACES = {"selective_router", "evidence_gate", "support_only"}
-IMPLICIT_EXECUTION_SKILLS = {"design-frontend"}
+IMPLICIT_SKILL_SURFACES = {
+    "design-frontend": "explicit_procedure",
+    "knowledge-base-read": "support_only",
+    "memory-bank-harness": "support_only",
+    "project-context-checkpoint": "explicit_procedure",
+}
 POLICY_COMPARE_KEYS = {
     "invocation_surface",
     "allow_implicit_invocation",
@@ -103,15 +108,11 @@ def validate_skill(skill_dir: Path, root: Path) -> list[str]:
     allow_implicit = policy.get("allow_implicit_invocation")
     if not isinstance(allow_implicit, bool):
         errors.append(f"{label}: allow_implicit_invocation must be boolean")
-    implicit_execution_allowed = (
-        skill_dir.name in IMPLICIT_EXECUTION_SKILLS
-        and role == "primary"
-        and surface == "explicit_procedure"
-    )
-    if allow_implicit is True and surface != "selective_router" and not implicit_execution_allowed:
+    narrow_implicit_allowed = IMPLICIT_SKILL_SURFACES.get(skill_dir.name) == surface
+    if allow_implicit is True and surface != "selective_router" and not narrow_implicit_allowed:
         errors.append(
             f"{label}: implicit invocation is only allowed for selective_router "
-            "or an approved execution skill"
+            "or an approved narrow skill surface"
         )
     if surface in NON_OWNER_SURFACES and not false_value(policy, "may_own_execution"):
         errors.append(f"{label}: {surface} must set may_own_execution: false")

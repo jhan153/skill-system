@@ -1,8 +1,10 @@
 # Harness Lifecycle Hooks
 
-This document defines the host-neutral lifecycle contract for 7.3.1 execution assurance.
+This document defines the host-neutral contract for the bundle's optional lifecycle diagnostics.
 
 Hooks are evidence and control surfaces. They do not replace `.codex/rules`, sandboxing, approval policy, or host permissions.
+
+The default Codex `hooks.json` is empty, and the Claude adapter is not auto-installed. The mappings below apply only after the user explicitly enables a diagnostic hook profile in live or project runtime configuration.
 
 ## Neutral Events
 
@@ -72,11 +74,11 @@ tool_result
 
 Codex `PermissionRequest` can be turn-scoped and may not include `tool_use_id`; record that case with `support_level: approximate`. Multiple tool calls can repeat this sequence before a passing `turn_finalize`. A passing `turn_finalize` event must not arrive while a tool call is still missing its `tool_result`, and the ledger end must not leave a started tool unfinished.
 
-Each `Stop` call records one lifecycle outcome. A validated terminal observation records one `turn_finalize`; failed, skipped, unverified, strict-blocked, Recovery Guard audit/handoff, and blocking LoopRun-continuation checks record one `turn_finalize_attempt`. Attempts preserve evidence without making later repair calls invalid, and the live hook continues by default unless an explicit bounded gate blocks.
+When the optional adapter is enabled, each `Stop` call records one lifecycle outcome. A validated terminal observation records one `turn_finalize`; failed, skipped, unverified, strict-blocked, Recovery Guard audit/handoff, and blocking LoopRun-continuation checks record one `turn_finalize_attempt`. Attempts preserve evidence without making later repair calls invalid, and the live hook continues by default unless an explicit bounded gate blocks.
 
 ### Context-pressure Recovery Guard
 
-The Codex adapter maintains an out-of-band, session-scoped reducer in default `observe` mode. It stores only counters, booleans, signal codes, and event hashes. `PostCompact`, six user turns, twenty tool preflights, or two correction episodes arm the reducer, but arming never blocks by itself. A soft audit is eligible only when an armed session has a pending explicit correction, the Stop message combines an apology/agreement opener with a rhetoric-only operational promise, contains no substantive result, and no changed-file or validation progress receipt followed the correction. Concrete direct conclusions count as substantive; an explicit Korean or English instruction to stop cancels the pending correction episode.
+When explicitly wired, the Codex adapter maintains an out-of-band, session-scoped reducer in `observe` mode. It stores only counters, booleans, signal codes, and event hashes. `PostCompact`, six user turns, twenty tool preflights, or two correction episodes arm the reducer, but arming never blocks by itself. A soft audit is eligible only when an armed session has a pending explicit correction, the Stop message combines an apology/agreement opener with a rhetoric-only operational promise, contains no substantive result, and no changed-file or validation progress receipt followed the correction. Concrete direct conclusions count as substantive; an explicit Korean or English instruction to stop cancels the pending correction episode.
 
 `SKILL_SYSTEM_RECOVERY_GUARD=audit` allows one Stop block per correction episode, capped at three blocks per session. The block requests a compact `recovery_audit`; only the host-marked `stop_hook_active=true` continuation can consume that response and move the reducer to `awaiting_user`. An inactive near-duplicate preserves the audit request. The handoff is recorded as a nonterminal `turn_finalize_attempt`, while the next user prompt cancels the pending handoff. Both paths skip agent-run finalization, completion notification, and post-session synchronization. A malformed packet is recorded but does not cause another block, preventing a hook-created recovery loop. An explicit active LoopRun has precedence and makes Recovery Guard shadow-only; this release does not deny tool calls. `SKILL_SYSTEM_RECOVERY_GUARD=off` is the environment-level emergency disable and overrides per-event audit mode.
 
@@ -90,6 +92,7 @@ Status values:
 
 ## Boundaries
 
+- Do not enable lifecycle hooks by default during generation, installation, or project initialization.
 - Do not treat hook checks as a complete security boundary.
 - Do not bypass sandbox, approval, or rule policy because a hook record exists.
 - Do not use `Stop` to run source-repo validation, behavior evals, release profiles, plan synchronization, or repository-wide repair.

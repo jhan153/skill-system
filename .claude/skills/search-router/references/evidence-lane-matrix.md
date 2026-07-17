@@ -8,13 +8,14 @@
 | runtime (command output, validation, repro) | `workflow-rigor` evidence phase | lane selection only |
 | visual (screenshot, diff, framing) | `design-visual-regression` | lane selection only |
 | accessibility (focus, contrast, semantics) | `design-a11y-audit` | lane selection only |
-| memory (accepted/stale/conflict signals) | `memory-bank-harness` / `memory-bank-maintenance` | lane selection only |
-| project knowledge (Wiki Bank, Runtime Projection, Context Pack) | `knowledge-context-harness` / `knowledge-base-maintenance` | lane selection only; no accepted knowledge mutation |
+| declared project Memory | `memory-bank-harness` | lane selection only; no mutation |
+| declared project Knowledge Base | `knowledge-base-read` | lane selection only; no mutation |
+| explicitly selected LLM Wiki | `llm-wiki-context` | lane selection only; use the Wiki's native guide/navigation |
 
 ## Ambiguous examples
 - "근거 자료 찾아서 ledger 만들어줘" -> evidence intent + no final owner stated -> `search-router` opens the paper/source lane (`search-paper-evidence`).
 - "이 결과가 맞는지 근거랑 같이 평가해줘" -> the goal is a report, not evidence discovery -> `report-qualitative` primary; evidence lane only if it asks to go find new sources.
-- "Wiki Bank 근거를 찾아서 이 구현에 붙여줘" -> implementation/planning remains primary; `knowledge-context-harness` supplies read-only Runtime Projection context.
+- "선택한 제품 Wiki에서 근거를 찾아 이 구현에 붙여줘" -> implementation/planning remains primary; `llm-wiki-context` supplies read-only context from that Wiki's native navigation.
 
 ## Router-vs-router examples
 - "연구 가설 세워줘 / ablation 설계해줘" -> `research-router` (research lifecycle), NOT `search-router`.

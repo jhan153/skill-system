@@ -88,20 +88,19 @@ Corrected after content inspection (recorded decisions overridden by evidence):
 Review record (the "reviewed allowlist diff"): post-cutover the integrity gate enforces
 `live == generator(source)`, so a standalone allowlist file is redundant. The Phase 1b change is
 the git-visible `+ .claude/schemas/` (24 files) and nothing else; `.codex` stayed byte-identical
-and `verify_bundle` core/knowledge/loop pass.
+and the applicable `verify_bundle` profiles pass.
 
 ## 5) Recorded Phase 1b decisions
 These decisions intentionally keep Claude lightweight for v1. Executable runtime tools stay
 Codex-only unless there is an explicit Claude-side runtime contract. Platform-neutral contracts
 can be shared.
 
-1. **Loop engine tools** (`init/activate/resume/deactivate/evaluate_loop_run.py`, `loop_policy.py`, `emit_loop_feedback.py`) — `codex-only` for v1.
-2. **Knowledge engine tools** (`knowledge_policy.py`, `build_context_pack.py`) — `codex-only` for v1.
-3. **`tools/task_ledger.py`, `tools/init_agent_run.py`** — `codex-only` for v1.
-4. **`schemas/`** (harness/knowledge/loop/orchestration/task/tools/workitem) — `shared-neutral` for v1.
-5. **`research/`** (ledger + schema) — `codex-only` for v1.
-6. **`tools/requirements.txt`** — `codex-only` for v1, because no runtime-logic tools move to Claude.
-7. **`rules/default.rules`** — `codex-only` for v1; no Claude equivalent is generated.
+1. **Loop engine tools** (`init/activate/resume/deactivate/evaluate_loop_run.py`, `loop_policy.py`) — `codex-only` for v1.
+2. **`tools/task_ledger.py`, `tools/init_agent_run.py`** — `codex-only` for v1.
+3. **`schemas/`** (harness/knowledge/loop/orchestration/task/tools/workitem) — `shared-neutral` for v1.
+4. **`research/`** (ledger + schema) — `codex-only` for v1.
+5. **`tools/requirements.txt`** — `codex-only` for v1, because no runtime-logic tools move to Claude.
+6. **`rules/default.rules`** — `codex-only` for v1; no Claude equivalent is generated.
 
 Phase 1b implementation scope after these decisions:
 - Add/generate `research-routing.md` to Claude as `shared-neutral`.

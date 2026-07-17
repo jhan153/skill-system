@@ -12,24 +12,24 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.2.1 Bundle
+## 9.3.0 Bundle
 
-This source tree carries the local 9.2.1 bundle line based on the immutable `v9.2.0` cut (the 7.3.1 bundle remains the compatibility baseline; see the 9.x direction note below). Its main components are:
+This source tree carries the local, not-yet-deployed 9.3.0 field-harness bundle line based on the immutable `v9.2.0` cut. Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
-* `eval`: example cases for checking skill selection and usage quality
+* `eval`: authored regression examples for structural and routing-contract maintenance; they are not field-quality evidence
 * `tools`: helper tools for inspecting the bundle structure
 * `integrations`: optional integration payloads — includes `integrations/kanboard-plan-sync`, a plan-centric MCP/CLI that projects Markdown plans onto a local Kanboard. The Kanboard app, DB, themes, and plugins are NOT bundled; only the integration code, two Agent skills (`kanboard-plan-rollout`, `kanboard-plan-ops`), MCP registration examples, and a local-host setup methodology are included.
-* `CHANGELOG.md`, `TERMS.md`, `FIELD_FEEDBACK.md`: change history, terminology notes, and field feedback template
+* `CHANGELOG.md`, `TERMS.md`: change history and terminology notes
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.2.1 — Conditional Reference Disclosure`, based on the local `v9.2.0` full-diet cut; the latest published release remains `v9.1.1`. This repository work does not install, deploy, publish, or push either local cut. Bundle 9.2.1 and the opt-in harness protocol named 9.2.1 are separate version identities.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.3.0 — Field Harness & Project Context`, based on the local `v9.2.0` full-diet cut; the latest pushed release remains `v9.1.1`. Local installation is explicit and does not imply publishing or pushing. Bundle 9.3.0 and the historical opt-in harness protocol named 9.2.1 are separate version identities.
 
-`7.4.x Context Assurance` is a legacy label and transition trace, not the current implementation target. The 7.3.1 skill bundle remains the compatibility baseline for existing calls, while the 8.0 direction changes the context model: evidence becomes claims and relations, claims are projected into Wiki Bank pages, and low-context Runtime Projection cards are compiled into Context Packs for execution.
+9.3 keeps global instructions short, uses an exact specialist directly, and opens at most one narrow router only when several owners genuinely compete. The nearest `project-context.yaml` may declare repository-relative Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery.
 
-The Wiki Bank is not a Source of Truth. Repository files, tests, schemas, explicit user decisions, validated plans, Kanboard state, and Agent Run evidence remain authority sources. Hooks and runtime traces may produce proposal evidence, but accepted knowledge changes require explicit review.
+Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, review, and decision knowledge linked to real artifacts. LLM Wikis are optional read-only context sources selected explicitly and navigated using their own conventions. The default hook map is empty; commit/closeout checkpoint writes operate only on declared stores and clear current-task facts.
 
 For development-focused installs, use `skill-system-core` + `skill-system-dev` as the minimum profile. Add `skill-system-quality` as the recommended companion when you want validation matrix support, including `workflow-validation`; dev workflows still fall back to their local validation rules when quality skills are not installed.
 
@@ -46,7 +46,7 @@ This system is designed to treat repetitive AI work as skills that can be select
 
 ## Operating Model
 
-This system does not handle every task through one large prompt. It interprets the request, selects an appropriate skill based on the task type, validates the execution result, and uses evaluation and feedback to improve the skill system when needed.
+This system does not handle every task through one large prompt. It interprets the request, uses a directly named or clearly matching specialist, opens one narrow router only for genuine ambiguity, and improves from problems the user reports during real use. Authored scenarios remain regression material, not field-quality evidence.
 
 ```mermaid
 flowchart TB
@@ -213,12 +213,11 @@ Memory skills manage long-term project context. They are used only when memory u
 
 ### Evaluation
 
-Evaluation skills improve the skill system itself through cases and usage observations.
+The evaluation skill maintains existing cases only when explicitly requested. It does not collect usage or establish field quality.
 
 | Skill                      | Role                                                                                                                                                           |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `evaluation-harness`       | Reviews `.codex/eval` usage cases, routing expectations, and schema consistency as a usage-quality review tool. |
-| `evaluation-usage-tracker` | Aggregates skill-call metadata into usage summaries, low/high-usage signals, and improvement candidates without storing original prompts or conversation logs. |
+| `evaluation-harness`       | Reviews existing `.codex/eval` cases for syntax, internal consistency, and scoped regression intent without treating scenario results as field-quality evidence. |
 
 ### Skill System
 
@@ -264,6 +263,9 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.1.2 | Design governance & pre-diet baseline | Hardens product-family rule discovery, approved component reuse, UX decision handling, and separate target/family visual evidence lanes. Freezes the strengthened 66-skill source surface and measured instruction size before 9.2.0 skill-diet work; this is an unpublished, non-deployed comparison baseline rather than a release. |
 | 9.2.0 | Full skill diet & bounded evidence | Reduces all 66 canonical skill bodies from 49,513 to 39,820 words (-19.58%) and resolves 38 merge/delete candidates as 32 merges plus 6 deletions, without moving detail into references. Preserves fail-closed design and adapter ownership corrections while keeping quality claims scoped to the checks and forward evidence that actually ran. Harness protocol 9.2.0 (historical) and 9.2.1 (current opt-in) remain independent of this bundle version. |
 | 9.2.1 | Conditional reference disclosure | Applies bounded progressive disclosure to six design skills while retaining routing selectors, evidence ceilings, and fail-closed decisions in the main bodies. Against `v9.2.0`, their main bodies fall by 638 words/4,723 UTF-8 bytes and main-plus-Markdown-reference surfaces fall by 450 words/3,184 bytes. Fresh admission observations cover only `design-visual-regression` and `design-frontend`; the other four skills remain admission-unverified rather than universally behavior-preserved. The opt-in harness monitor is narrowed to verifier-receipt freshness and has no task-result-label authority. |
+| 9.2.2 | Field-driven simplification | Removes the active skill-maturity and field-feedback persistence systems, deletes the usage-tracker skill and its Python validators/report generator, removes those proxy checks from core hygiene, and limits field input to problems the user explicitly reports in conversation. The active canonical surface is 65 skills; historical baselines remain historical only. |
+| 9.2.3 | Field-driven routing simplification | Keeps repository skill changes with the current task owner, reserves app-managed `skill-creator` for explicit or personal-skill creation, and fixes generated Claude manifests so all six local plugins install without the unsupported `displayName` key. |
+| 9.3.0 | Field harness & project context | Empties default hooks, compresses global routing, declares per-repository context paths, separates Memory Bank, artifact-linked Knowledge Base, and explicit LLM Wiki reads, adds bounded commit/closeout checkpointing, and removes maturity, packet-ingestion, telemetry, and automatic Wiki-projection machinery. The source candidate is not installed into a home or live plugin cache. |
 
 ## License
 

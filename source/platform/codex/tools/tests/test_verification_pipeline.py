@@ -81,7 +81,7 @@ class VerificationPipelineTests(unittest.TestCase):
             self.pipeline.RELEASE_REQUIRED_CHECK_IDS["core"],
         )
         for check in release_report["checks"]:
-            if check["id"] == "field_feedback":
+            if check["id"] == "doc_freshness":
                 check["required"] = False
                 check["status"] = "FAIL"
         self.assertIn(

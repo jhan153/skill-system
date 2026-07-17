@@ -1,29 +1,24 @@
 # memory-bank-init Reference
 
-## Scope
-- This pack covers initialization only.
-- It creates the storage root and baseline artifacts for a project-scoped memory bank.
+## Target And Identity
 
-## Data Root
-- Canonical root: `<project_root>/docs/memory-bank/projects/{project_id}/`
+- Default root for an explicitly requested init: `<project_root>/docs/memory-bank/projects/{project_id}/`
 - Required files: `current.md`, `archive.md`, `events.jsonl`, `meta.json`
-
-## Project ID Derivation
-1. Use an explicit project slug if the user or repo config provides one.
-2. Else derive from a normalized git remote identity such as `owner/repo`.
-3. Else fall back to `sha256(repo_root_absolute_path)[:12]`.
-
-Store both the final `project_id` and the locator source in `meta.json`.
+- Prefer `project_id` from `project-context.yaml`, then an explicit user slug, then normalized git remote identity, and finally `sha256(repo_root_absolute_path)[:12]`.
+- Store the final ID and locator source in `meta.json`.
 
 ## Canonical Enums
+
 - `entity`: `project|goal|rule|mistake|system`
 - `action`: `create|update|deprecate|consolidate|detect_conflict|resolve_conflict|validate`
 - `status`: `active|candidate|deprecated`
 - `verification`: `verified|unverified`
-- `confidence`: `low|medium|high`
 - `validation_state`: `agent-verified|user-verification-needed|unverified|blocked`
 
+Do not add confidence, maturity, usage, or satisfaction scores.
+
 ## Initial Event Record
+
 ```json
 {
   "event_id": "evt_20260410T120000Z_0001",
@@ -37,24 +32,24 @@ Store both the final `project_id` and the locator source in `meta.json`.
   "after": {
     "project_id": "owner-repo",
     "status": "active",
-    "verification": "verified",
-    "confidence": "high"
+    "verification": "verified"
   },
-  "reason": "memory bank initialized",
-  "evidence": "initialization requested by user",
+  "reason": "memory bank initialized by explicit request",
+  "evidence": "user initialization request",
   "snapshot_base_version": 0,
   "validation_state": "agent-verified"
 }
 ```
 
-## `meta.json` Initial Contract
+## `meta.json`
+
 ```json
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "project_id": "owner-repo",
   "project_locator": {
-    "type": "git-remote|explicit-slug|path-hash",
-    "value": "git@github.com:owner/repo.git"
+    "type": "project-context|git-remote|explicit-slug|path-hash",
+    "value": "owner-repo"
   },
   "snapshot_version": 1,
   "created_at": "2026-04-10T12:00:00Z",
@@ -63,28 +58,30 @@ Store both the final `project_id` and the locator source in `meta.json`.
 }
 ```
 
-## `current.md` Baseline Sections
+## Compact `current.md`
+
+Keep these headings even when empty:
+
 1. `이 프로젝트의 목표 & 방향 (Current)`
 2. `여러 세션간 지켜야할 룰 (Current)`
 3. `반복적으로 실수하는 실수 목록 (Current)`
+4. `효과가 좋았던 작업 방식 (Current)`
 
-Each section starts empty and must preserve the heading even when there are no items.
+`current.md` is the present operational snapshot. It does not contain implementation chronology, raw conversations, logs, completed task narratives, or full plan bodies. Use stable pointers to a plan or Knowledge record when details matter.
 
-## `archive.md` Init Block
-```markdown
-## 2026-04-10T12:00:00Z | evt_20260410T120000Z_0001
-- workflow: init
-- entity: project
-- action: create
-- item_id: project
-- reason: memory bank initialized
-- evidence: initialization requested by user
-- before: null
-- after: {"project_id":"owner-repo","status":"active"}
+## Manifest Section
+
+```yaml
+memory_bank:
+  root: docs/memory-bank/projects/owner-repo
+  storage: local
 ```
 
-## Validation Checklist
-- The target directory exists.
+Merge this section into an existing `project-context.yaml` without reformatting or replacing unrelated keys. If safe section-preserving update is unavailable, stop before writing either artifact.
+
+## Validation
+
 - All four files exist and are non-empty.
-- `events.jsonl` and `meta.json` are parseable.
-- `snapshot_version` starts at `1`.
+- `events.jsonl` and `meta.json` parse.
+- `snapshot_version` is `1` and all baseline artifacts share the first event ID.
+- The manifest points to the created bank and every pre-existing unrelated section remains semantically unchanged.

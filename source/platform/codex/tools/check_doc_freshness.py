@@ -8,9 +8,6 @@ from pathlib import Path
 
 
 ACTIVE_DOCS = [
-    "FIELD_FEEDBACK.md",
-    ".codex/docs/field_feedback_guidelines.md",
-    ".claude/docs/field_feedback_guidelines.md",
     ".codex/docs/improvement_tracks.md",
     ".claude/docs/improvement_tracks.md",
     ".codex/docs/runtime_terms.md",

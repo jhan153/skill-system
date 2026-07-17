@@ -12,24 +12,24 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 9.2.1 번들
+## 9.3.0 번들
 
-이 소스 트리는 변경하지 않는 로컬 `v9.2.0` 컷을 기반으로 한 9.2.1 번들 라인입니다(7.3.1 번들은 아래 9.x 방향 설명대로 호환 기준선으로 유지됩니다). 주요 구성은 다음과 같습니다.
+이 소스 트리는 변경하지 않는 로컬 `v9.2.0` 컷을 기반으로 한, 아직 배포하지 않은 9.3.0 필드 하네스 번들 라인입니다. 주요 구성은 다음과 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
 * `docs`: 스킬 목록, 사용 기준, 운영 참고 문서
-* `eval`: 스킬 선택과 사용 품질을 점검하기 위한 예시 케이스
+* `eval`: 구조와 라우팅 계약 유지보수용으로 작성된 회귀 예시이며 필드 품질 근거는 아님
 * `tools`: 번들 구성을 확인하기 위한 보조 도구
 * `integrations`: 선택적 연동 페이로드 — `integrations/kanboard-plan-sync`를 포함합니다. Markdown 플랜을 로컬 Kanboard에 projection하는 plan-centric MCP/CLI입니다. Kanboard 앱·DB·테마·플러그인은 번들에 포함하지 않으며, 연동 코드·Agent 스킬 2종(`kanboard-plan-rollout`, `kanboard-plan-ops`)·MCP 등록 예시·로컬 호스트 설정 방법론만 포함합니다.
-* `CHANGELOG.md`, `TERMS.md`, `FIELD_FEEDBACK.md`: 변경 이력, 용어 정리, 사용 후 피드백 기록 양식
+* `CHANGELOG.md`, `TERMS.md`: 변경 이력과 용어 정리
 
 ## 9.x 방향: Neutral Source & Plugin Packaging
 
-현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인은 로컬 `v9.2.0` 전체 다이어트 컷을 기반으로 한 `9.2.1 — Conditional Reference Disclosure`이며, 최신 배포 릴리스는 여전히 `v9.1.1`입니다. 이 저장소 작업은 두 로컬 컷을 설치·반영·배포·publish·push하지 않습니다. 번들 9.2.1과 같은 번호의 opt-in 하네스 프로토콜 9.2.1은 서로 독립된 버전 identity입니다.
+현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인은 로컬 `v9.2.0` 전체 다이어트 컷을 기반으로 한 `9.3.0 — Field Harness & Project Context`이며, 최신 push 릴리스는 여전히 `v9.1.1`입니다. 로컬 설치는 명시적으로 수행하며 publish나 push를 뜻하지 않습니다. 번들 9.3.0과 과거 opt-in 하네스 프로토콜 9.2.1은 서로 독립된 version identity입니다.
 
-`7.4.x Context Assurance`는 현재 구현 목표가 아니라 legacy label이자 전환 흔적입니다. 7.3.1 스킬 번들은 기존 호출을 위한 호환 기준선으로 유지하고, 8.0 방향에서는 context 모델을 바꿉니다. evidence를 claim과 relation으로 만들고, 이를 Wiki Bank page로 projection한 뒤, 저맥락 Runtime Projection card를 Context Pack으로 컴파일해 실행에 공급합니다.
+9.3은 전역 지침을 짧게 유지하고, 정확히 명시됐거나 분명히 일치하는 전문 스킬을 바로 사용하며, 여러 소유자가 실제로 경쟁할 때만 좁은 라우터 하나를 엽니다. 가장 가까운 `project-context.yaml`은 저장소 상대 경로로 Memory Bank, Knowledge Base, plan, skill root, 이름 있는 LLM Wiki를 선언할 수 있습니다. 없는 항목은 사용할 수 없는 것으로 처리하며 홈이나 인접 저장소를 추측해 검색하지 않습니다.
 
-Wiki Bank는 Source of Truth가 아닙니다. 저장소 파일, 테스트, 스키마, 명시적 사용자 결정, 검증된 plan, Kanboard 상태, Agent Run evidence가 authority source입니다. Hook과 runtime trace는 proposal evidence를 만들 수 있지만, accepted knowledge 변경에는 명시적 review가 필요합니다.
+Memory Bank는 세션을 넘는 목표·작업 규칙·반복 실수·검증된 작업 방식을 보존합니다. Knowledge Base는 실제 코드·디자인 산출물에 연결된 도메인·디자인·알고리즘·아키텍처·리뷰·결정 지식을 보존합니다. LLM Wiki는 명시적으로 선택하고 자체 탐색 규칙을 따르는 선택적 읽기 전용 컨텍스트입니다. 기본 hook map은 비어 있으며, commit/closeout 체크포인트도 선언된 저장소와 현재 작업의 명확한 사실만 다룹니다.
 
 개발 중심 설치에서는 `skill-system-core` + `skill-system-dev`를 최소 profile로 사용합니다. 검증 matrix 지원과 `workflow-validation`이 필요하면 `skill-system-quality`를 권장 동반 profile로 추가합니다. quality 스킬이 설치되어 있지 않아도 dev workflow는 각자의 로컬 검증 규칙으로 동작합니다.
 
@@ -46,7 +46,7 @@ Wiki Bank는 Source of Truth가 아닙니다. 저장소 파일, 테스트, 스�
 
 ## 운영 모델
 
-이 시스템은 하나의 긴 프롬프트로 모든 작업을 처리하지 않습니다. 요청을 해석한 뒤, 작업 성격에 맞는 스킬을 선택하고, 실행 결과를 검증하며, 필요한 경우 평가와 피드백을 통해 스킬을 다시 개선합니다.
+이 시스템은 하나의 긴 프롬프트로 모든 작업을 처리하지 않습니다. 요청을 해석한 뒤 명시됐거나 분명히 맞는 전문 스킬을 바로 사용하고, 실제 모호성이 있을 때만 좁은 라우터 하나를 사용합니다. 개선은 실사용 중 사용자가 언급한 문제를 기준으로 하며, 작성된 시나리오는 회귀 자료일 뿐 필드 품질 근거로 취급하지 않습니다.
 
 ```mermaid
 flowchart TB
@@ -213,12 +213,11 @@ Memory 스킬은 장기 프로젝트 맥락을 관리합니다. 메모리 사용
 
 ### Evaluation
 
-Evaluation 스킬은 사례와 사용 관찰을 통해 스킬 시스템 자체를 개선합니다.
+Evaluation 스킬은 명시적으로 요청된 기존 케이스만 유지보수합니다. 사용량을 수집하거나 필드 품질을 판정하지 않습니다.
 
 | 스킬                         | 역할                                                                               |
 | -------------------------- | -------------------------------------------------------------------------------- |
-| `evaluation-harness`       | `.codex/eval`의 사용 사례, 라우팅 기대값, 스키마 일관성을 사용 품질 점검 관점에서 검토합니다. |
-| `evaluation-usage-tracker` | 원문 프롬프트나 대화 기록을 저장하지 않고, 메타데이터만 담은 스킬 호출 기록을 사용 요약, 저사용·고사용 신호, 개선 후보로 집계합니다.    |
+| `evaluation-harness`       | 기존 `.codex/eval` 케이스의 문법, 내부 일관성, 제한된 회귀 의도를 검토하되 시나리오 결과를 필드 품질 근거로 사용하지 않습니다. |
 
 ### Skill System
 
@@ -264,6 +263,9 @@ Skill System 스킬은 작성된 스킬을 이 저장소에 통합하고 생성�
 | 9.1.2 | Design governance & pre-diet baseline | 제품군 규칙 탐색, 승인 컨트롤 재사용, UX 판단, target/family 시각 증거 분리를 강화합니다. 9.2.0 스킬 다이어트 전 강화된 66개 스킬의 행동과 instruction 크기를 고정한 미배포·비반영 비교 베이스라인입니다. |
 | 9.2.0 | Full skill diet & bounded evidence | canonical 스킬 66개 본문을 49,513단어에서 39,820단어로 줄이고(-19.58%), merge/delete 후보 38건을 32건 병합·6건 삭제로 모두 판정했습니다. 레퍼런스 이동 없이 fail-closed 설계와 adapter 소유권 교정을 보존했으며, 품질 주장은 실제 실행한 점검과 forward evidence 범위로 제한합니다. 하네스 프로토콜 9.2.0(과거)과 9.2.1(현재 opt-in)은 이 번들 버전과 독립적으로 유지합니다. |
 | 9.2.1 | Conditional reference disclosure | 6개 디자인 스킬에 bounded progressive disclosure를 적용하되 routing selector, evidence ceiling, fail-closed 판단은 본문에 유지합니다. `v9.2.0` 대비 본문은 638단어/4,723 UTF-8 bytes, 본문+Markdown reference 표면은 450단어/3,184 bytes 감소했습니다. fresh admission 관찰은 `design-visual-regression`과 `design-frontend`만 덮으며 나머지 4개 스킬은 universal behavior-preserved가 아니라 admission-unverified입니다. opt-in harness monitor는 verifier receipt freshness만 다루며 task result-label 권한이 없습니다. |
+| 9.2.2 | Field-driven simplification | 활성 스킬 성숙도·필드 피드백 영속화 체계를 제거하고 usage tracker 스킬과 Python validator/report generator를 삭제했습니다. 해당 대리 지표 검사를 core hygiene에서 제거했으며, 필드 입력은 사용자가 대화에서 명시적으로 언급한 문제로 제한합니다. 활성 canonical 표면은 65개 스킬이고 과거 baseline은 역사 자료로만 남습니다. |
+| 9.2.3 | Field-driven routing simplification | 저장소 스킬 변경은 현재 작업 소유자가 직접 처리하고 앱 관리 `skill-creator`는 명시 호출이나 개인 스킬 생성에만 사용합니다. 생성된 Claude manifest의 미지원 `displayName`도 제거해 로컬 플러그인 6개가 모두 설치되도록 했습니다. |
+| 9.3.0 | Field harness & project context | 기본 훅을 비우고 전역 라우팅을 압축하며, 저장소별 컨텍스트 경로를 선언합니다. Memory Bank, 산출물 연계 Knowledge Base, 명시적 LLM Wiki 읽기를 분리하고 제한된 commit/closeout 체크포인트를 추가하며, 성숙도·패킷 ingestion·텔레메트리·자동 Wiki projection 체계를 제거합니다. 이 소스 후보는 홈이나 live plugin cache에 설치하지 않습니다. |
 
 ## 라이선스
 

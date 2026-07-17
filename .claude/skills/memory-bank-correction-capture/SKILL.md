@@ -1,31 +1,38 @@
 ---
 name: memory-bank-correction-capture
-description: Capture an explicit project-level recurring correction as a candidate mistake with masked evidence and append-only history. Use only when the correction should affect future sessions; do not persist one-turn disagreement, wording changes, or ordinary goal/rule updates.
+description: Capture an explicitly persistent project-level interaction or execution mistake as a candidate in an existing declared Memory Bank. Use only on a direct memory request or approved project-context checkpoint; never collect complaints, chats, or one-turn corrections automatically.
 ---
 
 # Memory Bank Correction Capture
 
 ## Routing Card
 - role: memory_operation
-- intent_signature: recurring correction, repeated mistake capture, persistent correction memory
-- use_when: the user explicitly wants an identifiable recurring project-level correction or corrected stored belief remembered across sessions
-- do_not_use_when: the issue is turn-local, wording-only, inferred, a goal/rule update, or maintenance/consolidation
-- expected_inputs: target item or recurring pattern, recurrence evidence, and a maskable evidence summary
-- expected_outputs: candidate mistake event/current reflection, affected IDs, and validation status
-- context_targets: read the target and only nearby candidates; before writing load `.codex/docs/memory_mutation_contract.md` and `reference.md`; use `docs/document.md` only for an exceptional failure path
-- risk_profile: targeted append-only mutation after the gate; mask PII, secrets, identifiers, and raw private evidence
+- intent_signature: remember recurring mistake, persistent correction capture
+- use_when: the user explicitly asks to remember a recurring mistake, or an approved checkpoint identifies one durable cross-session correction
+- do_not_use_when: the issue is one-turn, wording-only, inferred, already represented as a goal/rule, or the bank is undeclared/absent
+- expected_inputs: exact mistake pattern, persistence authorization, masked evidence summary, and declared bank
+- expected_outputs: one candidate mistake event with compact four-file reflection and readback
+- context_targets:
+  must_read: manifest declaration, matching current candidates, `.codex/docs/memory_mutation_contract.md`, and `reference.md`
+  read_if_needed: matching event/archive record for duplicate identity
+  do_not_load_by_default: full bank, raw conversation, unrelated corrections, private identifiers
+- risk_profile:
+  reads: one declared bank and nearby candidates
+  writes: one candidate mistake operation
+  tools: targeted local mutation/readback
+  sensitive_resources: raw private evidence denied
 - entry_scene: PREPARE
 
 ## Capture Contract
-Write only when persistent-memory intent or explicit recurrence, project-scoped behavioral/knowledge impact, an identifiable target/pattern, and safely summarized evidence are all present. A negative phrase, one disagreement, or an agent inference is not recurrence evidence. Ambiguity or unsafe evidence yields no write and the appropriate user check/block.
+The correction must describe future project behavior, have an identifiable failure pattern, and be explicitly authorized for persistence. A complaint or negative phrase alone is not authorization or recurrence evidence. Do not infer a count, confidence, maturity, or severity score.
+
+New items are always `status=candidate` and `verification=unverified`. Capture does not promote, consolidate, initialize a bank, or create a field-feedback dataset.
 
 ## Workflow
-1. Confirm the target memory bank exists; otherwise route to `memory-bank-init` only if initialization is requested.
-2. Apply `reference.md`, check only relevant candidates, and update an obvious duplicate; uncertain matches remain separate candidates for maintenance.
-3. Mask the evidence, then stage the event and current/archive/meta reflections under one stable operation.
-4. Read back and validate every affected file before reporting success; partial reflection remains failed or blocked.
-
-New entries remain `status=candidate`, `verification=unverified`, and evidence-bounded recurrence counts. Capture never promotes, consolidates, or silently initializes a bank.
+1. Resolve the exact or manifest-declared bank; otherwise no-write.
+2. Compare only directly matching candidates. Update an obvious duplicate; leave uncertain matches separate.
+3. Mask the evidence and stage one event plus compact current/archive/meta reflections under one operation ID.
+4. Read back every affected file and confirm target-only change and history preservation.
 
 ## Output
-Report the gate decision, affected item/event IDs, masked-evidence status, readback validation, and any user verification needed. Do not reproduce raw evidence or imply that a captured candidate is true; `memory-bank-maintenance` owns later conflict resolution, consolidation, and promotion.
+Report the gate, item/event IDs, masked-evidence status, four-file readback, and any explicit maintenance need. Never reproduce raw evidence or imply a candidate is an active instruction.

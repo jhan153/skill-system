@@ -119,12 +119,6 @@ Reason: ordinary review or critical review may apply depending on risk framing; 
 Reason: use `report-diff`.
 
 ```text
-스킬 호출 통계 요약해줘.
-```
-
-Reason: use `evaluation-usage-tracker`.
-
-```text
 보고해줘.
 ```
 

@@ -35,7 +35,7 @@ description: Define verifier-backed success, progress, retry, checkpoint, safety
     - active plan and `.codex/docs/planning_state_model.md` when the overlay attaches to a plan lifecycle
     - cited runtime/source evidence when capability claims matter
   do_not_load_by_default:
-    - full repo, memory bank, Wiki Bank, old plans, or transcripts
+    - full repo, Memory Bank, Knowledge Base, LLM Wiki, old plans, or transcripts
     - every loop reference or governance section
 - risk_profile:
   reads:

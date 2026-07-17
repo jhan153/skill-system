@@ -1,4 +1,4 @@
-version: "9.2.1"
+version: "9.3.0"
 purpose: "Positive routing examples for common requests."
 cases:
   - case_id: route-001
@@ -86,23 +86,24 @@ cases:
     schema_version: 2
     user_request: "새 Skill System source skill pack 만들어줘."
     expected_primary_skill: null
-    expected_route_class: external_system_skill_creator
+    expected_route_class: direct_task_owner
     expected_supporting_skills: [skill-system-repo-adapter]
     should_not_trigger: [research-router]
-    expected_context: [skill name, use case, source target, authoring result, plugin membership decision]
-    expected_output_shape: "authored skill plus canonical source integration and repository validation"
-    quality_notes: "System skill-creator owns authoring; skill-system-repo-adapter is the Skill-System repository adapter."
-    friction_risk: "duplicate authoring owners or touching .system, live home runtime, generated mirrors, or plugin cache"
+    expected_context: [skill name, use case, source target, requested behavior, plugin membership decision]
+    expected_output_shape: "direct task-owner implementation plus canonical source integration and repository validation"
+    quality_notes: "The current task owner handles repository skill authoring; skill-system-repo-adapter is integration support only."
+    friction_risk: "implicitly invoking app-managed skill-creator or touching .system, live home runtime, generated mirrors, or plugin cache"
     expected_behaviors:
-      - author_skill_with_skill_creator
+      - author_skill_with_current_task_owner
       - integrate_authored_skill_in_canonical_source
     forbidden_behaviors:
+      - implicitly_invoke_system_skill_creator
       - mutate_system_skills
       - hand_edit_plugin_cache
       - let_repository_adapter_override_authoring
     required_evidence:
       - type: route_class
-        expected: external_system_skill_creator
+        expected: direct_task_owner
   - case_id: route-skill-adapter-001
     schema_version: 2
     user_request: "이미 작성한 source skill을 이 저장소 plugin manifest에 넣고 runtime/plugin target을 동기화해줘."
@@ -384,26 +385,6 @@ cases:
     expected_output_shape: "selected evidence lane and handoff"
     quality_notes: "search-router selects the evidence lane; it does not own synthesis or implementation."
     friction_risk: "router owning evidence collection itself"
-  - case_id: route-grp-005
-    user_request: "이 승인된 closeout 패킷을 장기 기억으로 승격해줘."
-    expected_primary_skill: memory-bank-ingestion
-    expected_supporting_skills: []
-    should_not_trigger: [memory-bank-update, plan-spec-curator]
-    expected_family: memory
-    expected_context: [approved closeout packet, target memory-bank path, mutation approval]
-    expected_output_shape: "appended ingestion event and archive pointers"
-    quality_notes: "Promotion of an approved packet is ingestion, not direct goal/rule update or curation."
-    friction_risk: "promoting without approval"
-  - case_id: route-grp-006
-    user_request: "스킬 호출 통계 요약해줘."
-    expected_primary_skill: evaluation-usage-tracker
-    expected_supporting_skills: []
-    should_not_trigger: [evaluation-harness]
-    expected_family: evaluation
-    expected_context: [local invocation ledger]
-    expected_output_shape: "usage summary, no-data status, and improvement candidates"
-    quality_notes: "Invocation telemetry is evaluation-usage-tracker; eval-case review is evaluation-harness."
-    friction_risk: "reading raw prompts instead of metadata or copying sample counts as measured data"
   - case_id: route-workflow-001
     schema_version: 2
     user_request: "이 승인된 스펙대로 Phase 1 초기 구현을 진행해줘."
@@ -507,7 +488,7 @@ cases:
     user_request: "accepted memory에서 이 작업용 context pack 만들어줘."
     expected_primary_skill: memory-bank-harness
     expected_supporting_skills: []
-    should_not_trigger: [memory-bank-update, memory-bank-ingestion]
+    should_not_trigger: [memory-bank-update]
     expected_family: memory
     expected_context: [accepted memory, task request]
     expected_output_shape: "filtered context pack with admitted/excluded/conflicts"
@@ -729,20 +710,20 @@ cases:
   - case_id: route-legacy-create-skill-pack-001
     schema_version: 2
     legacy_alias: create-skill-pack
-    expected_mode: authoring_then_repository_integration
+    expected_mode: direct_repository_skill_change
     direct_invocation: false
     user_request: "legacy ID create-skill-pack으로 새 source skill을 만들고 이 저장소에 통합해줘."
     expected_primary_skill: null
-    expected_route_class: external_system_skill_creator
+    expected_route_class: direct_task_owner
     expected_supporting_skills: [skill-system-repo-adapter]
     should_not_trigger: [analysis-codebase]
     expected_context: [legacy_alias_map, authoring_request, repository_target]
-    expected_output_shape: "system skill-creator authoring followed by repository adapter integration"
-    quality_notes: "The legacy primary split into semantic authoring and repository integration owners."
-    friction_risk: "mapping directly to the adapter and losing authoring ownership"
-    expected_behaviors: [resolve_legacy_alias, preserve_authoring_owner, attach_repository_adapter]
-    forbidden_behaviors: [load_removed_skill_stub, let_repository_adapter_author_skill]
-    required_evidence: [{type: route_class, expected: external_system_skill_creator}]
+    expected_output_shape: "direct task-owner implementation with repository adapter integration"
+    quality_notes: "The current task owner handles semantics without implicitly invoking the app-managed skill creator."
+    friction_risk: "attaching system skill-creator merely because the artifact is a skill"
+    expected_behaviors: [resolve_legacy_alias, preserve_task_owner, attach_repository_adapter]
+    forbidden_behaviors: [load_removed_skill_stub, implicitly_invoke_system_skill_creator]
+    required_evidence: [{type: route_class, expected: direct_task_owner}]
   - case_id: route-legacy-direct-slash-001
     schema_version: 2
     legacy_alias: design-dashboard

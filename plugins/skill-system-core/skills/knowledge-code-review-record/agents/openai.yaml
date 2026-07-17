@@ -1,0 +1,6 @@
+interface:
+  display_name: "Knowledge Code Review Record"
+  short_description: "Record recurring repository review rules"
+  default_prompt: "Use $knowledge-code-review-record to record this recurring repository-specific review rule."
+policy:
+  allow_implicit_invocation: false

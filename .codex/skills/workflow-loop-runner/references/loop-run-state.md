@@ -31,13 +31,11 @@ loop_run_state:
   pending_questions: []
   side_effect_journal: []
   approval_gates_reached: []
-  knowledge_feedback_candidates: []
   loop_stop_packet_ref:
   governance_status:
     stop_hook_loop_evaluation:
     durable_execution:
     event_runtime:
-    wiki_feedback:
     idempotency:
     context_poisoning:
     reward_hacking:
@@ -92,7 +90,7 @@ After every verifier result, record:
 - the action that changed state, if any
 - side effects attempted, idempotency keys, rollback notes, and approval gates
 - untrusted external observations admitted into context and instructions ignored as untrusted
-- knowledge feedback candidates, without promoting them to accepted Wiki Bank state
+- any explicitly requested Memory or Knowledge checkpoint reference, without automatic persistence or promotion
 - loop governance status for hook, durability, runtime trigger, idempotency, poisoning, reward hacking, thrashing, retry, premature completion, and oscillation gates
 - next planned action or stop reason
 

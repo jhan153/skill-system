@@ -4,15 +4,15 @@ The design cluster grows through distinct analysis/evidence skills and condition
 
 ## Current Skills
 
-| skill | maturity | role |
-| --- | --- | --- |
-| `design-frontend` | `usable` | High-fidelity implementation with conditional product-family governance, approved-component reuse, and evidence-based UX control choice. |
-| `design-tokens` | `experimental` | Normalize token sources, platform mappings, gaps, conflicts, and no-fabrication token evidence. |
-| `design-component-mapper` | `experimental` | Map component contracts and prove approved app-surface reuse with scoped exceptions or unmapped gaps. |
-| `design-visual-regression` | `experimental` | Capture visual evidence and keep exact-target fidelity separate from product-family coherence. |
-| `design-a11y-audit` | `experimental` | Review keyboard, focus, semantic, contrast, target-size, and responsive readability evidence. |
-| `design-ui-decomposer` | `experimental` | Decompose UI references into implementation-ready structure without writing code. |
-| `design-layout-translator` | `experimental` | Translate Auto Layout, flex/grid, sizing, overflow, and breakpoint constraints into code-ready rules. |
+| skill | role |
+| --- | --- |
+| `design-frontend` | High-fidelity implementation with conditional product-family governance, approved-component reuse, and evidence-based UX control choice. |
+| `design-tokens` | Normalize token sources, platform mappings, gaps, conflicts, and no-fabrication token evidence. |
+| `design-component-mapper` | Map component contracts and prove approved app-surface reuse with scoped exceptions or unmapped gaps. |
+| `design-visual-regression` | Capture visual evidence and keep exact-target fidelity separate from product-family coherence. |
+| `design-a11y-audit` | Review keyboard, focus, semantic, contrast, target-size, and responsive readability evidence. |
+| `design-ui-decomposer` | Decompose UI references into implementation-ready structure without writing code. |
+| `design-layout-translator` | Translate Auto Layout, flex/grid, sizing, overflow, and breakpoint constraints into code-ready rules. |
 
 ## Three-Stage Growth Direction
 
@@ -30,7 +30,7 @@ Stage 2: orchestration and limited analysis.
 Stage 3: field-trial expansion.
 - `design-frontend` selects `mobile`, `dashboard`, `section-web`, or `general` and loads one profile reference.
 - Promote a profile to a skill only after field evidence proves it needs a distinct owner, write boundary, or validation oracle.
-- Expansion requires route cases, negative cases, and field feedback.
+- Expansion requires a distinct owner boundary and an explicitly reported user need.
 
 ## Planned Candidates
 
@@ -50,14 +50,14 @@ These are roadmap candidates only; they are not active registry skills yet.
 - Do not treat screenshots alone as proof of implementation quality.
 - Do not treat a component export inventory as reuse proof or one sibling screenshot as a product-family oracle.
 - Keep specialist skills narrow and add negative routing cases before adding more design skills.
-- Keep `allow_implicit_invocation: false` for new and recently hardened design skills until route evidence and field feedback justify broader routing. `design-frontend` is the bounded exception for concrete repo-integrated UI implementation; analysis and evidence specialists remain explicit.
+- Keep `allow_implicit_invocation: false` for new and recently hardened design skills until explicit user reports justify broader routing. `design-frontend` is the bounded exception for concrete repo-integrated UI implementation; analysis and evidence specialists remain explicit.
 - Do not create a surface skill when a conditional `design-frontend` reference is sufficient.
 
 ## Improvement Track
 
-- Add field feedback for the four evidence gates after real projects.
-- Add field feedback for `design-ui-decomposer` and `design-layout-translator` before allowing implicit invocation.
+- Improve the four evidence gates only from problems the user explicitly reports.
+- Keep `design-ui-decomposer` and `design-layout-translator` explicit until a concrete user-reported need justifies implicit invocation.
 - Track dashboard/mobile/section profile quality, incorrect multi-profile loading, and missing surface constraints.
 - Track product-family profile conflicts, catalog reuse violations/exceptions, target-vs-family verdict divergence, and UX decisions reversed by missing context.
-- Promote UX pattern planning to a distinct skill only after repeated field cases show that the conditional `design-frontend` reference needs a separate owner or oracle.
+- Promote UX pattern planning to a distinct skill only after explicit user reports show that the conditional `design-frontend` reference needs a separate owner or oracle.
 - Track `design-frontend` over-trigger on critique, audits, layout translation, and small edits, plus under-trigger on concrete implementation, before broadening the exception or changing primary ownership rules.

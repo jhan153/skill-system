@@ -1,7 +1,7 @@
 {
   "name": "skill-system-maintainer",
-  "version": "9.2.1",
-  "description": "Skill System maintainer — routing eval, usage telemetry, repository integration, and bundle validation.",
+  "version": "9.3.0",
+  "description": "Skill System maintainer — routing eval, repository integration, and bundle validation.",
   "author": {
     "name": "Skill System Maintainers"
   },
@@ -15,7 +15,7 @@
   "interface": {
     "displayName": "Skill System Maintainer",
     "shortDescription": "Skill-system evaluation, repository integration, and bundle validation skills.",
-    "longDescription": "Skill System maintainer — routing eval, usage telemetry, repository integration, and bundle validation.",
+    "longDescription": "Skill System maintainer — routing eval, repository integration, and bundle validation.",
     "developerName": "Skill System Maintainers",
     "category": "Developer Tools",
     "capabilities": [

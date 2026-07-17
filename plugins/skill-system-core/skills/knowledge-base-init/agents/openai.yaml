@@ -1,0 +1,6 @@
+interface:
+  display_name: "Knowledge Base Init"
+  short_description: "Initialize a minimal project Knowledge Base"
+  default_prompt: "Use $knowledge-base-init to initialize a minimal project-local Knowledge Base."
+policy:
+  allow_implicit_invocation: false

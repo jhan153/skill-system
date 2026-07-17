@@ -1,5 +1,5 @@
-version: "9.2.1"
-purpose: "Real-use quality observation cases for routing and output improvement."
+version: "9.3.0"
+purpose: "Authored routing/output regression cases; not field-quality evidence."
 cases:
   - case_id: runtime-001
     user_request: "이 버그가 왜 반복되는지 원인 분석해줘."
@@ -91,15 +91,6 @@ cases:
     expected_output_shape: "grouped changed lines with concise Korean summaries"
     quality_notes: "Only show actual changed lines."
     friction_risk: "summarizing files not in the diff"
-  - case_id: runtime-011
-    user_request: "스킬 maturity 기준과 improvement track을 정리해줘."
-    expected_primary_skill: null
-    expected_supporting_skills: []
-    should_not_trigger: [coordination-handoff, evaluation-harness]
-    expected_context: [.codex/docs/skill_maturity.md, .codex/docs/skill_registry.md]
-    expected_output_shape: "direct explanation or scoped doc update if requested"
-    quality_notes: "Conceptual explanation does not need orchestration."
-    friction_risk: "turning glossary work into workflow state"
   - case_id: runtime-013
     user_request: "완료된 plan은 핵심 결정만 memory 후보로 남기고 raw plan은 다음부터 active context에서 빼줘."
     expected_primary_skill: plan-spec-curator
@@ -235,15 +226,6 @@ cases:
     expected_output_shape: "loop_term governance block with stop_hook_expectation, non_idempotent retry policy, anti_reward_hacking, safety/verifier/process/outcome metrics, and approval gates"
     quality_notes: "Runtime-sensitive governance belongs in the contract before execution; do not claim Stop-hook loop validation is agent-verified without current evidence."
     friction_risk: "executing non-idempotent retry or overstating hook/runtime support"
-  - case_id: runtime-028
-    user_request: "loop 실행 결과에서 Wiki Bank에 남길 개선 후보만 정리하고 accepted knowledge로는 올리지 마."
-    expected_primary_skill: workflow-loop-runner
-    expected_supporting_skills: [knowledge-base-maintenance]
-    should_not_trigger: [knowledge-context-harness, memory-bank-ingestion]
-    expected_context: [accepted_loop_term, loop_checkpoint, verifier_evidence, knowledge_feedback_candidates]
-    expected_output_shape: "checkpoint with knowledge_feedback_candidates and explicit note that accepted Wiki Bank mutation requires knowledge-base-maintenance review"
-    quality_notes: "Loop output can create feedback candidates, not accepted Wiki Bank knowledge. Knowledge maintenance is only a review/promotion handoff."
-    friction_risk: "context compounding or poisoning from unreviewed loop observations"
   - case_id: runtime-029
     user_request: "이 SVG 차트를 만들었는데 빌드만 통과했어. 실제로 렌더해서 보이는지 확인하고 완료해줘."
     expected_primary_skill: design-visual-regression

@@ -1,197 +1,89 @@
 # Context Routing
 
-This file is the operational routing reference for the global `.codex` setup. Keep `AGENTS.md` thin; put route details, conflict rules, and audit contracts here.
+This file defines only the exceptions that need routing. The current task owner remains responsible for understanding the request, implementation, validation, and final judgment.
 
-## Custom Skill Scope
-`.codex/skills/.system`, live home runtime directories, and plugin caches are app-managed or deployment state. Skill System repository integration and generation operations apply to canonical `source/` assets first, then generated `.codex`, `.claude`, and `plugins` targets. Do not audit, patch, migrate, deprecate, route-register, or smoke-test `.system` skills through `skill-system-repo-adapter`.
+## Default Resolution
 
-## Mode Separation
-Development / Implementation Mode:
-- Use for coding, refactoring, bug fixing, implementation plans, repo work, tests, scripts, APIs, build/lint/test tasks.
-- Treat user-provided requirements, keywords, file names, APIs, metrics, and implementation constraints as task specifications unless they are ambiguous, impossible, unsafe, contradictory, or conflict with repo rules.
-- Do not perform broad premise skepticism by default.
-- Do not route to `research-hypothesis-planning` just because the user mentions "experiment", "approach", "model", "loss", or "metric" in a development context.
-- Prefer concrete execution, verification, and repo validation.
-- Direct implementation commands such as `구현해`, `작업해`, `플랜대로 구현`, `fix`, `add tests`, or `refactor` stay in Development / Implementation Mode even when an active plan document exists.
-- Active plans may be read as task input and updated as secondary status tracking, but they must not replace source, test, runtime config/build, or executable scaffold changes for implementation requests.
-- Markdown-only, plan-only, spec-only, report-only, memory-only, or planning-manifest-only diffs are not implementation completion unless the user explicitly requested documentation/spec work only.
-- If a requested implementation cannot produce a non-documentation implementation diff, report `blocked` or analysis-only with the exact blocker instead of claiming completion.
+```text
+explicit user skill/path   -> direct use
+clear one-specialist match -> direct use
+genuine competing owners   -> one narrow router -> one specialist
+no skill needed            -> current task owner
+```
 
-Research Hypothesis Planning Mode:
-- Use only when the user explicitly asks for research plan, paper idea, novel method, experiment design, ablation design, loss design, training plan, hypothesis planning, or scientific claim development.
-- Treat user-provided causal or field-state claims as hypotheses, not facts.
-- Use premise triage, checkpoint-first baseline, one-claim core experiment, progressive ablation, and loss budget.
+Do not pre-classify every request. Do not attach skills merely because their names are related to the topic.
 
-If the request is primarily about implementing an already chosen method, stay in Development / Implementation Mode. If the request is primarily about deciding whether a scientific claim/method is valid or publishable, use Research Hypothesis Planning Mode.
+Resolve a requested skill in this order:
 
-## Context Bundle Contract
-For multi-step work, writes, broad scans, reports, automation changes, or memory mutation, compile a small internal context pack before acting. Start with the request, the selected owner, direct source, and validation evidence; expand only from `read_if_needed`, one layer at a time.
+1. exact path supplied by the user;
+2. skill exposed or installed in the current session;
+3. repository-local skill root explicitly declared by the nearest project instructions or `project-context.yaml`;
+4. `unresolved`.
 
-The canonical pack shape, cache-friendly ordering, reference-admission limits, and token-cost interpretation live in `.codex/docs/context_pack_guidelines.md`. Do not duplicate that schema here or recover from missing context by loading all repo docs, memory, skills, or chat history.
+An exact path is authoritative for discovery but does not broaden the skill's declared scope. Do not declare a skill missing from the visible list before checking an exact supplied path. Do not scan unrelated home directories, plugin versions, adjacent repositories, or guessed local harnesses as fallback.
 
-## Skill Precedence
-1. Explicit user invocation wins within the named skill's declared role and scope.
-2. Explicit artifact intent wins over generic analysis.
-3. Heavy artifact generators require explicit artifact, package, or report intent.
-4. Primary skills own task execution.
-5. Router skills may choose a primary skill but must not perform writes.
-6. Execution modifiers attach only when implementation or medium/high-risk change is active; do not attach `workflow-rigor`, `workflow-validation`, or `workflow-minimal-implementation` to simple edits, direct command output requests, or explanation-only turns without a concrete trigger.
-7. Output modifiers attach only to final presentation.
-8. Review gates attach only when critical review, QA, blocker, risk, or validation is requested.
-9. Memory operations attach only when persistent memory mutation or inspection is explicit.
-10. If two skills could apply, choose the narrower one and mark the broader one as excluded.
+## Narrow Routers
 
-## Route Matrix
-| Request type | Primary skill | Optional attachment | Must read | Default exclude |
-| --- | --- | --- | --- | --- |
-| bug diagnosis | `analysis-router` -> `analysis-bug` | `workflow-rigor` only if implementation/risk is active | symptom, repro, relevant files, logs | full repo report |
-| bug fix implementation | `workflow-bug-fix` | `analysis-bug` for unclear RCA; `workflow-recovery` for repeated same-signature failure; `workflow-validation` for check redesign when installed or explicitly requested; `workflow-rigor` for risky fixes | failure signal, expected behavior, repro or failing command, target files/tests | full repo report, plan package, broad redesign |
-| algorithm proposal | `analysis-router` -> `analysis-algorithm` | `report-qualitative` only for formal output | constraints, metrics, candidates | full repo or memory |
-| domain modeling for development | `analysis-domain-modeling` | `workflow-refactor-safely` or `workflow-implementation` only after a model decision is selected | domain area, current terminology, source/schema/tests/docs with domain rules | persistent memory/docs mutation, pure product ideation, module-boundary-only design |
-| performance analysis | `analysis-performance` | `workflow-implementation` only after a bottleneck and optimization are selected; `workflow-validation` for measurement plan when installed or explicitly requested | performance symptom, metric/workload, baseline or profile/log gap, hot path | correctness bug workflow, repo-wide report, research benchmark planning |
-| research / scientific workflow | `research-router` only when stage is unclear/multi-stage; otherwise the clear narrow research owner | selected next research stage; `plan-short-term-docs` only for explicit persisted `docs/plan` artifact | research decision, stage/artifact hints, provided upstream artifact, `.codex/research-routing.md` only when needed | full repo, full memory bank, `analysis-codebase`, `plan-long-term-package`, premature later stages |
-| cross-domain evidence search | `search-router` | selected evidence lane such as `search-paper-evidence`, `analysis-bug`, `design-visual-regression`, `memory-bank-harness`, `knowledge-context-harness`, or `search-deep-evidence` for a deep multi-angle adversarially-verified sweep | evidence intent, domain hint, claim/topic, final task owner | final synthesis, implementation, broad research lifecycle |
-| requirements discovery interview | `plan-requirements-discovery` | none by default; `plan-requirements-brief` only after discovery results are ready to distill | rough goal, idea, product direction, domain/scope hints, user willingness to answer questions | direct implementation, active docs/plan sync, lifecycle report package |
-| requirements contract / PRD brief | `plan-requirements-brief` | none by default; `plan-long-term-package` or `plan-short-term-docs` only after the brief is accepted for planning | discovery notes, stakeholder answers, decision log, rough requirements, intended handoff target | interactive elicitation, direct implementation, docs/plan status sync, lifecycle result reporting |
-| loop readiness classification | `loop-readiness-router` | `plan-loop-term` only after `contract_needed` or `loop_worthy`; `workflow-loop-runner` only after accepted contract | prompt draft, target domain, verifier hints, side-effect, approval, durability, event-runtime, Wiki feedback, parallelism, and idempotency signals | direct execution, contract drafting, verifier execution, broad planning |
-| loop verifier mapping | `loop-verifier-registry` | `plan-loop-term` when embedding the map into a contract; verifier skills only as owners, not executors | loop contract or success conditions, runtime verifier catalog, target domain, governance metrics | running checks, implementation, readiness classification |
-| accepted loop contract execution | `workflow-loop-runner` | task-specific primary skill; `workflow-recovery` for repeated failures; `workflow-validation` for verifier strategy; `knowledge-base-maintenance` only for explicit Wiki feedback review | accepted contract, verifier map, current checkpoint/budget; load only governance sections triggered by active risk/side-effect flags | contract creation, readiness classification, one-shot work, accepted Wiki mutation |
-| implementation | `workflow-implementation` | `workflow-minimal-implementation` only for explicit YAGNI/minimality requests or credible over-engineering pressure; `workflow-rigor` for medium/high-risk changes; `workflow-validation` for check selection when installed or explicitly requested; `plan-short-term-docs` only as secondary status sync when an active plan is explicitly in scope | repo `AGENTS.md`, relevant files, active plan as input when explicitly referenced, validation | unrelated docs, plan-only completion |
-| dependency upgrade | `workflow-dependency-upgrade` | `workflow-rigor` for risky upgrades; `workflow-validation` for compatibility matrix when installed or explicitly requested; `workflow-recovery` for repeated upgrade failure | package/runtime manifests, lockfiles, target dependency/version, usage sites, validation | broad package churn, unrelated feature work, security verdict-only review |
-| post-development source maintenance | `workflow-source-maintenance` | `workflow-validation` for deletion/build/typecheck/test check selection; `workflow-minimal-implementation` only as YAGNI pressure; `workflow-refactor-safely` only when cleanup uncovers structural refactor work | maintenance scope, target source/callers/tests, public exports, dynamic entrypoint risks, validation command | feature changes, concrete bug fixes, broad architecture redesign, dependency upgrades, comment-only edits |
-| comment-only maintenance | `workflow-comment-maintenance` | `workflow-validation` for doc-build/docstring-lint/typecheck check selection; `workflow-source-maintenance` only when comment work uncovers dead-code cleanup; `workflow-implementation` / `workflow-refactor-safely` only when a comment exposes a needed behavior or structure change | comment scope, target source and the described code, public/framework docstring consumption, validation command | feature changes, bug fixes, structural refactors, dead-code cleanup, dependency upgrades, README/wiki documentation writing |
-| behavior-preserving refactor | `workflow-refactor-safely` | `analysis-codebase-design` before boundary changes; `workflow-minimal-implementation` for abstraction pressure; `workflow-validation` for characterization checks when installed or explicitly requested | refactor goal, behavior contract, target files/callers, tests or smoke command | feature changes, bug fixes, design-only analysis, broad rewrite |
-| approved plan/spec execution | `workflow-plan-runner` | `workflow-rigor` for execution discipline; `workflow-validation` for check selection; `coordination-handoff` only for explicit handoff or multi-agent ownership | approved plan/spec/package slice, target phase or batch, execution-source sufficiency, source/test/config files, validation contract | plan/spec creation, plan-only completion, all plan packages |
-| validation-only work | `workflow-validation` | `workflow-rigor` only when validation itself has medium/high risk | changed artifact or plan/spec slice, success criteria, risk tier, available checks | `evaluation-harness`, broad repo audit, critical verdicts |
-| repeated failure recovery | `workflow-recovery` | `analysis-bug` for deeper RCA; `workflow-validation` for check redesign; `workflow-rigor` for risky fixes | repeated failure signature, failing command/log, latest attempted fix, narrowed repro, target files | broad redesign, plan package, simple rerun |
-| plan document | `plan-short-term-docs` | `report-critical` only for QA/review | active plan, plan template | phase package |
-| goal/loop contract | `plan-loop-term` | `loop-readiness-router` if readiness is unknown; `loop-verifier-registry` if verifier ownership is unclear; `plan-short-term-docs` only when persisting into `docs/plan`; `plan-long-term-package` only when this is one artifact in a broad phase package | goal or loop intent, target plan/spec, success criteria, verifier evidence, governance coverage, budgets, stop/retry boundaries | implementation, loop execution, broad package ownership, generic validation-only work |
-| context/spec lifecycle curation | `plan-spec-curator` | `report-critical` only for QA/review | current goal or task, candidate plan/spec slice, lifecycle state when available | full memory bank, all old plans, archived raw plans, full chat history |
-| knowledge context consumption | owning task primary | `knowledge-context-harness` only when `knowledge_context.mode` is `optional` or `required` | generated Runtime Projection index/cards, selected Context Pack, validation command | full Wiki Bank, raw chat, all plans, accepted knowledge mutation |
-| knowledge maintenance | `knowledge-base-maintenance` | `workflow-rigor` for write validation | target Knowledge Store files, feedback packet or claim IDs, projection validation | Memory Bank mutation, hooks as accepted knowledge, unrelated projections |
-| phase package | `plan-long-term-package` | `workflow-rigor` if execution risk is active | prior reports, templates | lightweight plan only |
-| codebase design / deep module analysis | `analysis-codebase-design` for one boundary decision or `analysis-architecture-deepening` for ranked candidates | `workflow-minimal-implementation` as abstraction pressure; `workflow-implementation` only after a candidate is selected | design pressure, target modules/call sites/tests, local patterns | full repo report, direct implementation before selection, domain glossary-only work |
-| codebase report | `analysis-codebase` | `report-critical` after report if requested | repo root, scripts, tracked files | single-bug workflow |
-| qualitative evaluation report | `report-qualitative` | `report-critical` only if blocker/QA verdict is also requested | artifact slice, evaluation goal, audience, criteria, evidence anchors, redaction boundary | readable changed-line diffs, artifact inventory, eval telemetry, implementation, debugging |
-| lifecycle artifact package | `report-lifecycle-artifacts` | `report-critical` only for blocker-first QA; `workflow-validation` only when concrete validation planning/execution is separately requested | lifecycle source artifacts, evidence anchors, desired tier/scope, traceability needs | direct implementation, small task inventory, casual planning, validation-only work |
-| diff presentation | `report-diff` | `report-critical` only if verdict requested | verified diff or snapshot | root-cause workflow |
-| critical review | `report-critical` | `report-qualitative` if formal report requested | artifact slice, goal, evidence anchors | full history |
-| memory operation | `memory-bank-init`, `memory-bank-update`, `memory-bank-correction-capture`, or `memory-bank-maintenance` | none by default | matching active memory cards and target memory files | unrelated memory |
-| skill authoring / update | system `skill-creator` when exposed | `skill-system-repo-adapter` only when the target belongs in this Skill-System repository; `report-critical` optional after draft | authoring request, target skill, concrete use cases, selected resources; repository adapter reads only implicated source/manifests | `.system`, live home runtime, plugin caches, unrelated repo files, full skill library |
-| Skill-System integration only | task-specific implementation owner | `skill-system-repo-adapter` for canonical placement, routing/registry/eval/plugin decisions, generation, and bundle validation | already-authored result or explicit runtime companion, affected `source/` paths and manifests | general/personal skill authoring, authoring decisions, generated-mirror hand edits |
+Use at most one router, and only when its decision is genuinely unresolved:
 
-Development/implementation requests keep the existing implementation, bug, algorithm, or plan skills as primary and follow concrete user requirements as task specifications. Do not route to the research cluster merely because a development request mentions model, metric, experiment, loss, or training. Detailed Research Cluster routing lives in `.codex/research-routing.md`.
+- `analysis-router`: competing deep technical analysis owners;
+- `research-router`: unclear scientific workflow stage;
+- `search-router`: unclear cross-domain evidence lane;
+- `loop-readiness-router`: explicit durable, repeated, event-driven, or Stop-driven execution whose readiness is not established.
 
-Router/support/context-cost guardrails:
-- Do not read the full skill library to answer "which skill" or "reduce token cost" requests; read the registry, routing matrix, analyzer output, and selected skills only.
-- Do not load every reference/template under a high-fanout skill. Use an index/catalog first, then admit selected references in small batches.
-- Router skills stop after route selection unless the user asked for the specialist artifact.
-- Evidence gates and support modifiers attach only when their trigger is explicit or the primary route needs their evidence to complete safely.
+The router returns one owner and stops. It does not acquire evidence, implement, validate, report, mutate Memory or Knowledge, or invoke another router. `workflow-rigor`, `workflow-validation`, reporting skills, `skill-creator`, Memory, and Knowledge are never automatic attachments.
 
-Knowledge context compilation does not imply Memory Bank mutation. Persistent Memory Bank mutation still requires explicit memory-bank workflows, and generated Wiki Bank / Runtime Projection artifacts must not be treated as editable memory state.
+## Direct Owners
 
-Aliases may remain in user-facing language, but routing docs should show actual skill IDs. System `skill-creator`, when exposed, owns skill design and authoring for both personal and repository skills. Attach `skill-system-repo-adapter` only when that authored result belongs in this Skill-System repository; the adapter owns canonical placement, integration decisions, generation, and bundle validation, never authoring quality. Personal/home skills must not attach the repository adapter. `.system` skills and plugin caches remain app-managed.
-
-Legacy skill-ID compatibility is narrowly model-level. When model-visible request text explicitly names one of the seven IDs in `docs/skill_registry.md`'s Legacy Skill Alias Migration table, select exactly its current owner and mode/profile without loading or inventing a removed skill. Host-resolved direct slash/plugin invocations bypass this routing layer and must use the current installed ID; report an old slash ID as unavailable and name the replacement instead of pretending the alias was installed.
-
-## Work Horizon Decision Table
-
-Use `.codex/docs/work_horizon_model.md` as the detailed reference. The table below resolves plan/workflow ambiguity before selecting a primary skill.
-
-Use `.codex/docs/planning_state_model.md` when a planning artifact changes state, when a plan is used as implementation input, or when old plan text may enter active context. Work horizon chooses the artifact altitude; planning state chooses whether the requested event is admitted.
-
-| Horizon / intent | Primary route | Attachments | Exclude |
-| --- | --- | --- | --- |
-| direct one-shot edit/check | small direct execution or `workflow-implementation` when coding workflow is useful | none by default | `workflow-task-ledger`, `plan-short-term-docs`, `plan-loop-term`, `workflow-loop-runner` |
-| task/ticket state across turns | task-specific primary such as `workflow-implementation` plus `workflow-task-ledger` | WorkItem only as lifecycle envelope when requested or already present | `plan-long-term-package`, `workflow-loop-runner` unless verifier feedback is required |
-| requirements discovery / interview | `plan-requirements-discovery` | none by default | direct implementation, phase package, lifecycle artifact report |
-| requirements contract / PRD brief | `plan-requirements-brief` | hand off to `plan-long-term-package` or `plan-short-term-docs` after acceptance | interactive discovery, direct implementation |
-| tactical design/current execution plan | `plan-short-term-docs` | `workflow-validation` or `report-critical` only when requested | `plan-long-term-package` |
-| strategic phase/package plan | `plan-long-term-package` | `plan-spec-curator` for lifecycle cleanup | `plan-short-term-docs` as primary |
-| formal SDLC/lifecycle artifact pack | `report-lifecycle-artifacts` | `report-critical` only for QA verdicting | direct implementation, task-local artifact inventory |
-| loop contract | `plan-loop-term` | `loop-verifier-registry` when verifier ownership is unclear | `workflow-loop-runner` before contract acceptance |
-| approved plan execution | `workflow-plan-runner` | `workflow-task-ledger` only when batch state must survive turns; `workflow-validation` for checks | plan creation skills as primary |
-| accepted loop execution | `workflow-loop-runner` | `workflow-recovery` for repeated failure; `workflow-task-ledger` only for adjacent non-loop task state | one-shot execution, plan creation |
-| plan/spec/context lifecycle cleanup | `plan-spec-curator` | memory/knowledge workflows only with explicit mutation/review intent | implementation owners, full history loading |
-
-## Planning State Admission
-
-- `plan-requirements-discovery` owns `scratch -> discovery`; it asks one decision-bearing question when requirements gaps affect scope, acceptance, edge behavior, data ownership, constraints, or non-goals.
-- `plan-requirements-brief` owns `discovery -> requirements_contract`; acceptance criteria must be observable before a brief can hand off to planning.
-- `plan-short-term-docs` owns `active_plan -> implementation_ready`; `approve_implementation` requires explicit active plan scope and current-task approval wording.
-- Direct implementation commands such as `이 플랜대로 구현`, `플랜 작업해`, or a referenced active plan path plus `작업해줘` may be accepted as implementation transition when the plan scope is explicit.
-- One-word replies such as `승인`, `작업해`, or `구현해` are invalid transition events when the active plan scope is not explicit in surrounding context.
-- `plan-loop-term` creates only the `loop_contract_ready` overlay; execution waits for accepted success conditions, verifier evidence mapping, and `workflow-loop-runner`.
-- `plan-long-term-package` creates the `package_planned` overlay; canonical state names, release gates, and source-of-truth ownership must not be redefined in derived docs.
-- `plan-spec-curator` owns `completed -> closed_out -> archived`; raw completed or archived plans are excluded by default unless explicitly requested or admitted as summary-only.
-
-## Design Cluster Routing
-
-`design-frontend` owns concrete visual implementation and selects one conditional surface profile. Evidence gates and analysis skills should not take over code changes unless the user explicitly asks for their artifact.
-
-| Request type | Primary skill | Supporting skill(s) | Must not trigger as primary |
-| --- | --- | --- | --- |
-| concrete visual artifact to repo UI code | `design-frontend` | token/component/visual/a11y gates when evidence exists | `design-ui-decomposer`, `design-layout-translator` |
-| visual reference breakdown without code | `design-ui-decomposer` | `design-layout-translator` if constraints dominate | `design-frontend` |
-| Auto Layout/flex/grid/sizing/overflow/breakpoint translation | `design-layout-translator` | `design-visual-regression` only after rendered evidence exists | `design-frontend` |
-| mobile/native screen implementation | `design-frontend` with `mobile` profile | `design-visual-regression`, `design-a11y-audit` when evidence is requested | other surface profiles by default |
-| dashboard/admin/analytics implementation | `design-frontend` with `dashboard` profile | `design-component-mapper`, `design-visual-regression`, `design-a11y-audit` when relevant | other surface profiles by default |
-| section-based web implementation | `design-frontend` with `section-web` profile | `design-visual-regression`, `design-a11y-audit` when evidence is requested | other surface profiles by default |
-| token source normalization or token gaps | `design-tokens` | `design-component-mapper` if component styles are involved | `design-frontend` |
-| design component to repo component/state mapping | `design-component-mapper` | `design-tokens`, `design-a11y-audit` when relevant | `design-visual-regression` |
-| rendered screenshot, nonblank, viewport, or visual diff evidence | `design-visual-regression` | `design-a11y-audit` for focus/contrast/readability | `design-frontend` |
-| keyboard/focus/semantic/contrast/target-size/readability evidence | `design-a11y-audit` | `design-visual-regression` for rendered screenshot evidence | `design-frontend` |
-
-Design cluster conservative defaults:
-- New or recently hardened design skills keep `allow_implicit_invocation: false` until route smoke tests and field feedback justify broader routing.
-- `design-frontend` is the bounded exception: it may enter implicitly only for concrete UI/design implementation in repository code. Critique, ideation, reuse or visual audits, layout-only translation, and small CSS/text edits remain outside it.
-- `design-ui-decomposer` and `design-layout-translator` are operational `experimental` analysis skills, but should remain explicit or clearly analysis-intent routed until field feedback exists.
-- Mobile, dashboard, and section-web guidance is conditionally loaded from `design-frontend/references/`; select one primary profile instead of attaching surface skills.
-- Each new design skill needs at least three `should_not_trigger` cases before implicit invocation can be reconsidered.
-
-## Routing Card Audit Shape
-Each Skill System source `SKILL.md` Routing Card should keep these Markdown fields in this order unless a local reason exists: `role`, `intent_signature`, `use_when`, `do_not_use_when`, `expected_inputs`, `expected_outputs`, `context_targets` with `must_read`, `read_if_needed`, `do_not_load_by_default`, `risk_profile` with `reads`, `writes`, `tools`, `sensitive_resources`, and `entry_scene`.
-
-## Routing Behavior Evals
-
-Canonical positive and negative routing cases live in `.codex/eval/routing_cases.yaml` and `.codex/eval/negative_routing_cases.yaml`. Do not copy case payloads into this operational document; duplicated examples drift and inflate every routing read.
-
-Use the eval schema and runner for field meanings and replay. A routing change is complete only when its focused positive case and a competing or negative case pass; schema or text presence alone is not routing-quality evidence.
-
-## Agent Metadata Tradeoff
-Current `agents/openai.yaml` metadata is conservative: specialist skills and heavy artifact generators use `allow_implicit_invocation: false` to prevent broad-trigger overactivation. The router exceptions are `analysis-router`, `research-router`, and `search-router`; `design-frontend` is the sole execution-owner exception for concrete repo-integrated UI implementation. Explicit aliases, Routing Cards, and this routing contract remain the primary activation path for all other skills.
-
-
-## Group Alias Routing
-
-User-facing skill families are defined in `docs/skill_registry.md` (the `family` column and Group Alias Map). This section defines only *when* group-selection mode is used and *which entry skill* each family routes to. Alias and display strings are not duplicated here; the registry Group Alias Map is their single source.
-
-Trigger guard:
-- Enter group-selection mode only when the request carries an explicit family-framing token (`스킬군`, `그룹`, `계열`, `group`, `family`) or an explicit family name.
-- Do not enter group-selection mode for bare domain words like `분석`, `검토`, `보고`, `계획`; those route by the normal Route Matrix.
-
-Family entry routing (Phase A):
-| family | entry skill |
+| Request | Owner |
 | --- | --- |
-| `search` | `search-router` |
-| `design` | `design-frontend` |
-| `report` | `report-qualitative` (정성평가/보고) or `report-critical` (검토/QA/blocker) by intent |
-| `research` | `research-router` |
-| `analysis` | `analysis-router` / `analysis-domain-modeling` / `analysis-performance` / `analysis-codebase-design` / `analysis-architecture-deepening` by intent |
-| `workflow` | `workflow-implementation` / `workflow-bug-fix` / `workflow-dependency-upgrade` / `workflow-source-maintenance` / `workflow-comment-maintenance` / `workflow-refactor-safely` / `workflow-rigor` / `workflow-minimal-implementation` / `workflow-plan-runner` / `workflow-validation` / `workflow-recovery` by intent |
-| `coordination` | `coordination-handoff` |
-| `planning` | `plan-short-term-docs` / `plan-loop-term` / `plan-long-term-package` by intent |
-| `loop` | `loop-readiness-router` / `loop-verifier-registry` / `workflow-loop-runner` by intent |
-| `memory` | `memory-bank-harness` (read), `memory-bank-ingestion` (promotion), or explicit memory-mutation skills by intent |
-| `evaluation` | `evaluation-harness` (case review) or `evaluation-usage-tracker` (usage telemetry) by intent |
-| `skill_system` | system `skill-creator` when exposed; attach `skill-system-repo-adapter` only for this repository |
+| direct implementation or refactor | current implementation owner or one clear specialist |
+| approved plan/spec execution | `workflow-plan-runner` |
+| bug fix with an unclear cause | `workflow-bug-fix`; use `analysis-bug` only for the unresolved cause |
+| short persisted plan | `plan-short-term-docs` |
+| accepted loop execution | `workflow-loop-runner` after a valid loop contract |
+| Memory read | current task owner using `memory-bank-harness` only for a declared, task-relevant slice |
+| persistent Memory write | the explicit Memory mutation skill matching the requested operation |
+| Knowledge read | current task owner using `knowledge-base-read` for declared project knowledge |
+| Knowledge write | the explicit category record, update, maintenance, or plan-sync owner |
+| named LLM Wiki context | `llm-wiki-context`, explicitly selected and read-only |
+| repository skill update | current implementation owner; add `skill-system-repo-adapter` only for repository integration |
+| personal skill creation | system `skill-creator` when explicitly named or clearly requested |
 
-Evidence vs research boundary (mirrored rule; `research-routing.md` is Codex-only, so this boundary lives here so both Codex and Claude apply it):
-- Cross-domain evidence search (papers, code, runtime, visual, memory) belongs to the `search` family; the `search` entry opens an evidence lane and `search-paper-evidence` provides paper evidence as support.
-- The whole task routes to `research` (`research-router`) only when the user develops a scientific claim, hypothesis, experiment, ablation, manuscript, or publishability decision.
-- Implementation/plan/algorithm requests that merely mention paper/loss/model/experiment keep their implementation/planning/analysis primary; research attaches only as a support evidence lane.
+Requested brevity, a status question, a correction, or a complaint does not change the task owner. A report of harm or undesired behavior is not permission to inspect or mutate external state.
 
-Phase B note:
-- `analysis-router`, `research-router`, and `search-router` are the only selectively implicit entry routers. `design-frontend` is the separately bounded implicit execution owner; specialist skills remain explicit-only unless future field feedback justifies another exception.
-- `evaluation-usage-tracker` and `memory-bank-ingestion` remain experimental explicit-only skills.
-- Loop engineering skills remain explicit/routing-controlled: readiness classification, verifier mapping, and loop execution are separate to avoid accidental long-running loops.
+## Project Context Locations
+
+The nearest `project-context.yaml` declares project-local skill roots, Memory Bank, Knowledge Base, plans, and named LLM Wikis. Follow `.codex/docs/project_context_manifest.md` or the Claude mirror for the locator contract.
+
+- An exact user path overrides the manifest.
+- The nearest manifest wins; do not merge it with parent manifests.
+- A missing declaration or missing target is `unavailable`; do not fallback-scan or auto-initialize.
+- Memory, Knowledge, plans, and Wiki content are context. Current instructions and verified source evidence outrank them.
+- Context admission never grants write permission or replaces the task owner.
+
+## Memory, Knowledge, And Wiki Boundary
+
+- Memory Bank stores cross-session working rules, recurring interaction mistakes, useful practices, and compact current state. Read only relevant active material; do not load full archives or event ledgers by default.
+- Knowledge Base stores durable project/domain/design/algorithm/architecture/code-review knowledge and direct artifact anchors. It is not an intermediate LLM Wiki projection.
+- An LLM Wiki is a separate, explicitly selected context source. Read its own guide and navigation contract; do not assume a shared schema or merge multiple Wikis.
+- Persistent writes require the owning workflow. General session completion, hook events, complaints, or inferred usefulness do not authorize collection or storage.
+
+## Execution And Runtime Boundary
+
+- Development requests execute source work; an active plan is input, not a substitute for implementation.
+- Use one `change -> validation` owner. A verifier does not become a second workflow owner.
+- Invoke routine approved executables directly. Use a shell wrapper only when pipeline, redirection, globbing, or other shell semantics are required.
+- Live home configuration, plugin caches, app-managed `.system` skills, and other sessions are deployment state. Modify them only on an explicit deployment or live-runtime request.
+- Explicit `/goal`, automation, durable repeated execution, or Stop continuation requires loop readiness and an accepted contract before execution.
+
+## Heavy Artifacts And Evidence
+
+- Plans, reports, lifecycle packages, synthetic eval suites, and other heavy artifacts require explicit artifact intent.
+- Scenario/replay files prove only their authored contracts; they are not field-quality evidence.
+- Hooks, harness records, and verifier receipts do not prove user intent and do not authorize repair.
+- Use the smallest existing verifier or actual-path observation that matches the material condition. Do not create fixtures or validation infrastructure merely to obtain a stronger result label.
+
+## Registry Boundary
+
+Skill names, families, aliases, plugin membership, and legacy replacements belong to `docs/skill_registry.md` and skill Routing Cards. This file does not duplicate the full inventory or group matrix. Unknown or stale explicit aliases are `unresolved`; do not invent an installed skill.

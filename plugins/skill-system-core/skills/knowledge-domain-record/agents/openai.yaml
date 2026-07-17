@@ -1,0 +1,6 @@
+interface:
+  display_name: "Knowledge Domain Record"
+  short_description: "Record durable project domain knowledge"
+  default_prompt: "Use $knowledge-domain-record to record this accepted project-specific domain rule."
+policy:
+  allow_implicit_invocation: false

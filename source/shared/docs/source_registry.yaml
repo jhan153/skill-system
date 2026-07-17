@@ -110,7 +110,6 @@ sources:
       - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
       - .codex/tools/verify_bundle.py
       - .codex/tools/validate_eval_cases.py
-      - .codex/tools/validate_field_feedback.py
       - .codex/tools/validate_source_registry.py
       - .codex/tools/validate_research_ledger.py
       - .codex/tools/run_verification_pipeline.py
@@ -176,7 +175,6 @@ sources:
     verification_status: agent-verified
     local_consumers:
       - .codex/skills/workflow-recovery/SKILL.md
-      - .codex/skills/evaluation-usage-tracker/references/harness-measurement-protocol.md
       - .codex/tools/recovery_guard.py
       - .codex/hooks/codex_hook_adapter.py
       - .codex/eval/runtime_usage_cases.yaml
@@ -206,7 +204,6 @@ adoption_decisions:
     decision: adapted
     upstream_reference: SRC-FABLIZE
     local_surface:
-      - .codex/skills/evaluation-usage-tracker/references/harness-measurement-protocol.md
       - .codex/tools/analyze_harness_measurement.py
       - .codex/hooks/codex_hook_adapter.py
       - .claude/hooks/claude_hook_adapter.py

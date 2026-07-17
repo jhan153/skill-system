@@ -197,19 +197,6 @@ def text_output(value: str | bytes | None) -> str:
 
 def core_checks(root: Path) -> list[Check]:
     py = sys.executable
-    skill_diet_command = [
-        py,
-        ".codex/tools/compare_skill_diet.py",
-        "check",
-        "--root",
-        str(root),
-        "--manifest",
-        ".codex/eval/baselines/skill-diet-9.1.2.yaml",
-        "--schema",
-        ".codex/eval/skill-diet-baseline.schema.json",
-    ]
-    if (root / ".git").exists():
-        skill_diet_command.append("--require-git-provenance")
     return [
         Check("doc_freshness", [py, ".codex/tools/check_doc_freshness.py", "."], root),
         Check("tool_requirements", [py, ".codex/tools/check_tool_requirements.py"], root),
@@ -227,15 +214,9 @@ def core_checks(root: Path) -> list[Check]:
             ],
             root,
         ),
-        Check("field_feedback", [py, ".codex/tools/validate_field_feedback.py", ".codex/field-feedback"], root, False),
         Check("source_registry", [py, ".codex/tools/validate_source_registry.py", ".codex/docs/source_registry.yaml"], root),
         Check("invocation_surface_policy", [py, ".codex/tools/check_invocation_surface_policy.py"], root),
         Check("work_horizon_policy", [py, ".codex/tools/check_work_horizon_policy.py"], root),
-        Check(
-            "skill_diet_baseline",
-            skill_diet_command,
-            root,
-        ),
         Check(
             "work_item_lifecycle",
             [py, ".codex/tools/validate_work_item.py", ".codex/schemas/workitem/examples/work-item.example.yaml"],
@@ -377,48 +358,6 @@ def agent_output_checks(root: Path) -> list[Check]:
     ]
 
 
-def knowledge_checks(root: Path) -> list[Check]:
-    py = sys.executable
-    return [
-        Check(
-            "knowledge_store_fixture",
-            [
-                py,
-                ".codex/tools/validate_knowledge_store.py",
-                ".codex/tools/tests/fixtures/knowledge-store/valid",
-                "--schemas",
-                ".codex/schemas/knowledge",
-                "--require-projections",
-            ],
-            root,
-        ),
-        Check(
-            "context_projection_build_check",
-            [
-                py,
-                ".codex/tools/build_context_pack.py",
-                ".codex/tools/tests/fixtures/knowledge-store/valid",
-                "--rebuild-projections",
-                "--build-run-pack",
-                "--check",
-            ],
-            root,
-        ),
-        Check("memory_explicit_contract", [py, ".codex/tools/check_memory_explicit_contract.py"], root),
-        Check(
-            "agent_run_context_linkage",
-            [
-                py,
-                ".codex/tools/validate_agent_run_artifact.py",
-                ".codex/tools/tests/fixtures/agent-runs/current-run",
-                "--schema",
-                ".codex/schemas/harness/agent-run.schema.json",
-            ],
-            root,
-        ),
-    ]
-
-
 def loop_checks(root: Path) -> list[Check]:
     py = sys.executable
     return [
@@ -515,8 +454,6 @@ def checks_for(profile: str, root: Path) -> list[Check]:
         return research_checks(root)
     if profile == "agent-output":
         return agent_output_checks(root)
-    if profile == "knowledge":
-        return knowledge_checks(root)
     if profile == "loop":
         return loop_checks(root)
     raise ValueError(f"unknown profile: {profile}")
@@ -524,7 +461,7 @@ def checks_for(profile: str, root: Path) -> list[Check]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--profile", choices=["core", "integrations", "execution", "agent-output", "research", "knowledge", "loop"], required=True)
+    parser.add_argument("--profile", choices=["core", "integrations", "execution", "agent-output", "research", "loop"], required=True)
     parser.add_argument("--format", choices=["text", "json"], default="text")
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--release", action="store_true", help="deprecated; use run_verification_pipeline.py --release")

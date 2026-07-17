@@ -11,8 +11,8 @@ Pipeline:
      CLAUDE.md, hooks, codex/claude-only trees, maintainer tools, codex-only schema example)
   3) mirror-from-canonical (Claude side only): docs/source_registry.yaml, eval/eval-case.schema.json
 
-Platform step is a MERGE overlay (does not delete shared output), so a platform tree can add
-codex-only files on top of a shared tree (e.g. the codex-only schemas/workitem/examples).
+Platform entries that overlap shared output are merged. Platform-only entries are replaced from
+source so deleted tools and hook files cannot survive in generated targets.
 
 Idempotency: verbatim trees copy unchanged bytes. Mirror files reuse the frozen
 generated_from/generated_at from source/mirror-meta.json, so regeneration is byte-stable.
@@ -33,6 +33,7 @@ NEUTRAL_VERBATIM: list[tuple[str, str]] = [
     ("shared/eval", "eval"),
     ("shared/schemas", "schemas"),  # Phase 1b: schema definitions are platform-neutral data contracts
 ]
+NEUTRAL_TARGET_ROOTS = {target_rel.split("/", 1)[0] for _, target_rel in NEUTRAL_VERBATIM}
 
 # Platform-native trees: every top-level entry under source/platform/<p> is copied verbatim
 # into that one target only. AGENTS.md / CLAUDE.md live here as platform-native for Phase 1a;
@@ -190,7 +191,10 @@ def _copy_platform(platform_root: Path, target: Path, written: list[str]) -> Non
     for child in sorted(platform_root.iterdir()):
         if _is_junk(child.name):
             continue
-        _merge_copy(child, target / child.name)
+        if child.name in NEUTRAL_TARGET_ROOTS:
+            _merge_copy(child, target / child.name)
+        else:
+            _copy(child, target / child.name)
         written.append((target / child.name).as_posix())
 
 
@@ -300,7 +304,6 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
         # `capabilities` blocks; components are directory-discovered, skills declared by path.
         claude_manifest = {
             "name": name,
-            "displayName": display_name,
             "version": str(spec["version"]),
             "description": spec["description"],
             "author": {"name": "Skill System Maintainers"},

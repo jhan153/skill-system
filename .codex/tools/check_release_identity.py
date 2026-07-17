@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 
-CURRENT_VERSION = "9.2.1"
+CURRENT_VERSION = "9.3.0"
 HISTORICAL_FORWARD_VERSION = "9.1.1"
 HISTORICAL_FORWARD_CASE_PREFIX = "solar-911-"
 PLUGIN_NAMES = (
@@ -25,13 +25,11 @@ SOURCE_PLUGIN_NAMES = {
     for name in PLUGIN_NAMES
 }
 EVAL_MANIFESTS = (
-    "context_compilation_cases.yaml",
     "design_usage_cases.yaml",
     "handoff_cases.yaml",
-    "knowledge_negative_cases.yaml",
-    "knowledge_routing_cases.yaml",
     "memory_usage_cases.yaml",
     "negative_routing_cases.yaml",
+    "pre_answer_depth_cases.yaml",
     "research_regression_cases.yaml",
     "routing_cases.yaml",
     "runtime_usage_cases.yaml",

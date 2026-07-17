@@ -4,9 +4,9 @@ As of the Phase 1.5 cutover, **`.codex/` and `.claude/` are generated targets. D
 directly.** Edit `source/` and regenerate.
 
 ## Layout
-- `source/skills/` — 66 skills (neutral; generated verbatim into both targets)
+- `source/skills/` — 74 skills (neutral; generated verbatim into both targets)
 - `source/shared/` — `context-routing.md`, `docs/`, `eval/` (neutral; generated into both)
-- `source/platform/codex/` — codex-only + maintainer payload (AGENTS.md, hooks, hooks.json, rules, schemas, research, research-routing.md, harness, field-feedback, tools)
+- `source/platform/codex/` — codex-only + maintainer payload (AGENTS.md, hooks, hooks.json, rules, schemas, research, research-routing.md, harness, tools)
 - `source/platform/claude/` — claude-only payload (CLAUDE.md, hooks, tools)
 - `source/mirror-meta.json` — frozen `generated_from`/`generated_at`/`source_checksum` for the two mirror-from-canonical files (keeps regeneration byte-identical)
 - `source/runtime-inventory.yaml`, `source/runtime-payload-policy.md` — Phase 0 classification + policy
@@ -31,5 +31,4 @@ directly.** Edit `source/` and regenerate.
   manifest — re-deriving the target is stronger than comparing a stored hash.
 - Mirror files (`docs/source_registry.yaml`, `eval/eval-case.schema.json`) keep their frozen
   `generated_at`; changing the canonical requires updating `source/mirror-meta.json` (Phase 1b).
-- Phase 1b (shared-neutral gap remediation) and the AGENTS.md/CLAUDE.md platform-template
-  refactor are not yet done; both are tracked in `docs/plan/2026-06-29-skill-system-plugin-neutral-source.md`.
+- Generation updates repository targets only. Installing into a home directory or live plugin cache is a separate, explicit deployment action.

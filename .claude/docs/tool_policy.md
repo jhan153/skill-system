@@ -32,6 +32,8 @@ not enough; classify by arguments, target, side effects, and current user intent
 
 - Treat this catalog as preflight guidance and reporting vocabulary.
 - Prefer `routine` checks before requesting risky actions.
+- Invoke the approved executable directly when shell syntax is not required. Do not wrap routine `git`, build, test, or product commands in `zsh -lc`, `bash -lc`, or a generic launcher because that hides the executable prefix from host approval reuse.
+- Use a shell wrapper only when the command genuinely needs shell semantics such as a pipeline, redirection, glob expansion, or shell variable evaluation; keep the wrapped scope as small as possible.
 - Mark missing approval, missing runtime support, or blocked host capability as
   `unverified` instead of inventing success.
 - Record postconditions as evidence: exit code, changed files, network target,

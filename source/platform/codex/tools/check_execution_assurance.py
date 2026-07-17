@@ -51,7 +51,6 @@ REQUIRED_FILES = [
     ".codex/tools/evaluate_loop_run.py",
     ".codex/tools/validate_loop_run.py",
     ".codex/tools/loop_policy.py",
-    ".codex/tools/emit_loop_feedback.py",
     ".codex/tools/check_evidence_ledger.py",
     ".codex/tools/activate_loop_run.py",
     ".codex/tools/deactivate_loop_run.py",

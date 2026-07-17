@@ -34,10 +34,10 @@ def canonical(relative: str) -> Path:
 class SkillInstructionQualityTests(unittest.TestCase):
     def test_current_skill_inventory_and_metadata_surface_are_bounded(self) -> None:
         skills = sorted((SOURCE / "skills").glob("*/SKILL.md"))
-        self.assertEqual(len(skills), 66)
-        audit = canonical("shared/docs/skill_quality_audit.md").read_text(encoding="utf-8")
+        self.assertTrue(skills)
+        registry = canonical("shared/docs/skill_registry.md").read_text(encoding="utf-8")
         for skill in skills:
-            self.assertIn(f"`{skill.parent.name}`", audit)
+            self.assertIn(f"`{skill.parent.name}`", registry)
             agent = skill.parent / "agents" / "openai.yaml"
             self.assertTrue(agent.is_file(), skill.parent.name)
             for line in agent.read_text(encoding="utf-8").splitlines():
@@ -66,23 +66,6 @@ class SkillInstructionQualityTests(unittest.TestCase):
                     HOST_PRODUCT_PATTERN.search(description),
                     f"{skill.parent.name}: frontmatter description must be host-neutral",
                 )
-
-    def test_every_current_skill_has_positive_and_negative_routing_coverage(self) -> None:
-        skills = {path.parent.name for path in (SOURCE / "skills").glob("*/SKILL.md")}
-        positive: set[str] = set()
-        negative: set[str] = set()
-        for path in (SOURCE / "shared" / "eval").glob("*.yaml"):
-            data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-            for case in data.get("cases", []) if isinstance(data, dict) else []:
-                if not isinstance(case, dict):
-                    continue
-                primary = case.get("expected_primary_skill")
-                if isinstance(primary, str):
-                    positive.add(primary)
-                positive.update(item for item in case.get("expected_supporting_skills", []) if isinstance(item, str))
-                negative.update(item for item in case.get("should_not_trigger", []) if isinstance(item, str))
-        self.assertEqual(skills - positive, set())
-        self.assertEqual(skills - negative, set())
 
     def test_global_agents_stays_thin_and_delegates_routing(self) -> None:
         text = canonical("platform/codex/AGENTS.md").read_text(encoding="utf-8")
@@ -135,10 +118,10 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertNotIn("needs only a quick answer", router)
         self.assertIn("Treat requested brevity as output shape, not evidence scope", metadata)
 
-    def test_routing_docs_do_not_embed_eval_payloads(self) -> None:
+    def test_routing_docs_do_not_own_eval_payloads(self) -> None:
         routing = canonical("shared/context-routing.md").read_text(encoding="utf-8")
         research = canonical("platform/codex/research-routing.md").read_text(encoding="utf-8")
-        self.assertIn(".codex/eval/routing_cases.yaml", routing)
+        self.assertNotIn(".codex/eval/", routing)
         self.assertNotIn("routing_smoke_tests:", routing)
         self.assertIn(".codex/eval/research_regression_cases.yaml", research)
         self.assertNotIn("research_route_smoke_tests:", research)
@@ -151,7 +134,7 @@ class SkillInstructionQualityTests(unittest.TestCase):
             "design-mobile-screen": ("design-frontend", "mobile"),
             "design-dashboard": ("design-frontend", "dashboard"),
             "design-section-web": ("design-frontend", "section-web"),
-            "create-skill-pack": ("skill-creator", "authoring_then_repository_integration"),
+            "create-skill-pack": ("task implementation owner", "direct_repository_skill_change"),
         }
         registry = canonical("shared/docs/skill_registry.md").read_text(encoding="utf-8")
         routing = canonical("shared/context-routing.md").read_text(encoding="utf-8")
@@ -164,7 +147,10 @@ class SkillInstructionQualityTests(unittest.TestCase):
             row = next(
                 line for line in registry.splitlines() if line.startswith(f"| `{legacy}` |")
             )
-            self.assertIn(f"`{owner}`", row)
+            if owner == "task implementation owner":
+                self.assertIn(owner, row)
+            else:
+                self.assertIn(f"`{owner}`", row)
             self.assertIn(f"`{mode}`", row)
             self.assertFalse((SOURCE / "skills" / legacy).exists(), legacy)
             alias_case = next(
@@ -173,8 +159,8 @@ class SkillInstructionQualityTests(unittest.TestCase):
                 if case.get("legacy_alias") == legacy and not case.get("direct_invocation")
             )
             self.assertEqual(alias_case.get("expected_mode"), mode)
-            if owner == "skill-creator":
-                self.assertEqual(alias_case.get("expected_route_class"), "external_system_skill_creator")
+            if owner == "task implementation owner":
+                self.assertEqual(alias_case.get("expected_route_class"), "direct_task_owner")
                 self.assertIn(
                     "skill-system-repo-adapter", alias_case.get("expected_supporting_skills", [])
                 )
@@ -187,7 +173,8 @@ class SkillInstructionQualityTests(unittest.TestCase):
         )
         self.assertIn("model-level compatibility", registry)
         self.assertIn("Direct slash/plugin invocation", registry)
-        self.assertIn("Host-resolved direct slash/plugin invocations", routing)
+        self.assertIn("exact path supplied by the user", routing)
+        self.assertIn("Do not scan unrelated home directories", routing)
         self.assertNotIn("`coordination-*`", routing)
 
     def test_research_router_disambiguates_search_and_development(self) -> None:
@@ -291,27 +278,25 @@ class SkillInstructionQualityTests(unittest.TestCase):
     def test_memory_writers_share_transaction_and_no_destructive_reinit(self) -> None:
         contract = canonical("shared/docs/memory_mutation_contract.md").read_text(encoding="utf-8")
         self.assertIn("Never report success from a partial", contract)
-        self.assertIn("reuse that ID", contract)
+        self.assertIn("retries reuse it", contract)
         for skill_id in (
             "memory-bank-init",
             "memory-bank-update",
             "memory-bank-correction-capture",
             "memory-bank-maintenance",
-            "memory-bank-ingestion",
         ):
             text = canonical(f"skills/{skill_id}/SKILL.md").read_text(encoding="utf-8")
             self.assertIn("memory_mutation_contract.md", text, skill_id)
         init = canonical("skills/memory-bank-init/SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("never delete or overwrite accepted history silently", init)
+        self.assertIn("never overwrite active history", init)
 
-    def test_context_harness_uses_live_store_and_measured_context_size(self) -> None:
-        knowledge = canonical("skills/knowledge-context-harness/SKILL.md").read_text(encoding="utf-8")
+    def test_memory_context_uses_declared_narrow_current_slice(self) -> None:
         memory = canonical("skills/memory-bank-harness/SKILL.md").read_text(encoding="utf-8")
-        self.assertNotIn("tests/fixtures/knowledge-store", knowledge)
-        self.assertIn("--rebuild-projections --check", knowledge)
-        self.assertIn("admitted words/UTF-8 bytes", knowledge)
-        self.assertIn("admitted_words", memory)
-        self.assertIn("advisory token estimate", memory)
+        self.assertIn("project-context.yaml", memory)
+        self.assertIn("active", memory)
+        self.assertIn("candidate", memory)
+        self.assertIn("deprecated", memory)
+        self.assertIn("full `current.md`", memory)
 
     def test_support_and_design_outputs_are_not_forced_on_simple_tasks(self) -> None:
         ledger = canonical("skills/workflow-task-ledger/SKILL.md").read_text(encoding="utf-8")

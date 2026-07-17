@@ -1,43 +1,51 @@
 # Memory Mutation Contract
 
-Use this contract for every write-producing Memory Bank operation. It is a consistency boundary, not permission to mutate memory.
+Use this contract for every write-producing Memory Bank operation. It is a consistency boundary, not permission to mutate Memory.
 
 ## Before Write
 
-1. Confirm explicit persistent-memory intent and the owning operation.
-2. Resolve the target bank, canonical entity (`project`, `goal`, `rule`, or `mistake`), stable item IDs, and base `snapshot_version`.
-3. Assign one stable operation/event ID before changing files; retries reuse that ID.
-4. Scan the ledger mechanically and admit only target records into model context.
-5. Preflight duplicates, conflicts, sensitivity/redaction, and every candidate in a batch. A batch with an unresolved candidate performs no writes.
-6. Build the expected event, current snapshot, archive block, and metadata result before committing.
+1. Confirm an explicit Memory request or approved project commit/closeout checkpoint.
+2. Resolve an exact user path or the nearest `project-context.yaml`; never select a fallback bank.
+3. Resolve the canonical entity (`project|goal|rule|mistake`), stable item IDs, and base `snapshot_version`.
+4. Assign one operation/event ID before changing files; retries reuse it.
+5. Read only the target current items and event/archive records needed for duplicate, conflict, sensitivity, and supersession checks.
+6. Build the expected event, compact current snapshot, archive block, and metadata result before committing. A batch with an unresolved item performs no writes.
+
+Canonical item state is `active|candidate|deprecated` with `verified|unverified`. Do not add confidence, maturity, recurrence, usage, or satisfaction scores.
 
 ## Commit And Replay
 
-- Prefer staging complete replacement content in a private temporary directory and atomically replacing files or the fresh bank directory where the filesystem permits it.
-- When the repository cannot atomically replace the whole multi-file state, persist a transaction marker containing operation ID, base version, intended file digests, and phase before the first ledger mutation.
-- Append or stage the canonical event once. A retry with the same operation ID must resume/verify the same intended state, never append a second semantic event.
-- Detect a changed base version before commit and stop for conflict resolution.
-- Never report success from a partial event/current/archive/meta update.
-- Fresh initialization commits all baseline files as one unit. Reinitialization is not fresh init and must preserve existing accepted history or stop.
+- Stage `events.jsonl`, `current.md`, `archive.md`, and `meta.json` as one operation. Prefer atomic replacement where repository policy permits it.
+- If whole-state atomic replacement is unavailable, use a transaction marker with operation ID, base version, intended digests, and phase before the first mutation.
+- Append or stage the semantic event once. A retry resumes or verifies the same intended state and never appends a duplicate event.
+- Detect a changed base version before commit and stop for explicit conflict resolution.
+- Never report success from a partial four-file update.
+- Fresh initialization also updates only the `memory_bank` section of `project-context.yaml` and preserves all other manifest sections.
+
+## Compact Snapshot Rule
+
+`current.md` contains only current goals, rules, recurring mistake summaries, successful working practices, routing anchors, and stable pointers. It does not accumulate raw conversations, logs, implementation chronology, completed task narratives, or full plan/Knowledge bodies. Move historical detail to events/archive and keep a pointer.
 
 ## Post-Write Validation
 
-Verify all of the following before reporting `agent-verified`:
+Before reporting success, verify:
 
-- event ID, entity, item ID, action, actor/workflow, and before/after state use the canonical schema;
-- `events.jsonl`, `current.md`, and `archive.md` agree on stable IDs and final state;
-- `meta.json` records the expected snapshot version and timestamp;
-- deprecation/consolidation preserved append-only history;
-- the operation changed only its owned entities and target items;
-- sensitive raw evidence was not persisted;
-- the transaction marker is completed/cleared according to repository policy.
+- canonical event ID, entity, item ID, action, actor/workflow, and before/after state;
+- event/current/archive agreement on stable IDs and final state;
+- expected `meta.json` snapshot version and timestamp;
+- append-only preservation for deprecation/consolidation;
+- target-only changes and no raw sensitive evidence;
+- completed/cleared transaction marker according to repository policy;
+- unchanged unrelated `project-context.yaml` sections when initialization touched the manifest.
 
-A failed post-check is `blocked` with the operation ID and inconsistent files. Do not start an unrelated repair or append a compensating event without an explicit recovery decision.
+A failed post-check is `blocked` with the operation ID and inconsistent files. Do not start unrelated repair or append a compensating event without an explicit recovery decision.
 
 ## Operation Boundaries
 
-- `memory-bank-update` owns canonical `goal`/`rule` create, update, and deprecate mutations.
-- `memory-bank-correction-capture` owns new recurring `mistake` candidates; correcting a stored goal/rule routes to update.
-- `memory-bank-maintenance` may consolidate mistake candidates. Goal/rule conflicts produce a proposal for update rather than an implicit policy mutation.
-- `memory-bank-ingestion` is a thin approved-packet adapter: every admitted candidate must map to a canonical entity/item ID and use the same transaction path.
-- A semantic-gate no-op is a valid no-write outcome, not a failure.
+- `memory-bank-init`: explicit fresh store and manifest-section registration.
+- `memory-bank-update`: goal/rule/practice create, update, or deprecate.
+- `memory-bank-correction-capture`: new recurring mistake candidate.
+- `memory-bank-maintenance`: read-only report/validation/conflict check plus explicitly requested consolidate/compact operations.
+- `project-context-checkpoint`: classifies an approved commit/closeout and delegates each Memory mutation to the narrow owner; it does not invent a separate packet format.
+
+A semantic-gate no-op is a valid no-write result.

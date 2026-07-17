@@ -1,4 +1,4 @@
-# 9.2.1 Terms
+# 9.3.0 Terms
 
 ## version_cut
 
@@ -20,35 +20,35 @@ The location that an agent should treat as the source of runtime guidance.
 
 Runtime configuration and automation assets, including `.codex/config.toml` and `automations`, are host-managed. Preserve existing local settings unless the user explicitly chooses to replace them.
 
-The Codex hook files are project-local evidence/control surfaces. They run under project trust, hook trust, sandboxing, approval policy, and rules.
+The default Codex hook map is empty. Hook adapters are optional project-local evidence/control surfaces and may be enabled only by explicit project/runtime policy.
+
+## project_context_manifest
+
+`project-context.yaml` declares repository-relative locations for optional project Memory Bank, Knowledge Base, plans, skill roots, and named LLM Wikis. A missing entry means that context source is unavailable; it does not authorize parent, home, or adjacent-repository discovery.
+
+## memory_bank_and_knowledge_base
+
+Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, code-review, and decision knowledge linked to canonical artifacts. Neither uses maturity, confidence, recurrence, usage, or satisfaction scores.
+
+## llm_wiki
+
+An LLM Wiki is an optional named read-only context source. It is selected explicitly and navigated through its own guide, index, search, graph, or backlink conventions; it is not a default Knowledge Base projection.
 
 ## app_managed_system_skills
 
 `.codex/skills/.system` is app-managed. Optional snapshots under `optional-system-skills-snapshot/` are comparison material and require explicit user intent before replacing an existing runtime `.system` folder.
 
-## skill_maturity
-
-A conservative label for how ready a skill is in real use.
-
-Allowed values:
-
-- `skeleton`
-- `usable`
-- `field_tuned`
-- `experimental`
-- `deprecated`
-
 ## improvement_track
 
-The next practical work needed to improve a skill. It can mention routing precision, better examples, context trimming, output shape, or field feedback.
+The next practical work needed to improve a skill after an explicit user report or request.
 
 ## runtime_usage_eval
 
-Usage examples that help observe skill behavior in real tasks and collect improvement evidence.
+Authored regression examples that can check their declared syntax and routing contract. They are not field-quality evidence.
 
 ## field_feedback
 
-Human notes from real use. Feedback can update maturity, routing examples, negative cases, docs, or skill text in the next version cut.
+A behavior or problem the user explicitly reports in conversation. The bundle does not automatically collect or persist prompts, transcripts, usage, or user identifiers.
 
 ## Host-Managed Or External Assets
 

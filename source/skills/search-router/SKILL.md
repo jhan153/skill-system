@@ -45,8 +45,9 @@ description: Route explicit cross-domain evidence requests to one sufficient lan
 | codebase behavior or structure | `analysis-codebase` | use `analysis-bug` instead for a concrete failure/RCA signal |
 | runtime/test/change evidence | active implementation workflow with `workflow-rigor` as needed | execution stays with that workflow |
 | screenshots or rendered UI | `design-visual-regression` | use `design-a11y-audit` for keyboard/semantic/contrast evidence |
-| accepted project memory | `memory-bank-harness` | use `memory-bank-maintenance` only for explicit state review/mutation |
-| Wiki/Runtime Projection knowledge | `knowledge-context-harness` | use `knowledge-base-maintenance` only for explicit mutation/review |
+| declared project Memory | `memory-bank-harness` | read only a task-relevant current slice; mutation stays with an explicit Memory owner |
+| declared project Knowledge Base | `knowledge-base-read` | read only matching records; mutation stays with an explicit Knowledge owner |
+| explicitly selected LLM Wiki | `llm-wiki-context` | follow that Wiki's own guide; read-only and no cross-Wiki merge |
 
 If two lanes remain materially plausible, consult the matrix or ask one lane-changing question. Never open both speculatively.
 

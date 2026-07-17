@@ -1,5 +1,30 @@
 # Changelog
 
+## 9.3.0
+
+- Replaced broad default lifecycle interception with an empty Codex hook map and compact global Codex/Claude rules. Harm reports, corrections, complaints, and status messages remain context rather than authorization for investigation or mutation.
+- Reduced routing to direct explicit/clearly matching specialists plus at most one narrow router when owners genuinely compete. Exact skill paths and repository declarations outrank exposed-session skills; undeclared home and adjacent repositories are not fallback search roots.
+- Added a portable `project-context.yaml` contract for repository-relative Memory Bank, Knowledge Base, plans, skill roots, and named LLM Wiki paths. Missing entries mean unavailable and do not initialize or discover stores.
+- Simplified Memory Bank to append-only events plus compact current/archive/meta reflection for cross-session goals, rules, recurring mistakes, and proven practices. Removed packet ingestion, maturity/confidence/recurrence/usage/satisfaction scoring, Stop writes, and automatic complaint capture.
+- Replaced the claim/edge/Runtime Projection Knowledge pipeline with a generic artifact-linked Markdown Knowledge Base lifecycle, five explicit category record skills, accepted-plan synchronization, and a separate explicit read-only LLM Wiki context skill.
+- Added a bounded `project-context-checkpoint` for explicit commit or closeout requests. It writes only clear current-task durable items to one existing declared store, never initializes stores, duplicates facts, mutates Wikis, or writes home/global context.
+- Kept authored scenarios as non-authoritative regression material and removed obsolete ingestion/projection cases instead of adding a 9.3 scenario suite. Advanced canonical bundle identity to 9.3.0 without installing, deploying, tagging, committing, or pushing it.
+
+## 9.2.3
+
+- Stopped routing every skill authoring or update request through the app-managed system `skill-creator`. Repository skill changes stay with the current task implementation owner; system `skill-creator` is reserved for explicit invocation or new personal-skill creation.
+- Remapped the retired `create-skill-pack` model alias to direct task ownership with optional `skill-system-repo-adapter` integration instead of an automatic external-system handoff.
+- Removed the unsupported `displayName` key from generated Claude plugin manifests while preserving Codex interface metadata, allowing all six local plugins to validate and install in both clients.
+- Advanced the active bundle identity to 9.2.3 without adding scenario, maturity, telemetry, or user-record machinery.
+
+## 9.2.2
+
+- Removed the skill maturity system from the active bundle: registry maturity values and review rules, maturity guidance, field-feedback persistence schemas/YAML/gates/reports, their validator and report-generator Python tools, and the `evaluation-usage-tracker` skill.
+- Removed field-feedback and frozen skill-diet comparisons from the required core gate. Historical changelog and baseline artifacts remain historical records, not active quality or release authorities.
+- Limited field feedback to problems the user explicitly reports in conversation. The bundle adds no automatic prompt, transcript, usage, identifier, or telemetry collection.
+- Narrowed `evaluation-harness` to explicitly requested maintenance of existing eval cases and stated that scenario results do not establish field quality.
+- Advanced active bundle identity to 9.2.2 while leaving the independently versioned opt-in harness protocol unchanged.
+
 ## 9.2.1
 
 - Continued the immutable local `v9.2.0` cut with bounded conditional reference disclosure across six design skills: `design-frontend`, `design-visual-regression`, `design-tokens`, `design-a11y-audit`, `design-component-mapper`, and `design-layout-translator`. Main bodies keep routing selectors, semantic decisions, evidence ceilings, and fail-closed behavior; detailed schemas, policies, and procedures are selected only for applicable tasks.

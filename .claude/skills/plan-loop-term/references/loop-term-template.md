@@ -127,7 +127,7 @@ loop_contract_companion:
     anti_reward_hacking: []
     parallel_ownership: []
     runtime_capabilities: []
-    knowledge_feedback_candidates_only: true
+    persistent_context_mutation: explicit_only
 
   handoff:
     execution_owner: workflow-loop-runner

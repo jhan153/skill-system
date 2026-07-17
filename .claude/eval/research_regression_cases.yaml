@@ -1,4 +1,4 @@
-version: "9.2.1"
+version: "9.3.0"
 purpose: "Research cluster regression cases."
 cases:
   - case_id: research-001

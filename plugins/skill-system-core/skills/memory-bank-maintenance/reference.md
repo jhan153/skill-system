@@ -1,78 +1,54 @@
 # memory-bank-maintenance Reference
 
-## Scope
-- This pack covers report, validate, conflict-check, and consolidate operations.
-- It does not create new projects and does not directly mutate goals or rules on behalf of feature work.
-
 ## Canonical Enums
-- `entity`: `goal|rule|mistake|system`
-- `action`: `validate|consolidate|detect_conflict|resolve_conflict|update|deprecate`
-- `status`: `active|candidate|deprecated`
-- `verification`: `verified|unverified`
-- `confidence`: `low|medium|high`
-- `validation_state`: `agent-verified|user-verification-needed|unverified|blocked`
 
-## Read-Only Operations
-- `report`: summarize current state, touched files, and validation status
-- `validate`: run schema and consistency checks without writes
-- `conflict-check`: identify duplicate items, invalid status combinations, or broken references without writes
+- Entity: `goal|rule|mistake|system`
+- Action: `validate|consolidate|detect_conflict|resolve_conflict|update|deprecate`
+- Status: `active|candidate|deprecated`
+- Verification: `verified|unverified`
+- Validation state: `agent-verified|user-verification-needed|unverified|blocked`
 
-## Consolidation Rules
-- Consolidation is the only maintenance operation that writes by default.
-- Candidate mistakes may be merged when item meaning clearly overlaps and evidence families match.
-- Promotion from `candidate` to `active` requires sufficient evidence and should set `verification=verified`.
-- Stale rules may be deprecated only when a stronger current rule supersedes them.
+Legacy `accepted|proposal|stale|superseded|archived|field_feedback` states are not silently mapped. Report them as migration candidates and wait for an explicit maintenance decision.
 
-## Consolidation Event Schema
-```json
-{
-  "event_id": "evt_20260410T123000Z_0004",
-  "at": "2026-04-10T12:30:00Z",
-  "actor": "agent|automation",
-  "workflow": "maintenance",
-  "entity": "system",
-  "action": "consolidate",
-  "item_id": "snapshot_0002",
-  "before": {
-    "snapshot_version": 1
-  },
-  "after": {
-    "snapshot_version": 2,
-    "affected_items": ["mistake_001"]
-  },
-  "reason": "candidate mistakes consolidated",
-  "evidence": "overlapping recurring corrections with sufficient evidence",
-  "snapshot_base_version": 1,
-  "validation_state": "agent-verified"
-}
-```
+## Operations
 
-## Conflict Criteria
-- Duplicate `item_id`
-- Invalid enum value
-- `current.md` item pointing to a missing `source_event`
-- Deprecated item still marked verified without current justification
+- `report`: summarize compact current state and schema version.
+- `validate`: check parseability, canonical enums, stable references, and snapshot monotonicity.
+- `conflict-check`: identify duplicate IDs, contradictory active rules, broken pointers, or candidate overlap.
+- `consolidate`: merge directly equivalent items or record explicit supersession with one append-only event.
+- `compact-current`: keep only current operational summaries and stable history/source pointers; chronology remains in events/archive or a plan/Knowledge artifact.
 
-## Validation Checklist
-- JSON parseability
-- Enum consistency
-- Cross-file reference consistency
-- Snapshot version monotonicity
+## Promotion And Deprecation
 
+- Candidate mistakes may be merged when identity and evidence clearly overlap.
+- Candidate activation requires explicit user acceptance or a current verified repository policy.
+- An active rule may be deprecated only when a stronger current instruction, source, decision, or plan supersedes it.
+- Never use counts, scores, or elapsed time as a promotion condition.
 
-## Memory Card Routing Contract
-Memory entries should be routable before they are loaded into context. Do not load the full memory bank by default; load active memory cards matching the repo, topic, and request. Superseded or archived entries are excluded unless conflict/history is specifically needed. One-turn preferences should not become memory cards.
+## Routable Current Item
 
 ```yaml
-memory_card:
-  memory_id:
-  project:
-  repo:
-  topic:
-  status: active | superseded | archived
-  applies_when:
-  do_not_apply_when:
-  related_skills:
-  related_files:
-  last_verified:
+memory_item:
+  id:
+  entity: goal | rule | mistake
+  kind: constraint | practice  # rule only
+  status: active | candidate | deprecated
+  verification: verified | unverified
+  summary:
+  applies_when: []
+  do_not_apply_when: []
+  related_skills: []
+  related_files: []
+  source_event:
+  updated_at:
 ```
+
+Items should be searchable from `current.md` before any event/archive detail is loaded. One-turn preferences and raw session narratives do not become items.
+
+## Validation
+
+- JSON parseability and canonical enum use.
+- Every current item points to an existing source event.
+- Event/current/archive/meta final state agrees.
+- Snapshot versions are monotonic.
+- `current.md` contains no long implementation chronology or raw conversation.

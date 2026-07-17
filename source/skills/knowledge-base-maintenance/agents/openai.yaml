@@ -1,7 +1,10 @@
 interface:
   display_name: "Knowledge Base Maintenance"
-  short_description: "Validate Wiki claims, sources, edges, and feedback"
+  short_description: "Maintain Markdown Knowledge records and links"
+  default_prompt: "Use $knowledge-base-maintenance to validate or maintain this declared project Knowledge Base."
 policy:
   invocation_surface: explicit_procedure
   allow_implicit_invocation: false
   may_own_execution: true
+  may_write: true
+  may_block_completion: false

@@ -1,31 +1,41 @@
 ---
 name: memory-bank-init
-description: Initialize project-scoped persistent memory by creating the canonical baseline files, project identity metadata, and first append-only event. Use only on an explicit init or reinit request; do not overwrite an existing bank as if it were a normal update.
+description: Initialize a project-scoped Memory Bank and register only its location in project-context.yaml. Use only for an explicit init or reinit request; never discover, overwrite, or merge an existing bank as fallback.
 ---
 
 # Memory Bank Init
 
 ## Routing Card
 - role: memory_operation
-- intent_signature: initialize memory bank, start persistent project memory, 메모리뱅크 초기화
-- use_when: the user explicitly requests a fresh project bank or explicitly approved reinitialization
-- do_not_use_when: update, correction capture, maintenance, or design discussion is primary
-- expected_inputs: verified project root/identity, target path state, and explicit init/reinit intent
-- expected_outputs: canonical baseline files, first event, stable identity, preservation decision, and readback result
-- context_targets: read project identity and exact target state; before writing load `.codex/docs/memory_mutation_contract.md` and `reference.md`; use `docs/document.md` only for exceptional failure
-- risk_profile: create one canonical bank only after explicit intent; never read unrelated banks or overwrite accepted history silently; credentials denied
+- intent_signature: initialize project Memory Bank, 메모리뱅크 초기화
+- use_when: the user explicitly requests fresh initialization or reinitialization
+- do_not_use_when: read, update, correction capture, checkpoint, or maintenance is primary
+- expected_inputs: verified project root/identity, exact target or manifest state, and explicit init/reinit intent
+- expected_outputs: four baseline files, first event, manifest section update, and readback result
+- context_targets:
+  must_read: exact project/target state, `reference.md`, `.codex/docs/memory_mutation_contract.md`, and existing `project-context.yaml` when present
+  read_if_needed: repository persistence convention
+  do_not_load_by_default: other banks, transcripts, full project history, common/home Memory
+- risk_profile:
+  reads: exact target and manifest only
+  writes: one project-local bank and only the manifest's `memory_bank` section
+  tools: local file operations and readback
+  sensitive_resources: credentials and raw private history denied
 - entry_scene: PREPARE
 
 ## Initialization Contract
-Resolve the project root and `project_id` by `reference.md`, record the locator source, and inspect the exact target before writing. A missing/ambiguous identity or unwritable path blocks creation. If any bank exists, ordinary init stops; reinit requires explicit intent plus a safe repository-approved preservation/migration path. Reinitialization must never delete or overwrite accepted history silently; do not replace or merge it as fallback.
+Target precedence is: exact user path, declared `memory_bank.root`, then the default path from `reference.md` only because initialization itself was explicitly requested. Ordinary resolution never creates this default.
+
+If a bank already exists, ordinary init stops. Reinit requires explicit intent and a repository-approved preservation or migration path; never overwrite active history. When writing `project-context.yaml`, preserve all unknown and unrelated sections and update only `memory_bank`.
 
 ## Workflow
-1. Stage `current.md`, `archive.md`, `events.jsonl`, and `meta.json` for the verified fresh target under the shared mutation contract.
-2. Append the first `entity=project`, `action=create` event.
-3. Write the baseline current/archive sections and project metadata.
-4. Commit as one unit, then read back all four files, their shared event ID, snapshot version, and stable project identity.
+1. Resolve project identity and target; inspect the exact bank and manifest state.
+2. Stage `current.md`, `archive.md`, `events.jsonl`, and `meta.json` under one operation ID.
+3. Append the first `entity=project`, `action=create` event and create the compact baseline snapshot.
+4. Add or update only the manifest `memory_bank` section.
+5. Commit the bank as one unit and read back all four files, shared event ID, snapshot version, project identity, and manifest path.
 
-Any partial creation, parse failure, or identity mismatch remains failed/blocked rather than a successful initialization.
+Any partial creation, parse failure, identity mismatch, or manifest clobber remains failed/blocked.
 
 ## Output
-Report created/preserved paths, project/event IDs, four-file readback, and identity/reinit uncertainty. Initialization creates storage, not substantive memory policy; surface the lower portability of a path-hash identity.
+Report exact created/preserved paths, project/event IDs, four-file and manifest readback, and any portability uncertainty. Initialization creates storage; it does not populate inferred project rules or session history.

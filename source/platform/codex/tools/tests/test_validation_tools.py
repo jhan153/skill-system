@@ -77,22 +77,9 @@ class ValidationToolTests(unittest.TestCase):
         self.addCleanup(lambda: ledger.unlink(missing_ok=True))
         return ledger
 
-    def hooks_json_command(self, event_name: str = "UserPromptSubmit") -> str:
+    def test_hooks_json_defaults_to_empty(self) -> None:
         hooks_config = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))
-        return hooks_config["hooks"][event_name][0]["hooks"][0]["command"]
-
-    def test_hooks_json_event_and_launcher_invariants(self) -> None:
-        hooks = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))["hooks"]
-        expected = {
-            "UserPromptSubmit", "SessionStart", "PreToolUse", "PermissionRequest",
-            "PostToolUse", "Stop", "PreCompact", "PostCompact",
-        }
-        self.assertEqual(set(hooks), expected)
-        commands = {spec[0]["hooks"][0]["command"] for spec in hooks.values()}
-        self.assertEqual(len(commands), 1, "all hook events must use one trusted adapter launcher")
-        for event_name, spec in hooks.items():
-            timeout = spec[0]["hooks"][0]["timeout"]
-            self.assertEqual(timeout, 45 if event_name == "Stop" else 30)
+        self.assertEqual(hooks_config, {"hooks": {}})
 
     def write_loop_contract(self, path: Path, max_iterations: int = 3, same_failure_limit: int = 2) -> None:
         path.write_text(
@@ -155,46 +142,6 @@ termination:
 
 
 
-
-
-
-    def test_context_pack_builder_excludes_unverified_claims(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
-            store_dir = Path(tmp) / "knowledge-store"
-            output_dir = Path(tmp) / "generated"
-            shutil.copytree(FIXTURES / "knowledge-store" / "valid", store_dir)
-            claims_file = store_dir / "claims.yaml"
-            claims_text = claims_file.read_text(encoding="utf-8")
-            claims_text = claims_text.replace(
-                (
-                    "  - claim_id: KC-20260621-103\n"
-                    "    claim_type: plan_state\n"
-                    "    statement: \"Active Kanboard card KB-20260621-001 anchors the current 8.0 implementation context.\"\n"
-                    "    authority_class: operational\n"
-                    "    context_density: low\n"
-                    "    verification_state: agent-verified\n"
-                ),
-                (
-                    "  - claim_id: KC-20260621-103\n"
-                    "    claim_type: plan_state\n"
-                    "    statement: \"Active Kanboard card KB-20260621-001 anchors the current 8.0 implementation context.\"\n"
-                    "    authority_class: operational\n"
-                    "    context_density: low\n"
-                    "    verification_state: unverified\n"
-                ),
-                1,
-            )
-            claims_file.write_text(claims_text, encoding="utf-8")
-            self.assert_passes(
-                ".codex/tools/build_context_pack.py",
-                str(store_dir),
-                "--output",
-                str(output_dir),
-                "--write",
-            )
-            pack_text = (output_dir / "context-packs" / "CP-20260621-101.yaml").read_text(encoding="utf-8")
-            self.assertNotIn("KC-20260621-103", pack_text)
-            self.assertFalse((output_dir / "wiki" / "index.md").exists())
 
 
 
@@ -291,36 +238,6 @@ termination:
                 any(str(reason).startswith("fallback_diagrams=") for reason in gate.get("reasons", [])),
                 gate,
             )
-
-    def test_knowledge_store_missing_source_ref_fails(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
-            store_dir = Path(tmp) / "knowledge-store"
-            shutil.copytree(FIXTURES / "knowledge-store" / "valid", store_dir)
-            claims_file = store_dir / "claims.yaml"
-            claims_file.write_text(
-                claims_file.read_text(encoding="utf-8").replace("SRC-20260621-101", "SRC-20260621-999", 1),
-                encoding="utf-8",
-            )
-            self.assert_fails(
-                ".codex/tools/validate_knowledge_store.py",
-                str(store_dir),
-                "--schemas",
-                ".codex/schemas/knowledge",
-            )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     def test_notify_desktop_dry_run_passes(self) -> None:
@@ -994,110 +911,6 @@ condition_results:
 
 
 
-
-    def test_hooks_json_command_launches_from_home_codex_without_repo_env(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
-            home = Path(tmp) / "home"
-            codex_home = home / ".codex"
-            for rel in [
-                Path("hooks/codex_hook_adapter.py"),
-                Path("tools/hook_runtime.py"),
-                Path("tools/_validation.py"),
-            ]:
-                target = codex_home / rel
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(ROOT / ".codex" / rel, target)
-
-            ledger = Path(tmp) / "hook-events.jsonl"
-            payload = json.dumps(
-                {
-                    "hook_event_name": "UserPromptSubmit",
-                    "session_id": "session-home",
-                    "turn_id": "turn-home",
-                    "cwd": "/",
-                    "permission_mode": "workspace-write",
-                    "prompt": "home hook",
-                }
-            )
-            result = subprocess.run(
-                self.hooks_json_command(),
-                cwd="/",
-                env={
-                    "HOME": str(home),
-                    "PATH": os.environ.get("PATH", ""),
-                    "PWD": "/",
-                    "PYTHONDONTWRITEBYTECODE": "1",
-                    "SKILL_SYSTEM_HOOK_LEDGER": str(ledger),
-                },
-                input=payload,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                shell=True,
-                check=False,
-                timeout=30,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertTrue(ledger.exists(), result.stdout + result.stderr)
-            self.assertNotIn("fatal: not a git repository", result.stdout + result.stderr)
-            self.assertNotIn("/.codex/hooks/codex_hook_adapter.py", result.stdout + result.stderr)
-            event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[0])
-            self.assertEqual(event["neutral_event"], "request_received")
-
-    def test_hooks_json_command_ignores_untrusted_cwd_adapter(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
-            home = Path(tmp) / "home"
-            codex_home = home / ".codex"
-            for rel in [
-                Path("hooks/codex_hook_adapter.py"),
-                Path("tools/hook_runtime.py"),
-                Path("tools/_validation.py"),
-            ]:
-                target = codex_home / rel
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(ROOT / ".codex" / rel, target)
-
-            untrusted = Path(tmp) / "untrusted"
-            untrusted.mkdir()
-            marker = Path(tmp) / "marker"
-            (untrusted / "codex_hook_adapter.py").write_text(
-                "from pathlib import Path\nPath(%r).write_text('hijacked')\nprint('UNTRUSTED')\n" % str(marker),
-                encoding="utf-8",
-            )
-            ledger = Path(tmp) / "hook-events.jsonl"
-            payload = json.dumps(
-                {
-                    "hook_event_name": "UserPromptSubmit",
-                    "session_id": "session-home",
-                    "turn_id": "turn-home",
-                    "cwd": str(untrusted),
-                    "permission_mode": "workspace-write",
-                    "prompt": "home hook",
-                }
-            )
-            result = subprocess.run(
-                self.hooks_json_command(),
-                cwd=untrusted,
-                env={
-                    "HOME": str(home),
-                    "PATH": os.environ.get("PATH", ""),
-                    "PWD": str(untrusted),
-                    "PYTHONDONTWRITEBYTECODE": "1",
-                    "SKILL_SYSTEM_HOOK_LEDGER": str(ledger),
-                },
-                input=payload,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                shell=True,
-                check=False,
-                timeout=30,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertFalse(marker.exists(), result.stdout + result.stderr)
-            self.assertNotIn("UNTRUSTED", result.stdout + result.stderr)
-            event = json.loads(ledger.read_text(encoding="utf-8").splitlines()[0])
-            self.assertEqual(event["neutral_event"], "request_received")
 
     def test_codex_hook_adapter_records_pretooluse(self) -> None:
         ledger = self.temp_ledger("live-hook-pretooluse")
