@@ -119,7 +119,7 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn("Treat requested brevity as output shape, not evidence scope", metadata)
 
     def test_routing_docs_do_not_own_eval_payloads(self) -> None:
-        routing = canonical("shared/context-routing.md").read_text(encoding="utf-8")
+        routing = canonical("platform/codex/context-routing.md").read_text(encoding="utf-8")
         research = canonical("platform/codex/research-routing.md").read_text(encoding="utf-8")
         self.assertNotIn(".codex/eval/", routing)
         self.assertNotIn("routing_smoke_tests:", routing)
@@ -137,7 +137,7 @@ class SkillInstructionQualityTests(unittest.TestCase):
             "create-skill-pack": ("task implementation owner", "direct_repository_skill_change"),
         }
         registry = canonical("shared/docs/skill_registry.md").read_text(encoding="utf-8")
-        routing = canonical("shared/context-routing.md").read_text(encoding="utf-8")
+        routing = canonical("platform/codex/context-routing.md").read_text(encoding="utf-8")
         case_data = yaml.safe_load(
             canonical("shared/eval/routing_cases.yaml").read_text(encoding="utf-8")
         )

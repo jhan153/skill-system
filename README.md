@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.3.0 Bundle
+## 9.3.1 Bundle
 
-This source tree carries the local, not-yet-deployed 9.3.0 field-harness bundle line based on the immutable `v9.2.0` cut. Its main components are:
+This source tree carries the local, not-yet-deployed 9.3.1 field-harness bundle line based on the immutable `v9.2.0` cut. Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -25,9 +25,11 @@ This source tree carries the local, not-yet-deployed 9.3.0 field-harness bundle 
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.3.0 — Field Harness & Project Context`, based on the local `v9.2.0` full-diet cut; the latest pushed release remains `v9.1.1`. Local installation is explicit and does not imply publishing or pushing. Bundle 9.3.0 and the historical opt-in harness protocol named 9.2.1 are separate version identities.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.3.1 — Platform Harness Split`, based on the local `v9.2.0` full-diet cut; the latest pushed release remains `v9.1.1`. Local installation is explicit and does not imply publishing or pushing. Codex and Claude share one bundle version and release tag; harness changes advance that version instead of creating a second protocol-version axis.
 
-9.3 keeps global instructions short, uses an exact specialist directly, and opens at most one narrow router only when several owners genuinely compete. The nearest `project-context.yaml` may declare repository-relative Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery.
+The Codex harness keeps the compact 9.3 routing model. The Claude harness is independently owned and preserves the proven 9.2.1 structured decision model while consuming the current shared skill catalog. Platform-specific global instructions, routing, hooks, and tools can be generated and checked independently; portable skills and data contracts remain shared.
+
+The Codex router uses an exact specialist directly and opens at most one narrow router only when several owners genuinely compete. The nearest `project-context.yaml` may declare repository-relative Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery.
 
 Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, review, and decision knowledge linked to real artifacts. LLM Wikis are optional read-only context sources selected explicitly and navigated using their own conventions. The default hook map is empty; commit/closeout checkpoint writes operate only on declared stores and clear current-task facts.
 
@@ -266,6 +268,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.2.2 | Field-driven simplification | Removes the active skill-maturity and field-feedback persistence systems, deletes the usage-tracker skill and its Python validators/report generator, removes those proxy checks from core hygiene, and limits field input to problems the user explicitly reports in conversation. The active canonical surface is 65 skills; historical baselines remain historical only. |
 | 9.2.3 | Field-driven routing simplification | Keeps repository skill changes with the current task owner, reserves app-managed `skill-creator` for explicit or personal-skill creation, and fixes generated Claude manifests so all six local plugins install without the unsupported `displayName` key. |
 | 9.3.0 | Field harness & project context | Empties default hooks, compresses global routing, declares per-repository context paths, separates Memory Bank, artifact-linked Knowledge Base, and explicit LLM Wiki reads, adds bounded commit/closeout checkpointing, and removes maturity, packet-ingestion, telemetry, and automatic Wiki-projection machinery. The source candidate is not installed into a home or live plugin cache. |
+| 9.3.1 | Platform harness split | Gives Codex and Claude independent global instructions, routing, hook, tool, generation, and parity-check paths while retaining one bundle version and tag. Codex keeps the compact 9.3 router; Claude continues the 9.2.1 structured behavior line against the current shared skills. The legacy version-selected receipt monitor becomes a versionless opt-in feature of the current bundle. |
 
 ## License
 

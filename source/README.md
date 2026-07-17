@@ -5,22 +5,25 @@ directly.** Edit `source/` and regenerate.
 
 ## Layout
 - `source/skills/` — 74 skills (neutral; generated verbatim into both targets)
-- `source/shared/` — `context-routing.md`, `docs/`, `eval/` (neutral; generated into both)
-- `source/platform/codex/` — codex-only + maintainer payload (AGENTS.md, hooks, hooks.json, rules, schemas, research, research-routing.md, harness, tools)
-- `source/platform/claude/` — claude-only payload (CLAUDE.md, hooks, tools)
+- `source/shared/` — portable `docs/`, `eval/`, and schemas (generated into both)
+- `source/platform/codex/` — Codex-owned harness (AGENTS.md, context-routing.md, hooks, rules, schemas, research, harness, tools)
+- `source/platform/claude/` — Claude-owned harness (CLAUDE.md, context-routing.md, hooks, tools)
 - `source/mirror-meta.json` — frozen `generated_from`/`generated_at`/`source_checksum` for the two mirror-from-canonical files (keeps regeneration byte-identical)
 - `source/runtime-inventory.yaml`, `source/runtime-payload-policy.md` — Phase 0 classification + policy
 - `source/tools/` — build system (not generated into any target)
 
 ## Workflow
 1. Edit files under `source/`.
-2. Regenerate targets:
+2. Regenerate only the platform changed by the harness edit:
    ```
-   python3 source/tools/generate_targets.py --target runtime
+   python3 source/tools/generate_targets.py --target runtime-codex
+   python3 source/tools/generate_targets.py --target runtime-claude
    ```
-3. Verify byte-identity / detect stray target edits (the cutover gate):
+   Use `--target runtime` only as the release aggregate that regenerates both.
+3. Verify byte-identity / detect stray target edits for the affected platform:
    ```
-   python3 source/tools/check_generated_targets.py --target runtime --baseline
+   python3 source/tools/check_generated_targets.py --target runtime-codex --baseline
+   python3 source/tools/check_generated_targets.py --target runtime-claude --baseline
    ```
    PASS = every generated file matches the live target. FAIL = a target was hand-edited or
    `source/` changed without regenerating. Run this before committing target changes.

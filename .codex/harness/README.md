@@ -12,7 +12,7 @@ The harness records execution evidence; it does not prove user success, grant pe
 | recovery emergency off | `SKILL_SYSTEM_RECOVERY_GUARD=off` | disable observation and blocking; the environment switch overrides per-event audit mode |
 | agent-run envelope | `SKILL_SYSTEM_AGENT_RUN_BOOTSTRAP=1` | create a session/turn run manifest and validate its evidence bindings |
 | strict output gate | `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict` | block only narrow current-turn evidence contradictions |
-| 9.2.1 verifier receipt monitor | `SKILL_SYSTEM_HARNESS_VERSION=9.2.1` | record whether one pre-bound verifier receipt is current for its declared subjects; never select a task label or control Stop/LoopRun |
+| verifier receipt monitor | `SKILL_SYSTEM_REFERENCE_MONITOR=1` | record whether one pre-bound verifier receipt is current for its declared subjects; never select a task label or control Stop/LoopRun |
 | LoopRun continuation | explicit active LoopRun | evaluate its accepted contract; bounded continuation may block Stop |
 
 Kanboard autosync and post-session reflection are disabled unless their own `dry-run` or `apply` environment mode is explicitly set.
@@ -47,11 +47,11 @@ python3 .codex/tools/verify_bundle.py --profile agent-output --format text
 python3 .codex/tools/compare_harness_versions.py --samples 1
 ```
 
-The 9.2.1 monitor is a small declared-subject receipt monitor, not a semantic evaluator, task-label authority, or test generator. Before `UserPromptSubmit`, the host may supply `SKILL_SYSTEM_VERIFIER_CONTRACT` with `contract_id`, one `verifier_command_hash`, `verifier_origin`, and workspace-relative `subject_refs`. Legacy oracle and negative-control fields are accepted but ignored. `PostToolUse` records matching verifier receipts. At `Stop`, the monitor reports `current_for_declared_subjects`, `missing`, `failed`, `stale`, `supporting_only`, `untrusted_origin`, `unavailable`, or `integrity_error`; it re-hashes only the declared subject files, bounded to 16 MiB total. Read-only or unrelated later tool use does not stale the receipt; a declared subject change does.
+The monitor is a small declared-subject receipt monitor, not a semantic evaluator, task-label authority, or test generator. Before `UserPromptSubmit`, the host may supply `SKILL_SYSTEM_VERIFIER_CONTRACT` with `contract_id`, one `verifier_command_hash`, `verifier_origin`, and workspace-relative `subject_refs`. Legacy oracle and negative-control fields are accepted but ignored. `PostToolUse` records matching verifier receipts. At `Stop`, the monitor reports `current_for_declared_subjects`, `missing`, `failed`, `stale`, `supporting_only`, `untrusted_origin`, `unavailable`, or `integrity_error`; it re-hashes only the declared subject files, bounded to 16 MiB total. Read-only or unrelated later tool use does not stale the receipt; a declared subject change does.
 
 Receipt status is additive ledger metadata. It does not read the assistant result label, produce a validation code, feed LoopRun, choose Stop output, block or reissue a response, suppress Agent Run bootstrap/finalization, or change independently enabled Kanboard and notification behavior. An internal monitor observation error is caught at the adapter boundary and recorded as `unavailable`; it cannot abort those ordinary paths. The monitor itself starts no verifier or subprocess. Ordinary Agent Run/output validation and external side effects keep their own enablement, so the total Stop subprocess count is not a monitor contract and latency comparison is advisory. Missing or failed receipts do not imply a user-only check; an agent-authored or agent-modified verifier remains `supporting_only`. Plans should retain the selected verifier and latest decisive result only, not raw logs, receipts, retry history, or repeated passes.
 
-This is a pre-release correction to the unreleased 9.2.1 candidate semantics. Earlier comparison artifacts that describe result-label authorization remain historical diagnostics, not the current protocol contract.
+Harness changes use the bundle version and release tag. Earlier 9.2.1 comparison artifacts that describe result-label authorization remain historical diagnostics, not a separately versioned current protocol.
 
 `status` reports `agent_output_gate_mode` and `recovery_guard_mode` independently. A strict output gate and Recovery Guard audit/off state are separate controls and must not be collapsed into one observational/active label.
 

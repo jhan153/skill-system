@@ -721,7 +721,10 @@ def input_digest(source: Path) -> str:
 
 def shared_context_kind(path: Path, source: Path) -> str | None:
     rel = path.relative_to(source)
-    if rel.as_posix() == "shared/context-routing.md":
+    if rel.as_posix() in {
+        "platform/codex/context-routing.md",
+        "platform/claude/context-routing.md",
+    }:
         return "context_routing"
     if rel.parts[:2] == ("shared", "docs"):
         return "shared_doc"
@@ -744,6 +747,10 @@ def shared_context_aliases(path: Path, source: Path) -> set[str]:
     if source_rel.startswith("shared/schemas/"):
         suffix = source_rel.removeprefix("shared/schemas/")
         candidates.update({f".codex/schemas/{suffix}", f".claude/schemas/{suffix}"})
+    if source_rel == "platform/codex/context-routing.md":
+        candidates.add(".codex/context-routing.md")
+    if source_rel == "platform/claude/context-routing.md":
+        candidates.add(".claude/context-routing.md")
     return candidates
 
 

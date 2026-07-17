@@ -50,13 +50,13 @@ entries:
     gap: none
     notes: "58 SKILL.md; diff -qr shows only .DS_Store differs. Primary Phase 1a regression-baseline anchor."
 
-  - path: "context-routing.md"
+  - path: "context-routing.md (codex) | context-routing.md (claude)"
     present_in: [codex, claude]
-    class: shared-neutral
-    generation: neutral-verbatim
+    class: platform-native
+    generation: codex-native + claude-native
     confidence: confirmed
     gap: none
-    notes: "byte-identical (diff -q)."
+    notes: "Split in 9.3.1: Codex keeps the compact exception router; Claude keeps its 9.2.1 structured routing line. Both ship under one bundle identity."
 
   - path: "docs/"
     present_in: [codex, claude]
@@ -93,11 +93,11 @@ entries:
   # platform-variant root: one neutral body + per-platform overlay
   - path: "AGENTS.md (codex) | CLAUDE.md (claude)"
     present_in: [codex, claude]
-    class: shared-neutral
-    generation: platform-template
+    class: platform-native
+    generation: codex-native + claude-native
     confidence: confirmed
     gap: none
-    notes: "same working-rules body; diverges only at feature-name level (settings.json/permission modes, .claude paths, /loop). Neutral body + codex/claude overlay produces AGENTS.md / CLAUDE.md."
+    notes: "Independent platform-owned global instructions. Portable skills and contracts remain shared."
 
 # ---------------------------------------------------------------------------
 # claude-only
@@ -227,7 +227,7 @@ entries:
     confidence: confirmed
     gap: none
     phase_1b_decision: "codex-only — CORRECTED from the recorded 'shared-neutral' after content inspection."
-    decision_rationale: "research-routing.md references codex-specific assets that do NOT exist on the Claude side (skill 'codex-research-lifecycle' and '.codex/references/speech-enhancement-research/'), which also do not exist under .codex at all (pre-existing dangling refs). Generating it to .claude would create a broken doc pointing at non-existent assets. Unlike context-routing.md (truly neutral), this is codex-specific. Sharing it would require a content rewrite, which is out of Phase 1b scope."
+    decision_rationale: "research-routing.md references Codex-specific assets. The independently owned Claude context-routing.md does not import that file."
 
   - path: "research/ (ledger.yaml, research-ledger.schema.json)"
     present_in: [codex]

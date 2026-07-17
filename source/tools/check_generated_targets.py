@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify source/ regenerates the current runtime targets byte-identically (Phase 1a).
+"""Verify source/ regenerates the selected runtime targets byte-identically.
 
 Regenerates everything the generator manages into a throwaway temp directory, then asserts
 each generated file is byte-identical to the live .codex / .claude target at the same path.
@@ -34,18 +34,30 @@ def _rel_files(root: Path) -> dict[str, Path]:
     return out
 
 
-def check_runtime(source: Path, codex: Path, claude: Path, baseline: bool) -> int:
+def check_runtime(
+    source: Path,
+    codex: Path,
+    claude: Path,
+    baseline: bool,
+    platforms: tuple[str, ...] = ("codex", "claude"),
+) -> int:
     diffs: list[str] = []
     managed = 0
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         gen_codex = tmp_path / "codex"
         gen_claude = tmp_path / "claude"
-        gt.generate_runtime(source, gen_codex, gen_claude)
+        if "codex" in platforms:
+            gt.generate_codex_runtime(source, gen_codex)
+        if "claude" in platforms:
+            gt.generate_claude_runtime(source, gen_claude)
 
-        for label, live_root, gen_root in (
-            ("codex", codex, gen_codex),
-            ("claude", claude, gen_claude),
+        roots = {
+            "codex": (codex, gen_codex),
+            "claude": (claude, gen_claude),
+        }
+        for label, (live_root, gen_root) in (
+            (platform, roots[platform]) for platform in platforms
         ):
             for rel, gen_path in sorted(_rel_files(gen_root).items()):
                 managed += 1
@@ -62,7 +74,8 @@ def check_runtime(source: Path, codex: Path, claude: Path, baseline: bool) -> in
         return 1
 
     mode = "baseline byte-identical" if baseline else "drift"
-    print(f"PASS ({mode}): {managed} managed files match live targets (junk ignored).")
+    selected = "+".join(platforms)
+    print(f"PASS ({mode}, {selected}): {managed} managed files match live targets (junk ignored).")
     return 0
 
 
@@ -97,7 +110,11 @@ def check_plugins(source: Path, plugins_root: Path, baseline: bool) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", choices=["runtime", "plugins"], required=True)
+    parser.add_argument(
+        "--target",
+        choices=["runtime", "runtime-codex", "runtime-claude", "plugins"],
+        required=True,
+    )
     parser.add_argument("--baseline", action="store_true")
     parser.add_argument("--source", default="source")
     parser.add_argument("--codex", default=".codex")
@@ -107,6 +124,14 @@ def main() -> int:
 
     if args.target == "runtime":
         return check_runtime(Path(args.source), Path(args.codex), Path(args.claude), args.baseline)
+    if args.target == "runtime-codex":
+        return check_runtime(
+            Path(args.source), Path(args.codex), Path(args.claude), args.baseline, ("codex",)
+        )
+    if args.target == "runtime-claude":
+        return check_runtime(
+            Path(args.source), Path(args.codex), Path(args.claude), args.baseline, ("claude",)
+        )
     return check_plugins(Path(args.source), Path(args.plugins), args.baseline)
 
 

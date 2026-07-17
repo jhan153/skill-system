@@ -742,15 +742,15 @@ def strict_gate_enabled(data: dict[str, Any]) -> bool:
 
 
 def reference_monitor_enabled(data: dict[str, Any]) -> bool:
-    configured = data.get("skill_system_harness_version") or os.environ.get(
-        "SKILL_SYSTEM_HARNESS_VERSION", ""
+    configured = data.get("skill_system_reference_monitor") or os.environ.get(
+        "SKILL_SYSTEM_REFERENCE_MONITOR", ""
     )
-    return str(configured).strip() == "9.2.1"
+    return str(configured).strip().lower() in {"1", "true", "on", "receipt-only"}
 
 
 def reference_monitor_error_status(error: Exception) -> dict[str, Any]:
     return {
-        "harness_version": "9.2.1",
+        "bundle_version": "9.3.1",
         "receipt_status": "unavailable",
         "reason_code": "monitor_observation_error",
         "error_type": type(error).__name__,

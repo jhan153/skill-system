@@ -15,7 +15,7 @@ HOOK = ROOT / ".codex" / "hooks" / "codex_hook_adapter.py"
 sys.dont_write_bytecode = True
 
 
-class Harness921ReferenceMonitorTests(unittest.TestCase):
+class ReferenceMonitorTests(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory(dir="/private/tmp")
         self.work = Path(self._tmp.name)
@@ -24,7 +24,7 @@ class Harness921ReferenceMonitorTests(unittest.TestCase):
         self.env = dict(os.environ)
         self.env.update({
             "PYTHONDONTWRITEBYTECODE": "1",
-            "SKILL_SYSTEM_HARNESS_VERSION": "9.2.1",
+            "SKILL_SYSTEM_REFERENCE_MONITOR": "1",
             "SKILL_SYSTEM_RECOVERY_GUARD": "off",
             "SKILL_SYSTEM_DESKTOP_NOTIFY": "dry-run",
         })
@@ -209,7 +209,7 @@ class Harness921ReferenceMonitorTests(unittest.TestCase):
         monitored_event = json.loads(self.ledger.read_text(encoding="utf-8").splitlines()[-1])
 
         self.ledger = self.work / "ordinary-hook-events.jsonl"
-        self.env.pop("SKILL_SYSTEM_HARNESS_VERSION", None)
+        self.env.pop("SKILL_SYSTEM_REFERENCE_MONITOR", None)
         self.event("UserPromptSubmit", prompt="monitor-off ordinary validation")
         ordinary = self.stop()
         ordinary_event = json.loads(self.ledger.read_text(encoding="utf-8").splitlines()[-1])

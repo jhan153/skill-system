@@ -176,7 +176,7 @@ Each heading below has exactly one provisional owner. A destination may leave a 
 | `design-frontend` | `schema_or_shared_contract` | `Loop Contract Consumption` -> loop contract and verifier-map contracts, retaining only this skill's verifier handoff |
 | `design-frontend` | `delete_candidate` | `Known Limits` after its surviving claims are proved present in validation, recovery, visual, and accessibility gates |
 | `workflow-comment-maintenance` | `main` | `Routing Card`; `Workflow`; `Behavior & Context Gate`; `Output Contract` |
-| `workflow-comment-maintenance` | `schema_or_shared_contract` | `Cross-Skill Boundaries` -> `source/shared/context-routing.md`, retaining only the stop-and-handoff rule needed during execution |
+| `workflow-comment-maintenance` | `schema_or_shared_contract` | `Cross-Skill Boundaries` -> the owning `source/platform/<platform>/context-routing.md`, retaining only the stop-and-handoff rule needed during execution |
 | `workflow-comment-maintenance` | `eval` | `Invocation Examples` -> `runtime-047`, `runtime-048`, `neg-workflow-comment-maintenance-001`, and `neg-workflow-comment-maintenance-002` |
 | `workflow-comment-maintenance` | `delete_candidate` | `Purpose`, whose distinct claims must first be shown in the description, Routing Card, workflow, or safety oracle |
 | `analysis-router` | `main` | `Routing Card`; `Decision Table`; `Precedence and Mixed Requests`; `Context Budget and Stop Rule`; `Output Contract` |

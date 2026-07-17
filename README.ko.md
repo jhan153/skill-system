@@ -12,9 +12,9 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 9.3.0 번들
+## 9.3.1 번들
 
-이 소스 트리는 변경하지 않는 로컬 `v9.2.0` 컷을 기반으로 한, 아직 배포하지 않은 9.3.0 필드 하네스 번들 라인입니다. 주요 구성은 다음과 같습니다.
+이 소스 트리는 변경하지 않는 로컬 `v9.2.0` 컷을 기반으로 한, 아직 배포하지 않은 9.3.1 필드 하네스 번들 라인입니다. 주요 구성은 다음과 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
 * `docs`: 스킬 목록, 사용 기준, 운영 참고 문서
@@ -25,9 +25,11 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 ## 9.x 방향: Neutral Source & Plugin Packaging
 
-현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인은 로컬 `v9.2.0` 전체 다이어트 컷을 기반으로 한 `9.3.0 — Field Harness & Project Context`이며, 최신 push 릴리스는 여전히 `v9.1.1`입니다. 로컬 설치는 명시적으로 수행하며 publish나 push를 뜻하지 않습니다. 번들 9.3.0과 과거 opt-in 하네스 프로토콜 9.2.1은 서로 독립된 version identity입니다.
+현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인은 로컬 `v9.2.0` 전체 다이어트 컷을 기반으로 한 `9.3.1 — Platform Harness Split`이며, 최신 push 릴리스는 여전히 `v9.1.1`입니다. 로컬 설치는 명시적으로 수행하며 publish나 push를 뜻하지 않습니다. Codex와 Claude는 하나의 번들 버전과 릴리스 태그를 공유하며, 하네스 변경도 별도 프로토콜 버전이 아니라 이 버전을 올립니다.
 
-9.3은 전역 지침을 짧게 유지하고, 정확히 명시됐거나 분명히 일치하는 전문 스킬을 바로 사용하며, 여러 소유자가 실제로 경쟁할 때만 좁은 라우터 하나를 엽니다. 가장 가까운 `project-context.yaml`은 저장소 상대 경로로 Memory Bank, Knowledge Base, plan, skill root, 이름 있는 LLM Wiki를 선언할 수 있습니다. 없는 항목은 사용할 수 없는 것으로 처리하며 홈이나 인접 저장소를 추측해 검색하지 않습니다.
+Codex 하네스는 9.3의 압축 라우팅을 유지합니다. Claude 하네스는 별도 소유 경로에서 검증된 9.2.1 구조형 판단 모델을 유지하면서 현재 공유 스킬 카탈로그를 사용합니다. 플랫폼별 전역 지침·라우팅·훅·도구는 독립적으로 생성·검사하고, portable skill과 data contract만 공유합니다.
+
+Codex 라우터는 정확히 명시됐거나 분명히 일치하는 전문 스킬을 바로 사용하며, 여러 소유자가 실제로 경쟁할 때만 좁은 라우터 하나를 엽니다. 가장 가까운 `project-context.yaml`은 저장소 상대 경로로 Memory Bank, Knowledge Base, plan, skill root, 이름 있는 LLM Wiki를 선언할 수 있습니다. 없는 항목은 사용할 수 없는 것으로 처리하며 홈이나 인접 저장소를 추측해 검색하지 않습니다.
 
 Memory Bank는 세션을 넘는 목표·작업 규칙·반복 실수·검증된 작업 방식을 보존합니다. Knowledge Base는 실제 코드·디자인 산출물에 연결된 도메인·디자인·알고리즘·아키텍처·리뷰·결정 지식을 보존합니다. LLM Wiki는 명시적으로 선택하고 자체 탐색 규칙을 따르는 선택적 읽기 전용 컨텍스트입니다. 기본 hook map은 비어 있으며, commit/closeout 체크포인트도 선언된 저장소와 현재 작업의 명확한 사실만 다룹니다.
 
@@ -266,6 +268,7 @@ Skill System 스킬은 작성된 스킬을 이 저장소에 통합하고 생성�
 | 9.2.2 | Field-driven simplification | 활성 스킬 성숙도·필드 피드백 영속화 체계를 제거하고 usage tracker 스킬과 Python validator/report generator를 삭제했습니다. 해당 대리 지표 검사를 core hygiene에서 제거했으며, 필드 입력은 사용자가 대화에서 명시적으로 언급한 문제로 제한합니다. 활성 canonical 표면은 65개 스킬이고 과거 baseline은 역사 자료로만 남습니다. |
 | 9.2.3 | Field-driven routing simplification | 저장소 스킬 변경은 현재 작업 소유자가 직접 처리하고 앱 관리 `skill-creator`는 명시 호출이나 개인 스킬 생성에만 사용합니다. 생성된 Claude manifest의 미지원 `displayName`도 제거해 로컬 플러그인 6개가 모두 설치되도록 했습니다. |
 | 9.3.0 | Field harness & project context | 기본 훅을 비우고 전역 라우팅을 압축하며, 저장소별 컨텍스트 경로를 선언합니다. Memory Bank, 산출물 연계 Knowledge Base, 명시적 LLM Wiki 읽기를 분리하고 제한된 commit/closeout 체크포인트를 추가하며, 성숙도·패킷 ingestion·텔레메트리·자동 Wiki projection 체계를 제거합니다. 이 소스 후보는 홈이나 live plugin cache에 설치하지 않습니다. |
+| 9.3.1 | Platform harness split | Codex와 Claude의 전역 지침·라우팅·훅·도구·생성·동일성 검사를 독립 경로로 분리하면서 번들 버전과 태그는 하나로 유지합니다. Codex는 9.3 압축 라우터를, Claude는 현재 공유 스킬에 맞춘 9.2.1 구조형 동작 계열을 유지합니다. 과거 버전 선택형 receipt monitor는 현재 번들의 버전 없는 opt-in 기능으로 전환합니다. |
 
 ## 라이선스
 

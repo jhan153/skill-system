@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Declared-subject receipt monitor for the opt-in 9.2.1 harness."""
+"""Declared-subject receipt monitor shipped with the current bundle."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from typing import Any
 from hook_runtime import ZERO_HASH, event_hash
 
 
-VERSION = "9.2.1"
+BUNDLE_VERSION = "9.3.1"
 CONTRACT_ENV = "SKILL_SYSTEM_VERIFIER_CONTRACT"
 TRUSTED_VERIFIERS = {"user", "repository", "external"}
 VERIFIER_ORIGINS = TRUSTED_VERIFIERS | {"agent_modified"}
@@ -67,7 +67,7 @@ def configured_contract() -> tuple[dict[str, Any] | None, str | None]:
     if len(normalized) != len(set(normalized)):
         return None, "verifier contract subject_refs must be unique"
     contract = {
-        "harness_version": VERSION,
+        "bundle_version": BUNDLE_VERSION,
         "contract_id": value["contract_id"],
         "verifier_command_hash": value["verifier_command_hash"],
         "verifier_origin": value["verifier_origin"],
@@ -124,8 +124,8 @@ def bound_contract(
     contract_digest = body.pop("contract_digest", None)
     if contract_digest != digest(body):
         return None, None, "pre-bound verifier contract digest mismatch"
-    if body.get("harness_version") != VERSION:
-        return None, None, "pre-bound verifier contract version mismatch"
+    if body.get("bundle_version") != BUNDLE_VERSION:
+        return None, None, "pre-bound verifier contract bundle mismatch"
     seq = int(binding_event.get("seq", 0))
     if any(
         event.get("neutral_event") in {"tool_preflight", "permission_requested", "tool_result"}
@@ -188,7 +188,7 @@ def observe_receipt(
     if command_hash != contract.get("verifier_command_hash"):
         return None
     receipt: dict[str, Any] = {
-        "harness_version": VERSION,
+        "bundle_version": BUNDLE_VERSION,
         "contract_digest": contract["contract_digest"],
         "kind": "positive",
         "command_hash": command_hash,
@@ -208,7 +208,7 @@ def observe_receipt(
 
 def decide(ledger: Path, data: dict[str, Any]) -> dict[str, Any]:
     """Report receipt state without interpreting or controlling task completion."""
-    base = {"harness_version": VERSION}
+    base = {"bundle_version": BUNDLE_VERSION}
 
     def result(receipt_status: str, reason_code: str, **extra: Any) -> dict[str, Any]:
         return {**base, "receipt_status": receipt_status, "reason_code": reason_code, **extra}

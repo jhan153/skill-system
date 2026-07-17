@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
-"""Generate runtime targets (.codex / .claude) from the neutral source/.
+"""Generate the Codex and Claude runtimes from canonical source/.
 
-Phase 1a goal: byte-identical regeneration of the current targets, no content change.
-Phase 1b: close real Claude gaps via shared-neutral additions (schema definitions).
-
-Pipeline:
-  1) neutral-verbatim shared payload -> BOTH targets: skills/, context-routing.md, docs/,
-     eval/, schemas/ (schema definitions; Phase 1b shared-neutral)
-  2) platform-native overlay -> single target: source/platform/{codex,claude}/ (AGENTS.md,
-     CLAUDE.md, hooks, codex/claude-only trees, maintainer tools, codex-only schema example)
-  3) mirror-from-canonical (Claude side only): docs/source_registry.yaml, eval/eval-case.schema.json
+Portable skills and data contracts are shared. Harness entry files, routing, hooks,
+permissions, and platform tools are owned by source/platform/{codex,claude} and can be
+generated independently. ``runtime`` remains the release aggregate that generates both.
 
 Platform entries that overlap shared output are merged. Platform-only entries are replaced from
 source so deleted tools and hook files cannot survive in generated targets.
@@ -25,10 +19,9 @@ import json
 import shutil
 from pathlib import Path
 
-# (source_rel, target_rel) copied unchanged into BOTH targets. source_rel may be file or dir.
+# (source_rel, target_rel) copied unchanged into either requested target.
 NEUTRAL_VERBATIM: list[tuple[str, str]] = [
     ("skills", "skills"),
-    ("shared/context-routing.md", "context-routing.md"),
     ("shared/docs", "docs"),
     ("shared/eval", "eval"),
     ("shared/schemas", "schemas"),  # Phase 1b: schema definitions are platform-neutral data contracts
@@ -198,6 +191,12 @@ def _copy_platform(platform_root: Path, target: Path, written: list[str]) -> Non
         written.append((target / child.name).as_posix())
 
 
+def _copy_neutral(source: Path, target: Path, written: list[str]) -> None:
+    for src_rel, dst_rel in NEUTRAL_VERBATIM:
+        _copy(source / src_rel, target / dst_rel)
+        written.append((target / dst_rel).as_posix())
+
+
 def _write_mirror(source: Path, claude: Path, dst_rel: str, spec: dict) -> None:
     canonical = source / spec["canonical"]
     if not canonical.is_file():
@@ -220,23 +219,28 @@ def _write_mirror(source: Path, claude: Path, dst_rel: str, spec: dict) -> None:
     out.write_text(content, encoding="utf-8")
 
 
-def generate_runtime(source: Path, codex: Path, claude: Path) -> list[str]:
+def generate_codex_runtime(source: Path, codex: Path) -> list[str]:
     written: list[str] = []
-    # 1) neutral-verbatim into both targets
-    for src_rel, dst_rel in NEUTRAL_VERBATIM:
-        src = source / src_rel
-        for target in (codex, claude):
-            _copy(src, target / dst_rel)
-            written.append((target / dst_rel).as_posix())
-    # 2) platform-native into each single target
+    _copy_neutral(source, codex, written)
     _copy_platform(source / PLATFORM_CODEX_ROOT, codex, written)
+    return written
+
+
+def generate_claude_runtime(source: Path, claude: Path) -> list[str]:
+    written: list[str] = []
+    _copy_neutral(source, claude, written)
     _copy_platform(source / PLATFORM_CLAUDE_ROOT, claude, written)
-    # 3) mirror-from-canonical: overwrite the Claude-side copies with header versions
+    # Claude keeps two provenance-bearing mirrors of shared canonical data.
     meta = json.loads((source / MIRROR_META_FILE).read_text(encoding="utf-8"))
     for dst_rel, spec in meta["mirrors"].items():
         _write_mirror(source, claude, dst_rel, spec)
         written.append((claude / dst_rel).as_posix() + " (mirror)")
     return written
+
+
+def generate_runtime(source: Path, codex: Path, claude: Path) -> list[str]:
+    """Release aggregate: generate both platform runtimes under one bundle identity."""
+    return generate_codex_runtime(source, codex) + generate_claude_runtime(source, claude)
 
 
 def _load_manifest(path: Path) -> dict:
@@ -355,7 +359,11 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", choices=["runtime", "plugins"], required=True)
+    parser.add_argument(
+        "--target",
+        choices=["runtime", "runtime-codex", "runtime-claude", "plugins"],
+        required=True,
+    )
     parser.add_argument("--source", default="source")
     parser.add_argument("--codex", default=".codex")
     parser.add_argument("--claude", default=".claude")
@@ -364,6 +372,10 @@ def main() -> int:
 
     if args.target == "runtime":
         written = generate_runtime(Path(args.source), Path(args.codex), Path(args.claude))
+    elif args.target == "runtime-codex":
+        written = generate_codex_runtime(Path(args.source), Path(args.codex))
+    elif args.target == "runtime-claude":
+        written = generate_claude_runtime(Path(args.source), Path(args.claude))
     else:
         written = generate_plugins(Path(args.source), Path(args.plugins))
     for path in written:

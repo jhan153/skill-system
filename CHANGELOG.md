@@ -1,5 +1,13 @@
 # Changelog
 
+## 9.3.1
+
+- Split platform harness ownership at the canonical source boundary. Codex and Claude now have independent global instructions and `context-routing.md` files; portable skills, docs, eval contracts, and schemas remain shared.
+- Kept the compact 9.3 Codex routing model and restored Claude's proven 9.2.1 structured decision/execution model, adapted only to the current Memory, Knowledge, Wiki, repository-skill, and non-scenario-gating contracts.
+- Added independent `runtime-codex` and `runtime-claude` generation and parity checks. The aggregate `runtime` target remains the unified release path.
+- Removed the separate active harness-protocol version selector. The optional receipt monitor now uses `SKILL_SYSTEM_REFERENCE_MONITOR=1` and reports the current bundle version; harness changes advance the single bundle version and tag.
+- Advanced canonical bundle identity to 9.3.1 without installing or modifying a live home runtime.
+
 ## 9.3.0
 
 - Replaced broad default lifecycle interception with an empty Codex hook map and compact global Codex/Claude rules. Harm reports, corrections, complaints, and status messages remain context rather than authorization for investigation or mutation.

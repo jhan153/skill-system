@@ -36,7 +36,8 @@ description: Integrate directly requested or already accepted skill changes into
 From the bundle root:
 
 ```bash
-python3 source/tools/generate_targets.py --target runtime
+python3 source/tools/generate_targets.py --target runtime-codex
+python3 source/tools/generate_targets.py --target runtime-claude
 python3 source/tools/generate_targets.py --target plugins
 python3 source/platform/codex/tools/verify_bundle.py --root . --profile core --format text
 ```

@@ -2010,7 +2010,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
             root = Path(tmp)
             write_fixture(root)
-            shared = root / "source" / "shared" / "context-routing.md"
+            shared = root / "source" / "platform" / "codex" / "context-routing.md"
             shared.parent.mkdir(parents=True, exist_ok=True)
             shared.write_text("Global routing contract v1.\n", encoding="utf-8")
             baseline = snapshot(root)
@@ -2040,7 +2040,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
             root = Path(tmp)
             write_fixture(root)
-            shared = root / "source" / "shared" / "context-routing.md"
+            shared = root / "source" / "platform" / "codex" / "context-routing.md"
             shared.parent.mkdir(parents=True, exist_ok=True)
             shared.write_text("Global routing contract.\n", encoding="utf-8")
             baseline = snapshot(root)
@@ -2075,8 +2075,9 @@ class SkillDietComparisonTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
             root = Path(tmp)
             write_fixture(root)
-            routing = root / "source" / "shared" / "context-routing.md"
+            routing = root / "source" / "platform" / "codex" / "context-routing.md"
             indirect = root / "source" / "shared" / "docs" / "indirect.md"
+            routing.parent.mkdir(parents=True, exist_ok=True)
             indirect.parent.mkdir(parents=True, exist_ok=True)
             routing.write_text("Read .codex/docs/indirect.md when routing applies.\n", encoding="utf-8")
             indirect.write_text("Indirect contract v1.\n", encoding="utf-8")

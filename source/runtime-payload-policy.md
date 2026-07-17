@@ -23,7 +23,7 @@ recorded for 8 inventory entries, corresponding to the 7 decision units below.
 
 | class | source location | generated into | strategy |
 |---|---|---|---|
-| shared-neutral | `source/skills/`, `source/` docs/eval/routing, `source/platform/<p>/` for variants | `.codex` AND `.claude` | `neutral-verbatim`, `mirror-from-canonical`, or `platform-template` |
+| shared-neutral | `source/skills/`, `source/shared/docs`, `source/shared/eval`, `source/shared/schemas` | `.codex` AND `.claude` | `neutral-verbatim` or `mirror-from-canonical` |
 | codex-only | `source/platform/codex/` | `.codex` only | `codex-native` |
 | claude-only | `source/platform/claude/` | `.claude` only | `claude-native` |
 | maintainer-only | `source/maintainer/` (or kept under `.codex/tools` as canonical tooling) | maintainer/CI surface, not per-platform parity | `tooling` |
@@ -31,7 +31,7 @@ recorded for 8 inventory entries, corresponding to the 7 decision units below.
 | local-only/ignored | n/a | n/a (gitignored) | `local-ignored` |
 
 ### Generation strategies
-- `neutral-verbatim` — copy unchanged to both targets (e.g. `skills/`, `context-routing.md`, `docs/`, `eval/`).
+- `neutral-verbatim` — copy unchanged to either generated target (e.g. `skills/`, `docs/`, `eval/`, `schemas/`).
 - `mirror-from-canonical` — generate the Claude copy from the Codex canonical with a
   `generated_from` / `source_checksum` / `do_not_edit` header. This is exactly the current
   `sync_generated_mirrors.py` behavior for `docs/source_registry.yaml` and `eval/eval-case.schema.json`.
@@ -39,6 +39,8 @@ recorded for 8 inventory entries, corresponding to the 7 decision units below.
   (e.g. `AGENTS.md` ↔ `CLAUDE.md`, and `tools/notify_desktop.py` which currently drifts).
 - `codex-native` / `claude-native` — lives in only one target.
 - `tooling` — generator/CI machinery; not shipped as per-platform runtime content.
+
+Since 9.3.1, `AGENTS.md`/`CLAUDE.md` and each platform's `context-routing.md` are platform-native harness surfaces. `runtime-codex` and `runtime-claude` generate and check them independently; `runtime` is the unified release aggregate. This split does not create platform-specific product versions or tags.
 
 ## 3) Phase 1a scope (regression baseline)
 Phase 1a must regenerate **byte-identical** output for every confirmed committed path in both

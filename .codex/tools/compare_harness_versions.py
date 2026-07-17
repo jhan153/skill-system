@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare historical authority gates with the 9.2.1 receipt-only monitor."""
+"""Compare historical bundle cuts with the current receipt-only monitor."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ import yaml
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MANIFEST = ROOT / ".codex" / "eval" / "harness_versions.json"
-REFERENCE_VERSION = "9.2.1"
+REFERENCE_VERSION = "9.3.1"
 
 
 def sha256_text(value: str) -> str:
@@ -94,7 +94,7 @@ def base_env(extra: dict[str, str] | None = None) -> dict[str, str]:
     })
     env.pop("SKILL_SYSTEM_AGENT_RUN_BOOTSTRAP", None)
     env.pop("SKILL_SYSTEM_VERIFIER_CONTRACT", None)
-    env.pop("SKILL_SYSTEM_HARNESS_VERSION", None)
+    env.pop("SKILL_SYSTEM_REFERENCE_MONITOR", None)
     if extra:
         env.update(extra)
     return env
@@ -225,7 +225,7 @@ def reference_case(version_root: Path, case_id: str, case_root: Path) -> dict[st
     )
     positive = "verify production subject"
     contract = contract_for_case(case_id, positive)
-    extra_env = {"SKILL_SYSTEM_HARNESS_VERSION": REFERENCE_VERSION}
+    extra_env = {"SKILL_SYSTEM_REFERENCE_MONITOR": "1"}
     if contract is not None:
         extra_env["SKILL_SYSTEM_VERIFIER_CONTRACT"] = json.dumps(contract, sort_keys=True)
     env = base_env(extra_env)
@@ -315,7 +315,7 @@ def benchmark_verifier_event_path(
         if version == REFERENCE_VERSION:
             contract = contract_for_case("trusted-verifier-success", positive)
             extra_env.update({
-                "SKILL_SYSTEM_HARNESS_VERSION": REFERENCE_VERSION,
+                "SKILL_SYSTEM_REFERENCE_MONITOR": "1",
                 "SKILL_SYSTEM_VERIFIER_CONTRACT": json.dumps(contract, sort_keys=True),
             })
         env = base_env(extra_env)

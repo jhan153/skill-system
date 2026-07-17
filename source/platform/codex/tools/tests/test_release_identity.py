@@ -67,6 +67,16 @@ class ReleaseIdentityTests(unittest.TestCase):
                 f'version: "{self.checker.CURRENT_VERSION}"\n',
                 encoding="utf-8",
             )
+        reference_monitor = root / "source" / "platform" / "codex" / "tools" / "reference_monitor.py"
+        reference_monitor.parent.mkdir(parents=True)
+        reference_monitor.write_text(
+            f'BUNDLE_VERSION = "{self.checker.CURRENT_VERSION}"\n', encoding="utf-8"
+        )
+        claude_rules = root / "source" / "platform" / "claude" / "CLAUDE.md"
+        claude_rules.parent.mkdir(parents=True)
+        claude_rules.write_text(
+            f'> Skill System bundle ({self.checker.CURRENT_VERSION})\n', encoding="utf-8"
+        )
         (eval_root / "release_forward_cases.yaml").write_text(
             f'version: "{self.checker.HISTORICAL_FORWARD_VERSION}"\n'
             + "cases:\n"

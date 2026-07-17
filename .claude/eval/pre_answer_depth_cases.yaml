@@ -1,4 +1,4 @@
-version: "9.3.0"
+version: "9.3.1"
 purpose: "Verify concise output depth with a mapped router owner and without any router, while keeping trivial work direct."
 cases:
   - case_id: runtime-pre-answer-depth-router-001
@@ -34,7 +34,7 @@ cases:
 
   - case_id: runtime-pre-answer-depth-global-001
     schema_version: 2
-    user_request: "source/platform/codex/AGENTS.md와 source/shared/context-routing.md가 '결론부터 세 문장' 요청에서도 조사 깊이와 final presentation을 별도 축으로 취급하는지 직접 문구와 관련 test를 확인해 주세요. 최종 답은 세 문장으로 써 주세요."
+    user_request: "source/platform/codex/AGENTS.md와 source/platform/codex/context-routing.md가 '결론부터 세 문장' 요청에서도 조사 깊이와 final presentation을 별도 축으로 취급하는지 직접 문구와 관련 test를 확인해 주세요. 최종 답은 세 문장으로 써 주세요."
     expected_primary_skill: null
     expected_supporting_skills: []
     should_not_trigger: [analysis-router, analysis-codebase, workflow-task-ledger]
