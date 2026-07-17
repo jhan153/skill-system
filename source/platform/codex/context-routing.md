@@ -47,6 +47,7 @@ The router returns one owner and stops. It does not acquire evidence, implement,
 | Knowledge read | current task owner using `knowledge-base-read` for declared project knowledge |
 | Knowledge write | the explicit category record, update, maintenance, or plan-sync owner |
 | named LLM Wiki context | `llm-wiki-context`, explicitly selected and read-only |
+| project context manifest initialization or location update | `project-context-init` or `project-context-update`, only on explicit request |
 | repository skill update | current implementation owner; add `skill-system-repo-adapter` only for repository integration |
 | personal skill creation | system `skill-creator` when explicitly named or clearly requested |
 

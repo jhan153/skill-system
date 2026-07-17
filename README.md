@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.3.1 Bundle
+## 9.3.2 Bundle
 
-This source tree carries the local, not-yet-deployed 9.3.1 field-harness bundle line based on the immutable `v9.2.0` cut. Its main components are:
+This source tree carries the local, not-yet-deployed 9.3.2 field-harness bundle line, directly succeeding the immutable `v9.3.1` release. Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -25,13 +25,13 @@ This source tree carries the local, not-yet-deployed 9.3.1 field-harness bundle 
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.3.1 — Platform Harness Split`, based on the local `v9.2.0` full-diet cut; the latest pushed release remains `v9.1.1`. Local installation is explicit and does not imply publishing or pushing. Codex and Claude share one bundle version and release tag; harness changes advance that version instead of creating a second protocol-version axis.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.3.2 — Native Codex Harness Reconstruction`, directly succeeding `v9.3.1`. Local installation is explicit and does not imply publishing or pushing. Codex and Claude share one bundle version and release tag; harness changes advance that version instead of creating a second protocol-version axis.
 
 The Codex harness keeps the compact 9.3 routing model. The Claude harness is independently owned and preserves the proven 9.2.1 structured decision model while consuming the current shared skill catalog. Platform-specific global instructions, routing, hooks, and tools can be generated and checked independently; portable skills and data contracts remain shared.
 
 The Codex router uses an exact specialist directly and opens at most one narrow router only when several owners genuinely compete. The nearest `project-context.yaml` may declare repository-relative Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery.
 
-Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, review, and decision knowledge linked to real artifacts. LLM Wikis are optional read-only context sources selected explicitly and navigated using their own conventions. The default hook map is empty; commit/closeout checkpoint writes operate only on declared stores and clear current-task facts.
+Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, review, and decision knowledge linked to real artifacts. LLM Wikis are optional read-only context sources selected explicitly and navigated using their own conventions. The default Codex hook map sends eight lifecycle events directly to one Go executable. Response correction, desktop notification, declared-plan Kanboard sync, active-only LoopRun, and location-only project context are independent bounded branches; commit/closeout checkpoint writes operate only on declared stores and clear current-task facts.
 
 For development-focused installs, use `skill-system-core` + `skill-system-dev` as the minimum profile. Add `skill-system-quality` as the recommended companion when you want validation matrix support, including `workflow-validation`; dev workflows still fall back to their local validation rules when quality skills are not installed.
 
@@ -153,7 +153,7 @@ Loop Engineering skills decide when repeated execution is justified, turn succes
 | `loop-verifier-registry` | Maps loop success conditions and governance metrics to verifier skills, commands, evidence targets, pass/fail signals, fallback checks, and labels.       |
 | `workflow-loop-runner`   | Executes accepted loop contracts through observe/decide/act/verify/checkpoint batches, backed by LoopRun state tools for checkpointing, continuation, recovery, and stop decisions. |
 
-Runtime assurance also includes an opt-in live agent-run manifest bootstrap (`.codex/tools/init_agent_run.py`), a tool/permission operating catalog (`.codex/docs/tool_policy.md`), and an orchestration capability contract (`.codex/docs/orchestration_capability_contract.md`). These are support layers, not new task-execution skills.
+Runtime support also includes the tool/permission operating catalog and orchestration capability contract. TaskRun, Research/Evidence ledgers, and LoopRun remain explicit workflow-owned state; Codex Agent Run and hook-event evidence ledgers are not part of the 9.3.2 runtime.
 
 ### Planning
 
@@ -269,6 +269,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.2.3 | Field-driven routing simplification | Keeps repository skill changes with the current task owner, reserves app-managed `skill-creator` for explicit or personal-skill creation, and fixes generated Claude manifests so all six local plugins install without the unsupported `displayName` key. |
 | 9.3.0 | Field harness & project context | Empties default hooks, compresses global routing, declares per-repository context paths, separates Memory Bank, artifact-linked Knowledge Base, and explicit LLM Wiki reads, adds bounded commit/closeout checkpointing, and removes maturity, packet-ingestion, telemetry, and automatic Wiki-projection machinery. The source candidate is not installed into a home or live plugin cache. |
 | 9.3.1 | Platform harness split | Gives Codex and Claude independent global instructions, routing, hook, tool, generation, and parity-check paths while retaining one bundle version and tag. Codex keeps the compact 9.3 router; Claude continues the 9.2.1 structured behavior line against the current shared skills. The legacy version-selected receipt monitor becomes a versionless opt-in feature of the current bundle. |
+| 9.3.2 | Native Codex harness reconstruction | Routes all eight Codex lifecycle events to cross-compiled Go artifacts, restores the packaged Swift macOS overlay and redaction, honors Windows `CODEX_HOME`, uses the official Stop continuation contract, and stamps Kanboard only after successful sync. Notification/Kanboard/active LoopRun remain independent; location-only project context is explicit, the diagnostic compatibility stack is removed, Global `AGENTS.md` is unchanged, and Claude retains its own hook runtime. |
 
 ## License
 

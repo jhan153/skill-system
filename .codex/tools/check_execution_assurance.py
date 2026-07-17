@@ -1,261 +1,154 @@
 #!/usr/bin/env python3
-"""Check 8.3.1 execution assurance artifacts."""
+"""Verify the 9.3.2 platform-separated runtime contract."""
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
-from typing import Any
+
 
 sys.dont_write_bytecode = True
 
-from _validation import load_json_file, load_yaml_file, read_text, resolve_bundle_path, validate_schema
-
-
-REQUIRED_FILES = [
-    ".codex/docs/harness_lifecycle_hooks.md",
-    ".claude/docs/harness_lifecycle_hooks.md",
-    ".codex/docs/tool_hardening_profile.md",
-    ".claude/docs/tool_hardening_profile.md",
-    ".codex/docs/work_item_lifecycle.md",
-    ".claude/docs/work_item_lifecycle.md",
-    ".codex/schemas/harness/lifecycle-event.schema.json",
-    ".codex/schemas/tools/tool-policy.schema.json",
-    ".codex/schemas/harness/examples/lifecycle-event.codex-tool-preflight.yaml",
-    ".codex/schemas/tools/examples/tool-policy.exec-command.yaml",
-    ".codex/hooks/codex-pretooluse.example.sh",
-    ".codex/hooks/codex_hook_adapter.py",
-    ".codex/hooks.json",
-    ".claude/tools/claude_notify_adapter.py",
-    ".claude/tools/notify_desktop.py",
-    ".codex/tools/hook_runtime.py",
-    ".codex/tools/recovery_guard.py",
-    ".codex/tools/notify_desktop.py",
-    ".codex/tools/run_behavior_evals.py",
-    ".codex/tools/run_validator_unit_tests.py",
-    ".codex/tools/run_verification_pipeline.py",
-    ".codex/tools/validate_agent_run_artifact.py",
-    ".codex/schemas/harness/agent-run.schema.json",
-    ".codex/tools/tests/fixtures/agent-runs/current-run/run.yaml",
-    ".codex/tools/tests/fixtures/agent-runs/permission-no-tool-id/run.yaml",
-    ".codex/tools/tests/fixtures/agent-runs/repeated-tools/run.yaml",
-    ".codex/schemas/loop/loop-contract.schema.json",
-    ".codex/schemas/loop/loop-run.schema.json",
-    ".codex/schemas/loop/iteration-result.schema.json",
-    ".codex/schemas/loop/user-acceptance-event.schema.json",
-    ".codex/schemas/loop/examples/loop-contract.example.yaml",
-    ".codex/schemas/loop/examples/loop-run.example.yaml",
-    ".codex/schemas/loop/examples/iteration-result.example.yaml",
-    ".codex/schemas/loop/examples/user-acceptance-event.example.yaml",
-    ".codex/tools/init_loop_run.py",
-    ".codex/tools/evaluate_loop_run.py",
-    ".codex/tools/validate_loop_run.py",
-    ".codex/tools/loop_policy.py",
-    ".codex/tools/check_evidence_ledger.py",
-    ".codex/tools/activate_loop_run.py",
-    ".codex/tools/deactivate_loop_run.py",
-    ".codex/tools/resume_loop_run.py",
-    ".codex/tools/tests/test_loop_engineering.py",
-    ".codex/tools/tests/fixtures/loop-runs/valid/contract.yaml",
-    ".codex/tools/tests/fixtures/loop-runs/valid/state.yaml",
-    ".codex/tools/tests/fixtures/loop-runs/valid/checkpoints/0000.yaml",
-    ".codex/skills/workflow-task-ledger/SKILL.md",
-    ".codex/schemas/task/task-run.schema.json",
-    ".codex/schemas/task/examples/task-run.example.yaml",
-    ".codex/schemas/workitem/work-item.schema.json",
-    ".codex/schemas/workitem/examples/work-item.example.yaml",
-    ".codex/tools/task_ledger.py",
-    ".codex/tools/validate_task_run.py",
-    ".codex/tools/validate_work_item.py",
-    ".codex/tools/tests/test_task_ledger.py",
-    ".codex/tools/tests/test_work_item_lifecycle.py",
-    ".codex/tools/analyze_harness_measurement.py",
-    ".codex/tools/tests/test_harness_measurement.py",
-    ".codex/tools/tests/test_recovery_guard.py",
-]
-SCHEMA_CONTRACTS = {
-    ".codex/schemas/harness/lifecycle-event.schema.json": {
-        "top_property": "mapping",
-        "example": ".codex/schemas/harness/examples/lifecycle-event.codex-tool-preflight.yaml",
-        "invalid": {"mapping": {"neutral_event": "not-real", "host": "codex", "host_event": "PreToolUse", "support_level": "native"}},
-    },
-    ".codex/schemas/tools/tool-policy.schema.json": {
-        "top_property": "tool_policy",
-        "example": ".codex/schemas/tools/examples/tool-policy.exec-command.yaml",
-        "invalid": {"tool_policy": {"tool_id": "x", "capabilities": ["made_up"], "decision": {"default": "maybe"}}},
-    },
-    ".codex/schemas/harness/agent-run.schema.json": {
-        "top_property": "outputs",
-        "example": ".codex/tools/tests/fixtures/agent-runs/current-run/run.yaml",
-        "invalid": {
-            "schema_version": 1,
-            "run_id": "AR-20260620-999",
-            "bundle_version": "7.3.1",
-            "task": {"user_request_summary": "invalid", "result_label": "done"},
-            "assistant_message": {"sha256": "x", "result_label": "done", "claim_ids": []},
-            "outputs": {"final_report": "final-report.md", "artifact_refs": [], "claims": []},
-            "validations": [],
-            "hook_events": "hook-events.jsonl",
-        },
-    },
-    ".codex/schemas/loop/loop-contract.schema.json": {
-        "top_property": "goal",
-        "example": ".codex/schemas/loop/examples/loop-contract.example.yaml",
-        "invalid": {
-            "schema_version": 1,
-            "contract_id": "LC-1",
-            "activation": "implicit",
-            "goal": {"statement": "x"},
-            "control": {},
-            "termination": {},
-        },
-    },
-    ".codex/schemas/loop/loop-run.schema.json": {
-        "top_property": "progress",
-        "example": ".codex/schemas/loop/examples/loop-run.example.yaml",
-        "invalid": {
-            "schema_version": 1,
-            "loop_run_id": "LR-1",
-            "contract_ref": "contract.yaml",
-            "contract_hash": "nothex",
-            "workspace": {},
-            "status": "running",
-            "iteration": -1,
-            "started_at": "x",
-            "updated_at": "x",
-            "budgets": {},
-            "condition_results": [],
-            "progress": {},
-            "agent_run_refs": [],
-            "last_decision": {},
-            "side_effect_journal": [],
-        },
-    },
-    ".codex/schemas/loop/iteration-result.schema.json": {
-        "top_property": "condition_results",
-        "example": ".codex/schemas/loop/examples/iteration-result.example.yaml",
-        "invalid": {
-            "schema_version": 2,
-            "loop_run_id": "LR-1",
-            "iteration": 0,
-            "condition_results": [],
-        },
-    },
-    ".codex/schemas/loop/user-acceptance-event.schema.json": {
-        "top_property": "source",
-        "example": ".codex/schemas/loop/examples/user-acceptance-event.example.yaml",
-        "invalid": {
-            "schema_version": 1,
-            "event_type": "user_acceptance",
-            "contract_id": "LC-20260623-001",
-            "loop_run_id": "LR-20260623-001",
-            "condition_id": "SC-001",
-            "actor": "agent",
-            "scope": "SC-001",
-            "accepted": False,
-            "observed_at": "2026-06-23T00:00:00Z",
-            "source": "generated",
-        },
-    },
-    ".codex/schemas/task/task-run.schema.json": {
-        "top_property": "steps",
-        "example": ".codex/schemas/task/examples/task-run.example.yaml",
-        "invalid": {
-            "schema_version": 1,
-            "task_run_id": "TR-x",
-            "objective": "x",
-            "status": "active",
-            "steps": [{"id": "S1", "title": "t", "status": "complete", "evidence_refs": []}],
-            "findings": [],
-            "final_verification": {"status": "pending", "evidence_refs": []},
-        },
-    },
-    ".codex/schemas/workitem/work-item.schema.json": {
-        "top_property": "history",
-        "example": ".codex/schemas/workitem/examples/work-item.example.yaml",
-        "invalid": {
-            "schema_version": 1,
-            "work_item_id": "WI-20260627-999",
-            "title": "invalid",
-            "source": {"type": "user_request", "ref": "demo"},
-            "state": "closed",
-            "owner": "agent",
-            "primary_skill": "workflow-task-ledger",
-            "runtime_boundary": {
-                "mode": "state_model",
-                "queue_runtime": True,
-                "scheduler_runtime": False,
-                "kanboard_source_of_truth": False,
-                "looprun_replacement": False,
-            },
-            "history": [{"state": "closed", "at": "2026-06-27T00:00:00Z", "actor": "agent", "evidence_refs": []}],
-            "evidence_refs": [],
-            "open_findings": [],
-            "next_action": "",
-        },
-    },
+EVENTS = {
+    "SessionStart",
+    "UserPromptSubmit",
+    "PreToolUse",
+    "PermissionRequest",
+    "PostToolUse",
+    "Stop",
+    "PreCompact",
+    "PostCompact",
 }
 
+REQUIRED_FILES = [
+    ".codex/bin/skill-system-harness",
+    ".codex/bin/skill-system-harness.exe",
+    ".codex/bin/skill-system-notify-overlay",
+    ".codex/hooks.json",
+    ".codex/docs/harness_lifecycle_hooks.md",
+    ".claude/docs/harness_lifecycle_hooks.md",
+    ".claude/hooks/claude_hook_adapter.py",
+    ".claude/tools/hook_runtime.py",
+    ".codex/docs/project_context_manifest.md",
+    ".codex/skills/project-context-init/SKILL.md",
+    ".codex/skills/project-context-update/SKILL.md",
+    ".codex/schemas/loop/loop-run.schema.json",
+    ".codex/tools/evaluate_loop_run.py",
+    ".codex/tools/task_ledger.py",
+    ".codex/tools/validate_task_run.py",
+    ".codex/research/ledger.yaml",
+]
 
-def validate_schema_contract(path: Path, contract: dict[str, Any], root: Path) -> list[str]:
+FORBIDDEN_CODEX_FILES = [
+    ".codex/hooks/codex_base_hook.py",
+    ".codex/hooks/codex_hook_adapter.py",
+    ".codex/tools/hook_runtime.py",
+    ".codex/tools/init_agent_run.py",
+    ".codex/tools/validate_agent_run_artifact.py",
+    ".codex/tools/recovery_guard.py",
+    ".codex/tools/reference_monitor.py",
+    ".codex/tools/analyze_harness_measurement.py",
+    ".codex/tools/compare_harness_versions.py",
+    ".codex/tools/notify_desktop.py",
+    ".codex/docs/agent_output_validation.md",
+    ".codex/schemas/harness/agent-run.schema.json",
+    ".codex/schemas/harness/lifecycle-event.schema.json",
+    ".codex/eval/harness_versions.json",
+    ".codex/eval/release_forward_cases.yaml",
+]
+
+
+def load_hooks(path: Path) -> tuple[dict, list[str]]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        return {}, [f"invalid hooks.json: {exc}"]
+    hooks = value.get("hooks") if isinstance(value, dict) else None
+    if not isinstance(hooks, dict):
+        return {}, ["hooks.json requires a hooks object"]
+    return hooks, []
+
+
+def validate_hooks(hooks: dict) -> list[str]:
     errors: list[str] = []
-    try:
-        schema = load_json_file(path)
-    except Exception as exc:  # noqa: BLE001
-        return [f"invalid json: {path.relative_to(root)}: {exc}"]
-    for key in ["$schema", "type", "required", "properties"]:
-        if key not in schema:
-            errors.append(f"{path.relative_to(root)}: schema missing {key}")
-    if schema.get("type") != "object":
-        errors.append(f"{path.relative_to(root)}: schema top-level type must be object")
-    top_property = contract["top_property"]
-    if top_property not in schema.get("required", []):
-        errors.append(f"{path.relative_to(root)}: schema must require {top_property}")
-    if top_property not in schema.get("properties", {}):
-        errors.append(f"{path.relative_to(root)}: schema must define {top_property}")
-    example_path = resolve_bundle_path(root, contract["example"]) or root / contract["example"]
-    try:
-        example = load_yaml_file(example_path)
-    except Exception as exc:  # noqa: BLE001
-        errors.append(f"{example_path.relative_to(root)}: invalid YAML: {exc}")
-        example = None
-    if example is not None:
-        for error in validate_schema(example, schema):
-            errors.append(f"{example_path.relative_to(root)}: {error}")
-    invalid_errors = validate_schema(contract["invalid"], schema)
-    if not invalid_errors:
-        errors.append(f"{path.relative_to(root)}: schema accepted invalid sentinel instance")
+    names = set(hooks)
+    if names != EVENTS:
+        errors.append(f"hook event set mismatch: missing={sorted(EVENTS - names)} extra={sorted(names - EVENTS)}")
+    for event, groups in hooks.items():
+        if not isinstance(groups, list) or len(groups) != 1:
+            errors.append(f"{event}: requires exactly one hook group")
+            continue
+        commands = groups[0].get("hooks") if isinstance(groups[0], dict) else None
+        if not isinstance(commands, list) or len(commands) != 1 or not isinstance(commands[0], dict):
+            errors.append(f"{event}: requires exactly one command hook")
+            continue
+        command = str(commands[0].get("command") or "")
+        windows = str(commands[0].get("commandWindows") or "")
+        if not command.endswith('/bin/skill-system-harness\"'):
+            errors.append(f"{event}: POSIX command is not the direct Go harness")
+        windows_lower = windows.lower()
+        if not windows_lower.startswith("cmd.exe /d /s /c "):
+            errors.append(f"{event}: Windows command lacks the bounded CODEX_HOME resolver")
+        if "%codex_home%\\bin\\skill-system-harness.exe" not in windows_lower:
+            errors.append(f"{event}: Windows command ignores CODEX_HOME")
+        if "%userprofile%\\.codex\\bin\\skill-system-harness.exe" not in windows_lower:
+            errors.append(f"{event}: Windows command lacks the default CODEX_HOME fallback")
+        timeout = commands[0].get("timeout")
+        expected_timeout = 12 if event == "Stop" else 3
+        if timeout != expected_timeout:
+            errors.append(f"{event}: timeout {timeout!r} != {expected_timeout}")
+        launchers = ("python", "zsh", "bash", "powershell", "codex_base_hook", "codex_hook_adapter")
+        lowered = (command + " " + windows).lower()
+        if any(token in lowered for token in launchers):
+            errors.append(f"{event}: command contains a launcher or legacy adapter")
     return errors
 
 
+def validate_binary(path: Path, kind: str) -> list[str]:
+    if not path.is_file():
+        return []
+    header = path.read_bytes()[:4]
+    if kind == "mach-o" and header not in {b"\xcf\xfa\xed\xfe", b"\xfe\xed\xfa\xcf"}:
+        return [f"{path}: not a Mach-O executable"]
+    if kind == "pe" and not header.startswith(b"MZ"):
+        return [f"{path}: not a Windows PE executable"]
+    return []
+
+
 def main() -> int:
-    root = Path(".").resolve()
-    errors: list[str] = []
-    for rel in REQUIRED_FILES:
-        if resolve_bundle_path(root, rel) is None:
-            errors.append(f"missing: {rel}")
-    lifecycle = root / ".codex/docs/harness_lifecycle_hooks.md"
-    if lifecycle.exists():
-        text = read_text(lifecycle)
-        for term in ["support_level", "native", "approximate", "unsupported", "do not replace", "approval policy"]:
-            if term not in text:
-                errors.append(f"harness lifecycle doc missing term: {term}")
-    tool_doc = root / ".codex/docs/tool_hardening_profile.md"
-    if tool_doc.exists():
-        text = read_text(tool_doc)
-        for term in ["tool_policy", "capabilities", "invocation_scope", "postconditions"]:
-            if term not in text:
-                errors.append(f"tool hardening doc missing term: {term}")
-    for rel, contract in SCHEMA_CONTRACTS.items():
-        path = resolve_bundle_path(root, rel) or root / rel
-        if path.exists():
-            errors.extend(validate_schema_contract(path, contract, root))
+    root = Path(__file__).resolve().parents[2]
+    errors = [f"missing required file: {path}" for path in REQUIRED_FILES if not (root / path).is_file()]
+    errors.extend(f"removed Codex legacy asset is still packaged: {path}" for path in FORBIDDEN_CODEX_FILES if (root / path).exists())
+
+    hooks, hook_errors = load_hooks(root / ".codex" / "hooks.json")
+    errors.extend(hook_errors)
+    if not hook_errors:
+        errors.extend(validate_hooks(hooks))
+    errors.extend(validate_binary(root / ".codex" / "bin" / "skill-system-harness", "mach-o"))
+    errors.extend(validate_binary(root / ".codex" / "bin" / "skill-system-harness.exe", "pe"))
+    errors.extend(validate_binary(root / ".codex" / "bin" / "skill-system-notify-overlay", "mach-o"))
+
+    harness = root / ".codex" / "bin" / "skill-system-harness"
+    if harness.is_file() and b"osascript" in harness.read_bytes():
+        errors.append("Codex harness regressed to the removed macOS osascript notification path")
+
+    for plugin_hooks in (root / "plugins").glob("*/hooks"):
+        if plugin_hooks.exists():
+            errors.append(f"plugin duplicates base hook ownership: {plugin_hooks.relative_to(root)}")
+
+    claude_adapter = root / ".claude" / "hooks" / "claude_hook_adapter.py"
+    if claude_adapter.is_file():
+        text = claude_adapter.read_text(encoding="utf-8")
+        if 'ROOT / ".claude" / "tools"' not in text or 'ROOT / ".codex" / "tools"' in text:
+            errors.append("Claude adapter does not own its runtime dependency")
+
     if errors:
         print("FAIL")
         for error in errors:
             print(f"- {error}")
         return 1
-    print("PASS")
+    print("PASS: Codex Go harness, platform ownership, and retained explicit ledgers are structurally valid")
     return 0
 
 

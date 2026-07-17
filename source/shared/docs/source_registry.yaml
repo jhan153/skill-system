@@ -11,17 +11,10 @@ sources:
     verification_status: agent-verified
     local_consumers:
       - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
-      - .codex/docs/agent_output_validation.md
       - .codex/docs/harness_lifecycle_hooks.md
       - .codex/docs/tool_hardening_profile.md
-      - .codex/schemas/harness/agent-run.schema.json
-      - .codex/tools/validate_agent_run_artifact.py
       - .codex/hooks.json
-      - .codex/hooks/codex_hook_adapter.py
-      - .codex/tools/tests/fixtures/agent-runs/current-run/run.yaml
-      - .codex/tools/tests/fixtures/agent-runs/permission-no-tool-id/run.yaml
-      - .codex/tools/tests/fixtures/agent-runs/stop-recovery/run.yaml
-      - .codex/tools/tests/fixtures/agent-runs/repeated-tools/run.yaml
+      - .codex/bin/skill-system-harness
       - .claude/docs/agent_output_validation.md
       - .claude/docs/harness_lifecycle_hooks.md
       - .claude/docs/tool_hardening_profile.md
@@ -37,17 +30,9 @@ sources:
     verification_status: user-verification-needed
     local_consumers:
       - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
-      - .codex/docs/agent_output_validation.md
       - .codex/docs/harness_lifecycle_hooks.md
-      - .codex/schemas/harness/lifecycle-event.schema.json
-      - .codex/tools/hook_runtime.py
-      - .codex/hooks/codex-pretooluse.example.sh
-      - .codex/hooks/codex_hook_adapter.py
       - .codex/hooks.json
-      - .codex/tools/tests/fixtures/agent-runs/current-run/hook-events.jsonl
-      - .codex/tools/tests/fixtures/agent-runs/permission-no-tool-id/hook-events.jsonl
-      - .codex/tools/tests/fixtures/agent-runs/stop-recovery/hook-events.jsonl
-      - .codex/tools/tests/fixtures/agent-runs/repeated-tools/hook-events.jsonl
+      - .codex/bin/skill-system-harness
       - .claude/docs/agent_output_validation.md
       - .claude/docs/harness_lifecycle_hooks.md
     local_modifications: summarized
@@ -78,7 +63,7 @@ sources:
     local_consumers:
       - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
       - .codex/docs/harness_lifecycle_hooks.md
-      - .codex/schemas/harness/lifecycle-event.schema.json
+      - .claude/schemas/harness/lifecycle-event.schema.json
       - .codex/research/ledger.yaml
     local_modifications: summarized
   - source_id: SRC-SKILLSCOPE
@@ -129,10 +114,8 @@ sources:
       - .codex/tools/sync_generated_mirrors.py
       - .codex/tools/check_execution_assurance.py
       - .codex/tools/run_behavior_evals.py
-      - .codex/tools/hook_runtime.py
-      - .codex/tools/validate_agent_run_artifact.py
-      - .codex/hooks/codex_hook_adapter.py
       - .codex/hooks.json
+      - .codex/bin/skill-system-harness
       - .codex/tools/tests/test_validation_tools.py
       - .github/workflows/verify-bundle.yml
     local_modifications: summarized
@@ -175,8 +158,9 @@ sources:
     verification_status: agent-verified
     local_consumers:
       - .codex/skills/workflow-recovery/SKILL.md
-      - .codex/tools/recovery_guard.py
-      - .codex/hooks/codex_hook_adapter.py
+      - .codex/docs/harness_lifecycle_hooks.md
+      - .codex/bin/skill-system-harness
+      - .claude/hooks/claude_hook_adapter.py
       - .codex/eval/runtime_usage_cases.yaml
     local_modifications: summarized
 adoption_decisions:
@@ -185,9 +169,8 @@ adoption_decisions:
     upstream_reference: SRC-FABLIZE
     local_surface:
       - .codex/skills/workflow-rigor/SKILL.md
-      - .codex/hooks/codex_hook_adapter.py
       - .claude/hooks/claude_hook_adapter.py
-    rationale: "Observed-evidence-over-claim completion plus accepted_risk terminal. Codex enforces via the manifest-bound strict agent-output gate; the Claude adapter adds a transcript-based observed-vs-claimed strict gate (8.4.1) for parity. No upstream code."
+    rationale: "Observed-evidence discipline remains in workflow guidance and the Claude transcript-derived opt-in gate. Codex 9.3.2 removed Agent Run and the manifest-bound output gate rather than claiming that a structural artifact validator understands user intent."
   - concept: debugging-hypothesis-ladder
     decision: adapted
     upstream_reference: SRC-FABLECODEX
@@ -204,18 +187,17 @@ adoption_decisions:
     decision: adapted
     upstream_reference: SRC-FABLIZE
     local_surface:
-      - .codex/tools/analyze_harness_measurement.py
-      - .codex/hooks/codex_hook_adapter.py
+      - .claude/tools/analyze_harness_measurement.py
       - .claude/hooks/claude_hook_adapter.py
-    rationale: "Out-of-band 80/20 holdout + sunset implemented (8.4.1): analyze_harness_measurement.py aggregates adapter-tagged turn_finalize events; the off arm is a gate-off baseline. observed-runs remain replay fixtures, not an outcome source; automated revert/reinstruction collection is a follow-up."
+    rationale: "Retained only with the preserved Claude opt-in adapter. Codex 9.3.2 removes this measurement and its synthetic release comparison because field feedback, not scenario scores, governs Codex harness patches."
   - concept: context-pressure-recovery-guard
     decision: adapted
     upstream_reference: SRC-FABLIZE
     local_surface:
-      - .codex/tools/recovery_guard.py
-      - .codex/hooks/codex_hook_adapter.py
+      - .codex/bin/skill-system-harness
+      - .codex/docs/harness_lifecycle_hooks.md
       - .codex/harness/README.md
-    rationale: "Local state-machine adaptation with no upstream code: always-on derived observation, long-context arming, independent correction/rhetoric/progress signals, one bounded Stop audit per episode, session-hashed state, and observe-by-default rollout. Tool denial and transcript parsing are intentionally excluded."
+    rationale: "Replaced in Codex by a bounded field-derived two-layer guard: Global AGENTS owns semantic authority boundaries and the Go Stop branch blocks one recovery-only correction response. It stores no transcript or raw prompt and does not use long-context scoring."
   - concept: checkpointed-execution-task-ledger
     decision: adapted
     upstream_reference: SRC-FABLECODEX

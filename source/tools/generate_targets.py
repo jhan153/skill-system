@@ -16,7 +16,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
+import subprocess
+import tempfile
 from pathlib import Path
 
 # (source_rel, target_rel) copied unchanged into either requested target.
@@ -197,6 +200,91 @@ def _copy_neutral(source: Path, target: Path, written: list[str]) -> None:
         written.append((target / dst_rel).as_posix())
 
 
+def _go_executable() -> str:
+    configured = os.environ.get("SKILL_SYSTEM_GO", "").strip()
+    if configured:
+        path = Path(configured).expanduser()
+        if not path.is_file():
+            raise SystemExit(f"SKILL_SYSTEM_GO is not a file: {path}")
+        return str(path)
+    discovered = shutil.which("go")
+    if discovered:
+        return discovered
+    raise SystemExit("Go is required to generate the Codex runtime; set SKILL_SYSTEM_GO or install Go")
+
+
+def _swiftc_executable() -> str:
+    configured = os.environ.get("SKILL_SYSTEM_SWIFTC", "").strip()
+    if configured:
+        path = Path(configured).expanduser()
+        if not path.is_file():
+            raise SystemExit(f"SKILL_SYSTEM_SWIFTC is not a file: {path}")
+        return str(path)
+    discovered = shutil.which("swiftc")
+    if discovered:
+        return discovered
+    raise SystemExit("swiftc is required to build the macOS notification overlay; set SKILL_SYSTEM_SWIFTC")
+
+
+def _build_codex_harness(source: Path, codex: Path, written: list[str]) -> None:
+    """Build two Go dispatchers and the precompiled macOS Swift notification overlay."""
+    module = source / "runtime" / "go"
+    if not (module / "go.mod").is_file():
+        raise SystemExit(f"missing Go harness module: {module}")
+    version = str(_load_manifest(source / "plugins" / "core.yaml")["version"])
+    output_root = codex / "bin"
+    if output_root.exists():
+        shutil.rmtree(output_root)
+    output_root.mkdir(parents=True, exist_ok=True)
+
+    targets = (
+        ("darwin", "arm64", output_root / "skill-system-harness"),
+        ("windows", "amd64", output_root / "skill-system-harness.exe"),
+    )
+    go = _go_executable()
+    for goos, goarch, output in targets:
+        env = os.environ.copy()
+        env.update({"CGO_ENABLED": "0", "GOOS": goos, "GOARCH": goarch})
+        subprocess.run(
+            [
+                go,
+                "build",
+                "-trimpath",
+                "-ldflags",
+                f"-s -w -X main.version={version}",
+                "-o",
+                str(output.resolve()),
+                "./cmd/skill-system-harness",
+            ],
+            cwd=module,
+            env=env,
+            check=True,
+        )
+        written.append(output.as_posix())
+
+    overlay_source = source / "runtime" / "swift" / "notification_overlay.swift"
+    if not overlay_source.is_file():
+        raise SystemExit(f"missing Swift notification overlay source: {overlay_source}")
+    overlay = output_root / "skill-system-notify-overlay"
+    with tempfile.TemporaryDirectory(prefix="skill-system-swift-cache-") as module_cache:
+        subprocess.run(
+            [
+                _swiftc_executable(),
+                "-O",
+                "-target",
+                "arm64-apple-macosx13.0",
+                "-module-cache-path",
+                module_cache,
+                str(overlay_source.resolve()),
+                "-o",
+                str(overlay.resolve()),
+            ],
+            check=True,
+        )
+    overlay.chmod(0o755)
+    written.append(overlay.as_posix())
+
+
 def _write_mirror(source: Path, claude: Path, dst_rel: str, spec: dict) -> None:
     canonical = source / spec["canonical"]
     if not canonical.is_file():
@@ -223,6 +311,7 @@ def generate_codex_runtime(source: Path, codex: Path) -> list[str]:
     written: list[str] = []
     _copy_neutral(source, codex, written)
     _copy_platform(source / PLATFORM_CODEX_ROOT, codex, written)
+    _build_codex_harness(source, codex, written)
     return written
 
 

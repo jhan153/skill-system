@@ -1,3 +1,0 @@
-$ python3 .codex/tools/run_verification_pipeline.py --profiles core execution research --release
-FAIL
-- core: FAIL

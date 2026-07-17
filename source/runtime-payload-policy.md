@@ -36,7 +36,7 @@ recorded for 8 inventory entries, corresponding to the 7 decision units below.
   `generated_from` / `source_checksum` / `do_not_edit` header. This is exactly the current
   `sync_generated_mirrors.py` behavior for `docs/source_registry.yaml` and `eval/eval-case.schema.json`.
 - `platform-template` — one neutral body + a per-platform overlay yields divergent output
-  (e.g. `AGENTS.md` ↔ `CLAUDE.md`, and `tools/notify_desktop.py` which currently drifts).
+  (e.g. `AGENTS.md` ↔ `CLAUDE.md`).
 - `codex-native` / `claude-native` — lives in only one target.
 - `tooling` — generator/CI machinery; not shipped as per-platform runtime content.
 
@@ -81,9 +81,9 @@ Corrected after content inspection (recorded decisions overridden by evidence):
   (`codex-research-lifecycle` skill and `.codex/references/...`, neither of which exists even under
   `.codex`). Generating to `.claude` would ship a broken doc. Sharing would require a content
   rewrite — out of Phase 1b scope.
-- `tools/notify_desktop.py` → **platform-native** (was "shared/drift"). The codex and claude
-  variants legitimately diverge (notification title/app defaults, and a `notify_linux` signature
-  difference). This is correct platform behavior; each keeps its own variant.
+- Desktop notification → **platform-native**. Codex owns OS-specific branches inside the generated
+  Go dispatcher plus a precompiled macOS Swift overlay, while Claude retains its Python notification
+  adapter. This is correct platform behavior, not a shared runtime dependency.
 - `harness/README.md` → **codex-only** (was "shared"). Documents `.codex/harness/` paths; Claude
   already has its own `hooks/README.md`.
 
@@ -98,15 +98,15 @@ Codex-only unless there is an explicit Claude-side runtime contract. Platform-ne
 can be shared.
 
 1. **Loop engine tools** (`init/activate/resume/deactivate/evaluate_loop_run.py`, `loop_policy.py`) — `codex-only` for v1.
-2. **`tools/task_ledger.py`, `tools/init_agent_run.py`** — `codex-only` for v1.
-3. **`schemas/`** (harness/knowledge/loop/orchestration/task/tools/workitem) — `shared-neutral` for v1.
+2. **`tools/task_ledger.py`** — `codex-only` explicit workflow runtime. Codex Agent Run was removed in 9.3.2.
+3. **Active portable schemas** (knowledge/loop/orchestration/task/tools/workitem) — `shared-neutral`; Claude's lifecycle ledger schema is Claude-native.
 4. **`research/`** (ledger + schema) — `codex-only` for v1.
 5. **`tools/requirements.txt`** — `codex-only` for v1, because no runtime-logic tools move to Claude.
 6. **`rules/default.rules`** — `codex-only` for v1; no Claude equivalent is generated.
 
 Phase 1b implementation scope after these decisions:
 - Add/generate `research-routing.md` to Claude as `shared-neutral`.
-- Reconcile `tools/notify_desktop.py` into neutral body + platform overlay.
+- Keep notification implementations platform-owned.
 - Reconcile `harness/README.md` against Claude's `hooks/README.md`.
 - Add/generate `schemas/` to Claude as `shared-neutral`.
 

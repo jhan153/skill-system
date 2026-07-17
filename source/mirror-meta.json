@@ -6,7 +6,7 @@
       "canonical": "shared/docs/source_registry.yaml",
       "generated_from": ".codex/docs/source_registry.yaml",
       "generated_at": "2026-06-25T22:01:27Z",
-      "source_checksum": "632b5659adb40bbd21fe6668f47f6821715ae88e8be8e17ec9b0e022ec1f5e62"
+      "source_checksum": "f807aae48d11f4052753bb72a82d545c95b75fbc33dd652cd1e02c8f24e56414"
     },
     "eval/eval-case.schema.json": {
       "kind": "json",

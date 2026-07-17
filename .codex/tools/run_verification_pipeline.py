@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 
 
-DEFAULT_PROFILES = ["core", "execution", "agent-output", "research", "integrations", "loop"]
+DEFAULT_PROFILES = ["core", "execution", "research", "integrations", "loop"]
 CHECK_STATUSES = {"PASS", "SKIP", "FAIL", "ERROR"}
 RELEASE_REQUIRED_CHECK_IDS = {
     "core": {
@@ -29,14 +29,6 @@ RELEASE_REQUIRED_CHECK_IDS = {
     },
     "execution": {
         "execution_assurance_artifacts",
-        "hook_runtime_smoke",
-        "behavior_replay",
-        "solar_forward_eval_9_1_1",
-    },
-    "agent-output": {
-        "agent_run_current_fixture",
-        "agent_run_permission_fixture",
-        "agent_run_recovery_fixture",
     },
     "research": {"research_ledger"},
     "integrations": {"kanboard_integration"},

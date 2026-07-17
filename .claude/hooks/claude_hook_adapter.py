@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Claude Code lifecycle hook adapter for Skill-System execution assurance.
 
-Claude-side counterpart of .codex/hooks/codex_hook_adapter.py. It records Claude
-Code lifecycle events through the same hash-chained evidence backend
-(.codex/tools/hook_runtime.py), using one durable fallback file per session. The
+Claude Code lifecycle adapter. It records lifecycle events through its
+Claude-owned hash-chained evidence backend (`.claude/tools/hook_runtime.py`),
+using one durable fallback file per session. The
 shared discipline contract lives in the byte-mirrored skills
 (workflow-rigor, analysis-bug, ...); this adapter is only the Claude runtime
 wiring.
@@ -28,7 +28,7 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
-CODEX_TOOLS = ROOT / ".codex" / "tools"
+CLAUDE_TOOLS = ROOT / ".claude" / "tools"
 
 EVENT_MAP = {
     "UserPromptSubmit": "request_received",
@@ -176,8 +176,8 @@ def main() -> int:
     if neutral is None:
         return 0
     try:
-        if str(CODEX_TOOLS) not in sys.path:
-            sys.path.insert(0, str(CODEX_TOOLS))
+        if str(CLAUDE_TOOLS) not in sys.path:
+            sys.path.insert(0, str(CLAUDE_TOOLS))
         from hook_runtime import default_ledger, utc_now, write_event  # noqa: PLC0415
     except Exception:
         return 0

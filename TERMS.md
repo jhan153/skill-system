@@ -1,4 +1,4 @@
-# 9.3.1 Terms
+# 9.3.2 Terms
 
 ## version_cut
 
@@ -12,7 +12,7 @@ A Skill System bundle is a portable set of skills, docs, eval cases, tools, and 
 
 The location that an agent should treat as the source of runtime guidance.
 
-- Codex: `.codex/docs`, `.codex/eval`, `.codex/tools`
+- Codex: `.codex/docs`, `.codex/eval`, `.codex/tools`, `.codex/bin`
 - Claude: `.claude/docs`, `.claude/eval`
 - Root: packaging documents only
 
@@ -20,7 +20,7 @@ The location that an agent should treat as the source of runtime guidance.
 
 Runtime configuration and automation assets, including `.codex/config.toml` and `automations`, are host-managed. Preserve existing local settings unless the user explicitly chooses to replace them.
 
-The default Codex hook map is empty. Hook adapters are optional project-local evidence/control surfaces and may be enabled only by explicit project/runtime policy.
+The default Codex hook map keeps eight lifecycle events and invokes the generated Go harness directly on POSIX. Windows uses one bounded environment-path resolver so custom `CODEX_HOME` and the default home both work. Hook registration, live home installation, and project-local overrides remain under explicit runtime policy; plugins do not add a duplicate base hook map.
 
 ## project_context_manifest
 

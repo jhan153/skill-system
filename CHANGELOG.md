@@ -1,5 +1,18 @@
 # Changelog
 
+## 9.3.2
+
+- Reconstructed the Codex eight-event base harness as cross-compiled Go executables for `darwin/arm64` and `windows/amd64`; POSIX calls Go directly, while Windows uses only a bounded `cmd.exe` conditional to honor custom `CODEX_HOME` with the default fallback.
+- Restored the precompiled Swift/Cocoa macOS notification overlay with no `osascript` fallback, and reinstated notification path/credential/token/URL redaction before launch.
+- Corrected the Stop continuation contract to `decision: "block"` plus `reason`, raised only the Stop host timeout above the active LoopRun bound, made Kanboard stamp only a successful stable worker result, and narrowed correction/direct-resolution heuristics so generic `실수`, code fences, and file links cannot trigger or bypass the guard alone.
+- Added an atomic, token-owned Kanboard pending lease per workspace so concurrent SessionStart/Stop events cannot queue overlapping sync workers. Worker leases expire after 120 seconds versus the 60-second execution bound, are released on handled exits, and gate Windows stamp replacement as well. Normalized `dry_run` to `dry-run` before both stamp comparison and worker execution.
+- Kept desktop notifications, declared-plan Kanboard sync, and active-only LoopRun as independent conditional branches. Idle tool/compact events perform no child process, network access, growing ledger scan, or file write.
+- Combined the unchanged Global `AGENTS.md` authority/depth rules with a bounded field-derived correction guard. Persistent guard state contains only a session hash, turn hash, and two booleans; raw prompts, responses, commands, and tool data are not stored.
+- Added a common location-only `project-context.yaml` resolver plus explicit `project-context-init` and `project-context-update` skills. Memory, Knowledge, plans, and named LLM Wiki contents remain under their specialist owners and are never collected by hooks.
+- Removed the Codex Python hook adapter/base prototype, lifecycle/hash-chain ledger, Agent Run, Agent Output Gate, Reference Monitor, Recovery Guard, harness measurement/version comparison, compact records, historical release replay packages, and their exclusive schemas, docs, fixtures, tests, and verification profiles. Task/Research/Evidence ledgers, Memory Bank events, Kanboard, and LoopRun remain.
+- Separated Claude's preserved opt-in hook ledger dependency into `.claude/tools` so the Claude adapter no longer borrows Codex runtime files. Plugins do not register duplicate base hooks.
+- Advanced the unified bundle identity to 9.3.2. This source change does not install into a home runtime or live plugin cache.
+
 ## 9.3.1
 
 - Split platform harness ownership at the canonical source boundary. Codex and Claude now have independent global instructions and `context-routing.md` files; portable skills, docs, eval contracts, and schemas remain shared.

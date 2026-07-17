@@ -9,9 +9,7 @@ import re
 from pathlib import Path
 
 
-CURRENT_VERSION = "9.3.1"
-HISTORICAL_FORWARD_VERSION = "9.1.1"
-HISTORICAL_FORWARD_CASE_PREFIX = "solar-911-"
+CURRENT_VERSION = "9.3.2"
 PLUGIN_NAMES = (
     "skill-system-core",
     "skill-system-dev",
@@ -149,54 +147,11 @@ def check(root: Path) -> list[str]:
         if version != CURRENT_VERSION:
             errors.append(f"{path.relative_to(root)} version {version!r} != {CURRENT_VERSION!r}")
 
-    reference_monitor = root / "source" / "platform" / "codex" / "tools" / "reference_monitor.py"
-    monitor_match = (
-        re.search(
-            r'(?m)^BUNDLE_VERSION\s*=\s*["\']([^"\']+)["\']\s*$',
-            reference_monitor.read_text(encoding="utf-8"),
-        )
-        if reference_monitor.is_file()
-        else None
-    )
-    monitor_version = monitor_match.group(1) if monitor_match else None
-    if monitor_version != CURRENT_VERSION:
-        errors.append(
-            "source/platform/codex/tools/reference_monitor.py bundle version "
-            f"{monitor_version!r} != {CURRENT_VERSION!r}"
-        )
-
     claude_rules = root / "source" / "platform" / "claude" / "CLAUDE.md"
     if not claude_rules.is_file() or f"bundle ({CURRENT_VERSION})" not in claude_rules.read_text(
         encoding="utf-8"
     ):
         errors.append(f"source/platform/claude/CLAUDE.md does not declare bundle {CURRENT_VERSION}")
-
-    forward_path = eval_root / "release_forward_cases.yaml"
-    if forward_path.is_file():
-        forward_version = yaml_scalar(forward_path, "version")
-        if forward_version != HISTORICAL_FORWARD_VERSION:
-            errors.append(
-                f"{forward_path.relative_to(root)} historical version {forward_version!r} "
-                f"!= {HISTORICAL_FORWARD_VERSION!r}"
-            )
-        case_ids = re.findall(
-            r"(?m)^\s*- case_id:\s*(\S+)\s*$",
-            forward_path.read_text(encoding="utf-8"),
-        )
-        if len(case_ids) != 5:
-            errors.append(
-                "release_forward_cases.yaml must contain exactly 5 historical cases, "
-                f"found {len(case_ids)}"
-            )
-        stale = [
-            case_id
-            for case_id in case_ids
-            if not case_id.startswith(HISTORICAL_FORWARD_CASE_PREFIX)
-        ]
-        if stale:
-            errors.append("non-historical forward case ids: " + ", ".join(stale))
-    else:
-        errors.append("missing historical release_forward_cases.yaml")
 
     return errors
 

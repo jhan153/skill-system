@@ -1,8 +1,0 @@
-{
-  "ledger_root": "/private/tmp/codex-home-9.1.1-forward.bX4cwa/harness/hook-ledgers",
-  "ledger_count": 2,
-  "distinct_run_ids": 2,
-  "entries_per_ledger": [1, 1],
-  "global_temp_fallback_used": false,
-  "live_codex_home_mutated": false
-}

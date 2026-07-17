@@ -1,8 +1,8 @@
 # Claude hooks (opt-in)
 
-`claude_hook_adapter.py` is the Claude-side counterpart of the Codex
-`hooks.json` adapter. It records Claude Code lifecycle events through the same
-hash-chained evidence backend as Codex (`.codex/tools/hook_runtime.py`). Default
+`claude_hook_adapter.py` is the Claude lifecycle adapter. It records Claude Code
+lifecycle events through its Claude-owned hash-chained evidence backend
+(`.claude/tools/hook_runtime.py`). Default
 storage is a durable per-session ledger family, so each file remains a
 single-run verifier input. The discipline
 contract itself lives in the byte-mirrored skills (`workflow-rigor`, etc.); this
@@ -24,7 +24,7 @@ file is only the runtime wiring.
   transcript parsing is best-effort and fails open. A `stop_hook_active` guard
   prevents re-blocking the same stop. Live verification against a real Claude
   transcript schema is still recommended before relying on it in production.
-- **Fail-open** — any error (including missing `.codex/tools`) exits 0 so a host
+- **Fail-open** — any error (including missing `.claude/tools`) exits 0 so a host
   session is never broken.
 
 ## Enable (host-managed, not auto-installed)
@@ -52,8 +52,8 @@ Add it to your `settings.json` (user `~/.claude/settings.json`, or a project
 Notes:
 - Adjust the path to where the bundle is deployed. For a project-scoped install
   use `$CLAUDE_PROJECT_DIR/.claude/hooks/claude_hook_adapter.py`.
-- Requires the Codex tools to be co-deployed (the adapter imports
-  `hook_runtime` from a sibling `.codex/tools`). Without it, the adapter no-ops.
+- Requires the bundled Claude tools to be co-deployed (the adapter imports
+  `hook_runtime` from sibling `.claude/tools`). Without it, the adapter no-ops.
 - The ledger path follows `hook_runtime.default_ledger(session_id)`. An explicit
   `SKILL_SYSTEM_HOOK_LEDGER` remains an exact-file override; otherwise the path
   is `${CODEX_HOME:-~/.codex}/harness/hook-ledgers/<run-key>/hook-events.jsonl`.

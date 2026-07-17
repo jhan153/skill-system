@@ -1,3 +1,0 @@
-$ python3 .codex/tools/verify_bundle.py --profile agent-output --format text
-PASS
-- agent_run_artifacts: PASS

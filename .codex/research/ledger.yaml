@@ -16,8 +16,9 @@ entries:
     verification_status: user-verification-needed
     local_consumers:
       - .codex/docs/harness_lifecycle_hooks.md
-      - .codex/schemas/harness/lifecycle-event.schema.json
-    notes: "Used for hook adapter contract and runtime example boundaries."
+      - .codex/hooks.json
+      - .codex/bin/skill-system-harness
+    notes: "Used for the bounded Go hook dispatcher and host-permission boundary."
   - entry_id: RLE-002
     source_id: SRC-HARNESSX
     claim: "Harness-oriented agent systems benefit from typed primitives, lifecycle processors, and trace-driven adaptation."
@@ -31,5 +32,5 @@ entries:
     verification_status: agent-verified
     local_consumers:
       - docs/plan/2026-06-20-7.2.6-field-evidence-and-harness-hardening.md
-      - .codex/schemas/harness/lifecycle-event.schema.json
+      - .codex/docs/harness_lifecycle_hooks.md
     notes: "Used as research background for the execution-assurance direction."

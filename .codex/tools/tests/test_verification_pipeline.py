@@ -50,7 +50,7 @@ class VerificationPipelineTests(unittest.TestCase):
             ],
         }
 
-    def test_release_execution_requires_solar_and_full_check_set(self) -> None:
+    def test_release_execution_requires_the_structural_runtime_check(self) -> None:
         complete = self.report(
             "execution",
             self.pipeline.RELEASE_REQUIRED_CHECK_IDS["execution"],
@@ -59,10 +59,10 @@ class VerificationPipelineTests(unittest.TestCase):
             self.pipeline.validate_profile_report(complete, "execution", release=True)
         )
 
-        minimal = self.report("execution", {"hook_runtime_smoke"})
+        minimal = self.report("execution", {"unrelated_check"})
         error = self.pipeline.validate_profile_report(minimal, "execution", release=True)
         self.assertIn("missing required checks", error or "")
-        self.assertIn("solar_forward_eval_9_1_1", error or "")
+        self.assertIn("execution_assurance_artifacts", error or "")
 
     def test_normal_profile_mirrors_optional_failure_semantics(self) -> None:
         report = {

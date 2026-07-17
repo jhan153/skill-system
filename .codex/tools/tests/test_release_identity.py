@@ -67,24 +67,10 @@ class ReleaseIdentityTests(unittest.TestCase):
                 f'version: "{self.checker.CURRENT_VERSION}"\n',
                 encoding="utf-8",
             )
-        reference_monitor = root / "source" / "platform" / "codex" / "tools" / "reference_monitor.py"
-        reference_monitor.parent.mkdir(parents=True)
-        reference_monitor.write_text(
-            f'BUNDLE_VERSION = "{self.checker.CURRENT_VERSION}"\n', encoding="utf-8"
-        )
         claude_rules = root / "source" / "platform" / "claude" / "CLAUDE.md"
         claude_rules.parent.mkdir(parents=True)
         claude_rules.write_text(
             f'> Skill System bundle ({self.checker.CURRENT_VERSION})\n', encoding="utf-8"
-        )
-        (eval_root / "release_forward_cases.yaml").write_text(
-            f'version: "{self.checker.HISTORICAL_FORWARD_VERSION}"\n'
-            + "cases:\n"
-            + "".join(
-                f"  - case_id: {self.checker.HISTORICAL_FORWARD_CASE_PREFIX}case-{index:03d}\n"
-                for index in range(1, 6)
-            ),
-            encoding="utf-8",
         )
 
     def test_consistent_release_identity_passes(self) -> None:
@@ -105,21 +91,6 @@ class ReleaseIdentityTests(unittest.TestCase):
             errors = self.checker.check(root)
             self.assertTrue(any("version" in error and "core.yaml" in error for error in errors), errors)
             self.assertTrue(any("cachebuster" in error for error in errors), errors)
-
-    def test_historical_forward_manifest_cannot_be_relabelled(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
-            root = Path(tmp)
-            self.build_fixture(root)
-            forward = root / "source" / "shared" / "eval" / "release_forward_cases.yaml"
-            text = forward.read_text(encoding="utf-8").replace(
-                self.checker.HISTORICAL_FORWARD_VERSION,
-                self.checker.CURRENT_VERSION,
-                1,
-            )
-            forward.write_text(text, encoding="utf-8")
-
-            errors = self.checker.check(root)
-            self.assertTrue(any("historical version" in error for error in errors), errors)
 
     def test_wrong_plugin_identity_and_marketplace_extra_fail(self) -> None:
         with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:

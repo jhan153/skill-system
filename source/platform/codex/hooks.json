@@ -1,3 +1,106 @@
 {
-  "hooks": {}
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CODEX_HOME:-$HOME/.codex}/bin/skill-system-harness\"",
+            "commandWindows": "cmd.exe /d /s /c \"if defined CODEX_HOME (\"%CODEX_HOME%\\bin\\skill-system-harness.exe\") else (\"%USERPROFILE%\\.codex\\bin\\skill-system-harness.exe\")\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CODEX_HOME:-$HOME/.codex}/bin/skill-system-harness\"",
+            "commandWindows": "cmd.exe /d /s /c \"if defined CODEX_HOME (\"%CODEX_HOME%\\bin\\skill-system-harness.exe\") else (\"%USERPROFILE%\\.codex\\bin\\skill-system-harness.exe\")\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CODEX_HOME:-$HOME/.codex}/bin/skill-system-harness\"",
+            "commandWindows": "cmd.exe /d /s /c \"if defined CODEX_HOME (\"%CODEX_HOME%\\bin\\skill-system-harness.exe\") else (\"%USERPROFILE%\\.codex\\bin\\skill-system-harness.exe\")\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CODEX_HOME:-$HOME/.codex}/bin/skill-system-harness\"",
+            "commandWindows": "cmd.exe /d /s /c \"if defined CODEX_HOME (\"%CODEX_HOME%\\bin\\skill-system-harness.exe\") else (\"%USERPROFILE%\\.codex\\bin\\skill-system-harness.exe\")\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CODEX_HOME:-$HOME/.codex}/bin/skill-system-harness\"",
+            "commandWindows": "cmd.exe /d /s /c \"if defined CODEX_HOME (\"%CODEX_HOME%\\bin\\skill-system-harness.exe\") else (\"%USERPROFILE%\\.codex\\bin\\skill-system-harness.exe\")\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CODEX_HOME:-$HOME/.codex}/bin/skill-system-harness\"",
+            "commandWindows": "cmd.exe /d /s /c \"if defined CODEX_HOME (\"%CODEX_HOME%\\bin\\skill-system-harness.exe\") else (\"%USERPROFILE%\\.codex\\bin\\skill-system-harness.exe\")\"",
+            "timeout": 12
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CODEX_HOME:-$HOME/.codex}/bin/skill-system-harness\"",
+            "commandWindows": "cmd.exe /d /s /c \"if defined CODEX_HOME (\"%CODEX_HOME%\\bin\\skill-system-harness.exe\") else (\"%USERPROFILE%\\.codex\\bin\\skill-system-harness.exe\")\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CODEX_HOME:-$HOME/.codex}/bin/skill-system-harness\"",
+            "commandWindows": "cmd.exe /d /s /c \"if defined CODEX_HOME (\"%CODEX_HOME%\\bin\\skill-system-harness.exe\") else (\"%USERPROFILE%\\.codex\\bin\\skill-system-harness.exe\")\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
 }

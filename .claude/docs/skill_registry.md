@@ -37,6 +37,8 @@
 | `plan-requirements-brief` | requirements_specification | Distill discovery notes, stakeholder answers, or decision logs into a requirements contract or PRD/SRS-lite. | Requirements still need interactive elicitation, active docs/plan sync, phase/package planning, or direct implementation is needed. | Collect field cases for PRD/SRS-lite boundaries, acceptance criteria quality, and handoff to HLD/LLD-style planning. | `planning` |
 | `plan-short-term-docs` | planning | Create or update persisted `docs/plan` artifacts. | The user only uses "plan" casually or asks for direct implementation. | Add more implementation-transition examples. | `planning` |
 | `project-context-checkpoint` | project_context | At an explicit commit or closeout checkpoint, classify clear durable current-task items into one existing declared Memory Bank or Knowledge Base. | The event is a Stop hook, no store is declared, the item is ambiguous, or the request is only a complaint/status update. | Refine classification directly from user-reported field misses; do not add telemetry. | `knowledge` |
+| `project-context-init` | project_context | Create a minimal repository-owned context-location manifest on explicit request without initializing any declared store. | A manifest already exists, the request is ordinary context resolution, or store initialization is primary. | Keep initialization location-only and portable across repository layouts. | `knowledge` |
+| `project-context-update` | project_context | Update explicitly selected manifest locations while preserving sibling and unknown sections. | No manifest exists, the request is implicit cleanup, or store content mutation is primary. | Refine section-preserving path updates from real repository changes. | `knowledge` |
 | `report-diff` | output | Present actual changed lines in readable grouped diff form. | No diff or change snapshot exists. | Add examples for large but still scoped diffs. | `report` |
 | `research-experiment-blueprint` | research | Convert a selected hypothesis into an identifiable protocol with controls, matched data/metrics, falsifiers, and reproducibility. | The claim is not selected yet or code generation/execution is requested. | Collect leakage, comparator, and checkpoint-only field cases. | `research` |
 | `research-experiment-scaffold` | research | Project an approved experiment contract into a repo-native minimal runnable scaffold and safe synthetic smoke check. | No approved equivalent contract exists, or real data download/training is the actual request. | Collect non-Python, dependency-missing, and synthetic-path field cases. | `research` |
@@ -97,7 +99,7 @@ Family is the user-facing grouping field. The `family` column above is the singl
 | `planning` | Planning | `plan-requirements-discovery` / `plan-requirements-brief` / `plan-short-term-docs` / `plan-loop-term` / `plan-long-term-package` by intent | 요구사항, PRD, 플랜, 계획, planning, plan, goal, loop |
 | `loop` | Loop Engineering | `loop-readiness-router` / `loop-verifier-registry` / `workflow-loop-runner` by intent | 루프, loop, goal loop, verifier, readiness |
 | `memory` | Memory | `memory-bank-harness` (read) / `memory-bank-init/update/maintenance/correction-capture` by intent | 메모리, memory |
-| `knowledge` | Project Knowledge & Wiki Context | `knowledge-base-read/init/update/maintenance/plan-sync`, category record skills, `llm-wiki-context`, or `project-context-checkpoint` by intent | 지식, knowledge, knowledge base, LLM Wiki, 위키 |
+| `knowledge` | Project Knowledge & Wiki Context | `knowledge-base-read/init/update/maintenance/plan-sync`, category record skills, `project-context-init/update/checkpoint`, or `llm-wiki-context` by intent | 지식, knowledge, knowledge base, project context, LLM Wiki, 위키 |
 | `evaluation` | Evaluation | `evaluation-harness` for explicitly requested existing-case review | 평가, evaluation, eval |
 | `skill_system` | Skill System | current task implementation owner; system `skill-creator` only by explicit name or personal-skill creation intent; `skill-system-repo-adapter` is the repository adapter | 스킬, skill, pack |
 
@@ -139,6 +141,7 @@ Resolve an exact legacy alias only when it appears in model-visible request text
 - `knowledge-domain-record`, `knowledge-design-record`, `knowledge-algorithm-record`, `knowledge-architecture-record`, `knowledge-code-review-record`: primary `knowledge`; tags `specialized_record`, `artifact_anchor`.
 - `llm-wiki-context`: primary `knowledge`; tags `explicit_wiki`, `read_only`, `native_navigation`.
 - `project-context-checkpoint`: primary `knowledge`; tags `commit_checkpoint`, `closeout`, `memory`, `knowledge`.
+- `project-context-init`, `project-context-update`: primary `knowledge`; tags `location_manifest`, `explicit_write`, `section_preservation`.
 
 ## Cluster Notes
 

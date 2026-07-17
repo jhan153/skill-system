@@ -64,7 +64,7 @@ entries:
     generation: neutral-verbatim
     confidence: confirmed
     gap: none
-    notes: "17 docs; all identical except docs/source_registry.yaml (separate mirror entry)."
+    notes: "Shared contracts generate to both platforms; harness lifecycle and Agent Output documents are platform-owned overlays because Codex and Claude runtimes intentionally differ."
 
   - path: "docs/source_registry.yaml"
     present_in: [codex, claude]
@@ -115,6 +115,13 @@ entries:
     confidence: confirmed
     notes: "Claude hook enable instructions."
 
+  - path: "tools/hook_runtime.py, tools/analyze_harness_measurement.py"
+    present_in: [claude]
+    class: claude-only
+    generation: claude-native
+    confidence: confirmed
+    notes: "Preserved Claude 9.2.1-series opt-in ledger and measurement dependency; Codex does not package these tools."
+
   - path: "tools/claude_notify_adapter.py"
     present_in: [claude]
     class: claude-only
@@ -124,31 +131,19 @@ entries:
 # ---------------------------------------------------------------------------
 # codex-only platform runtime
 # ---------------------------------------------------------------------------
-  - path: "hooks/codex_hook_adapter.py"
+  - path: "bin/skill-system-harness, bin/skill-system-harness.exe, bin/skill-system-notify-overlay"
     present_in: [codex]
     class: codex-only
-    generation: codex-native
+    generation: tooling
     confidence: confirmed
-
-  - path: "hooks/codex-pretooluse.example.sh"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: confirmed
+    notes: "Generator cross-builds the Go dispatcher for darwin/arm64 and windows/amd64 with CGO disabled and precompiles the darwin/arm64 Swift/Cocoa notification overlay. Target machines need neither Go nor Swift tooling."
 
   - path: "hooks.json"
     present_in: [codex]
     class: codex-only
     generation: codex-native
     confidence: confirmed
-    notes: "Empty default Codex hook config. The adapter remains packaged as an explicit opt-in diagnostic asset; the Claude equivalent is opt-in settings.json entries."
-
-  - path: "tools/hook_runtime.py"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: provisional
-    notes: "Codex hook engine; review for any platform-neutral core."
+    notes: "Sole base registration owner. POSIX invokes the Go binary directly; Windows uses a bounded cmd conditional to honor CODEX_HOME with the default fallback. Stop has a 12-second host timeout; plugins register no duplicate hooks."
 
   - path: "rules/default.rules"
     present_in: [codex]
@@ -161,14 +156,14 @@ entries:
 # ---------------------------------------------------------------------------
 # platform-variant tools (present in both but divergent, or shared deps)
 # ---------------------------------------------------------------------------
-  - path: "tools/notify_desktop.py"
+  - path: "desktop notification runtime"
     present_in: [codex, claude]
     class: platform-native
     generation: codex-native + claude-native
     confidence: confirmed
     gap: none
-    phase_1b_decision: "platform-native (kept as separate codex/claude variants), NOT shared-neutral."
-    decision_rationale: "Content inspection: the two variants legitimately diverge (Codex notification title/app default 'codex' vs Claude 'Claude approval requested'/'claude', and notify_linux has a different signature - codex takes an `app` param, claude does not). This is correct platform behavior, not accidental drift; a forced neutral body + overlay would be fragile. Each platform keeps its own variant under source/platform/<p>/tools/."
+    phase_1b_decision: "platform-native and independent."
+    decision_rationale: "Codex notification is an OS-specific Go branch that launches a packaged Swift overlay on macOS or PowerShell NotifyIcon on Windows after redaction; Claude retains its Python notification adapter. Neither branch owns validation, Kanboard, or LoopRun. Kanboard separately uses one atomic pending lease per workspace and stamps only successful stable syncs."
 
   - path: "tools/requirements.txt"
     present_in: [codex]
@@ -199,17 +194,8 @@ entries:
     generation: codex-native
     confidence: provisional
     gap: missing-in-claude
-    phase_1b_decision: "codex-only for v1, grouped with init_agent_run.py as the task/run-state decision."
-    decision_rationale: "Task/run-state tooling is executable runtime logic and should stay in the primary Codex runtime for the first cut."
-
-  - path: "tools/init_agent_run.py"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: provisional
-    gap: missing-in-claude
-    phase_1b_decision: "codex-only for v1, grouped with task_ledger.py as the task/run-state decision."
-    decision_rationale: "Task/run-state tooling is executable runtime logic and should stay in the primary Codex runtime for the first cut."
+    phase_1b_decision: "codex-only explicit workflow runtime."
+    decision_rationale: "TaskRun is independent of the removed Agent Run hook artifact and remains owned by workflow-task-ledger."
 
   - path: "schemas/ (harness, knowledge, loop, orchestration, task, tools, workitem)"
     present_in: [codex, claude]
@@ -217,8 +203,8 @@ entries:
     generation: neutral-verbatim
     confidence: confirmed
     gap: closed
-    phase_1b_decision: "shared-neutral for v1 — APPLIED. 24 schema definitions + neutral examples -> source/shared/schemas, generated to BOTH .codex and .claude."
-    decision_rationale: "Schemas are platform-agnostic contracts. EXCEPTION: schemas/workitem/examples/work-item.example.yaml references codex-only tooling (.codex/tools/validate_work_item.py) and stays codex-only (source/platform/codex/schemas, merge-overlaid onto .codex only). So .codex/schemas=25, .claude/schemas=24 (no .codex path leak)."
+    phase_1b_decision: "Portable active schemas remain shared-neutral. Claude's lifecycle-event schema is a Claude-native overlay; removed Codex Agent Run and lifecycle-ledger schemas are not regenerated into Codex."
+    decision_rationale: "Schemas follow active owners. WorkItem's Codex example and Claude's hook ledger schema remain platform-specific."
 
   - path: "research-routing.md"
     present_in: [codex]
@@ -245,7 +231,7 @@ entries:
     confidence: confirmed
     gap: none
     phase_1b_decision: "codex-only — CORRECTED from the recorded 'shared-neutral' after content inspection."
-    decision_rationale: "Content is codex-specific: it documents '.codex/harness/agent-runs/' runtime output and '.codex/tools/tests/fixtures/agent-runs/'. The Claude side already has its own hooks/README.md (claude-native). Not a shared gap; nothing to add to Claude."
+    decision_rationale: "Documents the Go hook dispatcher and source/runtime boundary. Agent Run compatibility and diagnostic commands were removed."
 
 # ---------------------------------------------------------------------------
 # maintainer-only: bundle CI / self-maintenance, not platform runtime parity
@@ -255,14 +241,14 @@ entries:
     class: maintainer-only
     generation: tooling
     confidence: confirmed
-    notes: "bundle gate; profiles core/integrations/execution/research/agent-output/loop."
+    notes: "bundle gate; profiles core/integrations/execution/research/loop. Agent Output is no longer a Codex profile."
 
   - path: "tools/validate_*.py"
     present_in: [codex]
     class: maintainer-only
     generation: tooling
     confidence: confirmed
-    notes: "validate_agent_run_artifact, _eval_cases, _loop_run, _research_ledger, _source_registry, _task_run, _work_item (7)."
+    notes: "validate_eval_cases, _loop_run, _research_ledger, _source_registry, _task_run, _work_item."
 
   - path: "tools/check_*.py"
     present_in: [codex]
@@ -278,7 +264,7 @@ entries:
     confidence: confirmed
     notes: "run_behavior_evals, run_validator_unit_tests, run_verification_pipeline (3)."
 
-  - path: "tools/ analysis+report: analyze_context_surface.py, analyze_harness_measurement.py, _validation.py"
+  - path: "tools/ analysis+report: analyze_context_surface.py, _validation.py"
     present_in: [codex]
     class: maintainer-only
     generation: tooling
@@ -303,7 +289,7 @@ entries:
     class: maintainer-only
     generation: tooling
     confidence: confirmed
-    notes: "agent-run replay fixtures for run_behavior_evals; present in BOTH targets (verified: diff -qr eval shows no dir-presence diff)."
+    notes: "Small validator fixtures may remain, but historical 9.1.x release replay packages and the synthetic harness comparison gate were removed."
 
 # ---------------------------------------------------------------------------
 # local-only / ignored
@@ -341,8 +327,8 @@ phase_scope:
       - "schemas/ -> shared-neutral: 24 definitions+examples generated to .claude (codex-only work-item.example.yaml kept out -> .claude/schemas=24, .codex/schemas=25, no .codex path leak)"
     corrected_after_content_inspection:
       - "research-routing.md -> codex-only (NOT shared): references codex-only/dangling assets (codex-research-lifecycle skill, .codex/references/...) -> would create a broken Claude doc"
-      - "tools/notify_desktop.py -> platform-native (NOT shared/drift): legitimate per-platform divergence incl. a notify_linux signature difference"
+      - "desktop notification -> platform-native: Codex Go branch and Claude Python adapter intentionally diverge"
       - "harness/README.md -> codex-only (NOT shared): documents .codex/harness/ paths; Claude has its own hooks/README.md"
     decisions_recorded_codex_only_for_v1:
-      - "loop engine tools, task_ledger.py, init_agent_run.py, research/ ledger+schema, tools/requirements.txt, rules/default.rules"
+      - "loop engine tools, task_ledger.py, research/ ledger+schema, tools/requirements.txt, rules/default.rules"
     review_record: "Phase 1b claude diff = + .claude/schemas/ (24 files) only. Verified at that cut: .codex byte-identical, .claude/schemas had no .codex refs, and core/loop profiles passed. Post-cutover the gate (live==source) replaces a separate allowlist file."

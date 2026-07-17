@@ -237,68 +237,6 @@ def execution_checks(root: Path) -> list[Check]:
     py = sys.executable
     return [
         Check("execution_assurance_artifacts", [py, ".codex/tools/check_execution_assurance.py"], root),
-        Check(
-            "hook_runtime_smoke",
-            [
-                py,
-                ".codex/tools/hook_runtime.py",
-                "record",
-                "--event",
-                "tool_preflight",
-                "--host",
-                "codex",
-                "--host-event",
-                "PreToolUse",
-                "--support-level",
-                "native",
-                "--tool-id",
-                "functions.exec_command",
-                "--evidence",
-                "{}",
-                "--ledger",
-                "/private/tmp/skill-system-hook-runtime-smoke.jsonl",
-            ],
-            root,
-        ),
-        Check(
-            "behavior_replay",
-            [
-                py,
-                ".codex/tools/run_behavior_evals.py",
-                "--mode",
-                "replay",
-                "--observed-runs",
-                ".codex/eval/observed-runs",
-                "--bundle-version",
-                "8.3.1",
-            ],
-            root,
-        ),
-        Check(
-            "solar_forward_eval_9_1_1",
-            [
-                py,
-                ".codex/tools/run_behavior_evals.py",
-                "--mode",
-                "host-assisted",
-                "--eval-path",
-                ".codex/eval/release_forward_cases.yaml",
-                "--eval-schema",
-                ".codex/eval/eval-case.schema.json",
-                "--observed-runs",
-                ".codex/eval/observed-runs/release-9.1.1",
-                "--bundle-version",
-                "9.1.1",
-                "--required-model",
-                "gpt-5.6-sol",
-                "--require-all-cases",
-                "--not-before",
-                "2026-07-10T18:00:00Z",
-                "--not-after",
-                "2026-07-12T00:00:00Z",
-            ],
-            root,
-        ),
     ]
 
 
@@ -316,45 +254,6 @@ def research_checks(root: Path) -> list[Check]:
             ],
             root,
         )
-    ]
-
-
-def agent_output_checks(root: Path) -> list[Check]:
-    py = sys.executable
-    return [
-        Check(
-            "agent_run_current_fixture",
-            [
-                py,
-                ".codex/tools/validate_agent_run_artifact.py",
-                ".codex/tools/tests/fixtures/agent-runs/current-run",
-                "--schema",
-                ".codex/schemas/harness/agent-run.schema.json",
-            ],
-            root,
-        ),
-        Check(
-            "agent_run_permission_fixture",
-            [
-                py,
-                ".codex/tools/validate_agent_run_artifact.py",
-                ".codex/tools/tests/fixtures/agent-runs/permission-no-tool-id",
-                "--schema",
-                ".codex/schemas/harness/agent-run.schema.json",
-            ],
-            root,
-        ),
-        Check(
-            "agent_run_recovery_fixture",
-            [
-                py,
-                ".codex/tools/validate_agent_run_artifact.py",
-                ".codex/tools/tests/fixtures/agent-runs/stop-recovery",
-                "--schema",
-                ".codex/schemas/harness/agent-run.schema.json",
-            ],
-            root,
-        ),
     ]
 
 
@@ -452,8 +351,6 @@ def checks_for(profile: str, root: Path) -> list[Check]:
         return execution_checks(root)
     if profile == "research":
         return research_checks(root)
-    if profile == "agent-output":
-        return agent_output_checks(root)
     if profile == "loop":
         return loop_checks(root)
     raise ValueError(f"unknown profile: {profile}")
@@ -461,7 +358,7 @@ def checks_for(profile: str, root: Path) -> list[Check]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--profile", choices=["core", "integrations", "execution", "agent-output", "research", "loop"], required=True)
+    parser.add_argument("--profile", choices=["core", "integrations", "execution", "research", "loop"], required=True)
     parser.add_argument("--format", choices=["text", "json"], default="text")
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--release", action="store_true", help="deprecated; use run_verification_pipeline.py --release")

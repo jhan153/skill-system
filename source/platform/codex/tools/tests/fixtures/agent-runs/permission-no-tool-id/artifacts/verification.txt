@@ -1,3 +1,0 @@
-PASS
-command: python3 .codex/tools/verify_bundle.py --profile agent-output --format text
-exit_code: 0

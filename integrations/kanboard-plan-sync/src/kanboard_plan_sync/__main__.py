@@ -94,7 +94,7 @@ def cmd_list_workspaces(args: argparse.Namespace) -> int:
 
 
 def cmd_sync_all(args: argparse.Namespace) -> int:
-    report = sync_all(apply=args.apply)
+    report = sync_all(apply=args.apply, workspace_root=args.workspace)
     _emit(report)
     return 0
 
@@ -184,6 +184,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--apply",
         action="store_true",
         help="write to live Kanboard (otherwise dry-run only)",
+    )
+    p_syncall.add_argument(
+        "--workspace",
+        help="limit sync to one exact registered workspace",
     )
     p_syncall.set_defaults(func=cmd_sync_all)
 

@@ -281,27 +281,6 @@ class LoopEngineeringTests(unittest.TestCase):
         self.assertEqual(deact.returncode, 0, deact.stdout + deact.stderr)
         self.assertEqual(json.loads(pointer.read_text())["status"], "inactive")
 
-    def test_hook_resolves_loop_by_session_and_decouples_unverified(self) -> None:
-        codexhome = self.tmp / "codexhome"
-        env = {**os.environ, "CODEX_HOME": str(codexhome)}
-        self.assertEqual(
-            run("activate_loop_run.py", "--session-id", "SESS-2", "--loop-run-dir", str(self.loop), env=env).returncode,
-            0,
-        )
-        os.environ["CODEX_HOME"] = str(codexhome)
-        self.addCleanup(os.environ.pop, "CODEX_HOME", None)
-        sys.path.insert(0, str(ROOT / ".codex" / "hooks"))
-        import codex_hook_adapter as hook
-
-        resolved = hook.active_loop_run_dir({"session_id": "SESS-2"})
-        self.assertIsNotNone(resolved)
-        self.assertEqual(Path(resolved).resolve(), self.loop.resolve())
-        # validation_code 4 (UNVERIFIED manifest) still evaluates an active loop
-        self.assertIsNotNone(hook.maybe_evaluate_active_loop({"session_id": "SESS-2"}, 4))
-        # hard failure (other codes) skips loop drive
-        self.assertIsNone(hook.maybe_evaluate_active_loop({"session_id": "SESS-2"}, 1))
-
-
     # --- P5: wall-time enforcement + precedence vocabulary ------------------
     def _init_contract(self, max_wall: int) -> Path:
         contract = self.tmp / "wc.yaml"
@@ -596,56 +575,6 @@ class LoopEngineeringTests(unittest.TestCase):
         # validates and runs — the vocabulary is coherent end-to-end.
         loop = self._init_contract(max_wall=0)
         self.assertTrue((loop / "state.yaml").is_file())
-
-    # --- F1/F3: activation lifecycle ----------------------------------------
-    def _activate(self, session_id: str, codexhome: Path):
-        return run("activate_loop_run.py", "--session-id", session_id, "--loop-run-dir", str(self.loop),
-                   env={**os.environ, "CODEX_HOME": str(codexhome)})
-
-    def _hook(self, codexhome: Path):
-        os.environ["CODEX_HOME"] = str(codexhome)
-        self.addCleanup(os.environ.pop, "CODEX_HOME", None)
-        sys.path.insert(0, str(ROOT / ".codex" / "hooks"))
-        import codex_hook_adapter as hook
-        return hook
-
-    def test_terminal_loop_deactivates_session_pointer(self):
-        codexhome = self.tmp / "ch1"
-        self.assertEqual(self._activate("SX", codexhome).returncode, 0)
-        hook = self._hook(codexhome)
-        self.assertIsNotNone(hook.active_loop_run_dir({"session_id": "SX"}))
-        deact = hook._deactivate_session_pointer("SX", str(self.loop), "success")
-        self.assertEqual(deact, {"deactivated": True, "final_action": "success"})
-        self.assertIsNone(hook.active_loop_run_dir({"session_id": "SX"}))
-        pointer = codexhome / "harness" / "active-loops" / "SX.json"
-        self.assertEqual(json.loads(pointer.read_text())["status"], "terminal")
-
-    def test_deactivate_guards_against_a_different_loop(self):
-        codexhome = self.tmp / "ch2"
-        self.assertEqual(self._activate("SY", codexhome).returncode, 0)
-        hook = self._hook(codexhome)
-        self.assertIsNone(hook._deactivate_session_pointer("SY", "/some/other/loop", "success"))
-        self.assertIsNotNone(hook.active_loop_run_dir({"session_id": "SY"}))
-
-    def test_observe_mode_does_not_consume_continuation_budget(self):
-        st = yaml.safe_load((self.loop / "state.yaml").read_text())
-        st["started_at"] = "2099-01-01T00:00:00Z"  # keep non-terminal (no wall-time exhaustion)
-        self.write_state_and_checkpoint(st)
-        codexhome = self.tmp / "ch3"
-        self.assertEqual(self._activate("SZ", codexhome).returncode, 0)
-        hook = self._hook(codexhome)
-
-        def used():
-            return yaml.safe_load((self.loop / "state.yaml").read_text())["budgets"]["stop_continuations_used"]
-
-        base = used()
-        os.environ["SKILL_SYSTEM_LOOP_CONTINUATION"] = "observe"
-        self.addCleanup(os.environ.pop, "SKILL_SYSTEM_LOOP_CONTINUATION", None)
-        hook.maybe_evaluate_active_loop({"session_id": "SZ"}, 0)
-        self.assertEqual(used(), base, "observe must not consume continuation budget")
-        os.environ.pop("SKILL_SYSTEM_LOOP_CONTINUATION", None)
-        hook.maybe_evaluate_active_loop({"session_id": "SZ"}, 0)
-        self.assertEqual(used(), base + 1, "blocking must consume continuation budget")
 
     # --- P3: convergence verifier soundness ---------------------------------
     def test_evidence_ledger_accepts_resolved_contradiction_without_rewarding_confirmation(self) -> None:
