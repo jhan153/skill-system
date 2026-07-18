@@ -696,7 +696,7 @@ class SkillDietComparisonTests(unittest.TestCase):
                 self.assertIn(cases["competing"], competing, skill_id)
 
     def test_evidence_schema_accepts_artifact_chain_and_rejects_legacy_pass_summary(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             manifest = snapshot(root)
@@ -713,7 +713,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertTrue(TOOL.validate_schema(legacy, schema))
 
     def test_local_pilot_schema_accepts_agent_review_chain_and_rejects_signature(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             manifest = snapshot(root)
@@ -729,7 +729,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertTrue(TOOL.validate_schema(evidence, schema))
 
     def test_local_pilot_pair_is_agent_reviewed_not_release_evidence(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail="Before body detail.")
             baseline = snapshot(root)
@@ -782,7 +782,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("local_pilot_not_enabled", {item["code"] for item in denied["issues"]})
 
     def test_local_pilot_can_lock_one_accepted_change_and_review_one_new_skill(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -859,7 +859,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         )
 
     def test_local_pilot_rejects_signed_pair_and_nonpilot_skill(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail="Before body detail.")
             baseline = snapshot(root)
@@ -911,7 +911,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("local_pilot_skill_not_allowed", {item["code"] for item in nonpilot["issues"]})
 
     def test_local_pilot_review_cannot_be_its_own_required_evidence(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             manifest = snapshot(root)
@@ -941,7 +941,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("evidence_required_result_failed", {item["code"] for item in paired["issues"]})
 
     def test_local_pilot_requires_same_prompt_and_passing_raw_pair_review(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             manifest = snapshot(root)
@@ -1030,7 +1030,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("requires --allow-agent-reviewed-local-pilot", result.stdout)
 
     def test_accepted_local_state_revalidates_persisted_evidence_semantics(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail="Keep this longer baseline operational detail in the main body.")
             write_beta_fixture(root)
@@ -1287,7 +1287,7 @@ class SkillDietComparisonTests(unittest.TestCase):
                 TOOL.load_pinned_local_pilot_state(root, baseline, candidate)
 
     def test_accepted_dependency_locks_reject_route_metadata_and_context_drift(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             write_beta_fixture(root)
@@ -1342,7 +1342,7 @@ class SkillDietComparisonTests(unittest.TestCase):
             )
 
     def test_atomic_dependency_group_uses_shared_closure_prefix_and_requires_scc(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail="Long alpha baseline detail for an atomic dependency fixture.")
             write_beta_fixture(root)
@@ -1406,7 +1406,7 @@ class SkillDietComparisonTests(unittest.TestCase):
             TOOL.accepted_atomic_dependency_groups(noncontiguous, 2)
 
     def test_same_snapshot_has_zero_delta_and_unverified_evidence(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1422,7 +1422,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         )
 
     def test_same_size_body_and_reference_changes_are_structural_changes(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail="AAAA BBBB", reference_text="CCCC DDDD")
             baseline = snapshot(root)
@@ -1434,7 +1434,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertTrue(result["skill_changes"][0]["resources_changed"])
 
     def test_skill_instruction_change_requires_paired_evidence_without_opt_in_flag(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail="Before body detail.")
             baseline = snapshot(root)
@@ -1444,7 +1444,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("paired_behavior_evidence_missing", {item["code"] for item in result["issues"]})
 
     def test_same_size_description_change_is_trigger_drift(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1458,7 +1458,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("trigger_metadata_drift", {item["code"] for item in result["issues"]})
 
     def test_valid_but_changed_policy_is_routing_drift(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1474,7 +1474,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("routing_contract_drift", {item["code"] for item in result["issues"]})
 
     def test_lost_and_weakened_cases_are_regressions(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1489,7 +1489,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("oracle_contract_weakened", codes)
 
     def test_eval_request_change_is_oracle_contract_change(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1509,7 +1509,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertEqual(allowed["axes"]["oracle_contract"], "regressed")
 
     def test_added_skill_fails_the_fixed_skill_set_lane(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1524,7 +1524,7 @@ class SkillDietComparisonTests(unittest.TestCase):
 
     def test_body_to_reference_is_possible_relocation(self) -> None:
         detail = "Detailed operational behavior that remains owned. " * 12
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail=detail)
             baseline = snapshot(root)
@@ -1536,7 +1536,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertEqual(change["classification"], "possible_relocation")
 
     def test_read_if_needed_to_must_read_increases_exact_declared_admission(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, reference_text="Conditional detail.", admission="read_if_needed")
             baseline = snapshot(root)
@@ -1547,7 +1547,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertEqual(result["axes"]["admission"], "unverified")
 
     def test_missing_admission_receipt_is_null_not_zero(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             skill = snapshot(root)["skills"][0]
@@ -1556,7 +1556,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIsNone(skill["observed_admission"]["utf8_bytes"])
 
     def test_nested_body_and_routing_card_units_cannot_be_double_counted(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             manifest = snapshot(root)
@@ -1587,7 +1587,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("evidence_admitted_context_overlap", {item["code"] for item in issues})
 
     def test_valid_paired_evidence_can_preserve_behavior(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1613,7 +1613,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertEqual(result["axes"]["admission"], "not_improved")
 
     def test_hash_consistent_receipts_without_external_trust_anchor_are_unverified(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1631,7 +1631,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertEqual(paired["behavior"], "unverified")
 
     def test_unknown_reviewer_cannot_use_a_self_supplied_public_key(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1650,7 +1650,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertEqual(paired["behavior"], "unverified")
 
     def test_pinned_reviewer_store_rejects_caller_modified_keys(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             target = root / "source" / "shared" / "eval" / "skill-diet-trusted-reviewers.json"
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -1661,7 +1661,7 @@ class SkillDietComparisonTests(unittest.TestCase):
                 TOOL.load_pinned_trusted_reviewers(root)
 
     def test_full_supporting_route_oracle_is_checked(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail="AAAA BBBB")
             write_beta_fixture(root)
@@ -1694,7 +1694,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("evidence_observed_supporting_mismatch", {item["code"] for item in paired["issues"]})
 
     def test_eval_route_oracle_rejects_unknown_skill_ids(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             eval_path = root / "source" / "shared" / "eval" / "routing_cases.yaml"
@@ -1705,7 +1705,7 @@ class SkillDietComparisonTests(unittest.TestCase):
                 snapshot(root)
 
     def test_stale_paired_file_hash_fails(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1733,7 +1733,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("evidence_artifact_hash_mismatch", {item["code"] for item in result["issues"]})
 
     def test_invalid_independent_review_signature_fails(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1753,7 +1753,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("evidence_verifier_signature_invalid", {item["code"] for item in paired["issues"]})
 
     def test_changed_skill_requires_full_positive_negative_structured_edge_scope(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail="AAAA BBBB")
             baseline = snapshot(root)
@@ -1789,7 +1789,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("paired_negative_coverage_missing", {item["code"] for item in result["issues"]})
 
     def test_legacy_negative_cannot_satisfy_structured_negative_gate(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail="AAAA BBBB")
             baseline = snapshot(root)
@@ -1816,7 +1816,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("paired_structured_negative_contract_missing", {item["code"] for item in result["issues"]})
 
     def test_changed_skill_with_complete_artifact_chain_is_preserved(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail="AAAA BBBB")
             baseline = snapshot(root)
@@ -1842,7 +1842,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertEqual(result["axes"]["behavior"], "preserved")
 
     def test_support_only_skill_uses_explicitly_owned_supporting_positive(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail="AAAA BBBB")
             write_beta_fixture(root)
@@ -1878,7 +1878,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertEqual(result["axes"]["behavior"], "preserved")
 
     def test_missing_required_evidence_contract_fails(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1901,7 +1901,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("evidence_required_contract_mismatch", {item["code"] for item in paired["issues"]})
 
     def test_required_evidence_mutation_control_is_rejected(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             manifest = snapshot(root)
@@ -1941,7 +1941,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         )
 
     def test_evidence_for_one_skill_cannot_cover_a_second_changed_skill(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -1969,7 +1969,7 @@ class SkillDietComparisonTests(unittest.TestCase):
 
     def test_shared_context_relocation_is_counted_in_observed_admission(self) -> None:
         detail = "Relocated shared operational rule. " * 20
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root, detail=detail)
             baseline = snapshot(root)
@@ -2007,7 +2007,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         )
 
     def test_global_shared_change_derives_all_skill_consumers_and_requires_observation(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             shared = root / "source" / "platform" / "codex" / "context-routing.md"
@@ -2037,7 +2037,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("alpha", result["skills_needing_evidence"])
 
     def test_global_shared_scope_cannot_omit_a_second_skill(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             shared = root / "source" / "platform" / "codex" / "context-routing.md"
@@ -2072,7 +2072,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         )
 
     def test_shared_consumer_graph_propagates_context_routing_references(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             routing = root / "source" / "platform" / "codex" / "context-routing.md"
@@ -2108,7 +2108,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertTrue(any(item.get("path") == "source/shared/docs/indirect.md" for item in matching))
 
     def test_affected_shared_change_must_be_observed_in_that_skills_receipt(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -2137,7 +2137,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertTrue(any(item.get("path") == "source/shared/docs/new-contract.md" for item in matching))
 
     def test_unsafe_artifact_path_is_rejected(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -2157,7 +2157,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("evidence_artifact_path_unsafe", {item["code"] for item in paired["issues"]})
 
     def test_new_public_eval_field_changes_oracle_digest(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -2171,7 +2171,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("oracle_contract_nonmonotonic_change", codes)
 
     def test_candidate_oracle_overlay_can_evaluate_frozen_baseline_and_candidate(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -2213,7 +2213,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertEqual(result["axes"]["behavior"], "preserved")
 
     def test_monotonic_oracle_overlay_scopes_evidence_to_explicit_behavior_owner(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             write_beta_fixture(root)
@@ -2231,7 +2231,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertEqual(result["skills_needing_evidence"], ["alpha"])
 
     def test_monotonic_oracle_overlay_requires_explicit_behavior_owner(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             eval_path = root / "source" / "shared" / "eval" / "routing_cases.yaml"
@@ -2250,7 +2250,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("oracle_overlay_owner_missing", {item["code"] for item in result["issues"]})
 
     def test_oracle_overlay_cannot_remove_required_behavior_or_forbidden_behavior(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -2269,7 +2269,7 @@ class SkillDietComparisonTests(unittest.TestCase):
         self.assertIn("oracle_contract_weakened", {item["code"] for item in result["issues"]})
 
     def test_required_paired_evidence_fails_when_missing(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             baseline = snapshot(root)
@@ -2286,7 +2286,7 @@ class SkillDietComparisonTests(unittest.TestCase):
             "validator_sha256": "4" * 64,
         }
         for field, changed_value in fields.items():
-            with self.subTest(field=field), tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as tmp:
                 root = Path(tmp)
                 write_fixture(root)
                 manifest = snapshot(root)
@@ -2319,7 +2319,7 @@ class SkillDietComparisonTests(unittest.TestCase):
             self.assertIn(field, {issue.get("field") for issue in mismatches}, mismatches)
 
     def test_unmatched_current_run_is_not_forward_evidence(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             observed = root / "source" / "shared" / "eval" / "observed-runs"
@@ -2341,7 +2341,7 @@ result: fail
         self.assertIn("fake-current", forward["invalid_or_unmatched_run_ids"])
 
     def test_git_snapshot_ignores_untracked_files_and_tree_mismatch_fails(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             subprocess.run(["git", "init", "-q"], cwd=root, check=True)
@@ -2376,7 +2376,7 @@ result: fail
         self.assertTrue(any("tracked input digest" in error for error in digest_errors), digest_errors)
 
     def test_candidate_lineage_requires_descendant_commit(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             subprocess.run(["git", "init", "-q"], cwd=root, check=True)
@@ -2433,7 +2433,7 @@ result: fail
         self.assertEqual({item["code"] for item in issues}, {"candidate_not_descendant"})
 
     def test_check_cli_applies_schema_and_git_provenance_by_default(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             write_fixture(root)
             subprocess.run(["git", "init", "-q"], cwd=root, check=True)

@@ -31,7 +31,7 @@ class WorkHorizonPolicyTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_missing_task_ledger_horizon_fails(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             for ns in [".codex", ".claude"]:
                 skill = root / ns / "skills" / "workflow-task-ledger"

@@ -30,7 +30,7 @@ CMD_EVIDENCE = '{"type": "command", "command": "pytest", "exit_code": 0}'
 
 class TaskLedgerTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.tmp = Path(tempfile.mkdtemp(dir="/private/tmp"))
+        self.tmp = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
         self.dir = self.tmp / "run"
         self.assertEqual(run("init", str(self.dir), "--objective", "demo").returncode, 0)

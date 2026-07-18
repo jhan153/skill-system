@@ -69,7 +69,7 @@ def write_result(
 
 class LoopEngineeringTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.tmp = Path(__import__("tempfile").mkdtemp(dir="/private/tmp"))
+        self.tmp = Path(__import__("tempfile").mkdtemp())
         self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
         self.loop = self.tmp / "loop"
         shutil.copytree(FIXTURE, self.loop)

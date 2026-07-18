@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 
-CURRENT_VERSION = "9.3.2"
+CURRENT_VERSION = "9.3.3"
 PLUGIN_NAMES = (
     "skill-system-core",
     "skill-system-dev",

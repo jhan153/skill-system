@@ -249,6 +249,7 @@ def _build_codex_harness(source: Path, codex: Path, written: list[str]) -> None:
             [
                 go,
                 "build",
+                "-buildvcs=false",
                 "-trimpath",
                 "-ldflags",
                 f"-s -w -X main.version={version}",

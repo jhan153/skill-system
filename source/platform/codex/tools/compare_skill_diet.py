@@ -909,7 +909,7 @@ def archived_ref(root: Path, ref: str, label: str | None = None) -> Iterator[tup
     skills_tree = git_text(root, "rev-parse", f"{commit}:source/skills")
     commit_time = git_text(root, "show", "-s", "--format=%cI", commit)
     archive = run_git(root, "archive", "--format=tar", commit).stdout
-    with tempfile.TemporaryDirectory(prefix="skill-diet-", dir="/private/tmp") as tmp:
+    with tempfile.TemporaryDirectory(prefix="skill-diet-") as tmp:
         extracted = Path(tmp)
         safe_extract(archive, extracted)
         yield extracted, {

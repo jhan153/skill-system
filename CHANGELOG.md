@@ -1,5 +1,11 @@
 # Changelog
 
+## 9.3.3
+
+- Disabled automatic Go VCS build metadata with `-buildvcs=false` so the committed `darwin/arm64` and `windows/amd64` harness binaries remain byte-identical when regenerated after the release commit.
+- Removed hard-coded `/private/tmp` writes from Codex verification tooling and tests so the caller's `TMPDIR` policy controls scratch files.
+- Regenerated both Go harness artifacts with the unchanged 9.3.2 Go runtime behavior and advanced the unified Codex/Claude/plugin bundle identity to 9.3.3.
+
 ## 9.3.2
 
 - Reconstructed the Codex eight-event base harness as cross-compiled Go executables for `darwin/arm64` and `windows/amd64`; POSIX calls Go directly, while Windows uses only a bounded `cmd.exe` conditional to honor custom `CODEX_HOME` with the default fallback.

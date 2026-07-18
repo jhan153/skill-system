@@ -110,7 +110,7 @@ class IntegrationCheckSelectionTests(unittest.TestCase):
         return root, integration
 
     def test_missing_pytest_uses_required_unittest_fallback(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root, integration = self.make_root(tmp)
             with mock.patch.object(
                 self.verifier.subprocess,
@@ -128,7 +128,7 @@ class IntegrationCheckSelectionTests(unittest.TestCase):
         )
 
     def test_available_pytest_remains_the_preferred_runner(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root, _ = self.make_root(tmp)
             with mock.patch.object(
                 self.verifier.subprocess,
@@ -144,7 +144,7 @@ class IntegrationCheckSelectionTests(unittest.TestCase):
         )
 
     def test_missing_integration_payload_remains_an_optional_skip(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             checks = self.verifier.integrations_checks(Path(tmp))
 
         self.assertEqual(len(checks), 1)

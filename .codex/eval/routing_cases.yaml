@@ -1,4 +1,4 @@
-version: "9.3.2"
+version: "9.3.3"
 purpose: "Positive routing examples for common requests."
 cases:
   - case_id: route-001

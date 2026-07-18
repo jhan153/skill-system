@@ -89,7 +89,7 @@ next_action: ""
 
 class WorkItemLifecycleTests(unittest.TestCase):
     def write_case(self, text: str) -> Path:
-        fd, raw = tempfile.mkstemp(prefix="work-item-", suffix=".yaml", dir="/private/tmp")
+        fd, raw = tempfile.mkstemp(prefix="work-item-", suffix=".yaml")
         os.close(fd)
         path = Path(raw)
         path.write_text(text, encoding="utf-8")

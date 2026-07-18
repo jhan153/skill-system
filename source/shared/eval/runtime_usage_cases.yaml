@@ -1,4 +1,4 @@
-version: "9.3.2"
+version: "9.3.3"
 purpose: "Authored routing/output regression cases; not field-quality evidence."
 cases:
   - case_id: runtime-001

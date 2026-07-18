@@ -31,7 +31,7 @@ class InvocationSurfacePolicyTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_implicit_non_router_fails(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             skill = root / ".codex" / "skills" / "sample-skill"
             (skill / "agents").mkdir(parents=True)
@@ -55,7 +55,7 @@ class InvocationSurfacePolicyTests(unittest.TestCase):
             self.assertIn("implicit invocation is only allowed", result.stdout)
 
     def test_approved_implicit_execution_skill_passes(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             skill = root / ".codex" / "skills" / "design-frontend"
             (skill / "agents").mkdir(parents=True)

@@ -74,13 +74,13 @@ class ReleaseIdentityTests(unittest.TestCase):
         )
 
     def test_consistent_release_identity_passes(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             self.build_fixture(root)
             self.assertEqual(self.checker.check(root), [])
 
     def test_stale_version_and_cachebuster_fail(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             self.build_fixture(root)
             manifest = root / "source" / "plugins" / "core.yaml"
@@ -93,7 +93,7 @@ class ReleaseIdentityTests(unittest.TestCase):
             self.assertTrue(any("cachebuster" in error for error in errors), errors)
 
     def test_wrong_plugin_identity_and_marketplace_extra_fail(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             self.build_fixture(root)
             source_manifest = root / "source" / "plugins" / "core.yaml"
@@ -117,7 +117,7 @@ class ReleaseIdentityTests(unittest.TestCase):
             self.assertTrue(any("Claude marketplace plugin set mismatch" in error for error in errors), errors)
 
     def test_codex_marketplace_requires_exact_unique_local_entries(self) -> None:
-        with tempfile.TemporaryDirectory(dir="/private/tmp") as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             self.build_fixture(root)
             marketplace_path = root / ".agents" / "plugins" / "marketplace.json"

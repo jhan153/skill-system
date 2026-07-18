@@ -12,9 +12,9 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 9.3.2 번들
+## 9.3.3 번들
 
-이 소스 트리는 변경하지 않는 `v9.3.1` 릴리스를 직접 잇는, 아직 배포하지 않은 로컬 9.3.2 필드 하네스 번들 라인입니다. 주요 구성은 다음과 같습니다.
+이 소스 트리는 변경하지 않는 `v9.3.2` 릴리스를 직접 잇는 로컬 9.3.3 재현 가능 하네스 릴리스 후보입니다. 주요 구성은 다음과 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
 * `docs`: 스킬 목록, 사용 기준, 운영 참고 문서
@@ -25,7 +25,7 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 ## 9.x 방향: Neutral Source & Plugin Packaging
 
-현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인 `9.3.2 — Native Codex Harness Reconstruction`은 `v9.3.1`을 직접 잇습니다. 로컬 설치는 명시적으로 수행하며 publish나 push를 뜻하지 않습니다. Codex와 Claude는 하나의 번들 버전과 릴리스 태그를 공유하며, 하네스 변경도 별도 프로토콜 버전이 아니라 이 버전을 올립니다.
+현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인 `9.3.3 — Reproducible Codex Harness Artifacts`는 `v9.3.2`를 직접 잇습니다. 로컬 설치는 명시적으로 수행하며 publish나 push를 뜻하지 않습니다. Codex와 Claude는 하나의 번들 버전과 릴리스 태그를 공유하며, 하네스 변경도 별도 프로토콜 버전이 아니라 이 버전을 올립니다.
 
 Codex 하네스는 9.3의 압축 라우팅을 유지합니다. Claude 하네스는 별도 소유 경로에서 검증된 9.2.1 구조형 판단 모델을 유지하면서 현재 공유 스킬 카탈로그를 사용합니다. 플랫폼별 전역 지침·라우팅·훅·도구는 독립적으로 생성·검사하고, portable skill과 data contract만 공유합니다.
 
@@ -153,7 +153,7 @@ Loop Engineering 스킬은 단순 작업을 과하게 루프화하지 않으면�
 | `loop-verifier-registry` | 루프 성공 조건과 governance metric을 검증 스킬, 명령, 증거 대상, pass/fail signal, fallback, label로 매핑합니다. |
 | `workflow-loop-runner`   | 승인된 loop contract를 observe/decide/act/verify/checkpoint 배치로 실행하고, LoopRun 상태 도구를 통해 checkpoint, continuation, recovery, stop 판정을 관리합니다. |
 
-Runtime 지원에는 tool/permission 운영 카탈로그와 orchestration capability contract도 포함됩니다. TaskRun, Research/Evidence ledger, LoopRun은 명시적 workflow 소유 상태로 유지하며, Codex Agent Run과 hook-event evidence ledger는 9.3.2 runtime에 포함하지 않습니다.
+Runtime 지원에는 tool/permission 운영 카탈로그와 orchestration capability contract도 포함됩니다. TaskRun, Research/Evidence ledger, LoopRun은 명시적 workflow 소유 상태로 유지하며, Codex Agent Run과 hook-event evidence ledger는 현재 runtime에 포함하지 않습니다.
 
 ### Planning
 
@@ -270,6 +270,7 @@ Skill System 스킬은 작성된 스킬을 이 저장소에 통합하고 생성�
 | 9.3.0 | Field harness & project context | 기본 훅을 비우고 전역 라우팅을 압축하며, 저장소별 컨텍스트 경로를 선언합니다. Memory Bank, 산출물 연계 Knowledge Base, 명시적 LLM Wiki 읽기를 분리하고 제한된 commit/closeout 체크포인트를 추가하며, 성숙도·패킷 ingestion·텔레메트리·자동 Wiki projection 체계를 제거합니다. 이 소스 후보는 홈이나 live plugin cache에 설치하지 않습니다. |
 | 9.3.1 | Platform harness split | Codex와 Claude의 전역 지침·라우팅·훅·도구·생성·동일성 검사를 독립 경로로 분리하면서 번들 버전과 태그는 하나로 유지합니다. Codex는 9.3 압축 라우터를, Claude는 현재 공유 스킬에 맞춘 9.2.1 구조형 동작 계열을 유지합니다. 과거 버전 선택형 receipt monitor는 현재 번들의 버전 없는 opt-in 기능으로 전환합니다. |
 | 9.3.2 | Native Codex harness reconstruction | Codex의 8개 lifecycle event를 cross-compiled Go artifact로 연결하고, 패키지된 Swift macOS overlay와 redaction을 복원하며 Windows `CODEX_HOME`, 공식 Stop continuation 계약, 성공 후 Kanboard stamp를 적용합니다. 알림·Kanboard·active LoopRun은 독립 분기로 유지하고, 위치 전용 project context는 명시적으로만 사용하며, 진단 호환 스택은 제거합니다. 전역 `AGENTS.md`와 별도 Claude hook runtime은 보존합니다. |
+| 9.3.3 | Reproducible Codex harness artifacts | Go 자동 VCS 빌드 메타데이터를 비활성화해 릴리스 커밋 뒤에도 macOS·Windows 하네스 바이너리를 byte-identical하게 재생성할 수 있도록 하고, Codex 검증 도구의 `/private/tmp` 쓰기 하드코딩을 제거하며, 9.3.2 Go 하네스 동작과 단일 번들 버전은 유지합니다. |
 
 ## 라이선스
 
