@@ -1,5 +1,21 @@
 # Changelog
 
+## 9.4.2
+
+- Upgraded the Markdown Knowledge Base contract from flat current records to readable current snapshots with accepted aliases/search terms, embedded typed spatial/causal links, source-traced observation events, and append-only semantic revision history. Literal diffs remain in Git; no separate claim, edge, event, score, Runtime Projection, or Wiki store is introduced.
+- Added overlap classification across all Knowledge writers and synchronization/checkpoint paths: same identity updates or observes the existing record, shared-provenance copies do not become independent support, stable changes amend in place, replacements use reciprocal supersession, partial scope uses typed relations, and contradictions remain visible.
+- Added bounded graph-style Knowledge reads for why/history/scope/recurrence questions and maintenance operations for relation/history/overlap checks plus transparent recurrence profiles. Observation count, independent verified provenance roots, time range, scopes, unresolved roots, and counterexamples stay separate; they never become confidence, importance, maturity, popularity, or composite frequency scores.
+- Made Knowledge storage location-independent: initialization binds approved `knowledge_root` and `knowledge_index` values, records them in `project-context.yaml`, and every bundled reader/writer/maintenance consumer reuses those resolved variables. Relative values resolve from the manifest; exact explicitly approved absolute targets are supported without parent or neighboring-store discovery.
+- Removed the orphaned `schemas/knowledge/context-pack.schema.json` from the retired claim/edge pipeline. The generic task Context Pack guidance remains a separate small reading-set contract.
+- Added non-executing workflow topology without a duplicate registry authority: Work Horizon owns persistence/artifact altitude, Planning State owns persisted-artifact transitions, and host routing owns the current-turn specialist. Direct stable work remains outside the planning state machine.
+- Expanded `project-context-init` into explicit `manifest-init`, guided `bootstrap`, and read-only `doctor` modes. Bootstrap enumerates manifest and store actions separately but accepts all or a subset in one transaction approval, then delegates approved Memory or Knowledge creation without a second approval unless scope changes; ordinary work never auto-initializes context.
+- Split risk review into Contract/Spec and Repository/Constraints axes. Material semantic claims that otherwise rest mainly on maker-authored implementation and checks trigger one independent standard pass when available; strict-risk work uses separate independent axes without treating review, authored tests, or repeat self-review as an oracle.
+- Added a shared delivery-shape contract: `single_batch` imports no slice ceremony, multi-batch features use `vertical_slice`, wide compatibility changes use `migration_sequence`, and non-feature work uses `evidence_unit`. The contract fabricates no architectural layer and mandates neither TDD nor ticket shape.
+- Removed the historical Research Ledger instance and schema from the generated `.codex/research/` runtime payload. Its synthetic validator fixture remains source-only, execution assurance no longer requires a research ledger, and runtime generation prunes the retired target root so installation cannot overwrite live research records.
+- Added the version-independent `CLEAN_INSTALL_GUIDE.md` contract. Release-side source regeneration stays in the maintainer build environment, while target-side installation checks the selected commit/tree, bundle identity, and core consistency without requiring Go or Swift. Live app-managed state, user stores, and plugin caches remain protected.
+- Retired the public external-source revision/license/adoption ledger and its generated mirrors, validator, research-fixture dependency, and release-gate wiring. Current project decisions remain in the manifest-declared local Knowledge Base, while two independent release checks reject reintroduction of the retired path or structured ledger payload.
+- Consolidated the corrected 9.4 work into unified Codex/Claude/plugin bundle identity 9.4.2, directly succeeding 9.3.4. Live home and plugin-cache installation remains a separate explicit operation.
+
 ## 9.3.4
 
 - Added a Claude-native Go dispatcher that shares the bounded response guard, project-context resolver, Kanboard lease/stamp implementation, redaction, and OS notification core without reusing the Codex event dispatcher.
@@ -184,18 +200,18 @@
 - Added Claude-side strict-block parity: an opt-in transcript-based observed-vs-claimed Stop gate (`SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict`) in `.claude/hooks/claude_hook_adapter.py` that blocks a stop when the final message claims `agent-verified` but a tool result errored with no later success. Pure decision logic, fail-open transcript parsing, and a `stop_hook_active` re-block guard.
 - Added the `workflow-task-ledger` skill (Checkpointed Execution): a resume-safe step/finding ledger for multi-turn work between one-shot and a LoopRun, with observed `evidence_refs` (not free text), an `accepted_risk` terminal, and a completion gate (all required steps complete + final verification pass + zero open findings). Ships `schemas/task/task-run.schema.json`, `tools/task_ledger.py`, unit tests, a `checkpointed_task` classification in `loop-readiness-router`, and registry/eval entries.
 - Added out-of-band harness-paradox measurement: `analyze_harness_measurement.py` (deterministic 80/20 holdout, per-arm gate-fire/block/finalize-fail rates, `harness_paradox_fail_delta`, and sunset). Both hook adapters tag `turn_finalize` events and treat the off arm as a gate-off baseline (opt-in `SKILL_SYSTEM_HARNESS_MEASUREMENT=1`, default off, so baseline behavior is unchanged).
-- Scope note: "harness parity" here means Claude/Codex contradiction-gate parity (observed-vs-claimed). It is not fablize 2.1 observation-gate feature parity — the quick/normal/deep task classifier, risk flags, a bounded max-block ceiling, and an automated revert/re-instruction outcome collector are intentionally not implemented (the system already has routers, risk boundaries, recovery, and LoopRun).
+- Scope note: "harness parity" here means Claude/Codex contradiction-gate parity (observed-vs-claimed). It does not add a quick/normal/deep task classifier, risk flags, a bounded max-block ceiling, or an automated revert/re-instruction outcome collector because the system already has routers, risk boundaries, recovery, and LoopRun.
 
 ## 8.4.0
 
-- Adopted Fable-style harness discipline (FableCodex, fablize) as concepts rather than code: observed-evidence completion plus an `accepted_risk` terminal in `workflow-rigor`, a debugging hypothesis ladder in `analysis-bug`, capability-ceiling escalation in `workflow-recovery`, and verification-grounding / noise-control runtime eval cases (`runtime-029..032`).
-- Added a harness-paradox out-of-band holdout + sunset measurement reference under `evaluation-usage-tracker`, and registered `SRC-FABLECODEX` (AGPL-3.0-or-later) and `SRC-FABLIZE` (MIT) in `source_registry.yaml` with an `adoption_decisions` ledger.
+- Added local observed-evidence completion with an `accepted_risk` terminal in `workflow-rigor`, a debugging hypothesis ladder in `analysis-bug`, capability-ceiling escalation in `workflow-recovery`, and verification-grounding/noise-control runtime eval cases (`runtime-029..032`).
+- Added a harness-paradox out-of-band holdout and sunset measurement reference under `evaluation-usage-tracker`; this historical measurement machinery was later removed.
 - Added an opt-in Claude-side observational hook adapter (`.claude/hooks/claude_hook_adapter.py`) that records lifecycle events to the shared hash-chained evidence ledger, reaching observed-evidence parity with the Codex `hooks.json` adapter in the default observational mode. Strict-block parity is deferred pending a Claude run-manifest producer.
 - Published the Checkpointed Execution (`workflow-task-ledger`) design as design-only; implementation is gated to a later release.
 
 ## 8.3.2
 
-- Scoped bundle verification to committed/distributable content: `validate_source_registry.py`, `validate_research_ledger.py`, and `validate_knowledge_store.py` no longer require local-only source-project paths (`docs/`, `.github/`, `.kanboard-plan`) to exist, while keeping schema validation, bundle-internal consumer/locator existence, and absolute-path rejection.
+- Scoped bundle verification to committed/distributable content: research and Knowledge validators no longer require unrelated local-only source-project paths (`docs/`, `.github/`, `.kanboard-plan`) to exist, while keeping schema validation, bundle-internal consumer/locator existence, and absolute-path rejection.
 - Removed the `context_compounding_plan` check from the `core` verification profile and deleted `check_context_compounding_plan.py`: it was a release-QA gate hardcoded to a local-only `docs/plan/...` document, not installed-bundle content.
 - Added `.claude/CLAUDE.md` as a Claude-adapted mapping of the global working rules in `.codex/AGENTS.md`, diverging only where Claude feature names differ (`settings.json` and permission modes, `.claude/` paths, `/loop`).
 
@@ -232,7 +248,7 @@
 - Wired repo-local Codex lifecycle hooks for `PreToolUse`, `PermissionRequest`, `PostToolUse`, and `Stop` through a live hook adapter; `Stop` now gates finalization on agent-run artifact validation once hooks are trusted.
 - Hardened the live hook prototype after review: `Stop` validates only the current `session_id`/`turn_id` run, missing current-run evidence is `UNVERIFIED` rather than pass, repeated tool calls validate per `tool_use_id`, failed `PostToolUse` exits record `fail`, hook evidence defaults to metadata hashes with redaction, and release CI installs `pytest`.
 - Hardened the P0 completion gate after execution feedback: failed/unverified `Stop` checks now record `turn_finalize_attempt` so repair work remains valid, Codex `PermissionRequest` without `tool_use_id` is accepted as approximate, dangling tool calls fail validation, `Stop.last_assistant_message` is hash-bound to the run manifest, unknown tool responses record `warn`, runtime traces are excluded from packaged evidence, and package verification uses synthetic fixtures.
-- Closed the hook launcher and finalization P0s: `hooks.json` no longer searches arbitrary `cwd` adapter paths, `Stop` post-finalize validation now accepts an in-memory candidate final event before appending the actual `turn_finalize`, and the release GitHub Actions workflow referenced by the source registry is restored.
+- Closed the hook launcher and finalization P0s: `hooks.json` no longer searches arbitrary `cwd` adapter paths, `Stop` post-finalize validation now accepts an in-memory candidate final event before appending the actual `turn_finalize`, and the release GitHub Actions workflow is restored.
 - Registered `workflow-minimal-implementation` in user-facing README catalogs and added routing/negative eval cases for minimal-implementation modifier behavior.
 - Wired the bounded verification loop layer into the bundle's own verification pipeline: added a `loop` profile to `verify_bundle.py` (committed LoopRun fixture validation + `init_loop_run` runtime smoke), added `loop` to `run_verification_pipeline.py` `DEFAULT_PROFILES` so release CI gates it, registered the three loop schemas, their `examples/`, the four loop runtime tools, and the committed LoopRun fixture in `check_execution_assurance.py` `REQUIRED_FILES` with schema accept/reject contracts, and added a first committed valid LoopRun fixture under `.codex/tools/tests/fixtures/loop-runs/valid/` plus four unit tests. Closes the loop-engineering integration debt where loop schemas/runtime had no dedicated verification profile and ran only against tmp dirs inside unit tests.
 - Codified two deterministic loop governance gates in `evaluate_loop_run.py`: an evidence-backed-pass guard (a required condition reported `pass` with empty `evidence_refs` is blocked with reason `pass_without_evidence`, resisting reward hacking / premature completion) and oscillation detection (a required condition regressing `pass`→`fail` increments `progress.oscillation_count`; reaching the optional contract `control.oscillation_limit`, default 2, switches to `recover`). Added `oscillation_count`/`oscillation_limit` to the loop-run/loop-contract schemas and `init_loop_run.py`.
@@ -267,7 +283,7 @@
 
 ## 7.3.1
 
-- Hardened validation integrity after the 7.3.0 release-candidate review: eval, field feedback, source registry, behavior replay, generated mirrors, and execution-assurance schemas now reject invalid sentinel data instead of only checking field names or headers.
+- Hardened validation integrity after the 7.3.0 release-candidate review: eval, field feedback, behavior replay, generated mirrors, and execution-assurance schemas now reject invalid sentinel data instead of only checking field names or headers.
 - Restored `integrations/kanboard-plan-sync/README.md` and added a static reference-target checker so skill context targets cannot silently point at missing files.
 - Added `unittest` coverage for new validators using valid/invalid fixtures, and wired those tests into `verify_bundle.py --profile core`.
 - Promoted representative production eval cases to schema v2 and moved the observed behavior replay fixture from a test-only case id to a production eval case.
@@ -285,8 +301,8 @@
 
 - Added `verify_bundle.py` as the profile-based verification entry point with text/json output and explicit `PASS`/`FAIL`/`SKIP`/`ERROR` status handling.
 - Added machine-readable field feedback scaffolding under `.codex/field-feedback/`, plus validators, fixtures, and a generated `FIELD_FEEDBACK.md` human-readable view.
-- Added eval case schema validation, source registry validation, generated mirror checksum validation, and active document freshness checks.
-- Added canonical `.codex/docs/source_registry.yaml` and generated Claude-side mirrors for source registry and eval schema.
+- Added eval case schema validation, generated mirror checksum validation, and active document freshness checks.
+- Added a generated Claude-side mirror for the eval schema.
 - Bumped active bundle labels to `7.2.7` while preserving `7.2.6` as the previous baseline.
 
 ## 7.2.6

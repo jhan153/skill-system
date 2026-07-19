@@ -1,7 +1,7 @@
 interface:
   display_name: "Knowledge Base Read"
-  short_description: "Read task-relevant project knowledge"
-  default_prompt: "Use $knowledge-base-read to load only the local Knowledge records relevant to this task."
+  short_description: "Read bounded Knowledge paths and current rules"
+  default_prompt: "Use $knowledge-base-read to load the smallest current record slice and traverse only the typed why/history/scope/recurrence path needed by the task."
 policy:
   invocation_surface: support_only
   allow_implicit_invocation: true

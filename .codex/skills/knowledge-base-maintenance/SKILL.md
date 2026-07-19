@@ -1,16 +1,16 @@
 ---
 name: knowledge-base-maintenance
-description: Validate, reindex, detect duplicates or broken artifact links, compact, and explicitly reconcile an existing Markdown Knowledge Base. Use for store-wide or cross-record maintenance; never use claim/edge/Wiki projection semantics, compute maturity scores, auto-repair read-only findings, or mutate Memory and LLM Wikis.
+description: Validate, reindex, inspect typed relations and semantic history, classify overlap, derive recurrence profiles, compact, and explicitly reconcile an existing Markdown Knowledge Base. Use for store-wide or cross-record maintenance; never auto-merge similarity, compute scores, auto-repair read-only findings, or mutate Memory and LLM Wikis.
 ---
 
 # Knowledge Base Maintenance
 
 ## Routing Card
 - role: knowledge_operation
-- intent_signature: Knowledge Base validate, reindex, link check, duplicate/conflict reconciliation
+- intent_signature: Knowledge Base validate, reindex, relation/history check, overlap/conflict reconciliation, recurrence report
 - use_when: the user explicitly requests maintenance of an exact or manifest-declared store
 - do_not_use_when: task context read, one known record update, new category authoring, plan sync, Memory, or Wiki work is primary
-- expected_inputs: declared store, `report|validate|reindex|link-check|conflict-check|compact` operation, and affected IDs when bounded
+- expected_inputs: declared store, `report|validate|reindex|link-check|relation-check|history-check|overlap-check|conflict-check|recurrence-report|compact` operation, and affected IDs when bounded
 - expected_outputs: structural findings and only explicitly requested store/index changes with readback
 - context_targets:
   must_read: manifest, index, affected records, and `.codex/docs/knowledge_record_contract.md`
@@ -24,21 +24,25 @@ description: Validate, reindex, detect duplicates or broken artifact links, comp
 - entry_scene: PREPARE
 
 ## Operations
-- `report`: summarize layout, categories, statuses, and unresolved structural issues; byte-read-only.
-- `validate`: check required envelope fields, stable IDs, category/path match, index/record agreement, and supersession links; byte-read-only.
+- `report`: summarize layout, categories, statuses, navigation coverage, and unresolved structural issues; byte-read-only.
+- `validate`: check required envelope fields, stable IDs, category/path match, index/record agreement, typed field shape, and reciprocal supersession links; byte-read-only. Treat untouched 9.3 envelopes as readable legacy records, not fabricated history.
 - `link-check`: inspect declared repo/design/component/verifier targets without broad external retrieval; byte-read-only.
+- `relation-check`: check relation vocabulary, target existence, basis refs, and invalid lifecycle cycles; byte-read-only. Reverse edges are derived and need not be duplicated.
+- `history-check`: compare current snapshot, `updated_at`, semantic revisions, and supersession state without reconstructing missing pre-9.4 history; byte-read-only.
+- `overlap-check`: classify exact identity, dependent duplication, stable-identity amendment, replacement, scope overlap, and contradiction. Similarity proposes candidates but never authorizes merge; byte-read-only.
 - `conflict-check`: identify duplicate active rules, contradictory scope, or competing canonical refs; byte-read-only.
+- `recurrence-report`: derive observation count, distinct verified provenance roots, first/last dates, scopes, unresolved roots, and counterexamples. Treat source existence separately from verification of the asserted relationship to the record. Keep dimensions separate and return no rank or score; byte-read-only.
 - `reindex`: rebuild only catalog rows from records, never rewrite records from the index.
-- `compact`: remove duplicated prose/index detail while preserving records, stable IDs, and history links.
+- `compact`: remove duplicated prose/index detail while preserving current snapshots, stable IDs, typed relations, observations, semantic revisions, and lifecycle links.
 
 Read-only findings never authorize repair. Reconciliation writes require explicit affected-record approval and use `knowledge-base-update` semantics.
 
 ## Workflow
-1. Resolve the exact or nearest manifest-declared store; missing is `unavailable`, not auto-init.
+1. Bind `knowledge_root` and `knowledge_index` from the exact or nearest manifest-declared store; missing is `unavailable`, not auto-init. Reuse those variables for every selected record and index operation; never substitute a default path.
 2. Scope the requested operation and select index/records before following refs.
-3. Separate structural validity from semantic truth and current-source verification.
+3. Separate structural validity, semantic identity/overlap, source existence, verification of the asserted relationship, current truth, and recurrence. Preserve counterexamples and unresolved provenance.
 4. Stop after findings for read-only operations.
-5. For approved writes, stage affected records and index rows together, preserve stable IDs/supersession, and read back exact changes.
+5. For approved writes, use `knowledge-base-update` semantics, stage affected records and index rows together, and read back current snapshots, relations, observations, revisions, and lifecycle links. Use an independent read-only semantic review when a merge/replacement can change a widely consumed rule.
 
 ## Output
-Lead with operation status, affected IDs/files, structural findings, semantic/source uncertainty, mutation/readback when applicable, and one next decision only if required.
+Lead with operation status, affected IDs/files, structural findings, overlap/relation/history findings, source dependence or recurrence dimensions, mutation/readback when applicable, and one next decision only if required. Never collapse the result into importance, confidence, maturity, or frequency scores.

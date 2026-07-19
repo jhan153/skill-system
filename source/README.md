@@ -8,7 +8,7 @@ directly.** Edit `source/` and regenerate.
 - `source/shared/` — portable `docs/`, `eval/`, and schemas (generated into both)
 - `source/platform/codex/` — Codex-owned harness (AGENTS.md, context-routing.md, hooks, rules, schemas, research, harness, tools)
 - `source/platform/claude/` — Claude-owned harness (CLAUDE.md, context-routing.md, hooks, tools)
-- `source/mirror-meta.json` — frozen `generated_from`/`generated_at`/`source_checksum` for the two mirror-from-canonical files (keeps regeneration byte-identical)
+- `source/mirror-meta.json` — frozen `generated_from`/`generated_at`/`source_checksum` for the eval-schema mirror (keeps regeneration byte-identical)
 - `source/runtime-inventory.yaml`, `source/runtime-payload-policy.md` — Phase 0 classification + policy
 - `source/tools/` — build system (not generated into any target)
 
@@ -32,6 +32,6 @@ directly.** Edit `source/` and regenerate.
 - The `.generated` marker at each target root declares the do-not-edit policy.
 - Integrity is enforced by regeneration (`check_generated_targets.py`), not a stored checksum
   manifest — re-deriving the target is stronger than comparing a stored hash.
-- Mirror files (`docs/source_registry.yaml`, `eval/eval-case.schema.json`) keep their frozen
-  `generated_at`; changing the canonical requires updating `source/mirror-meta.json` (Phase 1b).
+- The `eval/eval-case.schema.json` mirror keeps its frozen `generated_at`; changing the
+  canonical requires updating `source/mirror-meta.json` (Phase 1b).
 - Generation updates repository targets only. Installing into a home directory or live plugin cache is a separate, explicit deployment action.

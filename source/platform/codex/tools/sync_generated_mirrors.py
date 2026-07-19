@@ -11,7 +11,6 @@ from pathlib import Path
 
 
 MAPPINGS = [
-    (Path(".codex/docs/source_registry.yaml"), Path(".claude/docs/source_registry.yaml"), "yaml"),
     (Path(".codex/eval/eval-case.schema.json"), Path(".claude/eval/eval-case.schema.json"), "json"),
 ]
 

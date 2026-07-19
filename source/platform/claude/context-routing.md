@@ -35,11 +35,13 @@ The canonical pack shape, cache-friendly ordering, reference-admission limits, a
 3. Heavy artifact generators require explicit artifact, package, or report intent.
 4. Primary skills own task execution.
 5. Router skills may choose a primary skill but must not perform writes.
-6. Execution modifiers attach only when implementation or medium/high-risk change is active; do not attach `workflow-rigor`, `workflow-validation`, or `workflow-minimal-implementation` to simple edits, direct command output requests, or explanation-only turns without a concrete trigger.
+6. Execution modifiers attach only when implementation or medium/high-risk change is active. A material semantic completion claim that otherwise rests mainly on maker-authored code and checks is a concrete `workflow-rigor` standard trigger; do not attach `workflow-rigor`, `workflow-validation`, or `workflow-minimal-implementation` to simple edits, direct command output requests, or explanation-only turns without a concrete trigger.
 7. Output modifiers attach only to final presentation.
 8. Review gates attach only when critical review, QA, blocker, risk, or validation is requested.
 9. Memory operations attach only when persistent memory mutation or inspection is explicit.
 10. If two skills could apply, choose the narrower one and mark the broader one as excluded.
+
+For an explicit “what next / which flow” request, separate the questions instead of consulting another route matrix: `.claude/docs/work_horizon_model.md` owns persistence and artifact altitude, while `.claude/docs/planning_state_model.md` admits transitions only for persisted planning artifacts. Stable work with no such boundary stays with the current task owner. Neither reference invokes a chain.
 
 Resolve a requested skill in this order: exact user-provided path, skill installed or exposed in the current session, repository-local skill root declared by project instructions or `project-context.yaml`, then `unresolved`. Do not scan unrelated home directories, plugin versions, adjacent projects, or guessed harness locations as fallback.
 
@@ -69,7 +71,8 @@ Resolve a requested skill in this order: exact user-provided path, skill install
 | plan document | `plan-short-term-docs` | `report-critical` only for QA/review | active plan, plan template | phase package |
 | goal/loop contract | `plan-loop-term` | `loop-readiness-router` if readiness is unknown; `loop-verifier-registry` if verifier ownership is unclear; `plan-short-term-docs` only when persisting into `docs/plan`; `plan-long-term-package` only when this is one artifact in a broad phase package | goal or loop intent, target plan/spec, success criteria, verifier evidence, governance coverage, budgets, stop/retry boundaries | implementation, loop execution, broad package ownership, generic validation-only work |
 | context/spec lifecycle curation | `plan-spec-curator` | `report-critical` only for QA/review | current goal or task, candidate plan/spec slice, lifecycle state when available | full memory bank, all old plans, archived raw plans, full chat history |
-| Knowledge Base context consumption | owning task primary | `knowledge-base-read` for the declared task-relevant slice | nearest `project-context.yaml`, Knowledge index, artifact anchors, selected records | full Knowledge Base, raw chat, all plans, Knowledge mutation |
+| project context manifest init/bootstrap/doctor | `project-context-init` only on explicit request; `project-context-update` owns selected existing-manifest keys | store initializers only for action IDs approved in the exact bootstrap transaction | repository root, nearest manifest/instructions, proposed exact paths and storage intent | ordinary task auto-setup, home/adjacent scan, unapproved store creation |
+| Knowledge Base context consumption | owning task primary | `knowledge-base-read` for the declared current slice and bounded typed why/history/scope/recurrence path | nearest `project-context.yaml`, Knowledge index, artifact anchors, selected records/relations/revisions/observations | full graph/store dump, raw chat, all plans, Knowledge mutation, recurrence scoring |
 | named LLM Wiki context | `llm-wiki-context` only when a Wiki is explicitly named or an exact path is supplied | current task owner consumes the returned context | selected Wiki declaration/path, its own guide and navigation entrypoints | guessing a Wiki, loading every page, Wiki mutation |
 | knowledge maintenance | the explicit `knowledge-base-update`, category record, `knowledge-plan-sync`, or `knowledge-base-maintenance` owner | `workflow-rigor` for write validation | declared Knowledge files, affected records and canonical artifact anchors | Memory Bank mutation, Wiki mutation, unrelated records |
 | phase package | `plan-long-term-package` | `workflow-rigor` if execution risk is active | prior reports, templates | lightweight plan only |

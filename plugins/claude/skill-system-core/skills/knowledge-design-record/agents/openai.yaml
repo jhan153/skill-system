@@ -1,6 +1,6 @@
 interface:
   display_name: "Knowledge Design Record"
   short_description: "Record linked project design rules"
-  default_prompt: "Use $knowledge-design-record to record this accepted local design-system rule and its implementation anchors."
+  default_prompt: "Use $knowledge-design-record to classify overlap before recording one accepted local design identity with typed scope links, semantic history, and implementation anchors."
 policy:
   allow_implicit_invocation: false

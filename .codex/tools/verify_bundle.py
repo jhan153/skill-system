@@ -214,7 +214,6 @@ def core_checks(root: Path) -> list[Check]:
             ],
             root,
         ),
-        Check("source_registry", [py, ".codex/tools/validate_source_registry.py", ".codex/docs/source_registry.yaml"], root),
         Check("invocation_surface_policy", [py, ".codex/tools/check_invocation_surface_policy.py"], root),
         Check("work_horizon_policy", [py, ".codex/tools/check_work_horizon_policy.py"], root),
         Check(
@@ -248,9 +247,9 @@ def research_checks(root: Path) -> list[Check]:
             [
                 py,
                 ".codex/tools/validate_research_ledger.py",
-                ".codex/research/ledger.yaml",
+                "source/maintainer/fixtures/research-ledger/valid.yaml",
                 "--schema",
-                ".codex/research/research-ledger.schema.json",
+                "source/maintainer/fixtures/research-ledger/research-ledger.schema.json",
             ],
             root,
         )

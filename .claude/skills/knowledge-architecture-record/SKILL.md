@@ -11,7 +11,7 @@ disable-model-invocation: true
 - intent_signature: durable architecture boundary, ownership, lifecycle, dependency, data flow
 - use_when: the user explicitly requests recording an accepted project architecture rule or decision
 - do_not_use_when: architecture is undecided, the content is generic pattern advice, task chronology, or an existing-record update
-- expected_inputs: boundary/owners, dependency/data flow, invariants, consequences, canonical refs, consumers, and declared store
+- expected_inputs: boundary/owners, aliases/search terms, dependency/data flow, invariants, consequences, canonical refs, consumers, overlap candidates, and declared store
 - expected_outputs: one architecture record plus index row and readback
 - context_targets:
   must_read: manifest/index, matching architecture/decision records, exact module/schema/code refs, and `.codex/docs/knowledge_record_contract.md`
@@ -28,9 +28,10 @@ disable-model-invocation: true
 Capture boundary and owner, dependency direction, lifecycle/data flow, invariants, allowed exceptions, migration/consumer consequences, and direct code/schema/design anchors.
 
 ## Workflow
-1. Resolve the declared store and verify the boundary is accepted/current.
+1. Bind `knowledge_root` and `knowledge_index` from the exact approved path or nearest manifest declaration, reuse them for every record/index path, and verify the boundary is accepted/current. Missing is `unavailable`; never guess or scan for a store.
 2. Inspect representative owners/consumers and one material counterexample or exception when relevant.
-3. Create one `category=architecture` record using the common envelope.
-4. Add its index row and read back ownership, anchors, consumers, and supersession links.
+3. Search matching boundaries, owners, scopes, aliases, relations, and canonical anchors; classify same identity, amendment, replacement, partial overlap, conflict, or new boundary.
+4. Use `knowledge-base-update` for an existing identity. Create one `category=architecture` record only for a new identity, with the full current envelope, one `created` revision, and typed dependency/scope/causal links.
+5. Add its navigable index row and read back ownership, anchors, consumers, relations/history, and supersession links.
 
 Use `knowledge-base-update` for an existing boundary. Do not save a clean diagram as knowledge when source ownership disagrees.

@@ -13,6 +13,8 @@ no skill needed            -> current task owner
 
 Do not pre-classify every request. Do not attach skills merely because their names are related to the topic.
 
+When the user explicitly asks which workflow comes next, separate the questions instead of consulting a second routing table: `docs/work_horizon_model.md` owns persistence and artifact altitude, while `docs/planning_state_model.md` admits transitions only for persisted planning artifacts. Stable work with no such boundary stays with the current task owner. Neither reference invokes a chain.
+
 Resolve a requested skill in this order:
 
 1. exact path supplied by the user;
@@ -31,7 +33,7 @@ Use at most one router, and only when its decision is genuinely unresolved:
 - `search-router`: unclear cross-domain evidence lane;
 - `loop-readiness-router`: explicit durable, repeated, event-driven, or Stop-driven execution whose readiness is not established.
 
-The router returns one owner and stops. It does not acquire evidence, implement, validate, report, mutate Memory or Knowledge, or invoke another router. `workflow-rigor`, `workflow-validation`, reporting skills, `skill-creator`, Memory, and Knowledge are never automatic attachments.
+The router returns one owner and stops. It does not acquire evidence, implement, validate, report, mutate Memory or Knowledge, or invoke another router. `workflow-rigor`, `workflow-validation`, reporting skills, `skill-creator`, Memory, and Knowledge are never attached merely by topic or keyword. A primary execution owner may activate `workflow-rigor` from its actual risk/evidence trigger without surrendering ownership.
 
 ## Direct Owners
 
@@ -47,7 +49,7 @@ The router returns one owner and stops. It does not acquire evidence, implement,
 | Knowledge read | current task owner using `knowledge-base-read` for declared project knowledge |
 | Knowledge write | the explicit category record, update, maintenance, or plan-sync owner |
 | named LLM Wiki context | `llm-wiki-context`, explicitly selected and read-only |
-| project context manifest initialization or location update | `project-context-init` or `project-context-update`, only on explicit request |
+| project context manifest init/bootstrap/doctor or location update | `project-context-init` (`manifest-init|bootstrap|doctor`) or `project-context-update`, only on explicit request |
 | repository skill update | current implementation owner; add `skill-system-repo-adapter` only for repository integration |
 | personal skill creation | system `skill-creator` when explicitly named or clearly requested |
 
@@ -66,7 +68,7 @@ The nearest `project-context.yaml` declares project-local skill roots, Memory Ba
 ## Memory, Knowledge, And Wiki Boundary
 
 - Memory Bank stores cross-session working rules, recurring interaction mistakes, useful practices, and compact current state. Read only relevant active material; do not load full archives or event ledgers by default.
-- Knowledge Base stores durable project/domain/design/algorithm/architecture/code-review knowledge and direct artifact anchors. It is not an intermediate LLM Wiki projection.
+- Knowledge Base stores durable current project/domain/design/algorithm/architecture/code-review knowledge with direct artifact anchors, typed relations, semantic revisions, and source-traced observations. It derives recurrence dimensions without scores and is not an intermediate LLM Wiki projection or separate claim graph.
 - An LLM Wiki is a separate, explicitly selected context source. Read its own guide and navigation contract; do not assume a shared schema or merge multiple Wikis.
 - Persistent writes require the owning workflow. General session completion, hook events, complaints, or inferred usefulness do not authorize collection or storage.
 
@@ -74,6 +76,7 @@ The nearest `project-context.yaml` declares project-local skill roots, Memory Ba
 
 - Development requests execute source work; an active plan is input, not a substitute for implementation.
 - Use one `change -> validation` owner. A verifier does not become a second workflow owner.
+- When a material semantic completion claim would rest mainly on code and checks produced by that same owner, maker/checker separation is a concrete `workflow-rigor` standard trigger. Low-risk work with direct decisive observation stays self-reviewed; strict risk uses its two independent axes when available.
 - Invoke routine approved executables directly. Use a shell wrapper only when pipeline, redirection, globbing, or other shell semantics are required.
 - Live home configuration, plugin caches, app-managed `.system` skills, and other sessions are deployment state. Modify them only on an explicit deployment or live-runtime request.
 - Explicit `/goal`, automation, durable repeated execution, or Stop continuation requires loop readiness and an accepted contract before execution.

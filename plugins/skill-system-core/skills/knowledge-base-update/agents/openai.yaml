@@ -1,6 +1,6 @@
 interface:
   display_name: "Knowledge Base Update"
-  short_description: "Update or supersede project knowledge"
-  default_prompt: "Use $knowledge-base-update to update one accepted project Knowledge record and its index."
+  short_description: "Observe or revise existing project knowledge"
+  default_prompt: "Use $knowledge-base-update to classify overlap, then observe, amend, reverify, supersede, deprecate, or relink one existing record with provenance and semantic history."
 policy:
   allow_implicit_invocation: false

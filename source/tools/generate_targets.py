@@ -36,6 +36,7 @@ NEUTRAL_TARGET_ROOTS = {target_rel.split("/", 1)[0] for _, target_rel in NEUTRAL
 # factoring them into a shared body + overlay (platform-template) is a Phase 1b refinement.
 PLATFORM_CODEX_ROOT = "platform/codex"
 PLATFORM_CLAUDE_ROOT = "platform/claude"
+REMOVED_CODEX_TARGET_ROOTS = ("research",)
 
 MIRROR_META_FILE = "mirror-meta.json"
 
@@ -396,6 +397,15 @@ def generate_codex_runtime(source: Path, codex: Path) -> list[str]:
     written: list[str] = []
     _copy_neutral(source, codex, written)
     _copy_platform(source / PLATFORM_CODEX_ROOT, codex, written)
+    # Research ledger data and its validation schema are maintainer fixtures, not
+    # live runtime payload. Remove the former generated root so an upgrade cannot
+    # retain or redeploy the historical ledger.
+    for root_name in REMOVED_CODEX_TARGET_ROOTS:
+        stale = codex / root_name
+        if stale.is_dir():
+            shutil.rmtree(stale)
+        elif stale.exists():
+            stale.unlink()
     _build_codex_harness(source, codex, written)
     return written
 
@@ -410,7 +420,7 @@ def generate_claude_runtime(source: Path, claude: Path) -> list[str]:
     if not (source / PLATFORM_CLAUDE_ROOT / "tools").exists() and (claude / "tools").exists():
         shutil.rmtree(claude / "tools")
     _build_claude_harness(source, claude, written)
-    # Claude keeps two provenance-bearing mirrors of shared canonical data.
+    # Claude keeps the checksum-bearing eval-schema mirror of shared canonical data.
     meta = json.loads((source / MIRROR_META_FILE).read_text(encoding="utf-8"))
     for dst_rel, spec in meta["mirrors"].items():
         _write_mirror(source, claude, dst_rel, spec)

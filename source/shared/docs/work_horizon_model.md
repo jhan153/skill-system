@@ -11,6 +11,27 @@ one-shot
 loop_overlay and support_facets can attach to any level when their trigger is explicit.
 ```
 
+## Question Ownership And Non-Executing Topology
+
+This model owns work size, persistence, and artifact altitude. It does not select a domain specialist, admit a planning-state transition, or invoke a workflow chain.
+
+| question | authority |
+| --- | --- |
+| Who owns the current turn? | The host `context-routing.md` and the selected direct specialist. |
+| Does the work need durable task or plan state? | This Work Horizon Model. |
+| May a persisted planning artifact move to its next state? | `planning_state_model.md`. |
+| What lifecycle state does a ticket envelope have? | `work_item_lifecycle.md`. |
+
+For an explicit “what next?” question, choose only the first boundary that changes the actual deliverable or state lifetime:
+
+1. If a material product, scope, edge, or data decision is missing, use requirements discovery; distill a requirements contract only when that durable artifact is needed.
+2. If requirements are stable and no persisted plan, resume boundary, transfer, or loop is requested, keep the current task owner. Execute directly only when the current request authorizes mutation; a read-only “what next?” request receives a recommendation without starting work.
+3. If durable current-horizon or strategic planning is explicitly needed, select `short_plan` or `long_plan`; use the Planning State Model for its transition into execution.
+4. If one task must resume across turns, attach `task_ticket`; if ownership itself transfers, use an explicit handoff instead. Neither condition creates a plan automatically.
+5. If execution is explicitly repeated, event-driven, `/goal`, or verifier-feedback based, evaluate `loop_overlay`; it runs only after its own accepted contract.
+
+This is explanatory topology, not an orchestrator. It never calls the listed owners, requires every task to traverse every step, or overrides the current task owner.
+
 ## Horizon Levels
 
 | level | meaning | primary owner | durable state |

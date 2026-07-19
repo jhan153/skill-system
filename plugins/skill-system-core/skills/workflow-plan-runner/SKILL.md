@@ -22,6 +22,7 @@ description: Execute an approved plan/spec as source-anchored batches; real impl
     - request, owning source slice, and next batch's implementation surface
   read_if_needed:
     - blocker, canonical oracle, actual-path evidence, or requested status/coordination contract
+    - `.codex/docs/delivery_slice_contract.md` when the approved scope needs multiple executable batches, including a wide migration or non-feature decomposition
   do_not_load_by_default:
     - full repo/plan history, unrelated specs/logs, production data, or credentials
 - risk_profile:
@@ -37,7 +38,7 @@ Proceed only when the slice names a material condition, bounded surface or safe 
 
 ## Batch Workflow
 1. Resolve the requested scope to its canonical anchor and predecessors. Bind each condition to user/public/canonical/external/formal/observed authority; agent-authored tests may record, not invent, that contract.
-2. Choose one coherent batch. Freeze its surface/non-goals, intended change, one planned primary verifier, rollback, and approval boundary. A missing verifier lowers evidence authority; it does not create a validation batch.
+2. Choose one coherent batch. If several batches are required, record `delivery_shape` as `vertical_slice`, `migration_sequence`, or `evidence_unit` according to `delivery_slice_contract.md`; do not apply the contract to `single_batch` work. Freeze the surface/non-goals, intended change, blockers, one planned primary verifier, rollback, and approval boundary. A missing verifier lowers evidence authority; it does not create a validation batch.
 3. Change the production owner/path and callers, or produce the exact structural artifact when that is the whole condition. Interface/mock/test/scaffold/comment/status-only work is not implementation progress.
 4. Validate at matching scope with the planned existing verifier, direct observation, or focused smoke check. Do not add a test framework, mock layer, fixture family, dependency, or LoopRun solely to promote the result label. Behavior, source selection, migration, transforms, external boundaries, and policy-owning adapters still require representative actual-path output/side-effect readback when that path is the material condition.
 5. Record only the latest decisive result and preserve conflicting `fail`, `needs_review`, `unverified`, `blocked`, or `user-verification-needed`; lower-scope pass cannot close it. Keep raw logs, receipts, retries, and superseded results out of the plan.
@@ -47,7 +48,9 @@ Proceed only when the slice names a material condition, bounded surface or safe 
 - `batch_complete`: every material condition has direct evidence; test/interface/mock/document activity cannot replace production work. An exact structural condition may close from matching structural evidence.
 - `phase_complete`: every required batch and phase exit gate passed. `plan_complete`: every required phase and final gate passed.
 - Never infer `phase_complete` or `plan_complete` from a passing batch, and do not stop after the first passing batch when broader approved scope remains. Select the next batch instead of marking the request complete. Status prose and reporting never change these states.
-- When requested implementation is done but independent verification is unavailable, stop with `user-verification-needed`; do not extend the plan to manufacture `agent-verified` evidence.
+- When a named user-only product observation remains, stop with `user-verification-needed`; when evidence is unavailable without a user-only check, use `unverified`. Do not extend the plan to manufacture `agent-verified` evidence.
+- When material semantic completion otherwise rests mainly on maker-authored implementation and checks, request the `workflow-rigor` standard independent review pass when available; strict risk keeps its two axes separate. Review judgment never replaces the planned condition evidence.
+- Missing independent review lowers the task result where material but does not by itself change `batch_complete`, `phase_complete`, or `plan_complete`; it blocks one of those states only when the accepted plan names that review as an exit gate. Any underlying condition that lacks direct evidence remains open regardless.
 
 ## Output Contract
 Return anchors/batches, changed implementation and callers, condition authority/evidence/status, rollback or blocker, next batch, and directly known phase/plan status. Separate batch, requested-scope, phase, and plan completion.

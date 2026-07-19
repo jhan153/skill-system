@@ -36,9 +36,11 @@ type Manifest struct {
 }
 
 type Location struct {
-	Name   string `json:"name"`
-	Path   string `json:"path"`
-	Exists bool   `json:"exists"`
+	Name        string `json:"name"`
+	Path        string `json:"path"`
+	Exists      bool   `json:"exists"`
+	IndexPath   string `json:"index_path,omitempty"`
+	IndexExists bool   `json:"index_exists,omitempty"`
 }
 
 type Result struct {
@@ -92,6 +94,13 @@ func Resolve(start, exact string) (Result, error) {
 	}
 	if manifest.KnowledgeBase != nil && strings.TrimSpace(manifest.KnowledgeBase.Root) != "" {
 		item := location(base, "knowledge_base", manifest.KnowledgeBase.Root)
+		index := strings.TrimSpace(manifest.KnowledgeBase.Index)
+		if index == "" {
+			index = filepath.Join(item.Path, "index.md")
+		}
+		indexLocation := location(base, "knowledge_index", index)
+		item.IndexPath = indexLocation.Path
+		item.IndexExists = indexLocation.Exists
 		result.KnowledgeBase = &item
 	}
 	if manifest.Plans != nil && strings.TrimSpace(manifest.Plans.Root) != "" {

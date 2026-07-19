@@ -10,7 +10,7 @@ description: Record one recurring repository-specific code-review rule with dete
 - intent_signature: recurring repository-specific review rule
 - use_when: the user explicitly requests recording a durable review rule that should guide future changes
 - do_not_use_when: the comment is one-off, already enforced by an obvious tool without project nuance, generic style advice, a personal preference, or an existing-record update
-- expected_inputs: rule, affected scope, detection cues, correct pattern, exceptions, example/canonical refs, and declared store
+- expected_inputs: rule, aliases/search terms, affected scope, detection cues, correct pattern, exceptions, example/canonical refs, provenance roots, and declared store
 - expected_outputs: one code-review record plus index row and readback
 - context_targets:
   must_read: manifest/index, matching review records, representative correct/incorrect source refs, and `.codex/docs/knowledge_record_contract.md`
@@ -27,9 +27,10 @@ description: Record one recurring repository-specific code-review rule with dete
 Capture the repository-specific rule, why it matters here, detection cues, correct pattern, exceptions, affected files/symbols, tool support, and representative examples by stable pointer.
 
 ## Workflow
-1. Resolve the declared store and confirm the rule recurs or is an explicit repository policy.
-2. Separate durable rule from the one-off symptom and remove reviewer identity or conversational text.
-3. Create one `category=code-review` record using the common envelope.
-4. Add its index row and read back scope, examples, exceptions, and verifier/tool links.
+1. Bind `knowledge_root` and `knowledge_index` from the exact approved path or nearest manifest declaration, reuse them for every record/index path, and confirm the rule recurs or is an explicit repository policy. Missing is `unavailable`; never guess or scan for a store. Repetition from one copied source is not independent recurrence.
+2. Separate the durable rule from one-off symptoms, reviewer identity, conversational text, and tool-enforced generic advice. Record source events only by stable bounded pointers and provenance roots.
+3. Search matching rules/cues/scopes and classify same identity, dependent recurrence, amendment, replacement, partial overlap, conflict, or new rule. Use `knowledge-base-update` to append observations or revisions to an existing identity.
+4. Create one `category=code-review` record only for a new identity, with the full current envelope, one `created` revision, typed relations, and source-traced observations where available.
+5. Add its navigable index row and read back scope, examples, exceptions, recurrence dimensions, history, and verifier/tool links.
 
 Use `knowledge-base-update` for an existing rule. Do not convert every review comment into Knowledge.

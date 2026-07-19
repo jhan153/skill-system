@@ -29,6 +29,7 @@ description: Create or synchronize a persisted docs/plan artifact for the curren
     - affected source outline and target slices
     - relevant memory cards and validation contract
     - `.codex/docs/planning_state_model.md` when state admission is ambiguous
+    - `.codex/docs/delivery_slice_contract.md` when execution needs multiple batches, including wide migration or non-feature decomposition
   do_not_load_by_default:
     - full repo, memory bank, all plans, or phase-package templates
 - risk_profile:
@@ -52,7 +53,7 @@ Read the explicit plan pointer first. Without one, inspect only `docs/plan` name
 
 ## Author And Synchronize
 1. Create `docs/plan/YYYY-MM-DD-<task-slug>.md` from the template, or reuse the task's active file. The template is the format owner.
-2. Record objective, bounded scope/non-goals, observable success, concrete files/components, what/why, risks, decisions/questions, ordered implementation TODOs, one primary verifier, transition state, and a compact current snapshot. Use a bounded discovery TODO instead of guessing paths.
+2. Record objective, bounded scope/non-goals, observable success, concrete files/components, what/why, risks, decisions/questions, ordered implementation TODOs, one primary verifier, transition state, and a compact current snapshot. If execution needs several batches, record `delivery_shape` as `vertical_slice`, `migration_sequence`, or `evidence_unit`; omit the delivery contract for `single_batch` work. Use a bounded discovery TODO instead of guessing paths.
 3. Map each material change to its owner/path and completion signal. Prefer an existing repository verifier, direct-path observation, or a small smoke check. If none is available, record `user-verification-needed`; do not create a test framework, mock layer, fixture family, or validation phase solely to improve the result label.
 4. Keep validation bounded to the latest decisive result for each material condition. Raw command output, receipts, retry history, repeated passes, and superseded failures stay out of the plan. A rerun replaces the prior result instead of appending another progress entry.
 5. Treat tests, mocks, and validation helpers as implementation scope only when the user requested them or they directly cover a material regression risk with an already anchored expectation. Agent-authored checks remain supporting evidence; missing independent evidence lowers the result label rather than expanding the plan.
@@ -63,6 +64,7 @@ Do not pad plans with placeholder code or diagrams. Follow the template's condit
 ## Plan Quality Gate
 - Scope fits one execution horizon and deferred work is explicit.
 - The first executable TODO is clear; each TODO has an outcome, dependency/blocker, and completion signal.
+- Multi-batch TODOs follow `.codex/docs/delivery_slice_contract.md` and name exactly one applicable `delivery_shape`; single-batch work does not import slice ceremony.
 - Material changes trace to evidence and unresolved product/interface decisions block dependent work.
 - Validation names one smallest primary verifier and an optional user-only check; unavailable evidence does not create new implementation scope.
 - No test, mock, fixture, dependency, or loop work exists solely to manufacture completion evidence.

@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Rigor"
   short_description: "Mode-based evidence-first execution control"
-  default_prompt: "Use $workflow-rigor when execution risk needs extra proof: select lite/standard/strict from consequence and coupling, then attach only the matching validation and review gates."
+  default_prompt: "Use $workflow-rigor when execution risk or maker/checker separation needs extra proof: select lite/standard/strict, pin the fixed point, and keep Contract/Spec separate from Repository/Constraints review. Use independent passes only when material and never promote maker-authored checks into independent evidence."
 
 policy:
   invocation_surface: support_only

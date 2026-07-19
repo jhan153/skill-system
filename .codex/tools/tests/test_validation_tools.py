@@ -44,6 +44,7 @@ class RuntimeContractTests(unittest.TestCase):
 
     def test_codex_legacy_diagnostic_stack_is_not_packaged(self) -> None:
         removed = [
+            ".codex/research",
             ".codex/hooks/codex_base_hook.py",
             ".codex/hooks/codex_hook_adapter.py",
             ".codex/tools/hook_runtime.py",

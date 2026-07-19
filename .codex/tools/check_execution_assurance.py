@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the 9.3.4 platform-separated runtime contract."""
+"""Verify the 9.4.2 platform-separated runtime contract."""
 
 from __future__ import annotations
 
@@ -42,7 +42,6 @@ REQUIRED_FILES = [
     ".codex/tools/evaluate_loop_run.py",
     ".codex/tools/task_ledger.py",
     ".codex/tools/validate_task_run.py",
-    ".codex/research/ledger.yaml",
 ]
 
 FORBIDDEN_CLAUDE_PATHS = [
@@ -53,6 +52,7 @@ FORBIDDEN_CLAUDE_PATHS = [
 ]
 
 FORBIDDEN_CODEX_FILES = [
+    ".codex/research",
     ".codex/hooks/codex_base_hook.py",
     ".codex/hooks/codex_hook_adapter.py",
     ".codex/tools/hook_runtime.py",

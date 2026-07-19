@@ -9,15 +9,15 @@
 Evidence collected 2026-06-29 from `skill-system/` root:
 - `diff -qr .codex/skills .claude/skills` → only `.DS_Store` differs (skill bodies already mirrored).
 - `diff -q .codex/context-routing.md .claude/context-routing.md` → identical.
-- `diff -qr .codex/docs .claude/docs` → only `docs/source_registry.yaml` differs.
+- Shared docs generate verbatim; platform-owned document overlays remain intentionally distinct.
 - `diff -qr .codex/eval .claude/eval` → only `eval/eval-case.schema.json` differs.
-- `.codex` has 14 top-level entries; `.claude` has 7. `.codex/tools` = 40 files + `tests/`; `.claude/tools` = 2 files.
+- `.codex` has 15 top-level entries; `.claude` has 9. `.codex/tools` has 29 top-level files plus `tests/`; generated Claude runtime has no tools root.
 - `.gitignore` excludes `/docs/`, `/.github/`, `/.kanboard-plan/`, `/.kanboard-plan.yml`.
 
-Result counts (`source/runtime-inventory.yaml`, 36 entries): shared-neutral 11, codex-only 11,
-maintainer-only 9, claude-only 3, local-only/ignored 2. 11 entries are `provisional`
-(need content read or later validation); 9 entries are Claude gaps. Phase 1b decisions are
-recorded for 8 inventory entries, corresponding to the 7 decision units below.
+Current counts (`source/runtime-inventory.yaml`, 29 entries): shared-neutral 5,
+platform-native 3, codex-only 8, maintainer-only 9, claude-only 2, and
+local-only/ignored 2. Four entries remain `provisional`, three carry an explicit gap,
+and Phase 1b decisions are recorded for eight inventory entries.
 
 ## 2) Bucket → source/target mapping
 
@@ -33,9 +33,9 @@ recorded for 8 inventory entries, corresponding to the 7 decision units below.
 ### Generation strategies
 - `neutral-verbatim` — copy unchanged to either generated target (e.g. `docs/`, `eval/`, `schemas/`).
 - `platform-projected` — copy one canonical skill body, then translate the canonical invocation bit into host-native metadata. Codex keeps `agents/openai.yaml`; Claude adds `disable-model-invocation: true` only to explicit-only generated skills. Codex packages stay under `plugins/<name>` and paired Claude packages under `plugins/claude/<name>`, sharing one plugin name and version.
-- `mirror-from-canonical` — generate the Claude copy from the Codex canonical with a
-  `generated_from` / `source_checksum` / `do_not_edit` header. This is exactly the current
-  `sync_generated_mirrors.py` behavior for `docs/source_registry.yaml` and `eval/eval-case.schema.json`.
+- `mirror-from-canonical` — generate the Claude copy from shared canonical data with a
+  `generated_from` / `source_checksum` / `do_not_edit` header. The current instance is
+  `eval/eval-case.schema.json`.
 - `platform-template` — one neutral body + a per-platform overlay yields divergent output
   (e.g. `AGENTS.md` ↔ `CLAUDE.md`).
 - `codex-native` / `claude-native` — lives in only one target.
@@ -49,20 +49,19 @@ Phase 1a must regenerate **byte-identical** output for every confirmed committed
 codex-only, claude-only, and maintainer-only entries as they exist today. Only
 `local-only/ignored` paths are excluded.
 
-The existing `mirror-from-canonical` pair (`source_registry.yaml`, `eval-case.schema.json`) is
-the proven precedent: Phase 1a generalizes that mechanism to the full payload without changing
-any byte of current output.
+The existing `eval-case.schema.json` mirror is the proven precedent: Phase 1a generalizes that
+mechanism to the full payload without changing any byte of current output.
 
 **Byte-identical constraint — mirror headers carry a frozen timestamp.** The current
-`.claude/docs/source_registry.yaml` header contains `generated_at: 2026-06-25T22:01:27Z` plus a
+`.claude/eval/eval-case.schema.json` header contains a frozen `generated_at` plus a
 `source_checksum`. A naive regenerate would emit a *new* timestamp and break byte-identity.
 Phase 1a's generator must therefore be **idempotent**: when the canonical source content is
 unchanged, it preserves the existing target's `generated_at` (and only refreshes the timestamp
 when `source_checksum` actually changes). This keeps mirror-from-canonical files byte-identical
 on regeneration. Implement this before claiming Phase 1a byte-identity for the mirror files.
 Recommended sub-batch order for Phase 1a:
-1. neutral-verbatim payload (skills, context-routing.md, docs/ and eval/ minus the two mirror files) — no timestamp concern.
-2. mirror-from-canonical files (idempotent timestamp preservation).
+1. neutral-verbatim payload (skills, context-routing.md, docs/ and eval/ except the eval-schema mirror) — no timestamp concern.
+2. mirror-from-canonical eval schema (idempotent timestamp preservation).
 3. platform split (`AGENTS.md`/`CLAUDE.md`, hooks, codex-only/claude-only trees, maintainer tools).
 
 ## 4) Phase 1b scope (gap remediation) — DONE
@@ -78,6 +77,11 @@ Applied:
   Result: `.codex/schemas` = 25 (byte-identical), `.claude/schemas` = 24 (new, no `.codex` leak).
 
 Corrected after content inspection (recorded decisions overridden by evidence):
+- `research/` (ledger + schema) → **maintainer-only** (was `codex-only`). The only
+  active consumer is the repository-relative research verification profile; no skill,
+  hook, execution-assurance check, or live-home runtime reads `<CODEX_HOME>/research/`.
+  Both files live under `source/maintainer/fixtures/research-ledger/` and are not
+  generated into `.codex`, `.claude`, or plugins.
 - `research-routing.md` → **codex-only** (was "shared"). It references codex-only/dangling assets
   (`codex-research-lifecycle` skill and `.codex/references/...`, neither of which exists even under
   `.codex`). Generating to `.claude` would ship a broken doc. Sharing would require a content
@@ -101,7 +105,9 @@ can be shared.
 1. **Loop engine tools** (`init/activate/resume/deactivate/evaluate_loop_run.py`, `loop_policy.py`) — `codex-only` for v1.
 2. **`tools/task_ledger.py`** — `codex-only` explicit workflow runtime. Codex Agent Run was removed in 9.3.2.
 3. **Active portable schemas** (knowledge/loop/orchestration/task/tools/workitem) — `shared-neutral`; removed Agent Run and lifecycle-ledger schemas are not platform payload.
-4. **`research/`** (ledger + schema) — `codex-only` for v1.
+4. **`research/`** (ledger + schema) — originally recorded as `codex-only` for v1;
+   current consumer inspection supersedes that classification with a source-only
+   `maintainer` fixture outside all runtime targets.
 5. **`tools/requirements.txt`** — `codex-only` for v1, because no runtime-logic tools move to Claude.
 6. **`rules/default.rules`** — `codex-only` for v1; no Claude equivalent is generated.
 

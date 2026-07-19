@@ -142,6 +142,27 @@ class ReleaseIdentityTests(unittest.TestCase):
             self.assertTrue(any("duplicate plugin names" in error for error in errors), errors)
             self.assertTrue(any("source must be local" in error for error in errors), errors)
 
+    def test_retired_public_provenance_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.build_fixture(root)
+            retired = root / "source" / "shared" / "docs" / "source_registry.yaml"
+            retired.parent.mkdir(parents=True)
+            retired.write_text("schema_version: 1\n", encoding="utf-8")
+            errors = self.checker.check(root)
+            self.assertTrue(any("retired public provenance path" in error for error in errors), errors)
+
+            retired.unlink()
+            (root / "README.md").write_text(
+                "adoption_decisions:\n"
+                "  - upstream_reference: external\n"
+                "    local_surface: []\n"
+                "    rationale: retired\n",
+                encoding="utf-8",
+            )
+            errors = self.checker.check(root)
+            self.assertTrue(any("retired public provenance ledger content" in error for error in errors), errors)
+
 
 if __name__ == "__main__":
     unittest.main()

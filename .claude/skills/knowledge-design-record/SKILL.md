@@ -11,7 +11,7 @@ disable-model-invocation: true
 - intent_signature: durable product/design-system rule and implementation linkage
 - use_when: the user explicitly requests recording an accepted recurring local design rule
 - do_not_use_when: the input is a one-off preference, generic UI advice, unaccepted concept, screenshot critique, or existing-record update
-- expected_inputs: product intent, affected surfaces/states, design refs, tokens/components, implementation refs, verifier, and declared store
+- expected_inputs: product intent, accepted aliases/search terms, affected surfaces/states, design refs, tokens/components, implementation refs, verifier, overlap candidates, and declared store
 - expected_outputs: one design record plus index row and readback
 - context_targets:
   must_read: manifest/index, matching design records, actual design/design-system/code refs, and `.codex/docs/knowledge_record_contract.md`
@@ -28,9 +28,10 @@ disable-model-invocation: true
 Capture product intent, affected surface and states/variants, approved component/token/control, layout/interaction rule, accessibility constraint, implementation symbols, and validation expectation. A local approved control outranks a common model-generated UI pattern.
 
 ## Workflow
-1. Resolve the declared store and verify the rule is accepted, recurring, and project-specific.
+1. Bind `knowledge_root` and `knowledge_index` from the exact approved path or nearest manifest declaration, reuse them for every record/index path, and verify the rule is accepted, durable, and project-specific. Missing is `unavailable`; never guess or scan for a store.
 2. Read the exact design/design-system/code anchors; do not invent missing tokens or component names.
-3. Create one `category=design` record with the common envelope and direct consumers.
-4. Add its index row and read back record, design/code anchors, and verifier links.
+3. Classify matching records as same identity/recurrence, amendment, replacement, partial scope overlap, conflict, or new. Use `knowledge-base-update` for an existing identity and preserve source dependence.
+4. Create one `category=design` record only for a new identity, with the full current envelope, a `created` revision, direct consumers, and typed overlap/conflict links when applicable.
+5. Add its navigable index row and read back record, design/code anchors, relations/history, and verifier links.
 
 Use `knowledge-base-update` for an existing identity. Do not record broad aesthetics without an operational consequence.

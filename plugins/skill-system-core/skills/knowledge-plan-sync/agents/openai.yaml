@@ -1,6 +1,6 @@
 interface:
   display_name: "Knowledge Plan Sync"
   short_description: "Sync accepted plan decisions to Knowledge"
-  default_prompt: "Use $knowledge-plan-sync to synchronize accepted durable decisions from this plan into project Knowledge."
+  default_prompt: "Use $knowledge-plan-sync to synchronize only accepted durable plan decisions, preserving overlap classification, why/work links, provenance, and semantic history."
 policy:
   allow_implicit_invocation: false

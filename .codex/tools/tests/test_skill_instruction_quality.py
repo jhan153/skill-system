@@ -298,6 +298,156 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn("deprecated", memory)
         self.assertIn("full `current.md`", memory)
 
+    def test_knowledge_records_keep_temporal_relational_provenance_without_scores(self) -> None:
+        contract = canonical("shared/docs/knowledge_record_contract.md").read_text(
+            encoding="utf-8"
+        )
+        for phrase in (
+            "relations: []",
+            "observations: []",
+            "provenance_root",
+            "revisions: []",
+            "adopted_snapshot",
+            "Overlap Classification",
+            "distinct verified provenance roots",
+            "one typed edge at a time",
+            "Source identity, source existence, or an explicit report alone does not verify",
+            "Terms found only in an unverified observation do not silently become current search anchors",
+        ):
+            self.assertIn(phrase, contract)
+        self.assertIn("never persist one scalar score", contract)
+        self.assertIn("Similarity is a candidate-discovery signal, not merge authority", contract)
+        self.assertFalse((SOURCE / "shared/schemas/knowledge/context-pack.schema.json").exists())
+
+        writers = (
+            "knowledge-algorithm-record",
+            "knowledge-architecture-record",
+            "knowledge-base-init",
+            "knowledge-base-maintenance",
+            "knowledge-base-update",
+            "knowledge-code-review-record",
+            "knowledge-design-record",
+            "knowledge-domain-record",
+            "knowledge-plan-sync",
+            "project-context-checkpoint",
+        )
+        for skill_id in writers:
+            text = canonical(f"skills/{skill_id}/SKILL.md").read_text(encoding="utf-8")
+            self.assertIn("knowledge_record_contract.md", text, skill_id)
+
+        update = canonical("skills/knowledge-base-update/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("amend|observe|reverify|supersede|deprecate|relink", update)
+        self.assertIn("Shared provenance roots remain dependent", update)
+        self.assertIn("not merely that its source exists", update)
+        maintenance = canonical("skills/knowledge-base-maintenance/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        for operation in ("relation-check", "history-check", "overlap-check", "recurrence-report"):
+            self.assertIn(operation, maintenance)
+        read = canonical("skills/knowledge-base-read/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("source --relation--> target", read)
+        self.assertIn("never load the whole store as a graph dump", read)
+        contract = canonical("shared/docs/knowledge_record_contract.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("`knowledge_root` and `knowledge_index`", contract)
+        self.assertIn("The resolved root may be anywhere", contract)
+        self.assertIn("records both bound values explicitly", contract)
+        for skill_id in (
+            "knowledge-algorithm-record",
+            "knowledge-architecture-record",
+            "knowledge-base-init",
+            "knowledge-base-read",
+            "knowledge-base-update",
+            "knowledge-base-maintenance",
+            "knowledge-code-review-record",
+            "knowledge-design-record",
+            "knowledge-domain-record",
+            "knowledge-plan-sync",
+        ):
+            text = canonical(f"skills/{skill_id}/SKILL.md").read_text(encoding="utf-8")
+            self.assertIn("`knowledge_root`", text, skill_id)
+            self.assertIn("`knowledge_index`", text, skill_id)
+
+        init = canonical("skills/knowledge-base-init/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("materializes the bound index value", init)
+
+        manifest = canonical("shared/docs/project_context_manifest.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("knowledge_root  :=", manifest)
+        self.assertIn("knowledge_index :=", manifest)
+        self.assertIn("resolves outside `knowledge_root`", manifest)
+
+        resolver = canonical("runtime/go/internal/projectcontext/resolver.go").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('json:"index_path,omitempty"', resolver)
+        self.assertIn('json:"index_exists,omitempty"', resolver)
+
+    def test_project_context_bootstrap_and_doctor_remain_explicit(self) -> None:
+        skill = canonical("skills/project-context-init/SKILL.md").read_text(encoding="utf-8")
+        for mode in ("`manifest-init`", "`doctor`", "`bootstrap`"):
+            self.assertIn(mode, skill)
+        self.assertIn("one exact transaction decision", skill)
+        self.assertIn("approve all listed actions or a stated subset", skill)
+        self.assertIn("Do not ask for a second approval", skill)
+        self.assertIn("do not pre-write the same section through two owners", skill)
+        self.assertIn("`initialized-empty`", skill)
+        self.assertIn("binds `knowledge_root` and `knowledge_index`", skill)
+        self.assertIn("ordinary task orchestrator", skill)
+        self.assertIn("Never discover or scan home/adjacent repositories", skill)
+
+    def test_workflow_topology_and_delivery_shapes_do_not_orchestrate(self) -> None:
+        registry = canonical("shared/docs/skill_registry.md").read_text(encoding="utf-8")
+        self.assertNotIn("## Main Flow Navigator", registry)
+        horizon = canonical("shared/docs/work_horizon_model.md").read_text(encoding="utf-8")
+        planning = canonical("shared/docs/planning_state_model.md").read_text(encoding="utf-8")
+        self.assertIn("## Question Ownership And Non-Executing Topology", horizon)
+        self.assertIn("This is explanatory topology, not an orchestrator", horizon)
+        self.assertIn("a read-only “what next?” request receives a recommendation", horizon)
+        self.assertIn("stays outside this state machine", planning)
+        self.assertIn("does not need a synthetic", planning)
+        self.assertIn("`deactivate_scratch_for_direct_work`", planning)
+        self.assertIn("it never deletes a file", planning)
+        self.assertIn("cannot turn a required `fail`, `unverified`, batch, or exit gate", planning)
+
+        slices = canonical("shared/docs/delivery_slice_contract.md").read_text(
+            encoding="utf-8"
+        )
+        for shape in ("`single_batch`", "`vertical_slice`", "`migration_sequence`", "`evidence_unit`"):
+            self.assertIn(shape, slices)
+        self.assertIn("stop without loading, recording, or applying", slices)
+        self.assertIn("Thin Observable Path", slices)
+        self.assertIn("expand -> migrate -> contract", slices)
+        self.assertIn("Do not interpret “vertical” as touching every architectural layer", slices)
+        self.assertIn("does not mandate TDD", slices)
+        for skill_id in (
+            "plan-short-term-docs",
+            "plan-long-term-package",
+            "workflow-plan-runner",
+            "workflow-implementation",
+        ):
+            text = canonical(f"skills/{skill_id}/SKILL.md").read_text(encoding="utf-8")
+            self.assertIn("delivery_slice_contract.md", text, skill_id)
+            self.assertIn("non-feature decomposition", text, skill_id)
+
+    def test_rigor_review_axes_preserve_epistemic_independence(self) -> None:
+        rigor = canonical("skills/workflow-rigor/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("## Review Axes And Independence", rigor)
+        self.assertIn("`Contract/Spec`", rigor)
+        self.assertIn("`Repository/Constraints`", rigor)
+        self.assertIn("separate independent read-only review", rigor)
+        self.assertIn("do not reveal the intended verdict", rigor)
+        self.assertIn("do not call the maker's second pass independent", rigor)
+        self.assertIn("same mistaken interpretation can pass", rigor)
+        self.assertIn("attach no rigor mode", rigor)
+        self.assertIn("only when the accepted contract names review as an exit gate", rigor)
+        implementation = canonical("skills/workflow-implementation/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("depends mainly on code and checks produced by the same agent", implementation)
+
     def test_support_and_design_outputs_are_not_forced_on_simple_tasks(self) -> None:
         ledger = canonical("skills/workflow-task-ledger/SKILL.md").read_text(encoding="utf-8")
         validation = canonical("skills/workflow-validation/SKILL.md").read_text(encoding="utf-8")

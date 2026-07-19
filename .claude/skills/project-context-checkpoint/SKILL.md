@@ -20,17 +20,17 @@ description: At an explicit project commit request or explicit closeout/record r
 - expected_outputs: no-op or minimal delegated Memory/Knowledge mutations plus exact changed-file/staging report
 - context_targets:
   must_read: current task outcome, relevant diff/accepted decision slice, nearest `project-context.yaml`, and matching target current/index entries
-  read_if_needed: direct plan/source/design refs needed to establish durability or avoid duplicates
+  read_if_needed: direct plan/source/design refs needed to establish durability or avoid duplicates; `.codex/docs/knowledge_record_contract.md` for any Knowledge candidate
   do_not_load_by_default: full chat, full plan history, full stores, events/archive, unrelated repo history, home/common context
 - risk_profile:
   reads: current-task evidence and declared stores only
-  writes: existing declared project-local stores only
+  writes: existing exact/declared stores only within the current checkpoint authorization
   tools: targeted local read/edit/readback; normal commit tooling remains with the commit owner
   sensitive_resources: raw private text and credentials denied
 - entry_scene: PREPARE
 
 ## Authorization Boundary
-A commit request authorizes this checkpoint only for clear durable context finalized by the same commit and existing project-local stores. It does not authorize store initialization, unrelated cleanup, home/global writes, LLM Wiki mutation, or another approval prompt for each clear item. An explicit closeout/record request provides the same bounded authorization without authorizing a Git commit.
+A commit request authorizes this checkpoint only for clear durable context finalized by the same commit and existing repository-contained project stores. It does not authorize store initialization, unrelated cleanup, external/home writes, LLM Wiki mutation, or another approval prompt for each clear item. An explicit closeout/record request provides the same bounded authorization without authorizing a Git commit; an external Knowledge store is writable only when that request names or approves its exact resolved `knowledge_root` and any `knowledge_index` outside that root.
 
 Respect manifest persistence:
 
@@ -43,19 +43,21 @@ Respect manifest persistence:
 | --- | --- | --- |
 | recurring interaction/execution mistake | Memory candidate | `memory-bank-correction-capture` |
 | cross-session project goal, working rule, or successful practice | Memory active item | `memory-bank-update` |
-| domain/design/algorithm/architecture knowledge or recurring repository review rule | Knowledge category record/update | matching `knowledge-*-record` or `knowledge-base-update` |
+| new domain/design/algorithm/architecture knowledge or recurring repository review rule | Knowledge category record | matching `knowledge-*-record` after overlap classification |
+| existing Knowledge rule observed again or semantically changed | Knowledge observation/revision/relation | `knowledge-base-update` with stable provenance and history |
 | accepted durable plan/decision change | Knowledge decision or affected category | `knowledge-plan-sync` |
 | task status, raw log/chat, one-off comment, speculative idea, generic advice | no write | none |
 
 If one statement could fit both stores, choose its primary future use: agent interaction/working behavior goes to Memory; product/project truth and artifact-linked rules go to Knowledge. Never duplicate it for convenience.
 
 ## Workflow
-1. Resolve the nearest manifest and verify each declared target exists. Missing targets are no-write; do not initialize or search elsewhere.
+1. Resolve the nearest manifest and verify each declared target exists. For Knowledge, bind `knowledge_root` and `knowledge_index` once and reuse them through the delegated operation. Missing targets are no-write; do not initialize or search elsewhere.
 2. Read the current task diff/artifacts and only accepted decision slices. Derive candidate statements without copying raw chat.
-3. Classify each candidate as Memory, Knowledge, or transient. Exclude ambiguous, speculative, already-recorded, sensitive, and one-off material.
-4. Delegate each admitted item to the narrow owner and apply its normal mutation/readback contract. Keep one checkpoint owner and one changed-file inventory.
-5. Confirm no item was duplicated, no unrelated store content changed, and `storage` staging behavior was respected.
-6. Return the exact context files changed or `no durable context to record`, then let the normal commit/closeout owner continue.
+3. Classify each candidate as Memory, Knowledge, or transient. Exclude ambiguous, speculative, sensitive, and one-off material; treat an already-recorded fact as a possible source-traced observation or no-op rather than a duplicate record.
+4. For Knowledge candidates, classify same identity, dependent recurrence, amendment, replacement, scope overlap, conflict, or new identity. Preserve a stable source ref/provenance root and never turn repeated wording into confidence or importance.
+5. Delegate each admitted item to the narrow owner and apply its normal mutation/readback contract. Keep one checkpoint owner and one changed-file inventory.
+6. Confirm no identity or observation was duplicated, contradictions remain visible, no unrelated store content changed, and `storage` staging behavior was respected.
+7. Return the exact context files changed or `no durable context to record`, then let the normal commit/closeout owner continue.
 
 ## Output
 Return trigger, manifest, admitted/excluded candidates with concise reasons, destination/record IDs, changed files, repository/local staging status, readback, and unresolved ambiguity. Omit raw source text and empty categories.

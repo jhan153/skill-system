@@ -12,9 +12,9 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 9.3.4 번들
+## 9.4.2 번들
 
-이 소스 트리는 로컬 9.3.3 커밋을 직접 잇는 9.3.4 Claude-native Go 하네스 후보입니다. 주요 구성은 다음과 같습니다.
+이 소스 트리는 9.4 계열을 정리한 9.4.2 공개 번들 경계 릴리스입니다. 주요 구성은 다음과 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
 * `docs`: 스킬 목록, 사용 기준, 운영 참고 문서
@@ -25,13 +25,17 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 ## 9.x 방향: Neutral Source & Plugin Packaging
 
-현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인 `9.3.4 — Claude-native Go Harness`는 로컬 9.3.3 커밋을 직접 잇습니다. 로컬 설치는 명시적으로 수행하며 commit·tag·publish·push를 뜻하지 않습니다. Codex와 Claude는 릴리스할 때 하나의 bundle version과 tag를 공유하며, 하네스 변경도 별도 protocol version이 아니라 이 버전을 올립니다.
+현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인 `9.4.2 — Public Bundle Boundary`는 9.3.4를 직접 잇는 정리된 9.4 릴리스입니다. 로컬 설치는 명시적으로 수행하며 commit·tag·publish·push를 뜻하지 않습니다. Codex와 Claude는 릴리스할 때 하나의 bundle version과 tag를 공유하며, 하네스 변경도 별도 protocol version이 아니라 이 버전을 올립니다.
 
-Codex 하네스는 9.3의 압축 라우팅을 유지합니다. Claude는 별도로 소유하는 9.2.1 구조형 지침·라우팅 모델을 유지하면서 Python 훅 runtime만 Claude-native Go dispatcher로 교체합니다. 두 플랫폼은 제한된 Go core package와 하나의 bundle identity를 공유하지만 event normalization·hook topology·전역 지침·라우팅은 분리합니다. portable skill과 data contract는 계속 공유합니다.
+9.4.2는 시계열·관계형 Knowledge, guided project-context setup, 질문별 workflow navigation, 독립 review 축, 명시적 delivery shape를 추가합니다. 과거 Research Ledger는 생성 runtime payload에서 제거하고 clean install은 사용자 소유 store를 건드리지 않으며, 공개 외부 source revision/license/채택 원장을 폐기합니다. 프로젝트 결정은 배포 번들이 아니라 manifest에 선언된 로컬 Knowledge Base에 남깁니다. Codex 하네스는 9.3 압축 라우팅을, Claude는 별도 구조형 지침·라우팅 모델과 Claude-native Go dispatcher를 계속 유지합니다.
 
-Codex 라우터는 정확히 명시됐거나 분명히 일치하는 전문 스킬을 바로 사용하며, 여러 소유자가 실제로 경쟁할 때만 좁은 라우터 하나를 엽니다. implicit router는 선언되어 실제 노출된 읽기·분석 owner에만 자동 handoff할 수 있고, 무거운 writer와 명시적으로 선택하는 context는 explicit-only로 유지합니다. 하나의 canonical 호출 비트를 플랫폼별 native 계약으로 투영합니다. Codex는 `agents/openai.yaml`을 읽고, Claude에는 explicit-only 스킬에만 `disable-model-invocation: true`를 생성합니다. Codex 패키지는 기존 `plugins/<name>/skills`를 유지하고, Claude 패키지는 같은 이름·버전으로 `plugins/claude/<name>/skills`에 생성해 각 호스트가 자기 메타데이터만 탐색하게 합니다. 가장 가까운 `project-context.yaml`은 저장소 상대 경로로 Memory Bank, Knowledge Base, plan, skill root, 이름 있는 LLM Wiki를 선언할 수 있습니다. 없는 항목은 사용할 수 없는 것으로 처리하며 홈이나 인접 저장소를 추측해 검색하지 않습니다.
+Codex 라우터는 정확히 명시됐거나 분명히 일치하는 전문 스킬을 바로 사용하며, 여러 소유자가 실제로 경쟁할 때만 좁은 라우터 하나를 엽니다. implicit router는 선언되어 실제 노출된 읽기·분석 owner에만 자동 handoff할 수 있고, 무거운 writer와 명시적으로 선택하는 context는 explicit-only로 유지합니다. 하나의 canonical 호출 비트를 플랫폼별 native 계약으로 투영합니다. Codex는 `agents/openai.yaml`을 읽고, Claude에는 explicit-only 스킬에만 `disable-model-invocation: true`를 생성합니다. Codex 패키지는 기존 `plugins/<name>/skills`를 유지하고, Claude 패키지는 같은 이름·버전으로 `plugins/claude/<name>/skills`에 생성해 각 호스트가 자기 메타데이터만 탐색하게 합니다. 가장 가까운 `project-context.yaml`은 manifest 상대 경로나 정확히 승인된 절대 경로로 Memory Bank, Knowledge Base, plan, skill root, 이름 있는 LLM Wiki를 선언할 수 있습니다. 없는 항목은 사용할 수 없는 것으로 처리하며 홈이나 인접 저장소를 추측해 검색하지 않습니다. Knowledge 작업은 고정 디렉터리 대신 해석된 `knowledge_root`와 `knowledge_index` 변수를 소비합니다.
 
-Memory Bank는 세션을 넘는 목표·작업 규칙·반복 실수·검증된 작업 방식을 보존합니다. Knowledge Base는 실제 코드·디자인 산출물에 연결된 도메인·디자인·알고리즘·아키텍처·리뷰·결정 지식을 보존합니다. LLM Wiki는 명시적으로 선택하고 자체 탐색 규칙을 따르는 선택적 읽기 전용 컨텍스트입니다. 기본 Codex hook map은 8개 lifecycle event를 하나의 Go 실행 파일로 직접 보냅니다. 교정 방어, 데스크톱 알림, 선언된 plan의 Kanboard 동기화, active LoopRun, 위치 전용 project context는 서로 독립된 제한 분기이며, commit/closeout 체크포인트도 선언된 저장소와 현재 작업의 명확한 사실만 다룹니다.
+Memory Bank는 세션을 넘는 목표·작업 규칙·반복 실수·검증된 작업 방식을 보존합니다. Knowledge Base는 도메인·디자인·알고리즘·아키텍처·리뷰·결정 지식을 현재 Markdown snapshot, typed relation, semantic revision, 출처가 추적되는 observation event로 보존합니다. 반복성은 confidence·maturity·importance·popularity 점수가 아니라 observation과 provenance의 분리된 차원에서 파생합니다. LLM Wiki는 명시적으로 선택하고 자체 탐색 규칙을 따르는 선택적 읽기 전용 컨텍스트입니다.
+
+명시적인 “다음에 어떤 흐름인가” 질문은 중복 registry navigator가 아니라 기존 Work Horizon과 Planning State 계약으로 풉니다. horizon은 지속성·산출물 고도를, planning state는 저장된 계획 산출물의 전이를 맡고, 현재 턴 owner는 host routing이 유지합니다. `project-context-init`은 manifest-init, guided bootstrap, read-only doctor를 명시적으로 지원하며, 한 transaction에서 분리 열거한 write 전부 또는 일부를 승인할 수 있습니다. maker/checker 위험이 실질적이면 Contract/Spec과 Repository/Constraints 리뷰를 분리하고, 다중 배치는 `vertical_slice`, `migration_sequence`, `evidence_unit` 중 하나를 선택합니다. 어느 항목도 자동 거대 오케스트레이터를 만들지 않습니다.
+
+기본 Codex hook map은 8개 lifecycle event를 하나의 Go 실행 파일로 직접 보냅니다. 교정 방어, 데스크톱 알림, 선언된 plan의 Kanboard 동기화, active LoopRun, 위치 전용 project context는 서로 독립된 제한 분기이며, commit/closeout 체크포인트도 선언된 저장소와 현재 작업의 명확한 사실만 다룹니다.
 
 개발 중심 설치에서는 `skill-system-core` + `skill-system-dev`를 최소 profile로 사용합니다. 검증 matrix 지원과 `workflow-validation`이 필요하면 `skill-system-quality`를 권장 동반 profile로 추가합니다. quality 스킬이 설치되어 있지 않아도 dev workflow는 각자의 로컬 검증 규칙으로 동작합니다.
 
@@ -249,9 +253,9 @@ Skill System 스킬은 작성된 스킬을 이 저장소에 통합하고 생성�
 | 8.1.0 | Bounded verification loops | `/goal`과 명시적 loop 실행 전 readiness 판정, `plan-loop-term` 계약, verifier mapping, 최소 LoopRun runtime을 추가합니다. loop schema, state/checkpoint, progress/stall 판정, Stop-hook continuation, recovery handoff, 검증 근거, idempotency note, loop governance metric, Wiki feedback candidate, 실행 인계 문구를 다룹니다. |
 | 8.3.0 | Bounded loop 하드닝 | LoopRun 무결성 격차를 닫습니다: 세션 스코프 activation bridge(`activate_loop_run.py`/`deactivate_loop_run.py` + Stop hook이 `session_id`로 run 해석, generic agent-run manifest와 디커플링), 단조 iteration·terminal 불변·멱등 replay, `iterations/` 감사기록, precedence 반영 종료 + wall-time 집행, confirmed-only `search-deep-evidence` 수렴 검증기, 런타임 스키마 유효 `plan-loop-term` 계약을 포함합니다. |
 | 8.3.1 | 평가 프레이밍 정리 | 평가를 왜곡하는 배포/autonomy-negative 표현을 제거하고, runtime/hygiene 문서를 host-managed asset 언어로 정리하며, 검증 실행 후 cache cleanup이 안정적으로 유지되도록 합니다. |
-| 8.3.2 | 검증 범위 정리 | 번들 검증을 커밋·배포 콘텐츠로 한정합니다. source-registry·research-ledger·knowledge-store 검증기가 local-only 소스-프로젝트 경로(`docs/`, `.github/`, `.kanboard-plan`) 존재를 더는 요구하지 않고, local-only context-compounding 릴리즈 게이트를 `core`에서 제거합니다. 글로벌 작업 규칙을 Claude 측 `.claude/CLAUDE.md`로 매핑합니다. |
-| 8.4.0 | Fable 하네스 강화 | Fable 계열 하네스 규율(FableCodex, fablize)을 코드가 아닌 개념으로 도입합니다. `workflow-rigor`의 관찰-증거 완료 + `accepted_risk` 종결, `analysis-bug` 가설 사다리, `workflow-recovery` capability-ceiling escalation, 검증-접지/노이즈-제어 eval 케이스, harness-paradox holdout 측정 reference, `adoption_decisions` 출처 원장(`SRC-FABLECODEX` AGPL-3.0, `SRC-FABLIZE` MIT), Codex hook과 동일한(observational) opt-in Claude hook 어댑터를 포함합니다. |
-| 8.4.1 | Checkpointed 실행 + 하네스 패리티 | Claude strict-block 패리티(opt-in 전사 기반 observed-vs-claimed Stop 게이트), `workflow-task-ledger` checkpointed 실행 스킬(관찰-증거 `evidence_refs` step/finding 원장 + `accepted_risk` 종결 + findings 완료 게이트), out-of-band harness-paradox 측정(`analyze_harness_measurement.py`: 80/20 holdout, arm별 fire/block/finalize-fail율, fail delta, sunset)을 추가합니다. 전부 opt-in·기본 off. 여기서 "harness parity"는 Claude/Codex contradiction-gate 패리티이며 fablize 2.1 observation-gate 기능 패리티가 아닙니다. |
+| 8.3.2 | 검증 범위 정리 | 번들 검증을 커밋·배포 콘텐츠로 한정합니다. 번들 검증기가 local-only 소스-프로젝트 경로(`docs/`, `.github/`, `.kanboard-plan`) 존재를 더는 요구하지 않고, local-only context-compounding 릴리즈 게이트를 `core`에서 제거합니다. 글로벌 작업 규칙을 Claude 측 `.claude/CLAUDE.md`로 매핑합니다. |
+| 8.4.0 | 근거 기반 하네스 개선 | `workflow-rigor`의 관찰-증거 완료와 `accepted_risk` 종결, `analysis-bug` 가설 사다리, `workflow-recovery` capability-ceiling escalation, 검증-접지/노이즈-제어 eval 케이스, opt-in Claude 관찰형 hook 어댑터를 추가합니다. |
+| 8.4.1 | Checkpointed 실행 + 하네스 패리티 | Claude strict-block 패리티와 `workflow-task-ledger` checkpointed 실행 스킬을 추가합니다. 이 스킬은 재개 가능한 step/finding 원장, 관찰된 `evidence_refs`, `accepted_risk` 종결, findings 완료 게이트를 사용합니다. 과거 측정 machinery는 이후 제거했습니다. |
 | 8.4.2 | Runtime capability closure | opt-in live agent-run manifest bootstrap, tool/permission 운영 카탈로그, orchestration capability contract를 추가해 hook, permission, host scheduler를 패키지 암시 동작이 아니라 evidence-bound capability로 기록합니다. |
 | 8.4.3 | Live manifest finalization hardening | structured final report의 `result_label`과 `C-###` task claim을 `run.yaml`로 동기화하도록 live bootstrap finalization을 보강해, bootstrap placeholder claim drift를 줄이면서 opt-in·evidence-bound 경계를 유지합니다. |
 | 8.4.4 | Activation surface & feedback hardening | `invocation_surface` policy metadata와 검증, report-only context-surface 분석, optional harness-improvement field feedback, friction-signal maturity guidance를 추가합니다. WorkItem lifecycle은 8.5.0 horizon concept으로 남기며, 이 cut에서는 queue runtime을 도입하지 않습니다. |
@@ -272,6 +276,7 @@ Skill System 스킬은 작성된 스킬을 이 저장소에 통합하고 생성�
 | 9.3.2 | Native Codex harness reconstruction | Codex의 8개 lifecycle event를 cross-compiled Go artifact로 연결하고, 패키지된 Swift macOS overlay와 redaction을 복원하며 Windows `CODEX_HOME`, 공식 Stop continuation 계약, 성공 후 Kanboard stamp를 적용합니다. 알림·Kanboard·active LoopRun은 독립 분기로 유지하고, 위치 전용 project context는 명시적으로만 사용하며, 진단 호환 스택은 제거합니다. 전역 `AGENTS.md`와 별도 Claude hook runtime은 보존합니다. |
 | 9.3.3 | Reproducible Codex harness artifacts | Go 자동 VCS 빌드 메타데이터를 비활성화해 릴리스 커밋 뒤에도 macOS·Windows 하네스 바이너리를 byte-identical하게 재생성할 수 있도록 하고, Codex 검증 도구의 `/private/tmp` 쓰기 하드코딩을 제거하며, 9.3.2 Go 하네스 동작과 단일 번들 버전은 유지합니다. |
 | 9.3.4 | Claude-native Go harness | `prompt_id`와 해시형 세션 순번 fallback, native `Notification` 매핑, `stop_hook_active`, 제한된 공유 Go core, macOS·Windows·Linux artifact를 사용하는 4-event Claude dispatcher를 추가합니다. Claude의 독립 지침·라우팅 모델은 유지하면서 Python ledger·transcript Output Gate·measurement·lifecycle schema·notification adapter를 제거합니다. |
+| 9.4.2 | 공개 번들 경계 | 시계열·관계형 Knowledge와 workflow 지침을 clean-install 상태 보호와 통합합니다. 공개 외부 source revision/license/채택 원장을 폐기하고 프로젝트 결정은 선언된 로컬 Knowledge Base에만 남기며, release 검증이 해당 원장을 다시 도입하지 못하게 합니다. |
 
 ## 라이선스
 

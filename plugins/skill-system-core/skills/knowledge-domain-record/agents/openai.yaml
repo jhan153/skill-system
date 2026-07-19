@@ -1,6 +1,6 @@
 interface:
   display_name: "Knowledge Domain Record"
   short_description: "Record durable project domain knowledge"
-  default_prompt: "Use $knowledge-domain-record to record this accepted project-specific domain rule."
+  default_prompt: "Use $knowledge-domain-record to classify overlap before updating an existing identity or recording one new project-specific domain rule with navigation and history."
 policy:
   allow_implicit_invocation: false

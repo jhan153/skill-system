@@ -4,6 +4,12 @@ This reference defines the shared Planning-family state model. It is a routing
 and artifact-governance contract, not a queue, scheduler, daemon, automation
 runtime, or replacement for implementation workflows.
 
+It governs persisted planning artifacts and their admitted transitions. A direct
+task that has no persisted planning artifact stays outside this state machine;
+it does not need a synthetic `scratch -> implementation_ready -> executing`
+transition. Use `work_horizon_model.md` for persistence and artifact altitude,
+and the host `context-routing.md` for the current-turn owner.
+
 ## Core Rule
 
 Planning skills may propose questions, summaries, candidate scopes, and next
@@ -22,14 +28,14 @@ In practice:
 
 | state | owner | meaning | required evidence before leaving |
 | --- | --- | --- | --- |
-| `scratch` | current task | Temporary notes, rough goal, or ambiguous plan intent. | Enough user intent to ask a decision question or start direct work. |
+| `scratch` | current task | Temporary notes, rough goal, or ambiguous plan intent admitted to planning. | Enough user intent to ask a decision question, create an active plan, or deactivate the scratch artifact and return to direct task ownership. |
 | `discovery` | `plan-requirements-discovery` | Requirements gaps are being converted into explicit decisions. | Decision record or unresolved assumptions marked for handoff. |
 | `requirements_contract` | `plan-requirements-brief` | Scope, non-goals, assumptions, and observable acceptance criteria are stable. | Accepted or explicitly referenced contract. |
 | `active_plan` | `plan-short-term-docs` | Current-horizon implementation design/status artifact under `docs/plan`. | Changed-file list, risks, validation procedure, TODOs, and transition status. |
 | `implementation_ready` | `plan-short-term-docs` plus execution owner | Active plan has clear current-task implementation approval. | Plan scope is explicit and the approval event links to the current task. |
 | `executing` | task-specific workflow or `workflow-plan-runner` | Source, test, runtime config/build, or executable scaffold work is in progress. | Changed artifacts and command/manual observations. |
 | `validating` | execution owner or `workflow-validation` | Verification is being run against stated success conditions. | Validation output tied to changed artifacts or accepted manual checks. |
-| `completed` | execution owner | Required success conditions are satisfied or a scoped result is accepted. | Evidence for each material success condition. |
+| `completed` | execution owner | Required success conditions for the governed scope are satisfied. | Evidence for every required material success condition; an accepted residual risk may document a non-blocking exposure but cannot replace a required condition or gate. |
 | `closed_out` | `plan-spec-curator` | Plan is distilled into durable decisions, artifact pointers, and follow-ups. | Closeout summary and future load policy. |
 | `archived` | `plan-spec-curator` | Raw plan is historical material. | Archive/load policy: summary-only or explicit-request-only by default. |
 
@@ -42,6 +48,8 @@ Overlay states may attach to the main lifecycle:
 - `summary_only`: a closed or archived plan may inform context through a compact
   summary without admitting raw plan text.
 
+When one approved change requires several execution batches, apply `delivery_slice_contract.md` and name its `delivery_shape`: `vertical_slice` for feature behavior, `migration_sequence` for a wide compatibility change, or `evidence_unit` for non-feature work. A `single_batch` does not activate that contract. Slice completion never promotes phase or plan state by itself.
+
 ## Events And Preconditions
 
 | event | valid from | next state | preconditions |
@@ -49,11 +57,12 @@ Overlay states may attach to the main lifecycle:
 | `ask_decision_question` | `scratch`, `discovery` | `discovery` | A requirements gap changes scope, acceptance, edge behavior, data ownership, or non-goals. |
 | `record_decision` | `discovery` | `discovery` | The answer is decision-bearing and linked to the open question. |
 | `distill_requirements` | `discovery` | `requirements_contract` | Decisions are sufficient to state scope, non-goals, assumptions, and observable acceptance criteria. |
+| `deactivate_scratch_for_direct_work` | `scratch` | outside this model | Requirements are stable, no persisted planning artifact is needed, and the current request itself authorizes the direct task. Deactivation removes the artifact from active planning admission; it never deletes a file and is not execution or completion evidence. |
 | `create_active_plan` | `requirements_contract`, `scratch` | `active_plan` | The user requested a persisted current-horizon `docs/plan` artifact or an active plan already owns the task. |
 | `approve_implementation` | `active_plan` | `implementation_ready` | The current active plan scope is explicit and the approval wording applies to this task. |
 | `start_execution` | `implementation_ready` | `executing` | Runtime/sandbox policy permits mutation and a task-specific implementation workflow owns the work. |
 | `record_validation_evidence` | `executing`, `validating` | `validating` | Evidence is tied to changed artifacts or accepted manual checks. |
-| `mark_completed` | `validating` | `completed` | Every material success condition has evidence or an accepted residual-risk note. |
+| `mark_completed` | `validating` | `completed` | Every required material success condition has evidence. Accepted residual risk records non-blocking exposure or an explicitly authorized scope change; it cannot turn a required `fail`, `unverified`, batch, or exit gate into completion. |
 | `closeout_plan` | `completed` | `closed_out` | Durable decisions, artifact pointers, follow-ups, and future load policy are captured. |
 | `archive_or_summary_only` | `closed_out`, `archived` | `archived` or `summary_only` | Raw plan text is not needed for the current task. |
 | `reject_invalid_transition` | any | unchanged | Preconditions are missing, stale, contradictory, or outside the current scope. |
@@ -72,6 +81,10 @@ Overlay states may attach to the main lifecycle:
   to active context by historical relevance alone.
 - A multi-document package must not duplicate canonical state names, release
   gates, or source-of-truth ownership across derived docs.
+- When `workflow-plan-runner` owns execution, lifecycle `completed` is admitted
+  only after its governed requested scope is complete; whole-plan `completed`
+  additionally requires `plan_complete`. An incomplete required batch or gate
+  cannot coexist with completion merely because residual risk was noted.
 
 ## Skill Responsibilities
 

@@ -19,7 +19,6 @@ RELEASE_REQUIRED_CHECK_IDS = {
         "tool_requirements",
         "reference_targets",
         "eval_cases",
-        "source_registry",
         "invocation_surface_policy",
         "work_horizon_policy",
         "work_item_lifecycle",

@@ -1,6 +1,6 @@
 interface:
   display_name: "Knowledge Base Maintenance"
-  short_description: "Maintain Markdown Knowledge records and links"
-  default_prompt: "Use $knowledge-base-maintenance to validate or maintain this declared project Knowledge Base."
+  short_description: "Check Knowledge overlap, relations, history, recurrence"
+  default_prompt: "Use $knowledge-base-maintenance for an explicit declared-store operation. Keep overlap classification, typed relations, semantic history, provenance roots, and recurrence dimensions inspectable; never auto-merge or score them."
 policy:
   allow_implicit_invocation: false

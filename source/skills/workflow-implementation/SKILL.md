@@ -37,6 +37,7 @@ description: Primary workflow for direct software implementation. Use when the u
   read_if_needed:
     - adjacent callers, canonical data/source owner, package manifest, or validation contract
     - active plan only when explicitly referenced as task input
+    - `.codex/docs/delivery_slice_contract.md` when any requested change needs multiple executable batches, including a wide migration or non-feature decomposition
   do_not_load_by_default:
     - full repo
     - full memory bank
@@ -63,7 +64,7 @@ description: Primary workflow for direct software implementation. Use when the u
 ## Workflow
 1. State the observable success condition and one material negative or edge case.
 2. Inspect the smallest real caller-to-output path, including the canonical source or policy owner when selection is involved.
-3. Change that owner path with the smallest coherent diff; reuse local patterns before adding a layer or dependency.
+3. Change that owner path with the smallest coherent diff. If more than one batch is necessary, name the `delivery_shape`: `vertical_slice` for feature behavior, `migration_sequence` for a wide mechanical compatibility change, or `evidence_unit` for non-feature work. A `single_batch` does not activate the delivery-slice contract. Reuse local patterns before adding a layer or dependency.
 4. Observe the changed path with one existing verifier, direct observation, or focused smoke check that can expose the realistic failure. Add a regression test only when the user requested tests or the existing test system can cover a specific anchored regression without new framework, mock, fixture-family, or dependency work.
 5. Inspect the diff for scope creep, accidental churn, missed callers, and policy-owning wrappers.
 6. Report each material condition as evidenced, user-only, or unresolved.
@@ -72,8 +73,9 @@ description: Primary workflow for direct software implementation. Use when the u
 - Match each completion claim to the condition and surface the evidence actually covers. Structural checks prove structure; mocks prove the mocked boundary; agent-authored tests are regression/self-check evidence, not an independent semantic oracle.
 - Require actual-path readback for source selection, migration, media/data transforms, adapters, and external boundaries. A lower-scope pass cannot replace it.
 - A required `fail`, `needs_review`, `unverified`, or `blocked` condition stays open until evidence from that same condition resolves it.
-- If direct observation needs unavailable GUI, credentials, or external state, return `user_verification_needed` or `unverified`; do not add a surrogate path and call it complete.
+- If direct observation needs unavailable GUI, credentials, or external state, return task state `user-verification-needed` or `unverified`; do not add a surrogate path and call it complete.
 - If no suitable verifier exists, keep the implementation scope complete but lower its evidence label. Do not create validation-only work or repeat an unchanged check to promote the label.
+- If a material semantic completion claim otherwise depends mainly on code and checks produced by the same agent, use the `workflow-rigor` standard independent review pass when available. This review does not replace direct condition evidence or become a second implementation owner.
 - After the same failure survives a targeted change, hand the failing slice to `workflow-recovery`.
 
 ## Output Contract

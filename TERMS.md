@@ -1,4 +1,4 @@
-# 9.3.4 Terms
+# 9.4.2 Terms
 
 ## version_cut
 
@@ -24,11 +24,19 @@ The default Codex hook map keeps eight lifecycle events and invokes the generate
 
 ## project_context_manifest
 
-`project-context.yaml` declares repository-relative locations for optional project Memory Bank, Knowledge Base, plans, skill roots, and named LLM Wikis. A missing entry means that context source is unavailable; it does not authorize parent, home, or adjacent-repository discovery.
+`project-context.yaml` declares manifest-relative locations, or exact explicitly approved absolute locations, for optional project Memory Bank, Knowledge Base, plans, skill roots, and named LLM Wikis. A missing entry means that context source is unavailable; it does not authorize parent, home, or adjacent-repository discovery. Knowledge operations bind `knowledge_root` and `knowledge_index` once and consume those variables instead of a fixed directory. Explicit `manifest-init`, `bootstrap`, and `doctor` modes keep declaration, target existence, and content initialization separate.
+
+## workflow_topology
+
+Non-executing navigation composed from existing authorities. Work Horizon decides persistence and artifact altitude, Planning State admits transitions for persisted planning artifacts, and host routing retains the current-turn owner. It is not a registry table, skill chain, or orchestrator.
+
+## delivery_shape
+
+The batching form selected only when execution decomposition is needed: `single_batch`, `vertical_slice`, `migration_sequence`, or `evidence_unit`. The choice follows actual dependency and observation paths and does not require TDD or irrelevant architectural layers.
 
 ## memory_bank_and_knowledge_base
 
-Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, code-review, and decision knowledge linked to canonical artifacts. Neither uses maturity, confidence, recurrence, usage, or satisfaction scores.
+Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, code-review, and decision knowledge as current Markdown snapshots with typed links, semantic revisions, and source-traced observations. It may derive separate recurrence dimensions from explicit events and provenance roots; neither store uses maturity, confidence, importance, usage, popularity, satisfaction, or composite recurrence scores.
 
 ## llm_wiki
 

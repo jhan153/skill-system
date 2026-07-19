@@ -288,7 +288,7 @@ packaged `.claude/bin/skill-system-claude-harness` for `SessionStart`,
 `UserPromptSubmit`, `Stop`, and `Notification`. It shares bounded Go core packages
 with Codex while retaining Claude-native event normalization. The old Python
 ledger, transcript Output Gate, measurement, and notification adapters are not
-part of 9.3.4.
+part of 9.4.2; they were removed in 9.3.4.
 
 Other Claude runtime-companion files generated under `.claude/` (docs,
 `context-routing.md`, `eval/`, `schemas/`, hooks, and binaries) are likewise NOT installed by

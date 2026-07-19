@@ -7,12 +7,14 @@
 # generated target and must not carry a do-not-edit/checksum header.
 #
 # Evidence basis (2026-06-29, from skill-system/ root):
+#   - 9.4.2: Knowledge relation/history and workflow guidance added; Research fixtures remain
+#     source-only; public provenance ledger retired with release guards against reintroduction
 #   - 9.3.4: skill bodies remain shared; Claude frontmatter projects explicit-only invocation
 #   - diff -q  .codex/context-routing.md .claude/.. -> IDENTICAL
-#   - diff -qr .codex/docs .claude/docs            -> only docs/source_registry.yaml differs
+#   - shared docs generate verbatim; platform-owned overlays remain intentionally distinct
 #   - diff -qr .codex/eval .claude/eval            -> only eval/eval-case.schema.json differs
-#   - ls .codex (14 top-level) vs .claude (7 top-level)
-#   - .codex/tools = 40 files + tests/; .claude/tools = 2 files
+#   - ls .codex (15 top-level) vs .claude (9 top-level)
+#   - .codex/tools = 29 top-level files + tests/; generated Claude runtime has no tools root
 #   - .gitignore excludes /docs/ /.github/ /.kanboard-plan/ /.kanboard-plan.yml
 
 meta:
@@ -28,7 +30,7 @@ meta:
     local-only/ignored: "gitignored; never in release payload"
   generation_strategies:
     neutral-verbatim: "copy neutral source to both targets unchanged"
-    mirror-from-canonical: "generate Claude copy from Codex canonical with header + source_checksum (existing sync_generated_mirrors.py behavior)"
+    mirror-from-canonical: "generate a Claude copy from shared canonical data with header + source_checksum"
     platform-projected: "copy one canonical skill body and inject only the host-native invocation metadata"
     platform-template: "neutral body + per-platform overlay produces divergent codex/claude output"
     codex-native: "lives only in the .codex target"
@@ -66,14 +68,6 @@ entries:
     confidence: confirmed
     gap: none
     notes: "Shared contracts generate to both platforms; harness lifecycle and Agent Output documents are platform-owned overlays because Codex and Claude runtimes intentionally differ."
-
-  - path: "docs/source_registry.yaml"
-    present_in: [codex, claude]
-    class: shared-neutral
-    generation: mirror-from-canonical
-    confidence: confirmed
-    gap: none
-    notes: "already generated codex->claude by sync_generated_mirrors.py (header + checksum)."
 
   - path: "eval/"
     present_in: [codex, claude]
@@ -204,15 +198,6 @@ entries:
     phase_1b_decision: "codex-only — CORRECTED from the recorded 'shared-neutral' after content inspection."
     decision_rationale: "research-routing.md references Codex-specific assets. The independently owned Claude context-routing.md does not import that file."
 
-  - path: "research/ (ledger.yaml, research-ledger.schema.json)"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: provisional
-    gap: missing-in-claude
-    phase_1b_decision: "codex-only for v1."
-    decision_rationale: "The research ledger is mutable runtime/project data, not just a neutral contract. Keep it with the primary Codex runtime until a Claude-side research ledger workflow is explicit."
-
   - path: "harness/README.md"
     present_in: [codex]
     class: codex-only
@@ -225,6 +210,13 @@ entries:
 # ---------------------------------------------------------------------------
 # maintainer-only: bundle CI / self-maintenance, not platform runtime parity
 # ---------------------------------------------------------------------------
+  - path: "maintainer/fixtures/research-ledger/ (valid.yaml, research-ledger.schema.json)"
+    present_in: [source]
+    class: maintainer-only
+    generation: tooling
+    confidence: confirmed
+    notes: "The repository research profile consumes this ledger fixture and schema directly from source/maintainer. They are not generated into .codex, .claude, or plugins; no skill, hook, or live-home runtime consumes CODEX_HOME/research."
+
   - path: "tools/verify_bundle.py"
     present_in: [codex]
     class: maintainer-only
@@ -237,7 +229,7 @@ entries:
     class: maintainer-only
     generation: tooling
     confidence: confirmed
-    notes: "validate_eval_cases, _loop_run, _research_ledger, _source_registry, _task_run, _work_item."
+    notes: "validate_eval_cases, _loop_run, _research_ledger, _task_run, _work_item."
 
   - path: "tools/check_*.py"
     present_in: [codex]
@@ -304,7 +296,7 @@ phase_scope:
   phase_1a_regression_baseline:
     description: "Every confirmed committed path in .codex AND .claude must regenerate byte-identical from source. No content change."
     includes:
-      - "all shared-neutral (incl. mirror-from-canonical and platform-template) entries"
+      - "all shared-neutral (incl. the eval-schema mirror and platform-template entries)"
       - "all codex-only and claude-only entries as-is"
       - "all maintainer-only entries as-is"
     excludes:

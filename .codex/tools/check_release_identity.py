@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 
-CURRENT_VERSION = "9.3.4"
+CURRENT_VERSION = "9.4.2"
 PLUGIN_NAMES = (
     "skill-system-core",
     "skill-system-dev",
@@ -32,6 +32,21 @@ EVAL_MANIFESTS = (
     "routing_cases.yaml",
     "runtime_usage_cases.yaml",
 )
+RETIRED_PUBLIC_PROVENANCE_PATHS = (
+    "source/shared/docs/source_registry.yaml",
+    "source/platform/codex/tools/validate_source_registry.py",
+    ".codex/docs/source_registry.yaml",
+    ".codex/tools/validate_source_registry.py",
+    ".claude/docs/source_registry.yaml",
+)
+PUBLIC_TEXT_ROOTS = ("source", ".codex", ".claude", "plugins", "integrations")
+PUBLIC_ROOT_TEXT_FILES = ("README.md", "README.ko.md", "CHANGELOG.md", "TERMS.md")
+PUBLIC_TEXT_SUFFIXES = {".md", ".yaml", ".yml", ".json"}
+RETIRED_LEDGER_MARKERS = (
+    ("source_id:", "retrieved_at:", "local_modifications:"),
+    ("upstream_reference:", "local_surface:", "rationale:"),
+)
+RETIRED_EXACT_MARKERS = ("adoption_decisions:", "transient_locator: codex_attachment:")
 
 
 def yaml_scalar(path: Path, key: str) -> str | None:
@@ -43,8 +58,39 @@ def yaml_scalar(path: Path, key: str) -> str | None:
     return None
 
 
+def check_retired_public_provenance(root: Path) -> list[str]:
+    """Keep external revision/license/adoption ledgers out of the public bundle."""
+    errors: list[str] = []
+    for rel in RETIRED_PUBLIC_PROVENANCE_PATHS:
+        if (root / rel).exists():
+            errors.append(f"retired public provenance path exists: {rel}")
+
+    candidates = [root / rel for rel in PUBLIC_ROOT_TEXT_FILES]
+    for rel in PUBLIC_TEXT_ROOTS:
+        base = root / rel
+        if base.is_dir():
+            public_files = [path for path in base.rglob("*") if path.is_file()]
+            candidates.extend(public_files)
+            for path in public_files:
+                if path.name in {"source_registry.yaml", "validate_source_registry.py"}:
+                    error = f"retired public provenance path exists: {path.relative_to(root).as_posix()}"
+                    if error not in errors:
+                        errors.append(error)
+    for path in candidates:
+        if not path.is_file() or path.suffix.lower() not in PUBLIC_TEXT_SUFFIXES:
+            continue
+        rel = path.relative_to(root).as_posix()
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if any(marker in text for marker in RETIRED_EXACT_MARKERS) or any(
+            all(marker in text for marker in marker_set) for marker_set in RETIRED_LEDGER_MARKERS
+        ):
+            errors.append(f"retired public provenance ledger content exists: {rel}")
+    return errors
+
+
 def check(root: Path) -> list[str]:
     errors: list[str] = []
+    errors.extend(check_retired_public_provenance(root))
     source_manifests = sorted((root / "source" / "plugins").glob("*.yaml"))
     expected_source_paths = {
         root / "source" / "plugins" / f"{short_name}.yaml"

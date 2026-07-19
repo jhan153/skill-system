@@ -1,7 +1,7 @@
 interface:
   display_name: "Knowledge Algorithm Record"
   short_description: "Record selected project algorithms"
-  default_prompt: "Use $knowledge-algorithm-record to record this accepted algorithm choice and its code and verifier anchors."
+  default_prompt: "Use $knowledge-algorithm-record to classify overlap before recording one accepted algorithm identity with semantic history, typed relations, code anchors, and verifier evidence."
 policy:
   invocation_surface: explicit_procedure
   allow_implicit_invocation: false

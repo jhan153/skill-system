@@ -33,6 +33,7 @@ disable-model-invocation: true
     - explicitly relevant active plan, report, or prior package
     - source outline and validation contract
     - `.codex/docs/planning_state_model.md` when state names or release gates could drift
+    - `.codex/docs/delivery_slice_contract.md` when any phase needs multi-batch execution topology, including wide migration or non-feature decomposition
   do_not_load_by_default:
     - full repo or memory bank
     - all prior plans or codebase-intel artifacts
@@ -71,7 +72,7 @@ On validation failure, inspect the validator message and failing document first;
 3. Ingest only cited relevant reports/plans as derived evidence. Retain source pointers and do not create an empty ingest summary.
 4. Run `scripts/init_phase_plan_package.py --canonical-only`; fill canonical owners from admitted evidence in batches of 1-3 without leaving placeholders.
 5. Once canonical IDs, gates, topology, ingest binding, and budget are stable, run `--derived-only` with the exact same selection. Any drift must fail before derived writes.
-6. Decompose by independently verifiable concern, make hard predecessors explicit, and reconcile every derived statement to its canonical owner.
+6. Decompose by independently verifiable concern and make hard predecessors explicit. For each multi-batch execution group, select `delivery_shape` as `vertical_slice`, `migration_sequence`, or `evidence_unit`; do not apply the slice contract to `single_batch` work. Reconcile every derived statement to its canonical owner.
 7. Validate the complete package and report unresolved claims, decisions, or evidence as `Unverified` or blockers.
 
 ## Completion Gate
