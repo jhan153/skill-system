@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 
-CURRENT_VERSION = "9.3.3"
+CURRENT_VERSION = "9.3.4"
 PLUGIN_NAMES = (
     "skill-system-core",
     "skill-system-dev",
@@ -67,8 +67,11 @@ def check(root: Path) -> list[str]:
             errors.append(f"development cachebuster remains in {path.relative_to(root)}")
 
     for plugin in PLUGIN_NAMES:
-        for platform in (".codex-plugin", ".claude-plugin"):
-            path = root / "plugins" / plugin / platform / "plugin.json"
+        platform_paths = (
+            root / "plugins" / plugin / ".codex-plugin" / "plugin.json",
+            root / "plugins" / "claude" / plugin / ".claude-plugin" / "plugin.json",
+        )
+        for path in platform_paths:
             if not path.is_file():
                 errors.append(f"missing generated plugin manifest: {path.relative_to(root)}")
                 continue
@@ -104,10 +107,20 @@ def check(root: Path) -> list[str]:
             for item in entries
             if isinstance(item, dict)
         }
+        sources = {
+            str(item.get("name")): item.get("source")
+            for item in entries
+            if isinstance(item, dict)
+        }
         for plugin in PLUGIN_NAMES:
             if versions.get(plugin) != CURRENT_VERSION:
                 errors.append(
                     f"Claude marketplace {plugin} version {versions.get(plugin)!r} != {CURRENT_VERSION!r}"
+                )
+            expected_source = f"./claude/{plugin}"
+            if sources.get(plugin) != expected_source:
+                errors.append(
+                    f"Claude marketplace {plugin} source {sources.get(plugin)!r} != {expected_source!r}"
                 )
 
     codex_marketplace_path = root / ".agents" / "plugins" / "marketplace.json"

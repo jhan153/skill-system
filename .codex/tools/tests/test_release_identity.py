@@ -32,14 +32,23 @@ class ReleaseIdentityTests(unittest.TestCase):
                 f'name: {plugin}\nversion: "{self.checker.CURRENT_VERSION}"\n',
                 encoding="utf-8",
             )
-            for platform in (".codex-plugin", ".claude-plugin"):
-                manifest = root / "plugins" / plugin / platform / "plugin.json"
+            manifests = (
+                root / "plugins" / plugin / ".codex-plugin" / "plugin.json",
+                root / "plugins" / "claude" / plugin / ".claude-plugin" / "plugin.json",
+            )
+            for manifest in manifests:
                 manifest.parent.mkdir(parents=True, exist_ok=True)
                 manifest.write_text(
                     json.dumps({"name": plugin, "version": self.checker.CURRENT_VERSION}),
                     encoding="utf-8",
                 )
-            marketplace_entries.append({"name": plugin, "version": self.checker.CURRENT_VERSION})
+            marketplace_entries.append(
+                {
+                    "name": plugin,
+                    "version": self.checker.CURRENT_VERSION,
+                    "source": f"./claude/{plugin}",
+                }
+            )
         marketplace = root / "plugins" / ".claude-plugin" / "marketplace.json"
         marketplace.parent.mkdir(parents=True)
         marketplace.write_text(json.dumps({"plugins": marketplace_entries}), encoding="utf-8")
@@ -108,6 +117,7 @@ class ReleaseIdentityTests(unittest.TestCase):
             )
             marketplace_path = root / "plugins" / ".claude-plugin" / "marketplace.json"
             marketplace = json.loads(marketplace_path.read_text(encoding="utf-8"))
+            marketplace["plugins"][0]["source"] = "./wrong-path"
             marketplace["plugins"].append({"name": "skill-system-stale", "version": "9.1.0"})
             marketplace_path.write_text(json.dumps(marketplace), encoding="utf-8")
 
@@ -115,6 +125,7 @@ class ReleaseIdentityTests(unittest.TestCase):
             self.assertTrue(any("core.yaml name" in error for error in errors), errors)
             self.assertTrue(any("wrong-plugin" in error for error in errors), errors)
             self.assertTrue(any("Claude marketplace plugin set mismatch" in error for error in errors), errors)
+            self.assertTrue(any("Claude marketplace skill-system-core source" in error for error in errors), errors)
 
     def test_codex_marketplace_requires_exact_unique_local_entries(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

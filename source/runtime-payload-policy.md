@@ -23,15 +23,16 @@ recorded for 8 inventory entries, corresponding to the 7 decision units below.
 
 | class | source location | generated into | strategy |
 |---|---|---|---|
-| shared-neutral | `source/skills/`, `source/shared/docs`, `source/shared/eval`, `source/shared/schemas` | `.codex` AND `.claude` | `neutral-verbatim` or `mirror-from-canonical` |
+| shared-neutral | `source/skills/`, `source/shared/docs`, `source/shared/eval`, `source/shared/schemas` | `.codex` AND `.claude` | `neutral-verbatim`, `platform-projected`, or `mirror-from-canonical` |
 | codex-only | `source/platform/codex/` | `.codex` only | `codex-native` |
 | claude-only | `source/platform/claude/` | `.claude` only | `claude-native` |
 | maintainer-only | `source/maintainer/` (or kept under `.codex/tools` as canonical tooling) | maintainer/CI surface, not per-platform parity | `tooling` |
-| plugin-packageable | `source/plugins/*.yaml` membership (Phase 2) | `plugins/skill-system-*` | Phase 2 |
+| plugin-packageable | `source/plugins/*.yaml` membership (Phase 2) | Codex `plugins/skill-system-*`; Claude `plugins/claude/skill-system-*` | Phase 2 |
 | local-only/ignored | n/a | n/a (gitignored) | `local-ignored` |
 
 ### Generation strategies
-- `neutral-verbatim` — copy unchanged to either generated target (e.g. `skills/`, `docs/`, `eval/`, `schemas/`).
+- `neutral-verbatim` — copy unchanged to either generated target (e.g. `docs/`, `eval/`, `schemas/`).
+- `platform-projected` — copy one canonical skill body, then translate the canonical invocation bit into host-native metadata. Codex keeps `agents/openai.yaml`; Claude adds `disable-model-invocation: true` only to explicit-only generated skills. Codex packages stay under `plugins/<name>` and paired Claude packages under `plugins/claude/<name>`, sharing one plugin name and version.
 - `mirror-from-canonical` — generate the Claude copy from the Codex canonical with a
   `generated_from` / `source_checksum` / `do_not_edit` header. This is exactly the current
   `sync_generated_mirrors.py` behavior for `docs/source_registry.yaml` and `eval/eval-case.schema.json`.
@@ -81,9 +82,9 @@ Corrected after content inspection (recorded decisions overridden by evidence):
   (`codex-research-lifecycle` skill and `.codex/references/...`, neither of which exists even under
   `.codex`). Generating to `.claude` would ship a broken doc. Sharing would require a content
   rewrite — out of Phase 1b scope.
-- Desktop notification → **platform-native**. Codex owns OS-specific branches inside the generated
-  Go dispatcher plus a precompiled macOS Swift overlay, while Claude retains its Python notification
-  adapter. This is correct platform behavior, not a shared runtime dependency.
+- Desktop notification → **shared Go OS core with platform-native event mapping**. Both generated
+  dispatchers use the redacted Go notification package and packaged macOS Swift overlay. Claude
+  consumes native `Notification` types while Codex keeps its own permission/Stop event branches.
 - `harness/README.md` → **codex-only** (was "shared"). Documents `.codex/harness/` paths; Claude
   already has its own `hooks/README.md`.
 
@@ -99,7 +100,7 @@ can be shared.
 
 1. **Loop engine tools** (`init/activate/resume/deactivate/evaluate_loop_run.py`, `loop_policy.py`) — `codex-only` for v1.
 2. **`tools/task_ledger.py`** — `codex-only` explicit workflow runtime. Codex Agent Run was removed in 9.3.2.
-3. **Active portable schemas** (knowledge/loop/orchestration/task/tools/workitem) — `shared-neutral`; Claude's lifecycle ledger schema is Claude-native.
+3. **Active portable schemas** (knowledge/loop/orchestration/task/tools/workitem) — `shared-neutral`; removed Agent Run and lifecycle-ledger schemas are not platform payload.
 4. **`research/`** (ledger + schema) — `codex-only` for v1.
 5. **`tools/requirements.txt`** — `codex-only` for v1, because no runtime-logic tools move to Claude.
 6. **`rules/default.rules`** — `codex-only` for v1; no Claude equivalent is generated.

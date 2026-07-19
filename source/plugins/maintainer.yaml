@@ -1,6 +1,6 @@
 # source/plugins/maintainer.yaml — plugin membership manifest (hand-authored input).
 name: skill-system-maintainer
-version: "9.3.3"
+version: "9.3.4"
 description: 'Skill System maintainer — routing eval, repository integration, and bundle validation.'
 skills:
   - skill-system-repo-adapter

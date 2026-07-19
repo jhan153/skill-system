@@ -1,0 +1,6 @@
+interface:
+  display_name: "Knowledge Base Update"
+  short_description: "Update or supersede project knowledge"
+  default_prompt: "Use $knowledge-base-update to update one accepted project Knowledge record and its index."
+policy:
+  allow_implicit_invocation: false

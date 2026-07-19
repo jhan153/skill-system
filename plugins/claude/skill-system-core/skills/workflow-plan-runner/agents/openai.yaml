@@ -1,0 +1,7 @@
+interface:
+  display_name: "Workflow Plan Runner"
+  short_description: "Execute one approved implementation batch"
+  default_prompt: "Execute the smallest safe batch anchored to the approved plan/spec, validate it, and keep batch, phase, and whole-plan completion explicitly separate."
+
+policy:
+  allow_implicit_invocation: false

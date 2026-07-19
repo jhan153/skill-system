@@ -124,11 +124,57 @@ def _sanitize_plugin_agent_manifest(path: Path) -> None:
     path.write_text("\n".join(output) + "\n", encoding="utf-8")
 
 
-def _copy_plugin_skill(src: Path, dst: Path) -> None:
+def _allow_implicit_invocation(skill_dir: Path) -> bool:
+    """Read the one portable invocation bit from canonical Codex agent metadata."""
+    agent_manifest = skill_dir / "agents" / "openai.yaml"
+    if not agent_manifest.is_file():
+        raise SystemExit(f"missing skill agent manifest: {agent_manifest}")
+    matches: list[bool] = []
+    for line in agent_manifest.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("allow_implicit_invocation:"):
+            continue
+        value = stripped.split(":", 1)[1].strip().lower()
+        if value not in {"true", "false"}:
+            raise SystemExit(f"invalid allow_implicit_invocation in {agent_manifest}: {value!r}")
+        matches.append(value == "true")
+    if len(matches) != 1:
+        raise SystemExit(
+            f"expected exactly one allow_implicit_invocation in {agent_manifest}, found {len(matches)}"
+        )
+    return matches[0]
+
+
+def _project_claude_invocation(skill_dir: Path, target_dir: Path) -> None:
+    """Project the portable invocation bit into Claude's SKILL.md frontmatter."""
+    skill_md = target_dir / "SKILL.md"
+    text = skill_md.read_text(encoding="utf-8")
+    if "disable-model-invocation:" in text:
+        raise SystemExit(f"canonical skill must not contain Claude invocation metadata: {skill_md}")
+    if _allow_implicit_invocation(skill_dir):
+        return
+    if not text.startswith("---\n"):
+        raise SystemExit(f"skill frontmatter must start on the first line: {skill_md}")
+    closing = text.find("\n---\n", 4)
+    if closing < 0:
+        raise SystemExit(f"skill frontmatter is not closed: {skill_md}")
+    text = text[:closing] + "\ndisable-model-invocation: true" + text[closing:]
+    skill_md.write_text(text, encoding="utf-8")
+
+
+def _project_claude_runtime_skills(source: Path, claude: Path) -> None:
+    for skill_dir in sorted((source / "skills").iterdir()):
+        if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file():
+            _project_claude_invocation(skill_dir, claude / "skills" / skill_dir.name)
+
+
+def _copy_plugin_skill(src: Path, dst: Path, *, claude: bool = False) -> None:
     _copy(src, dst)
     agent_manifest = dst / "agents" / "openai.yaml"
     if agent_manifest.is_file():
         _sanitize_plugin_agent_manifest(agent_manifest)
+    if claude:
+        _project_claude_invocation(src, dst)
 
 
 def _render_yaml_mirror(canonical: Path, generated_from: str, generated_at: str, checksum: str) -> str:
@@ -226,23 +272,20 @@ def _swiftc_executable() -> str:
     raise SystemExit("swiftc is required to build the macOS notification overlay; set SKILL_SYSTEM_SWIFTC")
 
 
-def _build_codex_harness(source: Path, codex: Path, written: list[str]) -> None:
-    """Build two Go dispatchers and the precompiled macOS Swift notification overlay."""
+def _build_go_dispatchers(
+    source: Path,
+    output_root: Path,
+    command: str,
+    targets: tuple[tuple[str, str, str], ...],
+    written: list[str],
+) -> None:
     module = source / "runtime" / "go"
     if not (module / "go.mod").is_file():
         raise SystemExit(f"missing Go harness module: {module}")
     version = str(_load_manifest(source / "plugins" / "core.yaml")["version"])
-    output_root = codex / "bin"
-    if output_root.exists():
-        shutil.rmtree(output_root)
-    output_root.mkdir(parents=True, exist_ok=True)
-
-    targets = (
-        ("darwin", "arm64", output_root / "skill-system-harness"),
-        ("windows", "amd64", output_root / "skill-system-harness.exe"),
-    )
     go = _go_executable()
-    for goos, goarch, output in targets:
+    for goos, goarch, filename in targets:
+        output = output_root / filename
         env = os.environ.copy()
         env.update({"CGO_ENABLED": "0", "GOOS": goos, "GOARCH": goarch})
         subprocess.run(
@@ -255,7 +298,7 @@ def _build_codex_harness(source: Path, codex: Path, written: list[str]) -> None:
                 f"-s -w -X main.version={version}",
                 "-o",
                 str(output.resolve()),
-                "./cmd/skill-system-harness",
+                f"./cmd/{command}",
             ],
             cwd=module,
             env=env,
@@ -263,6 +306,8 @@ def _build_codex_harness(source: Path, codex: Path, written: list[str]) -> None:
         )
         written.append(output.as_posix())
 
+
+def _build_notification_overlay(source: Path, output_root: Path, written: list[str]) -> None:
     overlay_source = source / "runtime" / "swift" / "notification_overlay.swift"
     if not overlay_source.is_file():
         raise SystemExit(f"missing Swift notification overlay source: {overlay_source}")
@@ -284,6 +329,45 @@ def _build_codex_harness(source: Path, codex: Path, written: list[str]) -> None:
         )
     overlay.chmod(0o755)
     written.append(overlay.as_posix())
+
+
+def _build_codex_harness(source: Path, codex: Path, written: list[str]) -> None:
+    """Build the Codex Go dispatchers and packaged macOS notification overlay."""
+    output_root = codex / "bin"
+    if output_root.exists():
+        shutil.rmtree(output_root)
+    output_root.mkdir(parents=True, exist_ok=True)
+    _build_go_dispatchers(
+        source,
+        output_root,
+        "skill-system-harness",
+        (
+            ("darwin", "arm64", "skill-system-harness"),
+            ("windows", "amd64", "skill-system-harness.exe"),
+        ),
+        written,
+    )
+    _build_notification_overlay(source, output_root, written)
+
+
+def _build_claude_harness(source: Path, claude: Path, written: list[str]) -> None:
+    """Build Claude-native dispatchers plus the packaged macOS notification overlay."""
+    output_root = claude / "bin"
+    if output_root.exists():
+        shutil.rmtree(output_root)
+    output_root.mkdir(parents=True, exist_ok=True)
+    _build_go_dispatchers(
+        source,
+        output_root,
+        "skill-system-claude-harness",
+        (
+            ("darwin", "arm64", "skill-system-claude-harness"),
+            ("windows", "amd64", "skill-system-claude-harness.exe"),
+            ("linux", "amd64", "skill-system-claude-harness-linux-amd64"),
+        ),
+        written,
+    )
+    _build_notification_overlay(source, output_root, written)
 
 
 def _write_mirror(source: Path, claude: Path, dst_rel: str, spec: dict) -> None:
@@ -319,7 +403,13 @@ def generate_codex_runtime(source: Path, codex: Path) -> list[str]:
 def generate_claude_runtime(source: Path, claude: Path) -> list[str]:
     written: list[str] = []
     _copy_neutral(source, claude, written)
+    _project_claude_runtime_skills(source, claude)
     _copy_platform(source / PLATFORM_CLAUDE_ROOT, claude, written)
+    # 9.3.4 removes the Python-only Claude runtime. Prune the now-absent
+    # platform-owned root so stale adapters cannot survive regeneration.
+    if not (source / PLATFORM_CLAUDE_ROOT / "tools").exists() and (claude / "tools").exists():
+        shutil.rmtree(claude / "tools")
+    _build_claude_harness(source, claude, written)
     # Claude keeps two provenance-bearing mirrors of shared canonical data.
     meta = json.loads((source / MIRROR_META_FILE).read_text(encoding="utf-8"))
     for dst_rel, spec in meta["mirrors"].items():
@@ -360,12 +450,16 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
     src_skills = {p.name for p in (source / "skills").iterdir() if p.is_dir()}
     seen: dict[str, str] = {}
     marketplace_plugins: list[dict] = []
+    claude_packages_root = plugins_root / "claude"
+    if claude_packages_root.exists():
+        shutil.rmtree(claude_packages_root)
     for mf in manifests:
         spec = _load_manifest(mf)
         name = spec["name"]
-        pkg = plugins_root / name
-        if pkg.exists():
-            shutil.rmtree(pkg)
+        codex_pkg = plugins_root / name
+        claude_pkg = claude_packages_root / name
+        if codex_pkg.exists():
+            shutil.rmtree(codex_pkg)
         display_name, short_description = PLUGIN_DISPLAY.get(
             name,
             (name.replace("-", " ").title(), spec["description"]),
@@ -390,7 +484,7 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
                 "screenshots": [],
             },
         }
-        plugin_json = pkg / ".codex-plugin" / "plugin.json"
+        plugin_json = codex_pkg / ".codex-plugin" / "plugin.json"
         plugin_json.parent.mkdir(parents=True, exist_ok=True)
         plugin_json.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         written.append(plugin_json.as_posix())
@@ -405,7 +499,7 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
             "keywords": ["skill-system", "claude", name.removeprefix("skill-system-")],
             "skills": "./skills/",
         }
-        claude_plugin_json = pkg / ".claude-plugin" / "plugin.json"
+        claude_plugin_json = claude_pkg / ".claude-plugin" / "plugin.json"
         claude_plugin_json.parent.mkdir(parents=True, exist_ok=True)
         claude_plugin_json.write_text(json.dumps(claude_manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         written.append(claude_plugin_json.as_posix())
@@ -414,7 +508,7 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
         marketplace_plugins.append(
             {
                 "name": name,
-                "source": f"./{name}",
+                "source": f"./claude/{name}",
                 "description": spec["description"],
                 "version": str(spec["version"]),
                 "category": "Developer Tools",
@@ -426,8 +520,10 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
             if sid in seen:
                 raise SystemExit(f"skill '{sid}' assigned to both {seen[sid]} and {name}")
             seen[sid] = name
-            _copy_plugin_skill(source / "skills" / sid, pkg / "skills" / sid)
-            written.append((pkg / "skills" / sid).as_posix())
+            _copy_plugin_skill(source / "skills" / sid, codex_pkg / "skills" / sid)
+            written.append((codex_pkg / "skills" / sid).as_posix())
+            _copy_plugin_skill(source / "skills" / sid, claude_pkg / "skills" / sid, claude=True)
+            written.append((claude_pkg / "skills" / sid).as_posix())
     uncovered = src_skills - seen.keys()
     if uncovered:
         raise SystemExit(f"plugin coverage gap: {len(uncovered)} skills in no plugin: {sorted(uncovered)}")

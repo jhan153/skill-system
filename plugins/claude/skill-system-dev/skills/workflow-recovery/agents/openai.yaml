@@ -1,0 +1,7 @@
+interface:
+  display_name: "Workflow Recovery"
+  short_description: "Break repeated implementation or validation failure loops"
+  default_prompt: "Use $workflow-recovery when an intervention leaves the same failure fingerprint: test one falsifiable hypothesis with one action, rerun the original success signal, and classify the result."
+
+policy:
+  allow_implicit_invocation: false

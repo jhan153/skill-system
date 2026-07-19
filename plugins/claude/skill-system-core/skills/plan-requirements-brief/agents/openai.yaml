@@ -1,0 +1,10 @@
+interface:
+  display_name: "Plan Requirements Brief"
+  short_description: "Distill discovery into a requirements contract"
+  default_prompt: |
+    Use $plan-requirements-brief only when the user explicitly wants discovery notes, stakeholder answers, or decisions distilled into a requirements contract, PRD, or SRS-lite.
+
+    Preserve scope, non-goals, acceptance criteria, assumptions, risks, and open questions. Do not use for interactive elicitation, active docs/plan sync, direct implementation, validation execution, or lifecycle result reporting.
+
+policy:
+  allow_implicit_invocation: false

@@ -50,7 +50,7 @@ These are roadmap candidates only; they are not active registry skills yet.
 - Do not treat screenshots alone as proof of implementation quality.
 - Do not treat a component export inventory as reuse proof or one sibling screenshot as a product-family oracle.
 - Keep specialist skills narrow and add negative routing cases before adding more design skills.
-- Keep `allow_implicit_invocation: false` for new and recently hardened design skills until explicit user reports justify broader routing. `design-frontend` is the bounded exception for concrete repo-integrated UI implementation; analysis and evidence specialists remain explicit.
+- Keep `allow_implicit_invocation: false` for new and recently hardened design skills until explicit user reports justify broader routing. `design-frontend` remains the bounded design exception for concrete repo-integrated UI implementation; the router-target policy for non-design analysis/search skills does not broaden design evidence gates.
 - Do not create a surface skill when a conditional `design-frontend` reference is sufficient.
 
 ## Improvement Track

@@ -1,61 +1,53 @@
-# Claude hooks (opt-in)
+# Claude-native Go hooks
 
-`claude_hook_adapter.py` is the Claude lifecycle adapter. It records Claude Code
-lifecycle events through its Claude-owned hash-chained evidence backend
-(`.claude/tools/hook_runtime.py`). Default
-storage is a durable per-session ledger family, so each file remains a
-single-run verifier input. The discipline
-contract itself lives in the byte-mirrored skills (`workflow-rigor`, etc.); this
-file is only the runtime wiring.
+The Claude runtime ships a dedicated Go dispatcher. It reuses the bounded
+response guard, project-context resolver, Kanboard synchronizer, redaction,
+and OS notification packages without reusing the Codex event dispatcher.
 
-## Status
-- **Observational by default** — it records events and always allows stop. This
-  matches the Codex adapter's non-strict default and decision 6 (observational
-  default).
-- **Strict block (opt-in, transcript-based).** Set
-  `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict` to enable it. On stop it reads the
-  transcript and blocks (`{"decision":"block"}`) when the final assistant
-  message claims `agent-verified` but a tool result errored with no later
-  success. The Codex side enforces the same intent through a pre-declared
-  `run.yaml` manifest; the Claude runtime does not emit that manifest, so this
-  adapter derives the contradiction from the transcript instead (same intent,
-  runtime-specific mechanism). The decision logic (`claims_verified`,
-  `has_unresolved_tool_failure`, `strict_block`) is pure and unit-testable;
-  transcript parsing is best-effort and fails open. A `stop_hook_active` guard
-  prevents re-blocking the same stop. Live verification against a real Claude
-  transcript schema is still recommended before relying on it in production.
-- **Fail-open** — any error (including missing `.claude/tools`) exits 0 so a host
-  session is never broken.
+The runtime handles only four Claude events:
 
-## Enable (host-managed, not auto-installed)
-Hooks are managed by the host environment. The bundle never auto-installs this.
-Add it to your `settings.json` (user `~/.claude/settings.json`, or a project
-`.claude/settings.json`) and approve it under your permission policy:
+| Event | Behavior |
+| --- | --- |
+| `SessionStart` | Clear fresh-session correction state, conditionally queue Kanboard sync, and inject only the nearest `project-context.yaml` location summary. |
+| `UserPromptSubmit` | Record the current prompt identity and inject correction context only for an explicit user correction. |
+| `Stop` | Respect `stop_hook_active`, apply the one-shot recovery-only response guard, and conditionally queue Kanboard sync. |
+| `Notification` | Forward selected native Claude attention/completion notifications through the redacted OS notifier. |
 
-```json
-{
-  "hooks": {
-    "UserPromptSubmit": [
-      { "hooks": [{ "type": "command", "command": "python3 ~/.claude/hooks/claude_hook_adapter.py" }] }
-    ],
-    "PostToolUse": [
-      { "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit",
-        "hooks": [{ "type": "command", "command": "python3 ~/.claude/hooks/claude_hook_adapter.py" }] }
-    ],
-    "Stop": [
-      { "hooks": [{ "type": "command", "command": "python3 ~/.claude/hooks/claude_hook_adapter.py" }] }
-    ]
-  }
-}
-```
+`Notification` is matched only for `permission_prompt`, `idle_prompt`,
+`elicitation_dialog`, `agent_needs_input`, and `agent_completed`. Stop does not
+infer notification intent, so approval, idle, input, and background-completion
+alerts are not duplicated.
 
-Notes:
-- Adjust the path to where the bundle is deployed. For a project-scoped install
-  use `$CLAUDE_PROJECT_DIR/.claude/hooks/claude_hook_adapter.py`.
-- Requires the bundled Claude tools to be co-deployed (the adapter imports
-  `hook_runtime` from sibling `.claude/tools`). Without it, the adapter no-ops.
-- The ledger path follows `hook_runtime.default_ledger(session_id)`. An explicit
-  `SKILL_SYSTEM_HOOK_LEDGER` remains an exact-file override; otherwise the path
-  is `${CODEX_HOME:-~/.codex}/harness/hook-ledgers/<run-key>/hook-events.jsonl`.
-  `<run-key>` is a stable SHA-256 key and does not expose the raw session ID;
-  runtime state is never written into the bundle.
+Claude Code 2.1.196 and later supplies `prompt_id`; that is the primary turn
+identity. Older clients use a hash-only per-session sequence fallback. The
+dispatcher reads `last_assistant_message` directly on Stop and never parses a
+transcript for turn identity or final-response judgment. `stop_hook_active`
+always disables another guard block.
+
+The dispatcher has no lifecycle ledger, Agent Run, transcript-derived Output
+Gate, harness measurement, or Python hook adapter. Runtime state is bounded to
+hashed correction/turn state and Kanboard fingerprint/lease files under
+`${CLAUDE_CONFIG_DIR:-~/.claude}/harness/`; raw prompts and responses are not
+persisted.
+
+## Host registration
+
+Generation does not edit `~/.claude/settings.json`. Start from
+`settings.example.json`, replace `__ABSOLUTE_SKILL_SYSTEM_CLAUDE_HARNESS__`
+with the absolute executable installed for that machine, and merge only its
+`hooks` object into the existing settings file. Preserve all unrelated Claude
+settings and hooks.
+
+The template uses Claude's exec form (`"args": []`), so the binary is spawned
+directly without Bash, Zsh, PowerShell, or another command wrapper.
+
+Packaged artifacts:
+
+- macOS arm64: `.claude/bin/skill-system-claude-harness`
+- Windows amd64: `.claude/bin/skill-system-claude-harness.exe`
+- Linux/WSL amd64: `.claude/bin/skill-system-claude-harness-linux-amd64`
+- macOS overlay: `.claude/bin/skill-system-notify-overlay`
+
+For Linux/WSL, install the Linux artifact at the absolute path used by the
+settings template. Linux desktop notification uses `notify-send` when present
+and otherwise skips without affecting the hook result.

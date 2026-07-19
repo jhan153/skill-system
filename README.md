@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.3.3 Bundle
+## 9.3.4 Bundle
 
-This source tree carries the local 9.3.3 reproducible-harness release candidate, directly succeeding the immutable `v9.3.2` release. Its main components are:
+This source tree carries the local 9.3.4 Claude-native Go harness candidate, directly succeeding the local 9.3.3 commit. Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -25,11 +25,11 @@ This source tree carries the local 9.3.3 reproducible-harness release candidate,
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.3.3 — Reproducible Codex Harness Artifacts`, directly succeeding `v9.3.2`. Local installation is explicit and does not imply publishing or pushing. Codex and Claude share one bundle version and release tag; harness changes advance that version instead of creating a second protocol-version axis.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.3.4 — Claude-native Go Harness`, directly succeeding the local 9.3.3 commit. Local installation is explicit and does not imply committing, tagging, publishing, or pushing. Codex and Claude share one bundle version and release tag when released; harness changes advance that version instead of creating a second protocol-version axis.
 
-The Codex harness keeps the compact 9.3 routing model. The Claude harness is independently owned and preserves the proven 9.2.1 structured decision model while consuming the current shared skill catalog. Platform-specific global instructions, routing, hooks, and tools can be generated and checked independently; portable skills and data contracts remain shared.
+The Codex harness keeps the compact 9.3 routing model. Claude preserves its independently owned 9.2.1 structured instruction/routing model while replacing the Python hook runtime with a Claude-native Go dispatcher. The two platforms share bounded core packages and one bundle identity, but retain separate event normalization, hook topology, global instructions, and routing. Portable skills and data contracts remain shared.
 
-The Codex router uses an exact specialist directly and opens at most one narrow router only when several owners genuinely compete. The nearest `project-context.yaml` may declare repository-relative Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery.
+The Codex router uses an exact specialist directly and opens at most one narrow router only when several owners genuinely compete. An implicit router may automatically hand off only to a declared, implicitly exposed read/analysis owner; heavy writers and explicitly selected context remain explicit-only. One canonical invocation bit is projected into each host's native contract: Codex reads `agents/openai.yaml`, while Claude receives `disable-model-invocation: true` only for explicit-only skills. Codex packages stay at `plugins/<name>/skills`; paired Claude packages are generated at `plugins/claude/<name>/skills` under the same plugin name and version so each host discovers only its native metadata. The nearest `project-context.yaml` may declare repository-relative Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery.
 
 Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, review, and decision knowledge linked to real artifacts. LLM Wikis are optional read-only context sources selected explicitly and navigated using their own conventions. The default Codex hook map sends eight lifecycle events directly to one Go executable. Response correction, desktop notification, declared-plan Kanboard sync, active-only LoopRun, and location-only project context are independent bounded branches; commit/closeout checkpoint writes operate only on declared stores and clear current-task facts.
 
@@ -271,6 +271,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.3.1 | Platform harness split | Gives Codex and Claude independent global instructions, routing, hook, tool, generation, and parity-check paths while retaining one bundle version and tag. Codex keeps the compact 9.3 router; Claude continues the 9.2.1 structured behavior line against the current shared skills. The legacy version-selected receipt monitor becomes a versionless opt-in feature of the current bundle. |
 | 9.3.2 | Native Codex harness reconstruction | Routes all eight Codex lifecycle events to cross-compiled Go artifacts, restores the packaged Swift macOS overlay and redaction, honors Windows `CODEX_HOME`, uses the official Stop continuation contract, and stamps Kanboard only after successful sync. Notification/Kanboard/active LoopRun remain independent; location-only project context is explicit, the diagnostic compatibility stack is removed, Global `AGENTS.md` is unchanged, and Claude retains its own hook runtime. |
 | 9.3.3 | Reproducible Codex harness artifacts | Disables automatic Go VCS build metadata so committed macOS and Windows harness binaries remain byte-identical when regenerated after the release commit, removes hard-coded `/private/tmp` writes from Codex verification tooling, and retains the 9.3.2 Go harness behavior under one unified bundle version. |
+| 9.3.4 | Claude-native Go harness | Adds a four-event Claude dispatcher using `prompt_id` with a hashed sequence fallback, direct `Notification` mapping, `stop_hook_active`, shared bounded Go core packages, and macOS/Windows/Linux artifacts. Removes the Claude Python ledger, transcript Output Gate, measurement, lifecycle schema, and notification adapters without changing Claude's independent instruction/routing model. |
 
 ## License
 

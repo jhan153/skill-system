@@ -34,4 +34,4 @@ The guard does not reject direct explanations, completed actions, or a concrete 
 
 `hooks.json` is the sole base registration owner; plugins do not register duplicate hooks. The Stop host timeout is 12 seconds, longer than the active-only LoopRun evaluator's 8-second bound; other events retain a 3-second host timeout. The runtime contains `darwin/arm64` and `windows/amd64` Go artifacts plus the precompiled macOS overlay, so target machines need no build toolchain. Generation does not install the runtime into a live home or plugin cache.
 
-Claude owns a separate adapter and Python support runtime. Codex removal of the legacy Python diagnostics does not change Claude's default hook behavior.
+Claude owns a separate Go dispatcher and four-event registration template. It reuses bounded core packages but not the Codex event dispatcher, LoopRun branch, or hook topology.

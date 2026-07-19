@@ -1,6 +1,6 @@
 # Global CLAUDE
 
-> Claude-side global working rules for the Skill System bundle (9.3.3). Claude keeps the
+> Claude-side global working rules for the Skill System bundle (9.3.4). Claude keeps the
 > proven 9.2.1 decision and execution model while using the current shared skill catalog.
 > Its routing, hooks, permissions, validation, and runtime behavior are owned independently
 > from Codex; both platform harnesses still ship under one bundle version and release tag.
@@ -115,7 +115,7 @@
 - Preserve existing runtime settings unless the user explicitly requests replacement.
 - Project-local hooks may run after project trust and hook approval. They operate under permission modes and settings policy.
 - Review `settings.json` permissions, and any project-local `.claude/settings.json`, against local policy before applying.
-- The bundle ships an optional, observational evidence-recording hook at `.claude/hooks/claude_hook_adapter.py` (Claude-side counterpart of the Codex `hooks.json` adapter). It is not auto-installed: enable it by adding it to `settings.json` per `.claude/hooks/README.md`. It records lifecycle events through the shared evidence backend into a durable per-session ledger by default and is observational by default; under an opt-in strict gate (`SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict`) it blocks a stop when the final message claims `agent-verified` but the transcript shows an unrecovered tool failure.
+- The bundle ships a Claude-native Go dispatcher under `.claude/bin`. It is not auto-installed: merge the four-event exec-form template from `.claude/hooks/settings.example.json` into host settings only through an explicit installation step. The dispatcher handles correction context, the one-shot recovery-only Stop guard, project-context location resolution, conditional Kanboard sync, and native Claude notifications. It creates no hook ledger, Agent Run, transcript-derived Output Gate, or measurement record.
 - `.claude/skills/.system` is app-managed; replacing it requires explicit user intent.
 
 ### Harness And Stop Boundary

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Report Qualitative"
+  short_description: "Give decision-first, evidence-grounded qualitative assessments"
+  default_prompt: "Use $report-qualitative to lead with an evidence-grounded decision and at most three material findings; load detailed rubrics/templates only for an explicit full or scored report."
+
+policy:
+  allow_implicit_invocation: false

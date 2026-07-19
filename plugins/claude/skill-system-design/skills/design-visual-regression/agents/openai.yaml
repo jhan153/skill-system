@@ -1,0 +1,6 @@
+interface:
+  display_name: "Design Visual Regression"
+  short_description: "Compare target fidelity and product-family visual coherence"
+  default_prompt: "Use $design-visual-regression to inspect rendered screenshots, verify nonblank/framing evidence, and keep exact-target fidelity separate from product-family coherence against applicable pinned baselines."
+policy:
+  allow_implicit_invocation: false

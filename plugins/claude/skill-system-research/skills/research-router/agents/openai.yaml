@@ -1,0 +1,8 @@
+interface:
+  display_name: "Research Router"
+  short_description: "Route scientific research stages"
+  default_prompt: |
+    Route an unclear or multi-stage scientific decision to the narrowest owner sequence; send explicit paper-only acquisition directly to search-paper-evidence, ambiguous evidence lanes to search-router, and ordinary development outside the research cluster.
+
+policy:
+  allow_implicit_invocation: true

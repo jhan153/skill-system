@@ -1,0 +1,7 @@
+interface:
+  display_name: "Memory Bank Init"
+  short_description: "Create project memory files and baseline state"
+  default_prompt: "Use $memory-bank-init to initialize persistent project memory after resolving project identity and validating file creation."
+
+policy:
+  allow_implicit_invocation: false

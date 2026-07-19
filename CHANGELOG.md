@@ -1,5 +1,18 @@
 # Changelog
 
+## 9.3.4
+
+- Added a Claude-native Go dispatcher that shares the bounded response guard, project-context resolver, Kanboard lease/stamp implementation, redaction, and OS notification core without reusing the Codex event dispatcher.
+- Registered only `SessionStart`, `UserPromptSubmit`, `Stop`, and `Notification` in the host-owned Claude settings template. Hooks use shell-free exec form and are not auto-installed.
+- Uses Claude `prompt_id` as the primary turn identity with a hash-only session-sequence fallback for older clients, reads `last_assistant_message` directly, and respects `stop_hook_active` to prevent repeated Stop blocking.
+- Routes native Claude notification types for approval, idle, elicitation, background input, and background completion; Stop no longer infers those notification states.
+- Removed the Claude Python hook adapter, lifecycle ledger, transcript-derived Output Gate, harness measurement, lifecycle schema, and Python notification stack.
+- Added reproducible Claude artifacts for macOS arm64, Windows amd64, and Linux/WSL amd64 plus the packaged macOS Swift overlay. Linux uses `notify-send` when available.
+- Made bounded analysis, search, and non-writing research owners implicitly invocable when an implicit router declares them as automatic handoff targets. Heavy report/code/manuscript writers, design evidence gates, rigor modifiers, and explicitly selected Wiki context remain explicit-only.
+- Added router invocation contracts and verifier coverage so an automatic handoff target must exist and be implicitly exposed; explicit recommendations must remain explicit-only, and unclassified router references fail validation.
+- Projected the canonical `allow_implicit_invocation` bit into each host's native skill contract: Codex keeps `agents/openai.yaml`, while generated Claude skills add `disable-model-invocation: true` only when model invocation is disabled.
+- Preserved the existing Codex package paths at `plugins/<name>/skills` and generated paired Claude-native packages at `plugins/claude/<name>/skills` under the same plugin names and versions. Separate package roots prevent each host's default skill discovery from loading the other host's metadata.
+
 ## 9.3.3
 
 - Disabled automatic Go VCS build metadata with `-buildvcs=false` so the committed `darwin/arm64` and `windows/amd64` harness binaries remain byte-identical when regenerated after the release commit.

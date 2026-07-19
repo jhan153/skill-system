@@ -48,6 +48,12 @@ This skill chooses ownership. It does not search, synthesize, plan experiments, 
 | manuscript section or draft | `research-manuscript-writing` | evidence, results, citation status |
 | manuscript critique | `research-peer-review` | draft and review goal |
 
+## Invocation Contract
+- automatic_handoff_targets: `search-router`, `search-paper-evidence`, `research-literature-synthesis`, `research-literature-ideation`, `research-hypothesis-planning`, `research-experiment-blueprint`, `research-statistical-analysis`, `research-peer-review`
+- explicit_recommendation_targets: `research-experiment-scaffold`, `research-manuscript-writing`, `workflow-implementation`
+
+Load one automatic stage owner immediately after selection. Keep code/scaffold and manuscript-file writers explicit even when their upstream gates are satisfied; return their canonical skill id and explicit invocation requirement without doing their work. If an automatic target is absent from the current capability surface, report a plugin version/exposure mismatch rather than calling it uninstalled or replacing specialist work with router output.
+
 ## Decision Rules
 1. Decide research versus development from the requested deliverable, not keywords.
 2. Identify the latest verified upstream artifact. A claimed or planned artifact is not a completed upstream input.

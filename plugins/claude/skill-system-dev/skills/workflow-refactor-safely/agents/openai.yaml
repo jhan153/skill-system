@@ -1,0 +1,7 @@
+interface:
+  display_name: "Workflow Refactor Safely"
+  short_description: "Preserve behavior through scoped refactoring"
+  default_prompt: "Use $workflow-refactor-safely to rename, move, extract, collapse, simplify, or restructure code while preserving observable behavior. Lock the behavior contract, use characterization checks, refactor in small batches, validate, and report behavior-preservation evidence."
+
+policy:
+  allow_implicit_invocation: false

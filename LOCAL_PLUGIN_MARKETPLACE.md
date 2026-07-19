@@ -8,12 +8,13 @@ This repository can be used as a local plugin marketplace for both **Codex** and
 plugins/.claude-plugin/marketplace.json  # Claude Code
 ```
 
-Both catalogs are generated from `source/plugins/*.yaml` by
-`python3 source/tools/generate_targets.py --target plugins`. The sections below that
+Plugin packages and the Claude catalog are generated from `source/plugins/*.yaml` by
+`python3 source/tools/generate_targets.py --target plugins`; the stable Codex catalog
+keeps its local source entries in `.agents/plugins/marketplace.json`. The sections below that
 use `codex plugin ...` are the Codex flow; see the **Claude Code (Local Marketplace)**
 section near the end for the `/plugin ...` equivalents.
 
-The plugin packages are generated under:
+Codex packages keep their existing paths:
 
 ```text
 plugins/skill-system-core
@@ -24,11 +25,22 @@ plugins/skill-system-quality
 plugins/skill-system-maintainer
 ```
 
+Claude packages use paired platform-owned roots with the same names and versions:
+
+```text
+plugins/claude/skill-system-core
+plugins/claude/skill-system-dev
+plugins/claude/skill-system-design
+plugins/claude/skill-system-research
+plugins/claude/skill-system-quality
+plugins/claude/skill-system-maintainer
+```
+
 ## Ecosystem Parity
 
 Both Codex and Claude Code are reflected from the same canonical `source/`, and
-both receive the same skill set. They differ only in manifest format and in *how*
-each asset class is delivered. The rule holds for both ecosystems:
+both receive the same skill set. Their manifests, package roots, and invocation
+frontmatter are projected per host. The rule holds for both ecosystems:
 
 > Marketplace plugins ship **skills only**. Anything that can change execution
 > policy — hooks, tools, rules, schemas — is **runtime companion payload**,
@@ -36,11 +48,10 @@ each asset class is delivered. The rule holds for both ecosystems:
 
 | Asset | Codex | Claude Code | How it ships |
 | --- | --- | --- | --- |
-| Skills | `.codex-plugin/` + `skills/` | `.claude-plugin/` + `skills/` | **Marketplace plugin** — shared `SKILL.md` payload |
+| Skills | `plugins/<name>/.codex-plugin/` + `skills/` | `plugins/claude/<name>/.claude-plugin/` + `skills/` | **Marketplace plugin** — one canonical body with host-native invocation metadata |
 | Plugin manifest | `.codex-plugin/plugin.json` | `.claude-plugin/plugin.json` | generated per package |
 | Marketplace catalog | `.agents/plugins/marketplace.json` | `plugins/.claude-plugin/marketplace.json` | generated |
-| Hooks | `.codex/hooks.json` + `.codex/hooks/` | `.claude/hooks/claude_hook_adapter.py` | **Runtime companion** — `settings.json`, opt-in, NOT via plugin install |
-| Hook evidence ledger | `.codex/tools/hook_runtime.py` | Claude adapter imports the same `hook_runtime` | shared hash-chained backend; durable per-run files by default |
+| Hooks | `.codex/hooks.json` + `.codex/bin/skill-system-harness*` | `.claude/hooks/settings.example.json` + `.claude/bin/skill-system-claude-harness*` | **Runtime companion** — host registration is separate, NOT via plugin install |
 | Runtime docs / rules / schemas | `.codex/...` | `.claude/...` | runtime companion |
 | MCP integration | `integrations/kanboard-plan-sync` | same (MCP is runtime-agnostic) | separate integration, not in plugins |
 | Slash commands / subagents | — | supported by Claude, unused here | bundle expresses everything as skills |
@@ -200,10 +211,12 @@ the Runtime Companion Payload section before copying hooks, tools, or rules into
 
 ## Claude Code (Local Marketplace)
 
-Claude Code reads the generated catalog at `plugins/.claude-plugin/marketplace.json`
-and the per-package manifests at `plugins/<name>/.claude-plugin/plugin.json`. The
-skill payload (`plugins/<name>/skills/<id>/SKILL.md`) is shared with the Codex
-packages; only the manifest format differs (no Codex `interface`/`policy` blocks).
+Claude Code reads the generated catalog at `plugins/.claude-plugin/marketplace.json`.
+Each catalog entry points to `plugins/claude/<name>`, whose manifest lives at
+`.claude-plugin/plugin.json`. Its `skills/<id>/SKILL.md` is projected from the same
+canonical source as Codex, but explicit-only skills receive Claude's native
+`disable-model-invocation: true` frontmatter. The separate package root prevents
+Codex and Claude default discovery from loading each other's metadata.
 
 ### Register and install
 
@@ -264,28 +277,21 @@ and `/reload-plugins`, reinstalling any newly added plugins.
 
 ### Runtime companion payload — does hooking go into Claude too?
 
-Yes. Hooks exist on the Claude side as a full peer to the Codex adapter, but they
+Yes. Hooks exist on the Claude side as a full peer to the Codex harness, but they
 are **runtime companion payload, not part of the marketplace plugin**. `/plugin
 install` brings skills only; it never installs or enables a hook. Claude's plugin
-*system* can bundle `hooks/`, MCP servers, slash commands, and subagents inside a
-plugin — this bundle deliberately does not, because hooks affect execution policy
-and must be reviewed before they run, exactly like the Codex side.
+system can bundle hooks, but this bundle keeps execution-policy changes behind a
+separate reviewed runtime installation.
 
-The Claude hook is `.claude/hooks/claude_hook_adapter.py`, the counterpart of the
-Codex `hooks.json` adapter:
-
-- **Observational by default** — records lifecycle events through the same
-  hash-chained evidence backend as Codex (`.codex/tools/hook_runtime.py`) into a
-  durable per-session fallback file, then always allows stop.
-- **Opt-in strict block** — set `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict` to block a
-  stop when the final message claims `agent-verified` but a tool result errored
-  with no later success (transcript-derived, fail-open).
-- **Not auto-installed** — enable it in `settings.json` (`UserPromptSubmit` /
-  `PostToolUse` / `Stop`) per `.claude/hooks/README.md`. It imports `hook_runtime`
-  from a co-deployed `.codex/tools`, so the Codex tools must be present alongside.
+The Claude companion uses `.claude/hooks/settings.example.json` to register the
+packaged `.claude/bin/skill-system-claude-harness` for `SessionStart`,
+`UserPromptSubmit`, `Stop`, and `Notification`. It shares bounded Go core packages
+with Codex while retaining Claude-native event normalization. The old Python
+ledger, transcript Output Gate, measurement, and notification adapters are not
+part of 9.3.4.
 
 Other Claude runtime-companion files generated under `.claude/` (docs,
-`context-routing.md`, `eval/`, `schemas/`, `tools/`) are likewise NOT installed by
+`context-routing.md`, `eval/`, `schemas/`, hooks, and binaries) are likewise NOT installed by
 `/plugin install`. Sync them the same review-gated way as the Codex companion
 payload above: ask an Agent for a dry-run diff against your `~/.claude` first,
 approve, then copy only the reviewed files. Do not copy app-managed state

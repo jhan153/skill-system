@@ -1,7 +1,22 @@
 # Claude Harness Lifecycle Hooks
 
-Claude hook behavior remains a separate, opt-in platform adapter. `hooks/claude_hook_adapter.py` records supported Claude lifecycle events through the Claude-owned `tools/hook_runtime.py` hash-chained ledger and fails open on adapter or storage errors.
+Claude owns a native Go dispatcher separate from the Codex dispatcher. Shared
+packages provide the response guard, project-context resolution, Kanboard
+lease/stamp logic, redaction, and OS notification implementation; the Claude
+package owns Claude input normalization and output contracts.
 
-The default is observational. The opt-in `SKILL_SYSTEM_AGENT_OUTPUT_GATE=strict` path reads the Claude transcript on Stop and blocks only an `agent-verified` claim contradicted by an unresolved failed tool result. This runtime is not installed or enabled by Codex generation, and it does not depend on Codex hook files.
+Only `SessionStart`, `UserPromptSubmit`, `Stop`, and `Notification` are
+registered. `prompt_id` is the primary turn key, with a hash-only session
+sequence fallback for pre-2.1.196 clients. Stop reads
+`last_assistant_message`, respects `stop_hook_active`, and never uses the
+eventually-written transcript as current-turn evidence.
 
-Claude lifecycle records and optional measurement remain Claude platform assets. They do not authorize repair, bypass host approval, or mutate Memory, Knowledge, Wiki, plan, or project context stores.
+Native `Notification` payloads own approval, idle, elicitation, background
+input, and background completion alerts. Stop does not infer those states.
+Project context remains location-only, and Kanboard work remains conditional,
+leased, detached, and success-stamped.
+
+The Claude runtime contains no hook-event ledger, Agent Run, Output Gate,
+harness measurement, compact record, or Python adapter. Hook registration is a
+host-owned settings merge described in `hooks/README.md`; generation never
+edits live Claude settings or runtime state.

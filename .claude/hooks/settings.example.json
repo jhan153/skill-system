@@ -1,0 +1,54 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__ABSOLUTE_SKILL_SYSTEM_CLAUDE_HARNESS__",
+            "args": [],
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__ABSOLUTE_SKILL_SYSTEM_CLAUDE_HARNESS__",
+            "args": [],
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__ABSOLUTE_SKILL_SYSTEM_CLAUDE_HARNESS__",
+            "args": [],
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt|idle_prompt|elicitation_dialog|agent_needs_input|agent_completed",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "__ABSOLUTE_SKILL_SYSTEM_CLAUDE_HARNESS__",
+            "args": [],
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
+}

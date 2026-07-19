@@ -1,0 +1,10 @@
+interface:
+  display_name: "Plan Loop Term"
+  short_description: "Draft goal and loop completion contracts"
+  default_prompt: |
+    Use $plan-loop-term to define completion criteria, verifier evidence, progress signals, retry policy, stop policy, checkpoints, and approval gates before running a /goal or loop. If readiness or verifier ownership is unclear, hand off to $loop-readiness-router or $loop-verifier-registry first.
+
+    Do not use it to execute the loop or implement the planned work.
+
+policy:
+  allow_implicit_invocation: false

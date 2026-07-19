@@ -51,6 +51,12 @@ description: Route explicit cross-domain evidence requests to one sufficient lan
 
 If two lanes remain materially plausible, consult the matrix or ask one lane-changing question. Never open both speculatively.
 
+## Invocation Contract
+- automatic_handoff_targets: `search-paper-evidence`, `search-deep-evidence`, `analysis-bug`, `memory-bank-harness`, `knowledge-base-read`, `research-router`
+- explicit_recommendation_targets: `analysis-codebase`, `workflow-rigor`, `design-visual-regression`, `design-a11y-audit`, `llm-wiki-context`
+
+Load an automatic lane owner immediately after selection. For an explicit-only lane, return its canonical skill id and the explicit invocation requirement; do not acquire evidence in the router. If an automatic target is absent from the current capability surface, report a plugin version/exposure mismatch rather than calling it uninstalled or silently doing the lane work yourself.
+
 ## Output Contract
 Return only:
 - `evidence_intent_and_domain`

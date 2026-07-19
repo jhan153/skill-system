@@ -1,0 +1,6 @@
+interface:
+  display_name: "Design Component Mapper"
+  short_description: "Prove approved component reuse, contracts, states, and gaps"
+  default_prompt: "Use $design-component-mapper to pin the applicable catalog, map semantic roles and states to approved repo components, verify app-surface import/use evidence, and report conflicts, authorized exceptions, or unmapped gaps."
+policy:
+  allow_implicit_invocation: false

@@ -105,7 +105,7 @@ func Clear(sessionID string) error {
 
 func stateRoot() string {
 	if value := strings.TrimSpace(os.Getenv("SKILL_SYSTEM_HARNESS_STATE_DIR")); value != "" {
-		return value
+		return filepath.Join(value, "correction-gate")
 	}
 	if value := strings.TrimSpace(os.Getenv("CODEX_HOME")); value != "" {
 		return filepath.Join(value, "harness", "correction-gate")

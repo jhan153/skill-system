@@ -1,0 +1,6 @@
+interface:
+  display_name: "Knowledge Architecture Record"
+  short_description: "Record project architecture boundaries"
+  default_prompt: "Use $knowledge-architecture-record to record this accepted architecture boundary and its source anchors."
+policy:
+  allow_implicit_invocation: false

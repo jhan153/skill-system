@@ -1,0 +1,15 @@
+{
+  "name": "skill-system-research",
+  "version": "9.3.4",
+  "description": "Skill System research — literature, hypothesis, experiment, statistics, manuscript, paper evidence for the research role.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "claude",
+    "research"
+  ],
+  "skills": "./skills/"
+}

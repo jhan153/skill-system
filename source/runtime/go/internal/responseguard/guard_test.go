@@ -62,11 +62,12 @@ func TestStateContainsNoRawTextAndBlocksOnce(t *testing.T) {
 	if err != nil || !correction {
 		t.Fatalf("prompt result correction=%v err=%v", correction, err)
 	}
-	entries, err := os.ReadDir(root)
+	correctionRoot := filepath.Join(root, "correction-gate")
+	entries, err := os.ReadDir(correctionRoot)
 	if err != nil || len(entries) != 1 {
 		t.Fatalf("state entries=%d err=%v", len(entries), err)
 	}
-	raw, err := os.ReadFile(filepath.Join(root, entries[0].Name()))
+	raw, err := os.ReadFile(filepath.Join(correctionRoot, entries[0].Name()))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,8 +91,8 @@ func TestOrdinaryPromptDoesNotCreateState(t *testing.T) {
 	if err != nil || correction {
 		t.Fatalf("ordinary prompt correction=%v err=%v", correction, err)
 	}
-	entries, err := os.ReadDir(root)
-	if err != nil {
+	entries, err := os.ReadDir(filepath.Join(root, "correction-gate"))
+	if err != nil && !os.IsNotExist(err) {
 		t.Fatal(err)
 	}
 	if len(entries) != 0 {

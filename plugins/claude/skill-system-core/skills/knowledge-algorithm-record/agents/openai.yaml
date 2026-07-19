@@ -1,0 +1,6 @@
+interface:
+  display_name: "Knowledge Algorithm Record"
+  short_description: "Record selected project algorithms"
+  default_prompt: "Use $knowledge-algorithm-record to record this accepted algorithm choice and its code and verifier anchors."
+policy:
+  allow_implicit_invocation: false

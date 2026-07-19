@@ -7,7 +7,7 @@
 # generated target and must not carry a do-not-edit/checksum header.
 #
 # Evidence basis (2026-06-29, from skill-system/ root):
-#   - diff -qr .codex/skills .claude/skills        -> only .DS_Store differs
+#   - 9.3.4: skill bodies remain shared; Claude frontmatter projects explicit-only invocation
 #   - diff -q  .codex/context-routing.md .claude/.. -> IDENTICAL
 #   - diff -qr .codex/docs .claude/docs            -> only docs/source_registry.yaml differs
 #   - diff -qr .codex/eval .claude/eval            -> only eval/eval-case.schema.json differs
@@ -29,6 +29,7 @@ meta:
   generation_strategies:
     neutral-verbatim: "copy neutral source to both targets unchanged"
     mirror-from-canonical: "generate Claude copy from Codex canonical with header + source_checksum (existing sync_generated_mirrors.py behavior)"
+    platform-projected: "copy one canonical skill body and inject only the host-native invocation metadata"
     platform-template: "neutral body + per-platform overlay produces divergent codex/claude output"
     codex-native: "lives only in the .codex target"
     claude-native: "lives only in the .claude target"
@@ -45,10 +46,10 @@ entries:
   - path: "skills/"
     present_in: [codex, claude]
     class: shared-neutral
-    generation: neutral-verbatim
+    generation: platform-projected
     confidence: confirmed
     gap: none
-    notes: "58 SKILL.md; diff -qr shows only .DS_Store differs. Primary Phase 1a regression-baseline anchor."
+    notes: "Canonical SKILL.md stays Codex-neutral. Codex receives agents/openai.yaml unchanged; Claude explicit-only skills receive disable-model-invocation: true in generated frontmatter."
 
   - path: "context-routing.md (codex) | context-routing.md (claude)"
     present_in: [codex, claude]
@@ -102,31 +103,19 @@ entries:
 # ---------------------------------------------------------------------------
 # claude-only
 # ---------------------------------------------------------------------------
-  - path: "hooks/claude_hook_adapter.py"
+  - path: "bin/skill-system-claude-harness, bin/skill-system-claude-harness.exe, bin/skill-system-claude-harness-linux-amd64, bin/skill-system-notify-overlay"
     present_in: [claude]
     class: claude-only
-    generation: claude-native
+    generation: tooling
     confidence: confirmed
+    notes: "Generator cross-builds the Claude-native dispatcher for darwin/arm64, windows/amd64, and linux/amd64 and packages the macOS Swift overlay. It shares bounded core packages with Codex but owns Claude event normalization."
 
-  - path: "hooks/README.md"
+  - path: "hooks/README.md, hooks/settings.example.json"
     present_in: [claude]
     class: claude-only
     generation: claude-native
     confidence: confirmed
-    notes: "Claude hook enable instructions."
-
-  - path: "tools/hook_runtime.py, tools/analyze_harness_measurement.py"
-    present_in: [claude]
-    class: claude-only
-    generation: claude-native
-    confidence: confirmed
-    notes: "Preserved Claude 9.2.1-series opt-in ledger and measurement dependency; Codex does not package these tools."
-
-  - path: "tools/claude_notify_adapter.py"
-    present_in: [claude]
-    class: claude-only
-    generation: claude-native
-    confidence: confirmed
+    notes: "Host-owned four-event exec-form registration template. Generation does not edit live Claude settings."
 
 # ---------------------------------------------------------------------------
 # codex-only platform runtime
@@ -163,7 +152,7 @@ entries:
     confidence: confirmed
     gap: none
     phase_1b_decision: "platform-native and independent."
-    decision_rationale: "Codex notification is an OS-specific Go branch that launches a packaged Swift overlay on macOS or PowerShell NotifyIcon on Windows after redaction; Claude retains its Python notification adapter. Neither branch owns validation, Kanboard, or LoopRun. Kanboard separately uses one atomic pending lease per workspace and stamps only successful stable syncs."
+    decision_rationale: "Both dispatchers reuse the Go redaction and OS notification package, while event mapping remains platform-native. Claude listens to native Notification types rather than inferring approval or input from Stop. Neither branch owns validation or Kanboard; Codex alone owns its active LoopRun branch. Kanboard separately uses one atomic pending lease per workspace and stamps only successful stable syncs."
 
   - path: "tools/requirements.txt"
     present_in: [codex]
@@ -203,8 +192,8 @@ entries:
     generation: neutral-verbatim
     confidence: confirmed
     gap: closed
-    phase_1b_decision: "Portable active schemas remain shared-neutral. Claude's lifecycle-event schema is a Claude-native overlay; removed Codex Agent Run and lifecycle-ledger schemas are not regenerated into Codex."
-    decision_rationale: "Schemas follow active owners. WorkItem's Codex example and Claude's hook ledger schema remain platform-specific."
+    phase_1b_decision: "Portable active schemas remain shared-neutral. Removed Agent Run and lifecycle-ledger schemas are not regenerated into either platform."
+    decision_rationale: "Schemas follow active owners. WorkItem's Codex example remains platform-specific; the removed Claude hook ledger schema is not regenerated."
 
   - path: "research-routing.md"
     present_in: [codex]
@@ -327,7 +316,7 @@ phase_scope:
       - "schemas/ -> shared-neutral: 24 definitions+examples generated to .claude (codex-only work-item.example.yaml kept out -> .claude/schemas=24, .codex/schemas=25, no .codex path leak)"
     corrected_after_content_inspection:
       - "research-routing.md -> codex-only (NOT shared): references codex-only/dangling assets (codex-research-lifecycle skill, .codex/references/...) -> would create a broken Claude doc"
-      - "desktop notification -> platform-native: Codex Go branch and Claude Python adapter intentionally diverge"
+      - "desktop notification -> shared Go OS core with platform-native event mapping; Claude uses Notification rather than Stop inference"
       - "harness/README.md -> codex-only (NOT shared): documents .codex/harness/ paths; Claude has its own hooks/README.md"
     decisions_recorded_codex_only_for_v1:
       - "loop engine tools, task_ledger.py, research/ ledger+schema, tools/requirements.txt, rules/default.rules"
