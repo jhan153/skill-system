@@ -232,6 +232,17 @@ def core_checks(root: Path) -> list[Check]:
     ]
 
 
+def runtime_checks(root: Path) -> list[Check]:
+    return [
+        Check(
+            "runtime_go_tests",
+            ["go", "test", "./..."],
+            root / "source" / "runtime" / "go",
+            timeout_seconds=180,
+        ),
+    ]
+
+
 def execution_checks(root: Path) -> list[Check]:
     py = sys.executable
     return [
@@ -341,23 +352,55 @@ def integrations_checks(root: Path) -> list[Check]:
     ]
 
 
+PROFILE_CHECK_BUILDERS = {
+    "core": core_checks,
+    "runtime": runtime_checks,
+    "execution": execution_checks,
+    "research": research_checks,
+    "integrations": integrations_checks,
+    "loop": loop_checks,
+}
+
+RELEASE_REQUIRED_CHECK_IDS = {
+    "core": {
+        "doc_freshness",
+        "tool_requirements",
+        "reference_targets",
+        "eval_cases",
+        "invocation_surface_policy",
+        "work_horizon_policy",
+        "work_item_lifecycle",
+        "release_identity",
+        "generated_mirrors",
+        "validator_unit_tests",
+    },
+    "runtime": {"runtime_go_tests"},
+    "execution": {"execution_assurance_artifacts"},
+    "research": {"research_ledger"},
+    "integrations": {"kanboard_integration"},
+    "loop": {
+        "loop_run_fixture",
+        "loop_init_smoke",
+        "loop_evidence_ledger",
+        "loop_engineering_invariants",
+    },
+}
+
+
 def checks_for(profile: str, root: Path) -> list[Check]:
-    if profile == "core":
-        return core_checks(root)
-    if profile == "integrations":
-        return integrations_checks(root)
-    if profile == "execution":
-        return execution_checks(root)
-    if profile == "research":
-        return research_checks(root)
-    if profile == "loop":
-        return loop_checks(root)
-    raise ValueError(f"unknown profile: {profile}")
+    builder = PROFILE_CHECK_BUILDERS.get(profile)
+    if builder is None:
+        raise ValueError(f"unknown profile: {profile}")
+    return builder(root)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--profile", choices=["core", "integrations", "execution", "research", "loop"], required=True)
+    parser.add_argument(
+        "--profile",
+        choices=list(PROFILE_CHECK_BUILDERS),
+        required=True,
+    )
     parser.add_argument("--format", choices=["text", "json"], default="text")
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--release", action="store_true", help="deprecated; use run_verification_pipeline.py --release")

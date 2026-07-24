@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Explicitly reopen a terminal LoopRun.
 
-Terminal LoopRun states (success / blocked / budget_exhausted / unsafe / fatal /
-stalled) are immutable to evaluate_loop_run.py. Reopening one is a deliberate act
-that must go through this command, which records an audit event and resets the run
-to active. This keeps "the loop succeeded" from being silently overwritten by a
-late or stray iteration result.
+Terminal LoopRun states (success / user_verification_needed / blocked /
+budget_exhausted / unsafe / fatal / stalled) are immutable to
+evaluate_loop_run.py. Reopening one is a deliberate act that must go through this
+command, which records an audit event and resets the run to active. This keeps a
+terminal handoff from being silently overwritten by a late or stray result.
 """
 
 from __future__ import annotations
@@ -20,7 +20,15 @@ sys.dont_write_bytecode = True
 
 from loop_policy import append_jsonl, load_yaml, loop_lock, utc_now, write_yaml
 
-TERMINAL_STATUSES = {"success", "blocked", "budget_exhausted", "unsafe", "fatal", "stalled"}
+TERMINAL_STATUSES = {
+    "success",
+    "user_verification_needed",
+    "blocked",
+    "budget_exhausted",
+    "unsafe",
+    "fatal",
+    "stalled",
+}
 
 
 def main() -> int:
@@ -59,6 +67,7 @@ def main() -> int:
 
         now = utc_now()
         state["status"] = "active"
+        state["result_label"] = "pending"
         state["updated_at"] = now
         state.setdefault("resumes", []).append({"from": str(status), "reason": args.reason, "resumed_at": now})
         write_yaml(state_path, state)

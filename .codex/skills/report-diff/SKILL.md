@@ -1,6 +1,6 @@
 ---
 name: report-diff
-description: Present verified changed lines in intent-grouped diff blocks with concise Korean summaries. Use only for explicit changed-lines, readable-diff, or before/after requests; do not use for review or diagnosis.
+description: Present verified changed lines in intent-grouped Report Canvas compare HTML with concise Korean summaries. Use only for explicit changed-lines, readable-diff, or before/after requests; do not use for review or diagnosis.
 ---
 
 # Report Diff
@@ -11,10 +11,11 @@ description: Present verified changed lines in intent-grouped diff blocks with c
 - use_when: the user explicitly requests readable changed lines or grouped before/after presentation
 - do_not_use_when:
   - Root cause belongs to `analysis-bug`; blocker-first QA/release verdicts belong to `report-critical`.
+  - A causal source/runtime walkthrough of an implementation belongs to `report-implementation-explainer`.
   - Implementation belongs to `workflow-implementation`; changed-file/validation-command inventories belong to `coordination-handoff`.
   - Full raw or machine-readable patches stay on the normal diff/tool path.
 - expected_inputs: verified diff or verified snapshots; current snapshot only for explicitly unverified presentation
-- expected_outputs: intent-grouped changed-line blocks, source labels, concise Korean summaries, and calibrated evidence notes
+- expected_outputs: Report Canvas `compare` HTML with intent-grouped changed-line blocks, source labels, concise Korean summaries, and calibrated evidence notes
 - context_targets:
   must_read:
     - supplied diff/baseline and requested presentation scope
@@ -24,7 +25,7 @@ description: Present verified changed lines in intent-grouped diff blocks with c
     - full repository, memory, unrelated source, generated mirrors, or unrelated logs
 - risk_profile:
   reads: verified diff and narrow snapshots
-  writes: none
+  writes: one self-contained report HTML by default; no source or baseline mutation
   tools: safe diff/status commands only
   sensitive_resources: deny credentials
 - entry_scene: FINALIZE
@@ -59,10 +60,12 @@ Label rename/move-only and whitespace-only changes without implying behavior cha
 2. Identify effective changes and evidence scope; split mixed intent and combine same-intent edits across files.
 3. Order behavior/API, schema/config, refactor/rename, tests, then docs/comments unless user priority differs.
 4. Preserve exact `+`/`-` lines. Add minimal context only when necessary; explain long-line fields below the block instead of rewriting the diff.
-5. Render each unit with intent title, path/symbol, fenced `diff` block, one Korean summary, and any required evidence limitation.
+5. Model each unit with intent title, path/symbol, exact before/after `diff` content blocks, one Korean summary, and any required evidence limitation. Use fenced `diff` blocks only in an explicit chat-only fallback.
 
 ## Output And Validation
 
 Start with one conclusion. Emit only needed units and at most three cross-unit bullets. If review is separately active, put its verdict first unless the user requested diff only.
 
-Before returning, confirm that every displayed addition/removal exists in the baseline, unverified snapshots invent none, each unit has one intent/source label, special cases are not overstated, and the response remains changed-lines-first. When there is no effective change, say so and emit no fabricated block.
+For every admitted invocation, read `references/report_canvas_contract.md` and render the primary human-facing diff as Report Canvas `compare` HTML from the verified baseline with `scripts/report-canvas/render_report.py`. Return only a concise chat receipt with the conclusion and artifact link. Use chat-only output only when the user explicitly prohibits file creation or the host has no safe artifact surface. Preserve exact changed lines in compare blocks or evidence drawers; Canvas must not invent a baseline, observed effect, review verdict, or follow-up. Use `next_action.kind: none` for pure presentation unless the user requested a concrete next action.
+
+Before returning, confirm that every displayed addition/removal exists in the baseline, unverified snapshots invent none, each unit has one intent/source label, special cases are not overstated, and the report remains changed-lines-first. When there is no effective change, render an `info` Canvas with an explicit no-change summary and no fabricated block.

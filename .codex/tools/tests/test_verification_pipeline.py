@@ -97,6 +97,17 @@ class VerificationPipelineTests(unittest.TestCase):
         )
         self.assertIn("profile identity", error or "")
 
+    def test_pipeline_profiles_come_from_the_bundle_verifier_contract(self) -> None:
+        verifier = load_bundle_verifier()
+        self.assertEqual(
+            self.pipeline.DEFAULT_PROFILES,
+            list(verifier.PROFILE_CHECK_BUILDERS),
+        )
+        self.assertEqual(
+            self.pipeline.RELEASE_REQUIRED_CHECK_IDS,
+            verifier.RELEASE_REQUIRED_CHECK_IDS,
+        )
+
 
 class IntegrationCheckSelectionTests(unittest.TestCase):
     @classmethod
@@ -153,6 +164,32 @@ class IntegrationCheckSelectionTests(unittest.TestCase):
             "SKIP: integrations/kanboard-plan-sync not present",
             checks[0].cmd[-1],
         )
+
+
+class RuntimeCheckSelectionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.verifier = load_bundle_verifier()
+
+    def test_runtime_profile_requires_go_tests_from_canonical_source(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            checks = self.verifier.runtime_checks(root)
+
+        go_check = next(check for check in checks if check.check_id == "runtime_go_tests")
+        self.assertTrue(go_check.required)
+        self.assertEqual(go_check.cmd, ["go", "test", "./..."])
+        self.assertEqual(go_check.cwd, root / "source" / "runtime" / "go")
+        self.assertIn(
+            "runtime_go_tests",
+            load_pipeline().RELEASE_REQUIRED_CHECK_IDS["runtime"],
+        )
+
+    def test_target_side_core_does_not_require_go_source(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            checks = self.verifier.core_checks(Path(tmp))
+
+        self.assertNotIn("runtime_go_tests", {check.check_id for check in checks})
 
 
 if __name__ == "__main__":

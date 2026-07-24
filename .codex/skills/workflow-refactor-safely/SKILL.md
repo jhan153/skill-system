@@ -12,7 +12,7 @@ description: Restructure production code in small reversible batches while prese
 - use_when:
   - the user requests a production-code rename, move, extraction, collapse, simplification, or restructure with behavior preserved.
 - do_not_use_when:
-  - behavior/feature change, concrete bug repair, design-only judgment, validation-only work, comments/docs-only change, or repeated same-signature failure is primary.
+  - behavior/feature change, concrete bug repair, design-only judgment, validation-only work, comments/docs-only change, repeated same-signature failure, or deletion of unreachable/obsolete code without live structural changes is primary.
 - expected_inputs:
   - structural goal, material preservation conditions and authority, target production owner/path, callers, and available observations
 - expected_outputs:
@@ -48,4 +48,5 @@ description: Restructure production code in small reversible batches while prese
 Return only applicable fields: condition/authority mapping, production batch and changed callers, actual-path preservation evidence, scoped validation, rollback, unresolved conditions, and next action. Do not claim progress from scaffolding or completion from a narrower pass.
 
 ## Cross-Skill Boundaries
+- `workflow-refactor-safely` owns a still-reachable wrapper collapse or other behavior-preserving live-code restructuring even when the diff is small. `workflow-source-maintenance` owns deletion of unreachable or otherwise proven-obsolete code when no live structural change is required.
 - `analysis-codebase-design` owns an unresolved boundary; `workflow-implementation` owns feature changes; `workflow-bug-fix` owns repair; `workflow-comment-maintenance` owns comments-only work; `workflow-validation` owns validation-only matrices; `workflow-recovery` owns repeated post-refactor failure.

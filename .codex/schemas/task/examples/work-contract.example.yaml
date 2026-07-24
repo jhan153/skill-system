@@ -1,0 +1,35 @@
+schema_version: 1
+contract_id: WC-example-task
+source:
+  kind: natural_language
+execution:
+  mode: unattended_goal_loop
+scope:
+  core_deliverables:
+    - Implement the requested production behavior.
+  allowed_action_classes:
+    - core
+    - required_prerequisite
+  excluded_action_classes:
+    - agent_validation
+    - test_authoring
+    - validation_artifact
+    - optional_quality
+    - meta
+  non_goals:
+    - Agent-authored validation work
+verification:
+  owner: user
+  handoff_on_unavailable: user-verification-needed
+interaction:
+  mode: forbidden
+  approval_behavior: defer
+  question_behavior: defer
+continuation:
+  on_local_block: reevaluate_remaining_work
+  on_optional_failure: continue
+  duplicate_intent_behavior: defer_same_intent
+  global_block_condition: no_required_runnable_work
+termination:
+  time_budget_seconds: 14400
+  stop_condition: All required runnable production work is complete or genuinely blocked.

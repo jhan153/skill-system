@@ -1,20 +1,27 @@
-schema_version: 1
+schema_version: 2
 task_run_id: TR-20260625-001
 work_item_ref: WI-20260627-001
 objective: "Demo checkpointed run: implement importer fix across turns"
+work_contract_ref: work-contract.example.yaml
+work_contract_hash: "b95555a124f81335b733732ad1cc99c9cb5a1b34b7dd23f5b254450855a73c01"
 workspace:
   root: "/repo"
   revision: "abc123"
 status: complete
-active_step_id: S001
+result_label: user-verification-needed
+active_step_id: null
 steps:
   - id: S001
     title: "Fix quoted-comma parsing"
+    kind: core
+    required: true
+    depends_on: []
+    intent_key: importer-parser-fix
+    requires_interaction: false
     status: complete
     evidence_refs:
-      - type: command
-        command: "pytest tests/test_import.py"
-        exit_code: 0
+      - type: file
+        locator: "src/importer.py"
 findings:
   - id: F001
     title: "Legacy delimiter path left unhandled (out of scope)"
@@ -28,8 +35,5 @@ findings:
     reason: "Out of scope for this release; tracked separately."
     review_at: "next-release"
 final_verification:
-  status: pass
-  evidence_refs:
-    - type: command
-      command: "pytest tests/test_import.py"
-      exit_code: 0
+  status: user-verification-needed
+  evidence_refs: []

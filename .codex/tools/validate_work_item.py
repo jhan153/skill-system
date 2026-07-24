@@ -53,6 +53,51 @@ def lifecycle_errors(data: dict[str, Any]) -> list[str]:
             errors.append("closed WorkItem must leave next_action empty")
     if data.get("state") in {"ready", "implement", "verify", "review", "closed"} and not data.get("primary_skill"):
         errors.append(f"{data.get('state')} WorkItem must set primary_skill")
+    if data.get("schema_version") == 2:
+        state = data.get("state")
+        result_label = data.get("result_label")
+        if state not in {"closed", "blocked"} and result_label != "pending":
+            errors.append(f"{state} WorkItem must keep result_label pending")
+        runnable_refs = data.get("runnable_action_refs", [])
+        if state == "blocked" and isinstance(runnable_refs, list) and runnable_refs:
+            errors.append("blocked WorkItem cannot retain required runnable actions")
+        deferred = data.get("deferred_actions", [])
+        if isinstance(deferred, list):
+            intent_keys = [
+                item.get("intent_key")
+                for item in deferred
+                if isinstance(item, dict) and isinstance(item.get("intent_key"), str)
+            ]
+            duplicate_intents = sorted(
+                {
+                    intent_key
+                    for intent_key in intent_keys
+                    if intent_keys.count(intent_key) > 1
+                }
+            )
+            if duplicate_intents:
+                errors.append(
+                    "deferred_actions repeat semantic intents: "
+                    + ", ".join(duplicate_intents)
+                )
+            deferred_refs = {
+                item.get("action_ref")
+                for item in deferred
+                if isinstance(item, dict) and isinstance(item.get("action_ref"), str)
+            }
+            overlap = sorted(
+                deferred_refs
+                & {
+                    item
+                    for item in runnable_refs
+                    if isinstance(item, str)
+                }
+            ) if isinstance(runnable_refs, list) else []
+            if overlap:
+                errors.append(
+                    "actions cannot be both deferred and runnable: "
+                    + ", ".join(overlap)
+                )
     runtime = data.get("runtime_boundary") if isinstance(data.get("runtime_boundary"), dict) else {}
     for key in ["queue_runtime", "scheduler_runtime", "kanboard_source_of_truth", "looprun_replacement"]:
         if runtime.get(key) is not False:

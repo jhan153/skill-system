@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: verified project root/identity, exact target or manifest state, and explicit init/reinit intent
 - expected_outputs: four baseline files, first event, manifest section update, and readback result
 - context_targets:
-  must_read: exact project/target state, `reference.md`, `.codex/docs/memory_mutation_contract.md`, and existing `project-context.yaml` when present
+  must_read: exact project/target state, `reference.md`, `.claude/docs/memory_mutation_contract.md`, and existing `project-context.yaml` when present
   read_if_needed: repository persistence convention
   do_not_load_by_default: other banks, transcripts, full project history, common/home Memory
 - risk_profile:

@@ -126,6 +126,32 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn(".codex/eval/research_regression_cases.yaml", research)
         self.assertNotIn("research_route_smoke_tests:", research)
 
+    def test_family_entry_routing_has_one_shared_registry_owner(self) -> None:
+        registry = canonical("shared/docs/skill_registry.md").read_text(encoding="utf-8")
+        claude_routing = canonical("platform/claude/context-routing.md").read_text(encoding="utf-8")
+        alias_map = registry.split("## Group Alias Map", 1)[1].split(
+            "## Legacy Skill Alias Migration", 1
+        )[0]
+        self.assertIn("| family | display name | entry skill (Phase A) | aliases |", alias_map)
+        self.assertIn("one shared family-selection owner", alias_map)
+        for required_entry in (
+            "report-lifecycle-artifacts",
+            "analysis-bug",
+            "analysis-algorithm",
+            "plan-requirements-discovery",
+            "plan-requirements-brief",
+        ):
+            self.assertIn(f"`{required_entry}`", alias_map)
+        search_lane = next(
+            line
+            for line in registry.splitlines()
+            if line.startswith("- `search` secondary-tag (evidence lane) candidates:")
+        )
+        self.assertIn("`knowledge-base-read`", search_lane)
+        self.assertIn("`llm-wiki-context`", search_lane)
+        self.assertIn("Do not maintain a second family-entry table here", claude_routing)
+        self.assertNotIn("Family entry routing (Phase A):", claude_routing)
+
     def test_legacy_skill_aliases_map_to_current_owners_without_stub_packages(self) -> None:
         expected = {
             "coordination-brief": ("coordination-handoff", "brief"),
@@ -431,6 +457,21 @@ class SkillInstructionQualityTests(unittest.TestCase):
             text = canonical(f"skills/{skill_id}/SKILL.md").read_text(encoding="utf-8")
             self.assertIn("delivery_slice_contract.md", text, skill_id)
             self.assertIn("non-feature decomposition", text, skill_id)
+
+    def test_understanding_skills_are_bounded_and_reanchor_evidence(self) -> None:
+        explainer = canonical("skills/report-implementation-explainer/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        discovery = canonical("skills/plan-behavior-discovery/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertLessEqual(len(explainer.split()), 800)
+        self.assertLessEqual(len(discovery.split()), 800)
+        self.assertIn("derived index, never evidence", explainer)
+        self.assertIn("navigation aid, not current-behavior evidence", discovery)
+        self.assertIn("Re-open its cited production source/runtime/test anchors", discovery)
+        self.assertIn("For irreversible/high-risk choices", discovery)
+        self.assertIn("For reversible low-risk interaction choices", discovery)
 
     def test_rigor_review_axes_preserve_epistemic_independence(self) -> None:
         rigor = canonical("skills/workflow-rigor/SKILL.md").read_text(encoding="utf-8")

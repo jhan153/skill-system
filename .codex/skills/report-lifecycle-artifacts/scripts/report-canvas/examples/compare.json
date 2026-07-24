@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "mode": "compare",
+  "language": "ko",
+  "eyebrow": "Verified diff · compare",
+  "title": "출력 계약이 장문 Markdown에서 Report Canvas로 이동했습니다",
+  "summary": "리포트 소유권과 증거 의미는 유지하고, 지속형 인간용 산출물의 표현만 공용 모델과 self-contained HTML로 통일했습니다.",
+  "status": "info",
+  "evidence_status": "verified",
+  "findings": [
+    {
+      "severity": "info",
+      "title": "단순 채팅은 그대로입니다",
+      "summary": "명시적 산출물 또는 관계 중심 시각화가 필요할 때만 Canvas를 렌더링합니다.",
+      "evidence_refs": [
+        "contract"
+      ]
+    }
+  ],
+  "next_action": {
+    "kind": "next",
+    "label": "변경된 표현 계약을 한 대표 리포트에서 확인합니다"
+  },
+  "visual": {
+    "type": "compare",
+    "before_label": "Before",
+    "after_label": "After",
+    "before": [
+      {
+        "label": "Persistent report",
+        "content": "One long Markdown document\n- result\n- findings\n- evidence\n- appendix",
+        "language": "markdown"
+      }
+    ],
+    "after": [
+      {
+        "label": "Persistent report",
+        "content": "Report model → interactive Canvas\nfirst viewport: outcome + core visual + ≤3 findings + one action\nevidence: progressive drawers",
+        "language": "text"
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "id": "contract",
+      "title": "Report Canvas shared contract",
+      "status": "verified",
+      "kind": "source",
+      "source": "references/report_canvas_contract.md",
+      "summary": "선택 gate, 네 모드, evidence boundary, offline packaging을 정의합니다."
+    }
+  ]
+}

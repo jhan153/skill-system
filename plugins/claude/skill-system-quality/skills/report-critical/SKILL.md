@@ -1,13 +1,13 @@
 ---
 name: report-critical
-description: Diagnoses blockers or runs evidence-first critical review/QA gates for artifacts, plans, and research. Use when the user asks for blockers, risks, critical review, QA gate, plan validation, deep research validation, or failure analysis.
+description: Diagnoses blockers or runs evidence-first critical review/QA gates for artifacts, plans, and research, with the admitted human-facing result delivered as Report Canvas decision HTML by default. Use when the user asks for blockers, risks, critical review, QA gate, plan validation, deep research validation, or failure analysis.
 disable-model-invocation: true
 ---
 
 # Report Critical
 
 ## Routing Card
-- role: review_gate
+- role: report_primary
 - intent_signature:
   - current blocker diagnosis, QA gate, critical review, plan validation, artifact validation, deep research validation
 - use_when:
@@ -19,7 +19,7 @@ disable-model-invocation: true
   - artifact or conversation slice
   - task goal, material success criteria, and evidence anchors
 - expected_outputs:
-  - primary problem or QA verdict, prioritized findings, missing evidence, and one next action
+  - Report Canvas `decision` HTML containing the primary problem or QA verdict, prioritized findings, missing evidence, and one next action
 - context_targets:
   must_read:
     - smallest review target slice that can answer the request
@@ -36,7 +36,7 @@ disable-model-invocation: true
   reads:
     - target slice, criteria, and focused evidence anchors
   writes:
-    - none unless the user explicitly asks to revise the artifact after review
+    - one self-contained report HTML by default; never revise the reviewed artifact unless explicitly requested
   tools:
     - focused verification only when a material finding needs it
   sensitive_resources:
@@ -78,6 +78,8 @@ For implementation-plan gates, judge only execution-material content: target beh
 
 ## Output And Stop
 Start with one-line `primary_problem`, then only applicable fields: `mode`, `confidence`, `evidence_status`, up to two `root_causes`, up to three severity-ordered `top_findings`, `qa_verdict` and `risk_level` for `qa_gate`, decision-changing `missing_information`, exactly one `next_best_action`, and remaining `verification_items`.
+
+For every admitted invocation, read `references/report_canvas_contract.md` and render the primary human-facing review as Report Canvas `decision` HTML with `scripts/report-canvas/render_report.py`. Return only a concise chat receipt with the outcome and artifact link. Use chat-only output only when the user explicitly prohibits file creation or the host has no safe artifact surface. Canvas does not change the verdict, evidence threshold, three-finding ceiling, or one-action stop; set the closing action to `kind: next`.
 
 Keep `next_best_action` atomic. Do not dump a blank schema, rewrite the artifact, implement fixes, or soften `abstain` into pass. Stop after review. Route diff presentation to `report-diff`, qualitative assessment to `report-qualitative`, research peer review to `research-peer-review`, and implementation to its owning workflow.
 

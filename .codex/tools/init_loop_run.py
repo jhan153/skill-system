@@ -15,6 +15,9 @@ sys.dont_write_bytecode = True
 from _validation import load_json_file, load_yaml_file, validate_schema
 from loop_policy import (
     append_jsonl,
+    condition_defer_reason,
+    condition_dependencies,
+    condition_intent_key,
     contract_runtime_errors,
     control_value,
     file_sha256,
@@ -82,6 +85,24 @@ def main() -> int:
     shutil.copy2(args.contract, loop_dir / "contract.yaml")
 
     required_ids = required_condition_ids(contract)
+    initial_deferred = [
+        {
+            "condition_id": condition["id"],
+            "intent_key": condition_intent_key(contract, condition["id"]),
+            "reason": reason,
+        }
+        for condition in success_conditions(contract)
+        if (reason := condition_defer_reason(contract, condition["id"])) is not None
+    ]
+    deferred_ids = {item["condition_id"] for item in initial_deferred}
+    initial_target = next(
+        (
+            condition_id
+            for condition_id in required_ids
+            if condition_id not in deferred_ids and not condition_dependencies(contract, condition_id)
+        ),
+        None,
+    )
     now = utc_now()
     state = {
         "schema_version": 2,
@@ -94,6 +115,7 @@ def main() -> int:
             "workspace_id": ws_id,
         },
         "status": "active",
+        "result_label": "pending",
         "iteration": 0,
         "started_at": now,
         "updated_at": now,
@@ -125,9 +147,10 @@ def main() -> int:
         "last_decision": {
             "action": "continue",
             "reason_code": "initialized",
-            "target_condition": required_ids[0] if required_ids else None,
+            "target_condition": initial_target,
             "continuation_prompt": None,
         },
+        "deferred_actions": initial_deferred,
         "side_effect_journal": [],
     }
     state["progress"]["state_hash"] = state_fingerprint(contract, state)

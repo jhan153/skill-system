@@ -12,10 +12,8 @@ policy:
   may_own_execution: true
 
 work_horizon:
-  level: short_plan
+  level: one_shot
   role: requirements_discovery_owner
-  contains:
-    - task_ticket
   typical_agentic_duration: "30-90 minutes"
   legacy_equivalent: "1-2 weeks of stakeholder discovery"
 

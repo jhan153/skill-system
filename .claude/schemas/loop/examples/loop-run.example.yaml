@@ -7,6 +7,7 @@ workspace:
   revision: fixture
   workspace_id: fixtureworkspace
 status: active
+result_label: pending
 iteration: 1
 started_at: '2026-06-23T00:00:00Z'
 updated_at: '2026-06-23T00:05:00Z'

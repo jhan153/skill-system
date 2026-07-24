@@ -40,7 +40,7 @@ This skill chooses ownership. It does not search, synthesize, plan experiments, 
 | cross-domain or lane-ambiguous evidence search | `search-router` | claim and evidence-domain hints |
 | papers/citations or evidence ledger | `search-paper-evidence` | topic and source constraints |
 | thematic literature synthesis | `research-literature-synthesis` | verified evidence ledger |
-| gaps and candidate hypotheses | `research-literature-ideation` | evidence-backed synthesis |
+| gaps and candidate hypotheses | `research-literature-ideation` | verified evidence ledger or evidence-backed synthesis |
 | claim, validation, ablation, or loss budget | `research-hypothesis-planning` | claim and baseline/evidence state |
 | experiment specification without code | `research-experiment-blueprint` | selected hypothesis and constraints |
 | approved experiment code skeleton | `research-experiment-scaffold` | approved blueprint and write boundary |
@@ -57,11 +57,12 @@ Load one automatic stage owner immediately after selection. Keep code/scaffold a
 ## Decision Rules
 1. Decide research versus development from the requested deliverable, not keywords.
 2. Identify the latest verified upstream artifact. A claimed or planned artifact is not a completed upstream input.
-3. Select exactly one owner. Only an explicitly multi-stage outcome with at least two chain-ready stages permits a sequence; set `owner` to its first stage and include it in the shortest dependency order.
-4. If a required upstream artifact or write approval is missing, select the earliest stage that can produce it and keep later stages gated. Never lower the missing input to a warning or select the later owner as ready.
-5. A preceding included stage may produce the next stage's input without creating a gate. Exclude later stages whose required input cannot be supplied or produced by the included sequence.
-6. If the deliverable or upstream state is genuinely unclear, keep ownership with `research-router` and request that clarification.
-7. Hand off without doing specialist work.
+3. Treat a verified evidence ledger as a valid direct upstream for literature ideation when it contains source-traceable gap evidence; require synthesis only when the requested artifact is collective thematic interpretation or the ledger cannot support the proposed gap relation.
+4. Select exactly one owner. Only an explicitly multi-stage outcome with at least two chain-ready stages permits a sequence; set `owner` to its first stage and include it in the shortest dependency order.
+5. If a required upstream artifact or write approval is missing, select the earliest stage that can produce it and keep later stages gated. Never lower the missing input to a warning or select the later owner as ready.
+6. A preceding included stage may produce the next stage's input without creating a gate. Exclude later stages whose required input cannot be supplied or produced by the included sequence.
+7. If the deliverable or upstream state is genuinely unclear, keep ownership with `research-router` and request that clarification.
+8. Hand off without doing specialist work.
 
 ## Output Contract
 Return only:

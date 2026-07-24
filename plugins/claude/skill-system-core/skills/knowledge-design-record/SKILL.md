@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: product intent, accepted aliases/search terms, affected surfaces/states, design refs, tokens/components, implementation refs, verifier, overlap candidates, and declared store
 - expected_outputs: one design record plus index row and readback
 - context_targets:
-  must_read: manifest/index, matching design records, actual design/design-system/code refs, and `.codex/docs/knowledge_record_contract.md`
+  must_read: manifest/index, matching design records, actual design/design-system/code refs, and `.claude/docs/knowledge_record_contract.md`
   read_if_needed: accessibility or visual verification evidence directly tied to the rule
   do_not_load_by_default: full design library, unrelated code, Memory, Wiki, generic pattern catalogs
 - risk_profile:

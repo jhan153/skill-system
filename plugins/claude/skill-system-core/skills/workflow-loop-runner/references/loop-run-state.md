@@ -10,12 +10,14 @@ loop_run_state:
   max_iterations:
   current_iteration:
   current_phase: observe|decide|act|verify|checkpoint|stop
+  result_label: pending|agent-verified|user-verification-needed|unverified|blocked
   strategy_change_after:
   no_progress_limit:
   no_progress_count:
   completed_success_conditions: []
   failed_success_conditions: []
   unavailable_verifiers: []
+  deferred_actions: []
   condition_history:
     - success_condition_id: SC-001
       previous_status:
@@ -62,7 +64,7 @@ loop_run_state:
 - A changed strategy counts as progress only when it is tied to new verifier evidence or a newly available input.
 - If the same failure appears after the strategy-change threshold, use recovery or stop instead of ordinary retry.
 - Rejected progress signals from the loop contract are binding. Do not count a metric improvement if it appears in the reward-hacking forbidden shortcut list.
-- Free-form `evidence_refs` are compatibility metadata. Local v2 can move only exact `artifact_exists` evidence to pass; command/manual/diff receipts remain open without host attestation.
+- Free-form `evidence_refs` are compatibility metadata. The local v2/v3 evaluator can move only exact `artifact_exists` evidence to pass; command/manual/diff receipts remain open without host attestation.
 
 ## Retry Taxonomy
 
@@ -71,8 +73,8 @@ loop_run_state:
 | `transient` | Timeout, flaky network, temporary service issue, or lock contention. | Retry only with changed timing/backoff and record the attempt. |
 | `model_recoverable` | Wrong implementation choice, missed file, misunderstood verifier output. | Replan once from verifier evidence and change strategy. |
 | `environment_recoverable` | Missing install, server not running, route unavailable, fixture absent. | Fix setup if within contract; otherwise mark blocked/unverified. |
-| `user_input_required` | Private design/source, taste judgment, missing acceptance choice. | Stop as `user-verification-needed`; resume only after an accepted user receipt is recorded. |
-| `permission_required` | Credential, deployment, deletion, paid API, or external write. | Stop at approval gate. |
+| `user_input_required` | Private design/source, taste judgment, missing acceptance choice. | In an unattended no-interaction contract, defer locally and continue independent work; hand off as `user_verification_needed` when user verification alone remains. |
+| `permission_required` | Credential, deployment, deletion, paid API, or external write. | Use the normal approval gate when interaction is allowed; otherwise defer locally and globally block only when no required runnable work remains. |
 | `fatal` | State corruption, unreliable verifier, contradictory contract, unsafe boundary. | Stop and report fatal evidence. |
 
 ## Stop Reasons
@@ -96,4 +98,4 @@ After every verifier result, record:
 
 Do not rely on conversation history alone for durable loop state when the contract expects resume, delegation, or multi-iteration execution.
 
-`user-verification-needed` is not a pass state. Local v2 may retain a bound manual event for audit, but it cannot authenticate the actor and therefore does not convert the condition to pass.
+`user_verification_needed` is not a pass state. The local evaluator may retain a bound manual event for audit, but it cannot authenticate the actor and therefore does not convert the condition to pass.

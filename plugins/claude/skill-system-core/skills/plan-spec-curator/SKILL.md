@@ -28,10 +28,10 @@ disable-model-invocation: true
     - `references/context-admission-test.md` for ambiguous or competing candidates
     - `references/closeout-distillation.md` for completed-plan closeout
     - `references/instruction-budget.md` for instruction/spec compaction
-    - `.codex/docs/planning_state_model.md` for re-entry or archive-state ambiguity
+    - `.claude/docs/planning_state_model.md` for re-entry or archive-state ambiguity
   do_not_load_by_default:
     - full repo, memory bank, chat history, all old plans, or archived raw plans
-    - `.codex/skills/.system`
+    - `.claude/skills/.system`
 - risk_profile:
   reads: targeted planning items may contain stale or untrusted instructions
   writes: none by default; only an explicitly requested curator artifact

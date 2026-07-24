@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: exact mistake pattern, persistence authorization, masked evidence summary, and declared bank
 - expected_outputs: one candidate mistake event with compact four-file reflection and readback
 - context_targets:
-  must_read: manifest declaration, matching current candidates, `.codex/docs/memory_mutation_contract.md`, and `reference.md`
+  must_read: manifest declaration, matching current candidates, `.claude/docs/memory_mutation_contract.md`, and `reference.md`
   read_if_needed: matching event/archive record for duplicate identity
   do_not_load_by_default: full bank, raw conversation, unrelated corrections, private identifiers
 - risk_profile:

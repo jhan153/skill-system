@@ -1,6 +1,6 @@
 ---
 name: report-qualitative
-description: "Produce decision-first, evidence-grounded qualitative evaluations of artifacts, skills, plans, designs, or implementations. Use when the user asks about quality, readiness, risks, strengths and weaknesses, or prioritized improvements; use a full or scored report only when explicitly requested. Not for blocker QA, diffs, inventories, telemetry, or implementation."
+description: "Produce decision-first, evidence-grounded qualitative evaluations of artifacts, skills, plans, designs, or implementations as Report Canvas HTML by default. Use when the user asks about quality, readiness, risks, strengths and weaknesses, or prioritized improvements; use a full or scored report only when explicitly requested. Not for blocker QA, diffs, inventories, telemetry, or implementation."
 disable-model-invocation: true
 ---
 
@@ -21,6 +21,7 @@ disable-model-invocation: true
   - the user explicitly requests a qualitative, rubric-based, readiness, strengths/weaknesses, or evidence-first assessment.
 - do_not_use_when:
   - the user wants blocker-first critical review or failure diagnosis; use `report-critical`.
+  - the user wants a causal source/runtime walkthrough without a quality or readiness verdict; use `report-implementation-explainer`.
   - the user wants changed lines, an artifact inventory, eval telemetry, validation execution, or implementation.
   - the request is an ordinary code review or vague “검토/보고” request without qualitative-assessment intent.
 - expected_inputs:
@@ -28,7 +29,7 @@ disable-model-invocation: true
   - decision goal, audience, constraints, and user rubric when provided
   - evidence anchors or validation results when available
 - expected_outputs:
-  - a decision brief with no more than three material findings by default
+  - Report Canvas `decision` HTML with no more than three material findings by default
   - a full/scored report only on explicit request
   - a compact evidence report only for explicit `srq` or formal completion-report intent
 - context_targets:
@@ -48,7 +49,7 @@ disable-model-invocation: true
   reads:
     - provided artifact slices and decisive evidence anchors
   writes:
-    - none unless the user explicitly requests a report file
+    - one self-contained report HTML by default; no evaluated-artifact mutation
   tools:
     - focused read-only inspection when evidence is missing and locally available
   sensitive_resources:
@@ -82,6 +83,7 @@ Read `references/evidence_mapping.md` only for a large, multi-source, ambiguous,
 - `DecisionBrief`: conclusion first; zero to three material findings with decisive evidence, impact, action, and confidence; one highest-leverage next action; material limitations. Do not add duplicate strength/weakness, evidence-map, or score sections.
 - `FullOrScored`: read `references/report_template.md` plus `references/rubric.md` when needed, cover requested criteria, and avoid prose that repeats tables.
 - `CompactEvidence`: one-line conclusion, up to three verified facts with locations, one action, and verification only for code/workflow/delivery. It does not replace a requested readiness or risk evaluation.
+- For every admitted invocation, read `references/report_canvas_contract.md` and render the primary human-facing evaluation with `scripts/report-canvas/render_report.py` as Report Canvas `decision` HTML; use `compare` only when the primary evidence is an authoritative before/after pair. Return only a concise chat receipt with the conclusion and artifact link. Use chat-only output only when the user explicitly prohibits file creation or the host has no safe artifact surface. Full/scored reference templates shape the Canvas model and evidence drawers rather than restoring Markdown by default. Canvas does not activate `FullOrScored`, add findings, or strengthen evidence.
 
 ## Validation
 - Conclusion precedes method; every judgment is evidenced or explicitly uncertain; recommendations trace to findings.

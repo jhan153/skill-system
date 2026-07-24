@@ -1,4 +1,4 @@
-schema_version: 1
+schema_version: 2
 work_item_id: WI-20260627-001
 title: "Add WorkItem lifecycle governance"
 source:
@@ -9,6 +9,11 @@ owner: agent
 primary_skill: workflow-task-ledger
 task_run_ref: TR-20260627-001
 loop_run_ref: null
+work_contract_ref: task-runs/TR-20260627-001/work-contract.yaml
+work_contract_hash: "0000000000000000000000000000000000000000000000000000000000000000"
+result_label: agent-verified
+deferred_actions: []
+runnable_action_refs: []
 runtime_boundary:
   mode: state_model
   queue_runtime: false

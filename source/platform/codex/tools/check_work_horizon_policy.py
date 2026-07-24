@@ -16,7 +16,9 @@ from _validation import load_yaml_file, skill_dirs_by_id  # noqa: E402
 
 
 EXPECTED: dict[str, dict[str, str]] = {
+    "plan-behavior-discovery": {"work_horizon": "one_shot", "planning_altitude": "behavior_discovery"},
     "plan-long-term-package": {"work_horizon": "long_plan", "planning_altitude": "strategic_package"},
+    "plan-requirements-discovery": {"work_horizon": "one_shot", "planning_altitude": "requirements_discovery"},
     "plan-short-term-docs": {"work_horizon": "short_plan", "planning_altitude": "tactical_design"},
     "plan-loop-term": {"work_horizon": "loop_overlay", "planning_altitude": "loop_contract"},
     "plan-spec-curator": {"work_horizon": "cross_horizon", "planning_altitude": "lifecycle_curation"},
@@ -35,8 +37,15 @@ EXPECTED: dict[str, dict[str, str]] = {
     "workflow-minimal-implementation": {"work_horizon": "cross_horizon", "execution_mode": "minimality_constraint"},
 }
 
-VALID_HORIZONS = {"task_ticket", "short_plan", "long_plan", "loop_overlay", "cross_horizon"}
-VALID_ALTITUDES = {"strategic_package", "tactical_design", "loop_contract", "lifecycle_curation"}
+VALID_HORIZONS = {"one_shot", "task_ticket", "short_plan", "long_plan", "loop_overlay", "cross_horizon"}
+VALID_ALTITUDES = {
+    "behavior_discovery",
+    "requirements_discovery",
+    "strategic_package",
+    "tactical_design",
+    "loop_contract",
+    "lifecycle_curation",
+}
 VALID_EXECUTION_MODES = {
     "implementation_execution",
     "bug_fix_execution",

@@ -1,4 +1,4 @@
-version: "9.4.2"
+version: "9.4.3"
 purpose: "Design cluster usage-quality cases."
 cases:
   - case_id: design-001
@@ -167,7 +167,7 @@ cases:
     user_request: "이 UI 스크린샷을 구현하기 전에 정보 계층, 레이아웃 영역, 컴포넌트 후보로 분해해줘."
     expected_primary_skill: design-ui-decomposer
     expected_supporting_skills: []
-    should_not_trigger: [design-frontend, design-tokens, design-visual-regression]
+    should_not_trigger: [design-frontend, design-tokens, design-component-mapper, design-visual-regression]
     expected_context: [screenshot, surface type]
     expected_output_shape: "decomposition report"
     quality_notes: "Experimental analysis skill; no code edits."
@@ -310,6 +310,26 @@ cases:
         artifact_bound: true
       - type: qualitative_review
         expected: pass
+  - case_id: design-039
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [design-ui-decomposer, design-component-mapper]
+    scenario_tags: [handoff, ownership_boundary]
+    user_request: "UI decomposition에서 Button, Select, StatusBanner 후보가 나왔어. 이제 이 후보를 repo component와 variant/state에 매핑하고 실제 reuse 근거를 확인해줘."
+    expected_primary_skill: design-component-mapper
+    expected_supporting_skills: []
+    should_not_trigger: [design-ui-decomposer, design-frontend]
+    expected_context: [decomposition component candidates, repo component paths, approved catalog, variant and state requirements]
+    expected_output_shape: "component contract mappings, reuse evidence, and unresolved gaps"
+    quality_notes: "Decomposition proposes candidates; mapper owns confirmation against repository contracts."
+    friction_risk: "treating repeated visual patterns as confirmed component reuse"
+    expected_behaviors: [handoff_candidates_to_component_mapper, verify_semantic_role_and_reuse_site, preserve_unmapped_gaps]
+    forbidden_behaviors: [claim_reuse_from_decomposition_alone, rerun_decomposition_as_mapping, implement_components]
+    required_evidence:
+      - type: route_match
+        expected: design-component-mapper
+      - type: route_absence
+        expected: design-ui-decomposer
   - case_id: design-031
     schema_version: 2
     required_eval_mode: host-assisted

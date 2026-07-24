@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the 9.4.2 platform-separated runtime contract."""
+"""Verify the 9.4.3 platform-separated runtime contract."""
 
 from __future__ import annotations
 

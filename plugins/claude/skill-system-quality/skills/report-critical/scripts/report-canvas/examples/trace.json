@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "mode": "trace",
+  "language": "ko",
+  "eyebrow": "Implementation explainer · trace",
+  "title": "사용자 입력이 topology commit으로 이어지는 경로",
+  "summary": "입력과 preview는 분리되어 있고 Apply 단계에서만 production mutation path가 호출됩니다. 실패 atomicity는 runtime readback이 없어 아직 unverified입니다.",
+  "status": "info",
+  "evidence_status": "mixed",
+  "snapshot": {
+    "label": "current worktree",
+    "ref": "feature/mesh-preview"
+  },
+  "findings": [
+    {
+      "severity": "medium",
+      "title": "실패 시 원본 보존은 source-established에 머뭅니다",
+      "summary": "rollback branch는 존재하지만 representative non-manifold input의 runtime observation이 없습니다.",
+      "evidence_refs": [
+        "commit-source",
+        "runtime-missing"
+      ]
+    }
+  ],
+  "next_action": {
+    "kind": "next",
+    "label": "non-manifold 입력 한 건에서 pre/post topology readback을 수집합니다"
+  },
+  "visual": {
+    "type": "trace",
+    "trace_kind": "causal",
+    "nodes": [
+      {
+        "id": "input",
+        "label": "Tool input",
+        "detail": "사용자가 preview parameter를 바꿉니다.",
+        "status": "observed",
+        "evidence_refs": [
+          "ui-trace"
+        ]
+      },
+      {
+        "id": "preview",
+        "label": "Preview state",
+        "detail": "원본 mesh와 분리된 candidate를 표시합니다.",
+        "status": "verified",
+        "evidence_refs": [
+          "preview-source"
+        ]
+      },
+      {
+        "id": "commit",
+        "label": "Apply mutation",
+        "detail": "검증을 통과하면 topology owner가 변경을 commit합니다.",
+        "status": "unverified",
+        "evidence_refs": [
+          "commit-source",
+          "runtime-missing"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "input",
+        "to": "preview",
+        "label": "recompute"
+      },
+      {
+        "from": "preview",
+        "to": "commit",
+        "label": "Apply"
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "id": "ui-trace",
+      "title": "대표 UI trace",
+      "status": "observed",
+      "kind": "runtime",
+      "source": "trace://mesh-preview/001",
+      "summary": "parameter 입력과 preview refresh가 관찰됐습니다."
+    },
+    {
+      "id": "preview-source",
+      "title": "Preview ownership",
+      "status": "verified",
+      "kind": "source",
+      "source": "src/tools/MeshPreview.cpp:84",
+      "summary": "preview candidate가 original handle과 분리됩니다."
+    },
+    {
+      "id": "commit-source",
+      "title": "Commit path",
+      "status": "verified",
+      "kind": "source",
+      "source": "src/mesh/TopologyMutation.cpp:211",
+      "summary": "Apply 이후 topology owner로 mutation을 위임합니다."
+    },
+    {
+      "id": "runtime-missing",
+      "title": "Failure atomicity observation",
+      "status": "unverified",
+      "kind": "runtime",
+      "source": "representative failure trace unavailable",
+      "summary": "non-manifold rejection의 pre/post topology readback이 없습니다."
+    }
+  ]
+}

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import subprocess
 import sys
@@ -11,32 +12,24 @@ import time
 from pathlib import Path
 
 
-DEFAULT_PROFILES = ["core", "execution", "research", "integrations", "loop"]
-CHECK_STATUSES = {"PASS", "SKIP", "FAIL", "ERROR"}
-RELEASE_REQUIRED_CHECK_IDS = {
-    "core": {
-        "doc_freshness",
-        "tool_requirements",
-        "reference_targets",
-        "eval_cases",
-        "invocation_surface_policy",
-        "work_horizon_policy",
-        "work_item_lifecycle",
-        "release_identity",
-        "generated_mirrors",
-        "validator_unit_tests",
-    },
-    "execution": {
-        "execution_assurance_artifacts",
-    },
-    "research": {"research_ledger"},
-    "integrations": {"kanboard_integration"},
-    "loop": {
-        "loop_run_fixture",
-        "loop_init_smoke",
-        "loop_evidence_ledger",
-        "loop_engineering_invariants",
-    },
+def load_verifier_contract():
+    verifier_path = Path(__file__).with_name("verify_bundle.py")
+    spec = importlib.util.spec_from_file_location("skill_system_bundle_verifier", verifier_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"could not load verifier contract: {verifier_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+VERIFIER_CONTRACT = load_verifier_contract()
+DEFAULT_PROFILES = list(VERIFIER_CONTRACT.PROFILE_CHECK_BUILDERS)
+RELEASE_REQUIRED_CHECK_IDS = VERIFIER_CONTRACT.RELEASE_REQUIRED_CHECK_IDS
+CHECK_STATUSES = {
+    VERIFIER_CONTRACT.STATUS_PASS,
+    VERIFIER_CONTRACT.STATUS_SKIP,
+    VERIFIER_CONTRACT.STATUS_FAIL,
+    VERIFIER_CONTRACT.STATUS_ERROR,
 }
 
 

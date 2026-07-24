@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: verified project root/ID, exact target or manifest state, persistence intent, and exact init/reinit/bootstrap approval
 - expected_outputs: minimal category layout, navigable compact index, manifest section update, and readback
 - context_targets:
-  must_read: exact target/manifest state, `.codex/docs/project_context_manifest.md`, and `.codex/docs/knowledge_record_contract.md`
+  must_read: exact target/manifest state, `.claude/docs/project_context_manifest.md`, and `.claude/docs/knowledge_record_contract.md`
   read_if_needed: repository documentation/persistence convention
   do_not_load_by_default: other stores, Memory, Wikis, plans, transcripts, generated projections
 - risk_profile:

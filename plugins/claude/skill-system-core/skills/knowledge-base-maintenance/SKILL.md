@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: declared store, `report|validate|reindex|link-check|relation-check|history-check|overlap-check|conflict-check|recurrence-report|compact` operation, and affected IDs when bounded
 - expected_outputs: structural findings and only explicitly requested store/index changes with readback
 - context_targets:
-  must_read: manifest, index, affected records, and `.codex/docs/knowledge_record_contract.md`
+  must_read: manifest, index, affected records, and `.claude/docs/knowledge_record_contract.md`
   read_if_needed: direct canonical/evidence refs or superseded records needed for one finding
   do_not_load_by_default: full external sources, unrelated Memory/Wikis/plans, raw transcripts
 - risk_profile:

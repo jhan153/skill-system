@@ -24,7 +24,7 @@ Runtime configuration and automation assets, including `.codex/config.toml` and 
 
 Review `.codex/rules/default.rules` against local policy before copying it.
 
-The default Codex hook map is empty. Optional hook adapters require explicit project/runtime enablement.
+The default Codex hook map is the bounded eight-event topology described by its platform harness lifecycle document. It is not a permission, network, or general output-enforcement layer; optional integrations still require their explicit project/runtime conditions.
 
 ## project context manifest
 
@@ -47,6 +47,12 @@ Runtime usage eval cases are authored regression examples. They can check their 
 ## field feedback
 
 Field feedback means only a behavior or problem the user explicitly reports in conversation. The bundle does not automatically collect or persist prompts, transcripts, usage, or user identifiers.
+
+## user work contract
+
+The user work contract is the normalized execution authority formed from explicit natural-language goals, scope, exclusions, verification ownership, interaction availability, continuation behavior, and stop terms. It survives routing, skill selection, TaskRun/LoopRun projection, compaction, continuation, and finalization without requiring special user syntax.
+
+An excluded or locally blocked semantic intent may be deferred without making it successful. Global `blocked` means no required runnable work remains. Host-level approval denial is narrower: it applies only to an active unattended Goal/Loop that forbids additional interaction; attended and interaction-enabled work retains normal host permission behavior.
 
 ## WorkItem lifecycle
 

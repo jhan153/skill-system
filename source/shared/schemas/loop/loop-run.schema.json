@@ -42,7 +42,10 @@
       "additionalProperties": false
     },
     "status": {
-      "enum": ["active", "success", "blocked", "budget_exhausted", "unsafe", "fatal", "stalled"]
+      "enum": ["active", "success", "user_verification_needed", "blocked", "budget_exhausted", "unsafe", "fatal", "stalled"]
+    },
+    "result_label": {
+      "enum": ["pending", "agent-verified", "user-verification-needed", "unverified", "blocked"]
     },
     "iteration": { "type": "integer", "minimum": 0 },
     "started_at": { "type": "string", "format": "date-time" },
@@ -69,7 +72,7 @@
             "type": "string",
             "pattern": "^SC-[0-9]{3}$"
           },
-          "status": { "enum": ["pass", "fail", "unverified", "blocked"] },
+          "status": { "enum": ["pass", "fail", "unverified", "blocked", "deferred"] },
           "evidence_refs": {
             "type": "array",
             "items": { "type": "string" }
@@ -185,12 +188,28 @@
       "type": "object",
       "required": ["action", "reason_code"],
       "properties": {
-        "action": { "enum": ["success", "continue", "recover", "pause", "blocked", "budget_exhausted", "unsafe", "fatal"] },
+        "action": { "enum": ["success", "user_verification_needed", "continue", "recover", "pause", "blocked", "budget_exhausted", "unsafe", "fatal"] },
         "reason_code": { "type": "string", "minLength": 1 },
         "target_condition": { "type": ["string", "null"] },
         "continuation_prompt": { "type": ["string", "null"] }
       },
       "additionalProperties": false
+    },
+    "deferred_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["condition_id", "intent_key", "reason"],
+        "properties": {
+          "condition_id": {
+            "type": "string",
+            "pattern": "^SC-[0-9]{3}$"
+          },
+          "intent_key": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
     },
     "side_effect_journal": { "type": "array" },
     "applied_results": {

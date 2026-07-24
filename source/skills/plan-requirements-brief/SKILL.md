@@ -21,7 +21,7 @@ Own `discovery -> requirements_contract` only when goals, scope, non-goals, assu
 
 ## Distillation Workflow
 1. Prefer decision records over raw transcripts. Separate `decided`, `assumed`, `open`, and contradictory statements with source pointers for material decisions/conflicts.
-2. Normalize one problem, goals, actors, scope, non-goals, and deferred work; preserve source wording when meaning is sensitive.
+2. Normalize one problem, goals, actors, scope, non-goals, and deferred work; preserve source wording when meaning is sensitive. When supplied intent speaks to execution, also preserve verification owner, attended/unattended mode, interaction availability, local-block continuation, and stop terms so downstream skills cannot silently reset them.
 3. Create only value-bearing stories and stable IDs; link each material goal/story to an observable criterion or explicit deferral.
 4. Move unresolved facts to assumptions, risks, or blocking questions; preserve contradictions rather than selecting a convenient answer.
 5. Read narrow repo evidence only for compatibility claims; mark unsupported behavior or feasibility `Unverified`.

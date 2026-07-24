@@ -42,6 +42,8 @@ The router returns one owner and stops. It does not acquire evidence, implement,
 | direct implementation or refactor | current implementation owner or one clear specialist |
 | approved plan/spec execution | `workflow-plan-runner` |
 | bug fix with an unclear cause | `workflow-bug-fix`; use `analysis-bug` only for the unresolved cause |
+| existing implementation explanation or code-review-style HTML | `report-implementation-explainer`, only on explicit explanation/artifact intent |
+| product behavior discovery for an existing capability | `plan-behavior-discovery`, only on explicit one-question decision intent |
 | short persisted plan | `plan-short-term-docs` |
 | accepted loop execution | `workflow-loop-runner` after a valid loop contract |
 | Memory read | current task owner using `memory-bank-harness` only for a declared, task-relevant slice |
@@ -84,6 +86,7 @@ The nearest `project-context.yaml` declares project-local skill roots, Memory Ba
 ## Heavy Artifacts And Evidence
 
 - Plans, reports, lifecycle packages, synthetic eval suites, and other heavy artifacts require explicit artifact intent.
+- An implementation explainer proves only that a source/runtime-anchored aid was generated. Do not claim human understanding; prefer an observable scenario comparison or product decision when the task continues.
 - Scenario/replay files prove only their authored contracts; they are not field-quality evidence.
 - Hooks, harness records, and verifier receipts do not prove user intent and do not authorize repair.
 - Use the smallest existing verifier or actual-path observation that matches the material condition. Do not create fixtures or validation infrastructure merely to obtain a stronger result label.

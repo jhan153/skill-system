@@ -86,6 +86,45 @@ open_findings: []
 next_action: ""
 """
 
+V2_ACTIVE_WORK_ITEM = """\
+schema_version: 2
+work_item_id: WI-20260723-999
+title: "Nonblocking work contract projection"
+source:
+  type: user_request
+  ref: "demo"
+state: implement
+owner: agent
+primary_skill: workflow-task-ledger
+task_run_ref: TR-20260723-999
+loop_run_ref: LR-20260723-999
+work_contract_ref: task-runs/TR-20260723-999/work-contract.yaml
+work_contract_hash: "0000000000000000000000000000000000000000000000000000000000000000"
+result_label: pending
+deferred_actions:
+  - action_ref: validation
+    intent_key: validate-product
+    work_kind: agent_validation
+    reason: user owns verification
+    interaction_required: false
+runnable_action_refs:
+  - implement-parser
+runtime_boundary:
+  mode: state_model
+  queue_runtime: false
+  scheduler_runtime: false
+  kanboard_source_of_truth: false
+  looprun_replacement: false
+history:
+  - state: implement
+    at: "2026-07-23T00:00:00Z"
+    actor: agent
+    evidence_refs: []
+evidence_refs: []
+open_findings: []
+next_action: "implement-parser"
+"""
+
 
 class WorkItemLifecycleTests(unittest.TestCase):
     def write_case(self, text: str) -> Path:
@@ -129,6 +168,37 @@ class WorkItemLifecycleTests(unittest.TestCase):
         result = run_validate(path)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("queue_runtime", result.stdout)
+
+    def test_v2_local_defer_can_coexist_with_independent_runnable_work(self) -> None:
+        result = run_validate(self.write_case(V2_ACTIVE_WORK_ITEM))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_v2_blocked_rejects_remaining_runnable_work(self) -> None:
+        text = (
+            V2_ACTIVE_WORK_ITEM
+            .replace("state: implement", "state: blocked")
+            .replace("result_label: pending", "result_label: blocked")
+            .replace('next_action: "implement-parser"', 'blocked_reason: "approval unavailable"\nnext_action: "ask user"')
+        )
+        result = run_validate(self.write_case(text))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("runnable", result.stdout)
+
+    def test_v2_rejects_duplicate_deferred_semantic_intent(self) -> None:
+        duplicate = (
+            "  - action_ref: validation-retry\n"
+            "    intent_key: validate-product\n"
+            "    work_kind: validation_artifact\n"
+            "    reason: alternate form of the same purpose\n"
+            "    interaction_required: false\n"
+        )
+        text = V2_ACTIVE_WORK_ITEM.replace(
+            "runnable_action_refs:\n",
+            duplicate + "runnable_action_refs:\n",
+        )
+        result = run_validate(self.write_case(text))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("semantic intents", result.stdout)
 
 
 if __name__ == "__main__":

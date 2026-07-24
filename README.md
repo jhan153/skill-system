@@ -12,22 +12,24 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.4.2 Bundle
+## 9.4.3 Bundle
 
-This source tree carries the consolidated 9.4.2 public bundle boundary release. Its main components are:
+This source tree carries the 9.4.3 release above the 9.4.2 public bundle boundary. Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
 * `eval`: authored regression examples for structural and routing-contract maintenance; they are not field-quality evidence
 * `tools`: helper tools for inspecting the bundle structure
+* `work-contract`: shared TaskRun/WorkItem/LoopRun contracts plus a privacy-bounded Codex runtime projection that preserves user scope, verification ownership, and non-blocking continuation
+* `report-canvas`: one canonical offline report renderer and contract, projected into each generated `report-*` skill's `scripts/` and `references/` payload for installation-safe use
 * `integrations`: optional integration payloads — includes `integrations/kanboard-plan-sync`, a plan-centric MCP/CLI that projects Markdown plans onto a local Kanboard. The Kanboard app, DB, themes, and plugins are NOT bundled; only the integration code, two Agent skills (`kanboard-plan-rollout`, `kanboard-plan-ops`), MCP registration examples, and a local-host setup methodology are included.
 * `CHANGELOG.md`, `TERMS.md`: change history and terminology notes
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.4.2 — Public Bundle Boundary`, directly succeeding 9.3.4 as the corrected 9.4 release. Local installation is explicit and does not imply committing, tagging, publishing, or pushing. Codex and Claude share one bundle version and release tag when released; harness changes advance that version instead of creating a second protocol-version axis.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.4.3 — Work Contracts & Report Canvas`, directly succeeding `9.4.2 — Public Bundle Boundary`. Local installation is explicit and does not imply committing, tagging, publishing, or pushing. Codex and Claude share one bundle version and release tag; harness changes advance that version instead of creating a second protocol-version axis.
 
-9.4.2 adds temporal and relational Knowledge, guided project-context setup, question-owned workflow navigation, independent review axes, and explicit delivery shapes. It also removes the historical Research Ledger from generated runtime payloads, keeps clean installation away from user-owned stores, and retires the public external-source revision/license/adoption ledger. Project decisions remain in the manifest-declared local Knowledge Base rather than the distributable bundle. The Codex harness retains the compact 9.3 routing model, while Claude preserves its independently owned structured instruction/routing model and Claude-native Go dispatcher.
+9.4.3 retains the 9.4.2 public boundary while adding a persistent user work contract across direct work, TaskRun, WorkItem, and LoopRun. Optional validation or approval-bound support work can be deferred without replacing independent required work; automatic permission denial is limited to unattended Goal/Loop contracts that forbid interaction, while attended work keeps normal host behavior. The release also adds explicit implementation-explanation and existing-capability behavior-discovery skills and makes one offline Report Canvas the default human-facing output for admitted report-family tasks, with `decision`, `compare`, `trace`, and optional Three.js `spatial` views. Ordinary non-report answers remain concise chat. The Codex harness retains the compact 9.3 routing model, while Claude preserves its independently owned structured instruction/routing model and Claude-native Go dispatcher.
 
 The Codex router uses an exact specialist directly and opens at most one narrow router only when several owners genuinely compete. An implicit router may automatically hand off only to a declared, implicitly exposed read/analysis owner; heavy writers and explicitly selected context remain explicit-only. One canonical invocation bit is projected into each host's native contract: Codex reads `agents/openai.yaml`, while Claude receives `disable-model-invocation: true` only for explicit-only skills. Codex packages stay at `plugins/<name>/skills`; paired Claude packages are generated at `plugins/claude/<name>/skills` under the same plugin name and version so each host discovers only its native metadata. The nearest `project-context.yaml` may declare manifest-relative or exact approved absolute Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery. Knowledge operations consume resolved `knowledge_root` and `knowledge_index` variables rather than a fixed directory.
 
@@ -130,6 +132,10 @@ Report skills organize evidence, reviews, changes, and work artifacts into resul
 | `report-qualitative`        | Produces qualitative evaluation reports with explicit criteria, evidence, interpretation, judgment, and recommendations.   |
 | `report-critical`           | Performs blocker-first critical review, risk review, and QA-style judgment on artifacts, plans, outputs, or conversations. |
 | `report-diff`               | Presents only actual changed lines or verified before/after snapshots in a readable grouped diff format.                   |
+| `report-implementation-explainer` | Creates a source/runtime-anchored causal explanation or interactive trace/spatial Canvas for an existing implementation and its next product decision. |
+| `report-lifecycle-artifacts` | Packages explicitly requested lifecycle artifacts and condition-scoped traceability without treating package presence as delivery completion. |
+
+All report-family human-facing results use the shared offline Report Canvas by default, with Oblivion dark and Oblivion Hagoromo light themes. Generation projects the canonical contract and renderer into each `report-*` skill's own `references/` and `scripts/` folders, so an installed skill has no sibling-plugin or undeclared plugin-root dependency. The chat response is a concise outcome-and-link receipt; explicit chat-only/no-file and exact machine or canonical formats remain valid overrides. Report skills retain their own evidence, verdict, and handoff semantics; Canvas is only the common `decision` / `compare` / `trace` / `spatial` presentation layer.
 
 ### Workflow
 
@@ -277,6 +283,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.3.3 | Reproducible Codex harness artifacts | Disables automatic Go VCS build metadata so committed macOS and Windows harness binaries remain byte-identical when regenerated after the release commit, removes hard-coded `/private/tmp` writes from Codex verification tooling, and retains the 9.3.2 Go harness behavior under one unified bundle version. |
 | 9.3.4 | Claude-native Go harness | Adds a four-event Claude dispatcher using `prompt_id` with a hashed sequence fallback, direct `Notification` mapping, `stop_hook_active`, shared bounded Go core packages, and macOS/Windows/Linux artifacts. Removes the Claude Python ledger, transcript Output Gate, measurement, lifecycle schema, and notification adapters without changing Claude's independent instruction/routing model. |
 | 9.4.2 | Public bundle boundary | Consolidates temporal/relational Knowledge and workflow guidance with clean-install state protection. Retires the public external-source revision/license/adoption ledger, keeps project decisions in the declared local Knowledge Base, and prevents release validation from reintroducing that ledger. |
+| 9.4.3 | Work contracts & Report Canvas | Preserves user scope, verification ownership, local deferral, and non-blocking continuation across direct/Task/Loop work; adds implementation explanation, behavior discovery, and the shared offline Report Canvas. |
 
 ## License
 

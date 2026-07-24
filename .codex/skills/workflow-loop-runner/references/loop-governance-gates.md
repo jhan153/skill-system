@@ -20,7 +20,7 @@ Always enforce evidence/finalization, progress, budget, and approval/idempotency
 
 - A required `SC-NNN` passes only with a canonical structured receipt that matches its runtime verifier.
 - Free-form evidence refs, maker self-report, a generic Stop hook, or an unavailable label cannot prove pass.
-- `user-verification-needed` blocks success. Local v2 records manual events only as procedural evidence and has no host-authenticated path to auto-pass them.
+- `user_verification_needed` is a terminal handoff, not success. The local v2/v3 evaluator records manual events only as procedural evidence and has no host-authenticated path to auto-pass them.
 - Claimed command and diff logs are likewise non-authoritative; do not replace them with artifact-presence conditions to manufacture success.
 - Before success, validate the LoopRun and persist a stop packet.
 
@@ -63,7 +63,7 @@ Recover or stop when the bounded contract threshold is reached:
 
 ## Approval And Idempotency
 
-Before any external or irreversible action, require the contract's approval gate. Before retrying one, require an idempotency key, dry-run, rollback plan, or recorded prior result. Otherwise stop as `permission_required`/`user_input_required`; never retry deploy, delete, payment, notification, migration, or live write because the previous result is unclear.
+Before any external or irreversible action, require the contract's approval gate when interaction is allowed. In an unattended no-interaction contract, defer the action before UI wait and continue independent required work. Before any permitted retry, require an idempotency key, dry-run, rollback plan, or recorded prior result; never retry deploy, delete, payment, notification, migration, or live write because the previous result is unclear.
 
 ## Runtime Capability
 

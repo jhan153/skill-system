@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: selected mode, exact repository root/manifest, stable project ID when known, desired context capabilities, and one exact transaction approval that enumerates every write target
 - expected_outputs: manifest readback, a read-only diagnosis, or one approved bootstrap transaction delegated to existing store owners
 - context_targets:
-  must_read: exact root/manifest state, nearest repository instructions, and `.codex/docs/project_context_manifest.md`
+  must_read: exact root/manifest state, nearest repository instructions, and `.claude/docs/project_context_manifest.md`
   read_if_needed: bounded project-local paths that support one proposed declaration; owning init contract for each approved store
   do_not_load_by_default: full repo, store contents, transcripts, home/global context, adjacent repositories, undeclared Wikis
 - risk_profile:

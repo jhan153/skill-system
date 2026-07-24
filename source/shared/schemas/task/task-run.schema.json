@@ -5,13 +5,18 @@
   "type": "object",
   "required": ["schema_version", "task_run_id", "objective", "status", "steps", "findings", "final_verification"],
   "properties": {
-    "schema_version": { "enum": [1] },
+    "schema_version": { "enum": [1, 2] },
     "task_run_id": { "type": "string", "minLength": 1 },
     "work_item_ref": {
       "type": ["string", "null"],
       "pattern": "WI-[0-9]{8}-[0-9]{3}"
     },
     "objective": { "type": "string", "minLength": 1 },
+    "work_contract_ref": { "type": "string", "minLength": 1 },
+    "work_contract_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
     "workspace": {
       "type": "object",
       "properties": {
@@ -20,6 +25,9 @@
       }
     },
     "status": { "enum": ["active", "complete", "blocked", "cancelled"] },
+    "result_label": {
+      "enum": ["pending", "agent-verified", "user-verification-needed", "unverified", "blocked"]
+    },
     "active_step_id": { "type": ["string", "null"] },
     "steps": {
       "type": "array",
@@ -29,7 +37,28 @@
         "properties": {
           "id": { "type": "string", "minLength": 1 },
           "title": { "type": "string" },
-          "status": { "enum": ["pending", "in_progress", "complete", "failed", "blocked"] },
+          "kind": {
+            "enum": [
+              "core",
+              "required_prerequisite",
+              "agent_validation",
+              "test_authoring",
+              "validation_artifact",
+              "optional_quality",
+              "meta"
+            ]
+          },
+          "required": { "type": "boolean" },
+          "depends_on": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "intent_key": { "type": "string", "minLength": 1 },
+          "requires_interaction": { "type": "boolean" },
+          "status": {
+            "enum": ["pending", "in_progress", "complete", "failed", "blocked", "deferred"]
+          },
+          "deferred_reason": { "type": "string", "minLength": 1 },
           "evidence_refs": { "type": "array", "items": { "type": "object" } }
         },
         "additionalProperties": false,
@@ -38,6 +67,11 @@
             "comment": "a complete step must carry observed evidence",
             "if": { "properties": { "status": { "const": "complete" } }, "required": ["status"] },
             "then": { "properties": { "evidence_refs": { "minItems": 1 } } }
+          },
+          {
+            "comment": "a deferred step must record why it is not runnable",
+            "if": { "properties": { "status": { "const": "deferred" } }, "required": ["status"] },
+            "then": { "required": ["deferred_reason"] }
           }
         ]
       }
@@ -78,7 +112,9 @@
       "type": "object",
       "required": ["status", "evidence_refs"],
       "properties": {
-        "status": { "enum": ["pending", "pass"] },
+        "status": {
+          "enum": ["pending", "pass", "user-verification-needed", "unverified"]
+        },
         "evidence_refs": { "type": "array", "items": { "type": "object" } }
       },
       "additionalProperties": false,
@@ -91,5 +127,47 @@
       ]
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": { "schema_version": { "const": 2 } },
+        "required": ["schema_version"]
+      },
+      "then": {
+        "required": ["work_contract_ref", "work_contract_hash", "result_label"]
+      }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "active" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": { "result_label": { "const": "pending" } }
+      }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "blocked" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": { "result_label": { "const": "blocked" } }
+      }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "complete" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "result_label": {
+            "enum": ["agent-verified", "user-verification-needed", "unverified"]
+          }
+        }
+      }
+    }
+  ]
 }

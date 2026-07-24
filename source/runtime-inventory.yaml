@@ -7,6 +7,8 @@
 # generated target and must not carry a do-not-edit/checksum header.
 #
 # Evidence basis (2026-06-29, from skill-system/ root):
+#   - 9.4.3: user work contracts, non-blocking continuation, Report Canvas,
+#     implementation-understanding skills, and post-9.4.2 maintenance added
 #   - 9.4.2: Knowledge relation/history and workflow guidance added; Research fixtures remain
 #     source-only; public provenance ledger retired with release guards against reintroduction
 #   - 9.3.4: skill bodies remain shared; Claude frontmatter projects explicit-only invocation
@@ -68,6 +70,14 @@ entries:
     confidence: confirmed
     gap: none
     notes: "Shared contracts generate to both platforms; harness lifecycle and Agent Output documents are platform-owned overlays because Codex and Claude runtimes intentionally differ."
+
+  - path: "skills/report-*/scripts/report-canvas/ + skills/report-*/references/report_canvas_contract.md"
+    present_in: [codex, claude, report-skill plugins]
+    class: shared-canonical + skill-local projection
+    generation: derived per-report-skill payload
+    confidence: confirmed
+    gap: none
+    notes: "One canonical shared report model, deterministic offline renderer, Oblivion/Hagoromo themes, examples, and pinned dependencies project into every report skill's supported scripts/references boundary. Installed report skills need no sibling plugin or runtime root; non-report skills carry no Canvas payload. Three.js is embedded only in rendered spatial artifacts."
 
   - path: "eval/"
     present_in: [codex, claude]

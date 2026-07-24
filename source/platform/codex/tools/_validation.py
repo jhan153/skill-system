@@ -217,6 +217,16 @@ def validate_schema_subset(
         min_items = schema.get("minItems")
         if isinstance(min_items, int) and len(instance) < min_items:
             errors.append(f"{path}: expected at least {min_items} items, got {len(instance)}")
+        max_items = schema.get("maxItems")
+        if isinstance(max_items, int) and len(instance) > max_items:
+            errors.append(f"{path}: expected at most {max_items} items, got {len(instance)}")
+        if schema.get("uniqueItems") is True:
+            seen: set[str] = set()
+            for idx, item in enumerate(instance):
+                key = json.dumps(item, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+                if key in seen:
+                    errors.append(f"{path}[{idx}]: duplicate item is not allowed")
+                seen.add(key)
         item_schema = schema.get("items")
         if isinstance(item_schema, dict):
             for idx, item in enumerate(instance):

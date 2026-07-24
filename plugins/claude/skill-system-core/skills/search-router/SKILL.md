@@ -21,7 +21,7 @@ description: Route explicit cross-domain evidence requests to one sufficient lan
     - evidence intent, domain hints, and final task owner
   read_if_needed:
     - `references/evidence-lane-matrix.md` when two lanes remain plausible
-    - `.codex/research-routing.md` when paper terms may hide a research-stage request
+    - `.claude/context-routing.md` when paper terms may hide a research-stage request
   do_not_load_by_default:
     - full repo/memory or lane artifacts
 - risk_profile:

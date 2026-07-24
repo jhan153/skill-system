@@ -10,6 +10,18 @@ it does not need a synthetic `scratch -> implementation_ready -> executing`
 transition. Use `work_horizon_model.md` for persistence and artifact altitude,
 and the host `context-routing.md` for the current-turn owner.
 
+Staying outside the planning state machine does not remove the user work
+contract. Explicit scope, exclusions, verification ownership, interaction
+availability, continuation behavior, and stop terms govern direct work,
+TaskRun, and LoopRun alike; planning transitions may reference that contract
+but cannot relax it.
+
+`plan-behavior-discovery` also stays outside this persisted state machine by
+default. It uses current implementation evidence to resolve only the next
+human-operable slice; an explicitly requested decision record is an input to a
+later owner, not a synthetic return to `scratch -> discovery` or implementation
+approval.
+
 ## Core Rule
 
 Planning skills may propose questions, summaries, candidate scopes, and next

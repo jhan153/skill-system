@@ -38,7 +38,6 @@ IMPLICIT_SKILL_SURFACES = {
     "design-frontend": "explicit_procedure",
     "knowledge-base-read": "support_only",
     "memory-bank-harness": "support_only",
-    "project-context-checkpoint": "explicit_procedure",
 }
 POLICY_COMPARE_KEYS = {
     "invocation_surface",

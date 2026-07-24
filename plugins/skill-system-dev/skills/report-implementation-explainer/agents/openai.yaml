@@ -1,0 +1,7 @@
+interface:
+  display_name: "Implementation Explainer"
+  short_description: "Explain implemented behavior in Canvas HTML"
+  default_prompt: "Use $report-implementation-explainer to explain an existing implementation from source and runtime evidence as Report Canvas HTML."
+
+policy:
+  allow_implicit_invocation: false

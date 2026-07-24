@@ -15,6 +15,55 @@ func TestInactiveSessionDoesNotResolveLoop(t *testing.T) {
 	}
 }
 
+func TestUserVerificationHandoffIsTerminal(t *testing.T) {
+	if !terminalActions["user_verification_needed"] {
+		t.Fatal("user verification handoff must deactivate an active LoopRun")
+	}
+}
+
+func TestActiveV3WorkContractProjection(t *testing.T) {
+	loop := filepath.Join(t.TempDir(), "loop")
+	if err := os.MkdirAll(loop, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	contract := []byte(
+		"schema_version: 3\n" +
+			"work_contract:\n" +
+			"  execution:\n" +
+			"    mode: unattended_goal_loop\n" +
+			"  verification:\n" +
+			"    owner: user\n" +
+			"  interaction:\n" +
+			"    mode: forbidden\n" +
+			"  scope:\n" +
+			"    excluded_action_classes: [agent_validation, test_authoring]\n",
+	)
+	if err := os.WriteFile(filepath.Join(loop, "contract.yaml"), contract, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	state := []byte(
+		"schema_version: 2\n" +
+			"status: active\n" +
+			"contract_ref: contract.yaml\n" +
+			"contract_hash: " + digestBytes(contract) + "\n",
+	)
+	if err := os.WriteFile(filepath.Join(loop, "state.yaml"), state, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	projection, err := WorkContract("", loop)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !projection.Active ||
+		projection.ExecutionMode != "unattended_goal_loop" ||
+		projection.InteractionMode != "forbidden" ||
+		projection.VerificationOwner != "user" ||
+		len(projection.ExcludedActionClasses) != 2 ||
+		projection.SourceDigest != digestBytes(contract) {
+		t.Fatalf("unexpected projection: %#v", projection)
+	}
+}
+
 func TestActivePointerResolution(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("CODEX_HOME", home)

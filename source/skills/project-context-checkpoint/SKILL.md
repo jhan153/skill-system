@@ -1,16 +1,16 @@
 ---
 name: project-context-checkpoint
-description: At an explicit project commit request or explicit closeout/record request, classify newly finalized durable context into an existing project Memory Bank or Knowledge Base declared by project-context.yaml. Use only for the current task's clear changes; never run from Stop hooks, initialize stores, write home/global context, collect raw chat, or duplicate one fact in both stores.
+description: At an explicitly requested project context checkpoint during commit or closeout, classify newly finalized durable context into an existing project Memory Bank or Knowledge Base declared by project-context.yaml. Use only for the current task's clear changes; an ordinary commit does not invoke this writer, and it never runs from Stop hooks, initializes stores, writes home/global context, collects raw chat, or duplicates one fact in both stores.
 ---
 
 # Project Context Checkpoint
 
 ## Routing Card
-- role: context_operation
+- role: project_context_operation
 - intent_signature: project commit/closeout durable context checkpoint
 - use_when:
-  - the user requests a commit and the nearest manifest declares an existing Memory or Knowledge store; or
-  - the user explicitly requests closeout, context recording, or Memory/Knowledge checkpointing
+  - the user explicitly requests a project context checkpoint as part of a commit; or
+  - the user explicitly requests closeout context recording or Memory/Knowledge checkpointing
 - do_not_use_when:
   - ordinary session stop or status reporting
   - no store is declared/existing
@@ -30,7 +30,7 @@ description: At an explicit project commit request or explicit closeout/record r
 - entry_scene: PREPARE
 
 ## Authorization Boundary
-A commit request authorizes this checkpoint only for clear durable context finalized by the same commit and existing repository-contained project stores. It does not authorize store initialization, unrelated cleanup, external/home writes, LLM Wiki mutation, or another approval prompt for each clear item. An explicit closeout/record request provides the same bounded authorization without authorizing a Git commit; an external Knowledge store is writable only when that request names or approves its exact resolved `knowledge_root` and any `knowledge_index` outside that root.
+An ordinary commit request does not authorize or invoke this checkpoint. An explicit context-checkpoint request made alongside a commit authorizes only clear durable context finalized by that same commit and existing repository-contained project stores. It does not authorize store initialization, unrelated cleanup, external/home writes, LLM Wiki mutation, or another approval prompt for each clear item. An explicit closeout/record request provides the same bounded authorization without authorizing a Git commit; an external Knowledge store is writable only when that request names or approves its exact resolved `knowledge_root` and any `knowledge_index` outside that root.
 
 Respect manifest persistence:
 

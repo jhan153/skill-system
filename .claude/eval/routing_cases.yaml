@@ -1,4 +1,4 @@
-version: "9.4.2"
+version: "9.4.3"
 purpose: "Positive routing examples for common requests."
 cases:
   - case_id: route-001
@@ -741,3 +741,222 @@ cases:
     expected_behaviors: [report_legacy_slash_unavailable, name_current_direct_id]
     forbidden_behaviors: [claim_legacy_command_installed, silently_execute_replacement]
     required_evidence: [{type: route_class, expected: legacy_direct_invocation_unavailable}]
+  - case_id: route-report-implementation-explainer-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-implementation-explainer]
+    scenario_tags: [positive, implementation_understanding, html_artifact, report_canvas, spatial]
+    user_request: "이번에 붙인 mesh split이 내부에서 어떤 순서로 mesh를 바꾸는지 아직 감이 안 와. 코드리뷰할 때 볼 수 있게 실제 코드 경로와 한 실행 예시를 엮은 HTML로 보여줘. 계산이 존재하는 것과 에디터에서 실제로 조작·출시할 수 있는 상태는 구분해줘."
+    expected_primary_skill: report-implementation-explainer
+    expected_supporting_skills: []
+    should_not_trigger: [report-diff, report-qualitative, report-critical, analysis-algorithm, plan-behavior-discovery]
+    expected_family: report
+    expected_context: [concrete_snapshot, production_source_path, representative_runtime_trace, authoritative_geometry_and_issue_indices, next_product_decision]
+    expected_output_shape: "source/runtime-anchored Report Canvas spatial explainer with separate capability, operability, and release status"
+    quality_notes: "Explicit causal explanation intent for an existing implementation belongs to the explainer, not diff presentation, verdicting, or an automatic quiz."
+    friction_risk: "building a persuasive standalone demo that reimplements production logic or claiming that artifact viewing proves understanding"
+    expected_behaviors:
+      - pin_implementation_snapshot
+      - trace_production_causal_path
+      - separate_capability_operability_and_release
+      - use_production_backed_visual_evidence
+      - render_report_canvas_spatial
+      - keep_evidence_in_progressive_drawers
+      - expose_productization_gaps
+    forbidden_behaviors:
+      - reimplement_production_algorithm_in_html
+      - infer_topology_issue_classes_in_browser
+      - load_remote_spatial_dependencies
+      - claim_user_understood
+      - convert_explanation_into_correctness_verdict
+    required_evidence:
+      - type: route_match
+        expected: report-implementation-explainer
+  - case_id: route-report-canvas-qualitative-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-qualitative]
+    scenario_tags: [positive, qualitative_evaluation, html_artifact, report_canvas, non_spatial]
+    user_request: "이 설계안의 출시 준비도를 근거 중심으로 평가해줘. 긴 Markdown 대신 결론, 최대 세 findings, 다음 행동이 첫 화면에 보이고 근거는 펼쳐볼 수 있는 HTML 리포트로 남겨줘."
+    expected_primary_skill: report-qualitative
+    expected_supporting_skills: []
+    should_not_trigger: [report-critical, report-diff, report-implementation-explainer]
+    expected_family: report
+    expected_context: [target_design, intended_release_use, decisive_evidence, report_canvas_contract]
+    expected_output_shape: "Report Canvas decision artifact with conclusion-first first viewport, at most three findings, one action, and progressive evidence"
+    quality_notes: "An explicit persistent qualitative artifact uses the shared presentation without changing the evaluation owner or evidence strength."
+    friction_risk: "copying a long Markdown report into styled HTML, loading Three.js for decoration, or visually upgrading mixed evidence into pass"
+    expected_behaviors:
+      - render_report_canvas_decision
+      - keep_first_view_conclusion_first
+      - cap_material_findings_at_three
+      - expose_one_next_action
+      - preserve_evidence_status
+      - use_oblivion_and_hagoromo_themes
+    forbidden_behaviors:
+      - emit_long_markdown_as_primary_artifact
+      - load_three_for_non_spatial_report
+      - strengthen_evidence_through_presentation
+      - replace_report_owner_with_canvas
+    required_evidence:
+      - type: route_match
+        expected: report-qualitative
+  - case_id: route-report-canvas-default-critical-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-critical]
+    scenario_tags: [positive, default_html, critical_review, report_canvas]
+    user_request: "결제 데이터 마이그레이션 계획이 배포 게이트를 통과해도 되는지 블로커와 근거 중심으로 판정해줘."
+    expected_primary_skill: report-critical
+    expected_supporting_skills: []
+    should_not_trigger: [report-qualitative, report-diff, workflow-implementation]
+    expected_family: report
+    expected_context: [migration_plan, release_criteria, decisive_evidence, report_canvas_contract]
+    expected_output_shape: "Report Canvas decision HTML plus a concise outcome-and-link chat receipt"
+    quality_notes: "An admitted critical report defaults to Canvas even when the user does not repeat an HTML-format request."
+    friction_risk: "returning a long Markdown review or changing the QA verdict to fit the template"
+    expected_behaviors:
+      - render_report_canvas_decision_by_default
+      - preserve_critical_verdict_semantics
+      - return_concise_artifact_receipt
+      - expose_one_next_action
+    forbidden_behaviors:
+      - require_explicit_html_keyword
+      - emit_long_markdown_as_primary_artifact
+      - mutate_review_target
+    required_evidence:
+      - type: route_match
+        expected: report-critical
+  - case_id: route-report-canvas-default-diff-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-diff]
+    scenario_tags: [positive, default_html, readable_diff, report_canvas]
+    user_request: "이 브랜치와 기준 커밋 사이에서 실제로 바뀐 줄만 의도별로 보기 좋게 정리해줘."
+    expected_primary_skill: report-diff
+    expected_supporting_skills: []
+    should_not_trigger: [report-critical, report-qualitative, report-implementation-explainer]
+    expected_family: report
+    expected_context: [verified_baseline, verified_diff, intent_groups, report_canvas_contract]
+    expected_output_shape: "Report Canvas compare HTML plus a concise conclusion-and-link chat receipt"
+    quality_notes: "A readable-diff report defaults to Canvas compare while keeping exact changed lines authoritative."
+    friction_risk: "inventing a baseline, a correctness verdict, or a follow-up merely to fill the visual model"
+    expected_behaviors:
+      - render_report_canvas_compare_by_default
+      - preserve_exact_changed_lines
+      - use_explicit_no_follow_up_when_presentation_only
+      - return_concise_artifact_receipt
+    forbidden_behaviors:
+      - require_explicit_html_keyword
+      - invent_removed_lines
+      - invent_review_verdict
+      - invent_next_action
+    required_evidence:
+      - type: route_match
+        expected: report-diff
+  - case_id: route-report-canvas-default-qualitative-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-qualitative]
+    scenario_tags: [positive, default_html, qualitative_evaluation, report_canvas]
+    user_request: "새 온보딩 설계가 실사용 준비가 됐는지 강점, 위험, 우선 개선점 기준으로 정성평가해줘."
+    expected_primary_skill: report-qualitative
+    expected_supporting_skills: []
+    should_not_trigger: [report-critical, report-diff, report-implementation-explainer]
+    expected_family: report
+    expected_context: [onboarding_design, intended_use, evaluation_evidence, report_canvas_contract]
+    expected_output_shape: "Report Canvas decision HTML plus a concise conclusion-and-link chat receipt"
+    quality_notes: "A normal admitted qualitative report uses Canvas without upgrading itself to a full scored report."
+    friction_risk: "returning Markdown by habit or activating detailed scoring because HTML is available"
+    expected_behaviors:
+      - render_report_canvas_decision_by_default
+      - preserve_qualitative_mode_depth
+      - cap_material_findings_at_three
+      - return_concise_artifact_receipt
+    forbidden_behaviors:
+      - require_explicit_html_keyword
+      - activate_scored_mode_from_canvas
+      - strengthen_evidence_through_presentation
+    required_evidence:
+      - type: route_match
+        expected: report-qualitative
+  - case_id: route-report-canvas-default-implementation-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-implementation-explainer]
+    scenario_tags: [positive, default_html, implementation_understanding, report_canvas, non_spatial]
+    user_request: "이 캐시 무효화가 실제 요청에서 어떤 호출 순서로 동작하고 어디까지 검증됐는지 코드 경로와 한 사례로 설명해줘."
+    expected_primary_skill: report-implementation-explainer
+    expected_supporting_skills: []
+    should_not_trigger: [report-diff, report-qualitative, report-critical, analysis-algorithm]
+    expected_family: report
+    expected_context: [concrete_snapshot, production_source_path, representative_trace, report_canvas_contract]
+    expected_output_shape: "source/runtime-anchored Report Canvas trace HTML plus a concise outcome-and-link chat receipt"
+    quality_notes: "An admitted implementation explainer defaults to a trace artifact without needing the user to name HTML."
+    friction_risk: "falling back to a long Markdown walkthrough or claiming runtime behavior from source alone"
+    expected_behaviors:
+      - render_report_canvas_trace_by_default
+      - pin_implementation_snapshot
+      - preserve_source_runtime_evidence_labels
+      - return_concise_artifact_receipt
+    forbidden_behaviors:
+      - require_explicit_html_keyword
+      - emit_long_markdown_as_primary_artifact
+      - infer_runtime_behavior_from_source_only
+      - claim_user_understood
+    required_evidence:
+      - type: route_match
+        expected: report-implementation-explainer
+  - case_id: route-report-canvas-default-lifecycle-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-lifecycle-artifacts]
+    scenario_tags: [positive, default_html, lifecycle_artifacts, report_canvas]
+    user_request: "이번 기능의 요구사항부터 설계, 구현 근거, QA, 보안, 릴리즈까지 산출물을 묶고 서로 추적되게 정리해줘."
+    expected_primary_skill: report-lifecycle-artifacts
+    expected_supporting_skills: []
+    should_not_trigger: [coordination-handoff, report-critical, workflow-validation]
+    expected_family: report
+    expected_context: [requested_lifecycle_scope, canonical_artifacts, condition_scoped_evidence, report_canvas_contract]
+    expected_output_shape: "canonical lifecycle artifacts plus a Report Canvas trace HTML index and concise package-link receipt"
+    quality_notes: "The lifecycle owner preserves canonical formats while making Canvas the default human entry point."
+    friction_risk: "replacing canonical artifacts with HTML or treating package construction as delivery completion"
+    expected_behaviors:
+      - preserve_canonical_artifact_formats
+      - render_report_canvas_trace_index_by_default
+      - preserve_condition_scoped_status
+      - return_concise_artifact_receipt
+    forbidden_behaviors:
+      - require_explicit_html_keyword
+      - replace_canonical_artifacts_with_canvas
+      - claim_package_means_delivery_complete
+    required_evidence:
+      - type: route_match
+        expected: report-lifecycle-artifacts
+  - case_id: route-plan-behavior-discovery-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-behavior-discovery]
+    scenario_tags: [positive, existing_capability, product_behavior]
+    user_request: "mesh split 계산은 돌아가는데 툴로 쓰려니 다음 동작이 애매해. 취소할 때 원본을 어떻게 보존할지부터 지금 코드가 하는 일을 확인하면서 선택지를 하나씩 정해보자."
+    expected_primary_skill: plan-behavior-discovery
+    expected_supporting_skills: []
+    should_not_trigger: [plan-requirements-discovery, report-implementation-explainer, workflow-implementation]
+    expected_family: planning
+    expected_context: [existing_capability, current_behavior_evidence, target_actor, next_user_path]
+    expected_output_shape: "one evidence-grounded product behavior decision at a time plus an incremental behavior decision ledger"
+    quality_notes: "An existing capability plus explicit operability-decision intent routes to behavior discovery and stops when the next slice is ready."
+    friction_risk: "reopening greenfield requirements, testing code recall, or continuing to an exhaustive release questionnaire"
+    expected_behaviors:
+      - ground_current_behavior_before_question
+      - ask_one_observable_product_decision
+      - record_behavior_ledger_delta
+      - stop_at_next_human_operable_slice
+    forbidden_behaviors:
+      - ask_code_recall_quiz
+      - reopen_greenfield_requirements
+      - start_implementation
+      - claim_feature_complete
+    required_evidence:
+      - type: route_match
+        expected: plan-behavior-discovery

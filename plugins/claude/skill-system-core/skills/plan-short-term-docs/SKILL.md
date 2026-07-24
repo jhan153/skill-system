@@ -29,8 +29,8 @@ disable-model-invocation: true
   read_if_needed:
     - affected source outline and target slices
     - relevant memory cards and validation contract
-    - `.codex/docs/planning_state_model.md` when state admission is ambiguous
-    - `.codex/docs/delivery_slice_contract.md` when execution needs multiple batches, including wide migration or non-feature decomposition
+    - `.claude/docs/planning_state_model.md` when state admission is ambiguous
+    - `.claude/docs/delivery_slice_contract.md` when execution needs multiple batches, including wide migration or non-feature decomposition
   do_not_load_by_default:
     - full repo, memory bank, all plans, or phase-package templates
 - risk_profile:
@@ -65,7 +65,7 @@ Do not pad plans with placeholder code or diagrams. Follow the template's condit
 ## Plan Quality Gate
 - Scope fits one execution horizon and deferred work is explicit.
 - The first executable TODO is clear; each TODO has an outcome, dependency/blocker, and completion signal.
-- Multi-batch TODOs follow `.codex/docs/delivery_slice_contract.md` and name exactly one applicable `delivery_shape`; single-batch work does not import slice ceremony.
+- Multi-batch TODOs follow `.claude/docs/delivery_slice_contract.md` and name exactly one applicable `delivery_shape`; single-batch work does not import slice ceremony.
 - Material changes trace to evidence and unresolved product/interface decisions block dependent work.
 - Validation names one smallest primary verifier and an optional user-only check; unavailable evidence does not create new implementation scope.
 - No test, mock, fixture, dependency, or loop work exists solely to manufacture completion evidence.

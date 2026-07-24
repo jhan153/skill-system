@@ -66,7 +66,7 @@ success_conditions:
       - {owner: design-a11y-audit, type: a11y, evidence_target: "tool/manual observations and verdicts"}
 ```
 
-Replace `<accepting-user>` and each scope with the accepted contract's real owner/scope. Record a real visual/a11y validator command or manual event as audit evidence, but local v2 cannot authenticate either as pass. Semantic conditions remain `unverified` or `user-verification-needed`; the quality report informs the decision but cannot close the condition by existing.
+Replace `<accepting-user>` and each scope with the accepted contract's real owner/scope. Record a real visual/a11y validator command or manual event as audit evidence, but the local v2/v3 evaluator cannot authenticate either as pass. Semantic conditions remain `unverified` or terminate as `user_verification_needed` under a user-owned work contract; the quality report informs the decision but cannot close the condition by existing.
 
 ## Conditional Product-Family And UX Conditions
 
@@ -102,11 +102,11 @@ success_conditions:
     quality_verifiers: []
 ```
 
-If SC-006 lacks a real project-specific command, component inventory or a mapper report cannot substitute for deterministic enforcement; keep it `unverified` or use explicit accepted manual scope. If SC-008 lacks an executable user-path oracle, use scoped user acceptance and keep local v2 non-passing without authenticated provenance. Do not add SC-007 when the family has no applicable pinned baseline.
+If SC-006 lacks a real project-specific command, component inventory or a mapper report cannot substitute for deterministic enforcement; keep it `unverified` or use explicit accepted manual scope. If SC-008 lacks an executable user-path oracle, use scoped user acceptance and keep the local evaluator non-passing without authenticated provenance. Do not add SC-007 when the family has no applicable pinned baseline.
 
 Use `artifact_exists` only when the condition itself is “this exact artifact exists.” It cannot prove framing, fidelity, responsive behavior, accessibility, or any report verdict. If no deterministic or accepted-manual oracle exists, keep the semantic condition `unverified` or `user-verification-needed`.
 
-Use runtime `manual_check` only for explicit user acceptance. Local v2 validates the event shape/digest for audit but keeps it non-passing without host-authenticated provenance.
+Use runtime `manual_check` only for explicit user acceptance. The local v2/v3 evaluator validates the event shape/digest for audit but keeps it non-passing without host-authenticated provenance.
 
 ## Evidence Boundaries
 

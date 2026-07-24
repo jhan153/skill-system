@@ -1,9 +1,10 @@
 interface:
   display_name: "Report Diff"
-  short_description: "Show only changed lines with clear summaries"
-  default_prompt: "Use $report-diff for explicit changed-lines presentation: require a verified baseline for additions/removals, otherwise mark `Unverified`, group by intent, and allow at most two context lines."
+  short_description: "Show verified changed lines in Canvas HTML"
+  default_prompt: "Use $report-diff to present verified changed lines by intent as Report Canvas compare HTML."
 
 policy:
   invocation_surface: support_only
   allow_implicit_invocation: false
   may_own_execution: false
+  may_write: true

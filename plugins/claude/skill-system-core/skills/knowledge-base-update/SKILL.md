@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: declared store, exact record ID/path, `amend|observe|reverify|supersede|deprecate|relink`, accepted change/event, source/provenance anchors, and affected relation targets
 - expected_outputs: target record and index change with current snapshot, semantic revision or observation event, preserved lifecycle links, and readback
 - context_targets:
-  must_read: manifest, target record/index row, current canonical refs, and `.codex/docs/knowledge_record_contract.md`
+  must_read: manifest, target record/index row, current canonical refs, and `.claude/docs/knowledge_record_contract.md`
   read_if_needed: directly superseded records or accepted decision/plan slice
   do_not_load_by_default: full store, unrelated categories, Memory, Wiki, raw chat
 - risk_profile:

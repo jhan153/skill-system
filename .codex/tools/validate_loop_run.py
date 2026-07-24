@@ -12,10 +12,13 @@ sys.dont_write_bytecode = True
 from _validation import load_json_file, load_yaml_file, validate_schema
 from loop_policy import (
     canonical_hash,
+    condition_defer_reason,
+    condition_dependencies,
     condition_map,
     contained_path,
     contract_runtime_errors,
     file_sha256,
+    is_user_verification_condition,
     required_condition_ids,
     state_fingerprint,
     structured_evidence_errors,
@@ -58,6 +61,28 @@ def main() -> int:
         errors.append("state: schema_version 1 is legacy read-only")
     if state.get("contract_hash") != file_sha256(contract_path):
         errors.append("state: contract_hash does not match contract.yaml")
+    expected_result_labels = {
+        "active": "pending",
+        "success": "agent-verified",
+        "user_verification_needed": "user-verification-needed",
+        "blocked": "blocked",
+        "budget_exhausted": "unverified",
+        "unsafe": "blocked",
+        "fatal": "blocked",
+        "stalled": "unverified",
+    }
+    expected_result_label = expected_result_labels.get(str(state.get("status")))
+    if contract.get("schema_version") == 3 and "result_label" not in state:
+        errors.append("state: v3 LoopRun requires a task result_label")
+    if (
+        state.get("result_label") is not None
+        and expected_result_label is not None
+        and state.get("result_label") != expected_result_label
+    ):
+        errors.append(
+            f"state: result_label {state.get('result_label')!r} does not match "
+            f"status {state.get('status')!r}"
+        )
     contract_ids = set(required_condition_ids(contract))
     state_ids = {
         item.get("condition_id")
@@ -69,6 +94,71 @@ def main() -> int:
         errors.append(f"state: missing required condition results: {', '.join(missing)}")
     if state.get("progress", {}).get("required_total") != len(contract_ids):
         errors.append("state: progress.required_total does not match contract required conditions")
+    results = condition_map(state)
+    passed_ids = {
+        condition_id
+        for condition_id, result in results.items()
+        if result.get("status") == "pass"
+    }
+    runnable_ids = []
+    pending_user_verification = []
+    non_user_pending = []
+    for condition_id in required_condition_ids(contract):
+        result = results.get(condition_id, {})
+        if result.get("status") == "pass":
+            continue
+        if is_user_verification_condition(contract, condition_id):
+            pending_user_verification.append(condition_id)
+            continue
+        non_user_pending.append(condition_id)
+        if condition_defer_reason(contract, condition_id) is not None:
+            continue
+        if result.get("status") in {"blocked", "deferred"}:
+            continue
+        if all(dependency in passed_ids for dependency in condition_dependencies(contract, condition_id)):
+            runnable_ids.append(condition_id)
+    if state.get("status") == "blocked" and runnable_ids:
+        errors.append(
+            "state: blocked is invalid while required runnable work remains: "
+            + ", ".join(runnable_ids)
+        )
+    if state.get("status") == "user_verification_needed":
+        if not pending_user_verification:
+            errors.append("state: user_verification_needed requires pending user-owned manual verification")
+        if non_user_pending:
+            errors.append(
+                "state: user_verification_needed requires all non-user conditions to pass: "
+                + ", ".join(non_user_pending)
+            )
+    deferred_actions = state.get("deferred_actions", [])
+    if isinstance(deferred_actions, list):
+        deferred_ids = [
+            item.get("condition_id")
+            for item in deferred_actions
+            if isinstance(item, dict)
+        ]
+        duplicates = sorted(
+            {
+                condition_id
+                for condition_id in deferred_ids
+                if isinstance(condition_id, str) and deferred_ids.count(condition_id) > 1
+            }
+        )
+        if duplicates:
+            errors.append(f"state: duplicate deferred action conditions: {', '.join(duplicates)}")
+        passing_deferred = sorted(
+            {
+                condition_id
+                for condition_id in deferred_ids
+                if isinstance(condition_id, str)
+                and results.get(condition_id, {}).get("status") == "pass"
+            }
+        )
+        if passing_deferred:
+            errors.append(
+                "state: passing conditions cannot remain deferred: "
+                + ", ".join(passing_deferred)
+            )
     errors.extend(
         f"state: {error}"
         for error in structured_evidence_errors(
@@ -190,7 +280,13 @@ def main() -> int:
             if not isinstance(audit_decision, dict) or canonical_hash(audit_checkpoint.get("last_decision")) != canonical_hash(audit_decision):
                 errors.append(f"state: iteration {index} decision is not bound to its checkpoint")
         if last_audit_checkpoint is not None:
-            for field in ("condition_results", "agent_run_refs", "side_effect_journal", "applied_results"):
+            for field in (
+                "condition_results",
+                "agent_run_refs",
+                "deferred_actions",
+                "side_effect_journal",
+                "applied_results",
+            ):
                 if canonical_hash(state.get(field)) != canonical_hash(last_audit_checkpoint.get(field)):
                     errors.append(f"state: current {field} does not match the latest immutable iteration checkpoint")
     elif iteration:

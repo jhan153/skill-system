@@ -52,6 +52,29 @@ class WorkHorizonPolicyTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("work_horizon.level", result.stdout)
 
+    def test_discovery_cannot_claim_persisted_short_plan_horizon(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for ns in [".codex", ".claude"]:
+                skill = root / ns / "skills" / "plan-behavior-discovery"
+                (skill / "agents").mkdir(parents=True)
+                (skill / "SKILL.md").write_text(
+                    "# Behavior Discovery\n\n## Routing Card\n- role: primary\n",
+                    encoding="utf-8",
+                )
+                (skill / "agents" / "openai.yaml").write_text(
+                    (
+                        "work_horizon:\n"
+                        "  level: short_plan\n"
+                        "planning_altitude:\n"
+                        "  kind: behavior_discovery\n"
+                    ),
+                    encoding="utf-8",
+                )
+            result = self.run_tool("--root", str(root), "--allow-partial")
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("!= expected 'one_shot'", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

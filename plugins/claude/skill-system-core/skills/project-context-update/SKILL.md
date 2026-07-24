@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: exact or nearest declared manifest, selected keys and values, and explicit update intent
 - expected_outputs: section-preserving manifest update and direct readback
 - context_targets:
-  must_read: the complete target manifest and `.codex/docs/project_context_manifest.md`
+  must_read: the complete target manifest and `.claude/docs/project_context_manifest.md`
   read_if_needed: only the exact resolved paths named by the requested update
   do_not_load_by_default: store contents, other manifests, home context, adjacent repositories, Wiki pages
 - risk_profile:

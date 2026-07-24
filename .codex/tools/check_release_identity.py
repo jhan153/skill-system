@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 
-CURRENT_VERSION = "9.4.2"
+CURRENT_VERSION = "9.4.3"
 PLUGIN_NAMES = (
     "skill-system-core",
     "skill-system-dev",
@@ -25,6 +25,7 @@ SOURCE_PLUGIN_NAMES = {
 EVAL_MANIFESTS = (
     "design_usage_cases.yaml",
     "handoff_cases.yaml",
+    "knowledge_context_usage_cases.yaml",
     "memory_usage_cases.yaml",
     "negative_routing_cases.yaml",
     "pre_answer_depth_cases.yaml",

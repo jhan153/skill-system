@@ -24,7 +24,7 @@ disable-model-invocation: true
   read_if_needed:
     - `references/readiness-rubric.md` when axes conflict or a checkpoint/capability boundary is ambiguous
     - active plan/spec only when the prompt references it
-    - `.codex/docs/orchestration_capability_contract.md` when cron, webhook, queue, automation, durable scheduling, or event-triggered runtime is requested
+    - `.claude/docs/orchestration_capability_contract.md` when cron, webhook, queue, automation, durable scheduling, or event-triggered runtime is requested
   do_not_load_by_default:
     - full repo, memory bank, transcripts, or old plans
 - risk_profile:

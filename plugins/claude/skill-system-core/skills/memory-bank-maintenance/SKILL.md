@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: exact bank and `report|validate|conflict-check|consolidate|compact-current` operation
 - expected_outputs: evidence-backed findings and only the explicitly requested append-only changes
 - context_targets:
-  must_read: manifest/exact target, meta, current, targeted events, `.codex/docs/memory_mutation_contract.md`, and `reference.md`
+  must_read: manifest/exact target, meta, current, targeted events, `.claude/docs/memory_mutation_contract.md`, and `reference.md`
   read_if_needed: matching archive blocks
   do_not_load_by_default: unrelated banks, raw transcripts, full archive, full event ledger
 - risk_profile:

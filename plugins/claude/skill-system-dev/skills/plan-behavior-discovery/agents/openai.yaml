@@ -1,0 +1,7 @@
+interface:
+  display_name: "Plan Behavior Discovery"
+  short_description: "Decide product behavior for an existing capability"
+  default_prompt: "Use $plan-behavior-discovery to resolve one evidence-grounded product behavior decision at a time for an existing capability."
+
+policy:
+  allow_implicit_invocation: false

@@ -1,4 +1,4 @@
-version: "9.4.2"
+version: "9.4.3"
 purpose: "Authored routing/output regression cases; not field-quality evidence."
 cases:
   - case_id: runtime-001
@@ -427,6 +427,210 @@ cases:
         artifact_bound: true
       - type: qualitative_review
         expected: pass
+  - case_id: runtime-058
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [workflow-implementation]
+    scenario_tags: [work-contract, user-verification]
+    user_request: "제품 코드 구현만 해줘. 테스트와 실제 검증은 내가 맡을 테니 검증용 도구도 만들지 마."
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-validation, workflow-loop-runner]
+    expected_context: [core deliverable, explicit exclusions, verification owner]
+    expected_output_shape: "production implementation followed by user-verification-needed, without agent validation artifacts"
+    quality_notes: "User-owned verification is a normal handoff, not a reason to enlarge validation scope."
+    friction_risk: "reactivating tests or validation wrappers from workflow defaults"
+    expected_behaviors: [preserve_user_verification_owner, implement_core_only, handoff_user_verification_needed]
+    forbidden_behaviors: [run_agent_validation, author_tests, create_validation_artifact]
+    required_evidence: [{type: qualitative_review, expected: pass}]
+  - case_id: runtime-059
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [workflow-implementation]
+    scenario_tags: [work-contract, optional-failure]
+    user_request: "핵심 변경은 계속하고, 선택적인 검증이 안 되면 그 검증만 보류해."
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-recovery]
+    expected_context: [core work, optional validation, dependency graph]
+    expected_output_shape: "optional validation deferred while independent core work continues"
+    quality_notes: "An optional failure cannot become the task's global blocker."
+    friction_risk: "spending the remaining run on auxiliary verification recovery"
+    expected_behaviors: [defer_optional_action, reevaluate_required_runnable_work, continue_core]
+    forbidden_behaviors: [global_block_on_optional_failure, promote_optional_validation_to_required]
+    required_evidence: [{type: qualitative_review, expected: pass}]
+  - case_id: runtime-060
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [workflow-loop-runner]
+    scenario_tags: [work-contract, unattended, permission]
+    user_request: "/goal 무인 장시간 루프로 구현해. 추가 승인이나 질문은 받지 않을 테니 필요한 승인 행동만 보류하고 계속해."
+    expected_primary_skill: workflow-loop-runner
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-validation]
+    expected_context: [unattended Goal/Loop, forbidden interaction, required runnable work]
+    expected_output_shape: "permission intent denied before wait, recorded as deferred, then continuation"
+    quality_notes: "Non-waiting approval denial is scoped to this unattended no-interaction contract."
+    friction_risk: "opening a synchronous approval dialog and freezing the LoopRun"
+    expected_behaviors: [deny_permission_before_wait, record_deferred_intent, continue_independent_work]
+    forbidden_behaviors: [enter_approval_wait, ask_blocking_question]
+    required_evidence: [{type: qualitative_review, expected: pass}]
+  - case_id: runtime-061
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [workflow-loop-runner]
+    scenario_tags: [work-contract, local-block]
+    user_request: "SC-001은 막혔지만 독립적인 SC-002 구현은 가능해. 전체 blocked로 끝내지 말고 계속해."
+    expected_primary_skill: workflow-loop-runner
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-recovery]
+    expected_context: [condition dependencies, local blocked condition, independent required condition]
+    expected_output_shape: "SC-001 deferred and SC-002 selected as the next runnable condition"
+    quality_notes: "Global blocked requires an empty required-runnable set."
+    friction_risk: "globalizing one condition's blocked status"
+    expected_behaviors: [record_local_deferral, select_independent_required_condition]
+    forbidden_behaviors: [terminate_blocked_while_required_work_is_runnable]
+    required_evidence: [{type: qualitative_review, expected: pass}]
+  - case_id: runtime-062
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [workflow-loop-runner]
+    scenario_tags: [work-contract, semantic-deduplication]
+    user_request: "승인받지 못한 검증을 GUI 테스트나 검증 래퍼 형태로 다시 시도하지 마."
+    expected_primary_skill: workflow-loop-runner
+    expected_supporting_skills: []
+    should_not_trigger: [design-visual-regression, workflow-validation]
+    expected_context: [deferred semantic intent, alternate tool forms]
+    expected_output_shape: "alternate forms map to the existing deferred intent and are not scheduled"
+    quality_notes: "Deduplication is purpose-based, not command-string-based."
+    friction_risk: "renaming the same validation purpose into fresh work"
+    expected_behaviors: [reuse_deferred_intent_key, suppress_alternate_form_retry]
+    forbidden_behaviors: [create_gui_retry, create_validation_wrapper_retry]
+    required_evidence: [{type: qualitative_review, expected: pass}]
+  - case_id: runtime-063
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [workflow-loop-runner]
+    scenario_tags: [work-contract, compaction, continuation]
+    user_request: "처음에 정한 검증 제외와 사용자 검증 소유권을 컨텍스트 압축과 workflow 전환 뒤에도 유지해."
+    expected_primary_skill: workflow-loop-runner
+    expected_supporting_skills: []
+    should_not_trigger: [memory-bank-update]
+    expected_context: [persisted work-contract projection, original exclusions, verification owner]
+    expected_output_shape: "same contract fields restored after compaction and applied to the next action"
+    quality_notes: "Compaction cannot relax scope or return verification ownership to the agent."
+    friction_risk: "generic validation defaults reappearing after context loss"
+    expected_behaviors: [restore_contract_after_compaction, preserve_exclusions, preserve_verification_owner]
+    forbidden_behaviors: [relax_contract_after_compaction]
+    required_evidence: [{type: qualitative_review, expected: pass}]
+  - case_id: runtime-064
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [workflow-implementation]
+    scenario_tags: [work-contract, attended, permission]
+    user_request: "일반 대화형 작업이야. 필요한 승인과 질문은 해도 되고 테스트도 실행해."
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [workflow-loop-runner]
+    expected_context: [attended execution, allowed interaction, agent verification]
+    expected_output_shape: "ordinary implementation using the host's normal approval and validation flow"
+    quality_notes: "The unattended deny profile must not leak into normal interactive work."
+    friction_risk: "globally denying approvals after adding the unattended profile"
+    expected_behaviors: [preserve_normal_host_approval, allow_agent_validation]
+    forbidden_behaviors: [auto_deny_attended_permission]
+    required_evidence: [{type: qualitative_review, expected: pass}]
+  - case_id: runtime-065
+    schema_version: 2
+    required_eval_mode: host-assisted
+    behavior_contract_owners: [workflow-loop-runner]
+    scenario_tags: [work-contract, genuine-block]
+    user_request: "핵심 구현에 반드시 필요한 입력이 없고 다른 독립 작업도 없어. 이 경우에만 blocked로 끝내."
+    expected_primary_skill: workflow-loop-runner
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-recovery, workflow-validation]
+    expected_context: [required prerequisite, dependency graph, empty runnable set]
+    expected_output_shape: "blocked with the exact unmet prerequisite and no repeated question"
+    quality_notes: "This is the genuine global-block counterexample."
+    friction_risk: "reporting success or spinning on the same unavailable input"
+    expected_behaviors: [confirm_no_required_runnable_work, return_exact_blocker]
+    forbidden_behaviors: [repeat_same_question, mark_deferred_action_success]
+    required_evidence: [{type: qualitative_review, expected: pass}]
+  - case_id: runtime-054
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-refactor-safely, workflow-source-maintenance]
+    scenario_tags: [routing, ownership_boundary]
+    user_request: "호출 중인 얕은 wrapper를 inline하고 모든 caller를 새 owner로 바꾸되 observable behavior는 그대로 유지해줘."
+    expected_primary_skill: workflow-refactor-safely
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [workflow-source-maintenance, workflow-implementation]
+    expected_context: [behavior contract, reachable wrapper, representative callers, actual production path]
+    expected_output_shape: "one reversible live-code collapse with caller updates and behavior-preservation evidence"
+    quality_notes: "A still-reachable wrapper collapse is structural refactoring even when the diff is small."
+    friction_risk: "source maintenance claiming live structural changes as cleanup"
+    expected_behaviors: [route_live_wrapper_collapse_to_refactor, update_reachable_callers, verify_same_actual_path]
+    forbidden_behaviors: [route_to_source_maintenance, treat_no_static_reference_as_behavior_proof]
+    required_evidence:
+      - type: route_match
+        expected: workflow-refactor-safely
+      - type: route_absence
+        expected: workflow-source-maintenance
+  - case_id: runtime-055
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-source-maintenance, workflow-refactor-safely]
+    scenario_tags: [routing, ownership_boundary]
+    user_request: "caller도 dynamic/public entrypoint 역할도 없는 obsolete wrapper를 증거 확인해서 삭제하고 unused export만 정리해줘."
+    expected_primary_skill: workflow-source-maintenance
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [workflow-refactor-safely, workflow-implementation]
+    expected_context: [maintenance scope, reachability evidence, export surface, validation command]
+    expected_output_shape: "proven-obsolete deletion and deletion-required export repair"
+    quality_notes: "Unreachable obsolete deletion remains source maintenance because no live structural change is required."
+    friction_risk: "expanding deletion into unrelated refactoring"
+    expected_behaviors: [route_obsolete_deletion_to_source_maintenance, prove_no_dynamic_or_public_role, limit_repairs_to_deletion_consequences]
+    forbidden_behaviors: [route_to_refactor, restructure_live_callers]
+    required_evidence:
+      - type: route_match
+        expected: workflow-source-maintenance
+      - type: route_absence
+        expected: workflow-refactor-safely
+  - case_id: runtime-056
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [analysis-architecture-deepening]
+    scenario_tags: [handoff, ownership_boundary]
+    user_request: "architecture-deepening 결과의 1순위 후보는 동작을 바꾸지 않는 adapter 재구조화로 확정했어. 이제 그 후보를 적용해줘."
+    expected_primary_skill: workflow-refactor-safely
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [analysis-architecture-deepening, workflow-implementation, workflow-source-maintenance]
+    expected_context: [selected candidate, behavior-preservation contract, adapter callers, actual path]
+    expected_output_shape: "selected behavior-preserving restructure and actual-path validation"
+    quality_notes: "A selected architecture candidate hands to the owner matching its change contract."
+    friction_risk: "dead-end bounce through generic implementation"
+    expected_behaviors: [handoff_selected_restructure_to_refactor]
+    forbidden_behaviors: [route_all_architecture_candidates_to_workflow_implementation, rerun_candidate_discovery]
+    required_evidence:
+      - type: route_match
+        expected: workflow-refactor-safely
+  - case_id: runtime-057
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [analysis-architecture-deepening]
+    scenario_tags: [handoff, ownership_boundary]
+    user_request: "architecture-deepening에서 선택한 1순위 후보는 API fallback behavior를 새 정책으로 바꾸는 일이야. 그 변경을 구현해줘."
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [analysis-architecture-deepening, workflow-refactor-safely, workflow-source-maintenance]
+    expected_context: [selected candidate, new behavior contract, production owner, callers, validation path]
+    expected_output_shape: "scoped behavior change implementation and focused validation"
+    quality_notes: "A behavior-changing candidate hands to implementation, not refactor or maintenance."
+    friction_risk: "mislabeling a policy change as behavior-preserving refactor"
+    expected_behaviors: [handoff_selected_behavior_change_to_implementation]
+    forbidden_behaviors: [route_behavior_change_to_refactor, rerun_candidate_discovery]
+    required_evidence:
+      - type: route_match
+        expected: workflow-implementation
   - case_id: runtime-050
     schema_version: 2
     required_eval_mode: host-assisted

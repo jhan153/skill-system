@@ -21,9 +21,15 @@ except ImportError:  # pragma: no cover - non-POSIX fallback.
     fcntl = None  # type: ignore[assignment]
 
 
-LOOP_STATUSES = {"active", "success", "blocked", "budget_exhausted", "unsafe", "fatal", "stalled"}
-CONDITION_STATUSES = {"pass", "fail", "unverified", "blocked"}
-DECISION_ACTIONS = {"success", "continue", "recover", "pause", "blocked", "budget_exhausted", "unsafe", "fatal"}
+LOOP_STATUSES = {
+    "active", "success", "user_verification_needed", "blocked",
+    "budget_exhausted", "unsafe", "fatal", "stalled",
+}
+CONDITION_STATUSES = {"pass", "fail", "unverified", "blocked", "deferred"}
+DECISION_ACTIONS = {
+    "success", "user_verification_needed", "continue", "recover", "pause",
+    "blocked", "budget_exhausted", "unsafe", "fatal",
+}
 VERIFIER_RECEIPT_KINDS = {
     "command_exit": "command_exit",
     "artifact_exists": "artifact_exists",
@@ -131,10 +137,11 @@ def success_condition_map(contract: dict[str, Any]) -> dict[str, dict[str, Any]]
 
 
 def contract_runtime_errors(contract: dict[str, Any]) -> list[str]:
-    """Return fail-closed v2 runtime-contract errors before any state mutation."""
+    """Return fail-closed runtime-contract errors before any state mutation."""
     errors: list[str] = []
-    if contract.get("schema_version") != 2:
-        errors.append("schema_version 1 is legacy read-only; create or migrate to a v2 contract")
+    version = contract.get("schema_version")
+    if version not in {2, 3}:
+        errors.append("schema_version 1 is legacy read-only; create or migrate to a v2/v3 contract")
     conditions = success_conditions(contract)
     ids = [condition["id"] for condition in conditions]
     duplicates = sorted({condition_id for condition_id in ids if ids.count(condition_id) > 1})
@@ -154,7 +161,195 @@ def contract_runtime_errors(contract: dict[str, Any]) -> list[str]:
             errors.append(f"{condition['id']}: manual_check requires acceptance_scope")
         if verifier.get("type") == "diff_scope" and not verifier.get("path"):
             errors.append(f"{condition['id']}: diff_scope requires path")
+    if version == 3:
+        work_contract = contract.get("work_contract")
+        if not isinstance(work_contract, dict):
+            errors.append("schema_version 3 requires work_contract")
+            return errors
+        wc_scope = work_contract.get("scope") if isinstance(work_contract.get("scope"), dict) else {}
+        excluded = {
+            item
+            for item in wc_scope.get("excluded_action_classes", [])
+            if isinstance(item, str)
+        }
+        allowed = {
+            item
+            for item in wc_scope.get("allowed_action_classes", [])
+            if isinstance(item, str)
+        }
+        overlap = sorted(allowed & excluded)
+        if overlap:
+            errors.append(
+                "work contract action classes cannot be both allowed and excluded: "
+                + ", ".join(overlap)
+            )
+        verification = (
+            work_contract.get("verification")
+            if isinstance(work_contract.get("verification"), dict)
+            else {}
+        )
+        interaction = (
+            work_contract.get("interaction")
+            if isinstance(work_contract.get("interaction"), dict)
+            else {}
+        )
+        execution = (
+            work_contract.get("execution")
+            if isinstance(work_contract.get("execution"), dict)
+            else {}
+        )
+        if verification.get("owner") == "user" and not any(
+            isinstance(condition.get("verifier"), dict)
+            and condition["verifier"].get("type") == "manual_check"
+            and condition.get("required", True) is not False
+            for condition in conditions
+        ):
+            errors.append("user-owned verification requires one required manual_check handoff condition")
+        if verification.get("owner") == "user":
+            missing_exclusions = sorted(
+                {"agent_validation", "test_authoring", "validation_artifact"} - excluded
+            )
+            if missing_exclusions:
+                errors.append(
+                    "user-owned verification must exclude agent verification work: "
+                    + ", ".join(missing_exclusions)
+                )
+        if (
+            verification.get("owner") == "user"
+            and verification.get("handoff_on_unavailable") != "user-verification-needed"
+        ):
+            errors.append(
+                "user-owned verification requires handoff_on_unavailable=user-verification-needed"
+            )
+        termination = (
+            contract.get("termination")
+            if isinstance(contract.get("termination"), dict)
+            else {}
+        )
+        precedence = termination.get("precedence", [])
+        if (
+            verification.get("owner") == "user"
+            and (
+                not isinstance(precedence, list)
+                or "user_verification_needed" not in precedence
+            )
+        ):
+            errors.append(
+                "user-owned verification requires user_verification_needed in termination.precedence"
+            )
+        if execution.get("mode") == "unattended_goal_loop" and interaction.get("mode") == "forbidden":
+            if interaction.get("approval_behavior") != "defer" or interaction.get("question_behavior") != "defer":
+                errors.append("unattended no-interaction work must defer approvals and questions")
+        condition_ids = set(ids)
+        required_ids = {
+            condition["id"]
+            for condition in conditions
+            if condition.get("required", True) is not False
+        }
+        dependency_graph: dict[str, list[str]] = {}
+        seen_intents: set[str] = set()
+        for condition in conditions:
+            condition_id = condition["id"]
+            kind = condition.get("work_kind")
+            intent_key = condition.get("intent_key")
+            if not isinstance(kind, str):
+                errors.append(f"{condition_id}: work_kind is required for v3 runtime use")
+            if not isinstance(intent_key, str) or not intent_key.strip():
+                errors.append(f"{condition_id}: intent_key is required for v3 runtime use")
+            elif intent_key in seen_intents:
+                errors.append(f"{condition_id}: duplicate semantic intent_key {intent_key!r}")
+            else:
+                seen_intents.add(intent_key)
+            if kind in excluded and condition.get("required", True) is not False:
+                errors.append(f"{condition_id}: excluded work_kind {kind!r} cannot be a required condition")
+            dependencies = condition.get("depends_on", [])
+            if not isinstance(dependencies, list):
+                continue
+            dependency_graph[condition_id] = [
+                dependency
+                for dependency in dependencies
+                if isinstance(dependency, str) and dependency in condition_ids
+            ]
+            for dependency in dependencies:
+                if dependency == condition_id:
+                    errors.append(f"{condition_id}: condition cannot depend on itself")
+                elif dependency not in condition_ids:
+                    errors.append(f"{condition_id}: unknown dependency {dependency!r}")
+                elif condition_id in required_ids and dependency not in required_ids:
+                    errors.append(
+                        f"{condition_id}: required condition cannot depend on optional condition {dependency!r}"
+                    )
+        visiting: set[str] = set()
+        visited: set[str] = set()
+
+        def visit(condition_id: str, path: list[str]) -> None:
+            if condition_id in visited:
+                return
+            if condition_id in visiting:
+                start = path.index(condition_id) if condition_id in path else 0
+                cycle = path[start:] + [condition_id]
+                errors.append(f"dependency cycle: {' -> '.join(cycle)}")
+                return
+            visiting.add(condition_id)
+            for dependency in dependency_graph.get(condition_id, []):
+                visit(dependency, path + [condition_id])
+            visiting.remove(condition_id)
+            visited.add(condition_id)
+
+        for condition_id in ids:
+            visit(condition_id, [])
     return errors
+
+
+def work_contract(contract: dict[str, Any]) -> dict[str, Any]:
+    value = contract.get("work_contract")
+    return value if isinstance(value, dict) else {}
+
+
+def work_contract_value(contract: dict[str, Any], section: str, key: str, default: Any = None) -> Any:
+    value = work_contract(contract).get(section)
+    if not isinstance(value, dict):
+        return default
+    return value.get(key, default)
+
+
+def success_condition(contract: dict[str, Any], condition_id: str) -> dict[str, Any]:
+    return success_condition_map(contract).get(condition_id, {})
+
+
+def is_user_verification_condition(contract: dict[str, Any], condition_id: str) -> bool:
+    if work_contract_value(contract, "verification", "owner") != "user":
+        return False
+    verifier = success_condition(contract, condition_id).get("verifier")
+    return isinstance(verifier, dict) and verifier.get("type") == "manual_check"
+
+
+def condition_dependencies(contract: dict[str, Any], condition_id: str) -> list[str]:
+    raw = success_condition(contract, condition_id).get("depends_on", [])
+    return [item for item in raw if isinstance(item, str)] if isinstance(raw, list) else []
+
+
+def condition_intent_key(contract: dict[str, Any], condition_id: str) -> str:
+    condition = success_condition(contract, condition_id)
+    value = condition.get("intent_key")
+    return value if isinstance(value, str) and value else condition_id
+
+
+def contract_excluded_action_classes(contract: dict[str, Any]) -> set[str]:
+    raw = work_contract_value(contract, "scope", "excluded_action_classes", [])
+    return {item for item in raw if isinstance(item, str)} if isinstance(raw, list) else set()
+
+
+def condition_defer_reason(contract: dict[str, Any], condition_id: str) -> str | None:
+    condition = success_condition(contract, condition_id)
+    kind = condition.get("work_kind")
+    if isinstance(kind, str) and kind in contract_excluded_action_classes(contract):
+        return f"work_kind {kind} is excluded by the user work contract"
+    unattended = work_contract_value(contract, "execution", "mode") == "unattended_goal_loop"
+    no_interaction = work_contract_value(contract, "interaction", "mode") == "forbidden"
+    if unattended and no_interaction and condition.get("interaction_required") is True:
+        return "unattended Goal/Loop contract forbids required human interaction"
+    return None
 
 
 def _receipt_artifact_path(

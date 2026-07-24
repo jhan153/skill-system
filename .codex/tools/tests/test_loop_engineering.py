@@ -67,6 +67,30 @@ def write_result(
     )
 
 
+def write_results(
+    path: Path,
+    *,
+    loop_run_id: str,
+    iteration: int,
+    rid: str,
+    condition_results: list[dict],
+) -> None:
+    path.write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 2,
+                "loop_run_id": loop_run_id,
+                "iteration": iteration,
+                "iteration_result_id": rid,
+                "condition_results": condition_results,
+                "side_effects": [],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+
+
 class LoopEngineeringTests(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp = Path(__import__("tempfile").mkdtemp())
@@ -365,6 +389,316 @@ class LoopEngineeringTests(unittest.TestCase):
         out = run("init_loop_run.py", str(contract), "--output-root", str(self.tmp / "runs"), "--workspace-root", str(self.tmp))
         self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
         return Path(json.loads(out.stdout)["loop_run_dir"])
+
+    def _init_v3_contract(
+        self,
+        *,
+        contract_id: str,
+        conditions: list[dict],
+        execution_mode: str = "unattended_goal_loop",
+        interaction_mode: str = "forbidden",
+        verification_owner: str = "agent",
+    ) -> Path:
+        handoff = "user-verification-needed" if verification_owner == "user" else "unverified"
+        excluded_actions = (
+            ["agent_validation", "test_authoring", "validation_artifact"]
+            if verification_owner == "user"
+            else []
+        )
+        interaction_behavior = (
+            "defer"
+            if execution_mode == "unattended_goal_loop" and interaction_mode == "forbidden"
+            else "normal"
+        )
+        contract = self.tmp / f"{contract_id}.yaml"
+        contract.write_text(
+            yaml.safe_dump(
+                {
+                    "schema_version": 3,
+                    "contract_id": contract_id,
+                    "activation": "explicit",
+                    "goal": {
+                        "statement": "work-contract loop regression",
+                        "success_conditions": conditions,
+                    },
+                    "work_contract": {
+                        "schema_version": 1,
+                        "contract_id": f"WC-{contract_id}",
+                        "source": {"kind": "loop_contract"},
+                        "execution": {"mode": execution_mode},
+                        "scope": {
+                            "core_deliverables": ["Implement the requested production behavior."],
+                            "allowed_action_classes": ["core", "required_prerequisite"],
+                            "excluded_action_classes": excluded_actions,
+                            "non_goals": [],
+                        },
+                        "verification": {
+                            "owner": verification_owner,
+                            "handoff_on_unavailable": handoff,
+                        },
+                        "interaction": {
+                            "mode": interaction_mode,
+                            "approval_behavior": interaction_behavior,
+                            "question_behavior": interaction_behavior,
+                        },
+                        "continuation": {
+                            "on_local_block": "reevaluate_remaining_work",
+                            "on_optional_failure": "continue",
+                            "duplicate_intent_behavior": "defer_same_intent",
+                            "global_block_condition": "no_required_runnable_work",
+                        },
+                        "termination": {
+                            "time_budget_seconds": 3600,
+                            "stop_condition": "All required runnable work is complete or genuinely blocked.",
+                        },
+                    },
+                    "control": {
+                        "max_iterations": 9,
+                        "max_wall_time_seconds": 3600,
+                        "no_progress_limit": 3,
+                        "same_failure_limit": 3,
+                        "max_stop_continuations": 9,
+                    },
+                    "termination": {
+                        "precedence": [
+                            "unsafe",
+                            "fatal",
+                            "blocked",
+                            "success",
+                            "user_verification_needed",
+                            "approval_required",
+                            "stalled",
+                            "budget_exhausted",
+                            "recover",
+                            "continue",
+                        ]
+                    },
+                },
+                sort_keys=False,
+            ),
+            encoding="utf-8",
+        )
+        initialized = run(
+            "init_loop_run.py",
+            str(contract),
+            "--output-root",
+            str(self.tmp / f"{contract_id}-runs"),
+            "--workspace-root",
+            str(self.tmp),
+        )
+        self.assertEqual(initialized.returncode, 0, initialized.stdout + initialized.stderr)
+        return Path(json.loads(initialized.stdout)["loop_run_dir"])
+
+    @staticmethod
+    def _artifact_condition(
+        condition_id: str,
+        *,
+        intent_key: str,
+        interaction_required: bool = False,
+        depends_on: list[str] | None = None,
+    ) -> dict:
+        return {
+            "id": condition_id,
+            "statement": f"{condition_id} artifact exists.",
+            "required": True,
+            "work_kind": "core",
+            "depends_on": depends_on or [],
+            "interaction_required": interaction_required,
+            "intent_key": intent_key,
+            "verifier": {
+                "type": "artifact_exists",
+                "owner": "agent:codex",
+                "path": f"artifacts/{condition_id.lower()}.ok",
+            },
+        }
+
+    def test_v3_local_block_continues_independent_required_work(self) -> None:
+        loop = self._init_v3_contract(
+            contract_id="LC-20260723-101",
+            conditions=[
+                self._artifact_condition("SC-001", intent_key="core-one"),
+                self._artifact_condition("SC-002", intent_key="core-two"),
+            ],
+        )
+        state = yaml.safe_load((loop / "state.yaml").read_text(encoding="utf-8"))
+        result_path = self.tmp / "local-block.yaml"
+        write_results(
+            result_path,
+            loop_run_id=state["loop_run_id"],
+            iteration=1,
+            rid="IR-local-block",
+            condition_results=[
+                {"condition_id": "SC-001", "status": "blocked", "evidence_refs": []},
+                {"condition_id": "SC-002", "status": "unverified", "evidence_refs": []},
+            ],
+        )
+        evaluated = run(
+            "evaluate_loop_run.py",
+            str(loop),
+            "--iteration-result",
+            str(result_path),
+            "--format",
+            "json",
+        )
+        self.assertEqual(evaluated.returncode, 0, evaluated.stdout + evaluated.stderr)
+        decision = json.loads(evaluated.stdout)["decision"]
+        self.assertEqual(decision["action"], "continue")
+        self.assertEqual(decision["target_condition"], "SC-002")
+        updated = yaml.safe_load((loop / "state.yaml").read_text(encoding="utf-8"))
+        self.assertEqual(updated["status"], "active")
+        self.assertEqual(updated["deferred_actions"][0]["condition_id"], "SC-001")
+
+    def test_v3_global_block_requires_no_runnable_required_work(self) -> None:
+        loop = self._init_v3_contract(
+            contract_id="LC-20260723-102",
+            conditions=[
+                self._artifact_condition("SC-001", intent_key="core-one"),
+                self._artifact_condition("SC-002", intent_key="core-two"),
+            ],
+        )
+        state = yaml.safe_load((loop / "state.yaml").read_text(encoding="utf-8"))
+        result_path = self.tmp / "all-blocked.yaml"
+        write_results(
+            result_path,
+            loop_run_id=state["loop_run_id"],
+            iteration=1,
+            rid="IR-all-blocked",
+            condition_results=[
+                {"condition_id": "SC-001", "status": "blocked", "evidence_refs": []},
+                {"condition_id": "SC-002", "status": "deferred", "evidence_refs": []},
+            ],
+        )
+        evaluated = run(
+            "evaluate_loop_run.py",
+            str(loop),
+            "--iteration-result",
+            str(result_path),
+            "--format",
+            "json",
+        )
+        self.assertEqual(evaluated.returncode, 0, evaluated.stdout + evaluated.stderr)
+        decision = json.loads(evaluated.stdout)["decision"]
+        self.assertEqual(decision["action"], "blocked")
+        self.assertEqual(decision["reason_code"], "no_required_runnable_work")
+
+    def test_v3_user_owned_verification_is_terminal_handoff(self) -> None:
+        conditions = [
+            self._artifact_condition("SC-001", intent_key="core-implementation"),
+            {
+                "id": "SC-002",
+                "statement": "The user verifies product behavior.",
+                "required": True,
+                "work_kind": "required_prerequisite",
+                "depends_on": ["SC-001"],
+                "interaction_required": True,
+                "intent_key": "user-product-verification",
+                "verifier": {
+                    "type": "manual_check",
+                    "owner": "user",
+                    "acceptance_scope": "product-behavior",
+                },
+            },
+        ]
+        loop = self._init_v3_contract(
+            contract_id="LC-20260723-103",
+            conditions=conditions,
+            verification_owner="user",
+        )
+        artifact = self.tmp / "artifacts" / "sc-001.ok"
+        artifact.parent.mkdir(exist_ok=True)
+        artifact.write_text("implemented\n", encoding="utf-8")
+        state = yaml.safe_load((loop / "state.yaml").read_text(encoding="utf-8"))
+        receipt = {
+            "kind": "artifact_exists",
+            "verifier_owner": "agent:codex",
+            "observed_at": state["started_at"],
+            "outcome": "pass",
+            "artifact_ref": "artifacts/sc-001.ok",
+            "artifact_scope": "workspace",
+            "artifact_sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),
+        }
+        result_path = self.tmp / "user-handoff.yaml"
+        write_results(
+            result_path,
+            loop_run_id=state["loop_run_id"],
+            iteration=1,
+            rid="IR-user-handoff",
+            condition_results=[
+                {
+                    "condition_id": "SC-001",
+                    "status": "pass",
+                    "evidence_refs": ["artifacts/sc-001.ok"],
+                    "evidence": [receipt],
+                },
+                {
+                    "condition_id": "SC-002",
+                    "status": "unverified",
+                    "evidence_refs": ["user-verification-needed"],
+                },
+            ],
+        )
+        evaluated = run(
+            "evaluate_loop_run.py",
+            str(loop),
+            "--iteration-result",
+            str(result_path),
+            "--format",
+            "json",
+        )
+        self.assertEqual(evaluated.returncode, 0, evaluated.stdout + evaluated.stderr)
+        decision = json.loads(evaluated.stdout)["decision"]
+        self.assertEqual(decision["action"], "user_verification_needed")
+        self.assertEqual(decision["reason_code"], "user_owned_verification_pending")
+        terminal_state = yaml.safe_load((loop / "state.yaml").read_text(encoding="utf-8"))
+        self.assertEqual(terminal_state["status"], "user_verification_needed")
+        self.assertEqual(terminal_state["result_label"], "user-verification-needed")
+
+    def test_v3_attended_work_does_not_defer_interaction_required_condition(self) -> None:
+        loop = self._init_v3_contract(
+            contract_id="LC-20260723-104",
+            conditions=[
+                self._artifact_condition(
+                    "SC-001",
+                    intent_key="attended-prerequisite",
+                    interaction_required=True,
+                )
+            ],
+            execution_mode="attended",
+            interaction_mode="forbidden",
+        )
+        evaluated = run("evaluate_loop_run.py", str(loop), "--format", "json")
+        self.assertEqual(evaluated.returncode, 0, evaluated.stdout + evaluated.stderr)
+        decision = json.loads(evaluated.stdout)["decision"]
+        self.assertEqual(decision["action"], "continue")
+        self.assertEqual(decision["target_condition"], "SC-001")
+        state = yaml.safe_load((loop / "state.yaml").read_text(encoding="utf-8"))
+        self.assertEqual(state["deferred_actions"], [])
+
+    def test_v3_duplicate_semantic_intent_is_rejected(self) -> None:
+        conditions = [
+            self._artifact_condition("SC-001", intent_key="same-purpose"),
+            self._artifact_condition("SC-002", intent_key="same-purpose"),
+        ]
+        contract = self.tmp / "LC-20260723-105.yaml"
+        # Build a valid v3 contract first, then reuse its generated contract with
+        # a duplicate semantic purpose to exercise the admission gate.
+        first = self._init_v3_contract(
+            contract_id="LC-20260723-105",
+            conditions=[conditions[0]],
+        )
+        duplicate_contract = yaml.safe_load((first / "contract.yaml").read_text(encoding="utf-8"))
+        duplicate_contract["goal"]["success_conditions"] = conditions
+        contract.write_text(yaml.safe_dump(duplicate_contract, sort_keys=False), encoding="utf-8")
+        initialized = run(
+            "init_loop_run.py",
+            str(contract),
+            "--output-root",
+            str(self.tmp / "duplicate-runs"),
+            "--workspace-root",
+            str(self.tmp),
+        )
+        self.assertEqual(initialized.returncode, 1, initialized.stdout + initialized.stderr)
+        self.assertIn("duplicate semantic intent_key", initialized.stdout)
 
     def test_claimed_command_log_cannot_self_attest_success(self) -> None:
         loop = self._init_contract(max_wall=0)

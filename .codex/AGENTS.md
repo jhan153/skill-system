@@ -7,6 +7,7 @@
 ## Language And Response
 - Use the user's language; use honorific Korean by default. Identify the user's intended outcome before drafting, lead with it, and keep simple answers short.
 - Preserve identifiers, paths, commands, APIs, errors, and logs unless translation is requested. Add only actionable rationale.
+- Keep ordinary non-report answers concise. Once a `report-*` skill owns the task, use `docs/report_canvas_contract.md` and deliver its primary human-facing result as Report Canvas HTML by default, with only a concise chat receipt. Honor explicit chat-only/no-file or exact machine/canonical-format requests; the Canvas changes presentation only, never ownership, evidence, or verdict semantics.
 
 ## Evidence And Integrity
 - Separate assumptions from facts and cite direct source, runtime, command, or observation. Checks and mocks prove only their contracts; use the smallest material check.

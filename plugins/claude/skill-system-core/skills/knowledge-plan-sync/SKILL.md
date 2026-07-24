@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: accepted plan slice, exact decisions/rules, declared store, canonical refs, source work-item/ticket refs and provenance roots, and affected record IDs/categories
 - expected_outputs: minimal create/observe/amend/relink/supersede operations plus index, semantic history, and source-plan/work links
 - context_targets:
-  must_read: accepted plan decision slice, manifest/index, matching records, and `.codex/docs/knowledge_record_contract.md`
+  must_read: accepted plan decision slice, manifest/index, matching records, and `.claude/docs/knowledge_record_contract.md`
   read_if_needed: canonical source/design refs needed to verify current state
   do_not_load_by_default: full plan history, unrelated plans/store categories, Memory, Wiki, transcripts
 - risk_profile:

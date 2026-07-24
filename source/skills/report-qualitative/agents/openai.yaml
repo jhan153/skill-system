@@ -1,9 +1,10 @@
 interface:
   display_name: "Report Qualitative"
-  short_description: "Give decision-first, evidence-grounded qualitative assessments"
-  default_prompt: "Use $report-qualitative to lead with an evidence-grounded decision and at most three material findings; load detailed rubrics/templates only for an explicit full or scored report."
+  short_description: "Evaluate quality and readiness in Canvas HTML"
+  default_prompt: "Use $report-qualitative to produce a decision-first, evidence-grounded Report Canvas HTML evaluation."
 
 policy:
   invocation_surface: explicit_procedure
   allow_implicit_invocation: false
   may_own_execution: true
+  may_write: true

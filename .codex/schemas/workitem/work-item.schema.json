@@ -17,7 +17,7 @@
     "next_action"
   ],
   "properties": {
-    "schema_version": { "enum": [1] },
+    "schema_version": { "enum": [1, 2] },
     "work_item_id": {
       "type": "string",
       "pattern": "WI-[0-9]{8}-[0-9]{3}"
@@ -41,6 +41,44 @@
     "primary_skill": { "type": ["string", "null"] },
     "task_run_ref": { "type": ["string", "null"] },
     "loop_run_ref": { "type": ["string", "null"] },
+    "work_contract_ref": { "type": "string", "minLength": 1 },
+    "work_contract_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "result_label": {
+      "enum": ["pending", "agent-verified", "user-verification-needed", "unverified", "blocked"]
+    },
+    "deferred_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["intent_key", "work_kind", "reason"],
+        "properties": {
+          "action_ref": { "type": "string", "minLength": 1 },
+          "intent_key": { "type": "string", "minLength": 1 },
+          "work_kind": {
+            "enum": [
+              "core",
+              "required_prerequisite",
+              "agent_validation",
+              "test_authoring",
+              "validation_artifact",
+              "optional_quality",
+              "meta"
+            ]
+          },
+          "reason": { "type": "string", "minLength": 1 },
+          "interaction_required": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "runnable_action_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
     "runtime_boundary": {
       "type": "object",
       "required": [
@@ -115,14 +153,43 @@
   "additionalProperties": false,
   "allOf": [
     {
+      "if": {
+        "properties": { "schema_version": { "const": 2 } },
+        "required": ["schema_version"]
+      },
+      "then": {
+        "required": [
+          "work_contract_ref",
+          "work_contract_hash",
+          "result_label",
+          "deferred_actions",
+          "runnable_action_refs"
+        ]
+      }
+    },
+    {
       "comment": "closed WorkItems need evidence",
       "if": { "properties": { "state": { "const": "closed" } }, "required": ["state"] },
-      "then": { "properties": { "evidence_refs": { "minItems": 1 } } }
+      "then": {
+        "properties": {
+          "evidence_refs": { "minItems": 1 },
+          "result_label": {
+            "enum": ["agent-verified", "user-verification-needed", "unverified"]
+          }
+        }
+      }
     },
     {
       "comment": "blocked WorkItems need a reason and next action",
       "if": { "properties": { "state": { "const": "blocked" } }, "required": ["state"] },
-      "then": { "required": ["blocked_reason"], "properties": { "next_action": { "minLength": 1 } } }
+      "then": {
+        "required": ["blocked_reason"],
+        "properties": {
+          "next_action": { "minLength": 1 },
+          "result_label": { "const": "blocked" },
+          "runnable_action_refs": { "maxItems": 0 }
+        }
+      }
     }
   ]
 }

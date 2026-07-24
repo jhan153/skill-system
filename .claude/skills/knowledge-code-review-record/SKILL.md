@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: rule, aliases/search terms, affected scope, detection cues, correct pattern, exceptions, example/canonical refs, provenance roots, and declared store
 - expected_outputs: one code-review record plus index row and readback
 - context_targets:
-  must_read: manifest/index, matching review records, representative correct/incorrect source refs, and `.codex/docs/knowledge_record_contract.md`
+  must_read: manifest/index, matching review records, representative correct/incorrect source refs, and `.claude/docs/knowledge_record_contract.md`
   read_if_needed: linter/test/config or prior accepted decision owning the rule
   do_not_load_by_default: full review history, PR comments, unrelated code, Memory, Wiki
 - risk_profile:

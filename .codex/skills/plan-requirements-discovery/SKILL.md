@@ -38,6 +38,7 @@ description: Run an explicitly requested one-question requirements interview tha
 | Request | Owner |
 | --- | --- |
 | explicit one-question elicitation | `plan-requirements-discovery` |
+| product behavior decision for a concrete existing capability/path | `plan-behavior-discovery` |
 | supplied answers to requirements contract | `plan-requirements-brief` |
 | stable requirements to implementation | `workflow-implementation` |
 | active `docs/plan` synchronization | `plan-short-term-docs` |

@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: exact item, `create|update|deprecate`, declared bank, and persistence authorization
 - expected_outputs: one append-only event plus compact current/archive/meta reflection and readback
 - context_targets:
-  must_read: manifest declaration, targeted current item, latest meta/event state, `.codex/docs/memory_mutation_contract.md`, and `reference.md`
+  must_read: manifest declaration, targeted current item, latest meta/event state, `.claude/docs/memory_mutation_contract.md`, and `reference.md`
   read_if_needed: matching archive block for supersession
   do_not_load_by_default: full bank, unrelated items, raw chat, implementation history
 - risk_profile:

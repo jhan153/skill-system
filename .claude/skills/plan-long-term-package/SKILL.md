@@ -32,8 +32,8 @@ disable-model-invocation: true
     - `references/package-core-invariants.md` after package intent is confirmed
     - explicitly relevant active plan, report, or prior package
     - source outline and validation contract
-    - `.codex/docs/planning_state_model.md` when state names or release gates could drift
-    - `.codex/docs/delivery_slice_contract.md` when any phase needs multi-batch execution topology, including wide migration or non-feature decomposition
+    - `.claude/docs/planning_state_model.md` when state names or release gates could drift
+    - `.claude/docs/delivery_slice_contract.md` when any phase needs multi-batch execution topology, including wide migration or non-feature decomposition
   do_not_load_by_default:
     - full repo or memory bank
     - all prior plans or codebase-intel artifacts

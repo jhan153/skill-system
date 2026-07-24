@@ -1,0 +1,19 @@
+interface:
+  display_name: "Plan Behavior Discovery"
+  short_description: "Decide product behavior for an existing capability"
+  default_prompt: "Use $plan-behavior-discovery to resolve one evidence-grounded product behavior decision at a time for an existing capability."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: one_shot
+  role: behavior_discovery_owner
+  typical_agentic_duration: "20-60 minutes"
+  legacy_equivalent: "several product behavior review sessions"
+
+planning_altitude:
+  kind: behavior_discovery
+  artifact_level: behavior_decision_record

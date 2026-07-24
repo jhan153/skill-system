@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: boundary/owners, aliases/search terms, dependency/data flow, invariants, consequences, canonical refs, consumers, overlap candidates, and declared store
 - expected_outputs: one architecture record plus index row and readback
 - context_targets:
-  must_read: manifest/index, matching architecture/decision records, exact module/schema/code refs, and `.codex/docs/knowledge_record_contract.md`
+  must_read: manifest/index, matching architecture/decision records, exact module/schema/code refs, and `.claude/docs/knowledge_record_contract.md`
   read_if_needed: migration plan or runtime evidence directly governing the boundary
   do_not_load_by_default: full repo architecture, unrelated diagrams, Memory, Wiki, old plans
 - risk_profile:

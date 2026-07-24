@@ -24,7 +24,7 @@ description: Read a minimum task-relevant slice of a declared Knowledge Base, in
 - entry_scene: PREPARE
 
 ## Workflow
-1. Bind `knowledge_root` and `knowledge_index` from the exact path or nearest manifest declaration according to `.codex/docs/project_context_manifest.md`. Missing means `unavailable`; do not scan, initialize, or substitute a default.
+1. Bind `knowledge_root` and `knowledge_index` from the exact path or nearest manifest declaration according to `.claude/docs/project_context_manifest.md`. Missing means `unavailable`; do not scan, initialize, or substitute a default.
 2. Derive task anchors and search `knowledge_index` first. Resolve every selected record path under the bound `knowledge_root` unless the index contains an explicit approved external record path.
 3. Select matching current records by title, accepted aliases, search terms, `applies_to`, consumers, relation targets, and canonical anchors. Surface matching unverified records; admit superseded/deprecated records only for a material history path.
 4. Choose the edge family that answers the question: causal/decision links for why, semantic/scope links for overlap or applicability, lifecycle/revisions for change history, and observations/provenance roots for recurrence.

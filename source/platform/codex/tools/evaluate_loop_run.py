@@ -18,16 +18,21 @@ from loop_policy import (
     canonical_hash,
     contained_path,
     contract_runtime_errors,
+    condition_defer_reason,
+    condition_dependencies,
+    condition_intent_key,
     condition_map,
     control_value,
     elapsed_seconds,
     file_sha256,
+    is_user_verification_condition,
     load_yaml,
     loop_lock,
     passed_required_count,
     required_condition_ids,
     state_fingerprint,
     structured_evidence_errors,
+    success_conditions,
     utc_now,
     write_yaml,
 )
@@ -112,24 +117,109 @@ def failed_required_conditions(contract: dict[str, Any], state: dict[str, Any]) 
     return failed
 
 
+def remaining_work(
+    contract: dict[str, Any],
+    state: dict[str, Any],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """Classify non-passing required conditions without globalizing a local block.
+
+    Returns runnable work, locally deferred work, and dependency-waiting work.
+    User-owned manual verification is a terminal handoff and is classified by
+    ``decide`` before this helper is used.
+    """
+    results = condition_map(state)
+    passed = {
+        condition_id
+        for condition_id, result in results.items()
+        if result.get("status") == "pass"
+    }
+    runnable: list[dict[str, Any]] = []
+    deferred: list[dict[str, Any]] = []
+    waiting: list[dict[str, Any]] = []
+    for condition_id in required_condition_ids(contract):
+        result = results.get(
+            condition_id,
+            {"condition_id": condition_id, "status": "unverified", "evidence_refs": []},
+        )
+        if result.get("status") == "pass" or is_user_verification_condition(contract, condition_id):
+            continue
+        reason = condition_defer_reason(contract, condition_id)
+        status = result.get("status")
+        if reason is None and status == "blocked":
+            reason = "condition is locally blocked"
+        elif reason is None and status == "deferred":
+            reason = "condition was locally deferred"
+        if reason is not None:
+            deferred.append(
+                {
+                    "condition_id": condition_id,
+                    "intent_key": condition_intent_key(contract, condition_id),
+                    "reason": reason,
+                }
+            )
+            continue
+        dependencies = condition_dependencies(contract, condition_id)
+        if all(dependency in passed for dependency in dependencies):
+            runnable.append(result)
+        else:
+            waiting.append(result)
+    for condition in success_conditions(contract):
+        if condition.get("required", True) is not False:
+            continue
+        condition_id = condition["id"]
+        result = results.get(
+            condition_id,
+            {"condition_id": condition_id, "status": "unverified", "evidence_refs": []},
+        )
+        if result.get("status") == "pass":
+            continue
+        reason = condition_defer_reason(contract, condition_id)
+        if reason is None and result.get("status") == "blocked":
+            reason = "optional condition is locally blocked"
+        elif reason is None and result.get("status") == "deferred":
+            reason = "optional condition was locally deferred"
+        if reason is not None:
+            deferred.append(
+                {
+                    "condition_id": condition_id,
+                    "intent_key": condition_intent_key(contract, condition_id),
+                    "reason": reason,
+                }
+            )
+    return runnable, deferred, waiting
+
+
+def record_deferred_actions(state: dict[str, Any], deferred: list[dict[str, Any]]) -> None:
+    state["deferred_actions"] = deferred
+
+
 def continuation_prompt(action: str, reason_code: str, contract: dict[str, Any], state: dict[str, Any], target: str | None) -> str:
     max_iterations = control_value(contract, "max_iterations", 1)
     prefix = f"Loop iteration {int(state.get('iteration', 0)) + 1}/{max_iterations}."
+    work_contract_active = bool(contract.get("work_contract"))
     if action == "recover":
         if reason_code == "oscillation_limit_reached":
             target_text = f" Regressed condition: {target}." if target else ""
             return (
                 f"{prefix} Oscillation detected: a previously passing required condition regressed to fail.{target_text} "
                 "Switch to workflow-recovery: find what reverted the condition and fix that root cause; "
-                "do not re-break conditions that were already passing or weaken tests. "
-                "Record new verifier evidence before finalizing again."
+                "do not re-break conditions that were already passing or weaken success conditions. "
+                "Record only evidence already required by the accepted contract."
             )
         return (
             f"{prefix} Repeated verifier failure reached the recovery threshold. "
             "Switch to workflow-recovery: use one hypothesis, one diagnostic, and one fix. "
-            "Do not weaken tests or expand write scope. Record new verifier evidence before finalizing again."
+            "Do not weaken success conditions or expand write scope. "
+            "Record only evidence already required by the accepted contract."
         )
     target_text = f" Target condition: {target}." if target else ""
+    if work_contract_active:
+        return (
+            f"{prefix}{target_text} Continue the smallest in-contract action that advances this required condition. "
+            "Keep locally deferred purposes deferred, reevaluate independent required work after each local block, "
+            "and do not create optional validation or management work. "
+            "Record only evidence already required by the accepted contract."
+        )
     return (
         f"{prefix}{target_text} Continue only with the smallest action that can change verifier evidence. "
         "Do not weaken success conditions. Record verifier evidence before finalizing again."
@@ -140,7 +230,8 @@ def continuation_prompt(action: str, reason_code: str, contract: dict[str, Any],
 # Reserved states (unsafe/fatal/approval_required/stalled) have no auto-emit path
 # yet; they stay in the vocabulary so a future verifier signal resolves correctly.
 DEFAULT_PRECEDENCE = [
-    "unsafe", "fatal", "blocked", "success", "approval_required", "stalled", "budget_exhausted", "recover", "continue",
+    "unsafe", "fatal", "blocked", "success", "user_verification_needed",
+    "approval_required", "stalled", "budget_exhausted", "recover", "continue",
 ]
 
 
@@ -158,15 +249,50 @@ def decide(
     failed = failed_required_conditions(contract, state)
     progress = state.get("progress", {}) if isinstance(state.get("progress"), dict) else {}
     budgets = state.get("budgets", {}) if isinstance(state.get("budgets"), dict) else {}
-    target = failed[0]["condition_id"] if failed else None
 
     # Hard governance guards win regardless of contract precedence: malformed,
     # mismatched, missing, or stale verifier receipts can never be overridden.
     if evidence_errors:
         target_condition = evidence_errors[0].split(":", 1)[0]
         return {"action": "blocked", "reason_code": "invalid_verifier_evidence", "target_condition": target_condition}
-    if any(item.get("status") == "blocked" for item in failed):
-        return {"action": "blocked", "reason_code": "required_condition_blocked", "target_condition": target}
+
+    user_pending = [
+        item
+        for item in failed
+        if is_user_verification_condition(contract, str(item.get("condition_id", "")))
+    ]
+    non_user_failed = [
+        item
+        for item in failed
+        if not is_user_verification_condition(contract, str(item.get("condition_id", "")))
+    ]
+    if user_pending and not non_user_failed:
+        record_deferred_actions(state, [])
+        return {
+            "action": "user_verification_needed",
+            "reason_code": "user_owned_verification_pending",
+            "target_condition": user_pending[0].get("condition_id"),
+        }
+
+    runnable, deferred, waiting = remaining_work(contract, state)
+    record_deferred_actions(state, deferred)
+    target = runnable[0].get("condition_id") if runnable else None
+
+    # A local block is terminal only after the remaining dependency graph has no
+    # independent required condition that can still run.
+    if failed and not runnable:
+        blocked_target = (
+            deferred[0]["condition_id"]
+            if deferred
+            else waiting[0].get("condition_id")
+            if waiting
+            else failed[0].get("condition_id")
+        )
+        return {
+            "action": "blocked",
+            "reason_code": "no_required_runnable_work",
+            "target_condition": blocked_target,
+        }
 
     # Terminal (stop) candidates are resolved by the contract's termination.precedence.
     # These are mutually bounded: success only when nothing failed; budget only when
@@ -189,6 +315,13 @@ def decide(
 
     # Not terminating: choose the continuation strategy from progress thresholds.
     # recover-vs-continue is a strategy decision, not a termination ordering.
+    target_status = runnable[0].get("status") if runnable else None
+    if deferred and target_status == "unverified":
+        return {
+            "action": "continue",
+            "reason_code": "local_block_deferred_independent_work_remaining",
+            "target_condition": target,
+        }
     if int(progress.get("repeated_failure_count", 0)) >= control_value(contract, "same_failure_limit", 1):
         return {"action": "recover", "reason_code": "same_failure_limit_reached", "target_condition": target}
     if int(progress.get("oscillation_count", 0)) >= control_value(contract, "oscillation_limit", 2):
@@ -322,7 +455,13 @@ def _evaluate(args: argparse.Namespace) -> int:
                 print(f"FAIL: iteration_result_id {rid!r} reused with a different payload (conflict, not replay)")
                 return 3
             prior = read_recorded_decision(args.loop_run_dir, int(prior_iteration))
-            report = {"status": "PASS", "loop_run_id": state["loop_run_id"], "decision": prior, "replay": True}
+            report = {
+                "status": "PASS",
+                "loop_run_id": state["loop_run_id"],
+                "result_label": state.get("result_label", "pending"),
+                "decision": prior,
+                "replay": True,
+            }
             if args.format == "json":
                 print(json.dumps(report, sort_keys=True))
             else:
@@ -398,17 +537,26 @@ def _evaluate(args: argparse.Namespace) -> int:
             decision.get("target_condition") if isinstance(decision.get("target_condition"), str) else None,
         )
         state["status"] = "active"
+        state["result_label"] = "pending"
     elif decision["action"] == "success":
         state["status"] = "success"
+        state["result_label"] = "agent-verified"
+        decision["continuation_prompt"] = None
+    elif decision["action"] == "user_verification_needed":
+        state["status"] = "user_verification_needed"
+        state["result_label"] = "user-verification-needed"
         decision["continuation_prompt"] = None
     elif decision["action"] == "budget_exhausted":
         state["status"] = "budget_exhausted"
+        state["result_label"] = "unverified"
         decision["continuation_prompt"] = None
     elif decision["action"] == "blocked":
         state["status"] = "blocked"
+        state["result_label"] = "blocked"
         decision["continuation_prompt"] = None
     else:
         state["status"] = str(decision["action"])
+        state["result_label"] = "blocked" if decision["action"] in {"unsafe", "fatal"} else "unverified"
         decision["continuation_prompt"] = None
 
     now = utc_now()
@@ -437,7 +585,12 @@ def _evaluate(args: argparse.Namespace) -> int:
             "state_hash": state["progress"]["state_hash"],
         },
     )
-    report = {"status": "PASS", "loop_run_id": state["loop_run_id"], "decision": decision}
+    report = {
+        "status": "PASS",
+        "loop_run_id": state["loop_run_id"],
+        "result_label": state["result_label"],
+        "decision": decision,
+    }
     if args.format == "json":
         print(json.dumps(report, sort_keys=True))
     else:

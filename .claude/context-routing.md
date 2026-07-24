@@ -56,6 +56,7 @@ Resolve a requested skill in this order: exact user-provided path, skill install
 | research / scientific workflow | `research-router` only when stage is unclear/multi-stage; otherwise the clear narrow research owner | selected next research stage; `plan-short-term-docs` only for explicit persisted `docs/plan` artifact | research decision, stage/artifact hints, provided upstream artifact | full repo, full memory bank, `analysis-codebase`, `plan-long-term-package`, premature later stages |
 | cross-domain evidence search | `search-router` | selected evidence lane such as `search-paper-evidence`, `analysis-bug`, `design-visual-regression`, `memory-bank-harness`, `knowledge-base-read`, explicit `llm-wiki-context`, or `search-deep-evidence` | evidence intent, domain hint, claim/topic, final task owner | final synthesis, implementation, broad research lifecycle |
 | requirements discovery interview | `plan-requirements-discovery` | none by default; `plan-requirements-brief` only after discovery results are ready to distill | rough goal, idea, product direction, domain/scope hints, user willingness to answer questions | direct implementation, active docs/plan sync, lifecycle report package |
+| behavior discovery for an existing capability | `plan-behavior-discovery` | `report-implementation-explainer` only when an explanation artifact is explicitly requested | concrete capability/path, current source/runtime evidence, target actor, unresolved operability decision | greenfield requirements discovery, quiz, direct implementation, exhaustive release questionnaire |
 | requirements contract / PRD brief | `plan-requirements-brief` | none by default; `plan-long-term-package` or `plan-short-term-docs` only after the brief is accepted for planning | discovery notes, stakeholder answers, decision log, rough requirements, intended handoff target | interactive elicitation, direct implementation, docs/plan status sync, lifecycle result reporting |
 | loop readiness classification | `loop-readiness-router` | `plan-loop-term` only after `contract_needed` or `loop_worthy`; `workflow-loop-runner` only after accepted contract | prompt draft, target domain, verifier hints, side-effect, approval, durability, event-runtime, Wiki feedback, parallelism, and idempotency signals | direct execution, contract drafting, verifier execution, broad planning |
 | loop verifier mapping | `loop-verifier-registry` | `plan-loop-term` when embedding the map into a contract; verifier skills only as owners, not executors | loop contract or success conditions, runtime verifier catalog, target domain, governance metrics | running checks, implementation, readiness classification |
@@ -79,6 +80,7 @@ Resolve a requested skill in this order: exact user-provided path, skill install
 | codebase design / deep module analysis | `analysis-codebase-design` for one boundary decision or `analysis-architecture-deepening` for ranked candidates | `workflow-minimal-implementation` as abstraction pressure; `workflow-implementation` only after a candidate is selected | design pressure, target modules/call sites/tests, local patterns | full repo report, direct implementation before selection, domain glossary-only work |
 | codebase report | `analysis-codebase` | `report-critical` after report if requested | repo root, scripts, tracked files | single-bug workflow |
 | qualitative evaluation report | `report-qualitative` | `report-critical` only if blocker/QA verdict is also requested | artifact slice, evaluation goal, audience, criteria, evidence anchors, redaction boundary | readable changed-line diffs, artifact inventory, eval telemetry, implementation, debugging |
+| implementation explanation / visualization | `report-implementation-explainer` | `workflow-implementation` only when new production trace/readback instrumentation is separately requested | concrete snapshot, production path, decision purpose, available runtime evidence | diff-only output, correctness verdict, pre-implementation algorithm choice, automatic post-implementation gate |
 | lifecycle artifact package | `report-lifecycle-artifacts` | `report-critical` only for blocker-first QA; `workflow-validation` only when concrete validation planning/execution is separately requested | lifecycle source artifacts, evidence anchors, desired tier/scope, traceability needs | direct implementation, small task inventory, casual planning, validation-only work |
 | diff presentation | `report-diff` | `report-critical` only if verdict requested | verified diff or snapshot | root-cause workflow |
 | critical review | `report-critical` | `report-qualitative` if formal report requested | artifact slice, goal, evidence anchors | full history |
@@ -112,6 +114,7 @@ Use `.claude/docs/planning_state_model.md` when a planning artifact changes stat
 | direct one-shot edit/check | small direct execution or `workflow-implementation` when coding workflow is useful | none by default | `workflow-task-ledger`, `plan-short-term-docs`, `plan-loop-term`, `workflow-loop-runner` |
 | task/ticket state across turns | task-specific primary such as `workflow-implementation` plus `workflow-task-ledger` | WorkItem only as lifecycle envelope when requested or already present | `plan-long-term-package`, `workflow-loop-runner` unless verifier feedback is required |
 | requirements discovery / interview | `plan-requirements-discovery` | none by default | direct implementation, phase package, lifecycle artifact report |
+| existing-capability behavior discovery | `plan-behavior-discovery` | none by default; consume an existing explainer only when relevant | greenfield discovery, direct implementation, exhaustive feature/release interview |
 | requirements contract / PRD brief | `plan-requirements-brief` | hand off to `plan-long-term-package` or `plan-short-term-docs` after acceptance | interactive discovery, direct implementation |
 | tactical design/current execution plan | `plan-short-term-docs` | `workflow-validation` or `report-critical` only when requested | `plan-long-term-package` |
 | strategic phase/package plan | `plan-long-term-package` | `plan-spec-curator` for lifecycle cleanup | `plan-short-term-docs` as primary |
@@ -123,6 +126,7 @@ Use `.claude/docs/planning_state_model.md` when a planning artifact changes stat
 
 ## Planning State Admission
 
+- `plan-behavior-discovery` is a bounded, non-persisted decision surface around an existing capability unless the user explicitly requests a record. It does not reopen `scratch -> discovery`, synthesize a plan state, or authorize implementation; it stops when the next human-operable slice is decision-ready.
 - `plan-requirements-discovery` owns `scratch -> discovery`; it asks one decision-bearing question when requirements gaps affect scope, acceptance, edge behavior, data ownership, constraints, or non-goals.
 - `plan-requirements-brief` owns `discovery -> requirements_contract`; acceptance criteria must be observable before a brief can hand off to planning.
 - `plan-short-term-docs` owns `active_plan -> implementation_ready`; `approve_implementation` requires explicit active plan scope and current-task approval wording.
@@ -171,29 +175,13 @@ Current `agents/openai.yaml` metadata is conservative: specialist skills and hea
 
 ## Group Alias Routing
 
-User-facing skill families are defined in `docs/skill_registry.md` (the `family` column and Group Alias Map). This section defines only *when* group-selection mode is used and *which entry skill* each family routes to. Alias and display strings are not duplicated here; the registry Group Alias Map is their single source.
+User-facing skill families, aliases, display strings, and Phase A entry mapping are defined in `docs/skill_registry.md` (the `family` column and Group Alias Map). This section defines only *when* group-selection mode is used and the platform guardrails around that selection.
 
 Trigger guard:
 - Enter group-selection mode only when the request carries an explicit family-framing token (`스킬군`, `그룹`, `계열`, `group`, `family`) or an explicit family name.
 - Do not enter group-selection mode for bare domain words like `분석`, `검토`, `보고`, `계획`; those route by the normal Route Matrix.
 
-Family entry routing (Phase A):
-| family | entry skill |
-| --- | --- |
-| `search` | `search-router` |
-| `design` | `design-frontend` |
-| `report` | `report-qualitative` (정성평가/보고) or `report-critical` (검토/QA/blocker) by intent |
-| `research` | `research-router` |
-| `analysis` | `analysis-router` / `analysis-domain-modeling` / `analysis-performance` / `analysis-codebase-design` / `analysis-architecture-deepening` by intent |
-| `workflow` | `workflow-implementation` / `workflow-bug-fix` / `workflow-dependency-upgrade` / `workflow-source-maintenance` / `workflow-comment-maintenance` / `workflow-refactor-safely` / `workflow-rigor` / `workflow-minimal-implementation` / `workflow-plan-runner` / `workflow-validation` / `workflow-recovery` by intent |
-| `coordination` | `coordination-handoff` |
-| `planning` | `plan-short-term-docs` / `plan-loop-term` / `plan-long-term-package` by intent |
-| `loop` | `loop-readiness-router` / `loop-verifier-registry` / `workflow-loop-runner` by intent |
-| `memory` | `memory-bank-harness` (read) or an explicit Memory mutation skill by intent |
-| `knowledge` | `knowledge-base-read` (read) or an explicit category/update/maintenance owner by intent |
-| `wiki` | explicit `llm-wiki-context` for one named read-only Wiki |
-| `evaluation` | `evaluation-harness` only for explicitly requested case-structure review |
-| `skill_system` | current implementation owner; attach `skill-system-repo-adapter` only for this repository |
+When the trigger guard admits group-selection mode, resolve the family and its entry owner from the registry Group Alias Map. Do not maintain a second family-entry table here. A named Wiki remains an explicit `llm-wiki-context` operation within the `knowledge` family rather than a separate family.
 
 Evidence vs research boundary (mirrored rule; `research-routing.md` is Codex-only, so this boundary lives here so both Codex and Claude apply it):
 - Cross-domain evidence search (papers, code, runtime, visual, memory) belongs to the `search` family; the `search` entry opens an evidence lane and `search-paper-evidence` provides paper evidence as support.

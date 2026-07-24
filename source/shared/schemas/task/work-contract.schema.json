@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-work-contract.schema.json",
+  "title": "Skill System User Work Contract",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "source",
+    "execution",
+    "scope",
+    "verification",
+    "interaction",
+    "continuation",
+    "termination"
+  ],
+  "properties": {
+    "schema_version": { "enum": [1] },
+    "contract_id": {
+      "type": "string",
+      "pattern": "^WC-[A-Za-z0-9][A-Za-z0-9._-]{0,95}$"
+    },
+    "source": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "enum": ["natural_language", "requirements_contract", "plan", "loop_contract"]
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "ref": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "execution": {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": { "enum": ["attended", "unattended_goal_loop"] }
+      },
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "object",
+      "required": ["core_deliverables", "allowed_action_classes", "excluded_action_classes"],
+      "properties": {
+        "core_deliverables": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "allowed_action_classes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "core",
+              "required_prerequisite",
+              "agent_validation",
+              "test_authoring",
+              "validation_artifact",
+              "optional_quality",
+              "meta"
+            ]
+          }
+        },
+        "excluded_action_classes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "core",
+              "required_prerequisite",
+              "agent_validation",
+              "test_authoring",
+              "validation_artifact",
+              "optional_quality",
+              "meta"
+            ]
+          }
+        },
+        "non_goals": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "verification": {
+      "type": "object",
+      "required": ["owner", "handoff_on_unavailable"],
+      "properties": {
+        "owner": { "enum": ["agent", "user", "shared", "external"] },
+        "handoff_on_unavailable": {
+          "enum": ["user-verification-needed", "unverified", "blocked"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "interaction": {
+      "type": "object",
+      "required": ["mode", "approval_behavior", "question_behavior"],
+      "properties": {
+        "mode": { "enum": ["allowed", "forbidden"] },
+        "approval_behavior": { "enum": ["normal", "defer"] },
+        "question_behavior": { "enum": ["normal", "defer"] }
+      },
+      "additionalProperties": false
+    },
+    "continuation": {
+      "type": "object",
+      "required": [
+        "on_local_block",
+        "on_optional_failure",
+        "duplicate_intent_behavior",
+        "global_block_condition"
+      ],
+      "properties": {
+        "on_local_block": { "const": "reevaluate_remaining_work" },
+        "on_optional_failure": { "const": "continue" },
+        "duplicate_intent_behavior": { "const": "defer_same_intent" },
+        "global_block_condition": { "const": "no_required_runnable_work" }
+      },
+      "additionalProperties": false
+    },
+    "termination": {
+      "type": "object",
+      "required": ["stop_condition"],
+      "properties": {
+        "time_budget_seconds": { "type": ["integer", "null"], "minimum": 0 },
+        "stop_condition": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "verification": {
+            "properties": { "owner": { "const": "user" } },
+            "required": ["owner"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "verification": {
+            "properties": {
+              "handoff_on_unavailable": { "const": "user-verification-needed" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution": {
+            "properties": { "mode": { "const": "unattended_goal_loop" } },
+            "required": ["mode"]
+          },
+          "interaction": {
+            "properties": { "mode": { "const": "forbidden" } },
+            "required": ["mode"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "interaction": {
+            "properties": {
+              "approval_behavior": { "const": "defer" },
+              "question_behavior": { "const": "defer" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

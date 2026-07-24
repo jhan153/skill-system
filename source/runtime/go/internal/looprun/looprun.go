@@ -2,6 +2,8 @@ package looprun
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"os"
@@ -10,10 +12,12 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 var terminalActions = map[string]bool{
-	"success": true, "blocked": true, "budget_exhausted": true,
+	"success": true, "user_verification_needed": true, "blocked": true, "budget_exhausted": true,
 	"unsafe": true, "fatal": true, "stalled": true,
 }
 
@@ -24,11 +28,12 @@ type Decision struct {
 }
 
 type Report struct {
-	Status    string   `json:"status"`
-	LoopRunID string   `json:"loop_run_id"`
-	Decision  Decision `json:"decision"`
-	Reason    string   `json:"reason,omitempty"`
-	LoopDir   string   `json:"-"`
+	Status      string   `json:"status"`
+	LoopRunID   string   `json:"loop_run_id"`
+	ResultLabel string   `json:"result_label"`
+	Decision    Decision `json:"decision"`
+	Reason      string   `json:"reason,omitempty"`
+	LoopDir     string   `json:"-"`
 }
 
 type Output struct {
@@ -36,6 +41,15 @@ type Output struct {
 	Decision      string `json:"decision,omitempty"`
 	Reason        string `json:"reason,omitempty"`
 	SystemMessage string `json:"systemMessage,omitempty"`
+}
+
+type WorkContractProjection struct {
+	Active                bool
+	SourceDigest          string
+	ExecutionMode         string
+	VerificationOwner     string
+	InteractionMode       string
+	ExcludedActionClasses []string
 }
 
 func Evaluate(sessionID, explicitDir string) (Report, *Output) {
@@ -87,6 +101,115 @@ func Evaluate(sessionID, explicitDir string) (Report, *Output) {
 		return report, &Output{Continue: &value, SystemMessage: "Loop continuation (observational): " + report.Decision.ContinuationPrompt}
 	}
 	return report, nil
+}
+
+// Active reports whether this session currently owns an accepted active
+// LoopRun. It performs the same bounded pointer/explicit-directory lookup used
+// by Evaluate and does not mutate loop state.
+func Active(sessionID, explicitDir string) bool {
+	loopDir, _ := activeLoop(sessionID, explicitDir)
+	return loopDir != ""
+}
+
+// WorkContract returns the bounded policy fields embedded in an accepted active
+// v3 LoopRun. Legacy contracts remain active but expose no projection, so they
+// retain the host's existing approval behavior.
+func WorkContract(sessionID, explicitDir string) (WorkContractProjection, error) {
+	loopDir, _ := activeLoop(sessionID, explicitDir)
+	if loopDir == "" {
+		return WorkContractProjection{}, nil
+	}
+	stateRaw, err := os.ReadFile(filepath.Join(loopDir, "state.yaml"))
+	if err != nil {
+		return WorkContractProjection{Active: true}, err
+	}
+	if len(stateRaw) > 256*1024 {
+		return WorkContractProjection{Active: true}, errors.New("LoopRun state exceeds bounded projection size")
+	}
+	var state struct {
+		SchemaVersion int    `yaml:"schema_version"`
+		Status        string `yaml:"status"`
+		ContractRef   string `yaml:"contract_ref"`
+		ContractHash  string `yaml:"contract_hash"`
+	}
+	if err := yaml.Unmarshal(stateRaw, &state); err != nil {
+		return WorkContractProjection{Active: true}, err
+	}
+	if state.SchemaVersion != 2 || state.Status != "active" || state.ContractRef == "" || state.ContractHash == "" {
+		return WorkContractProjection{Active: true}, errors.New("LoopRun state lacks accepted contract identity")
+	}
+	path, ok := containedContractPath(loopDir, state.ContractRef)
+	if !ok {
+		return WorkContractProjection{Active: true}, errors.New("LoopRun contract_ref escapes the run directory")
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return WorkContractProjection{Active: true}, err
+	}
+	if len(raw) > 256*1024 {
+		return WorkContractProjection{Active: true}, errors.New("LoopRun contract exceeds bounded projection size")
+	}
+	if digestBytes(raw) != state.ContractHash {
+		return WorkContractProjection{Active: true}, errors.New("LoopRun contract hash does not match state")
+	}
+	var contract struct {
+		SchemaVersion int `yaml:"schema_version"`
+		WorkContract  struct {
+			Execution struct {
+				Mode string `yaml:"mode"`
+			} `yaml:"execution"`
+			Verification struct {
+				Owner string `yaml:"owner"`
+			} `yaml:"verification"`
+			Interaction struct {
+				Mode string `yaml:"mode"`
+			} `yaml:"interaction"`
+			Scope struct {
+				ExcludedActionClasses []string `yaml:"excluded_action_classes"`
+			} `yaml:"scope"`
+		} `yaml:"work_contract"`
+	}
+	if err := yaml.Unmarshal(raw, &contract); err != nil {
+		return WorkContractProjection{Active: true}, err
+	}
+	if contract.SchemaVersion != 3 || contract.WorkContract.Execution.Mode == "" {
+		return WorkContractProjection{Active: true}, nil
+	}
+	return WorkContractProjection{
+		Active:                true,
+		SourceDigest:          state.ContractHash,
+		ExecutionMode:         contract.WorkContract.Execution.Mode,
+		VerificationOwner:     contract.WorkContract.Verification.Owner,
+		InteractionMode:       contract.WorkContract.Interaction.Mode,
+		ExcludedActionClasses: contract.WorkContract.Scope.ExcludedActionClasses,
+	}, nil
+}
+
+func containedContractPath(loopDir, ref string) (string, bool) {
+	if filepath.IsAbs(ref) {
+		return "", false
+	}
+	root, err := filepath.Abs(loopDir)
+	if err != nil {
+		return "", false
+	}
+	root, err = filepath.EvalSymlinks(root)
+	if err != nil {
+		return "", false
+	}
+	candidate, err := filepath.Abs(filepath.Join(root, filepath.Clean(ref)))
+	if err != nil {
+		return "", false
+	}
+	candidate, err = filepath.EvalSymlinks(candidate)
+	if err != nil {
+		return "", false
+	}
+	relative, err := filepath.Rel(root, candidate)
+	if err != nil || relative == ".." || strings.HasPrefix(relative, ".."+string(os.PathSeparator)) {
+		return "", false
+	}
+	return candidate, true
 }
 
 func activeLoop(sessionID, explicitDir string) (string, string) {
@@ -190,6 +313,11 @@ func safeID(value string) string {
 		return "unknown-session"
 	}
 	return result
+}
+
+func digestBytes(value []byte) string {
+	sum := sha256.Sum256(value)
+	return hex.EncodeToString(sum[:])
 }
 
 func pythonCommand() (string, []string, error) {

@@ -145,4 +145,4 @@ governance:
 
 Do not mark event-driven runtime, durable execution, persistent context mutation, or Stop-hook loop evaluation as `agent-verified` unless current run evidence proves it.
 
-`user-verification-needed` is never a success substitute. Local v2 keeps manual event evidence non-passing because actor provenance is not host-authenticated.
+`user_verification_needed` is never a success substitute. The local v2/v3 evaluator keeps manual event evidence non-passing because actor provenance is not host-authenticated.

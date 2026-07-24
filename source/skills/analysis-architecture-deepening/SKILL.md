@@ -15,7 +15,7 @@ description: Rank evidence-backed improvements across deep modules, seams, adapt
   - recurring bug root cause: `analysis-bug`
   - domain concepts/invariants: `analysis-domain-modeling`
   - measured bottleneck: `analysis-performance`
-  - direct production change: `workflow-implementation`
+  - direct production change: route by the selected candidate's change contract—`workflow-refactor-safely` for behavior-preserving live restructuring, `workflow-source-maintenance` for proven-obsolete deletion, or `workflow-implementation` for behavior changes
 - expected_inputs: bounded scope, pain/change signals, implementation appetite
 - expected_outputs: coverage, evidenced friction, ranked candidates, next candidate, handoff, unverified gaps
 - context_targets:
@@ -66,7 +66,7 @@ Return only:
 - `friction_signals` with evidence scope and references
 - `candidates` with stable IDs, `ranking`, and counterevidence
 - `recommended_next_candidate` as a ranked candidate ID (never `none` when ranking an opportunity), plus the decisive tradeoff
-- `handoff` to `analysis-codebase-design` or the appropriate owner
+- `handoff` to `analysis-codebase-design` when one boundary still needs design, `workflow-refactor-safely` for selected behavior-preserving live restructuring, `workflow-source-maintenance` for selected proven-obsolete deletion, or `workflow-implementation` for selected behavior changes
 - `unverified_gaps`
 
 Do not implement, generate a repo-wide report, or expand the shortlist into an exhaustive backlog.

@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: precise statement, aliases/search terms, scope, canonical/evidence refs, consumers, overlap candidates, and declared store
 - expected_outputs: one domain record plus index row and readback
 - context_targets:
-  must_read: manifest/index, matching domain records, canonical refs, and `.codex/docs/knowledge_record_contract.md`
+  must_read: manifest/index, matching domain records, canonical refs, and `.claude/docs/knowledge_record_contract.md`
   read_if_needed: source slice needed to disambiguate vocabulary or invariant
   do_not_load_by_default: full store/domain corpus, Memory, Wiki, transcripts
 - risk_profile:

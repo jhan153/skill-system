@@ -1,6 +1,6 @@
 ---
 name: workflow-source-maintenance
-description: Post-development source maintenance workflow for behavior-preserving code cleanup, dead-code pruning, source diet, stale scaffold removal, unused import/export cleanup, shallow wrapper collapse, and small maintainability refactors. Use when the user asks to clean up, slim down, prune, or maintain source code after implementation without adding features or changing intended behavior. Do not use for feature implementation, concrete bug fixes, broad architecture redesign, dependency upgrades, documentation-only edits, or comment-only maintenance.
+description: Post-development source maintenance workflow for behavior-preserving dead-code pruning, source diet, stale scaffold removal, and unused import/export cleanup. Use when the user asks to delete or prune source proven obsolete after implementation without adding features or changing intended behavior. Do not use for live-code restructuring or wrapper collapse, feature implementation, concrete bug fixes, broad architecture redesign, dependency upgrades, documentation-only edits, or comment-only maintenance.
 ---
 
 # Workflow Source Maintenance
@@ -27,12 +27,12 @@ description: Post-development source maintenance workflow for behavior-preservin
   - 1차 개발 후 정리
 - use_when:
   - the user asks to clean up or slim down source code after implementation.
-  - the task is mostly deletion, pruning, simplification, or local maintainability cleanup.
-  - suspected dead code, stale scaffolding, unused imports/exports, shallow wrappers, obsolete branches, or temporary implementation leftovers should be removed safely.
+  - the task is mostly deletion or pruning of obsolete source, stale scaffolding, unused imports/exports, obsolete branches, or temporary implementation leftovers.
   - the requested maintenance must preserve intended behavior.
 - do_not_use_when:
   - the user asks to add or change product behavior; use `workflow-implementation`.
   - the user asks for behavior-preserving structural refactor such as rename, move, extract, split, or broad restructure as the main task; use `workflow-refactor-safely`.
+  - the user asks to inline or collapse a still-reachable wrapper, simplify live control flow, or update callers for a structural change; use `workflow-refactor-safely` regardless of change size.
   - the user asks to fix a concrete failing test, build error, runtime exception, or regression; use `workflow-bug-fix`.
   - the user asks for architecture candidate discovery or design judgment only; use `analysis-architecture-deepening` or `analysis-codebase-design`.
   - the user asks only to update comments or docstrings; use `workflow-comment-maintenance`.
@@ -72,7 +72,7 @@ description: Post-development source maintenance workflow for behavior-preservin
 ## Contract
 - Remove only code proven obsolete while preserving intended user-visible behavior. “No static references” is a lead, not proof.
 - Establish one canonical owner before editing. Generated/runtime projections are never a second source: change the owner, regenerate, and read back the affected projection.
-- Keep source maintenance to deletion and the smallest repair or simplification caused by deletion. Route discovered feature work, structural redesign, or concrete failures to their owners.
+- Keep source maintenance to proven-obsolete deletion and the smallest import/export/caller repair caused by that deletion. Route live-code simplification, wrapper collapse, feature work, structural redesign, or concrete failures to their owners.
 
 ## Workflow
 1. Lock the maintenance slice, behavior-preservation boundary, cleanup type, canonical source, and generated or external projections. If ownership is ambiguous, stop before mutation.
@@ -88,7 +88,7 @@ If cleanup exposes a concrete failing path, preserve the evidence and route repa
 Delete only when canonical ownership is known, production reachability and contract checks support obsolescence, and no material public, dynamic, migration, compatibility, fixture, or external-source role remains. Valid cases include:
 - an internal symbol with no static or dynamic reachability;
 - call sites removed or updated in the same batch without changing the behavior boundary;
-- a shallow wrapper with no independent source selection, policy, fallback, validation, compatibility, or public API responsibility;
+- an unreachable wrapper with no callers or dynamic/public entrypoint role; collapsing a still-reachable wrapper belongs to `workflow-refactor-safely`;
 - an explicitly obsolete branch/scaffold supported by current code, contract, or user decision;
 - a mechanically unused import/export confirmed by the language toolchain.
 
@@ -97,4 +97,4 @@ Builds, linters, and tests validate only what they cover; they do not independen
 ## Output
 Return only applicable sections: `maintenance_scope`, `candidate_inventory`, `delete_plan`, `changed_artifacts`, `deleted_or_pruned`, `simplified`, `preserved_with_reason`, `validation`, `behavior_preservation_evidence`, and `remaining_risks`.
 
-Keep feature implementation with `workflow-implementation`, concrete repair with `workflow-bug-fix`, structural rename/move/extract/split with `workflow-refactor-safely`, and comment-only or dependency work with their dedicated workflows.
+Keep feature implementation with `workflow-implementation`, concrete repair with `workflow-bug-fix`, live-code rename/move/extract/split/inline/collapse with `workflow-refactor-safely`, and comment-only or dependency work with their dedicated workflows.

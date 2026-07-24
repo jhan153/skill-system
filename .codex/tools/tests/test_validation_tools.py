@@ -9,6 +9,55 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 class RuntimeContractTests(unittest.TestCase):
+    def test_default_rules_keep_network_shell_and_mutating_state_reviewable(self) -> None:
+        rules = (ROOT / ".codex" / "rules" / "default.rules").read_text(encoding="utf-8")
+        self.assertIn(
+            'prefix_rule(pattern=["curl"], decision="prompt"',
+            rules,
+        )
+        self.assertNotIn(
+            'prefix_rule(pattern=[["mmdc", "rg", "curl"]], decision="allow")',
+            rules,
+        )
+        self.assertNotIn('exec curl "$@"', rules)
+        self.assertIn(
+            'prefix_rule(pattern=[["sh", "bash", "zsh", "/bin/sh", "/bin/bash", "/bin/zsh"], ["-c", "-lc"]], decision="prompt"',
+            rules,
+        )
+        self.assertIn(
+            'prefix_rule(pattern=["git", ["add", "apply", "commit", "fetch", "ls-remote", "pull", "push", "rebase", "merge", "switch"]], decision="prompt"',
+            rules,
+        )
+        self.assertIn(
+            'prefix_rule(pattern=["git", "branch", ["-D", "-f", "-m"]], decision="prompt"',
+            rules,
+        )
+        self.assertIn(
+            'prefix_rule(pattern=[["codex", "claude"], "plugin"], decision="prompt"',
+            rules,
+        )
+        self.assertIn(
+            'prefix_rule(pattern=["git", ["status", "merge-tree"]], decision="allow")',
+            rules,
+        )
+        self.assertNotIn("# User-approved Git workflows.", rules)
+        self.assertNotIn("install_runtime.py", rules)
+        self.assertNotIn("task_ledger.py", rules)
+        self.assertNotIn("fetch-codex-manual.mjs", rules)
+        self.assertNotIn(
+            'prefix_rule(pattern=["git", ["add", "apply", "commit"',
+            "\n".join(line for line in rules.splitlines() if 'decision="allow"' in line),
+        )
+
+    def test_runtime_terms_reference_the_actual_hook_topology(self) -> None:
+        terms = (ROOT / ".codex" / "docs" / "runtime_terms.md").read_text(encoding="utf-8")
+        lifecycle = (ROOT / ".codex" / "docs" / "harness_lifecycle_hooks.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("default Codex hook map is empty", terms)
+        self.assertIn("bounded eight-event topology", terms)
+        self.assertIn("all eight supported lifecycle events", lifecycle)
+
     def test_codex_hooks_use_one_direct_go_command_for_eight_events(self) -> None:
         payload = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))
         hooks = payload["hooks"]
@@ -108,6 +157,26 @@ class RuntimeContractTests(unittest.TestCase):
         plugin_claude = (claude_plugin / "skills" / explicit_skill / "SKILL.md").read_text(encoding="utf-8")
         self.assertNotIn("disable-model-invocation:", plugin_codex)
         self.assertIn("disable-model-invocation: true", plugin_claude)
+
+    def test_claude_skill_paths_are_projected_without_changing_codex_paths(self) -> None:
+        codex_read = (ROOT / ".codex" / "skills" / "knowledge-base-read" / "SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        claude_read = (ROOT / ".claude" / "skills" / "knowledge-base-read" / "SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(".codex/docs/project_context_manifest.md", codex_read)
+        self.assertIn(".claude/docs/project_context_manifest.md", claude_read)
+
+        claude_skill_files = list((ROOT / ".claude" / "skills").glob("*/SKILL.md"))
+        claude_skill_files.extend((ROOT / "plugins" / "claude").glob("*/skills/*/SKILL.md"))
+        self.assertTrue(claude_skill_files)
+        for skill_file in claude_skill_files:
+            self.assertNotIn(
+                ".codex/",
+                skill_file.read_text(encoding="utf-8"),
+                skill_file.relative_to(ROOT).as_posix(),
+            )
 
 
 if __name__ == "__main__":

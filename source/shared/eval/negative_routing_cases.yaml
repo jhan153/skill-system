@@ -1,4 +1,4 @@
-version: "9.4.2"
+version: "9.4.3"
 purpose: "Requests that should not trigger heavy or wrong skills."
 cases:
   - case_id: neg-001
@@ -887,3 +887,166 @@ cases:
     required_evidence:
       - type: route_match
         expected: analysis-algorithm
+  - case_id: neg-implementation-explainer-diff-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-implementation-explainer]
+    scenario_tags: [negative, diff_boundary]
+    user_request: "이번 mesh 변경에서 실제로 바뀐 줄만 짧은 before/after diff로 보여줘."
+    expected_primary_skill: report-diff
+    expected_supporting_skills: []
+    should_not_trigger: [report-implementation-explainer, report-qualitative, report-critical]
+    expected_family: report
+    expected_context: [verified_diff]
+    expected_output_shape: "intent-grouped changed-line diff without an implementation explainer"
+    quality_notes: "Changed-line presentation remains report-diff even when the diff contains a complex algorithm."
+    friction_risk: "inflating a concise diff request into a source/runtime explanation artifact"
+    expected_behaviors: [present_verified_changed_lines]
+    forbidden_behaviors: [generate_implementation_explainer, create_html_artifact, claim_user_understood]
+    required_evidence:
+      - type: route_match
+        expected: report-diff
+  - case_id: neg-implementation-explainer-line-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-implementation-explainer]
+    scenario_tags: [negative, lightweight_explanation]
+    user_request: "이 함수에서 line 42의 guard가 무슨 뜻인지 한 문단으로 설명해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [report-implementation-explainer, report-diff, analysis-codebase]
+    expected_family: none
+    expected_context: [target_function, target_line]
+    expected_output_shape: "one direct source-grounded paragraph"
+    quality_notes: "A local line explanation needs no heavy implementation-understanding artifact."
+    friction_risk: "turning ordinary code explanation into a report workflow"
+    expected_behaviors: [answer_local_explanation_directly]
+    forbidden_behaviors: [generate_implementation_explainer, create_html_artifact]
+    required_evidence:
+      - type: route_match
+        expected: null
+  - case_id: neg-implementation-explainer-verdict-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-implementation-explainer]
+    scenario_tags: [negative, verdict_boundary, ambiguity]
+    user_request: "새 mesh split 코드가 출시해도 될 만큼 안전한지 blocker 중심으로 판단해줘."
+    expected_primary_skill: report-critical
+    expected_supporting_skills: []
+    should_not_trigger: [report-implementation-explainer, report-diff, report-qualitative]
+    expected_family: report
+    expected_context: [implementation_snapshot, release_criteria, validation_evidence]
+    expected_output_shape: "blocker-first readiness verdict rather than an implementation walkthrough"
+    quality_notes: "Mentioning an implementation does not route a correctness or release verdict to the explainer."
+    friction_risk: "substituting a persuasive walkthrough for a readiness judgment"
+    expected_behaviors: [produce_blocker_first_verdict]
+    forbidden_behaviors: [generate_implementation_explainer, claim_user_understood]
+    required_evidence:
+      - type: route_match
+        expected: report-critical
+  - case_id: neg-behavior-discovery-greenfield-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-behavior-discovery]
+    scenario_tags: [negative, greenfield_boundary]
+    user_request: "아직 구현은 없어. 새 3D mesh 편집 기능의 사용자, 범위, 예외를 한 번에 하나씩 질문해서 요구사항을 찾아줘."
+    expected_primary_skill: plan-requirements-discovery
+    expected_supporting_skills: []
+    should_not_trigger: [plan-behavior-discovery, workflow-implementation]
+    expected_family: planning
+    expected_context: [rough_goal, domain_hints, user_answers]
+    expected_output_shape: "pre-implementation requirements discovery interview"
+    quality_notes: "Without a concrete capability or existing path, one-question elicitation remains requirements discovery."
+    friction_risk: "inventing current behavior evidence for a nonexistent implementation"
+    expected_behaviors: [ask_one_requirements_decision]
+    forbidden_behaviors: [invoke_behavior_discovery, fabricate_current_implementation]
+    required_evidence:
+      - type: route_match
+        expected: plan-requirements-discovery
+  - case_id: neg-behavior-discovery-selected-change-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-behavior-discovery]
+    scenario_tags: [negative, implementation_boundary]
+    user_request: "preview 중에는 원본 mesh를 건드리지 않고 Apply에서만 atomic commit하기로 결정했어. 이 동작을 구현하고 테스트해줘."
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: []
+    should_not_trigger: [plan-behavior-discovery, plan-requirements-discovery, report-implementation-explainer]
+    expected_family: workflow
+    expected_context: [selected_behavior_contract, production_path, validation]
+    expected_output_shape: "direct implementation of the selected preview and atomic-commit behavior"
+    quality_notes: "A selected observable behavior plus code intent belongs to implementation, not another interview."
+    friction_risk: "reopening an already decided product contract"
+    expected_behaviors: [implement_selected_behavior]
+    forbidden_behaviors: [restart_behavior_interview, ask_recall_quiz]
+    required_evidence:
+      - type: route_match
+        expected: workflow-implementation
+  - case_id: neg-behavior-discovery-vague-next-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-behavior-discovery]
+    scenario_tags: [negative, ambiguous_target, lightweight]
+    user_request: "메시 편집 UX는 다음에 뭘 정해야 할까?"
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [plan-behavior-discovery, plan-requirements-discovery, report-implementation-explainer]
+    expected_family: none
+    expected_context: [stated_product_area]
+    expected_output_shape: "a brief recommendation or clarification request without starting a discovery interview"
+    quality_notes: "A vague what-next question without a concrete capability/path or explicit interview request remains a direct answer."
+    friction_risk: "starting a heavy interview from a generic UX question"
+    expected_behaviors: [answer_lightweight_gap_question]
+    forbidden_behaviors: [start_behavior_interview, start_requirements_interview]
+    required_evidence:
+      - type: route_match
+        expected: null
+  - case_id: neg-report-canvas-light-chat-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-diff]
+    scenario_tags: [negative, lightweight, report_canvas_boundary]
+    user_request: "이 diff에서 바뀐 한 줄만 채팅에 짧게 보여줘. 파일은 만들지 마."
+    expected_primary_skill: report-diff
+    expected_supporting_skills: []
+    should_not_trigger: [report-implementation-explainer, report-qualitative, report-critical]
+    expected_family: report
+    expected_context: [verified_diff, explicit_no_artifact]
+    expected_output_shape: "one concise changed-line chat response without a persistent artifact"
+    quality_notes: "An explicit no-file instruction overrides the report-family HTML default."
+    friction_risk: "ignoring the user's no-file boundary or expanding one line into an artifact"
+    expected_behaviors:
+      - present_verified_changed_line_in_chat
+      - honor_no_artifact_boundary
+    forbidden_behaviors:
+      - create_report_canvas
+      - create_html_artifact
+      - load_three
+      - emit_report_schema
+    required_evidence:
+      - type: route_match
+        expected: report-diff
+  - case_id: neg-report-canvas-spatial-decoration-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [report-qualitative]
+    scenario_tags: [negative, edge, report_canvas, non_spatial]
+    user_request: "이 API 설계 두 안을 비교 평가해서 인터랙티브 HTML 리포트로 줘. 3D 데이터는 없어."
+    expected_primary_skill: report-qualitative
+    expected_supporting_skills: []
+    should_not_trigger: [report-implementation-explainer, report-diff]
+    expected_family: report
+    expected_context: [api_design_candidates, evaluation_criteria, explicit_html_artifact]
+    expected_output_shape: "non-spatial Report Canvas decision or compare artifact without Three.js"
+    quality_notes: "Interactivity alone does not justify spatial mode or its dependency payload."
+    friction_risk: "using a 3D scene as decoration or paying the Three.js payload on a non-spatial report"
+    expected_behaviors:
+      - render_non_spatial_report_canvas
+      - compare_api_design_evidence
+    forbidden_behaviors:
+      - render_report_canvas_spatial
+      - load_three_for_non_spatial_report
+      - invent_spatial_data
+    required_evidence:
+      - type: route_match
+        expected: report-qualitative

@@ -19,7 +19,7 @@ Allowed states:
 - `implement`: bounded execution is active, usually through ordinary workflow or a `TaskRun`.
 - `verify`: evidence is being collected.
 - `review`: residual findings or acceptance decisions are being checked.
-- `blocked`: progress needs user input, permission, external state, or a scope decision.
+- `blocked`: required work remains but dependency reevaluation finds no required runnable action. One locally deferred action is not enough while independent work remains.
 - `closed`: required evidence exists and no open or blocked findings remain.
 
 ## Artifact Shape
@@ -47,6 +47,9 @@ WorkItem completion is evidence-bound:
 - `closed` requires non-empty `evidence_refs`.
 - `closed` is invalid when any finding is `open` or `blocked`.
 - `blocked` requires `blocked_reason` and a non-empty `next_action`.
+- WorkItem v2 projects the active `work_contract_ref`/hash, result label, locally `deferred_actions`, and `runnable_action_refs` from its TaskRun or LoopRun owner.
+- A semantic intent cannot appear twice in `deferred_actions`, and one action cannot be both deferred and runnable.
+- Global `blocked` requires an empty `runnable_action_refs`; local approval, interaction, or optional validation blocks remain deferred while other required work continues.
 - runtime boundary flags must stay false unless a separate orchestration capability contract verifies those capabilities.
 
 ## Relationship To TaskRun
@@ -57,6 +60,7 @@ Use a `TaskRun` when a WorkItem enters `implement`, `verify`, or `review` and th
 
 - WorkItem owns lifecycle state and source/ownership context.
 - TaskRun owns checkpointed steps, findings, and final verification for an execution slice.
+- TaskRun owns work classification, dependencies, semantic intent deduplication, and the exact local-defer/global-block decision. WorkItem records only its lifecycle projection.
 - TaskRun may reference a WorkItem with `work_item_ref`.
 - Closing a TaskRun does not automatically close the WorkItem.
 

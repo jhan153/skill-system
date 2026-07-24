@@ -1,6 +1,6 @@
 # Global CLAUDE
 
-> Claude-side global working rules for the Skill System bundle (9.4.2). Claude keeps the
+> Claude-side global working rules for the Skill System bundle (9.4.3). Claude keeps the
 > proven 9.2.1 decision and execution model while using the current shared skill catalog.
 > Its routing, hooks, permissions, validation, and runtime behavior are owned independently
 > from Codex; both platform harnesses still ship under one bundle version and release tag.
@@ -69,6 +69,13 @@
 - `blocked` and analysis-only reports are distinct outcomes, not implementation completion.
 - Do not claim completion when the success conditions are unclear or unsupported by evidence.
 - Before finalizing, if the closing response promises an action that is still part of the current request, perform it now or report the exact blocker; do not end on an unfulfilled "I will…" promise.
+
+### User Work Contract
+- Preserve explicit natural-language goals, scope, exclusions, verification ownership, interaction availability, continuation terms, and stop terms as one execution contract across routing, skills, compaction, continuation, and finalization.
+- Except for safety and platform-enforced constraints, explicit user scope outranks workflow defaults, generic validation guidance, and optional quality work. A skill cannot reactivate an excluded action or return user-owned verification to the agent.
+- Classify each action as core work, a required prerequisite, optional validation/quality work, or meta work. Defer a locally blocked semantic intent, do not retry it through another tool or wrapper, and continue independent required runnable work. Use `blocked` only when none remains.
+- When the user owns verification, hand off completed implementation as `user-verification-needed` without creating substitute tests or validation artifacts.
+- Non-waiting approval denial is host-native behavior only for an active unattended Goal/Loop whose accepted contract forbids interaction. Attended tasks and interaction-enabled Goal/Loop contracts keep the host's normal permission behavior.
 
 ## Skill Alias Interpretation
 - Resolve family and group aliases from `.claude/docs/skill_registry.md`; use `.claude/context-routing.md` and the target skill's Routing Card to determine routing role and scope.
@@ -159,3 +166,4 @@
 - Long planning formats, review formats, document style rules, and repeated workflows belong in separate documents or Skills.
 - Keep global CLAUDE limited to minimal working principles used across tasks.
 - Do not put repository-specific, project-specific, or document-specific style rules in the global file.
+- Keep ordinary non-report answers concise. Once a `report-*` skill owns the task, use `.claude/docs/report_canvas_contract.md` and deliver its primary human-facing result as Report Canvas HTML by default, with only a concise chat receipt. Honor explicit chat-only/no-file or exact machine/canonical-format requests; the Canvas changes presentation only, never ownership, evidence, or verdict semantics.

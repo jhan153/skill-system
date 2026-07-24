@@ -1,0 +1,27 @@
+{
+  "pico": {
+    "package": "@picocss/pico",
+    "version": "2.1.1",
+    "source": "css/pico.min.css",
+    "license": "MIT",
+    "sha256": "fbc9a63fc9fc9f72d12fd7fc9806e11fa9f77ae4f9cad146b27003a1119ba3db"
+  },
+  "three_spatial_bundle": {
+    "package": "three",
+    "version": "0.185.1",
+    "entrypoints": [
+      "three",
+      "three/addons/controls/OrbitControls.js",
+      "three/addons/loaders/GLTFLoader.js"
+    ],
+    "bundler": {
+      "package": "esbuild",
+      "version": "0.28.1",
+      "format": "iife",
+      "target": "es2020",
+      "global_name": "SkillSystemSpatialDeps"
+    },
+    "license": "MIT",
+    "sha256": "a04c53f7f8b0205e02f68caa626bd05313e7bb592ec251680a6c9e921958d822"
+  }
+}

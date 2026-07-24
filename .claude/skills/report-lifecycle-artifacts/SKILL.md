@@ -1,6 +1,6 @@
 ---
 name: report-lifecycle-artifacts
-description: Package explicitly requested lifecycle artifacts and traceability across requirements, design, implementation, validation, security, release, and retrospective.
+description: Package explicitly requested lifecycle artifacts and traceability across requirements, design, implementation, validation, security, release, and retrospective, with a Report Canvas trace index as the default human-facing entry point.
 disable-model-invocation: true
 ---
 
@@ -17,7 +17,7 @@ disable-model-invocation: true
   - Changed files plus validation notes use `coordination-handoff`; blocker-first QA critique uses `report-critical`.
   - Missing evidence does not cancel explicit packaging; preserve the unresolved result.
 - expected_inputs: package scope or sources; evidence anchors for result claims
-- expected_outputs: artifact pack, traceability matrix, condition-scoped statuses and gaps
+- expected_outputs: Report Canvas `trace` HTML index plus the requested canonical artifact pack, traceability matrix, condition-scoped statuses, and gaps
 - context_targets:
   must_read:
     - packaging request, included sources, and evidence for claimed results
@@ -28,7 +28,7 @@ disable-model-invocation: true
     - full repository, memory bank, plan inventory, unrelated logs, or generated mirrors
 - risk_profile:
   reads: provided artifacts and named evidence
-  writes: none by default; lifecycle artifact files only when explicitly requested
+  writes: one self-contained report HTML by default; canonical lifecycle files only within the explicitly requested package scope
   sensitive_resources: deny credentials; redact secrets
 - entry_scene: PREPARE
 
@@ -66,6 +66,8 @@ If the exact condition is structural, such as a matrix with valid stable links, 
 Prefer stable IDs: `REQ-*`, `AC-*`, `WBS-*`, `HLD-*`, `LLD-*`, `TEST-*`, `SEC-*`, `REL-*`, and `RETRO-*`.
 
 Return only needed sections: `artifact_scope`, `source_artifacts`, `artifact_pack`, `traceability_matrix`, `evidence_status`, `gaps`, and `handoff_targets`. Link completed claims to condition-scoped evidence.
+
+Persist the requested canonical artifacts in their required formats. For every admitted invocation, read `references/report_canvas_contract.md` and render the primary human-facing entry point with `scripts/report-canvas/render_report.py` as Report Canvas `trace` HTML whose nodes identify the canonical artifacts and condition-scoped evidence. Declare `trace_kind: lifecycle` and set every node's typed `lifecycle_status` to the preserved lifecycle result while keeping node `status` limited to evidence confidence; the renderer rejects a lifecycle trace that omits either contract. Never collapse the two axes into label/detail prose. Return only a concise chat receipt with package status and the Canvas link. Use chat-only output only when the user explicitly prohibits file creation or the host has no safe artifact surface. Canvas is navigation over the package, not the package or proof of lifecycle completion.
 
 ## Owner Boundaries
 

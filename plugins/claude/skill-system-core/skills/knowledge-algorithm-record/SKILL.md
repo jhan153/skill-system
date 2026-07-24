@@ -14,7 +14,7 @@ disable-model-invocation: true
 - expected_inputs: problem, constraints, selected method, aliases/search terms, invariants/complexity, alternatives, implementation/verifier refs, overlap candidates, and declared store
 - expected_outputs: one algorithm record plus index row and readback
 - context_targets:
-  must_read: manifest/index, matching algorithm/decision records, implementation/verifier refs, and `.codex/docs/knowledge_record_contract.md`
+  must_read: manifest/index, matching algorithm/decision records, implementation/verifier refs, and `.claude/docs/knowledge_record_contract.md`
   read_if_needed: exact benchmark or design decision that materially supports selection
   do_not_load_by_default: full benchmark history, unrelated algorithms, Memory, Wiki, papers not selected as evidence
 - risk_profile:

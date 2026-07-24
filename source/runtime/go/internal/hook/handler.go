@@ -1,6 +1,7 @@
 package hook
 
 import (
+	"encoding/json"
 	"path/filepath"
 	"strings"
 
@@ -9,6 +10,7 @@ import (
 	"skill-system.local/harness/internal/notify"
 	"skill-system.local/harness/internal/projectcontext"
 	"skill-system.local/harness/internal/responseguard"
+	"skill-system.local/harness/internal/workcontract"
 )
 
 var supportedEvents = map[string]bool{
@@ -18,18 +20,22 @@ var supportedEvents = map[string]bool{
 }
 
 type Event struct {
-	HookEventName           string `json:"hook_event_name"`
-	SessionID               string `json:"session_id"`
-	TurnID                  string `json:"turn_id"`
-	Cwd                     string `json:"cwd"`
-	Source                  string `json:"source"`
-	Prompt                  string `json:"prompt"`
-	LastAssistantMessage    string `json:"last_assistant_message"`
-	ToolName                string `json:"tool_name"`
-	Model                   string `json:"model"`
-	TaskSubject             string `json:"task_subject"`
-	SkillSystemLoopRunDir   string `json:"skill_system_loop_run_dir"`
-	SkillSystemNotifyDryRun bool   `json:"skill_system_notify_dry_run"`
+	HookEventName           string          `json:"hook_event_name"`
+	SessionID               string          `json:"session_id"`
+	TurnID                  string          `json:"turn_id"`
+	Cwd                     string          `json:"cwd"`
+	Source                  string          `json:"source"`
+	Prompt                  string          `json:"prompt"`
+	LastAssistantMessage    string          `json:"last_assistant_message"`
+	ToolName                string          `json:"tool_name"`
+	ToolInput               json.RawMessage `json:"tool_input"`
+	ToolUseID               string          `json:"tool_use_id"`
+	PermissionMode          string          `json:"permission_mode"`
+	Trigger                 string          `json:"trigger"`
+	Model                   string          `json:"model"`
+	TaskSubject             string          `json:"task_subject"`
+	SkillSystemLoopRunDir   string          `json:"skill_system_loop_run_dir"`
+	SkillSystemNotifyDryRun bool            `json:"skill_system_notify_dry_run"`
 }
 
 func Handle(event Event) map[string]any {
@@ -41,11 +47,14 @@ func Handle(event Event) map[string]any {
 		return sessionStart(event)
 	case "UserPromptSubmit":
 		return userPrompt(event)
+	case "PreToolUse":
+		return preToolUse(event)
 	case "PermissionRequest":
-		permission(event)
-		return nil
+		return permission(event)
 	case "Stop":
 		return stop(event)
+	case "PreCompact", "PostCompact":
+		return compact(event)
 	default:
 		return nil
 	}
@@ -54,40 +63,101 @@ func Handle(event Event) map[string]any {
 func sessionStart(event Event) map[string]any {
 	if event.Source == "startup" || event.Source == "clear" {
 		_ = responseguard.Clear(event.SessionID)
+		_ = workcontract.Clear(event.SessionID)
 	}
+	syncLoopWorkContract(event)
 	kanboard.MaybeSync(event.Cwd, false)
+	var contexts []string
 	result, err := projectcontext.Resolve(event.Cwd, "")
-	if err != nil {
-		return nil
+	if err == nil {
+		if context := projectcontext.Context(result); context != "" {
+			contexts = append(contexts, context)
+		}
 	}
-	context := projectcontext.Context(result)
-	if context == "" {
+	if state, loadErr := workcontract.Load(event.SessionID); loadErr == nil {
+		if context := workcontract.Context(state); context != "" {
+			contexts = append(contexts, context)
+		}
+	}
+	if len(contexts) == 0 {
 		return nil
 	}
 	return map[string]any{
 		"continue": true,
 		"hookSpecificOutput": map[string]any{
 			"hookEventName":     "SessionStart",
-			"additionalContext": context,
+			"additionalContext": strings.Join(contexts, "\n\n"),
 		},
 	}
 }
 
 func userPrompt(event Event) map[string]any {
 	correction, err := responseguard.Prompt(event.SessionID, event.TurnID, event.Prompt)
-	if err != nil || !correction {
+	var contexts []string
+	if err == nil && correction {
+		contexts = append(contexts, responseguard.CorrectionContext)
+	}
+	_, _, _ = workcontract.Capture(event.SessionID, event.Prompt)
+	syncLoopWorkContract(event)
+	if state, contractErr := workcontract.Load(event.SessionID); contractErr == nil {
+		if context := workcontract.Context(state); context != "" {
+			contexts = append(contexts, context)
+		}
+	}
+	if len(contexts) == 0 {
 		return nil
 	}
 	return map[string]any{
 		"continue": true,
 		"hookSpecificOutput": map[string]any{
 			"hookEventName":     "UserPromptSubmit",
-			"additionalContext": responseguard.CorrectionContext,
+			"additionalContext": strings.Join(contexts, "\n\n"),
 		},
 	}
 }
 
-func permission(event Event) {
+func preToolUse(event Event) map[string]any {
+	syncLoopWorkContract(event)
+	decision, err := workcontract.Preflight(event.SessionID, event.ToolName, event.ToolInput)
+	if err != nil {
+		return nil
+	}
+	if decision.Rewrite {
+		return map[string]any{
+			"hookSpecificOutput": map[string]any{
+				"hookEventName":      "PreToolUse",
+				"permissionDecision": "allow",
+				"updatedInput":       decision.UpdatedInput,
+				"additionalContext":  decision.Reason,
+			},
+		}
+	}
+	if !decision.Deny {
+		return nil
+	}
+	return map[string]any{
+		"hookSpecificOutput": map[string]any{
+			"hookEventName":            "PreToolUse",
+			"permissionDecision":       "deny",
+			"permissionDecisionReason": decision.Reason,
+		},
+	}
+}
+
+func permission(event Event) map[string]any {
+	syncLoopWorkContract(event)
+	decision, err := workcontract.Permission(event.SessionID, event.ToolName, event.ToolInput)
+	if err == nil && decision.Deny {
+		return map[string]any{
+			"hookSpecificOutput": map[string]any{
+				"hookEventName": "PermissionRequest",
+				"decision": map[string]any{
+					"behavior": "deny",
+					"message":  decision.Reason,
+				},
+			},
+		}
+	}
 	tool := strings.TrimSpace(event.ToolName)
 	if tool == "" {
 		tool = "A tool"
@@ -100,6 +170,22 @@ func permission(event Event) {
 		Event: "approval-requested", Topic: "approval", Title: "Codex approval requested",
 		Body: tool + " is waiting for approval" + location + ".", Model: shortModel(event.Model), Session: label(event),
 	})
+	return nil
+}
+
+func compact(event Event) map[string]any {
+	syncLoopWorkContract(event)
+	state, err := workcontract.Load(event.SessionID)
+	if err != nil {
+		return nil
+	}
+	context := workcontract.Context(state)
+	if context == "" {
+		return nil
+	}
+	return map[string]any{
+		"systemMessage": "Active user work contract remains in force through compaction.\n" + context,
+	}
 }
 
 func stop(event Event) map[string]any {
@@ -110,6 +196,17 @@ func stop(event Event) map[string]any {
 			"reason":   "A user correction is pending, but the response only acknowledges it and promises later action. Re-answer the current correction now: state the corrected premise, invalidate affected conclusions, and provide the direct answer, completed action, or concrete requested plan.",
 		}
 	}
+	syncLoopWorkContract(event)
+	if needsInput(event.LastAssistantMessage) && !reportsBlocked(event.LastAssistantMessage) {
+		if resume, contractErr := workcontract.ContinueWithoutInput(event.SessionID); contractErr == nil && resume {
+			return map[string]any{
+				"decision": "block",
+				"reason": "The active user work contract forbids additional questions or approval waits. " +
+					"Defer the blocked action without retrying its purpose, then continue any other required runnable work. " +
+					"If none remains, return a concrete blocked result with the exact unmet requirement instead of asking.",
+			}
+		}
+	}
 	report, loopOutput := looprun.Evaluate(event.SessionID, event.SkillSystemLoopRunDir)
 	kanboard.MaybeSync(event.Cwd, false)
 	if report.Status != "" {
@@ -118,10 +215,15 @@ func stop(event Event) map[string]any {
 			topic = "error"
 		} else if report.Decision.Action == "success" {
 			topic = "done"
-		} else if report.Decision.Action == "blocked" {
+		} else if report.Decision.Action == "blocked" || report.Decision.Action == "user_verification_needed" {
 			topic = "input"
 		}
-		body := strings.Trim(strings.Join([]string{report.LoopRunID, report.Decision.Action, report.Decision.ReasonCode}, " "), " ")
+		body := strings.Trim(strings.Join([]string{
+			report.LoopRunID,
+			report.ResultLabel,
+			report.Decision.Action,
+			report.Decision.ReasonCode,
+		}, " "), " ")
 		if body == "" {
 			body = report.Reason
 		}
@@ -132,6 +234,9 @@ func stop(event Event) map[string]any {
 		notify.Send(notify.Message{Event: "turn-complete", Topic: "done", Title: "Codex task complete", Body: completionMessage(event), Model: shortModel(event.Model), Session: label(event)})
 	}
 	if loopOutput == nil {
+		if report.Status != "" && terminalLoopAction(report.Decision.Action) {
+			_ = workcontract.Clear(event.SessionID)
+		}
 		return nil
 	}
 	output := map[string]any{}
@@ -148,6 +253,40 @@ func stop(event Event) map[string]any {
 		output["systemMessage"] = loopOutput.SystemMessage
 	}
 	return output
+}
+
+func syncLoopWorkContract(event Event) {
+	projection, err := looprun.WorkContract(event.SessionID, event.SkillSystemLoopRunDir)
+	if err != nil || !projection.Active || projection.ExecutionMode == "" {
+		return
+	}
+	_, _, _ = workcontract.AdoptLoopContract(
+		event.SessionID,
+		workcontract.LoopProjection{
+			SourceDigest:          projection.SourceDigest,
+			ExecutionMode:         projection.ExecutionMode,
+			VerificationOwner:     projection.VerificationOwner,
+			InteractionMode:       projection.InteractionMode,
+			ExcludedActionClasses: projection.ExcludedActionClasses,
+		},
+	)
+}
+
+func terminalLoopAction(action string) bool {
+	switch action {
+	case "success", "user_verification_needed", "blocked", "budget_exhausted", "unsafe", "fatal", "stalled":
+		return true
+	default:
+		return false
+	}
+}
+
+func reportsBlocked(message string) bool {
+	text := strings.ToLower(message)
+	return strings.Contains(text, "`blocked`") ||
+		strings.Contains(text, "status: blocked") ||
+		strings.Contains(text, "result: blocked") ||
+		strings.Contains(text, "결과: blocked")
 }
 
 func needsInput(message string) bool {

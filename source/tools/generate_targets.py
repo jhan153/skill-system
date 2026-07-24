@@ -30,6 +30,10 @@ NEUTRAL_VERBATIM: list[tuple[str, str]] = [
     ("shared/schemas", "schemas"),  # Phase 1b: schema definitions are platform-neutral data contracts
 ]
 NEUTRAL_TARGET_ROOTS = {target_rel.split("/", 1)[0] for _, target_rel in NEUTRAL_VERBATIM}
+REPORT_CANVAS_SOURCE = Path("shared/report-canvas")
+REPORT_CANVAS_CONTRACT_SOURCE = Path("shared/docs/report_canvas_contract.md")
+REPORT_CANVAS_SCRIPT_TARGET = Path("scripts/report-canvas")
+REPORT_CANVAS_REFERENCE_TARGET = Path("references/report_canvas_contract.md")
 
 # Platform-native trees: every top-level entry under source/platform/<p> is copied verbatim
 # into that one target only. AGENTS.md / CLAUDE.md live here as platform-native for Phase 1a;
@@ -40,11 +44,22 @@ REMOVED_CODEX_TARGET_ROOTS = ("research",)
 
 MIRROR_META_FILE = "mirror-meta.json"
 
+# Portable skill bodies use Codex runtime paths as their canonical host spelling. Claude
+# packages must project only namespaces that have a Claude-owned equivalent; tool-dependent
+# instructions use host-neutral tool names in the canonical skill text instead.
+CLAUDE_SKILL_PATH_PROJECTIONS: tuple[tuple[str, str], ...] = (
+    (".codex/research-routing.md", ".claude/context-routing.md"),
+    (".codex/docs/", ".claude/docs/"),
+    (".codex/eval/", ".claude/eval/"),
+    (".codex/schemas/", ".claude/schemas/"),
+    (".codex/skills/.system", ".claude/skills/.system"),
+)
+
 _CACHE_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 
 PLUGIN_DISPLAY = {
     "skill-system-core": ("Skill System Core", "Shared operating platform skills for Codex workflows."),
-    "skill-system-dev": ("Skill System Dev", "Engineering analysis, implementation, refactoring, and recovery skills."),
+    "skill-system-dev": ("Skill System Dev", "Engineering analysis, implementation, understanding, behavior discovery, refactoring, and recovery skills."),
     "skill-system-design": ("Skill System Design", "Frontend, UI, layout, component, token, and visual validation skills."),
     "skill-system-research": ("Skill System Research", "Scientific research, synthesis, experiment, and manuscript skills."),
     "skill-system-quality": ("Skill System Quality", "QA, qualitative review, critical review, and validation skills."),
@@ -147,12 +162,17 @@ def _allow_implicit_invocation(skill_dir: Path) -> bool:
 
 
 def _project_claude_invocation(skill_dir: Path, target_dir: Path) -> None:
-    """Project the portable invocation bit into Claude's SKILL.md frontmatter."""
+    """Project portable skill paths and invocation metadata into Claude's SKILL.md."""
     skill_md = target_dir / "SKILL.md"
     text = skill_md.read_text(encoding="utf-8")
+    for source_path, claude_path in CLAUDE_SKILL_PATH_PROJECTIONS:
+        text = text.replace(source_path, claude_path)
+    if ".codex/" in text:
+        raise SystemExit(f"unprojected Codex runtime path in Claude skill: {skill_md}")
     if "disable-model-invocation:" in text:
         raise SystemExit(f"canonical skill must not contain Claude invocation metadata: {skill_md}")
     if _allow_implicit_invocation(skill_dir):
+        skill_md.write_text(text, encoding="utf-8")
         return
     if not text.startswith("---\n"):
         raise SystemExit(f"skill frontmatter must start on the first line: {skill_md}")
@@ -176,6 +196,37 @@ def _copy_plugin_skill(src: Path, dst: Path, *, claude: bool = False) -> None:
         _sanitize_plugin_agent_manifest(agent_manifest)
     if claude:
         _project_claude_invocation(src, dst)
+
+
+def _is_report_skill(skill_dir: Path) -> bool:
+    return skill_dir.name.startswith("report-") and (skill_dir / "SKILL.md").is_file()
+
+
+def _attach_report_canvas_payload(source: Path, skill_dir: Path) -> None:
+    """Project the shared Canvas into one self-contained report skill package."""
+    if not _is_report_skill(skill_dir):
+        return
+    skill_text = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
+    if "references/report_canvas_contract.md" not in skill_text:
+        raise SystemExit(
+            f"report skill does not reference its local Canvas contract: {skill_dir}"
+        )
+    _copy(source / REPORT_CANVAS_SOURCE, skill_dir / REPORT_CANVAS_SCRIPT_TARGET)
+    _copy(
+        source / REPORT_CANVAS_CONTRACT_SOURCE,
+        skill_dir / REPORT_CANVAS_REFERENCE_TARGET,
+    )
+
+
+def _attach_runtime_report_canvas_payloads(source: Path, runtime: Path) -> None:
+    skills_root = runtime / "skills"
+    for skill_dir in sorted(skills_root.iterdir()):
+        _attach_report_canvas_payload(source, skill_dir)
+    stale_root = runtime / "report-canvas"
+    if stale_root.is_dir():
+        shutil.rmtree(stale_root)
+    elif stale_root.exists():
+        stale_root.unlink()
 
 
 def _render_yaml_mirror(canonical: Path, generated_from: str, generated_at: str, checksum: str) -> str:
@@ -396,6 +447,7 @@ def _write_mirror(source: Path, claude: Path, dst_rel: str, spec: dict) -> None:
 def generate_codex_runtime(source: Path, codex: Path) -> list[str]:
     written: list[str] = []
     _copy_neutral(source, codex, written)
+    _attach_runtime_report_canvas_payloads(source, codex)
     _copy_platform(source / PLATFORM_CODEX_ROOT, codex, written)
     # Research ledger data and its validation schema are maintainer fixtures, not
     # live runtime payload. Remove the former generated root so an upgrade cannot
@@ -414,6 +466,7 @@ def generate_claude_runtime(source: Path, claude: Path) -> list[str]:
     written: list[str] = []
     _copy_neutral(source, claude, written)
     _project_claude_runtime_skills(source, claude)
+    _attach_runtime_report_canvas_payloads(source, claude)
     _copy_platform(source / PLATFORM_CLAUDE_ROOT, claude, written)
     # 9.3.4 removes the Python-only Claude runtime. Prune the now-absent
     # platform-owned root so stale adapters cannot survive regeneration.
@@ -531,8 +584,10 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
                 raise SystemExit(f"skill '{sid}' assigned to both {seen[sid]} and {name}")
             seen[sid] = name
             _copy_plugin_skill(source / "skills" / sid, codex_pkg / "skills" / sid)
+            _attach_report_canvas_payload(source, codex_pkg / "skills" / sid)
             written.append((codex_pkg / "skills" / sid).as_posix())
             _copy_plugin_skill(source / "skills" / sid, claude_pkg / "skills" / sid, claude=True)
+            _attach_report_canvas_payload(source, claude_pkg / "skills" / sid)
             written.append((claude_pkg / "skills" / sid).as_posix())
     uncovered = src_skills - seen.keys()
     if uncovered:
