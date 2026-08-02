@@ -1,4 +1,4 @@
-version: "9.4.3"
+version: "9.4.4"
 purpose: "Positive routing examples for common requests."
 cases:
   - case_id: route-001
@@ -960,3 +960,119 @@ cases:
     required_evidence:
       - type: route_match
         expected: plan-behavior-discovery
+  - case_id: route-workflow-prototype-ui-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-prototype]
+    scenario_tags: [positive, ui, prototype, decision_evidence]
+    user_request: "기존 검색 route에서 결과 배치를 아직 못 정했어. 실제 화면 맥락은 유지하고 구조가 확실히 다른 프로토타입 3개를 한 화면에서 빠르게 바꿔 보며 고르게 해줘. 백엔드 쓰기는 가짜로 막아줘."
+    expected_primary_skill: workflow-prototype
+    expected_supporting_skills: []
+    should_not_trigger: [design-frontend, plan-behavior-discovery, workflow-implementation]
+    expected_family: workflow
+    expected_context: [one_question, decision_owner, target_route, local_ui_patterns, discriminating_observation, budget_stop, proof_ceiling, retention_plan]
+    expected_output_shape: "isolated real-route UI prototype with three structural variants, one run command, observation guide, and bounded verdict"
+    quality_notes: "An explicit selected comparison question belongs to prototype execution, not production UI implementation or another discovery interview."
+    friction_risk: "polishing one production-looking option, changing only colors, or wiring real mutations"
+    expected_behaviors:
+      - lock_one_prototype_question
+      - select_ui_prototype_shape
+      - build_structurally_distinct_variants
+      - preserve_real_host_context
+      - stub_external_mutations
+      - provide_one_run_command
+      - state_proof_ceiling
+      - preserve_prototype_until_decision_owner_observes
+    forbidden_behaviors:
+      - harden_prototype_as_production
+      - compare_cosmetic_only_variants
+      - mutate_real_backend
+      - claim_human_preference_from_static_checks
+    required_evidence:
+      - type: route_match
+        expected: workflow-prototype
+  - case_id: route-workflow-prototype-logic-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-prototype]
+    scenario_tags: [positive, edge, logic, state_model, prototype]
+    user_request: "결제 capture 뒤 주문 취소를 허용할 때 상태 전이가 납득되는지 확인하고 싶어. DB는 붙이지 말고 이 repo 언어로 순수 상태 모델과 얇은 CLI/TUI 프로토타입을 만들어서 매 액션 뒤 전체 상태와 거부 이유를 보여줘."
+    expected_primary_skill: workflow-prototype
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-domain-modeling, plan-behavior-discovery, workflow-implementation]
+    expected_family: workflow
+    expected_context: [one_question, starting_state, candidate_transitions, invariant, representative_sequence, counterexample, host_runtime, retention_plan]
+    expected_output_shape: "pure in-memory state model plus thin runnable driver, full-state readback, one command, verdict, and proof ceiling"
+    quality_notes: "A selected state-model question with explicit runnable evidence shape is a logic prototype, not production persistence or open-ended domain modeling."
+    friction_risk: "adding a database, framework, broad test suite, or hiding state behind source inspection"
+    expected_behaviors:
+      - lock_one_prototype_question
+      - select_logic_prototype_shape
+      - keep_core_pure_and_driver_thin
+      - keep_state_in_memory
+      - render_full_relevant_state_after_actions
+      - exercise_material_counterexample
+      - provide_one_run_command
+      - preserve_prototype_until_decision_owner_observes
+    forbidden_behaviors:
+      - add_persistence_layer
+      - add_generalized_framework
+      - claim_production_integration_correctness
+      - merge_driver_into_production
+    required_evidence:
+      - type: route_match
+        expected: workflow-prototype
+  - case_id: route-workflow-prototype-pending-human-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-prototype]
+    scenario_tags: [positive, edge, ui, human_decision, retention]
+    user_request: "기존 대시보드 필터 위치를 결정하려고 현재안과 상단 고정안 두 개만 프로토타입으로 만들어줘. 내가 내일 직접 써보고 고를 테니 그전에는 switcher나 fixture를 지우거나 production에 합치지 마."
+    expected_primary_skill: workflow-prototype
+    expected_supporting_skills: []
+    should_not_trigger: [plan-behavior-discovery, design-frontend, workflow-implementation]
+    expected_family: workflow
+    expected_context: [selected_question, decision_owner, two_credible_variants, observation_task, user_verification, retention_plan, production_exclusion]
+    expected_output_shape: "runnable two-variant isolated prototype retained for later human observation, with user-verification-needed and no cleanup or production merge"
+    quality_notes: "A pending human comparison remains runnable until the named decision owner observes it; throwaway does not mean immediately deleted."
+    friction_risk: "destroying the requested comparison before observation or treating a build as the user's selection"
+    expected_behaviors:
+      - build_minimum_credible_comparison
+      - preserve_switcher_and_fixtures_until_owner_decision
+      - report_user_verification_needed
+      - keep_prototype_out_of_production
+      - state_retention_location_and_trigger
+    forbidden_behaviors:
+      - fabricate_third_variant
+      - delete_pending_prototype
+      - mark_human_choice_selected
+      - merge_prototype_into_production
+    required_evidence:
+      - type: route_match
+        expected: workflow-prototype
+  - case_id: route-implicit-workflow-bug-fix-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-bug-fix]
+    scenario_tags: [positive, implicit_invocation, delegated_worker, bug_fix]
+    direct_invocation: false
+    user_request: "결제 callback 뒤 같은 regression test가 계속 실패해. 담당 worker가 원래 실패를 재현하고 가장 작은 수정을 적용한 다음 그 테스트가 통과하는지 확인하게 해줘."
+    expected_primary_skill: workflow-bug-fix
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-bug, workflow-implementation, coordination-handoff]
+    expected_family: workflow
+    expected_context: [failure_signal, expected_behavior, repro, target_path, focused_validation]
+    expected_output_shape: "intent-matched bug-fix execution without requiring a skill alias"
+    quality_notes: "A natural-language delegated repair request exposes the concrete bug-fix owner; model selection does not add authority beyond the requested source change."
+    friction_risk: "the worker cannot discover the explicit-only workflow and falls back to generic unaided execution"
+    expected_behaviors:
+      - activate_intent_matched_skill_without_alias
+      - preserve_requested_write_scope
+      - verify_original_failure_signal
+    forbidden_behaviors:
+      - require_explicit_skill_alias
+      - broaden_write_authority_from_skill_selection
+      - attach_coordination_without_coordination_intent
+    required_evidence:
+      - type: route_match
+        expected: workflow-bug-fix

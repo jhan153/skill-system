@@ -203,6 +203,25 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn("Do not scan unrelated home directories", routing)
         self.assertNotIn("`coordination-*`", routing)
 
+    def test_handoff_propagates_selected_skills_without_guessing(self) -> None:
+        handoff = canonical("skills/coordination-handoff/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        schema = canonical(
+            "skills/coordination-handoff/references/handoff-schemas.md"
+        ).read_text(encoding="utf-8")
+        team_patterns = canonical("shared/docs/team_patterns.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("`selected_skills`", handoff)
+        self.assertIn("instead of asking the worker to rediscover", handoff)
+        self.assertIn("never invent an adjacent skill ID", handoff)
+        self.assertIn("selected_skills: []", schema)
+        self.assertIn("normal implicit routing", schema)
+        self.assertIn("selected_skills: []", team_patterns)
+        self.assertIn("repeated in the worker instruction", team_patterns)
+
     def test_research_router_disambiguates_search_and_development(self) -> None:
         text = canonical("skills/research-router/SKILL.md").read_text(encoding="utf-8")
         self.assertIn("Explicit paper-only acquisition", text)

@@ -7,7 +7,7 @@
 ## Language And Response
 - Use the user's language; use honorific Korean by default. Identify the user's intended outcome before drafting, lead with it, and keep simple answers short.
 - Preserve identifiers, paths, commands, APIs, errors, and logs unless translation is requested. Add only actionable rationale.
-- Keep ordinary non-report answers concise. Once a `report-*` skill owns the task, use `docs/report_canvas_contract.md` and deliver its primary human-facing result as Report Canvas HTML by default, with only a concise chat receipt. Honor explicit chat-only/no-file or exact machine/canonical-format requests; the Canvas changes presentation only, never ownership, evidence, or verdict semantics.
+- Keep ordinary answers concise. When `report-*` owns the task, follow `docs/report_canvas_contract.md`: deliver Canvas HTML plus a short receipt unless the user requests chat-only/no-file or an exact format. Canvas changes presentation, not ownership, evidence, or verdict.
 
 ## Evidence And Integrity
 - Separate assumptions from facts and cite direct source, runtime, command, or observation. Checks and mocks prove only their contracts; use the smallest material check.
@@ -38,6 +38,7 @@
 - When present, the nearest repository `project-context.yaml` declares project-local Memory Bank, Knowledge Base, plan, and named LLM Wiki locations. An exact path from the user overrides it; a missing declaration means unavailable, not auto-discovery or auto-initialization.
 - Route explicit `/goal`, durable/event automation, or Stop-driven continuation through loop readiness. Start a LoopRun only after an accepted schema-valid contract defines verifier, checkpoint, budget, approval, and stop state.
 - Treat an unknown or stale explicit skill alias as unresolved. Load references one layer at a time; heavy artifacts require explicit intent.
+- Pass already selected canonical skill IDs to delegated workers; otherwise let each worker resolve skills normally.
 - Treat Memory Bank, Knowledge Base, explicitly selected LLM Wikis, plans, and summaries as context; current instructions and verified evidence outrank them.
 - Persistent memory or accepted-knowledge mutation requires its explicit owning workflow.
 

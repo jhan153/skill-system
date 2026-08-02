@@ -34,10 +34,34 @@ EVIDENCE_GATE_ROLES = {
     "review_gate",
 }
 NON_OWNER_SURFACES = {"selective_router", "evidence_gate", "support_only"}
-IMPLICIT_SKILL_SURFACES = {
-    "design-frontend": "explicit_procedure",
-    "knowledge-base-read": "support_only",
-    "memory-bank-harness": "support_only",
+EXPLICIT_ONLY_SKILLS = {
+    "evaluation-harness",
+    "kanboard-plan-ops",
+    "kanboard-plan-rollout",
+    "knowledge-algorithm-record",
+    "knowledge-architecture-record",
+    "knowledge-base-init",
+    "knowledge-base-maintenance",
+    "knowledge-base-update",
+    "knowledge-code-review-record",
+    "knowledge-design-record",
+    "knowledge-domain-record",
+    "knowledge-plan-sync",
+    "llm-wiki-context",
+    "loop-readiness-router",
+    "loop-verifier-registry",
+    "memory-bank-correction-capture",
+    "memory-bank-init",
+    "memory-bank-maintenance",
+    "memory-bank-update",
+    "plan-loop-term",
+    "project-context-checkpoint",
+    "project-context-init",
+    "project-context-update",
+    "workflow-loop-runner",
+    "workflow-rigor",
+    "workflow-task-ledger",
+    "workflow-validation",
 }
 POLICY_COMPARE_KEYS = {
     "invocation_surface",
@@ -92,7 +116,7 @@ def true_value(policy: dict[str, Any], key: str) -> bool:
     return policy.get(key) is True
 
 
-def validate_skill(skill_dir: Path, root: Path, automatic_handoff_targets: set[str]) -> list[str]:
+def validate_skill(skill_dir: Path, root: Path) -> list[str]:
     errors: list[str] = []
     label = skill_dir.relative_to(root).as_posix()
     role = routing_role(skill_dir / "SKILL.md")
@@ -109,14 +133,10 @@ def validate_skill(skill_dir: Path, root: Path, automatic_handoff_targets: set[s
     allow_implicit = policy.get("allow_implicit_invocation")
     if not isinstance(allow_implicit, bool):
         errors.append(f"{label}: allow_implicit_invocation must be boolean")
-    narrow_implicit_allowed = (
-        IMPLICIT_SKILL_SURFACES.get(skill_dir.name) == surface
-        or skill_dir.name in automatic_handoff_targets
-    )
-    if allow_implicit is True and surface != "selective_router" and not narrow_implicit_allowed:
+    if allow_implicit is True and skill_dir.name in EXPLICIT_ONLY_SKILLS:
         errors.append(
-            f"{label}: implicit invocation is only allowed for selective_router "
-            "or an approved narrow skill surface"
+            f"{label}: governed persistent, external-state, loop, or lifecycle-gate skill "
+            "must remain explicit-only"
         )
     if surface in NON_OWNER_SURFACES and not false_value(policy, "may_own_execution"):
         errors.append(f"{label}: {surface} must set may_own_execution: false")
@@ -141,10 +161,9 @@ def invocation_contract(skill_md: Path) -> tuple[set[str] | None, set[str] | Non
     return values("automatic_handoff_targets"), values("explicit_recommendation_targets")
 
 
-def validate_handoff_contracts(root: Path, namespace: str) -> tuple[list[str], set[str]]:
+def validate_handoff_contracts(root: Path, namespace: str) -> list[str]:
     errors: list[str] = []
     skills = {path.name: path for path in skill_dirs(root, namespace)}
-    automatic_union: set[str] = set()
     for router_id, router_dir in skills.items():
         if routing_role(router_dir / "SKILL.md") != "router":
             continue
@@ -186,12 +205,7 @@ def validate_handoff_contracts(root: Path, namespace: str) -> tuple[list[str], s
             target_dir = skills.get(target)
             if target_dir is None:
                 errors.append(f"{label}: explicit recommendation target does not exist: {target}")
-                continue
-            target_policy, _ = load_policy(target_dir)
-            if target_policy is None or target_policy.get("allow_implicit_invocation") is not False:
-                errors.append(f"{label}: explicit recommendation target must remain explicit-only: {target}")
-        automatic_union.update(automatic)
-    return errors, automatic_union
+    return errors
 
 
 def policy_subset(policy: dict[str, Any]) -> dict[str, Any]:
@@ -322,10 +336,9 @@ def main() -> int:
     root = args.root.resolve()
     errors: list[str] = []
     for namespace in [".codex", ".claude"]:
-        contract_errors, automatic_handoff_targets = validate_handoff_contracts(root, namespace)
-        errors.extend(contract_errors)
+        errors.extend(validate_handoff_contracts(root, namespace))
         for skill_dir in skill_dirs(root, namespace):
-            errors.extend(validate_skill(skill_dir, root, automatic_handoff_targets))
+            errors.extend(validate_skill(skill_dir, root))
     errors.extend(validate_runtime_projection(root))
     errors.extend(validate_plugin_projection(root))
     if errors:

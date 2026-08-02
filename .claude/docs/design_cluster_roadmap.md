@@ -50,13 +50,13 @@ These are roadmap candidates only; they are not active registry skills yet.
 - Do not treat screenshots alone as proof of implementation quality.
 - Do not treat a component export inventory as reuse proof or one sibling screenshot as a product-family oracle.
 - Keep specialist skills narrow and add negative routing cases before adding more design skills.
-- Keep `allow_implicit_invocation: false` for new and recently hardened design skills until explicit user reports justify broader routing. `design-frontend` remains the bounded design exception for concrete repo-integrated UI implementation; the router-target policy for non-design analysis/search skills does not broaden design evidence gates.
+- Keep `allow_implicit_invocation: false` for new design skills until explicit user reports justify broader routing. The current bounded exceptions are `design-frontend` for concrete repo-integrated UI implementation plus `design-ui-decomposer` and `design-layout-translator` for supplied-reference or concrete-constraint interpretation; design evidence gates remain explicit.
 - Do not create a surface skill when a conditional `design-frontend` reference is sufficient.
 
 ## Improvement Track
 
 - Improve the four evidence gates only from problems the user explicitly reports.
-- Keep `design-ui-decomposer` and `design-layout-translator` explicit until a concrete user-reported need justifies implicit invocation.
+- Evaluate the newly implicit `design-ui-decomposer` and `design-layout-translator` against supplied-reference positives and bare-topic negatives; revert either if field use shows broad-trigger attachment.
 - Track dashboard/mobile/section profile quality, incorrect multi-profile loading, and missing surface constraints.
 - Track product-family profile conflicts, catalog reuse violations/exceptions, target-vs-family verdict divergence, and UX decisions reversed by missing context.
 - Promote UX pattern planning to a distinct skill only after explicit user reports show that the conditional `design-frontend` reference needs a separate owner or oracle.

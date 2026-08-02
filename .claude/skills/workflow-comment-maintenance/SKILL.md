@@ -1,7 +1,6 @@
 ---
 name: workflow-comment-maintenance
 description: Behavior-preserving comment and docstring maintenance workflow for synchronizing comments, docstrings, inline rationale, and TODO/FIXME markers with current code meaning. Use when the user asks to update, fix, prune, or sync comments or docstrings without changing code behavior. Do not use for feature implementation, concrete bug fixes, structural refactors, source/code cleanup, dependency upgrades, or README/wiki/general documentation writing.
-disable-model-invocation: true
 ---
 
 # Workflow Comment Maintenance

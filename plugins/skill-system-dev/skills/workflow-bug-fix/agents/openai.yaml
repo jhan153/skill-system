@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $workflow-bug-fix to repair a concrete failing test, build error, runtime exception, regression, or broken behavior. Lock the failure signal, create the fastest useful feedback loop, apply one targeted fix, verify the original failure, and escalate to $workflow-recovery if the same signature repeats."
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

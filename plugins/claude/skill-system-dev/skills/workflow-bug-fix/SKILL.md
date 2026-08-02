@@ -1,7 +1,6 @@
 ---
 name: workflow-bug-fix
 description: Fix a concrete test, build, runtime, regression, or user-visible failure by changing its production cause and verifying the original condition on the actual path.
-disable-model-invocation: true
 ---
 
 # Workflow Bug Fix

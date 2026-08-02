@@ -25,6 +25,7 @@ task_cards:
   - task_id:
     owner:
     purpose:
+    selected_skills: []
     allowed_files: []
     do_not_touch: []
     lock_scope:
@@ -34,6 +35,8 @@ task_cards:
 integration_owner:
 serialization_order: []
 ```
+
+Use `selected_skills` only for exact canonical IDs already chosen for that task. Include those IDs verbatim in the worker instruction. Omit the field when the upstream owner made no selection; the worker then follows normal implicit routing. Never populate it by guessing from a nearby skill name.
 
 For a completed handoff, add only observed fields:
 

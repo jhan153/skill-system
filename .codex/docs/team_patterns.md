@@ -65,6 +65,7 @@ task_card:
   task_id:
   owner:
   purpose:
+  selected_skills: []
   allowed_files: []
   do_not_touch: []
   lock_scope:
@@ -76,6 +77,7 @@ task_card:
 ```
 
 Rules:
+- `selected_skills` carries exact canonical IDs already selected upstream and must be repeated in the worker instruction; omit it when the worker should route implicitly.
 - `lock_scope` should be a file list, directory list, or clearly named doc section.
 - `validation_owner` must be one owner, usually `main_agent` for final integration.
 - If two cards need the same file, mark them sequential instead of parallel.

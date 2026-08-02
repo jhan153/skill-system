@@ -24,6 +24,7 @@ EXPECTED: dict[str, dict[str, str]] = {
     "plan-spec-curator": {"work_horizon": "cross_horizon", "planning_altitude": "lifecycle_curation"},
     "workflow-implementation": {"work_horizon": "cross_horizon", "execution_mode": "implementation_execution"},
     "workflow-bug-fix": {"work_horizon": "cross_horizon", "execution_mode": "bug_fix_execution"},
+    "workflow-prototype": {"work_horizon": "cross_horizon", "execution_mode": "prototype_execution"},
     "workflow-comment-maintenance": {"work_horizon": "cross_horizon", "execution_mode": "comment_maintenance_execution"},
     "workflow-dependency-upgrade": {"work_horizon": "cross_horizon", "execution_mode": "dependency_upgrade_execution"},
     "workflow-source-maintenance": {"work_horizon": "cross_horizon", "execution_mode": "source_maintenance_execution"},
@@ -49,6 +50,7 @@ VALID_ALTITUDES = {
 VALID_EXECUTION_MODES = {
     "implementation_execution",
     "bug_fix_execution",
+    "prototype_execution",
     "dependency_upgrade_execution",
     "comment_maintenance_execution",
     "source_maintenance_execution",

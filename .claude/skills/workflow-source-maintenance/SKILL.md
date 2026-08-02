@@ -1,7 +1,6 @@
 ---
 name: workflow-source-maintenance
 description: Post-development source maintenance workflow for behavior-preserving dead-code pruning, source diet, stale scaffold removal, and unused import/export cleanup. Use when the user asks to delete or prune source proven obsolete after implementation without adding features or changing intended behavior. Do not use for live-code restructuring or wrapper collapse, feature implementation, concrete bug fixes, broad architecture redesign, dependency upgrades, documentation-only edits, or comment-only maintenance.
-disable-model-invocation: true
 ---
 
 # Workflow Source Maintenance

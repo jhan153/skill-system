@@ -1,7 +1,6 @@
 ---
 name: workflow-recovery
 description: Recovers repeated failure loops during implementation or validation. Use when the same test/build/runtime failure repeats, prior fixes did not resolve the issue, fake-fix risk is high, or the user asks to isolate one cause and break the retry loop.
-disable-model-invocation: true
 ---
 
 # Workflow Recovery

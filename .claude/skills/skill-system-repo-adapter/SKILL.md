@@ -1,7 +1,6 @@
 ---
 name: skill-system-repo-adapter
 description: Integrate directly requested or already accepted skill changes into this Skill System repository by updating canonical source, repository metadata, generated targets, and bundle validation. Use only for repository integration after the user request or current implementation owner establishes the intended behavior; do not use for personal skills, app-managed skills, live runtimes, or plugin caches.
-disable-model-invocation: true
 ---
 
 # Skill System Repository Adapter

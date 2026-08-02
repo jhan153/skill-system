@@ -1,7 +1,6 @@
 ---
 name: workflow-refactor-safely
 description: Restructure production code in small reversible batches while preserving an established observable contract and verifying the same actual path after each batch.
-disable-model-invocation: true
 ---
 
 # Workflow Refactor Safely

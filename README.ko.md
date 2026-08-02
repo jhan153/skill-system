@@ -12,9 +12,9 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 9.4.3 번들
+## 9.4.4 번들
 
-이 소스 트리는 9.4.2 공개 번들 경계를 잇는 9.4.3 릴리스입니다. 주요 구성은 다음과 같습니다.
+이 소스 트리는 9.4.3 작업계약·Report Canvas 라인을 잇는 9.4.4 릴리스입니다. 주요 구성은 다음과 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
 * `docs`: 스킬 목록, 사용 기준, 운영 참고 문서
@@ -27,9 +27,9 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 ## 9.x 방향: Neutral Source & Plugin Packaging
 
-현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인 `9.4.3 — Work Contracts & Report Canvas`는 `9.4.2 — Public Bundle Boundary`를 직접 잇습니다. 로컬 설치는 명시적으로 수행하며 commit·tag·publish·push를 뜻하지 않습니다. Codex와 Claude는 하나의 bundle version과 tag를 공유하며, 하네스 변경도 별도 protocol version이 아니라 이 버전을 올립니다.
+현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인 `9.4.4 — Implicit Workflow Routing & Prototyping`은 `9.4.3 — Work Contracts & Report Canvas`를 직접 잇습니다. 로컬 설치는 명시적으로 수행하며 commit·tag·publish·push를 뜻하지 않습니다. Codex와 Claude는 하나의 bundle version과 tag를 공유하며, 하네스 변경도 별도 protocol version이 아니라 이 버전을 올립니다.
 
-9.4.3은 9.4.2 공개 경계를 유지하면서 direct work, TaskRun, WorkItem, LoopRun 전체에 지속적인 사용자 작업계약을 추가합니다. 선택적 검증이나 승인 의존 보조 작업은 독립적인 필수 작업을 대체하지 않고 국소 보류되며, 자동 승인 거절은 상호작용을 금지한 무인 Goal/Loop 계약으로 한정됩니다. 대화형 작업은 기존 host 동작을 유지합니다. 이 릴리스는 명시적 구현 설명·기존 capability 행동 발견 스킬도 추가하고, 승인된 report-family 작업의 기본 인간용 산출물로 `decision`, `compare`, `trace`, 선택적 Three.js `spatial` view를 갖춘 공용 offline Report Canvas를 사용합니다. 일반 비리포트 답변은 계속 간결한 chat으로 남습니다. Codex 하네스는 9.3 압축 라우팅을, Claude는 별도 구조형 지침·라우팅 모델과 Claude-native Go dispatcher를 계속 유지합니다.
+9.4.4는 9.4.3 작업계약과 Report Canvas를 유지하면서 명확한 자연어 workflow, coordination, repository-adapter, 제한된 design 의도를 스킬 alias 없이도 모델이 선택할 수 있게 합니다. 영속 상태, 외부 상태, LoopRun, lifecycle gate, 명시 선택 context를 다루는 스킬은 계속 explicit-only이며, 모델의 스킬 선택은 사용자 권한을 넓히지 않습니다. 상위에서 이미 선택한 canonical skill ID는 위임 worker에 그대로 전달하고, 상위 선택이 없으면 worker가 정상 라우팅합니다. 또한 하나의 미해결 UI·interaction·state·logic 질문을 위한 격리된 runnable `workflow-prototype`을 추가하고, 결정권자가 관찰할 때까지 pending evidence를 실행 가능하게 유지하며 production hardening과 분리합니다. 작성된 positive/negative case는 이 계약의 회귀 표면일 뿐 현장 라우팅 품질이나 사람의 prototype 결정을 증명하지 않습니다.
 
 Codex 라우터는 정확히 명시됐거나 분명히 일치하는 전문 스킬을 바로 사용하며, 여러 소유자가 실제로 경쟁할 때만 좁은 라우터 하나를 엽니다. implicit router는 선언되어 실제 노출된 읽기·분석 owner에만 자동 handoff할 수 있고, 무거운 writer와 명시적으로 선택하는 context는 explicit-only로 유지합니다. 하나의 canonical 호출 비트를 플랫폼별 native 계약으로 투영합니다. Codex는 `agents/openai.yaml`을 읽고, Claude에는 explicit-only 스킬에만 `disable-model-invocation: true`를 생성합니다. Codex 패키지는 기존 `plugins/<name>/skills`를 유지하고, Claude 패키지는 같은 이름·버전으로 `plugins/claude/<name>/skills`에 생성해 각 호스트가 자기 메타데이터만 탐색하게 합니다. 가장 가까운 `project-context.yaml`은 manifest 상대 경로나 정확히 승인된 절대 경로로 Memory Bank, Knowledge Base, plan, skill root, 이름 있는 LLM Wiki를 선언할 수 있습니다. 없는 항목은 사용할 수 없는 것으로 처리하며 홈이나 인접 저장소를 추측해 검색하지 않습니다. Knowledge 작업은 고정 디렉터리 대신 해석된 `knowledge_root`와 `knowledge_index` 변수를 소비합니다.
 
@@ -284,6 +284,7 @@ Skill System 스킬은 작성된 스킬을 이 저장소에 통합하고 생성�
 | 9.3.4 | Claude-native Go harness | `prompt_id`와 해시형 세션 순번 fallback, native `Notification` 매핑, `stop_hook_active`, 제한된 공유 Go core, macOS·Windows·Linux artifact를 사용하는 4-event Claude dispatcher를 추가합니다. Claude의 독립 지침·라우팅 모델은 유지하면서 Python ledger·transcript Output Gate·measurement·lifecycle schema·notification adapter를 제거합니다. |
 | 9.4.2 | 공개 번들 경계 | 시계열·관계형 Knowledge와 workflow 지침을 clean-install 상태 보호와 통합합니다. 공개 외부 source revision/license/채택 원장을 폐기하고 프로젝트 결정은 선언된 로컬 Knowledge Base에만 남기며, release 검증이 해당 원장을 다시 도입하지 못하게 합니다. |
 | 9.4.3 | 작업계약·Report Canvas | direct/Task/Loop 작업 전반에서 사용자 범위, 검증 소유권, 국소 보류, 비차단 continuation을 보존하고 구현 설명·행동 발견·공용 오프라인 Report Canvas를 추가합니다. |
+| 9.4.4 | 암시적 workflow 라우팅·prototyping | 명확한 자연어 의도에 맞는 workflow 및 제한된 support owner를 노출하면서 lifecycle·영속화 gate는 explicit-only로 유지합니다. 선택된 skill을 위임 경계에 전달하고, 하나의 미해결 결정을 위한 격리·보존형 runnable prototype을 추가합니다. |
 
 ## 라이선스
 

@@ -27,6 +27,8 @@ If the request is primarily about implementing an already chosen method, stay in
 ## Context Bundle Contract
 For multi-step work, writes, broad scans, reports, automation changes, or memory mutation, compile a small internal context pack before acting. Start with the request, the selected owner, direct source, and validation evidence; expand only from `read_if_needed`, one layer at a time.
 
+When delegation follows an already selected specialist, carry its exact canonical skill ID into the worker task. If no specialist was selected upstream, let the worker route normally rather than inventing one for the handoff.
+
 The canonical pack shape, cache-friendly ordering, reference-admission limits, and token-cost interpretation live in `.claude/docs/context_pack_guidelines.md`. Do not duplicate that schema here or recover from missing context by loading all repo docs, memory, skills, or chat history.
 
 ## Skill Precedence
@@ -57,6 +59,7 @@ Resolve a requested skill in this order: exact user-provided path, skill install
 | cross-domain evidence search | `search-router` | selected evidence lane such as `search-paper-evidence`, `analysis-bug`, `design-visual-regression`, `memory-bank-harness`, `knowledge-base-read`, explicit `llm-wiki-context`, or `search-deep-evidence` | evidence intent, domain hint, claim/topic, final task owner | final synthesis, implementation, broad research lifecycle |
 | requirements discovery interview | `plan-requirements-discovery` | none by default; `plan-requirements-brief` only after discovery results are ready to distill | rough goal, idea, product direction, domain/scope hints, user willingness to answer questions | direct implementation, active docs/plan sync, lifecycle report package |
 | behavior discovery for an existing capability | `plan-behavior-discovery` | `report-implementation-explainer` only when an explanation artifact is explicitly requested | concrete capability/path, current source/runtime evidence, target actor, unresolved operability decision | greenfield requirements discovery, quiz, direct implementation, exhaustive release questionnaire |
+| runnable prototype for one unresolved UI, interaction, state, or logic question | `workflow-prototype` | `plan-behavior-discovery` only when the question itself is not selected; normal implementation owner only after a decision | one question, decision owner, discriminating observation, target host path, budget/stop, proof ceiling, retention boundary | vague ideation, cleanup before decision-owner observation, production hardening, bug work, real data mutation, performance/security/accessibility/concurrency proof |
 | requirements contract / PRD brief | `plan-requirements-brief` | none by default; `plan-long-term-package` or `plan-short-term-docs` only after the brief is accepted for planning | discovery notes, stakeholder answers, decision log, rough requirements, intended handoff target | interactive elicitation, direct implementation, docs/plan status sync, lifecycle result reporting |
 | loop readiness classification | `loop-readiness-router` | `plan-loop-term` only after `contract_needed` or `loop_worthy`; `workflow-loop-runner` only after accepted contract | prompt draft, target domain, verifier hints, side-effect, approval, durability, event-runtime, Wiki feedback, parallelism, and idempotency signals | direct execution, contract drafting, verifier execution, broad planning |
 | loop verifier mapping | `loop-verifier-registry` | `plan-loop-term` when embedding the map into a contract; verifier skills only as owners, not executors | loop contract or success conditions, runtime verifier catalog, target domain, governance metrics | running checks, implementation, readiness classification |
@@ -115,6 +118,7 @@ Use `.claude/docs/planning_state_model.md` when a planning artifact changes stat
 | task/ticket state across turns | task-specific primary such as `workflow-implementation` plus `workflow-task-ledger` | WorkItem only as lifecycle envelope when requested or already present | `plan-long-term-package`, `workflow-loop-runner` unless verifier feedback is required |
 | requirements discovery / interview | `plan-requirements-discovery` | none by default | direct implementation, phase package, lifecycle artifact report |
 | existing-capability behavior discovery | `plan-behavior-discovery` | none by default; consume an existing explainer only when relevant | greenfield discovery, direct implementation, exhaustive feature/release interview |
+| bounded runnable prototype | `workflow-prototype` | question-selection discovery only when needed; production implementation only after verdict | vague ideation, cleanup before decision-owner observation, automatic production merge, release claims |
 | requirements contract / PRD brief | `plan-requirements-brief` | hand off to `plan-long-term-package` or `plan-short-term-docs` after acceptance | interactive discovery, direct implementation |
 | tactical design/current execution plan | `plan-short-term-docs` | `workflow-validation` or `report-critical` only when requested | `plan-long-term-package` |
 | strategic phase/package plan | `plan-long-term-package` | `plan-spec-curator` for lifecycle cleanup | `plan-short-term-docs` as primary |
@@ -154,9 +158,9 @@ Use `.claude/docs/planning_state_model.md` when a planning artifact changes stat
 | keyboard/focus/semantic/contrast/target-size/readability evidence | `design-a11y-audit` | `design-visual-regression` for rendered screenshot evidence | `design-frontend` |
 
 Design cluster conservative defaults:
-- Design specialists keep `allow_implicit_invocation: false` unless their current metadata explicitly permits a narrow implicit route.
+- Design specialists follow their canonical invocation bit; implicit selection still requires the concrete intent and inputs declared in the skill description.
 - `design-frontend` is the bounded exception: it may enter implicitly only for concrete UI/design implementation in repository code. Critique, ideation, reuse or visual audits, layout-only translation, and small CSS/text edits remain outside it.
-- `design-ui-decomposer` and `design-layout-translator` remain explicit or clearly analysis-intent routed.
+- `design-ui-decomposer` and `design-layout-translator` may enter implicitly for a supplied UI reference or concrete layout-constraint translation, but never from a bare design topic.
 - Mobile, dashboard, and section-web guidance is conditionally loaded from `design-frontend/references/`; select one primary profile instead of attaching surface skills.
 - Do not infer broader implicit routing from scenario counts or advisory quality labels.
 
@@ -170,7 +174,7 @@ Historical positive and negative routing cases live in `.claude/eval/`. Do not c
 Those cases may support an explicit structural review, but they are not a release gate or evidence of field quality. Do not create new scenario suites merely to justify a routing change.
 
 ## Agent Metadata Tradeoff
-Current `agents/openai.yaml` metadata is conservative: specialist skills and heavy artifact generators use `allow_implicit_invocation: false` to prevent broad-trigger overactivation. The router exceptions are `analysis-router`, `research-router`, and `search-router`; `design-frontend` is the sole execution-owner exception for concrete repo-integrated UI implementation. Explicit aliases, Routing Cards, and this routing contract remain the primary activation path for all other skills.
+`allow_implicit_invocation` controls model discoverability, not authorization. Clear intent-matched workflow owners, bounded design interpreters, coordination handoff, and repository integration support may be implicit while their Routing Cards continue to enforce scope and side effects. A router-local recommendation does not disable a target that normal routing may select implicitly. Persistent Memory/Knowledge writes, project-context mutation, Kanboard, LoopRun, lifecycle gates, and explicitly selected context remain explicit-only.
 
 
 ## Group Alias Routing
@@ -189,6 +193,6 @@ Evidence vs research boundary (mirrored rule; `research-routing.md` is Codex-onl
 - Implementation/plan/algorithm requests that merely mention paper/loss/model/experiment keep their implementation/planning/analysis primary; research attaches only as a support evidence lane.
 
 Phase B note:
-- `analysis-router`, `research-router`, and `search-router` are the only selectively implicit entry routers. `design-frontend` is the separately bounded implicit execution owner; other specialists remain explicit or narrow-intent routed.
+- `analysis-router`, `research-router`, and `search-router` remain selectively implicit entry routers. Clear workflow owners and bounded design/support specialists may also be selected directly from natural-language intent; hooks retain lifecycle gates.
 - Persistent Memory and Knowledge writes, LLM Wiki reads, and evaluation review remain explicit operations.
 - Loop engineering skills remain explicit/routing-controlled: readiness classification, verifier mapping, and loop execution are separate to avoid accidental long-running loops.

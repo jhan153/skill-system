@@ -7,6 +7,7 @@
 # generated target and must not carry a do-not-edit/checksum header.
 #
 # Evidence basis (2026-06-29, from skill-system/ root):
+#   - 9.4.4: implicit workflow routing, selected-skill delegation, and bounded runnable prototypes added
 #   - 9.4.3: user work contracts, non-blocking continuation, Report Canvas,
 #     implementation-understanding skills, and post-9.4.2 maintenance added
 #   - 9.4.2: Knowledge relation/history and workflow guidance added; Research fixtures remain

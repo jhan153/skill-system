@@ -1,4 +1,4 @@
-version: "9.4.3"
+version: "9.4.4"
 purpose: "Requests that should not trigger heavy or wrong skills."
 cases:
   - case_id: neg-001
@@ -183,6 +183,32 @@ cases:
     expected_output_shape: "behavior-preserving refactor plan with comment sync as a substep and validation"
     quality_notes: "Structural refactor stays refactor ownership; comment sync rides along as a substep, not primary."
     friction_risk: "comment maintenance stealing structural refactor requests"
+  - case_id: neg-implicit-workflow-comment-maintenance-competing-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-comment-maintenance, workflow-bug-fix]
+    scenario_tags: [negative, implicit_invocation, competing_owner, bug_fix]
+    direct_invocation: false
+    user_request: "CSV parser가 빈 행에서 crash 나. 원래 실패를 재현해서 동작을 고쳐줘. 근처 주석도 오래됐지만 이번에는 실행 코드와 회귀 테스트만 수정하고 주석 정리는 따로 하지 마."
+    expected_primary_skill: workflow-bug-fix
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-comment-maintenance, workflow-implementation]
+    expected_family: workflow
+    expected_context: [failure_signal, expected_behavior, repro, target_code, focused_validation, explicit_comment_exclusion]
+    expected_output_shape: "targeted bug fix without attaching comment maintenance"
+    quality_notes: "Mentioning stale comments does not activate an implicitly visible comment workflow when the user explicitly excludes comment work."
+    friction_risk: "keyword-driven attachment expands scope beyond the requested bug fix"
+    expected_behaviors:
+      - preserve_bug_fix_owner
+      - honor_comment_work_exclusion
+      - verify_original_failure_signal
+    forbidden_behaviors:
+      - invoke_workflow_comment_maintenance
+      - edit_comments_or_docstrings
+      - broaden_scope_from_implicit_visibility
+    required_evidence:
+      - type: route_match
+        expected: workflow-bug-fix
   - case_id: neg-report-qualitative-001
     user_request: "이 문장 맞춤법만 봐줘."
     expected_primary_skill: null
@@ -1050,3 +1076,104 @@ cases:
     required_evidence:
       - type: route_match
         expected: report-qualitative
+  - case_id: neg-workflow-prototype-question-unselected-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-prototype, plan-behavior-discovery]
+    scenario_tags: [negative, question_selection, existing_capability]
+    user_request: "기존 검색 route를 프로토타입으로 개선해 보자. 아직 무엇을 비교해야 할지는 모르겠으니 먼저 다음 사용자 동작 중 무엇을 결정해야 하는지 하나씩 정하자."
+    expected_primary_skill: plan-behavior-discovery
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-prototype, workflow-implementation, design-frontend]
+    expected_family: planning
+    expected_context: [existing_capability, current_behavior_evidence, target_actor, unresolved_decision_question]
+    expected_output_shape: "one evidence-grounded behavior decision question without prototype files"
+    quality_notes: "Prototype execution starts only after one discriminating question is selected; the word prototype does not authorize speculative variants."
+    friction_risk: "writing arbitrary UI alternatives before the decision question and observation are known"
+    expected_behaviors:
+      - preserve_behavior_discovery_owner
+      - ground_current_behavior
+      - select_one_blocking_product_question
+    forbidden_behaviors:
+      - invoke_workflow_prototype
+      - create_prototype_files
+      - invent_comparison_variants
+    required_evidence:
+      - type: route_match
+        expected: plan-behavior-discovery
+  - case_id: neg-workflow-prototype-bug-fix-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-prototype, workflow-bug-fix]
+    scenario_tags: [negative, bug_boundary]
+    user_request: "OAuth callback 뒤 로그인 화면이 crash 나. 실패를 재현해서 원인을 고치고 원래 crash가 사라졌는지 확인해줘."
+    expected_primary_skill: workflow-bug-fix
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-prototype, plan-behavior-discovery]
+    expected_family: workflow
+    expected_context: [failure_signal, expected_behavior, repro, target_path, focused_validation]
+    expected_output_shape: "targeted bug fix against the original failure signal"
+    quality_notes: "A concrete failure and repair request stays with bug-fix execution even if a throwaway repro harness might be useful internally."
+    friction_risk: "turning the failure into a design prototype and leaving production broken"
+    expected_behaviors:
+      - preserve_bug_fix_owner
+      - reproduce_original_failure
+      - verify_targeted_fix
+    forbidden_behaviors:
+      - invoke_workflow_prototype
+      - replace_fix_with_throwaway_demo
+      - treat_bug_as_open_product_choice
+    required_evidence:
+      - type: route_match
+        expected: workflow-bug-fix
+  - case_id: neg-workflow-prototype-selected-production-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-prototype, workflow-implementation]
+    scenario_tags: [negative, production_boundary]
+    user_request: "검색 UI는 헤더 입력창과 flat result stream으로 결정했어. variant selector나 가짜 데이터 없이 실제 검색 API와 연결한 production 화면으로 구현해줘."
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-prototype, plan-behavior-discovery, design-frontend]
+    expected_family: workflow
+    expected_context: [selected_behavior, production_route, real_api_contract, validation]
+    expected_output_shape: "production implementation of the selected search behavior without prototype harness"
+    quality_notes: "Once the decision is selected and real integration is requested, production implementation owns the change."
+    friction_risk: "reopening alternatives or hardening the prototype switcher in place"
+    expected_behaviors:
+      - preserve_selected_behavior
+      - implement_real_production_path
+      - exclude_prototype_harness
+    forbidden_behaviors:
+      - invoke_workflow_prototype
+      - rebuild_multiple_variants
+      - retain_fake_backend
+    required_evidence:
+      - type: route_match
+        expected: workflow-implementation
+  - case_id: neg-implicit-workflow-bug-fix-explanation-only-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [analysis-bug, workflow-bug-fix]
+    scenario_tags: [negative, implicit_invocation, read_only_diagnosis]
+    direct_invocation: false
+    user_request: "이 login failure가 왜 생기는지만 실제 경로와 로그를 보고 설명해줘. 아직 파일이나 테스트는 수정하지 마."
+    expected_primary_skill: analysis-bug
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-bug-fix, workflow-implementation, workflow-recovery]
+    expected_family: analysis
+    expected_context: [failure_signal, actual_path, logs, competing_causes, read_only_scope]
+    expected_output_shape: "read-only cause diagnosis with no implementation mutation"
+    quality_notes: "Implicit discoverability does not turn a diagnosis-only request into authorized repair work."
+    friction_risk: "selecting a writable workflow merely because the prompt contains a failure"
+    expected_behaviors:
+      - preserve_read_only_diagnosis
+      - discriminate_causes_on_actual_path
+      - keep_model_selection_separate_from_write_authority
+    forbidden_behaviors:
+      - invoke_workflow_bug_fix
+      - edit_source_or_tests
+      - treat_skill_visibility_as_write_permission
+    required_evidence:
+      - type: route_match
+        expected: analysis-bug

@@ -52,7 +52,7 @@ This skill chooses ownership. It does not search, synthesize, plan experiments, 
 - automatic_handoff_targets: `search-router`, `search-paper-evidence`, `research-literature-synthesis`, `research-literature-ideation`, `research-hypothesis-planning`, `research-experiment-blueprint`, `research-statistical-analysis`, `research-peer-review`
 - explicit_recommendation_targets: `research-experiment-scaffold`, `research-manuscript-writing`, `workflow-implementation`
 
-Load one automatic stage owner immediately after selection. Keep code/scaffold and manuscript-file writers explicit even when their upstream gates are satisfied; return their canonical skill id and explicit invocation requirement without doing their work. If an automatic target is absent from the current capability surface, report a plugin version/exposure mismatch rather than calling it uninstalled or replacing specialist work with router output.
+Load one automatic stage owner immediately after selection. Keep experiment-scaffold and manuscript-file writers explicit even when their upstream gates are satisfied. `workflow-implementation` is recommendation-only from this research router but remains available to normal intent-matched development routing. Return the selected recommendation's canonical skill id and reason without doing its work, adding an explicit invocation requirement only when its own metadata is explicit-only. If an automatic target is absent from the current capability surface, report a plugin version/exposure mismatch rather than calling it uninstalled or replacing specialist work with router output.
 
 ## Decision Rules
 1. Decide research versus development from the requested deliverable, not keywords.

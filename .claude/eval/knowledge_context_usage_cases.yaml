@@ -1,4 +1,4 @@
-version: "9.4.3"
+version: "9.4.4"
 purpose: "Positive and negative routing/usage contracts for Knowledge and project-context skills."
 cases:
   - case_id: knowledge-context-positive-read-001

@@ -13,6 +13,8 @@ no skill needed            -> current task owner
 
 Do not pre-classify every request. Do not attach skills merely because their names are related to the topic.
 
+Implicit invocation selects an owner from a clear natural-language intent; it does not grant write, side-effect, persistence, or external-state authority beyond the user's request and the selected skill's guardrails.
+
 When the user explicitly asks which workflow comes next, separate the questions instead of consulting a second routing table: `docs/work_horizon_model.md` owns persistence and artifact altitude, while `docs/planning_state_model.md` admits transitions only for persisted planning artifacts. Stable work with no such boundary stays with the current task owner. Neither reference invokes a chain.
 
 Resolve a requested skill in this order:
@@ -44,6 +46,7 @@ The router returns one owner and stops. It does not acquire evidence, implement,
 | bug fix with an unclear cause | `workflow-bug-fix`; use `analysis-bug` only for the unresolved cause |
 | existing implementation explanation or code-review-style HTML | `report-implementation-explainer`, only on explicit explanation/artifact intent |
 | product behavior discovery for an existing capability | `plan-behavior-discovery`, only on explicit one-question decision intent |
+| runnable prototype for one unresolved UI, interaction, state, or logic question | `workflow-prototype`; use discovery only when the question itself is not selected |
 | short persisted plan | `plan-short-term-docs` |
 | accepted loop execution | `workflow-loop-runner` after a valid loop contract |
 | Memory read | current task owner using `memory-bank-harness` only for a declared, task-relevant slice |
@@ -78,6 +81,7 @@ The nearest `project-context.yaml` declares project-local skill roots, Memory Ba
 
 - Development requests execute source work; an active plan is input, not a substitute for implementation.
 - Use one `change -> validation` owner. A verifier does not become a second workflow owner.
+- When delegation follows an already selected specialist, pass its exact canonical skill ID to the worker. With no upstream selection, let the worker resolve normally instead of inventing a recommendation.
 - When a material semantic completion claim would rest mainly on code and checks produced by that same owner, maker/checker separation is a concrete `workflow-rigor` standard trigger. Low-risk work with direct decisive observation stays self-reviewed; strict risk uses its two independent axes when available.
 - Invoke routine approved executables directly. Use a shell wrapper only when pipeline, redirection, globbing, or other shell semantics are required.
 - Live home configuration, plugin caches, app-managed `.system` skills, and other sessions are deployment state. Modify them only on an explicit deployment or live-runtime request.

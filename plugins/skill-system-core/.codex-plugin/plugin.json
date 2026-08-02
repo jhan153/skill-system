@@ -1,6 +1,6 @@
 {
   "name": "skill-system-core",
-  "version": "9.4.3",
+  "version": "9.4.4",
   "description": "Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, search broker, validation/reporting contract, task state) used by all role plugins.",
   "author": {
     "name": "Skill System Maintainers"

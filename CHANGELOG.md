@@ -1,5 +1,15 @@
 # Changelog
 
+## 9.4.4
+
+- Expanded natural-language model visibility from 20 to 33 of 79 canonical skills by making intent-matched workflow execution owners, coordination handoff, repository integration support, and two bounded design interpreters implicitly invocable. Invocation remains selection rather than authorization: persistent Memory/Knowledge writes, project-context mutation, Kanboard, LoopRun, lifecycle gates, explicitly selected Wiki context, evaluation, rigor, task-ledger, and validation owners remain explicit-only.
+- Changed invocation policy enforcement from a narrow implicit allowlist to an explicit protected set for governed persistent, external-state, loop, and lifecycle-sensitive owners. A router's `explicit_recommendation_targets` now describes that router's local behavior and no longer disables a target that normal intent routing may select implicitly.
+- Preserved upstream specialist selection across delegation. `coordination-handoff`, shared task-card guidance, and both host routing contracts carry exact canonical IDs in `selected_skills`; when no specialist was selected upstream, workers retain normal implicit routing rather than receiving a guessed ID.
+- Added the implicitly invocable `workflow-prototype` dev skill for one bounded runnable UI/interaction comparison or pure state/logic discriminator. It reuses the target host path, stubs external mutations, states a proof ceiling, stays isolated from production hardening, and remains runnable until the decision owner observes it or an authorized cleanup trigger fires.
+- Registered prototype execution in the dev plugin, Work Horizon, shared registry, Codex and Claude routing, and generated plugin packages. Added authored UI, logic, pending-human, bug-boundary, production-boundary, and question-selection regression cases; these cases validate declared routing contracts and do not claim field-quality admission or human preference evidence.
+- Extended invocation-policy, work-horizon, instruction-quality, handoff, and competing-owner regression coverage, then regenerated the Codex runtime, Claude runtime, and paired plugin packages under one 9.4.4 identity.
+- Cut the unified source/runtime/plugin/eval 9.4.4 release with the local annotated tag `v9.4.4`. Remote push, publication, archive creation, installation, and live cache mutation remain separate explicit operations.
+
 ## 9.4.3
 
 - Added a shared user work contract for direct work, TaskRun, WorkItem, and v3 LoopRun. The contract structures core deliverables, allowed/excluded action classes, verification ownership, interaction mode, local-block continuation, semantic intent identity, and terminal handoff without requiring users to write YAML or learn field names. Skills and workflow guidance preserve explicit user limits ahead of optional validation, quality, and meta procedures.

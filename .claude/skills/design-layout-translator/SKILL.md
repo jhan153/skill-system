@@ -1,7 +1,6 @@
 ---
 name: design-layout-translator
 description: Translate evidenced design layout constraints into bounded, code-ready sizing, spacing, overflow, and responsive rules without owning UI implementation.
-disable-model-invocation: true
 ---
 
 # design-layout-translator

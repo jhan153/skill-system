@@ -1,7 +1,6 @@
 ---
 name: workflow-plan-runner
 description: Execute an approved plan/spec as source-anchored batches; real implementation and matching evidence gate batch, phase, and plan completion.
-disable-model-invocation: true
 ---
 
 # Workflow Plan Runner

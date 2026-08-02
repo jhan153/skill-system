@@ -57,7 +57,7 @@ description: "Route deep technical analysis to bug diagnosis, algorithm selectio
 - automatic_handoff_targets: `analysis-bug`, `analysis-algorithm`, `analysis-codebase-design`, `analysis-architecture-deepening`, `analysis-domain-modeling`, `analysis-performance`
 - explicit_recommendation_targets: `analysis-codebase`
 
-Load one automatic target immediately after selection and keep the current task owner. For an explicit-only target, return its canonical skill id and the explicit invocation requirement without doing its work. If an automatic target is absent from the current capability surface, report a plugin version/exposure mismatch; do not describe the skill as uninstalled or substitute router reasoning for specialist work.
+Load one automatic target immediately after selection and keep the current task owner. A recommendation target is never loaded by this router; return its canonical skill id and reason, adding an explicit invocation requirement only when that target's own metadata is explicit-only. If an automatic target is absent from the current capability surface, report a plugin version/exposure mismatch; do not describe the skill as uninstalled or substitute router reasoning for specialist work.
 
 ## Precedence and Mixed Requests
 1. Honor an explicit fitting specialist invocation without loading alternatives.

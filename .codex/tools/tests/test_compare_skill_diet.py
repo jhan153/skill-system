@@ -668,6 +668,7 @@ class SkillDietComparisonTests(unittest.TestCase):
             "workflow-comment-maintenance": {
                 "structured": "runtime-047",
                 "negative": "neg-workflow-comment-maintenance-001",
+                "competing": "neg-implicit-workflow-comment-maintenance-competing-001",
                 "composition": "neg-workflow-comment-maintenance-002",
                 "edge": "runtime-047",
             },

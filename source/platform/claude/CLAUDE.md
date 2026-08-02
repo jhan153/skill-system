@@ -1,6 +1,6 @@
 # Global CLAUDE
 
-> Claude-side global working rules for the Skill System bundle (9.4.3). Claude keeps the
+> Claude-side global working rules for the Skill System bundle (9.4.4). Claude keeps the
 > proven 9.2.1 decision and execution model while using the current shared skill catalog.
 > Its routing, hooks, permissions, validation, and runtime behavior are owned independently
 > from Codex; both platform harnesses still ship under one bundle version and release tag.

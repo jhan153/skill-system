@@ -9,7 +9,7 @@
   "evidence_status": "mixed",
   "snapshot": {
     "label": "release candidate",
-    "ref": "v9.4.3-rc"
+    "ref": "v9.4.4-rc"
   },
   "findings": [
     {

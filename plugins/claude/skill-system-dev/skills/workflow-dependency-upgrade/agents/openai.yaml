@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $workflow-dependency-upgrade to update dependency, package, runtime, framework, SDK, or lockfile versions with bounded scope, required migration fixes, lockfile review, validation, and rollback/fallback notes."
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

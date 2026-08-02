@@ -1,7 +1,6 @@
 ---
 name: design-ui-decomposer
 description: Decompose UI references into source-traced hierarchy, layout, pattern, state, token, and validation decisions without writing code or overstating flat-image evidence.
-disable-model-invocation: true
 ---
 
 # design-ui-decomposer

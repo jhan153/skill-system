@@ -1,7 +1,6 @@
 ---
 name: workflow-dependency-upgrade
 description: Upgrade one dependency, runtime, framework, SDK, package, or lockfile with bounded migration and evidence from the canonical dependency state and actual selected path.
-disable-model-invocation: true
 ---
 
 # Workflow Dependency Upgrade

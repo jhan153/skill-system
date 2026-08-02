@@ -1,4 +1,4 @@
-# 9.4.3 Terms
+# 9.4.4 Terms
 
 ## version_cut
 
@@ -53,6 +53,14 @@ The next practical work needed to improve a skill after an explicit user report 
 ## runtime_usage_eval
 
 Authored regression examples that can check their declared syntax and routing contract. They are not field-quality evidence.
+
+## implicit_invocation
+
+Model-visible selection of a skill from clear natural-language intent without requiring an explicit skill alias. It does not grant write, side-effect, persistence, external-state, or lifecycle authority beyond the user's request and the selected skill's guardrails.
+
+## workflow_prototype
+
+One isolated runnable artifact built to discriminate an explicit unresolved UI, interaction, state, or logic question before production implementation. It is decision evidence rather than production proof and remains runnable until the decision owner observes it or an authorized cleanup trigger fires.
 
 ## field_feedback
 

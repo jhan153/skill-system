@@ -1,7 +1,6 @@
 ---
 name: workflow-implementation
 description: Primary workflow for direct software implementation. Use when the user requests production code, API, script, config, build, or explicitly scoped test changes from current requirements. Do not use for behavior-preserving refactors, concrete bug fixes, approved plan execution, repeated failure recovery, or analysis/validation-only work.
-disable-model-invocation: true
 ---
 
 # Workflow Implementation
