@@ -138,7 +138,8 @@ class ReleaseIdentityTests(unittest.TestCase):
             marketplace_path.write_text(json.dumps(marketplace), encoding="utf-8")
 
             errors = self.checker.check(root)
-            self.assertTrue(any("exactly 6" in error for error in errors), errors)
+            expected_count = len(self.checker.PLUGIN_NAMES)
+            self.assertTrue(any(f"exactly {expected_count}" in error for error in errors), errors)
             self.assertTrue(any("duplicate plugin names" in error for error in errors), errors)
             self.assertTrue(any("source must be local" in error for error in errors), errors)
 

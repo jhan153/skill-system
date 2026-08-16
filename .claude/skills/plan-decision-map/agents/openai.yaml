@@ -1,0 +1,22 @@
+interface:
+  display_name: "Decision Map"
+  short_description: "Keep multi-session uncertainty in one decision map"
+  default_prompt: |
+    Use $plan-decision-map only for an explicitly requested durable decision map. Preserve one target outcome, bounded decision items, prerequisite links, a derived ready set, unshaped unknowns, and explicit exclusions. Keep implementation and unauthorized external mutations outside the map.
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: long_plan
+  role: decision_map_owner
+  contains:
+    - task_ticket
+  typical_agentic_duration: "multiple sessions"
+  legacy_equivalent: "durable pre-plan decision work"
+
+planning_altitude:
+  kind: strategic_package
+  artifact_level: decision_map

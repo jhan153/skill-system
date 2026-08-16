@@ -15,7 +15,7 @@ description: Build the smallest throwaway runnable artifact that answers one exp
   - the task is open-ended ideation, requirements discovery, ordinary production implementation, bug work, validation-only work, or a behavior-preserving refactor.
   - the desired claim requires representative load, production data, security review, accessibility audit, concurrency evidence, or real integration behavior.
 - expected_inputs: one question, decision owner, discriminating observation, target project/runtime, budget/stop, write boundary, retention boundary, and excluded claims
-- expected_outputs: isolated runnable prototype, one run command, observation guide, bounded verdict or pending-decision state, proof ceiling, retention status, and production handoff
+- expected_outputs: isolated runnable prototype, one exact launch instruction, observation guide, bounded verdict or pending-decision state, proof ceiling, retention status, and production handoff
 - context_targets:
   must_read:
     - current question and target decision
@@ -28,61 +28,43 @@ description: Build the smallest throwaway runnable artifact that answers one exp
 - risk_profile:
   reads: scoped target context and representative safe data/state shapes
   writes: isolated prototype files within the authorized boundary; optional branch/worktree only when repository policy permits it; no cleanup or deletion without explicit authorization
-  tools: host runtime plus the narrowest build, preview, browser, terminal, or smoke command needed to observe the question
+  tools: host runtime plus the narrowest build, preview, browser, terminal, file-open, or smoke operation needed to observe the question
   sensitive_resources: deny credentials and production data; stub external writes unless that boundary is the explicit question and separately authorized
 - entry_scene: PREPARE
 
 ## Prototype Contract
 
-Treat the prototype as decision evidence, not an early production implementation. Before writing, lock:
-
-- `question`: one sentence ending in a choice, hypothesis, or observable uncertainty.
-- `decision_owner`: the person or accepted rule that can select the outcome.
-- `observation`: what a human or direct run must reveal to distinguish outcomes.
-- `decision_rule`: what selects, supports, contradicts, or leaves the question inconclusive.
-- `budget_stop`: the smallest time/code/variant boundary after which to stop.
-- `proof_ceiling`: qualities the prototype cannot establish.
-- `retention`: where the runnable evidence remains until the decision owner observes it, plus any explicitly authorized cleanup trigger.
-
-Infer a reversible field only when it does not change the deliverable; otherwise ask for the missing decision. If no observation can discriminate the options, return to behavior or requirements discovery instead of coding.
-
-Keep one active question. When UI shape and logic shape are both open, prototype the one blocking the next decision and defer the other unless the user explicitly scopes two prototypes.
+Treat the artifact as decision evidence, not early production. Before writing, lock one `question`, `decision_owner`, discriminating `observation`, `decision_rule`, `budget_stop`, `proof_ceiling`, and `retention`/cleanup trigger. Infer only reversible fields that do not change the deliverable. If no observation can discriminate outcomes, return to behavior or requirements discovery; if UI and logic are both open, prototype only the one blocking the next decision unless two artifacts were explicitly requested.
 
 ## Select The Artifact Shape
 
 - For layout, hierarchy, density, control placement, navigation, or interaction comparison, read [UI Prototype](references/ui-prototype.md) and build a UI comparison in the real host surface when safe.
-- For state transitions, invariants, command semantics, reducer/state-machine shape, or domain feedback, read [Logic Prototype](references/logic-prototype.md) and build a pure model with a thin runnable driver.
+- For state transitions, invariants, command semantics, reducer/state-machine shape, or domain feedback, read [Logic Prototype](references/logic-prototype.md) and expose a deterministic rule model through one browser-openable HTML evidence page.
 - For a question that depends on performance, security, accessibility, concurrency, persistence durability, or production integration, use the specialist actual-path workflow instead. A throwaway harness may illustrate behavior but cannot close that claim.
 
 ## Workflow
 
-1. **Bind the question.** Record the contract fields, current evidence, non-goals, and the decision that becomes possible after observation.
-2. **Inspect the host path.** Reuse the project's runtime, package manager, route/module conventions, components, fixtures, and one-command entrypoint. Avoid standalone scaffolding when the real surface can host the prototype safely.
-3. **Isolate the evidence.** Mark the artifact `PROTOTYPE` and throwaway. Prefer an isolated route, story, preview, or nearby path inside the authorized workspace. Use a branch/worktree only when explicitly requested or repository policy makes it the accepted isolation mechanism. Never stash, reset, overwrite, or relocate unrelated work to obtain isolation, and never push without authorization.
-4. **Build only the discriminator.** Implement the selected UI or logic shape. Stub mutations and external systems, keep state in memory by default, and omit polish, generalized abstractions, defensive completeness, migrations, persistence, analytics, and production error handling unless one is the explicit question.
-5. **Make observation cheap.** Provide one exact command and working directory. Expose the relevant variants, actions, state, transitions, or failures without requiring source inspection. Keep the observation small enough to repeat while feedback is fresh.
-6. **Observe and classify.** Run the narrow entrypoint when agent verification is allowed. Record `selected`, `supported`, `contradicted`, or `inconclusive`, the decisive observation, and counterevidence. Human taste or private interaction stays `user-verification-needed` until the decision owner responds; do not convert a pending human decision into `selected`.
-7. **Close the boundary without destroying the evidence.** Keep the switcher, driver, fixtures, and alternatives runnable in the isolated prototype until the decision owner observes them. Keep those prototype-only pieces out of the production line. After an explicit selection, hand the accepted behavior to its normal implementation owner; delete or compact prototype evidence only when the user requests cleanup or the pre-agreed retention trigger fires.
+1. Bind the contract, current evidence, non-goals, and resulting decision.
+2. Inspect the smallest real host path. Reuse local runtime/components/fixtures for UI or authoritative rules and safe fixtures for logic.
+3. Isolate and mark the artifact `PROTOTYPE`. Prefer a route/story/preview/nearby file; use a branch/worktree only when explicitly requested or required by repository policy. Never disturb unrelated work or push without authorization.
+4. Build only the discriminator. Stub mutations/external systems, keep state in memory, and omit polish, generalized abstractions, migrations, persistence, analytics, and production hardening unless they are the question.
+5. Provide one exact launch instruction and expose the decisive variants/actions/states without source inspection.
+6. Observe and classify `selected`, `supported`, `contradicted`, or `inconclusive`. Human/private judgment stays `user-verification-needed` until the owner responds.
+7. Keep comparison evidence runnable and outside production until observation. After explicit selection, hand off to the production owner; clean up only on request or the agreed trigger.
 
 ## Guardrails
 
-- Make variants structurally different; color, copy, spacing, or icon-only changes do not answer a layout question.
-- Use representative real context or fixtures, but do not mutate real accounts, services, databases, files, or external systems by default.
-- Add no new framework, package, persistence layer, backend endpoint, or generic abstraction merely to support the prototype.
-- Do not use passing builds, typechecks, mocks, screenshots, or self-authored tests to claim the design question is answered. They prove only their covered boundary.
-- Do not claim production correctness, maintainability, scalability, security, accessibility, reliability, or release readiness from prototype evidence.
-- Do not silently merge prototype code into production. Lift only a small validated pure core when its ownership and production checks are explicit; rewrite the production surface under its normal workflow.
-- Do not delete, collapse, or make the comparison unrunnable while its decision remains `user-verification-needed`.
+Use structurally discriminating variants and representative safe fixtures without real external mutation. Add no framework, package, persistence, backend, or generic abstraction merely for the prototype. Builds, mocks, screenshots, and self-authored checks prove only their boundary; never claim production correctness, scalability, security, accessibility, reliability, integration, or release readiness. Do not silently merge or delete the evidence while its decision is pending; only a small validated pure core may be lifted after ownership and production checks are explicit.
 
 ## Validation And Output
 
-Confirm the exact command starts the artifact, the observation matches the question, external side effects are absent or explicitly authorized, the budget remained bounded, the production/evidence boundary is visible, and pending evidence remains runnable at its declared retention location.
+Confirm the launch instruction, question/observation match, side-effect boundary, budget, proof ceiling, and runnable retention. Apply the selected UI/logic reference's additional checks.
 
 Return only applicable fields:
 
 - `prototype_question`
 - `artifact_shape` and changed paths
-- `run_command`
+- `launch_instruction`
 - `observation_guide`
 - `verdict` and decisive evidence
 - `proof_ceiling`

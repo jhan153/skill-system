@@ -51,7 +51,7 @@ Return only the affected cases, the concrete inconsistency, the owning source, a
 ## Cross-Skill Boundaries
 - `report-critical` owns release/readiness/QA verdicts.
 - `workflow-validation` owns validation selection for implementation changes.
-- `skill-system-repo-adapter` owns canonical integration and generated-target maintenance.
+- Canonical integration and generated-target maintenance stay with the current repository implementation owner.
 
 ## Validation
 Keep edited cases YAML-parseable and schema-valid. Do not create fresh conversational scenarios, forward tasks, user records, or new validation infrastructure.

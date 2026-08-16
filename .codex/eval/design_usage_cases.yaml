@@ -1,4 +1,4 @@
-version: "9.4.4"
+version: "9.4.5"
 purpose: "Design cluster usage-quality cases."
 cases:
   - case_id: design-001
@@ -50,7 +50,7 @@ cases:
     user_request: "스크린샷을 보고 동일한 HTML/CSS 페이지를 만들어줘."
     expected_primary_skill: design-frontend
     expected_supporting_skills: [design-visual-regression]
-    should_not_trigger: [research-router]
+    should_not_trigger: [research-hypothesis-planning]
     expected_context: [screenshot, target files]
     expected_output_shape: "implemented page and screenshot check"
     quality_notes: "Implementation intent is explicit."
@@ -77,7 +77,7 @@ cases:
     user_request: "landing page 말고 실제 usable app 첫 화면을 만들어줘."
     expected_primary_skill: design-frontend
     expected_supporting_skills: []
-    should_not_trigger: [research-router]
+    should_not_trigger: [research-hypothesis-planning]
     expected_context: [app purpose, repo stack]
     expected_output_shape: "usable first screen"
     quality_notes: "Respect app-not-landing-page rule."

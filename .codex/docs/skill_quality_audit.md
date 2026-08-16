@@ -2,9 +2,9 @@
 
 Date: 2026-07-15
 Bundle: 9.2.0 (local release cut)
-Scope: the 66 canonical `source/skills/*/SKILL.md` packages in the 9.2.0 cut.
+Scope: historical audit of the 66 canonical `source/skills/*/SKILL.md` packages in the 9.2.0 cut.
 
-This is a maintenance record, not routing context. Do not load it during normal skill selection. App-managed system skills and seven pre-commit skills already removed by consolidation are outside scope. Historical 9.1.1 release-forward evidence and the unpublished 9.1.2 pre-diet baseline retain their original labels; neither is relabeled as 9.2.0 evidence.
+This is a historical maintenance record, not current inventory or routing context. Do not load it during normal skill selection. Later consolidations may retire names in the table; current ownership lives in `skill_registry.md`. App-managed system skills and seven pre-commit skills already removed by consolidation are outside scope. Historical 9.1.1 release-forward evidence and the unpublished 9.1.2 pre-diet baseline retain their original labels; neither is relabeled as 9.2.0 evidence.
 
 ## 9.2.0 Skill Diet Result
 
@@ -63,7 +63,7 @@ The table below preserves the 9.1.2 ownership and behavior audit. The 9.2.0 size
 
 | skill | decision | audit result |
 | --- | --- | --- |
-| `coordination-handoff` | prior + revalidated | Consolidated DAG/handoff/lock-scope owner remains support-only; metadata was shortened. |
+| `plan-task-handoff` | prior + revalidated | Consolidated DAG/handoff/lock-scope owner remains support-only; metadata was shortened. |
 | `design-a11y-audit` | revised | Narrow checks no longer force a full audit schema; interaction evidence remains separate from static hints. |
 | `design-component-mapper` | revised | Output stays scoped while requiring app-surface import/use evidence for approved-catalog reuse and explicit exception boundaries. |
 | `design-frontend` | revised | Surface profiles remain conditional; product-family, component-reuse, and open UX-decision gates now fail closed only when applicable. |
@@ -76,7 +76,7 @@ The table below preserves the 9.1.2 ownership and behavior audit. The 9.2.0 size
 
 | skill | decision | audit result |
 | --- | --- | --- |
-| `evaluation-harness` | prior + revalidated | Case-quality review remains separate from field quality and release verdicts. |
+| `evaluation-harness` | restored | Case-quality review remains a dedicated explicit owner, separate from field quality and release verdicts. |
 | `kanboard-plan-ops` | retained | Existing-board push/pull/validation ownership remains distinct; metadata was shortened. |
 | `kanboard-plan-rollout` | retained | Onboarding/bulk-sync ownership remains distinct; metadata was shortened. |
 | `knowledge-base-init` | added | Explicitly creates only a minimal Markdown store and its project-context manifest entry. |
@@ -85,15 +85,15 @@ The table below preserves the 9.1.2 ownership and behavior audit. The 9.2.0 size
 | `knowledge-base-maintenance` | revised | Maintains generic Markdown records and direct artifact links without claim graphs, projections, or scores. |
 | `knowledge-plan-sync` | added | Admits only accepted durable plan decisions, never the whole plan or implementation chronology. |
 | `knowledge-*-record` | added | Five explicit domain, design, algorithm, architecture, and recurring code-review owners share one small record envelope. |
-| `llm-wiki-context` | added | Uses one explicitly selected Wiki's own navigation method and returns a minimum read-only task context. |
-| `project-context-checkpoint` | added | Classifies clear current-task durable items at explicit commit/closeout boundaries; Stop hooks and implicit collection are excluded. |
+| `analysis-llm-wiki-context` | added | Uses one explicitly selected Wiki's own navigation method and returns a minimum read-only task context. |
+| `workflow-project-context-checkpoint` | added | Classifies clear current-task durable items at explicit commit/closeout boundaries; Stop hooks and implicit collection are excluded. |
 
 ### Loop And Memory
 
 | skill | decision | audit result |
 | --- | --- | --- |
-| `loop-readiness-router` | prior + revalidated | One-shot/checkpoint/LoopRun readiness remains a routing decision, not an executor. |
-| `loop-verifier-registry` | prior + revalidated | Verifier mapping remains fail-closed and cannot self-pass from artifact presence. |
+| `analysis-loop-readiness` | prior + revalidated | One-shot/checkpoint/LoopRun readiness remains a routing decision, not an executor. |
+| `plan-loop-verification` | prior + revalidated | Verifier mapping remains fail-closed and cannot self-pass from artifact presence. |
 | `memory-bank-correction-capture` | revised | Only explicitly persistent project mistakes enter as unverified candidates; complaints alone authorize no write. |
 | `memory-bank-harness` | revised | Reads only the manifest-declared bank and a small task-relevant slice of compact current state. |
 | `memory-bank-init` | revised | Fresh init creates the four-file bank and updates only the manifest's Memory path. |
@@ -136,7 +136,7 @@ The table below preserves the 9.1.2 ownership and behavior audit. The 9.2.0 size
 
 | skill | decision | audit result |
 | --- | --- | --- |
-| `skill-system-repo-adapter` | prior + revalidated | Repository projection remains support-only; semantic authoring stays with the primary owner. |
+| `workflow-skill-system-integration` | prior + revalidated | Repository projection remains support-only; semantic authoring stays with the primary owner. |
 | `workflow-bug-fix` | retained | Direct failure repair remains distinct from RCA-only and recovery; routing metadata is host-neutral. |
 | `workflow-comment-maintenance` | retained | Comment/docstring-only behavior-preserving scope and public-contract guard are distinct. |
 | `workflow-dependency-upgrade` | retained | Manifest/lockfile/migration scope and network/lifecycle boundaries are distinct; routing metadata is host-neutral. |

@@ -26,6 +26,34 @@ Use owner and output intent, not document length, to select the projection:
 The owning skill determines the claims, verdict, evidence boundary, and next action. Canvas only
 determines how those already-supported claims are navigated.
 
+## Runtime Asset Resolution
+
+Before reading this contract or rendering, set `REPORT_SKILL_DIR` to the directory containing the
+active report skill's resolved `SKILL.md`. The current skill catalog's exact `file:` path is the
+authority; the current working directory, repository root, and an inferred install root are not.
+For a Codex local-plugin install, the resolved path normally has this shape:
+
+```text
+~/.codex/plugins/cache/skill-system-local/<plugin-id>/<version>/skills/<report-skill>/SKILL.md
+```
+
+Expand `~` and use the exact exposed path. `<plugin-id>` and `<version>` are placeholders: never
+glob cache versions, choose a presumed latest version, or infer plugin ownership from the skill
+name. A bundle runtime may instead expose `.codex/skills/<report-skill>/SKILL.md`; the same
+resolved-`SKILL.md` rule applies.
+
+Require both `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and
+`$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py`. If either is absent, treat the active
+installation as an incomplete report payload, name the missing local asset, and use the Selection
+Gate's allowed chat fallback. Do not wander through sibling plugins, another cache version,
+`~/.codex/skills`, unrelated repository checkouts, or `.codex/skills/.system` looking for a
+substitute.
+
+Repository authoring uses `source/shared/docs/report_canvas_contract.md`,
+`source/shared/report-canvas/`, and `source/tools/generate_targets.py`. Those paths are only for
+maintaining and projecting the bundle: `generate_targets.py` does not render reports and must not
+be run during an ordinary report invocation.
+
 ## Shared Model
 
 Author a JSON model conforming to `scripts/report-canvas/report-model.schema.json`. The first viewport
@@ -56,7 +84,7 @@ The four modes are:
 | Mode | Use | Typical owners |
 |---|---|---|
 | `decision` | verdict, recommendation, option consequence, one next choice | `report-critical`, `report-qualitative` |
-| `compare` | verified before/after, changed behavior or artifact comparison | `report-diff`, qualitative comparison |
+| `compare` | verified before/after, changed behavior or artifact comparison | `report-implementation-explainer` (`compare`), qualitative comparison |
 | `trace` | causal path, lifecycle progression, state/ownership sequence | `report-implementation-explainer`, `report-lifecycle-artifacts` |
 | `spatial` | authoritative 3D geometry, topology, overlay, and mutation-state inspection | implementation explainer or another explicit 3D report owner |
 
@@ -70,10 +98,12 @@ result in a label merely to bypass the typed model.
 
 ## Rendering
 
-Run from the active generated `report-*` skill directory:
+After resolving the active skill directory, invoke its bundled renderer by absolute path; the
+working directory need not be the skill directory:
 
 ```bash
-python3 scripts/report-canvas/render_report.py \
+REPORT_SKILL_DIR="/absolute/path/to/active/report-skill"
+python3 "$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py" \
   --input /absolute/path/report-model.json \
   --output /absolute/path/report.html
 ```

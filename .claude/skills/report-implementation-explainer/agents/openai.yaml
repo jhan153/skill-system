@@ -1,7 +1,7 @@
 interface:
   display_name: "Implementation Explainer"
-  short_description: "Explain implemented behavior in Canvas HTML"
-  default_prompt: "Use $report-implementation-explainer to explain an existing implementation from source and runtime evidence as Report Canvas HTML."
+  short_description: "Explain implementation or present a verified diff"
+  default_prompt: "Use $report-implementation-explainer in explain mode for source/runtime causal understanding or compare mode for verified changed lines. Keep claims within the selected evidence and do not turn either mode into a readiness verdict."
 
 policy:
   invocation_surface: explicit_procedure

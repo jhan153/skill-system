@@ -76,12 +76,18 @@ Do not turn missing evidence into scores or percentage thresholds. When scores a
 
 For implementation-plan gates, judge only execution-material content: target behavior/scope, likely changed surfaces, risks/non-goals, validation, unresolved decisions, and transition. Optional formatting is not a blocker. For research-plan validation, check hypothesis/fact separation, falsifiability, baselines, isolating ablations, loss-versus-metric separation, and support/refute/inconclusive outcomes; do not rewrite the plan unless asked.
 
+## Canvas Asset Resolution
+
+For every admitted invocation, set `REPORT_SKILL_DIR` to the directory containing this active skill's resolved `SKILL.md`; use the exact `file:` path exposed by the current skill catalog. The bundled contract documents the Codex plugin-cache layout explicitly. Never guess, glob, or select an install/cache version from the current working directory.
+
+Require `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py`. `source/tools/generate_targets.py` only projects repository assets and is not the report renderer. If either local file is missing, report an incomplete installed payload and use the contract's allowed chat fallback; do not search sibling plugins, unrelated checkouts, alternate global skill roots, or app-managed system skills for substitutes.
+
 ## Output And Stop
 Start with one-line `primary_problem`, then only applicable fields: `mode`, `confidence`, `evidence_status`, up to two `root_causes`, up to three severity-ordered `top_findings`, `qa_verdict` and `risk_level` for `qa_gate`, decision-changing `missing_information`, exactly one `next_best_action`, and remaining `verification_items`.
 
-For every admitted invocation, read `references/report_canvas_contract.md` and render the primary human-facing review as Report Canvas `decision` HTML with `scripts/report-canvas/render_report.py`. Return only a concise chat receipt with the outcome and artifact link. Use chat-only output only when the user explicitly prohibits file creation or the host has no safe artifact surface. Canvas does not change the verdict, evidence threshold, three-finding ceiling, or one-action stop; set the closing action to `kind: next`.
+Read `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and render the primary human-facing review as Report Canvas `decision` HTML with `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py`. Return only a concise chat receipt with the outcome and artifact link. Use chat-only output only when the user explicitly prohibits file creation, the host has no safe artifact surface, or the resolved installed payload is incomplete. Canvas does not change the verdict, evidence threshold, three-finding ceiling, or one-action stop; set the closing action to `kind: next`.
 
-Keep `next_best_action` atomic. Do not dump a blank schema, rewrite the artifact, implement fixes, or soften `abstain` into pass. Stop after review. Route diff presentation to `report-diff`, qualitative assessment to `report-qualitative`, research peer review to `research-peer-review`, and implementation to its owning workflow.
+Keep `next_best_action` atomic. Do not dump a blank schema, rewrite the artifact, implement fixes, or soften `abstain` into pass. Stop after review. Route changed-line presentation to `report-implementation-explainer` in `compare` mode, qualitative assessment to `report-qualitative`, research peer review to `research-peer-review`, and implementation to its owning workflow.
 
 ## Validation And Limits
 - Mode, target, goal, and material criteria are explicit; findings have tight evidence locations and calibrated status.

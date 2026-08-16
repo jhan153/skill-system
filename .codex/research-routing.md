@@ -1,6 +1,6 @@
 # Research Routing
 
-Detailed routing for the 6.0 Research Cluster. Keep `.codex/context-routing.md` thin; use this file for internal research stage routing, artifact ownership, and links to canonical research evals.
+Direct stage routing for the Research Cluster. The current task owner uses this file only when the requested scientific artifact or latest verified upstream state does not already select one specialist.
 
 ## Cluster Principles
 - `codex-research-lifecycle.zip` is source material only; do not install `codex-research-lifecycle` as a monolithic skill.
@@ -15,7 +15,8 @@ Detailed routing for the 6.0 Research Cluster. Keep `.codex/context-routing.md` 
 ## Route Matrix
 | Request | Primary skill | Next skill(s) | Default exclude |
 | --- | --- | --- | --- |
-| research stage unclear | `research-router` | selected narrow skill | monolithic lifecycle, `.system` |
+| research stage genuinely unclear | current task owner asks for the missing deliverable/upstream distinction | selected narrow skill after clarification | monolithic lifecycle, `.system`, speculative multi-stage fan-out |
+| one claim needs independent evidence lanes | `search-deep-evidence` | research stage owner after evidence is ready | lane router, premature synthesis |
 | latest papers/evidence/citations | `search-paper-evidence` | synthesis or ideation if requested | scaffold, manuscript, statistics |
 | literature review / related work | `research-literature-synthesis` | ideation if requested | scaffold, blueprint |
 | gap / hypothesis ideation | `research-literature-ideation` | hypothesis planning | scaffold, manuscript |
@@ -25,6 +26,8 @@ Detailed routing for the 6.0 Research Cluster. Keep `.codex/context-routing.md` 
 | statistical analysis | `research-statistical-analysis` | manuscript writing | paper search, scaffold |
 | manuscript writing | `research-manuscript-writing` | peer review | scaffold, statistics unless results missing |
 | peer review | `research-peer-review` | revision planning | manuscript generation unless requested |
+
+Select by requested artifact, not research vocabulary. Identify the latest verified upstream artifact; if it is missing, choose the earliest stage that can produce it and keep later stages gated. Use a sequence only for an explicitly multi-stage outcome whose included stages can produce the next inputs. Concrete implementation of an already selected method remains development work.
 
 ## Artifact Ownership
 | Artifact | Owning skill |

@@ -49,4 +49,4 @@ description: Upgrade one dependency, runtime, framework, SDK, package, or lockfi
 Return only applicable fields: target/scope, changed canonical state and migrations, selected-version/path evidence, lockfile review, condition-scoped validation, unresolved conditions, rollback, and next action. Do not claim an upgrade from manifest text, mocks, agent-authored tests, or command exit alone.
 
 ## Cross-Skill Boundaries
-- `workflow-implementation` owns unrelated feature work; `analysis-algorithm` owns choice-only analysis; `workflow-comment-maintenance` owns comments/docs-only work; `workflow-validation` owns validation-only matrices; `report-critical` owns security/release verdicts; `analysis-performance` owns bottleneck diagnosis; `workflow-recovery` owns repeated failure recovery.
+- `workflow-implementation` owns unrelated feature work; `analysis-algorithm` owns choice-only analysis; `workflow-source-maintenance` owns comment-only work in `comment_sync`; `workflow-validation` owns validation-only matrices; `report-critical` owns security/release verdicts; `analysis-performance` owns bottleneck diagnosis; `workflow-recovery` owns repeated failure recovery.

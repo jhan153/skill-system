@@ -13,7 +13,7 @@ description: Package explicitly requested lifecycle artifacts and traceability a
   - Lifecycle records must be linked in a formal traceability matrix.
 - do_not_use_when:
   - Do not use for implementation, planning, `docs/plan` sync, validation execution, critique-only review, or memory promotion.
-  - Changed files plus validation notes use `coordination-handoff`; blocker-first QA critique uses `report-critical`.
+  - Changed files plus validation notes use `plan-task-handoff`; blocker-first QA critique uses `report-critical`.
   - Missing evidence does not cancel explicit packaging; preserve the unresolved result.
 - expected_inputs: package scope or sources; evidence anchors for result claims
 - expected_outputs: Report Canvas `trace` HTML index plus the requested canonical artifact pack, traceability matrix, condition-scoped statuses, and gaps
@@ -60,17 +60,23 @@ Never lower an unresolved status because a narrower check passed. Change the sam
 
 If the exact condition is structural, such as a matrix with valid stable links, a structural check may close only that condition. Planned-shell delivery may be package-complete while represented results remain planned or not executed.
 
+## Canvas Asset Resolution
+
+For every admitted invocation, set `REPORT_SKILL_DIR` to the directory containing this active skill's resolved `SKILL.md`; use the exact `file:` path exposed by the current skill catalog. The bundled contract documents the Codex plugin-cache layout explicitly. Never guess, glob, or select an install/cache version from the current working directory.
+
+Require `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py`. `source/tools/generate_targets.py` only projects repository assets and is not the report renderer. If either local file is missing, report an incomplete installed payload and use the contract's allowed chat fallback; do not search sibling plugins, unrelated checkouts, alternate global skill roots, or app-managed system skills for substitutes.
+
 ## Traceability And Output
 
 Prefer stable IDs: `REQ-*`, `AC-*`, `WBS-*`, `HLD-*`, `LLD-*`, `TEST-*`, `SEC-*`, `REL-*`, and `RETRO-*`.
 
 Return only needed sections: `artifact_scope`, `source_artifacts`, `artifact_pack`, `traceability_matrix`, `evidence_status`, `gaps`, and `handoff_targets`. Link completed claims to condition-scoped evidence.
 
-Persist the requested canonical artifacts in their required formats. For every admitted invocation, read `references/report_canvas_contract.md` and render the primary human-facing entry point with `scripts/report-canvas/render_report.py` as Report Canvas `trace` HTML whose nodes identify the canonical artifacts and condition-scoped evidence. Declare `trace_kind: lifecycle` and set every node's typed `lifecycle_status` to the preserved lifecycle result while keeping node `status` limited to evidence confidence; the renderer rejects a lifecycle trace that omits either contract. Never collapse the two axes into label/detail prose. Return only a concise chat receipt with package status and the Canvas link. Use chat-only output only when the user explicitly prohibits file creation or the host has no safe artifact surface. Canvas is navigation over the package, not the package or proof of lifecycle completion.
+Persist the requested canonical artifacts in their required formats. Read `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and render the primary human-facing entry point with `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py` as Report Canvas `trace` HTML whose nodes identify the canonical artifacts and condition-scoped evidence. Declare `trace_kind: lifecycle` and set every node's typed `lifecycle_status` to the preserved lifecycle result while keeping node `status` limited to evidence confidence; the renderer rejects a lifecycle trace that omits either contract. Never collapse the two axes into label/detail prose. Return only a concise chat receipt with package status and the Canvas link. Use chat-only output only when the user explicitly prohibits file creation, the host has no safe artifact surface, or the resolved installed payload is incomplete. Canvas is navigation over the package, not the package or proof of lifecycle completion.
 
 ## Owner Boundaries
 
 - `plan-requirements-discovery`: elicitation; `plan-requirements-brief`: requirements contracts.
 - `plan-long-term-package`: heavy phase planning; `plan-short-term-docs`: active implementation design/status sync.
 - `workflow-plan-runner`: plan execution; `workflow-validation`: validation strategy/execution.
-- `coordination-handoff`: small task-local inventories; `report-critical`: blocker-first critique.
+- `plan-task-handoff`: small task-local inventories; `report-critical`: blocker-first critique.

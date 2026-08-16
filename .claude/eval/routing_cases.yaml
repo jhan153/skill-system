@@ -1,14 +1,14 @@
-version: "9.4.4"
+version: "9.4.5"
 purpose: "Positive routing examples for common requests."
 cases:
   - case_id: route-001
     schema_version: 2
-    behavior_contract_owners: [analysis-router]
+    behavior_contract_owners: [analysis-bug]
     scenario_tags: [edge]
     user_request: "analysis-bug로 이 장애를 분석해줘."
     expected_primary_skill: analysis-bug
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase, analysis-router]
+    should_not_trigger: [analysis-codebase]
     expected_context: [symptom, repro, logs]
     expected_output_shape: "root cause analysis"
     quality_notes: "Explicit skill invocation wins."
@@ -17,18 +17,15 @@ cases:
       - route_to_analysis_bug
     forbidden_behaviors:
       - route_to_analysis_codebase
-      - route_to_analysis_router
     required_evidence:
       - type: route_match
         expected: analysis-bug
-      - type: route_absence
-        expected: analysis-router
   - case_id: route-002
     schema_version: 2
     user_request: "srq로 검증 결과를 보고해줘."
     expected_primary_skill: report-qualitative
     expected_supporting_skills: []
-    should_not_trigger: [workflow-rigor]
+    should_not_trigger: []
     expected_context: [verified work, command outputs]
     expected_output_shape: "compact evidence-first report"
     quality_notes: "Legacy srq uses report-qualitative compact evidence report mode."
@@ -36,7 +33,7 @@ cases:
     expected_behaviors:
       - compact_evidence_first_report
     forbidden_behaviors:
-      - route_to_workflow_rigor
+      - claim_field_quality_from_report_shape
     required_evidence:
       - type: command_exit
         expected: 0
@@ -45,7 +42,7 @@ cases:
     user_request: "이 SKILL.md 초안을 실사용성, 근거성, 리스크, 개선 우선순위 관점에서 정성평가 리포트로 작성해줘."
     expected_primary_skill: report-qualitative
     expected_supporting_skills: []
-    should_not_trigger: [report-critical, report-diff, evaluation-harness]
+    should_not_trigger: [report-critical, report-implementation-explainer]
     expected_family: report
     expected_context: [artifact, evaluation_goal, criteria, evidence_anchors]
     expected_output_shape: "qualitative evaluation report"
@@ -67,11 +64,11 @@ cases:
     user_request: "이 diff를 품질, 리스크, 개선안 중심으로 정성평가해줘."
     expected_primary_skill: report-qualitative
     expected_supporting_skills: []
-    should_not_trigger: [report-diff, report-critical]
+    should_not_trigger: [report-implementation-explainer, report-critical]
     expected_family: report
     expected_context: [diff_or_change_snapshot, evaluation_goal, risk_criteria, evidence_anchors]
     expected_output_shape: "qualitative diff evaluation without changed-line diff blocks"
-    quality_notes: "A diff can be the evaluated artifact; changed-line presentation still belongs to report-diff unless explicitly requested."
+    quality_notes: "A diff can be the evaluated artifact; changed-line presentation still belongs to report-implementation-explainer compare mode unless explicitly requested."
     friction_risk: "confusing qualitative judgment with readable diff output"
     expected_behaviors:
       - evaluate_diff_qualitatively
@@ -85,13 +82,13 @@ cases:
   - case_id: route-003
     schema_version: 2
     user_request: "새 Skill System source skill pack 만들어줘."
-    expected_primary_skill: null
-    expected_route_class: direct_task_owner
-    expected_supporting_skills: [skill-system-repo-adapter]
-    should_not_trigger: [research-router]
+    behavior_contract_owners: [workflow-implementation]
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: []
+    should_not_trigger: []
     expected_context: [skill name, use case, source target, requested behavior, plugin membership decision]
-    expected_output_shape: "direct task-owner implementation plus canonical source integration and repository validation"
-    quality_notes: "The current task owner handles repository skill authoring; skill-system-repo-adapter is integration support only."
+    expected_output_shape: "workflow implementation plus canonical source integration and repository validation"
+    quality_notes: "The implementation owner handles skill semantics and follows canonical-source, generation, and repository-validation rules directly."
     friction_risk: "implicitly invoking app-managed skill-creator or touching .system, live home runtime, generated mirrors, or plugin cache"
     expected_behaviors:
       - author_skill_with_current_task_owner
@@ -102,17 +99,17 @@ cases:
       - hand_edit_plugin_cache
       - let_repository_adapter_override_authoring
     required_evidence:
-      - type: route_class
-        expected: direct_task_owner
+      - type: route_match
+        expected: workflow-implementation
   - case_id: route-skill-adapter-001
     schema_version: 2
     user_request: "이미 작성한 source skill을 이 저장소 plugin manifest에 넣고 runtime/plugin target을 동기화해줘."
     expected_primary_skill: workflow-implementation
-    expected_supporting_skills: [skill-system-repo-adapter]
+    expected_supporting_skills: []
     should_not_trigger: [analysis-codebase]
     expected_context: [authored skill source, target plugin manifest, generation commands, bundle validation]
     expected_output_shape: "canonical integration diff, generated targets, and repository validation"
-    quality_notes: "No authoring decision remains; the adapter supports repository integration only."
+    quality_notes: "No authoring decision remains; workflow-implementation performs the bounded repository integration directly."
     friction_risk: "reopening authoring decisions or hand-editing generated mirrors"
     expected_behaviors:
       - integrate_authored_skill_in_canonical_source
@@ -130,10 +127,10 @@ cases:
     user_request: "논문 관련 evidence search 해줘."
     expected_primary_skill: search-paper-evidence
     expected_supporting_skills: []
-    should_not_trigger: [search-router, research-router, research-manuscript-writing]
+    should_not_trigger: [research-manuscript-writing]
     expected_context: [topic, source constraints, date range]
     expected_output_shape: "evidence ledger"
-    quality_notes: "The paper lane is explicit, so route directly to acquisition; use search-router only when the evidence lane is ambiguous or cross-domain."
+    quality_notes: "The paper lane is explicit, so route directly to acquisition; a genuinely multi-lane claim routes to search-deep-evidence."
     friction_risk: "unsupported citations"
     expected_behaviors:
       - create_evidence_ledger
@@ -198,7 +195,7 @@ cases:
     user_request: "이 PR 코멘트들을 비판적으로 검토해줘."
     expected_primary_skill: report-critical
     expected_supporting_skills: []
-    should_not_trigger: [report-diff]
+    should_not_trigger: [report-implementation-explainer]
     expected_context: [comments, patch, tests]
     expected_output_shape: "findings first"
     quality_notes: "Review stance."
@@ -247,12 +244,12 @@ cases:
   - case_id: route-011
     schema_version: 2
     user_request: "old plan들이 context를 오염시키는 것 같아. active plan만 남기고 load policy를 정리해줘."
-    expected_primary_skill: plan-spec-curator
+    expected_primary_skill: plan-short-term-docs
     expected_supporting_skills: []
-    should_not_trigger: [plan-short-term-docs, coordination-handoff, memory-bank-maintenance]
+    should_not_trigger: [plan-task-handoff, memory-bank-maintenance]
     expected_context: [current_goal, candidate_plan_index]
     expected_output_shape: "active context decision and archive/load policy"
-    quality_notes: "Context lifecycle curation is separate from plan artifact writing and memory maintenance."
+    quality_notes: "Context lifecycle curation is plan-short-term-docs curation mode, separate from active-plan authoring and memory maintenance."
     friction_risk: "opening every old plan before admission"
     expected_behaviors:
       - curate_active_context_policy
@@ -260,7 +257,7 @@ cases:
       - load_all_old_plans_by_default
     required_evidence:
       - type: route_match
-        expected: plan-spec-curator
+        expected: plan-short-term-docs
   - case_id: route-plan-requirements-discovery-001
     schema_version: 2
     user_request: "구현 전에 요구사항을 한 번에 하나씩 질문해서 범위, 예외, 디자인 방향을 끌어내줘."
@@ -270,10 +267,12 @@ cases:
     expected_family: planning
     expected_context: [rough_goal, domain_hints, user_answers]
     expected_output_shape: "requirements discovery interview and discovery record"
-    quality_notes: "Explicit human-in-loop requirements interview routes to requirements discovery, not implementation or docs/plan sync."
-    friction_risk: "asking broad multi-question forms instead of one decision-bearing question at a time"
+    quality_notes: "Explicit human-in-loop requirements interview routes to requirements discovery and honors the user's requested one-at-a-time pacing."
+    friction_risk: "ignoring explicit pacing or expanding into implementation/docs sync"
     expected_behaviors:
-      - ask_one_decision_question_at_a_time
+      - build_decision_dependency_graph
+      - honor_explicit_one_at_a_time_pacing
+      - ask_one_ready_decision
     forbidden_behaviors:
       - start_implementation
       - create_docs_plan_by_default
@@ -304,7 +303,7 @@ cases:
     user_request: "요구사항 기록, PRD, HLD/LLD 플랜, 테스트/QA/보안/릴리즈 체크를 SDLC 산출물 패키지와 traceability matrix로 만들어줘."
     expected_primary_skill: report-lifecycle-artifacts
     expected_supporting_skills: []
-    should_not_trigger: [coordination-handoff, report-critical, workflow-validation]
+    should_not_trigger: [plan-task-handoff, report-critical, workflow-validation]
     expected_family: report
     expected_context: [requirements_artifacts, planning_artifacts, validation_evidence, traceability_needs]
     expected_output_shape: "lifecycle artifact pack and traceability matrix"
@@ -322,27 +321,28 @@ cases:
   - case_id: route-grp-001
     schema_version: 2
     required_eval_mode: replay
-    behavior_contract_owners: [analysis-router]
     user_request: "분석 스킬군에서 적절한 스킬 골라줘."
-    expected_primary_skill: analysis-router
+    expected_primary_skill: null
+    expected_route_class: direct_task_owner
     expected_supporting_skills: []
-    should_not_trigger: []
+    should_not_trigger: [analysis-bug, analysis-algorithm]
     expected_family: analysis
     expected_context: [request intent, family alias map]
-    expected_output_shape: "group entry selection"
-    quality_notes: "Explicit 스킬군 framing enters group-selection mode; analysis entry is analysis-router."
-    friction_risk: "selecting a non-entry skill in the family"
+    expected_output_shape: "bounded request for the missing analysis deliverable or direct narrow specialist selection when inferable"
+    quality_notes: "Explicit 스킬군 framing resolves the family, but an underspecified analysis deliverable does not justify an arbitrary router or specialist."
+    friction_risk: "inventing a router surface or selecting an arbitrary specialist"
     expected_behaviors:
-      - select_analysis_family_entry
+      - resolve_analysis_family
+      - ask_for_missing_analysis_deliverable
       - route_without_repository_inspection
       - stop_after_group_entry_selection
     forbidden_behaviors:
-      - select_non_entry_skill_by_default
+      - select_arbitrary_specialist
       - inspect_repository_during_routing
-      - execute_specialist_analysis_in_router
+      - execute_specialist_analysis_without_a_selected_deliverable
     required_evidence:
-      - type: route_match
-        expected: analysis-router
+      - type: route_class
+        expected: direct_task_owner
       - type: context_scope
         expected: no_repository_context
       - type: router_stop
@@ -369,28 +369,35 @@ cases:
     user_request: "검색 스킬군으로 논문 근거 찾아줘."
     expected_primary_skill: search-paper-evidence
     expected_supporting_skills: []
-    should_not_trigger: [research-router]
+    should_not_trigger: []
     expected_family: search
     expected_context: [topic, evidence intent]
     expected_output_shape: "evidence ledger"
-    quality_notes: "Search group entry is search-router (Phase B); whole task must not route to the research cluster."
+    quality_notes: "The requested paper lane routes directly to search-paper-evidence; the whole task must not route to the research cluster."
     friction_risk: "routing the whole task to the research cluster"
   - case_id: route-grp-004
-    user_request: "search-router로 이 코드 근거 좀 찾아줘."
-    expected_primary_skill: search-router
+    schema_version: 2
+    legacy_alias: search-router
+    expected_mode: evidence_lane_selection
+    direct_invocation: false
+    user_request: "legacy ID search-router 방식으로 이 코드 근거에 맞는 evidence lane만 골라줘."
+    expected_primary_skill: null
+    expected_route_class: direct_task_owner
     expected_supporting_skills: []
-    should_not_trigger: [research-router]
-    expected_family: search
+    should_not_trigger: [search-paper-evidence, search-deep-evidence]
     expected_context: [topic, evidence domain hints]
     expected_output_shape: "selected evidence lane and handoff"
-    quality_notes: "search-router selects the evidence lane; it does not own synthesis or implementation."
-    friction_risk: "router owning evidence collection itself"
+    quality_notes: "The removed router alias maps to current-owner lane selection without recreating a router package."
+    friction_risk: "recreating the retired router or owning evidence collection in a lane-choice-only request"
+    expected_behaviors: [resolve_legacy_alias, select_one_sufficient_evidence_lane]
+    forbidden_behaviors: [load_removed_skill_stub, acquire_or_synthesize_evidence]
+    required_evidence: [{type: route_class, expected: direct_task_owner}]
   - case_id: route-workflow-001
     schema_version: 2
     user_request: "이 승인된 스펙대로 Phase 1 초기 구현을 진행해줘."
     expected_primary_skill: workflow-plan-runner
     expected_supporting_skills: [workflow-rigor, workflow-validation]
-    should_not_trigger: [plan-long-term-package, coordination-handoff]
+    should_not_trigger: [plan-long-term-package, plan-task-handoff]
     expected_family: workflow
     expected_context: [approved spec, target phase, source files, validation contract]
     expected_output_shape: "one source-anchored implementation batch with validation and separate batch/phase/plan status"
@@ -410,7 +417,7 @@ cases:
     user_request: "이 변경을 어떻게 검증할지 validation matrix만 짜줘."
     expected_primary_skill: workflow-validation
     expected_supporting_skills: []
-    should_not_trigger: [evaluation-harness, report-critical]
+    should_not_trigger: [report-critical]
     expected_family: workflow
     expected_context: [changed artifact, success criteria, available checks]
     expected_output_shape: "validation matrix"
@@ -430,7 +437,7 @@ cases:
     user_request: "이 승인된 plan package의 Batch 2를 실제 코드 변경으로 실행하고 검증까지 해줘."
     expected_primary_skill: workflow-plan-runner
     expected_supporting_skills: [workflow-validation]
-    should_not_trigger: [plan-long-term-package, coordination-handoff]
+    should_not_trigger: [plan-long-term-package, plan-task-handoff]
     expected_family: workflow
     expected_context: [approved package, batch id, executable scope, validation expectation]
     expected_output_shape: "source_anchor, changed implementation artifacts, validation evidence, batch_status, and only evidence-backed phase/plan status"
@@ -458,27 +465,60 @@ cases:
     friction_risk: "broad repo analysis or weakening validation"
   - case_id: route-workflow-minimal-001
     schema_version: 2
-    user_request: "최소 구현으로 이 기능 추가해줘. 새 의존성은 가능하면 피하고 과잉 추상화도 막아줘."
-    expected_primary_skill: null
+    user_request: "workflow-implementation에 최소 구현 규칙을 붙여 shared Handle 위치 변경을 구현해줘. owner 생성→spatial identity→render routing→depth→visible geometry→picking 계약이 모두 닫혀야 하고, 새 의존성이나 과잉 추상화는 피하면서 바로 적용해줘."
+    expected_primary_skill: workflow-implementation
     expected_supporting_skills: [workflow-minimal-implementation]
     should_not_trigger: [analysis-codebase, plan-long-term-package]
     expected_family: workflow
-    expected_context: [requested behavior, relevant files, validation command]
-    expected_output_shape: "smallest coherent implementation with focused validation"
-    quality_notes: "Minimal implementation is an execution modifier attached to the task-specific implementation path."
-    friction_risk: "turning YAGNI pressure into a broad architecture review"
+    expected_context: [positive objective, canonical artifacts and owner, actual production paths, materially affected consumers, invariants and dependency order, picking disconfirming case, validation command]
+    expected_output_shape: "smallest complete Handle behavior across the required production path with focused validation"
+    quality_notes: "Minimality constrains solution shape only after workflow-implementation establishes the complete required behavior boundary."
+    friction_risk: "fixing one convenient caller, treating urgency as shallow-investigation permission, or turning YAGNI pressure into an unbounded architecture review"
     expected_behaviors:
+      - classify_nontrivial_behavior_boundary
+      - establish_complete_required_behavior_boundary
+      - trace_materially_affected_consumers
+      - seek_disconfirming_picking_case
+      - implement_smallest_complete_behavior
+      - derive_delivery_topology_from_dependencies_and_overlap
       - attach_minimal_implementation_modifier
     forbidden_behaviors:
+      - use_minimality_to_bound_investigation
+      - implement_one_convenient_caller_only
+      - parallelize_across_unresolved_ownership
       - add_speculative_abstraction
     required_evidence:
       - type: route_match
-        expected: workflow-minimal-implementation
+        expected: workflow-implementation
+  - case_id: route-workflow-implementation-local-negative-001
+    schema_version: 2
+    scenario_tags: [negative, local]
+    user_request: "workflow-implementation으로 src/ui/SettingsButton.tsx의 label literal을 Save에서 Apply로 바꿔줘. 동작, event handler, ownership은 그대로고 다른 변경은 하지 마."
+    expected_primary_skill: workflow-implementation
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-minimal-implementation, analysis-codebase, plan-long-term-package]
+    expected_family: workflow
+    expected_context: [named file and literal, unchanged behavior boundary, one representative caller-to-output path]
+    expected_output_shape: "one local edit with focused readback and no full-frame expansion"
+    quality_notes: "A proven one-owner, one-path edit remains local; the full-frame gate is conditional, not a mandatory repository scan."
+    friction_risk: "over-reading callers or architecture after the request already fixes the complete local boundary"
+    expected_behaviors:
+      - classify_genuinely_local_change
+      - inspect_one_representative_path
+      - make_smallest_coherent_diff
+    forbidden_behaviors:
+      - reconstruct_full_working_frame_without_invalidation
+      - scan_all_repository_consumers
+      - add_abstraction_or_dependency
+      - invoke_analysis_codebase
+    required_evidence:
+      - type: route_match
+        expected: workflow-implementation
   - case_id: hs-pos-001
     user_request: "이번 작업 산출물과 검증 내역 정리해줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
-    should_not_trigger: [report-diff, report-critical]
+    should_not_trigger: [report-implementation-explainer, report-critical]
     expected_family: coordination
     expected_context: [changed files, validation evidence]
     expected_output_shape: "artifact inventory (changed/generated/validation/followups)"
@@ -498,7 +538,7 @@ cases:
     user_request: "이 논문 근거를 찾아서 구현 플랜에 반영해줘."
     expected_primary_skill: null
     expected_supporting_skills: [search-paper-evidence]
-    should_not_trigger: [research-router]
+    should_not_trigger: []
     expected_family: none
     expected_context: [implementation goal, paper topic]
     expected_output_shape: "implementation/planning primary with paper evidence as support"
@@ -506,23 +546,23 @@ cases:
     friction_risk: "routing the whole task to research"
   - case_id: route-kanboard-rollout-001
     user_request: "이 repo의 docs/plan 들을 칸보드에 올리고 등록해서 한 번에 동기화해줘."
-    expected_primary_skill: kanboard-plan-rollout
+    expected_primary_skill: kanboard-plan
     expected_supporting_skills: []
-    should_not_trigger: [kanboard-plan-ops, plan-short-term-docs]
+    should_not_trigger: [plan-short-term-docs]
     expected_family: workflow
     expected_context: [workspace path, docs/plan, approval boundary]
     expected_output_shape: "register + sync-all dry-run then apply on approval"
-    quality_notes: "Onboarding/bulk register+sync is rollout, not single-board ops."
+    quality_notes: "Onboarding/bulk register+sync selects kanboard-plan rollout mode, not ops mode."
     friction_risk: "applying live before dry-run approval"
   - case_id: route-kanboard-ops-001
     user_request: "plan 바뀐 내용 칸보드 보드에 반영하고, 보드에서 수동으로 옮긴 것들 변경 후보로 알려줘."
-    expected_primary_skill: kanboard-plan-ops
+    expected_primary_skill: kanboard-plan
     expected_supporting_skills: []
-    should_not_trigger: [kanboard-plan-rollout]
+    should_not_trigger: []
     expected_family: workflow
     expected_context: [registered workspace, plan path]
     expected_output_shape: "markdown-primary push + pull candidates (markdown unchanged)"
-    quality_notes: "Ongoing push/pull on a registered board is ops, not onboarding."
+    quality_notes: "Ongoing push/pull on a registered board selects kanboard-plan ops mode, not rollout mode."
     friction_risk: "promoting completion to markdown without evidence"
   - case_id: route-plan-state-001
     schema_version: 2
@@ -550,7 +590,7 @@ cases:
     schema_version: 2
     user_request: "/goal로 돌리기 전에 이 active plan의 성공 조건, verifier evidence, stop policy를 계약으로 만들어줘."
     expected_primary_skill: plan-loop-term
-    expected_supporting_skills: [loop-verifier-registry]
+    expected_supporting_skills: []
     should_not_trigger: [workflow-loop-runner, workflow-plan-runner]
     expected_family: planning
     expected_context: [active_plan, success_conditions, verifier_evidence, stop_policy]
@@ -617,48 +657,48 @@ cases:
     expected_mode: brief
     direct_invocation: false
     user_request: "legacy ID coordination-brief를 써서 이 plan을 작은 handoff DAG로 정리해줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
     should_not_trigger: [plan-long-term-package]
     expected_context: [legacy_alias_map, active_plan, brief_mode]
-    expected_output_shape: "coordination-handoff brief mode"
+    expected_output_shape: "plan-task-handoff brief mode"
     quality_notes: "Model-visible legacy text maps to the current owner without a stub package."
     friction_risk: "loading or recreating the removed skill"
     expected_behaviors: [resolve_legacy_alias, select_brief_mode]
     forbidden_behaviors: [load_removed_skill_stub, claim_legacy_command_installed]
-    required_evidence: [{type: route_match, expected: coordination-handoff}]
+    required_evidence: [{type: route_match, expected: plan-task-handoff}]
   - case_id: route-legacy-coordination-multi-agent-001
     schema_version: 2
     legacy_alias: coordination-multi-agent
     expected_mode: multi_agent
     direct_invocation: false
     user_request: "legacy ID coordination-multi-agent로 파일 lock scope와 validation owner를 나눠줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
     should_not_trigger: [workflow-plan-runner]
     expected_context: [legacy_alias_map, workstreams, multi_agent_mode]
-    expected_output_shape: "coordination-handoff multi_agent mode"
+    expected_output_shape: "plan-task-handoff multi_agent mode"
     quality_notes: "The merged owner preserves explicit multi-agent handoff intent."
     friction_risk: "dropping lock-scope semantics during migration"
     expected_behaviors: [resolve_legacy_alias, select_multi_agent_mode]
     forbidden_behaviors: [load_removed_skill_stub, create_persistent_workflow_state]
-    required_evidence: [{type: route_match, expected: coordination-handoff}]
+    required_evidence: [{type: route_match, expected: plan-task-handoff}]
   - case_id: route-legacy-artifact-inventory-001
     schema_version: 2
     legacy_alias: report-artifact-inventory
     expected_mode: artifact_inventory
     direct_invocation: false
     user_request: "legacy ID report-artifact-inventory로 이번 작업 산출물과 검증만 정리해줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
-    should_not_trigger: [report-lifecycle-artifacts, report-diff]
+    should_not_trigger: [report-lifecycle-artifacts, report-implementation-explainer]
     expected_context: [legacy_alias_map, changed_files, validation_evidence]
-    expected_output_shape: "coordination-handoff artifact_inventory mode"
+    expected_output_shape: "plan-task-handoff artifact_inventory mode"
     quality_notes: "Task-local inventory maps to the merged coordination support owner."
     friction_risk: "escalating a small inventory into a lifecycle report"
     expected_behaviors: [resolve_legacy_alias, select_artifact_inventory_mode]
     forbidden_behaviors: [load_removed_skill_stub, create_persistent_registry]
-    required_evidence: [{type: route_match, expected: coordination-handoff}]
+    required_evidence: [{type: route_match, expected: plan-task-handoff}]
   - case_id: route-legacy-design-mobile-001
     schema_version: 2
     legacy_alias: design-mobile-screen
@@ -715,13 +755,13 @@ cases:
     user_request: "legacy ID create-skill-pack으로 새 source skill을 만들고 이 저장소에 통합해줘."
     expected_primary_skill: null
     expected_route_class: direct_task_owner
-    expected_supporting_skills: [skill-system-repo-adapter]
+    expected_supporting_skills: []
     should_not_trigger: [analysis-codebase]
     expected_context: [legacy_alias_map, authoring_request, repository_target]
-    expected_output_shape: "direct task-owner implementation with repository adapter integration"
+    expected_output_shape: "direct task-owner implementation following repository integration rules"
     quality_notes: "The current task owner handles semantics without implicitly invoking the app-managed skill creator."
     friction_risk: "attaching system skill-creator merely because the artifact is a skill"
-    expected_behaviors: [resolve_legacy_alias, preserve_task_owner, attach_repository_adapter]
+    expected_behaviors: [resolve_legacy_alias, preserve_task_owner, follow_repository_integration_rules]
     forbidden_behaviors: [load_removed_skill_stub, implicitly_invoke_system_skill_creator]
     required_evidence: [{type: route_class, expected: direct_task_owner}]
   - case_id: route-legacy-direct-slash-001
@@ -749,7 +789,7 @@ cases:
     user_request: "이번에 붙인 mesh split이 내부에서 어떤 순서로 mesh를 바꾸는지 아직 감이 안 와. 코드리뷰할 때 볼 수 있게 실제 코드 경로와 한 실행 예시를 엮은 HTML로 보여줘. 계산이 존재하는 것과 에디터에서 실제로 조작·출시할 수 있는 상태는 구분해줘."
     expected_primary_skill: report-implementation-explainer
     expected_supporting_skills: []
-    should_not_trigger: [report-diff, report-qualitative, report-critical, analysis-algorithm, plan-behavior-discovery]
+    should_not_trigger: [report-qualitative, report-critical, analysis-algorithm, plan-behavior-discovery]
     expected_family: report
     expected_context: [concrete_snapshot, production_source_path, representative_runtime_trace, authoritative_geometry_and_issue_indices, next_product_decision]
     expected_output_shape: "source/runtime-anchored Report Canvas spatial explainer with separate capability, operability, and release status"
@@ -780,7 +820,7 @@ cases:
     user_request: "이 설계안의 출시 준비도를 근거 중심으로 평가해줘. 긴 Markdown 대신 결론, 최대 세 findings, 다음 행동이 첫 화면에 보이고 근거는 펼쳐볼 수 있는 HTML 리포트로 남겨줘."
     expected_primary_skill: report-qualitative
     expected_supporting_skills: []
-    should_not_trigger: [report-critical, report-diff, report-implementation-explainer]
+    should_not_trigger: [report-critical, report-implementation-explainer]
     expected_family: report
     expected_context: [target_design, intended_release_use, decisive_evidence, report_canvas_contract]
     expected_output_shape: "Report Canvas decision artifact with conclusion-first first viewport, at most three findings, one action, and progressive evidence"
@@ -809,7 +849,7 @@ cases:
     user_request: "결제 데이터 마이그레이션 계획이 배포 게이트를 통과해도 되는지 블로커와 근거 중심으로 판정해줘."
     expected_primary_skill: report-critical
     expected_supporting_skills: []
-    should_not_trigger: [report-qualitative, report-diff, workflow-implementation]
+    should_not_trigger: [report-qualitative, report-implementation-explainer, workflow-implementation]
     expected_family: report
     expected_context: [migration_plan, release_criteria, decisive_evidence, report_canvas_contract]
     expected_output_shape: "Report Canvas decision HTML plus a concise outcome-and-link chat receipt"
@@ -830,12 +870,13 @@ cases:
   - case_id: route-report-canvas-default-diff-001
     schema_version: 2
     required_eval_mode: replay
-    behavior_contract_owners: [report-diff]
+    behavior_contract_owners: [report-implementation-explainer]
     scenario_tags: [positive, default_html, readable_diff, report_canvas]
     user_request: "이 브랜치와 기준 커밋 사이에서 실제로 바뀐 줄만 의도별로 보기 좋게 정리해줘."
-    expected_primary_skill: report-diff
+    expected_primary_skill: report-implementation-explainer
+    expected_mode: compare
     expected_supporting_skills: []
-    should_not_trigger: [report-critical, report-qualitative, report-implementation-explainer]
+    should_not_trigger: [report-critical, report-qualitative]
     expected_family: report
     expected_context: [verified_baseline, verified_diff, intent_groups, report_canvas_contract]
     expected_output_shape: "Report Canvas compare HTML plus a concise conclusion-and-link chat receipt"
@@ -853,7 +894,7 @@ cases:
       - invent_next_action
     required_evidence:
       - type: route_match
-        expected: report-diff
+        expected: report-implementation-explainer
   - case_id: route-report-canvas-default-qualitative-001
     schema_version: 2
     required_eval_mode: replay
@@ -862,7 +903,7 @@ cases:
     user_request: "새 온보딩 설계가 실사용 준비가 됐는지 강점, 위험, 우선 개선점 기준으로 정성평가해줘."
     expected_primary_skill: report-qualitative
     expected_supporting_skills: []
-    should_not_trigger: [report-critical, report-diff, report-implementation-explainer]
+    should_not_trigger: [report-critical, report-implementation-explainer]
     expected_family: report
     expected_context: [onboarding_design, intended_use, evaluation_evidence, report_canvas_contract]
     expected_output_shape: "Report Canvas decision HTML plus a concise conclusion-and-link chat receipt"
@@ -888,7 +929,7 @@ cases:
     user_request: "이 캐시 무효화가 실제 요청에서 어떤 호출 순서로 동작하고 어디까지 검증됐는지 코드 경로와 한 사례로 설명해줘."
     expected_primary_skill: report-implementation-explainer
     expected_supporting_skills: []
-    should_not_trigger: [report-diff, report-qualitative, report-critical, analysis-algorithm]
+    should_not_trigger: [report-qualitative, report-critical, analysis-algorithm]
     expected_family: report
     expected_context: [concrete_snapshot, production_source_path, representative_trace, report_canvas_contract]
     expected_output_shape: "source/runtime-anchored Report Canvas trace HTML plus a concise outcome-and-link chat receipt"
@@ -915,7 +956,7 @@ cases:
     user_request: "이번 기능의 요구사항부터 설계, 구현 근거, QA, 보안, 릴리즈까지 산출물을 묶고 서로 추적되게 정리해줘."
     expected_primary_skill: report-lifecycle-artifacts
     expected_supporting_skills: []
-    should_not_trigger: [coordination-handoff, report-critical, workflow-validation]
+    should_not_trigger: [plan-task-handoff, report-critical, workflow-validation]
     expected_family: report
     expected_context: [requested_lifecycle_scope, canonical_artifacts, condition_scoped_evidence, report_canvas_contract]
     expected_output_shape: "canonical lifecycle artifacts plus a Report Canvas trace HTML index and concise package-link receipt"
@@ -996,29 +1037,33 @@ cases:
     required_eval_mode: replay
     behavior_contract_owners: [workflow-prototype]
     scenario_tags: [positive, edge, logic, state_model, prototype]
-    user_request: "결제 capture 뒤 주문 취소를 허용할 때 상태 전이가 납득되는지 확인하고 싶어. DB는 붙이지 말고 이 repo 언어로 순수 상태 모델과 얇은 CLI/TUI 프로토타입을 만들어서 매 액션 뒤 전체 상태와 거부 이유를 보여줘."
+    user_request: "결제 capture 뒤 주문 취소를 허용할 때 상태 전이가 납득되는지 확인하고 싶어. PM도 더블클릭해서 열 수 있게 DB나 서버 없이 규칙 모델, 직접 조작 버튼, 초기화 가능한 사례, 매 동작의 결과와 거부 이유를 보여주는 HTML 파일 하나를 만들어줘."
     expected_primary_skill: workflow-prototype
     expected_supporting_skills: []
     should_not_trigger: [analysis-domain-modeling, plan-behavior-discovery, workflow-implementation]
     expected_family: workflow
-    expected_context: [one_question, starting_state, candidate_transitions, invariant, representative_sequence, counterexample, host_runtime, retention_plan]
-    expected_output_shape: "pure in-memory state model plus thin runnable driver, full-state readback, one command, verdict, and proof ceiling"
-    quality_notes: "A selected state-model question with explicit runnable evidence shape is a logic prototype, not production persistence or open-ended domain modeling."
-    friction_risk: "adding a database, framework, broad test suite, or hiding state behind source inspection"
+    expected_context: [one_question, starting_state, candidate_transitions, invariant, representative_sequence, counterexample, domain_language, retention_plan]
+    expected_output_shape: "one browser-openable HTML file with inline resources, a deterministic in-memory rule model, readable state and action trace, scenario presets, direct-open instruction, verdict, and proof ceiling"
+    quality_notes: "A selected state-model question for a non-developer belongs to the browser-openable logic profile, not production persistence, CLI-only output, or open-ended domain modeling."
+    friction_risk: "adding a database, framework, build/server dependency, broad test suite, CLI/TUI-only driver, or raw-JSON-only state view"
     expected_behaviors:
       - lock_one_prototype_question
       - select_logic_prototype_shape
-      - keep_core_pure_and_driver_thin
+      - separate_rule_model_from_observation_adapter
       - keep_state_in_memory
+      - create_one_browser_openable_html_file_with_inline_resources
+      - expose_direct_actions_and_resettable_scenario_presets
       - render_full_relevant_state_after_actions
       - exercise_material_counterexample
-      - provide_one_run_command
+      - provide_exact_direct_open_instruction
       - preserve_prototype_until_decision_owner_observes
     forbidden_behaviors:
       - add_persistence_layer
       - add_generalized_framework
+      - require_cli_tui_or_dev_server
+      - use_remote_cdn_or_network_dependency
       - claim_production_integration_correctness
-      - merge_driver_into_production
+      - merge_observation_adapter_into_production
     required_evidence:
       - type: route_match
         expected: workflow-prototype
@@ -1059,7 +1104,7 @@ cases:
     user_request: "결제 callback 뒤 같은 regression test가 계속 실패해. 담당 worker가 원래 실패를 재현하고 가장 작은 수정을 적용한 다음 그 테스트가 통과하는지 확인하게 해줘."
     expected_primary_skill: workflow-bug-fix
     expected_supporting_skills: []
-    should_not_trigger: [analysis-bug, workflow-implementation, coordination-handoff]
+    should_not_trigger: [analysis-bug, workflow-implementation, plan-task-handoff]
     expected_family: workflow
     expected_context: [failure_signal, expected_behavior, repro, target_path, focused_validation]
     expected_output_shape: "intent-matched bug-fix execution without requiring a skill alias"
@@ -1076,3 +1121,171 @@ cases:
     required_evidence:
       - type: route_match
         expected: workflow-bug-fix
+  - case_id: route-plan-decision-map-decision-map-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-decision-map]
+    scenario_tags: [positive, explicit_only, multi_session, decision_map]
+    direct_invocation: true
+    user_request: "$plan-decision-map 새 렌더링 파이프라인 전환은 여러 세션이 걸려. 이 저장소 안 Markdown으로 목표 결과, 결정 항목과 선행 관계, 지금 처리 가능한 항목, 아직 질문으로 만들기 어려운 불확실성, 제외 범위를 계속 이어갈 수 있게 정리해줘. 구현은 하지 마."
+    expected_primary_skill: plan-decision-map
+    expected_supporting_skills: []
+    should_not_trigger: [plan-long-term-package, workflow-implementation, plan-task-handoff]
+    expected_family: planning
+    expected_context: [target_outcome, decision_owner, scope_boundary, local_artifact_boundary, known_constraints]
+    expected_output_shape: "local canonical decision index plus bounded decision items, prerequisite links, derived ready set, unshaped unknowns, and exclusions without implementation"
+    quality_notes: "Explicit durable decision-map intent preserves multi-session uncertainty without manufacturing an implementation backlog or remote issues."
+    friction_risk: "turning undecidable uncertainty into speculative build tasks, answering user-owned choices, or mutating a remote tracker"
+    expected_behaviors:
+      - bind_target_outcome_before_items
+      - apply_persistence_threshold
+      - create_local_decision_index_and_stable_item_ids
+      - add_prerequisite_links_after_item_identity
+      - derive_open_unclaimed_ready_set
+      - distinguish_unshaped_unknowns_from_exclusions
+      - stop_after_initialization_without_implementation
+    forbidden_behaviors:
+      - create_remote_issues_without_authority
+      - turn_decisions_into_implementation_backlog
+      - answer_user_guided_choice_for_the_user
+      - start_target_outcome_execution
+    required_evidence:
+      - type: route_match
+        expected: plan-decision-map
+  - case_id: route-requirements-ready-round-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-requirements-discovery]
+    scenario_tags: [positive, ready_question_round, dependency_graph, fact_boundary]
+    user_request: "신규 B2B export 기능 요구사항을 디스커버리해줘. 저장소에서 확인 가능한 현재 포맷은 네가 보고, 선행 답이 필요 없는 배포 대상·실패 정책·보존 기간 결정은 지금 한 라운드에 추천안과 함께 질문해줘."
+    expected_primary_skill: plan-requirements-discovery
+    expected_supporting_skills: []
+    should_not_trigger: [plan-stakeholder-questionnaire, plan-requirements-brief, workflow-implementation]
+    expected_family: planning
+    expected_context: [rough_goal, admitted_repository_facts, decision_dependency_graph, ready_question_set, user_answers]
+    expected_output_shape: "one numbered round of up to three mutually independent ready questions with recommendations plus ledger deltas"
+    quality_notes: "Independent decisions whose prerequisites are settled are asked together, while discoverable facts remain agent-owned."
+    friction_risk: "asking the user for repository facts, serializing independent decisions without reason, or asking dependent questions prematurely"
+    expected_behaviors:
+      - build_decision_dependency_graph
+      - resolve_discoverable_facts_from_admitted_sources
+      - derive_ready_question_set
+      - ask_up_to_three_independent_questions_in_one_round
+      - recommend_an_answer_for_each_ready_question
+      - recompute_dependencies_after_answers
+    forbidden_behaviors:
+      - ask_user_for_discoverable_environment_fact
+      - ask_question_with_unsettled_prerequisite
+      - start_implementation
+    required_evidence:
+      - type: route_match
+        expected: plan-requirements-discovery
+  - case_id: route-workflow-explanation-repair-001
+    schema_version: 2
+    required_eval_mode: replay
+    scenario_tags: [positive, communication_repair]
+    user_request: "방금 답변이 어디서 나온 얘기인지 놓쳤어요. 전제부터 우리 프로젝트 용어로 짧게 다시 설명해줘."
+    expected_primary_skill: null
+    expected_route_class: direct_task_owner
+    expected_supporting_skills: []
+    should_not_trigger: [report-implementation-explainer, knowledge-base-read, analysis-codebase]
+    expected_context: [immediately_preceding_exchange, user_confusion_signal, already_admitted_project_terms]
+    expected_output_shape: "self-contained replacement explanation that repairs the missing context or reasoning connection"
+    quality_notes: "Explanation repair replaces the last answer only; it does not load more project context or start a new investigation."
+    friction_risk: "defending the old wording, fabricating certainty, or treating explanation repair as tool authority"
+    expected_behaviors:
+      - identify_and_restore_missing_connection
+      - use_user_language_and_admitted_domain_terms
+      - simplify_without_changing_evidence_scope
+      - correct_prior_uncertainty_when_needed
+    forbidden_behaviors:
+      - inspect_repository_or_external_sources
+      - mutate_files_or_external_state
+      - start_new_task
+    required_evidence:
+      - type: route_class
+        expected: direct_task_owner
+  - case_id: route-plan-stakeholder-questionnaire-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-stakeholder-questionnaire]
+    scenario_tags: [positive, explicit_only, stakeholder, questionnaire]
+    direct_invocation: true
+    user_request: "$plan-stakeholder-questionnaire 보안 책임자만 아는 데이터 보존·삭제 승인 규칙을 받아야 해. 받는 사람은 우리 CISO이고, 답을 받아 출시 정책을 확정할 거야. 15분 안에 부분 답변도 가능한 Markdown 질문지로 만들어줘. 보내지는 마."
+    expected_primary_skill: plan-stakeholder-questionnaire
+    expected_supporting_skills: []
+    should_not_trigger: [plan-requirements-discovery, plan-requirements-brief, plan-task-handoff]
+    expected_family: planning
+    expected_context: [recipient_role, knowledge_ownership, needed_back_list, downstream_use, response_constraints, no_delivery_boundary]
+    expected_output_shape: "one local recipient-fitted Markdown questionnaire with coverage readback and no external delivery"
+    quality_notes: "The user supplied recipient setup and the downstream decision, so the artifact asks the stakeholder for the subject matter instead of asking the user to guess it."
+    friction_risk: "asking the user to answer CISO-owned facts, using compound questions, requesting secrets, or sending the file"
+    expected_behaviors:
+      - separate_artifact_setup_from_stakeholder_answer_ownership
+      - cover_each_needed_back_entry_once
+      - order_high_value_questions_first
+      - allow_partial_and_unknown_answers
+      - create_one_local_markdown_artifact
+      - preserve_no_delivery_boundary
+    forbidden_behaviors:
+      - invent_stakeholder_answers
+      - solicit_credentials_or_secrets
+      - send_upload_or_message_questionnaire
+    required_evidence:
+      - type: route_match
+        expected: plan-stakeholder-questionnaire
+  - case_id: route-architecture-recent-change-yagni-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [analysis-architecture-deepening]
+    scenario_tags: [positive, recent_change_weighting, yagni, read_only]
+    user_request: "특정 모듈을 찍지는 않을게. 최근 자주 바뀐 production 경로에 가중치를 둬서 architecture deepening 후보를 찾아줘. 생성물·lockfile·기계적 migration은 빼고, 최근 변경만으로 추천하지는 마."
+    expected_primary_skill: analysis-architecture-deepening
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-codebase, workflow-refactor-safely, workflow-implementation]
+    expected_family: analysis
+    expected_context: [bounded_recent_non_merge_history, canonical_owner_paths, production_callers, observed_change_or_failure_pressure, low_signal_control]
+    expected_output_shape: "recent-change-weighted sampling basis plus evidence-backed ranked deepening candidates and unverified gaps"
+    quality_notes: "When no scope is named, bounded recent history weights the scan but owner/path friction remains required for ranking."
+    friction_risk: "repo-wide scanning, generated-churn bias, or equating frequently changed files with architecture defects"
+    expected_behaviors:
+      - inspect_bounded_recent_non_merge_history
+      - exclude_generated_vendor_and_mechanical_churn
+      - weight_recurring_canonical_production_paths
+      - confirm_shortlist_on_owner_and_representative_path
+      - report_sampling_basis_and_counterevidence
+    forbidden_behaviors:
+      - recommend_from_churn_alone
+      - implement_ranked_candidate
+      - generate_repo_wide_report
+    required_evidence:
+      - type: route_match
+        expected: analysis-architecture-deepening
+  - case_id: route-long-term-phase-boundary-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-long-term-package]
+    scenario_tags: [positive, phase_boundary, context_transition, explicit_artifact]
+    user_request: "$plan-long-term-package로 장기 migration package를 만들고 실제 phase 경계마다 Continue, Clear, Handoff, Subagent, Compact 순서로 첫 yes를 기록해줘. 다음 phase가 지금 합의의 정확한 why를 필요로 하면 Continue여야 해. host 동작은 실행하지 마."
+    expected_primary_skill: plan-long-term-package
+    expected_supporting_skills: []
+    should_not_trigger: [plan-task-handoff, workflow-plan-runner, workflow-loop-runner]
+    expected_family: planning
+    expected_context: [explicit_package_intent, phase_topology, next_phase_primary_source_need, host_capabilities, handoff_index]
+    expected_output_shape: "validated phase package whose procedural handoff index records one non-executed result from the ordered context carryover gate"
+    quality_notes: "The package records the transition at a real phase boundary; it does not execute host commands or turn every boundary into a handoff."
+    friction_risk: "compacting mid-phase, selecting handoff without portability, or treating a recommendation as authorization"
+    expected_behaviors:
+      - evaluate_transition_only_at_phase_boundary
+      - evaluate_continue_clear_handoff_subagent_compact_in_order
+      - select_continue_when_primary_source_is_needed
+      - record_retain_discardable_and_loss_risk
+      - avoid_executing_host_transition
+    forbidden_behaviors:
+      - compact_mid_phase
+      - auto_invoke_coordination_handoff
+      - auto_delegate_subagent
+      - execute_clear_or_compact
+    required_evidence:
+      - type: route_match
+        expected: plan-long-term-package

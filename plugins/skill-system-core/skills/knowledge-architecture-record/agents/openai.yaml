@@ -1,6 +1,0 @@
-interface:
-  display_name: "Knowledge Architecture Record"
-  short_description: "Record project architecture boundaries"
-  default_prompt: "Use $knowledge-architecture-record to classify overlap before recording one accepted architecture identity with typed dependency/scope links, history, and source anchors."
-policy:
-  allow_implicit_invocation: false

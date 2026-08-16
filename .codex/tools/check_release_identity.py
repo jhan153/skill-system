@@ -9,14 +9,13 @@ import re
 from pathlib import Path
 
 
-CURRENT_VERSION = "9.4.4"
+CURRENT_VERSION = "9.4.5"
 PLUGIN_NAMES = (
     "skill-system-core",
     "skill-system-dev",
     "skill-system-design",
     "skill-system-research",
     "skill-system-quality",
-    "skill-system-maintainer",
 )
 SOURCE_PLUGIN_NAMES = {
     name.removeprefix("skill-system-"): name

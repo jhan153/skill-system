@@ -1,0 +1,6 @@
+interface:
+  display_name: "Project Context"
+  short_description: "Initialize, diagnose, or update project context declarations"
+  default_prompt: "Use $workflow-project-context only for an explicit manifest-init, doctor, update, or bounded bootstrap request. Preserve unrelated manifest sections, show exact write targets, and delegate only approved store creation."
+policy:
+  allow_implicit_invocation: false

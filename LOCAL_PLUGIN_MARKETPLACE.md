@@ -22,7 +22,6 @@ plugins/skill-system-dev
 plugins/skill-system-design
 plugins/skill-system-research
 plugins/skill-system-quality
-plugins/skill-system-maintainer
 ```
 
 Claude packages use paired platform-owned roots with the same names and versions:
@@ -33,7 +32,6 @@ plugins/claude/skill-system-dev
 plugins/claude/skill-system-design
 plugins/claude/skill-system-research
 plugins/claude/skill-system-quality
-plugins/claude/skill-system-maintainer
 ```
 
 ## Ecosystem Parity
@@ -80,7 +78,6 @@ skill-system-dev@skill-system-local
 skill-system-design@skill-system-local
 skill-system-research@skill-system-local
 skill-system-quality@skill-system-local
-skill-system-maintainer@skill-system-local
 ```
 
 ## Install Plugins
@@ -98,12 +95,11 @@ Add quality support when validation-matrix and QA workflow skills are needed:
 codex plugin add skill-system-quality@skill-system-local
 ```
 
-Design, research, and maintainer plugins can be installed the same way:
+Design and research plugins can be installed the same way:
 
 ```bash
 codex plugin add skill-system-design@skill-system-local
 codex plugin add skill-system-research@skill-system-local
-codex plugin add skill-system-maintainer@skill-system-local
 ```
 
 Start a new Codex thread after installing or reinstalling plugins so the new
@@ -232,8 +228,8 @@ commands (the marketplace directory is the repo's `plugins/` folder, which holds
 ```
 
 Add other roles the same way: `skill-system-quality@skill-system-local`,
-`skill-system-design@skill-system-local`, `skill-system-research@skill-system-local`,
-`skill-system-maintainer@skill-system-local`. After install / enable / disable, run
+`skill-system-design@skill-system-local`, and `skill-system-research@skill-system-local`.
+After install / enable / disable, run
 `/reload-plugins` to apply changes without restarting.
 
 Plugin skills are namespaced by plugin name, e.g.

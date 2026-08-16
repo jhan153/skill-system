@@ -63,7 +63,6 @@ PLUGIN_DISPLAY = {
     "skill-system-design": ("Skill System Design", "Frontend, UI, layout, component, token, and visual validation skills."),
     "skill-system-research": ("Skill System Research", "Scientific research, synthesis, experiment, and manuscript skills."),
     "skill-system-quality": ("Skill System Quality", "QA, qualitative review, critical review, and validation skills."),
-    "skill-system-maintainer": ("Skill System Maintainer", "Skill-system evaluation, repository integration, and bundle validation skills."),
 }
 
 
@@ -510,6 +509,10 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
     manifests = sorted((source / "plugins").glob("*.yaml"))
     if not manifests:
         raise SystemExit(f"no plugin manifests under {source / 'plugins'}")
+    manifest_names = {_load_manifest(path)["name"] for path in manifests}
+    for path in plugins_root.glob("skill-system-*"):
+        if path.is_dir() and path.name not in manifest_names:
+            shutil.rmtree(path)
     src_skills = {p.name for p in (source / "skills").iterdir() if p.is_dir()}
     seen: dict[str, str] = {}
     marketplace_plugins: list[dict] = []

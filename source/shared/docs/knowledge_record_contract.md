@@ -144,6 +144,10 @@ After the envelope, each record contains only the sections its category needs:
 
 Do not turn one-off review comments, tentative plan language, generic industry advice, or model-generated patterns into durable records.
 
+### Approved Plan Admission
+
+An explicit plan-to-Knowledge request or approved project checkpoint may admit only accepted/current durable decisions or changed project rules. Exclude TODOs, estimates, implementation chronology, rejected proposals except bounded decision history, and speculative future state. Preserve stable plan/work-item/canonical pointers and classify overlap before writing; proximity inside a plan does not establish a causal relation. New identity uses `knowledge-base-record`; an existing identity, recurrence, amendment, reverification, relink, or supersession uses `knowledge-base-update`.
+
 ## Index And Retrieval Contract
 
 `index.md` is a compact catalog and navigation surface, not a duplicate store. A new index should use:
@@ -177,7 +181,7 @@ Similarity is a candidate-discovery signal, not merge authority. Do not auto-mer
 ## Mutation Contract
 
 - Bind and reuse `knowledge_root` and `knowledge_index`; exact user path wins, otherwise use the nearest manifest declaration.
-- Writes require the matching explicit category/update/maintenance/plan-sync workflow or an approved project checkpoint.
+- Writes require the matching explicit record/update/maintenance workflow or an approved project checkpoint.
 - Update the record and its index row in the same operation and read both back.
 - Preserve unresolved relations, source dependence, and contradictory evidence; do not convert them into a clean consensus.
 - Do not compute maturity, confidence, importance, usage, popularity, satisfaction, or composite frequency scores.

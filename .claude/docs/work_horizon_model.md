@@ -24,7 +24,7 @@ This model owns work size, persistence, and artifact altitude. It does not selec
 
 For an explicit “what next?” question, choose only the first boundary that changes the actual deliverable or state lifetime:
 
-1. If an existing capability's next user path is blocked by a product-facing behavior decision, use behavior discovery; otherwise use requirements discovery for missing product, scope, edge, or data decisions. Distill a durable contract only when that artifact is needed.
+1. If the target outcome is nameable but unresolved decisions and their dependencies need durable multi-session state, use explicit `plan-decision-map`. Otherwise, if an existing capability's next user path is blocked by a product-facing behavior decision, use behavior discovery; use requirements discovery for missing product, scope, edge, or data decisions. Use `plan-stakeholder-questionnaire` only when an explicit one-recipient input artifact is needed. Distill a durable contract only when that artifact is needed.
 2. If requirements are stable and no persisted plan, resume boundary, transfer, or loop is requested, keep the current task owner. Execute directly only when the current request authorizes mutation; a read-only “what next?” request receives a recommendation without starting work.
 3. If durable current-horizon or strategic planning is explicitly needed, select `short_plan` or `long_plan`; use the Planning State Model for its transition into execution.
 4. If one task must resume across turns, attach `task_ticket`; if ownership itself transfers, use an explicit handoff instead. Neither condition creates a plan automatically.
@@ -39,7 +39,7 @@ This is explanatory topology, not an orchestrator. It never calls the listed own
 | `one_shot` | one response, one small edit/command/check, or one bounded decision question | task-specific direct execution or discovery owner | none by default |
 | `task_ticket` | 3-5 shot work where findings/evidence can be lost across turns | task-specific primary plus `workflow-task-ledger` | `TaskRun`; optional `WorkItem` envelope |
 | `short_plan` | current execution horizon; several task/ticket items in one tactical design | `plan-short-term-docs` | persisted `docs/plan` artifact |
-| `long_plan` | multi-horizon phase/package/architecture plan | `plan-long-term-package` | planning package |
+| `long_plan` | multi-horizon decision map or phase/package/architecture plan | `plan-decision-map` while material decision dependencies remain; `plan-long-term-package` after decisions support decomposition | decision map or planning package |
 | `loop_overlay` | verifier-feedback convergence contract or execution | `plan-loop-term`, then `workflow-loop-runner` | LoopRun only after an accepted contract |
 | `cross_horizon` | modifier, curation, recovery, validation, or execution behavior that can attach across levels | owning facet skill | depends on the owner |
 
@@ -51,13 +51,15 @@ Plan skills are separated by artifact altitude:
 | --- | --- | --- |
 | `behavior_discovery` | `plan-behavior-discovery` | evidence-grounded product behavior decisions for the next slice of an existing capability |
 | `requirements_discovery` | `plan-requirements-discovery` | human-in-loop elicitation before PRD/HLD/LLD planning |
+| `requirements_discovery` | `plan-stakeholder-questionnaire` | explicit question document for one answer-owning stakeholder; returned answers are not implied |
 | `requirements_contract` | `plan-requirements-brief` | PRD/SRS-lite requirements contract from discovery notes and decisions |
 | `tactical_design` | `plan-short-term-docs` | executable short-plan artifact |
 | `strategic_package` | `plan-long-term-package` | phase/package/architecture decomposition |
+| `strategic_package` | `plan-decision-map` | durable target/decision map for unresolved multi-session dependencies before implementation decomposition |
 | `loop_contract` | `plan-loop-term` | success, verifier, retry, stop, and governance contract |
-| `lifecycle_curation` | `plan-spec-curator` | closeout, archive load policy, active context pruning |
+| `lifecycle_curation` | `plan-short-term-docs` (`curation`) | closeout, archive load policy, active context pruning |
 
-Each `behavior_discovery` or `requirements_discovery` question is a non-persisted `one_shot` turn. A conversation may continue through another explicit question without becoming a `short_plan`; attach `task_ticket` only when the user requests durable cross-turn resumption and persist a discovery record only on explicit request. `behavior_discovery` does not reopen requirements discovery or authorize implementation. `requirements_discovery` and `requirements_contract` sit before tactical and strategic planning. None is an implementation plan by itself.
+Each `behavior_discovery` question or requirements ready-question round is a non-persisted `one_shot` turn. A `plan-stakeholder-questionnaire` file is a one-shot stakeholder input request, not a discovery result. A conversation may continue through another explicit round without becoming a `short_plan`; attach `task_ticket` only when the user requests durable cross-turn resumption and persist a discovery record only on explicit request. `plan-decision-map` is durable `long_plan` context but remains a decision map rather than an implementation plan. `behavior_discovery` does not reopen requirements discovery or authorize implementation. `requirements_discovery` and `requirements_contract` sit before tactical and strategic planning. None is an implementation plan by itself.
 
 Use `planning_state_model.md` when a planning artifact might move between lifecycle states. Work horizon answers "how large and durable is this work?"; Planning State answers "which event and invariant admit this artifact into the next state?"
 
@@ -71,7 +73,7 @@ Report skills may package artifacts across horizons without owning the underlyin
 
 | reporting_altitude | owner | role |
 | --- | --- | --- |
-| `implementation_explanation` | `report-implementation-explainer` | source/runtime-anchored implementation navigation and productization-gap artifact for a concrete next decision |
+| `implementation_explanation` | `report-implementation-explainer` | source/runtime-anchored implementation navigation, changed-line comparison, and productization-gap artifact for a concrete next decision |
 | `lifecycle_artifact_reporting` | `report-lifecycle-artifacts` | SDLC/product lifecycle artifact pack and traceability matrix from planning, implementation, validation, security, release, and retrospective evidence |
 
 ## Execution Mode
@@ -82,33 +84,32 @@ Workflow skills are separated by how they control execution:
 | --- | --- | --- |
 | `implementation_execution` | `workflow-implementation` | own direct coding and refactoring from requirement to validated diff |
 | `bug_fix_execution` | `workflow-bug-fix` | own concrete failure repair from failure signal to verified fix |
-| `prototype_execution` | `workflow-prototype` | build and preserve one isolated runnable discriminator for a selected UI or state/logic question through decision-owner observation, then stop before production hardening |
-| `comment_maintenance_execution` | `workflow-comment-maintenance` | own behavior-preserving comment/docstring/TODO-FIXME sync to current code meaning |
+| `prototype_execution` | `workflow-prototype` | build and preserve one isolated runnable discriminator for a selected UI question or one self-contained offline HTML state/logic model through decision-owner observation, then stop before production hardening |
 | `dependency_upgrade_execution` | `workflow-dependency-upgrade` | own dependency/runtime/package upgrades and compatibility validation |
-| `source_maintenance_execution` | `workflow-source-maintenance` | own post-development source cleanup and evidence-gated dead-code pruning |
+| `source_maintenance_execution` | `workflow-source-maintenance` | own post-development source cleanup/dead-code pruning in `source_prune` mode or behavior-preserving comment/docstring/TODO-FIXME sync in `comment_sync` mode |
 | `safe_refactor_execution` | `workflow-refactor-safely` | own behavior-preserving refactors with characterization checks |
 | `plan_batch_execution` | `workflow-plan-runner` | execute an approved plan/spec/package in batches |
 | `loop_convergence_execution` | `workflow-loop-runner` | run an accepted loop contract through verifier feedback |
 | `checkpoint_ledger` | `workflow-task-ledger` | preserve task/ticket steps, findings, and evidence |
-| `rigor_modifier` | `workflow-rigor` | evidence-first execution discipline |
-| `recovery_intervention` | `workflow-recovery` | take over when repeated failure requires a changed strategy |
+| `rigor_modifier` | `workflow-rigor` | add risk-proportional evidence, checker separation, rollback/readback, and independent review without taking over implementation |
 | `validation_lane` | `workflow-validation` | validation-only lane or attached check strategy |
-| `minimality_constraint` | `workflow-minimal-implementation` | keep implementation minimal and dependency-light |
 
 ## Decision Table
 
 | user intent | route |
 | --- | --- |
 | "작은 오타 하나만 고쳐" | direct one-shot execution; no ledger or plan |
-| "이 기능 구현해줘" | `workflow-implementation`; attach rigor/minimality/validation only when triggered |
-| "이 failing test 고쳐줘" | `workflow-bug-fix`; escalate to `workflow-recovery` if the same signature repeats |
+| "이 기능 구현해줘" | `workflow-implementation`; attach `workflow-minimal-implementation` under YAGNI pressure, attach `workflow-rigor` when medium/high risk or maker/checker separation is material, and attach validation only when triggered |
+| "이 failing test 고쳐줘" | `workflow-bug-fix`; if the same signature repeats, hand off to `workflow-recovery` |
 | "검색 결과 배치를 결정할 수 있게 구조가 다른 프로토타입 3개를 만들어줘" | `workflow-prototype`; keep the comparison throwaway and hand a selected result to production implementation separately |
 | "React 버전 올리고 깨지는 call site까지 고쳐줘" | `workflow-dependency-upgrade` |
 | "1차 개발 끝났으니 죽은 코드 지우고 소스 정리해줘" | `workflow-source-maintenance` |
-| "주석이 코드랑 안 맞으니 최신화하고 불필요한 주석 정리해줘" | `workflow-comment-maintenance` |
+| "주석이 코드랑 안 맞으니 최신화하고 불필요한 주석 정리해줘" | `workflow-source-maintenance` in `comment_sync` mode |
 | "동작 보존하면서 모듈을 나눠줘" | `workflow-refactor-safely` |
 | "다음 세션에도 이어갈 수 있게 상태를 남겨" | task-specific primary plus `workflow-task-ledger` |
-| "구현 전에 요구사항을 하나씩 질문해서 끌어내줘" | `plan-requirements-discovery` |
+| "여러 세션이 필요한데 목적지만 보이고 결정 경로는 아직 흐려" | explicit `plan-decision-map`; create a decision map, not an implementation backlog |
+| "구현 전에 요구사항 의존성을 보고 지금 답할 수 있는 것부터 질문해줘" | `plan-requirements-discovery`; ask a bounded round of mutually independent ready questions |
+| "보안 책임자에게 비동기로 받을 질문지를 만들어줘" | explicit `plan-stakeholder-questionnaire`; create one local Markdown artifact and do not send it |
 | "구현된 mesh 연산을 실제로 어떻게 preview/commit/undo할지 하나씩 결정하자" | `plan-behavior-discovery` |
 | "인터뷰 결과를 PRD/요구사항 계약으로 정리해줘" | `plan-requirements-brief` |
 | "이 작업을 플랜 문서로 만들어" | `plan-short-term-docs` |
@@ -118,7 +119,7 @@ Workflow skills are separated by how they control execution:
 | "이 goal을 반복 실행하기 전에 완료 조건을 잡아" | `plan-loop-term` |
 | "승인된 loop contract를 실행해" | `workflow-loop-runner` |
 | "이 plan대로 구현해" | `workflow-plan-runner`; attach `workflow-task-ledger` only when batch state must survive turns |
-| "오래된 plan/spec을 정리하고 active context를 줄여" | `plan-spec-curator` |
+| "오래된 plan/spec을 정리하고 active context를 줄여" | `plan-short-term-docs` in `curation` mode |
 
 ## WorkItem And TaskRun
 

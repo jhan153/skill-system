@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Prototype"
   short_description: "Build runnable evidence for one UI or logic question"
-  default_prompt: "Use $workflow-prototype to answer one unresolved UI or logic question with the smallest runnable throwaway artifact."
+  default_prompt: "Use $workflow-prototype to answer one unresolved UI or logic question with the smallest runnable throwaway artifact. For logic/state questions, deliver exactly one browser-openable HTML evidence page with inline resources and a deterministic rule model separated from page behavior."
 
 policy:
   allow_implicit_invocation: true

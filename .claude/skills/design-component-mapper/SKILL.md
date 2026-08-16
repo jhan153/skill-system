@@ -8,34 +8,18 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: design_evidence_gate
-- intent_signature:
-  - component contract mapping
-  - approved component catalog mapping
-  - component reuse proof
-  - design component inventory
-  - repo component mapping
-  - variant and state coverage
-  - responsive and accessibility contract coverage
+- intent_signature: design-to-repo component contract mapping, catalog reuse proof, or required variant/state coverage
 - use_when:
-  - a design-to-production task needs proof that design components map to implemented repo components.
-  - a product-family policy requires approved controls instead of raw, default, or custom app-surface controls.
-  - missing UI states, variants, slots, events, or responsive behavior need to be recorded before implementation or completion.
-  - the user asks to compare Figma/spec/Storybook/component variants or state names.
+  - a design source must map to repo components or a declared catalog before implementation/completion.
+  - required variants, states, slots, events, responsive behavior, reuse, exceptions, or gaps need evidence.
 - do_not_use_when:
   - the task only needs token normalization, screenshot comparison, or accessibility checks.
   - no design source, component list, or implementation target is available.
   - the user asks for direct visual implementation; use `design-frontend` as primary and this skill as a supporting gate.
 - expected_inputs:
-  - design component inventory or reference artifact
-  - repository component paths, stories, exports, or examples
-  - expected variants, states, slots, events, and breakpoints
-  - approved component catalog and fallback/exception policy when declared
+  - design/reference inventory, target repo component paths/examples, required contract dimensions, and any approved catalog/fallback policy
 - expected_outputs:
-  - design component inventory
-  - repo component mapping
-  - component reuse evidence or scoped exception
-  - variant/state/responsive matrix
-  - unresolved component contract gaps
+  - semantic mapping, reuse/exception evidence, required coverage, and unresolved contract gaps
 - context_targets:
   must_read:
     - design source or component list
@@ -63,7 +47,7 @@ disable-model-invocation: true
 - entry_scene:
   - PREPARE
 
-Use this skill to connect design roles to existing code components without redesigning their API. The gate distinguishes what a catalog offers, what a plan selects, and what the product actually uses.
+Connect design roles to existing code components without redesigning their API; keep catalog availability, planned selection, and actual app-surface reuse distinct.
 
 ## Contract
 - Pin each applicable design source, repository surface, and approved catalog by path plus version or digest. Include the catalog's platform/surface scope and declared fallback policy.

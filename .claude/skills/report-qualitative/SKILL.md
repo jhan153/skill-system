@@ -8,14 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: report_primary
-- intent_signature:
-  - qualitative evaluation report
-  - 정성 평가 리포트
-  - evidence-based assessment
-  - strengths and weaknesses
-  - readiness review
-  - rubric-based review
-  - explicit-only `srq` or formal evidence-first report requests
+- intent_signature: explicit qualitative/readiness/strengths-risks/rubric evaluation or `srq` evidence report
 - use_when:
   - the user needs a decision about an artifact's quality, usefulness, readiness, risks, or improvement path.
   - the user explicitly requests a qualitative, rubric-based, readiness, strengths/weaknesses, or evidence-first assessment.
@@ -79,11 +72,17 @@ Artifact size does not activate `FullOrScored`; vague “검토/요약/보고”
 
 Read `references/evidence_mapping.md` only for a large, multi-source, ambiguous, or unsupported-judgment-prone target. Distinguish external from artifact evidence, redact sensitive values, and never infer hidden intent or requirements outside scope.
 
+## Canvas Asset Resolution
+
+For every admitted invocation, set `REPORT_SKILL_DIR` to the directory containing this active skill's resolved `SKILL.md`; use the exact `file:` path exposed by the current skill catalog. The bundled contract documents the Codex plugin-cache layout explicitly. Never guess, glob, or select an install/cache version from the working directory.
+
+Require `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py`. `source/tools/generate_targets.py` projects repository assets; it is not the renderer. If either local file is missing, report an incomplete installed payload and use only the contract's allowed chat fallback.
+
 ## Output
-- `DecisionBrief`: conclusion first; zero to three material findings with decisive evidence, impact, action, and confidence; one highest-leverage next action; material limitations. Do not add duplicate strength/weakness, evidence-map, or score sections.
-- `FullOrScored`: read `references/report_template.md` plus `references/rubric.md` when needed, cover requested criteria, and avoid prose that repeats tables.
-- `CompactEvidence`: one-line conclusion, up to three verified facts with locations, one action, and verification only for code/workflow/delivery. It does not replace a requested readiness or risk evaluation.
-- For every admitted invocation, read `references/report_canvas_contract.md` and render the primary human-facing evaluation with `scripts/report-canvas/render_report.py` as Report Canvas `decision` HTML; use `compare` only when the primary evidence is an authoritative before/after pair. Return only a concise chat receipt with the conclusion and artifact link. Use chat-only output only when the user explicitly prohibits file creation or the host has no safe artifact surface. Full/scored reference templates shape the Canvas model and evidence drawers rather than restoring Markdown by default. Canvas does not activate `FullOrScored`, add findings, or strengthen evidence.
+- `DecisionBrief`: conclusion, zero to three material findings with evidence/impact/action/confidence, one next action, and material limits.
+- `FullOrScored`: read the report template and rubric, cover requested criteria, and avoid prose duplicating tables.
+- `CompactEvidence`: one-line conclusion, up to three verified facts with locations, one action, and relevant verification.
+- Render Report Canvas `decision`; use `compare` only for an authoritative before/after evidence pair. Return a concise receipt and use only contract-permitted chat fallback. Canvas never activates a deeper mode, adds findings, or strengthens evidence.
 
 ## Validation
 - Conclusion precedes method; every judgment is evidenced or explicitly uncertain; recommendations trace to findings.

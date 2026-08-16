@@ -1,4 +1,4 @@
-version: "9.4.4"
+version: "9.4.5"
 purpose: "Requests that should not trigger heavy or wrong skills."
 cases:
   - case_id: neg-001
@@ -13,11 +13,11 @@ cases:
   - case_id: neg-002
     schema_version: 2
     required_eval_mode: replay
-    behavior_contract_owners: [analysis-router]
+    behavior_contract_owners: [analysis-bug]
     user_request: "이 개념을 가볍게 탐색해보자."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [analysis-router, research-router]
+    should_not_trigger: [analysis-bug, research-hypothesis-planning]
     expected_context: []
     expected_output_shape: "brief exploratory conversation"
     quality_notes: "No deep workflow unless requested."
@@ -26,16 +26,16 @@ cases:
       - answer_light_exploration_without_deep_router
       - avoid_repository_context
     forbidden_behaviors:
-      - invoke_analysis_router
+      - invoke_analysis_specialist
       - expand_into_deep_analysis_workflow
     required_evidence:
       - type: route_absence
-        expected: analysis-router
+        expected: analysis-bug
       - type: context_scope
         expected: no_repository_context
   - case_id: neg-003
     user_request: "간단히 diff 요약해줘."
-    expected_primary_skill: report-diff
+    expected_primary_skill: report-implementation-explainer
     expected_supporting_skills: []
     should_not_trigger: [analysis-codebase]
     expected_context: [diff]
@@ -55,7 +55,7 @@ cases:
     user_request: "loss 함수 구현하고 테스트 추가해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [research-hypothesis-planning, research-router]
+    should_not_trigger: [research-hypothesis-planning]
     expected_context: [source file, tests, requested formula]
     expected_output_shape: "implementation and tests"
     quality_notes: "Model/loss words can be ordinary development."
@@ -73,7 +73,7 @@ cases:
     user_request: "메모리에 저장하지 말고 이번 답변에만 반영해."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [memory-bank-update, memory-bank-correction-capture]
+    should_not_trigger: [memory-bank-update]
     expected_context: [current instruction]
     expected_output_shape: "current-turn behavior"
     quality_notes: "Temporary instruction is not memory."
@@ -100,7 +100,7 @@ cases:
     user_request: "이 테스트 하나만 실행해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [evaluation-harness, analysis-codebase]
+    should_not_trigger: [analysis-codebase]
     expected_context: [test command]
     expected_output_shape: "test result"
     quality_notes: "Local test is not runtime usage eval."
@@ -109,7 +109,7 @@ cases:
     user_request: "현재 시간 알려줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [analysis-router, report-qualitative]
+    should_not_trigger: [report-qualitative]
     expected_context: []
     expected_output_shape: "time"
     quality_notes: "Simple command."
@@ -118,7 +118,7 @@ cases:
     user_request: "브랜치 이름 추천해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [coordination-handoff, plan-short-term-docs]
+    should_not_trigger: [plan-task-handoff, plan-short-term-docs]
     expected_context: [task summary]
     expected_output_shape: "short branch name options"
     quality_notes: "No handoff."
@@ -153,11 +153,11 @@ cases:
   - case_id: neg-workflow-comment-maintenance-001
     schema_version: 2
     required_eval_mode: replay
-    behavior_contract_owners: [workflow-comment-maintenance]
+    behavior_contract_owners: [workflow-source-maintenance]
     user_request: "주석이랑 docstring이 뭐가 다른 거야?"
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [workflow-comment-maintenance, workflow-implementation]
+    should_not_trigger: [workflow-source-maintenance, workflow-implementation]
     expected_context: []
     expected_output_shape: "short conceptual explanation"
     quality_notes: "Concept explanation does not start a comment maintenance workflow."
@@ -167,18 +167,18 @@ cases:
       - avoid_comment_maintenance_workflow
       - preserve_no_write_scope
     forbidden_behaviors:
-      - invoke_workflow_comment_maintenance
+      - invoke_workflow_source_maintenance
       - mutate_codebase
     required_evidence:
       - type: route_absence
-        expected: workflow-comment-maintenance
+        expected: workflow-source-maintenance
       - type: mutation_absence
         expected: pass
   - case_id: neg-workflow-comment-maintenance-002
     user_request: "리팩터링하면서 주석도 같이 맞춰줘."
     expected_primary_skill: workflow-refactor-safely
-    expected_supporting_skills: [workflow-comment-maintenance]
-    should_not_trigger: [workflow-implementation, workflow-source-maintenance]
+    expected_supporting_skills: [workflow-source-maintenance]
+    should_not_trigger: [workflow-implementation]
     expected_context: [behavior contract, target files, callers, comment sync substep, validation command]
     expected_output_shape: "behavior-preserving refactor plan with comment sync as a substep and validation"
     quality_notes: "Structural refactor stays refactor ownership; comment sync rides along as a substep, not primary."
@@ -186,13 +186,13 @@ cases:
   - case_id: neg-implicit-workflow-comment-maintenance-competing-001
     schema_version: 2
     required_eval_mode: replay
-    behavior_contract_owners: [workflow-comment-maintenance, workflow-bug-fix]
+    behavior_contract_owners: [workflow-source-maintenance, workflow-bug-fix]
     scenario_tags: [negative, implicit_invocation, competing_owner, bug_fix]
     direct_invocation: false
     user_request: "CSV parser가 빈 행에서 crash 나. 원래 실패를 재현해서 동작을 고쳐줘. 근처 주석도 오래됐지만 이번에는 실행 코드와 회귀 테스트만 수정하고 주석 정리는 따로 하지 마."
     expected_primary_skill: workflow-bug-fix
     expected_supporting_skills: []
-    should_not_trigger: [workflow-comment-maintenance, workflow-implementation]
+    should_not_trigger: [workflow-source-maintenance, workflow-implementation]
     expected_family: workflow
     expected_context: [failure_signal, expected_behavior, repro, target_code, focused_validation, explicit_comment_exclusion]
     expected_output_shape: "targeted bug fix without attaching comment maintenance"
@@ -220,12 +220,13 @@ cases:
     friction_risk: "inflating a simple polish request into a report"
   - case_id: neg-report-qualitative-002
     user_request: "바뀐 부분만 before/after diff로 보여줘."
-    expected_primary_skill: report-diff
+    expected_primary_skill: report-implementation-explainer
+    expected_mode: compare
     expected_supporting_skills: []
     should_not_trigger: [report-qualitative, report-critical]
     expected_context: [verified diff or before/after snapshot]
     expected_output_shape: "readable changed-line diff"
-    quality_notes: "Readable diff presentation is report-diff, not qualitative evaluation."
+    quality_notes: "Readable diff presentation is report-implementation-explainer compare mode, not qualitative evaluation."
     friction_risk: "over-routing diff display to qualitative reporting"
   - case_id: neg-report-qualitative-003
     user_request: "보고해줘."
@@ -240,7 +241,7 @@ cases:
     user_request: "이 파일 라인 10 설명해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase, analysis-router]
+    should_not_trigger: [analysis-codebase]
     expected_context: [target file line]
     expected_output_shape: "line explanation"
     quality_notes: "Narrow explanation."
@@ -258,7 +259,7 @@ cases:
     user_request: "skill이라는 개념이 뭐야?"
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [skill-system-repo-adapter]
+    should_not_trigger: [workflow-implementation]
     expected_context: []
     expected_output_shape: "concept explanation"
     quality_notes: "No skill creation."
@@ -285,7 +286,7 @@ cases:
     user_request: "작업을 두 명에게 나눠야 하는지 의견만 줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [coordination-handoff]
+    should_not_trigger: [plan-task-handoff]
     expected_context: [task description]
     expected_output_shape: "short recommendation"
     quality_notes: "Opinion is not handoff packet."
@@ -294,7 +295,7 @@ cases:
     user_request: "이 YAML 문법 맞는지만 확인해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [evaluation-harness, analysis-codebase]
+    should_not_trigger: [analysis-codebase]
     expected_context: [yaml file]
     expected_output_shape: "syntax result"
     quality_notes: "Not usage eval."
@@ -312,7 +313,7 @@ cases:
     user_request: "목표가 뭔지 한 문장으로 정리해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [coordination-handoff, plan-long-term-package]
+    should_not_trigger: [plan-task-handoff, plan-long-term-package]
     expected_context: [provided text]
     expected_output_shape: "one-sentence summary"
     quality_notes: "The word goal does not imply coordination."
@@ -321,7 +322,7 @@ cases:
     user_request: "이 작업의 다음 단계 하나만 추천해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [coordination-handoff]
+    should_not_trigger: [plan-task-handoff]
     expected_context: [current task state]
     expected_output_shape: "single recommendation"
     quality_notes: "No handoff or DAG."
@@ -330,7 +331,7 @@ cases:
     user_request: "간단한 TODO 세 개만 적어줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [plan-long-term-package, coordination-handoff]
+    should_not_trigger: [plan-long-term-package, plan-task-handoff]
     expected_context: [task summary]
     expected_output_shape: "short TODO list"
     quality_notes: "A TODO list is not a planning package."
@@ -348,7 +349,7 @@ cases:
     user_request: "이전 계획 내용을 한 문단으로 요약해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [plan-spec-curator, plan-short-term-docs, coordination-handoff]
+    should_not_trigger: [plan-short-term-docs, plan-task-handoff]
     expected_context: [provided_plan_text]
     expected_output_shape: "brief summary"
     quality_notes: "Plain summarization is not lifecycle curation."
@@ -357,7 +358,7 @@ cases:
     user_request: "지금 목표를 한 문장으로 말해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [plan-spec-curator, coordination-handoff]
+    should_not_trigger: [plan-short-term-docs, plan-task-handoff]
     expected_context: [current_task_context]
     expected_output_shape: "one-sentence goal summary"
     quality_notes: "The word goal alone does not imply context governance."
@@ -366,7 +367,7 @@ cases:
     user_request: "모델 학습 로그에서 에러 한 줄만 설명해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [research-router, research-statistical-analysis]
+    should_not_trigger: [research-statistical-analysis]
     expected_context: [log line]
     expected_output_shape: "error explanation"
     quality_notes: "ML terms can be ordinary debugging."
@@ -402,7 +403,7 @@ cases:
     user_request: "이 스킬 이름을 더 짧게 추천해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [skill-system-repo-adapter, coordination-handoff]
+    should_not_trigger: [workflow-implementation, plan-task-handoff]
     expected_context: [skill name]
     expected_output_shape: "name suggestions"
     quality_notes: "Naming suggestion is not skill lifecycle unless files are requested."
@@ -447,7 +448,7 @@ cases:
     user_request: "목표 단어가 들어간 문장만 찾아줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [coordination-handoff]
+    should_not_trigger: [plan-task-handoff]
     expected_context: [provided text]
     expected_output_shape: "matching sentences"
     quality_notes: "The word goal is not coordination intent."
@@ -474,7 +475,7 @@ cases:
     user_request: "이 테스트 하나만 다시 실행해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [workflow-validation, evaluation-harness]
+    should_not_trigger: [workflow-validation]
     expected_context: [test command]
     expected_output_shape: "test result"
     quality_notes: "A single explicit rerun is not validation strategy or eval-case review."
@@ -483,7 +484,7 @@ cases:
     user_request: "첫 실패 로그 한 줄 설명해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [workflow-recovery, analysis-bug]
+    should_not_trigger: [analysis-bug]
     expected_context: [log line]
     expected_output_shape: "short explanation"
     quality_notes: "First-observation explanation is not repeated failure recovery."
@@ -501,7 +502,7 @@ cases:
     user_request: "이 버그 원인 분석해줘."
     expected_primary_skill: analysis-bug
     expected_supporting_skills: []
-    should_not_trigger: [workflow-recovery]
+    should_not_trigger: [workflow-bug-fix]
     expected_context: [symptom, repro, logs]
     expected_output_shape: "root cause analysis"
     quality_notes: "First-pass bug RCA is analysis-bug unless a repeated fix loop exists."
@@ -529,12 +530,12 @@ cases:
     user_request: "이 PR 평가 좀 해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [evaluation-harness]
+    should_not_trigger: [report-qualitative]
     expected_family: none
     expected_context: [PR diff, review intent]
     expected_output_shape: "ordinary review, not eval-case telemetry"
     quality_notes: "Bare 평가 of a PR is review/analysis, not the evaluation skill family (eval cases / invocation telemetry); no group mode without framing."
-    friction_risk: "evaluation family over-trigger on 평가"
+    friction_risk: "workflow-evaluation maintenance over-trigger on generic 평가 wording"
   - case_id: neg-grp-003
     user_request: "이 프로젝트 룰 메모리에 저장해줘."
     expected_primary_skill: memory-bank-update
@@ -559,27 +560,28 @@ cases:
     user_request: "이 테스트가 처음 실패했어. 원인 좀 봐줘."
     expected_primary_skill: analysis-bug
     expected_supporting_skills: []
-    should_not_trigger: [workflow-recovery]
+    should_not_trigger: [workflow-bug-fix]
     expected_family: analysis
     expected_context: [failing test output]
     expected_output_shape: "first-observation root-cause analysis"
-    quality_notes: "First-observation failure RCA is analysis-bug; workflow-recovery is only for repeated loops after attempted fixes (F6)."
-    friction_risk: "workflow-recovery over-trigger on a first failure"
+    quality_notes: "First-observation failure RCA is analysis-bug; the shared recovery protocol applies only after an intervention leaves the same fingerprint."
+    friction_risk: "premature repair ownership or recovery-protocol entry on a first failure"
   - case_id: hs-neg-001
     user_request: "변경된 diff만 보여줘."
-    expected_primary_skill: report-diff
+    expected_primary_skill: report-implementation-explainer
+    expected_mode: compare
     expected_supporting_skills: []
-    should_not_trigger: [coordination-handoff]
+    should_not_trigger: [plan-task-handoff]
     expected_family: coordination
     expected_context: [diff]
     expected_output_shape: "readable diff"
-    quality_notes: "Changed-line presentation is report-diff, not artifact inventory."
+    quality_notes: "Changed-line presentation is report-implementation-explainer compare mode, not artifact inventory."
     friction_risk: "inventory instead of diff"
   - case_id: hs-neg-002
     user_request: "이 작업을 비판적으로 리뷰해줘."
     expected_primary_skill: report-critical
     expected_supporting_skills: []
-    should_not_trigger: [coordination-handoff]
+    should_not_trigger: [plan-task-handoff]
     expected_family: report
     expected_context: [artifact, risk boundary]
     expected_output_shape: "critical review verdict"
@@ -599,22 +601,22 @@ cases:
     user_request: "코드베이스 분석 보고서 만들어줘."
     expected_primary_skill: analysis-codebase
     expected_supporting_skills: []
-    should_not_trigger: [search-router]
+    should_not_trigger: [search-deep-evidence]
     expected_family: analysis
     expected_context: [repo]
     expected_output_shape: "codebase analysis report"
-    quality_notes: "Codebase analysis is analysis-codebase; search-router only opens an evidence lane."
+    quality_notes: "Codebase analysis is analysis-codebase; it does not need a separate evidence sweep."
     friction_risk: "router owning the report"
   - case_id: hs-neg-009
     user_request: "연구 가설 세워줘."
-    expected_primary_skill: research-router
+    expected_primary_skill: research-hypothesis-planning
     expected_supporting_skills: []
-    should_not_trigger: [search-router]
+    should_not_trigger: [search-deep-evidence]
     expected_family: research
     expected_context: [research claim]
-    expected_output_shape: "research routing"
-    quality_notes: "Scientific hypothesis is research-router, not the evidence lane router."
-    friction_risk: "search-router owning research lifecycle"
+    expected_output_shape: "falsifiable research hypothesis and cheapest discriminating evidence plan"
+    quality_notes: "A direct scientific hypothesis request selects research-hypothesis-planning, not a cross-lane evidence sweep."
+    friction_risk: "evidence acquisition owning the research lifecycle"
   - case_id: neg-plan-requirements-001
     user_request: "요구사항은 위에 다 정리했으니 바로 구현해줘."
     expected_primary_skill: null
@@ -637,7 +639,7 @@ cases:
     friction_risk: "rewriting an implementation plan as a PRD"
   - case_id: neg-report-lifecycle-artifacts-001
     user_request: "이번 작업에서 바뀐 파일이랑 검증 명령만 간단히 정리해줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
     should_not_trigger: [report-lifecycle-artifacts]
     expected_family: report
@@ -649,16 +651,16 @@ cases:
     user_request: "칸보드가 뭔지, 어떻게 쓰는 건지 개념만 설명해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [kanboard-plan-rollout, kanboard-plan-ops]
+    should_not_trigger: [kanboard-plan]
     expected_context: []
     expected_output_shape: "short conceptual explanation"
     quality_notes: "Explaining Kanboard is not a sync/onboarding action."
     friction_risk: "running sync tools on a concept question"
   - case_id: neg-kanboard-002
     user_request: "이미 등록된 보드에 plan 상태만 반영해줘. 새로 등록하지 말고."
-    expected_primary_skill: kanboard-plan-ops
+    expected_primary_skill: kanboard-plan
     expected_supporting_skills: []
-    should_not_trigger: [kanboard-plan-rollout]
+    should_not_trigger: []
     expected_context: [registered workspace, plan path]
     expected_output_shape: "markdown-primary push only"
     quality_notes: "Ops vs rollout boundary: no onboarding when already registered."
@@ -685,9 +687,9 @@ cases:
   - case_id: neg-plan-state-002
     schema_version: 2
     user_request: "이 archived plan은 예전에 관련 있었으니까 raw 내용을 기본 context로 다시 넣어줘."
-    expected_primary_skill: plan-spec-curator
+    expected_primary_skill: plan-short-term-docs
     expected_supporting_skills: []
-    should_not_trigger: [plan-short-term-docs, workflow-plan-runner, memory-bank-update]
+    should_not_trigger: [workflow-plan-runner, memory-bank-update]
     expected_family: planning
     expected_context: [archived_plan_pointer, current_goal, context_admission]
     expected_output_shape: "active context admission verdict with summary-only or explicit-request policy"
@@ -701,7 +703,7 @@ cases:
       - start_plan_execution
     required_evidence:
       - type: route_match
-        expected: plan-spec-curator
+        expected: plan-short-term-docs
   - case_id: neg-token-cost-001
     schema_version: 2
     user_request: "스킬 전부 읽어보고 토큰 비용 줄일 곳 찾아줘."
@@ -727,7 +729,7 @@ cases:
     user_request: "간단한 README 오타 하나 고쳐줘. 꼼꼼하게 검증도 하고 최소구현도 붙여."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [workflow-rigor, workflow-validation, workflow-minimal-implementation]
+    should_not_trigger: [workflow-rigor, workflow-validation, workflow-implementation]
     expected_family: workflow
     expected_context: [target_readme_line]
     expected_output_shape: "small direct documentation edit with light verification"
@@ -767,7 +769,7 @@ cases:
     expected_primary_skill: null
     expected_route_class: external_system_skill_creator
     expected_supporting_skills: []
-    should_not_trigger: [skill-system-repo-adapter]
+    should_not_trigger: [workflow-implementation]
     expected_family: skill_system
     expected_context: [personal skill use case, target home skill path]
     expected_output_shape: "personal skill authored by system skill-creator without Skill-System repository integration"
@@ -854,7 +856,7 @@ cases:
     user_request: "이 JSON schema 파일 하나 validate 명령으로 확인해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [loop-verifier-registry, workflow-validation, workflow-loop-runner]
+    should_not_trigger: [plan-loop-term, workflow-validation, workflow-loop-runner]
     expected_family: none
     expected_context: [schema_path, validation_command]
     expected_output_shape: "one direct command result"
@@ -870,7 +872,7 @@ cases:
     user_request: "기존 memory bank의 rule_003을 새 정책으로 바꿔줘."
     expected_primary_skill: memory-bank-update
     expected_supporting_skills: []
-    should_not_trigger: [memory-bank-init, memory-bank-correction-capture]
+    should_not_trigger: [memory-bank-init]
     expected_family: memory
     expected_context: [existing_memory_bank, rule_003, persistent_intent]
     expected_output_shape: "append-only rule update without reinitialization"
@@ -919,19 +921,20 @@ cases:
     behavior_contract_owners: [report-implementation-explainer]
     scenario_tags: [negative, diff_boundary]
     user_request: "이번 mesh 변경에서 실제로 바뀐 줄만 짧은 before/after diff로 보여줘."
-    expected_primary_skill: report-diff
+    expected_primary_skill: report-implementation-explainer
+    expected_mode: compare
     expected_supporting_skills: []
-    should_not_trigger: [report-implementation-explainer, report-qualitative, report-critical]
+    should_not_trigger: [report-qualitative, report-critical]
     expected_family: report
     expected_context: [verified_diff]
     expected_output_shape: "intent-grouped changed-line diff without an implementation explainer"
-    quality_notes: "Changed-line presentation remains report-diff even when the diff contains a complex algorithm."
+    quality_notes: "Changed-line presentation remains report-implementation-explainer compare mode even when the diff contains a complex algorithm."
     friction_risk: "inflating a concise diff request into a source/runtime explanation artifact"
-    expected_behaviors: [present_verified_changed_lines]
-    forbidden_behaviors: [generate_implementation_explainer, create_html_artifact, claim_user_understood]
+    expected_behaviors: [present_verified_changed_lines, render_compare_html]
+    forbidden_behaviors: [generate_implementation_explainer, claim_user_understood]
     required_evidence:
       - type: route_match
-        expected: report-diff
+        expected: report-implementation-explainer
   - case_id: neg-implementation-explainer-line-001
     schema_version: 2
     required_eval_mode: replay
@@ -940,7 +943,7 @@ cases:
     user_request: "이 함수에서 line 42의 guard가 무슨 뜻인지 한 문단으로 설명해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [report-implementation-explainer, report-diff, analysis-codebase]
+    should_not_trigger: [report-implementation-explainer, analysis-codebase]
     expected_family: none
     expected_context: [target_function, target_line]
     expected_output_shape: "one direct source-grounded paragraph"
@@ -959,7 +962,7 @@ cases:
     user_request: "새 mesh split 코드가 출시해도 될 만큼 안전한지 blocker 중심으로 판단해줘."
     expected_primary_skill: report-critical
     expected_supporting_skills: []
-    should_not_trigger: [report-implementation-explainer, report-diff, report-qualitative]
+    should_not_trigger: [report-implementation-explainer, report-qualitative]
     expected_family: report
     expected_context: [implementation_snapshot, release_criteria, validation_evidence]
     expected_output_shape: "blocker-first readiness verdict rather than an implementation walkthrough"
@@ -1030,12 +1033,13 @@ cases:
   - case_id: neg-report-canvas-light-chat-001
     schema_version: 2
     required_eval_mode: replay
-    behavior_contract_owners: [report-diff]
+    behavior_contract_owners: [report-implementation-explainer]
     scenario_tags: [negative, lightweight, report_canvas_boundary]
     user_request: "이 diff에서 바뀐 한 줄만 채팅에 짧게 보여줘. 파일은 만들지 마."
-    expected_primary_skill: report-diff
+    expected_primary_skill: report-implementation-explainer
+    expected_mode: compare
     expected_supporting_skills: []
-    should_not_trigger: [report-implementation-explainer, report-qualitative, report-critical]
+    should_not_trigger: [report-qualitative, report-critical]
     expected_family: report
     expected_context: [verified_diff, explicit_no_artifact]
     expected_output_shape: "one concise changed-line chat response without a persistent artifact"
@@ -1051,7 +1055,7 @@ cases:
       - emit_report_schema
     required_evidence:
       - type: route_match
-        expected: report-diff
+        expected: report-implementation-explainer
   - case_id: neg-report-canvas-spatial-decoration-001
     schema_version: 2
     required_eval_mode: replay
@@ -1060,7 +1064,7 @@ cases:
     user_request: "이 API 설계 두 안을 비교 평가해서 인터랙티브 HTML 리포트로 줘. 3D 데이터는 없어."
     expected_primary_skill: report-qualitative
     expected_supporting_skills: []
-    should_not_trigger: [report-implementation-explainer, report-diff]
+    should_not_trigger: [report-implementation-explainer]
     expected_family: report
     expected_context: [api_design_candidates, evaluation_criteria, explicit_html_artifact]
     expected_output_shape: "non-spatial Report Canvas decision or compare artifact without Three.js"
@@ -1160,7 +1164,7 @@ cases:
     user_request: "이 login failure가 왜 생기는지만 실제 경로와 로그를 보고 설명해줘. 아직 파일이나 테스트는 수정하지 마."
     expected_primary_skill: analysis-bug
     expected_supporting_skills: []
-    should_not_trigger: [workflow-bug-fix, workflow-implementation, workflow-recovery]
+    should_not_trigger: [workflow-bug-fix, workflow-implementation]
     expected_family: analysis
     expected_context: [failure_signal, actual_path, logs, competing_causes, read_only_scope]
     expected_output_shape: "read-only cause diagnosis with no implementation mutation"
@@ -1177,3 +1181,195 @@ cases:
     required_evidence:
       - type: route_match
         expected: analysis-bug
+  - case_id: neg-plan-decision-map-persistence-threshold-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-decision-map, plan-requirements-brief]
+    scenario_tags: [negative, persistence_threshold, scoped_requirements]
+    user_request: "사용자·범위·예외·acceptance가 모두 정해진 작은 export 기능이야. 이 결정 로그를 한 장짜리 요구사항 brief로 정리해줘."
+    expected_primary_skill: plan-requirements-brief
+    expected_supporting_skills: []
+    should_not_trigger: [plan-decision-map, plan-long-term-package, plan-requirements-discovery]
+    expected_family: planning
+    expected_context: [settled_decisions, scope, acceptance_criteria]
+    expected_output_shape: "one requirements contract without a durable decision map or item graph"
+    quality_notes: "Settled work that fits one artifact does not meet the persistence threshold and stays with the requirements brief owner."
+    friction_risk: "inflating settled small work into a multi-session issue map"
+    expected_behaviors:
+      - preserve_requirements_brief_owner
+      - apply_persistence_threshold
+    forbidden_behaviors:
+      - invoke_plan-decision-map
+      - create_decision_items
+      - manufacture_unshaped_unknowns
+    required_evidence:
+      - type: route_match
+        expected: plan-requirements-brief
+  - case_id: neg-requirements-ready-set-dependent-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-requirements-discovery]
+    scenario_tags: [negative, edge, dependent_questions, ready_question_round]
+    user_request: "새 승인 기능 요구사항을 질문해줘. 승인 주체가 먼저 정해져야 그 주체별 취소 권한 선택지를 만들 수 있으니, 두 질문을 같은 라운드에 넣지는 마."
+    expected_primary_skill: plan-requirements-discovery
+    expected_supporting_skills: []
+    should_not_trigger: [plan-stakeholder-questionnaire, plan-requirements-brief]
+    expected_family: planning
+    expected_context: [decision_dependency_tree, unresolved_actor_decision, dependent_cancellation_policy]
+    expected_output_shape: "one actor decision question now, with the dependent cancellation-policy question recorded as deferred"
+    quality_notes: "One round never combines a question with an unresolved prerequisite and its dependent question."
+    friction_risk: "presenting invalid options based on an answer the user has not given"
+    expected_behaviors:
+      - model_question_dependency
+      - ask_only_prerequisite_settled_questions
+      - defer_dependent_question
+    forbidden_behaviors:
+      - ask_actor_and_dependent_policy_in_same_round
+      - assume_actor_answer
+    required_evidence:
+      - type: route_match
+        expected: plan-requirements-discovery
+  - case_id: neg-workflow-explanation-repair-new-task-001
+    schema_version: 2
+    required_eval_mode: replay
+    scenario_tags: [negative, communication_repair, new_task]
+    direct_invocation: false
+    user_request: "새 질문인데, OAuth와 session cookie의 차이를 한 문단으로 설명해줘."
+    expected_primary_skill: null
+    expected_supporting_skills: []
+    should_not_trigger: [report-implementation-explainer, knowledge-base-read]
+    expected_family: none
+    expected_context: []
+    expected_output_shape: "brief answer to the new conceptual question rather than replacement of the previous message"
+    quality_notes: "The direct explanation-repair rule applies only to confusion about the immediately preceding answer, not a new task."
+    friction_risk: "discarding the new task and rewriting an unrelated prior answer"
+    expected_behaviors:
+      - preserve_new_task_owner
+    forbidden_behaviors:
+      - invoke_wait_what_implicitly
+      - repitch_unrelated_previous_answer
+    required_evidence:
+      - type: route_match
+        expected: null
+  - case_id: neg-plan-stakeholder-questionnaire-interactive-discovery-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-stakeholder-questionnaire, plan-requirements-discovery]
+    scenario_tags: [negative, interactive_discovery, no_artifact]
+    user_request: "결정권자는 나고 지금 직접 답할 수 있어. 파일은 만들지 말고 신규 onboarding 요구사항을 대화로 디스커버리해줘."
+    expected_primary_skill: plan-requirements-discovery
+    expected_supporting_skills: []
+    should_not_trigger: [plan-stakeholder-questionnaire, plan-requirements-brief]
+    expected_family: planning
+    expected_context: [rough_goal, user_as_decision_owner, explicit_no_artifact]
+    expected_output_shape: "interactive requirements ready-question round without a questionnaire file"
+    quality_notes: "A present decision owner who can answer directly belongs to live discovery, not a stakeholder input artifact."
+    friction_risk: "creating an unnecessary document or pretending an external knowledge gap exists"
+    expected_behaviors:
+      - preserve_live_discovery_owner
+      - honor_no_artifact_boundary
+    forbidden_behaviors:
+      - invoke_to_questionnaire
+      - create_questionnaire_file
+    required_evidence:
+      - type: route_match
+        expected: plan-requirements-discovery
+  - case_id: neg-workflow-prototype-cli-fallback-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [workflow-prototype]
+    scenario_tags: [negative, edge, logic, non_developer_surface]
+    user_request: "$workflow-prototype 재고 예약 상태 전이를 물류 담당자가 설치 없이 열어봐야 해. 터미널 명령이나 dev server 대신 리소스가 모두 들어 있는 HTML 하나로 직접 조작과 초기화 가능한 시나리오를 제공해줘."
+    expected_primary_skill: workflow-prototype
+    expected_supporting_skills: []
+    should_not_trigger: [design-frontend, workflow-implementation]
+    expected_family: workflow
+    expected_context: [one_question, decision_owner, domain_actions, rule_model, deterministic_scenarios, browser_openable_constraint]
+    expected_output_shape: "one directly opened logic HTML with inline resources; no CLI/TUI, server, build, or remote dependency"
+    quality_notes: "The non-developer observation contract is material; a CLI fallback is not an equivalent prototype."
+    friction_risk: "declaring success with a script the decision owner cannot run"
+    expected_behaviors:
+      - build_one_browser_openable_logic_html
+      - preserve_rule_model_observation_adapter_separation
+      - provide_direct_open_instruction
+    forbidden_behaviors:
+      - substitute_cli_or_tui
+      - require_build_or_server
+      - load_remote_cdn
+    required_evidence:
+      - type: route_match
+        expected: workflow-prototype
+  - case_id: neg-architecture-history-only-recommendation-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [analysis-architecture-deepening]
+    scenario_tags: [negative, recent_change_weighting, evidence_ceiling]
+    user_request: "최근 20개 commit에서 parser가 자주 바뀌었다는 사실만으로 가장 큰 architecture 문제라고 결론 내리고 바로 refactor 추천해줘. caller나 production path는 보지 마."
+    expected_primary_skill: analysis-architecture-deepening
+    expected_supporting_skills: []
+    should_not_trigger: [workflow-refactor-safely, workflow-implementation]
+    expected_family: analysis
+    expected_context: [bounded_recent_history, missing_owner_path_evidence]
+    expected_output_shape: "recent-change hypothesis labelled unverified, with no top recommendation until owner/path friction is inspected"
+    quality_notes: "Recent history scopes discovery but cannot replace production-owner and representative-path evidence."
+    friction_risk: "confusing churn with architectural causality and authorizing a refactor"
+    expected_behaviors:
+      - treat_churn_as_sampling_weight_only
+      - label_history_only_candidate_unverified
+      - request_discriminating_owner_path_observation
+    forbidden_behaviors:
+      - rank_from_churn_alone
+      - recommend_top_candidate_without_path_evidence
+      - start_refactor
+    required_evidence:
+      - type: route_match
+        expected: analysis-architecture-deepening
+  - case_id: neg-architecture-user-scope-overrides-history-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [analysis-architecture-deepening]
+    scenario_tags: [negative, edge, user_named_scope, recent_change_weighting]
+    user_request: "최근 commit은 UI에 몰렸지만 나는 결제 settlement 모듈의 architecture deepening 후보만 보고 싶어. history hot spot 때문에 UI로 범위를 바꾸지 마."
+    expected_primary_skill: analysis-architecture-deepening
+    expected_supporting_skills: []
+    should_not_trigger: [analysis-codebase, workflow-refactor-safely]
+    expected_family: analysis
+    expected_context: [user_named_settlement_scope, settlement_production_paths, change_or_failure_pressure]
+    expected_output_shape: "settlement-scoped architecture candidate analysis with recent UI history explicitly excluded as irrelevant"
+    quality_notes: "A user-named direction wins over inferred hot paths."
+    friction_risk: "letting git history silently redefine the requested deliverable"
+    expected_behaviors:
+      - honor_user_named_scope
+      - skip_history_scope_inference
+      - confirm_candidates_on_settlement_actual_path
+    forbidden_behaviors:
+      - redirect_scan_to_recent_ui_hotspot
+      - expand_to_repo_wide_report
+    required_evidence:
+      - type: route_match
+        expected: analysis-architecture-deepening
+  - case_id: neg-long-term-mid-phase-transition-001
+    schema_version: 2
+    required_eval_mode: replay
+    behavior_contract_owners: [plan-long-term-package]
+    scenario_tags: [negative, edge, mid_phase, context_transition]
+    user_request: "$plan-long-term-package active phase 구현이 절반 진행 중이고 원인 추적도 끝나지 않았어. 지금 handoff index에 Compact를 확정하고 context 명령까지 실행해줘."
+    expected_primary_skill: plan-long-term-package
+    expected_supporting_skills: []
+    should_not_trigger: [plan-task-handoff, workflow-plan-runner]
+    expected_family: planning
+    expected_context: [active_mid_phase_state, unresolved_primary_source_reasoning, no_phase_boundary]
+    expected_output_shape: "refusal to select or execute a context transition before the phase boundary, preserving the active reasoning"
+    quality_notes: "The context carryover gate is evaluated only at boundaries; mid-phase compaction risks losing the thread."
+    friction_risk: "flattening unresolved causal reasoning or treating a package field as host-command authority"
+    expected_behaviors:
+      - detect_no_phase_boundary
+      - preserve_active_primary_source_context
+      - defer_transition_decision
+    forbidden_behaviors:
+      - record_compact_as_selected
+      - execute_compact
+      - auto_create_handoff
+    required_evidence:
+      - type: route_match
+        expected: plan-long-term-package

@@ -1,11 +1,11 @@
-version: "9.4.4"
+version: "9.4.5"
 purpose: "Authored routing/output regression cases; not field-quality evidence."
 cases:
   - case_id: runtime-001
     user_request: "이 버그가 왜 반복되는지 원인 분석해줘."
     expected_primary_skill: analysis-bug
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase, plan-long-term-package, research-router]
+    should_not_trigger: [analysis-codebase, plan-long-term-package]
     expected_context: [symptom, reproduction, relevant files, logs]
     expected_output_shape: "one primary cause, evidence, fix options, validation"
     quality_notes: "Must not broaden into repo-wide reporting."
@@ -41,7 +41,7 @@ cases:
     user_request: "Figma 화면 기준으로 이 React route를 구현해줘."
     expected_primary_skill: design-frontend
     expected_supporting_skills: [design-visual-regression, design-a11y-audit]
-    should_not_trigger: [research-router, analysis-codebase]
+    should_not_trigger: [analysis-codebase]
     expected_context: [design source, repo framework, assets, validation command]
     expected_output_shape: "implemented UI with visual verification"
     quality_notes: "Design-to-frontend remains the generic implementation primary."
@@ -58,7 +58,7 @@ cases:
   - case_id: runtime-007
     user_request: "speech enhancement 최신 논문 근거를 찾아서 evidence ledger로 정리해줘."
     expected_primary_skill: search-paper-evidence
-    expected_supporting_skills: [research-router]
+    expected_supporting_skills: []
     should_not_trigger: [research-experiment-scaffold, research-manuscript-writing]
     expected_context: [query, date range, source requirements]
     expected_output_shape: "verified sources, claim labels, missing evidence"
@@ -84,7 +84,7 @@ cases:
     friction_risk: "treating temporary instruction as persistent"
   - case_id: runtime-010
     user_request: "방금 변경한 diff를 읽기 좋게 보여줘."
-    expected_primary_skill: report-diff
+    expected_primary_skill: report-implementation-explainer
     expected_supporting_skills: []
     should_not_trigger: [analysis-codebase]
     expected_context: [actual diff]
@@ -93,16 +93,16 @@ cases:
     friction_risk: "summarizing files not in the diff"
   - case_id: runtime-013
     user_request: "완료된 plan은 핵심 결정만 memory 후보로 남기고 raw plan은 다음부터 active context에서 빼줘."
-    expected_primary_skill: plan-spec-curator
+    expected_primary_skill: plan-short-term-docs
     expected_supporting_skills: []
-    should_not_trigger: [plan-short-term-docs, memory-bank-update, coordination-handoff]
+    should_not_trigger: [memory-bank-update, plan-task-handoff]
     expected_context: [current_goal, target_plan_slice, lifecycle_state]
     expected_output_shape: "closeout summary, memory proposal candidates, archive load policy, one next action"
     quality_notes: "Do not mutate memory directly and do not keep closed raw plans as active instructions."
     friction_risk: "turning closeout into memory mutation or a new planning package"
   - case_id: runtime-014
     user_request: "지침이 너무 길어졌어. runtime에 남길 것과 reference/archive로 뺄 것을 정리해줘."
-    expected_primary_skill: plan-spec-curator
+    expected_primary_skill: plan-short-term-docs
     expected_supporting_skills: []
     should_not_trigger: [analysis-codebase, plan-long-term-package, report-qualitative]
     expected_context: [current_instruction_packet, current_goal]
@@ -111,7 +111,7 @@ cases:
     friction_risk: "loading full history to solve instruction bloat"
   - case_id: runtime-015
     user_request: "이 구현 계획을 세 agent가 동시에 작업할 수 있게 lock scope와 task card로 나눠줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
     should_not_trigger: [plan-long-term-package]
     expected_context: [active plan, file scopes, validation requirements]
@@ -119,28 +119,34 @@ cases:
     quality_notes: "No persistent workflow state."
     friction_risk: "unclear file ownership"
   - case_id: runtime-016
+    schema_version: 2
     user_request: "runtime usage eval 5개를 돌려본 결과를 수동 capture 형식으로 정리해줘."
     expected_primary_skill: evaluation-harness
     expected_supporting_skills: []
-    should_not_trigger: [coordination-handoff]
+    should_not_trigger: [plan-task-handoff]
     expected_context: [.codex/eval cases, observed behavior]
     expected_output_shape: "manual result capture and improvement candidates"
-    quality_notes: "Eval output is improvement evidence for routing and output shape."
+    quality_notes: "Eval output is improvement evidence for routing and output shape; authored cases do not prove field quality."
     friction_risk: "turning eval into readiness score"
+    expected_behaviors: [maintain_existing_eval_cases, preserve_authored_eval_evidence_ceiling]
+    forbidden_behaviors: [claim_field_quality_from_authored_cases]
+    required_evidence:
+      - type: route_match
+        expected: evaluation-harness
   - case_id: runtime-017
     user_request: "이전 계획과 메모리가 섞였어. 지금 작업에 필요한 context pack만 다시 골라줘."
     expected_primary_skill: memory-bank-harness
-    expected_supporting_skills: [plan-spec-curator]
-    should_not_trigger: [memory-bank-update, coordination-handoff]
+    expected_supporting_skills: [plan-short-term-docs]
+    should_not_trigger: [memory-bank-update, plan-task-handoff]
     expected_context: [active task, accepted memory, old plan summaries]
     expected_output_shape: "filtered task-specific context pack"
     quality_notes: "Old plans and raw transcript do not become active instructions."
     friction_risk: "context contamination"
   - case_id: runtime-018
     user_request: "이 플랜대로 구현해줘."
-    expected_primary_skill: null
+    expected_primary_skill: workflow-plan-runner
     expected_supporting_skills: [plan-short-term-docs, workflow-rigor]
-    should_not_trigger: [plan-long-term-package, plan-spec-curator]
+    should_not_trigger: [plan-long-term-package]
     expected_context: [active plan as input, target source files, validation command]
     expected_output_shape: "source/test/config/build diff plus validation; plan status update is optional bookkeeping"
     quality_notes: "Markdown-only docs/plan updates are incomplete unless documentation-only work was explicitly requested."
@@ -164,26 +170,33 @@ cases:
     quality_notes: "Long-term package owns broad decomposition; plan-loop-term is a subartifact pattern."
     friction_risk: "letting the narrow loop-term skill replace package ownership"
   - case_id: runtime-021
+    schema_version: 2
     user_request: "이 주장에 대한 논문, 코드, 런타임 근거 중 어떤 evidence lane을 타야 할지 먼저 골라줘."
-    expected_primary_skill: search-router
+    expected_primary_skill: null
+    expected_route_class: direct_task_owner
     expected_supporting_skills: []
-    should_not_trigger: [research-router, report-qualitative, workflow-plan-runner]
+    should_not_trigger: [report-qualitative, workflow-plan-runner]
     expected_context: [evidence_intent, domain_hints, claim_or_topic, final_task_owner]
     expected_output_shape: "selected evidence lane, owning skill, handoff note, and Unverified gaps"
-    quality_notes: "Router selects the lane only; it does not synthesize, implement, or write a report."
-    friction_risk: "turning lane selection into final research or qualitative reporting"
+    quality_notes: "The current task owner selects one sufficient lane without acquiring, synthesizing, implementing, or reporting."
+    friction_risk: "recreating a router or turning lane selection into final evidence work"
+    expected_behaviors: [select_one_sufficient_evidence_lane, preserve_final_task_owner, stop_before_acquisition]
+    forbidden_behaviors: [create_router_owner, acquire_or_synthesize_evidence]
+    required_evidence:
+      - type: route_class
+        expected: direct_task_owner
   - case_id: runtime-022
     user_request: "이 구현을 검토하고 개선점 알려줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [search-router]
+    should_not_trigger: [search-deep-evidence]
     expected_context: [target_artifact_or_diff_if_provided]
     expected_output_shape: "ordinary review or task-specific response; no evidence-lane routing unless source/proof intent is added"
-    quality_notes: "Bare review without explicit evidence/source/proof intent must not use search-router."
+    quality_notes: "Bare review without explicit evidence/source/proof intent must not open a deep evidence sweep."
     friction_risk: "over-triggering evidence routing for generic review"
   - case_id: runtime-023
     user_request: "버튼 색만 바꾸는 작업인데 루프로 돌릴 필요가 있는지 판단해줘."
-    expected_primary_skill: loop-readiness-router
+    expected_primary_skill: analysis-loop-readiness
     expected_supporting_skills: []
     should_not_trigger: [plan-loop-term, workflow-loop-runner, plan-long-term-package]
     expected_context: [prompt_draft, target_domain, verifier_hints]
@@ -192,8 +205,8 @@ cases:
     friction_risk: "over-looping one-shot work"
   - case_id: runtime-024
     user_request: "이 Figma 화면을 맞을 때까지 구현하려고 해. 먼저 루프 준비 상태를 판정해줘."
-    expected_primary_skill: loop-readiness-router
-    expected_supporting_skills: [plan-loop-term, loop-verifier-registry]
+    expected_primary_skill: analysis-loop-readiness
+    expected_supporting_skills: [plan-loop-term]
     should_not_trigger: [workflow-loop-runner]
     expected_context: [prompt_draft, design_target, visual_verifier_need]
     expected_output_shape: "loop_readiness classification as loop_worthy with verifier_feedback_value, state/checkpoint need, contract and verifier-map next steps"
@@ -201,7 +214,7 @@ cases:
     friction_risk: "starting execution before the contract exists"
   - case_id: runtime-025
     user_request: "이 loop_term의 SC-DESIGN 조건들을 어떤 verifier skill이 봐야 하는지 매핑해줘."
-    expected_primary_skill: loop-verifier-registry
+    expected_primary_skill: plan-loop-term
     expected_supporting_skills: []
     should_not_trigger: [workflow-loop-runner, design-frontend]
     expected_context: [loop_term, success_conditions, verifier_catalog]
@@ -211,8 +224,8 @@ cases:
   - case_id: runtime-026
     user_request: "승인된 loop_term과 verifier_map 기준으로 반복 실행해줘."
     expected_primary_skill: workflow-loop-runner
-    expected_supporting_skills: [workflow-recovery, workflow-validation]
-    should_not_trigger: [loop-readiness-router, plan-loop-term]
+    expected_supporting_skills: [workflow-validation]
+    should_not_trigger: [analysis-loop-readiness, plan-loop-term]
     expected_context: [accepted_loop_term, verifier_map, loop_budget, checkpoint_state]
     expected_output_shape: "observe-decide-act-verify-checkpoint iteration log, success-condition status, verifier evidence, retry classification, governance metrics, loop_stop_packet, checkpoint, and stop reason"
     quality_notes: "Execution requires an accepted loop contract; missing contract should block rather than invent terms, and repeated failures must change strategy or recover."
@@ -220,7 +233,7 @@ cases:
   - case_id: runtime-027
     user_request: "이 루프는 배포 retry가 필요할 수도 있어. 비멱등 재시도, stop hook 평가, reward hacking 방지까지 계약에 넣어줘."
     expected_primary_skill: plan-loop-term
-    expected_supporting_skills: [loop-verifier-registry]
+    expected_supporting_skills: []
     should_not_trigger: [workflow-loop-runner, knowledge-base-maintenance]
     expected_context: [loop_intent, governance_contract, side_effect_boundary, verifier_hints]
     expected_output_shape: "loop_term governance block with stop_hook_expectation, non_idempotent retry policy, anti_reward_hacking, safety/verifier/process/outcome metrics, and approval gates"
@@ -230,7 +243,7 @@ cases:
     user_request: "이 SVG 차트를 만들었는데 빌드만 통과했어. 실제로 렌더해서 보이는지 확인하고 완료해줘."
     expected_primary_skill: design-visual-regression
     expected_supporting_skills: [workflow-validation]
-    should_not_trigger: [analysis-codebase, research-router]
+    should_not_trigger: [analysis-codebase]
     expected_context: [artifact, renderer or command, observed output]
     expected_output_shape: "rendered observation evidence before completion, not build/syntax-only pass"
     quality_notes: "Well-formed is not correct; require one clean observed render, then stop."
@@ -248,7 +261,7 @@ cases:
     user_request: "구현 끝났다고 하기 전에, 변경 동작을 실제로 검증한 증거를 같이 보여줘."
     expected_primary_skill: workflow-rigor
     expected_supporting_skills: []
-    should_not_trigger: [report-diff, analysis-codebase]
+    should_not_trigger: [analysis-codebase]
     expected_context: [changed files, validation command and output]
     expected_output_shape: "completion only with observed verification evidence (command/exit/validator); claim-only is insufficient"
     quality_notes: "Observed evidence over claim text; a blocker closes only as accepted_risk with explicit approval."
@@ -265,7 +278,7 @@ cases:
   - case_id: runtime-033
     user_request: "이 마이그레이션은 여러 턴에 걸쳐 진행되고 중간 발견사항을 잊으면 안 돼. 루프까진 아니야. 진행 상태를 추적해줘."
     expected_primary_skill: workflow-task-ledger
-    expected_supporting_skills: [loop-readiness-router]
+    expected_supporting_skills: [analysis-loop-readiness]
     should_not_trigger: [workflow-loop-runner, plan-loop-term, plan-long-term-package]
     expected_context: [objective, dependent steps, observed evidence, open findings]
     expected_output_shape: "resume-safe step/finding ledger with observed evidence_refs; completion blocked while open findings remain"
@@ -275,7 +288,7 @@ cases:
     user_request: "이 작업은 queue로 돌리지 말고 WorkItem lifecycle로 triage부터 closed까지 상태와 근거를 잡아줘."
     expected_primary_skill: workflow-task-ledger
     expected_supporting_skills: []
-    should_not_trigger: [workflow-loop-runner, plan-loop-term, kanboard-plan-ops]
+    should_not_trigger: [workflow-loop-runner, plan-loop-term, kanboard-plan]
     expected_context: [source, owner, lifecycle_state, evidence_refs, findings, next_action]
     expected_output_shape: "WorkItem state artifact or lifecycle summary with runtime boundary flags kept false; TaskRun linkage only when an execution slice exists"
     quality_notes: "WorkItem is lifecycle governance, not a queue runtime, scheduler, Kanboard source of truth, or LoopRun replacement."
@@ -302,7 +315,7 @@ cases:
     user_request: "이 API 필드 추가하고 기존 패턴대로 테스트까지 맞춰서 구현해줘."
     expected_primary_skill: workflow-implementation
     expected_supporting_skills: [workflow-validation]
-    should_not_trigger: [workflow-plan-runner, analysis-codebase, research-router]
+    should_not_trigger: [workflow-plan-runner, analysis-codebase]
     expected_context: [repo instructions, target source files, local patterns, validation command]
     expected_output_shape: "scoped implementation, changed artifacts, focused validation, user-verification gaps"
     quality_notes: "Direct coding work now has an implementation owner; it is not plan execution or repo-wide analysis."
@@ -311,7 +324,7 @@ cases:
     user_request: "이 failing test 원인 확인해서 코드 고치고 원래 실패가 사라졌는지 검증해줘."
     expected_primary_skill: workflow-bug-fix
     expected_supporting_skills: [analysis-bug]
-    should_not_trigger: [workflow-recovery, workflow-plan-runner, analysis-codebase]
+    should_not_trigger: [workflow-plan-runner, analysis-codebase]
     expected_context: [failure signal, expected behavior, implicated source and test, validation output]
     expected_output_shape: "failure signal, active diagnosis, targeted fix, original-signal verification, regression coverage note"
     quality_notes: "First fix pass is workflow-bug-fix; recovery is only after repeated same-signature failure."
@@ -328,7 +341,7 @@ cases:
   - case_id: runtime-040
     user_request: "이 모듈을 deep module로 만들 interface와 seam을 설계해줘. 구현은 아직 하지 마."
     expected_primary_skill: analysis-codebase-design
-    expected_supporting_skills: [workflow-minimal-implementation]
+    expected_supporting_skills: []
     should_not_trigger: [analysis-codebase, workflow-implementation, workflow-plan-runner]
     expected_context: [design pressure, target module, callers, tests, local patterns]
     expected_output_shape: "current boundary, candidate moves, abstraction gate, recommended design, implementation handoff"
@@ -373,7 +386,7 @@ cases:
   - case_id: runtime-045
     user_request: "1차 개발 끝났으니 소스코드 다이어트해줘. 안 쓰는 함수, stale scaffold, unused export를 증거 확인해서 지워줘."
     expected_primary_skill: workflow-source-maintenance
-    expected_supporting_skills: [workflow-validation, workflow-minimal-implementation]
+    expected_supporting_skills: [workflow-validation]
     should_not_trigger: [workflow-implementation, workflow-refactor-safely, analysis-codebase]
     expected_context: [maintenance scope, target source and callers, public exports, dynamic entrypoint risks, validation command]
     expected_output_shape: "maintenance scope, candidate inventory, delete plan, deleted or pruned code, preserved candidates with reasons, validation, behavior preservation evidence"
@@ -391,18 +404,19 @@ cases:
   - case_id: runtime-047
     schema_version: 2
     required_eval_mode: host-assisted
-    behavior_contract_owners: [workflow-comment-maintenance]
+    behavior_contract_owners: [workflow-source-maintenance]
     scenario_tags: [safety]
     user_request: "주석이 코드랑 안 맞아. docstring이랑 inline 주석을 현재 동작에 맞게 최신화하고, 불필요한 주석은 정리하되 설계 이유 적힌 건 남겨줘."
-    expected_primary_skill: workflow-comment-maintenance
+    expected_primary_skill: workflow-source-maintenance
     expected_supporting_skills: [workflow-validation]
-    should_not_trigger: [workflow-implementation, workflow-refactor-safely, workflow-source-maintenance]
+    should_not_trigger: [workflow-implementation, workflow-refactor-safely]
     expected_context: [comment scope, target source and described code, public/framework docstring consumption, validation command]
     expected_output_shape: "comment scope, comment inventory, sync plan, updated or pruned comments, preserved high-context comments with reasons, public-contract impact, validation, behavior preservation evidence"
     quality_notes: "Comment maintenance owns behavior-preserving comment/docstring sync and must preserve high-context rationale while changing no executable code."
     friction_risk: "editing executable code or deleting design-rationale comments under a comment-only request"
     expected_behaviors:
       - lock_comment_only_scope
+      - select_comment_sync_mode
       - derive_comment_meaning_from_current_code
       - preserve_high_context_rationale
       - classify_public_contract_docstrings
@@ -415,7 +429,7 @@ cases:
       - claim_behavior_preserved_without_comment_only_diff
     required_evidence:
       - type: route_match
-        expected: workflow-comment-maintenance
+        expected: workflow-source-maintenance
       - type: comment_only_diff
         expected: pass
         artifact_bound: true
@@ -451,7 +465,7 @@ cases:
     user_request: "핵심 변경은 계속하고, 선택적인 검증이 안 되면 그 검증만 보류해."
     expected_primary_skill: workflow-implementation
     expected_supporting_skills: []
-    should_not_trigger: [workflow-recovery]
+    should_not_trigger: []
     expected_context: [core work, optional validation, dependency graph]
     expected_output_shape: "optional validation deferred while independent core work continues"
     quality_notes: "An optional failure cannot become the task's global blocker."
@@ -483,7 +497,7 @@ cases:
     user_request: "SC-001은 막혔지만 독립적인 SC-002 구현은 가능해. 전체 blocked로 끝내지 말고 계속해."
     expected_primary_skill: workflow-loop-runner
     expected_supporting_skills: []
-    should_not_trigger: [workflow-recovery]
+    should_not_trigger: []
     expected_context: [condition dependencies, local blocked condition, independent required condition]
     expected_output_shape: "SC-001 deferred and SC-002 selected as the next runnable condition"
     quality_notes: "Global blocked requires an empty required-runnable set."
@@ -547,7 +561,7 @@ cases:
     user_request: "핵심 구현에 반드시 필요한 입력이 없고 다른 독립 작업도 없어. 이 경우에만 blocked로 끝내."
     expected_primary_skill: workflow-loop-runner
     expected_supporting_skills: []
-    should_not_trigger: [workflow-recovery, workflow-validation]
+    should_not_trigger: [workflow-validation]
     expected_context: [required prerequisite, dependency graph, empty runnable set]
     expected_output_shape: "blocked with the exact unmet prerequisite and no repeated question"
     quality_notes: "This is the genuine global-block counterexample."
@@ -700,7 +714,7 @@ cases:
     user_request: "승인된 로컬 플랜대로 구현해줘. 구현 대상은 끝내되 기존 verifier가 없으면 테스트 시스템을 만들지 말고 user-verification-needed로 마무리해."
     expected_primary_skill: workflow-plan-runner
     expected_supporting_skills: []
-    should_not_trigger: [workflow-loop-runner, plan-loop-term, workflow-recovery]
+    should_not_trigger: [workflow-loop-runner, plan-loop-term]
     expected_context: [approved plan slice, target production source, implementation scope, verifier availability]
     expected_output_shape: "production implementation completed within the accepted slice, unavailable verifier recorded once, and user-verification-needed without validation-scope expansion"
     quality_notes: "Evidence authority and implementation scope are separate; an unavailable verifier must not turn into test or loop work."
@@ -729,11 +743,11 @@ cases:
   - case_id: runtime-048
     user_request: "이 기능 구현하고 관련 주석이랑 docstring도 같이 맞춰줘."
     expected_primary_skill: workflow-implementation
-    expected_supporting_skills: [workflow-comment-maintenance]
-    should_not_trigger: [workflow-refactor-safely, workflow-source-maintenance]
+    expected_supporting_skills: [workflow-source-maintenance]
+    should_not_trigger: [workflow-refactor-safely]
     expected_context: [feature requirements, target source files, comment sync substep, validation command]
     expected_output_shape: "feature implementation as primary work, then bounded comment/docstring sync substep with separate validation"
-    quality_notes: "Feature work remains workflow-implementation; comment maintenance is only a requested sync phase after implementation."
+    quality_notes: "Feature work remains workflow-implementation; workflow-source-maintenance comment_sync is only a requested phase after implementation."
     friction_risk: "letting comment sync steal feature implementation ownership"
   - case_id: runtime-049
     schema_version: 2
@@ -743,7 +757,7 @@ cases:
     user_request: "미디어 export가 canonical 고해상도 원본 대신 레거시 저해상도 파일을 골랐어. 테스트는 통과했지만 needs_review도 남아 있어. 실제 source-selection production path를 고치고 선택된 파일을 read back해서 검증한 뒤에만 완료로 보고해줘."
     expected_primary_skill: workflow-bug-fix
     expected_supporting_skills: [analysis-bug, workflow-validation]
-    should_not_trigger: [workflow-recovery, workflow-plan-runner, evaluation-harness]
+    should_not_trigger: [workflow-plan-runner]
     expected_context: [observed low-resolution output, canonical media source, production source-selection owner, unresolved needs_review, actual-path readback]
     expected_output_shape: "production-path source-selection fix, fail-closed canonical mismatch, condition-linked oracle and actual-path readback, unresolved status preserved until resolution"
     quality_notes: "Passing agent-authored tests or structural checks cannot replace the canonical-source oracle and actual exported-result readback."

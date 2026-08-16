@@ -566,8 +566,19 @@ class ReportCanvasTests(unittest.TestCase):
             with self.subTest(skill=skill.parent.name):
                 body = skill.read_text(encoding="utf-8")
                 self.assertIn("For every admitted invocation", body)
-                self.assertIn("references/report_canvas_contract.md", body)
-                self.assertIn("scripts/report-canvas/render_report.py", body)
+                self.assertIn("this active skill's resolved `SKILL.md`", body)
+                self.assertIn("the exact `file:` path exposed by the current skill catalog", body)
+                self.assertIn(
+                    "bundled contract documents the Codex plugin-cache layout", body
+                )
+                self.assertIn(
+                    "$REPORT_SKILL_DIR/references/report_canvas_contract.md", body
+                )
+                self.assertIn(
+                    "$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py", body
+                )
+                self.assertIn("source/tools/generate_targets.py", body)
+                self.assertIn("incomplete installed payload", body)
                 self.assertIn("one self-contained report HTML by default", body)
                 self.assertNotIn("../../docs/report_canvas_contract.md", body)
                 self.assertNotIn("../../report-canvas", body)
@@ -615,7 +626,7 @@ class ReportCanvasTests(unittest.TestCase):
                 (skill / "references" / "report_canvas_contract.md").exists()
             )
 
-    def test_detached_generated_report_skill_can_render(self) -> None:
+    def test_codex_cache_nested_report_skill_can_render_outside_skill_cwd(self) -> None:
         source_skill = next(
             (
                 skill.parent
@@ -632,7 +643,17 @@ class ReportCanvasTests(unittest.TestCase):
         if source_skill is None:
             self.skipTest("canonical source projects Canvas payloads during generation")
         with tempfile.TemporaryDirectory() as temp_dir:
-            detached = Path(temp_dir) / source_skill.name
+            detached = (
+                Path(temp_dir)
+                / ".codex"
+                / "plugins"
+                / "cache"
+                / "skill-system-local"
+                / "skill-system-example"
+                / "9.9.9"
+                / "skills"
+                / source_skill.name
+            )
             shutil.copytree(source_skill, detached)
             canvas = detached / "scripts" / "report-canvas"
             output = detached / "detached-report.html"
@@ -645,7 +666,7 @@ class ReportCanvasTests(unittest.TestCase):
                     "--output",
                     str(output),
                 ],
-                cwd=detached,
+                cwd=temp_dir,
                 check=False,
                 capture_output=True,
                 text=True,
@@ -660,7 +681,17 @@ class ReportCanvasTests(unittest.TestCase):
             contract,
         )
         self.assertIn("explicit `chat-only`, `no file`", contract)
-        self.assertIn("scripts/report-canvas/render_report.py", contract)
+        self.assertIn("current skill catalog's exact `file:` path", contract)
+        self.assertIn(
+            "~/.codex/plugins/cache/skill-system-local/"
+            "<plugin-id>/<version>/skills/<report-skill>/SKILL.md",
+            contract,
+        )
+        self.assertIn(
+            "$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py", contract
+        )
+        self.assertIn("`generate_targets.py` does not render reports", contract)
+        self.assertIn("incomplete report payload", contract)
 
     def test_generated_plugins_keep_canvas_inside_report_skills(self) -> None:
         here = Path(__file__).resolve()

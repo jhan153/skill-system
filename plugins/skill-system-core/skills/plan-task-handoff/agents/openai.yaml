@@ -1,0 +1,5 @@
+interface:
+  display_name: "Task Handoff Plan"
+  short_description: "Create task DAGs, handoffs, and lock scopes"
+policy:
+  allow_implicit_invocation: true

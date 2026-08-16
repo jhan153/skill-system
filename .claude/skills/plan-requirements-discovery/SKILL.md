@@ -1,6 +1,6 @@
 ---
 name: plan-requirements-discovery
-description: Run an explicitly requested one-question requirements interview that records decision-bearing gaps and stops at a traceable handoff without implying approval or implementation permission.
+description: Run an explicitly requested requirements interview that models decision dependencies, groups currently answerable independent decisions into bounded rounds, and stops at a traceable handoff without implying approval or implementation permission.
 disable-model-invocation: true
 ---
 
@@ -14,7 +14,7 @@ disable-model-invocation: true
 - do_not_use_when:
   - requirements are stable, one clarification/direct answer is enough, or execution/artifact work is requested
 - expected_inputs: rough goal, known constraints/non-goals, domain hints, notes, and willingness to answer
-- expected_outputs: incremental decision ledger and discovery record ready for distillation
+- expected_outputs: incremental decision-dependency graph, ready-question set, decision ledger, and discovery record ready for distillation
 - context_targets:
   must_read:
     - discovery request and supplied goal/notes
@@ -38,7 +38,7 @@ disable-model-invocation: true
 ## Exact Route
 | Request | Owner |
 | --- | --- |
-| explicit one-question elicitation | `plan-requirements-discovery` |
+| explicit requirements elicitation in dependency-aware question rounds | `plan-requirements-discovery` |
 | product behavior decision for a concrete existing capability/path | `plan-behavior-discovery` |
 | supplied answers to requirements contract | `plan-requirements-brief` |
 | stable requirements to implementation | `workflow-implementation` |
@@ -55,11 +55,13 @@ Use exact owners. Keyword mentions of requirements or plans do not start an inte
 
 ## Interview Workflow
 1. Extract supplied facts, decisions, assumptions, and open gaps before asking.
-2. Rank blocking/irreversible decisions first, then costly scope/interface decisions, then preferences.
-3. Ask exactly one highest-impact question. State its consequence briefly; when useful, offer 2–4 exclusive options with the recommended choice first and its tradeoff.
-4. Record only the ledger delta: id, question, answer, `decided|assumed|open`, affected scope/criterion, and source.
-5. Re-rank after each answer. Skip questions safely resolved by admitted evidence; never repeat an answered decision or use a broad questionnaire.
-6. Stop when readiness passes, the user stops, or a blocking decision belongs to an external stakeholder.
+2. Build a **decision-dependency graph**: each open decision names the earlier decisions or fact checks required to make its wording and options valid. Rank blocking or irreversible decisions first, then costly scope/interface decisions, then preferences.
+3. Resolve discoverable facts yourself through the narrowest admitted source or tool. A fact lookup is an unsettled prerequisite, so delay only its descendants. Delegate independent lookups only when the host supports it and current user/repository authority permits delegation; otherwise inspect locally.
+4. Derive the **ready-question set**: open decisions whose decision and fact prerequisites are settled. Ask up to three mutually independent high-value questions in one numbered round. Give each a short consequence and, when useful, 2–4 exclusive options with the recommended choice first and its tradeoff.
+5. Ask exactly one question when another candidate depends on its answer, the decision is irreversible or high-stakes enough to require focused steering, the user requests one-at-a-time pacing, or the host interaction surface admits only one.
+6. Record only each ledger delta: id, prerequisite ids, question, answer, `decided|assumed|open`, affected scope/criterion, and source.
+7. Recompute dependencies and the ready-question set after every round. Never carry a question forward unchanged when an answer altered its premise; never repeat a settled decision or ask the user for a fact that admitted evidence can resolve.
+8. Stop when no ready or deferred in-scope decision remains, readiness passes, the user stops, or a blocking answer belongs to an external stakeholder. Use `plan-stakeholder-questionnaire` only on an explicit request for a local stakeholder question document.
 
 ## Readiness Gate
 Applicable dimensions must be decided or explicitly recorded with impact, owner, and blocking status:
@@ -73,6 +75,6 @@ Applicable dimensions must be decided or explicitly recorded with impact, owner,
 Handoff is ready when no unrecorded unknown blocks a requirements contract.
 
 ## Output And Handoff
-- During interview turns, return only the next decision-bearing question, short rationale/options, and latest ledger delta when needed; never replay the full record.
+- During interview turns, return only the current ready-question round, short rationale/options, and latest ledger deltas when needed; never replay the full record.
 - At stop or explicit artifact request, load the record template and emit populated decisions, terms, constraints, non-goals, edges, acceptance signals, assumptions, open questions, and handoff.
 - Hand a ready record to `plan-requirements-brief`; preserve unresolved stakeholder decisions as open/unverified rather than inventing them.

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Kanboard Plan"
+  short_description: "Onboard or operate Markdown-authoritative Kanboard plans"
+  default_prompt: "Use $kanboard-plan in rollout mode for first-time or bulk onboarding, or ops mode for a registered board. Dry-run every live write, require matching approval, keep Markdown authoritative, and verify apply by live readback."
+
+policy:
+  allow_implicit_invocation: false

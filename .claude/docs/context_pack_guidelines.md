@@ -40,6 +40,13 @@ Order context from stable to volatile so repeated turns can reuse the stable pre
 
 Do not put volatile command output, timestamps, or fresh logs before stable routing and policy context unless the current task is only to inspect that output.
 
+## Recoverable Facts And Durable Context
+
+- Reference an authoritative file or deterministic lookup instead of freezing its current value into agent instructions when that lookup is cheap.
+- Preserve information whose value is in the reasoning: decisions, constraints, failure modes, costly observations, and operational caveats.
+- Verify that every reference is available from the installed runtime. A pointer outside the recipient's reachable surface is missing context, not compression.
+- When prose and its referenced authority disagree, follow the authority and route correction of the obsolete prose through its owning maintenance workflow.
+
 ## Reference Admission
 
 - Load indexes, catalogs, or routing cards before large reference folders.

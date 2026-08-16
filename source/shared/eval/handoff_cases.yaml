@@ -1,9 +1,9 @@
-version: "9.4.4"
+version: "9.4.5"
 purpose: "Lightweight handoff and coordination cases."
 cases:
   - case_id: handoff-001
     user_request: "이 계획을 두 세션으로 나눌 handoff note만 만들어줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
     should_not_trigger: [plan-long-term-package]
     expected_context: [existing plan, file scopes]
@@ -12,7 +12,7 @@ cases:
     friction_risk: "over-structuring"
   - case_id: handoff-002
     user_request: "이 TODO를 task DAG로 가볍게 정리해줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
     should_not_trigger: [plan-long-term-package]
     expected_context: [task list]
@@ -21,16 +21,16 @@ cases:
     friction_risk: "creating state files"
   - case_id: handoff-003
     user_request: "변경 산출물과 검증 명령만 인수인계용으로 요약해줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
-    should_not_trigger: [evaluation-harness]
+    should_not_trigger: []
     expected_context: [changed files, checks]
     expected_output_shape: "artifact inventory"
     quality_notes: "No registry."
     friction_risk: "turning summary into tracking system"
   - case_id: handoff-004
     user_request: "이 작업은 병렬로 나눌 수 있는지 lock scope 기준으로 봐줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
     should_not_trigger: [analysis-codebase]
     expected_context: [files, task boundaries]
@@ -39,7 +39,7 @@ cases:
     friction_risk: "missing file boundaries"
   - case_id: handoff-005
     user_request: "다음 작업자가 읽을 짧은 continuation note 작성해줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
     should_not_trigger: [plan-long-term-package]
     expected_context: [current state, changed files, next step]
@@ -48,7 +48,7 @@ cases:
     friction_risk: "too much process"
   - case_id: handoff-006
     user_request: "이 디자인 스킬 보강을 agent A/B/C로 나눠서 allowed files와 validation owner까지 task card로 만들어줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
     should_not_trigger: [plan-long-term-package]
     expected_context: [active plan, allowed files, validation requirements]
@@ -57,7 +57,7 @@ cases:
     friction_risk: "parallel agents touching the same file"
   - case_id: handoff-007
     user_request: "목표, non-goals, do-not-touch만 공유용 goal brief로 정리해줘. 파일은 만들지 마."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
     should_not_trigger: [plan-short-term-docs]
     expected_context: [current plan, user constraints]
@@ -66,9 +66,9 @@ cases:
     friction_risk: "creating a plan document"
   - case_id: handoff-008
     user_request: "이전 agent가 바꾼 것/안 바꾼 것/검증한 것/남은 위험을 handoff packet으로 남겨줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
-    should_not_trigger: [evaluation-harness]
+    should_not_trigger: []
     expected_context: [changed files, validation output, remaining risks]
     expected_output_shape: "handoff packet"
     quality_notes: "Must distinguish changed, not_changed, validation_done, and remaining_risk."
@@ -76,12 +76,12 @@ cases:
   - case_id: handoff-009
     schema_version: 2
     required_eval_mode: replay
-    behavior_contract_owners: [coordination-handoff]
+    behavior_contract_owners: [plan-task-handoff]
     scenario_tags: [positive, multi_agent, selected_skill_propagation]
     user_request: "부모 작업에서 workflow-bug-fix를 이 실패의 owner로 이미 골랐어. agent A에게 재현과 수정을 맡기는 task card를 만들고 그 스킬 선택도 그대로 전달해줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
-    should_not_trigger: [workflow-implementation, workflow-recovery]
+    should_not_trigger: [workflow-implementation]
     expected_context: [upstream_selected_skill, canonical_skill_id, worker_task, lock_scope, validation_owner]
     expected_output_shape: "task card with selected_skills containing workflow-bug-fix and the same canonical ID in the worker instruction"
     quality_notes: "An upstream specialist decision crosses the worker boundary verbatim instead of being rediscovered."
@@ -96,16 +96,16 @@ cases:
       - invent_additional_skill_ids
     required_evidence:
       - type: route_match
-        expected: coordination-handoff
+        expected: plan-task-handoff
   - case_id: handoff-010
     schema_version: 2
     required_eval_mode: replay
-    behavior_contract_owners: [coordination-handoff]
+    behavior_contract_owners: [plan-task-handoff]
     scenario_tags: [negative, multi_agent, no_upstream_selection]
     user_request: "이 독립적인 두 조사 작업을 agent 둘로 나눠줘. 아직 specialist는 고르지 않았으니 파일 scope와 결과 형식만 전달하고 각 agent가 자기 요청에서 정상적으로 route하게 해줘."
-    expected_primary_skill: coordination-handoff
+    expected_primary_skill: plan-task-handoff
     expected_supporting_skills: []
-    should_not_trigger: [analysis-router, workflow-implementation]
+    should_not_trigger: [workflow-implementation]
     expected_context: [workstreams, lock_scopes, expected_outputs, no_upstream_skill_selection]
     expected_output_shape: "two task cards without selected_skills, leaving normal implicit routing to each worker"
     quality_notes: "The handoff carries real upstream selections but does not manufacture one to fill a field."
@@ -120,4 +120,4 @@ cases:
       - force_explicit_alias_on_worker
     required_evidence:
       - type: route_match
-        expected: coordination-handoff
+        expected: plan-task-handoff

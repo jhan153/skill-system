@@ -35,6 +35,17 @@ derived_from:
 - [ ] canonical dated plan read
 {{CHECKLIST}}
 
+## Phase-Boundary Context Transition
+- status: `not_at_boundary | evaluated`
+- selected: `none | continue | clear | handoff | subagent | compact`
+- basis: `not evaluated until a real boundary`
+- retain: `[]`
+- discardable: `[]`
+- mechanism: `not evaluated until a real boundary`
+- loss_risk: `not evaluated until a real boundary`
+
+At an actual phase boundary, apply the ordered `continue -> clear -> handoff -> subagent -> compact` carryover gate. This entry records a recommendation; it does not execute a host action or authorize delegation or external state.
+
 ## Update Rules
 - scope change -> capability map
 - state change -> UI state contract

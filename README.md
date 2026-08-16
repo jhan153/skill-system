@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.4.4 Bundle
+## 9.4.5 Bundle
 
-This source tree carries the 9.4.4 release above the 9.4.3 work-contract and Report Canvas line. Its main components are:
+This source tree carries the 9.4.5 release above the 9.4.4 implicit-routing and prototyping line. Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -22,20 +22,20 @@ This source tree carries the 9.4.4 release above the 9.4.3 work-contract and Rep
 * `tools`: helper tools for inspecting the bundle structure
 * `work-contract`: shared TaskRun/WorkItem/LoopRun contracts plus a privacy-bounded Codex runtime projection that preserves user scope, verification ownership, and non-blocking continuation
 * `report-canvas`: one canonical offline report renderer and contract, projected into each generated `report-*` skill's `scripts/` and `references/` payload for installation-safe use
-* `integrations`: optional integration payloads — includes `integrations/kanboard-plan-sync`, a plan-centric MCP/CLI that projects Markdown plans onto a local Kanboard. The Kanboard app, DB, themes, and plugins are NOT bundled; only the integration code, two Agent skills (`kanboard-plan-rollout`, `kanboard-plan-ops`), MCP registration examples, and a local-host setup methodology are included.
+* `integrations`: optional integration payloads — includes `integrations/kanboard-plan-sync`, a plan-centric MCP/CLI that projects Markdown plans onto a local Kanboard. The Kanboard app, DB, themes, and plugins are NOT bundled; only the integration code, the `kanboard-plan` Agent skill, MCP registration examples, and a local-host setup methodology are included.
 * `CHANGELOG.md`, `TERMS.md`: change history and terminology notes
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.4.4 — Implicit Workflow Routing & Prototyping`, directly succeeding `9.4.3 — Work Contracts & Report Canvas`. Local installation is explicit and does not imply committing, tagging, publishing, or pushing. Codex and Claude share one bundle version and release tag; harness changes advance that version instead of creating a second protocol-version axis.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.4.5 — Direct Specialist Routing & Surface Consolidation`, directly succeeding `9.4.4 — Implicit Workflow Routing & Prototyping`. Local installation is explicit and does not imply committing, tagging, publishing, or pushing. Codex and Claude share one bundle version and release tag; harness changes advance that version instead of creating a second protocol-version axis.
 
-9.4.4 retains the 9.4.3 work contracts and Report Canvas while making clear natural-language workflow, coordination, repository-adapter, and bounded design intent model-visible without requiring a skill alias. Governed persistence, external-state, LoopRun, lifecycle-gate, and explicitly selected context skills remain explicit-only, and model selection never expands user authority. Delegated workers receive exact canonical skill IDs already selected upstream; workers with no upstream selection route normally. The release also adds `workflow-prototype` for one isolated runnable UI, interaction, state, or logic discriminator, keeps pending evidence runnable until the decision owner observes it, and separates that evidence from production hardening. Authored positive and negative cases cover these contracts but do not establish field-quality routing or a human prototype decision.
+9.4.5 keeps the 9.4.4 work contracts, Report Canvas, implicit specialist selection, and isolated prototypes while collapsing standalone router skills and merging overlapping owners. Family entry now selects the matching specialist directly; legacy IDs remain aliases only. The canonical surface is 65 skills across five plugins. Governed persistence, external-state, LoopRun, lifecycle-gate, and explicitly selected context skills remain explicit-only, and model selection never expands user authority. Delegated workers receive exact canonical skill IDs already selected upstream; workers with no upstream selection route normally. Authored positive and negative cases cover these contracts but do not establish field-quality routing.
 
 The Codex router uses an exact specialist directly and opens at most one narrow router only when several owners genuinely compete. Clear intent-matched workflow owners and bounded design/support specialists may be implicitly selected, while model selection never expands user authority. Persistent Memory/Knowledge writes, project-context mutation, Kanboard, LoopRun, lifecycle gates, and explicitly selected context remain explicit-only. An implicit router may hand off only to a declared implicitly exposed target, and an already selected canonical skill ID is preserved across worker handoff. One canonical invocation bit is projected into each host's native contract: Codex reads `agents/openai.yaml`, while Claude receives `disable-model-invocation: true` only for explicit-only skills. Codex packages stay at `plugins/<name>/skills`; paired Claude packages are generated at `plugins/claude/<name>/skills` under the same plugin name and version so each host discovers only its native metadata. The nearest `project-context.yaml` may declare manifest-relative or exact approved absolute Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery. Knowledge operations consume resolved `knowledge_root` and `knowledge_index` variables rather than a fixed directory.
 
 Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, review, and decision knowledge as readable current snapshots with typed relations, semantic revisions, and source-traced observation events. Recurrence is derived from transparent observation/provenance dimensions rather than a confidence, maturity, importance, or popularity score. LLM Wikis remain optional read-only context sources selected explicitly and navigated using their own conventions.
 
-Explicit “what next” questions use the existing Work Horizon and Planning State contracts instead of a duplicate registry navigator: horizon owns persistence/altitude, planning state owns persisted-artifact transitions, and host routing retains the current-turn owner. `project-context-init` supports explicit manifest-init, guided bootstrap, and read-only doctor modes; one transaction may approve all or a subset of separately enumerated writes. Material maker/checker risk may separate Contract/Spec from Repository/Constraints review, while multi-batch work selects `vertical_slice`, `migration_sequence`, or `evidence_unit`. None of these additions creates an automatic mega-orchestrator.
+Explicit “what next” questions use the existing Work Horizon and Planning State contracts instead of a duplicate registry navigator: horizon owns persistence/altitude, planning state owns persisted-artifact transitions, and host routing retains the current-turn owner. `workflow-project-context` supports explicit manifest-init, guided bootstrap, update, and read-only doctor modes; one transaction may approve all or a subset of separately enumerated writes. Material maker/checker risk may separate Contract/Spec from Repository/Constraints review, while multi-batch work selects `vertical_slice`, `migration_sequence`, or `evidence_unit`. None of these additions creates an automatic mega-orchestrator.
 
 The default Codex hook map sends eight lifecycle events directly to one Go executable. Response correction, desktop notification, declared-plan Kanboard sync, active-only LoopRun, and location-only project context are independent bounded branches; commit/closeout checkpoint writes operate only on declared stores and clear current-task facts.
 
@@ -105,9 +105,10 @@ Analysis skills are used to diagnose failures, compare approaches, or build code
 | `analysis-algorithm` | Compares algorithms, architectures, models, search strategies, or implementation approaches against explicit constraints and success criteria. |
 | `analysis-codebase`  | Performs codebase-level analysis when repository-wide artifacts, architecture maps, dependency views, or quality-gate reports are needed.      |
 | `analysis-codebase-design` | Judges targeted module boundaries, deep modules, interfaces, seams, adapters, dependency direction, and testability before implementation. |
-| `analysis-architecture-deepening` | Finds ranked architecture-deepening, deep-module, seam, adapter, shallow-wrapper, and policy-move candidates without a full repo report. |
+| `analysis-architecture-deepening` | Finds ranked architecture-deepening candidates without a full repo report, using recent canonical production paths as a YAGNI sampling weight when the user did not name a scope. |
 | `analysis-domain-modeling` | Clarifies domain concepts, entity/value-object boundaries, state transitions, invariants, business rules, and naming language for software design. |
 | `analysis-performance` | Diagnoses latency, throughput, CPU, memory, query, rendering, startup, bundle, or algorithmic bottlenecks with scoped evidence. |
+| `analysis-llm-wiki-context` | Builds a minimum read-only task context from one explicitly selected LLM Wiki using that Wiki's own navigation rules. |
 
 ### Design
 
@@ -143,15 +144,21 @@ Workflow skills control implementation discipline, validation, and failure recov
 
 | Skill                  | Role                                                                                                                                                                    |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workflow-implementation` | Owns direct coding requests from scoped requirement to changed artifacts and focused validation. |
+| `workflow-implementation` | Owns direct coding requests from scoped requirement to the smallest coherent production change and focused validation. |
 | `workflow-bug-fix` | Fixes concrete software failures with a repro signal, targeted code/test change, and verification against the original failure. |
 | `workflow-dependency-upgrade` | Upgrades dependencies, runtimes, SDKs, frameworks, packages, and lockfiles with required compatibility fixes and validation. |
 | `workflow-refactor-safely` | Runs behavior-preserving refactors with a behavior contract, characterization checks, small batches, and validation. |
 | `workflow-rigor`       | Applies evidence-first execution, scoped changes, separated validation results, and review discipline for medium- and high-risk changes.                                |
-| `workflow-minimal-implementation` | Applies conditional YAGNI pressure to implementation and refactoring work to avoid unnecessary dependencies, abstractions, files, and boilerplate. |
+| `workflow-prototype` | Builds one bounded throwaway UI comparison or one browser-openable HTML evidence page that lets a non-developer exercise a deterministic rule model. |
 | `workflow-plan-runner` | Executes approved plans, specifications, or packages as implementation batches, while managing scoped validation, rollback, or alternative choices.                     |
 | `workflow-validation`  | Plans or performs focused validation for completed or planned changes. It separates validation performed by the agent from validation that must be checked by the user. |
 | `workflow-recovery`    | Breaks repeated implementation or validation retry loops through single-hypothesis diagnosis, narrowed reproduction steps, rollback, or alternative decisions.          |
+| `workflow-source-maintenance` | Prunes source proven obsolete after development while preserving intended behavior and dynamic/public entry points. |
+| `workflow-comment-maintenance` | Synchronizes comments and docstrings with current code meaning without changing behavior. |
+| `workflow-task-ledger` | Preserves resumable task steps and findings only when work is expected to cross a turn or session boundary. |
+| `workflow-project-context-init` | Initializes or diagnoses the project context manifest and proposes only explicitly approved store setup. |
+| `workflow-project-context-update` | Updates selected manifest locations while preserving sibling and unknown sections. |
+| `workflow-project-context-checkpoint` | At an explicit closeout checkpoint, classifies durable current-task items into an existing declared Memory Bank or Knowledge Base. |
 
 ### Loop Engineering
 
@@ -159,8 +166,8 @@ Loop Engineering skills decide when repeated execution is justified, turn succes
 
 | Skill                    | Role                                                                                                                                                    |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `loop-readiness-router`  | Classifies an initial request as `one_shot`, `contract_needed`, or `loop_worthy` before execution, including governance prerequisites.                    |
-| `loop-verifier-registry` | Maps loop success conditions and governance metrics to verifier skills, commands, evidence targets, pass/fail signals, fallback checks, and labels.       |
+| `analysis-loop-readiness`  | Classifies an initial request as `one_shot`, `contract_needed`, or `loop_worthy` before execution, including governance prerequisites.                    |
+| `plan-loop-term`         | Defines the loop contract and maps success conditions to verifier owners, commands, evidence targets, pass/fail signals, fallbacks, and stop terms.       |
 | `workflow-loop-runner`   | Executes accepted loop contracts through observe/decide/act/verify/checkpoint batches, backed by LoopRun state tools for checkpointing, continuation, recovery, and stop decisions. |
 
 Runtime support also includes the tool/permission operating catalog and orchestration capability contract. TaskRun, Research/Evidence ledgers, and LoopRun remain explicit workflow-owned state; Codex Agent Run and hook-event evidence ledgers are not part of the current runtime.
@@ -171,6 +178,11 @@ Planning skills create or organize planning and specification artifacts without 
 
 | Skill                    | Role                                                                                                                                                                       |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plan-decision-map`      | Maintains one explicit multi-session decision map with a target outcome, prerequisite-linked decision items, a derived ready set, unshaped unknowns, and exclusions.       |
+| `plan-behavior-discovery` | Resolves one product-behavior decision at a time for an existing capability until the next human-operable vertical slice is ready. |
+| `plan-requirements-discovery` | Runs dependency-aware discovery: the agent resolves safely discoverable facts and asks up to three mutually independent ready questions per round.                         |
+| `plan-requirements-brief` | Distills accepted discovery notes and stakeholder answers into a bounded requirements contract or PRD/SRS-lite. |
+| `plan-stakeholder-questionnaire` | Creates one decision-linked Markdown question document for a stakeholder who owns missing answers; artifact delivery remains outside the skill.                  |
 | `plan-short-term-docs`   | Creates or updates persistent `docs/plan` work plans for near-term tasks, state, and implementation transitions.                                                           |
 | `plan-long-term-package` | Creates large multi-document planning packages for bulk work, migrations, rewrites, or milestone plans that future sessions must be able to continue from documents alone. |
 | `plan-loop-term`         | Creates goal/loop completion contracts with success conditions, verifier evidence, progress signals, retry terms, stop policy, checkpoints, and handoff text.             |
@@ -182,7 +194,7 @@ Coordination skills provide lightweight structures for task splitting and handof
 
 | Skill                      | Role                                                                                                                                              |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `coordination-handoff`     | Creates explicit goal briefs, task DAGs, multi-agent/session handoffs, lock scopes, validation ownership, and task-local artifact inventories.     |
+| `plan-task-handoff`     | Creates explicit goal briefs, task DAGs, multi-agent/session handoffs, lock scopes, validation ownership, and task-local artifact inventories.     |
 
 ### Research
 
@@ -206,7 +218,6 @@ Search skills find evidence or define evidence-gathering paths while keeping syn
 
 | Skill                   | Role                                                                                                                                             |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `search-router`         | Detects search intent for papers, code, runtime evidence, visual references, or memory evidence, and routes it to the appropriate evidence lane. |
 | `search-paper-evidence` | Searches for paper/source evidence or plans a search path, while tracking citation status in an evidence ledger without fabricating citations.   |
 | `search-deep-evidence`  | Runs a deep multi-angle evidence sweep across lanes with adversarial verification and citation-status labels, producing a verified evidence set for report or synthesis skills. |
 
@@ -217,27 +228,30 @@ Memory skills manage long-term project context. They are used only when memory u
 | Skill                            | Role                                                                                                                             |
 | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `memory-bank-harness`            | Builds a context pack from approved memory for the current task while filtering out stale, conflicting, or risky entries.        |
-| `memory-bank-ingestion`          | Promotes approved closeout packets and proposed candidates into long-term memory with append-only events and archive links.      |
 | `memory-bank-init`               | Initializes a project-scoped persistent memory bank after confirming project identity and write boundaries.                      |
 | `memory-bank-update`             | Updates persistent goals or rules as append-only history when the user wants long-term memory changes.                           |
 | `memory-bank-maintenance`        | Inspects, validates, consolidates, or repairs existing memory state.                                                             |
 | `memory-bank-correction-capture` | Captures an explicit user correction as a memory candidate while preserving approval steps and sensitive-information boundaries. |
 
-### Evaluation
+### Knowledge
 
-The evaluation skill maintains existing cases only when explicitly requested. It does not collect usage or establish field quality.
+Knowledge skills operate only on a declared project Knowledge Base. New records share one owner and select a category profile instead of loading five separate authoring skills.
 
-| Skill                      | Role                                                                                                                                                           |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `evaluation-harness`       | Reviews existing `.codex/eval` cases for syntax, internal consistency, and scoped regression intent without treating scenario results as field-quality evidence. |
+| Skill | Role |
+| --- | --- |
+| `knowledge-base-record` | Creates one new accepted domain, design, algorithm, architecture, or recurring code-review identity using the shared record contract and one selected category profile. |
+| `knowledge-base-read` | Reads the smallest artifact-anchored current slice and only the relations or history needed by the task. |
+| `knowledge-base-init` | Initializes an explicitly approved empty store and its manifest binding. |
+| `knowledge-base-update` | Updates, reverifies, relinks, supersedes, or deprecates an existing identity. |
+| `knowledge-base-maintenance` | Validates and maintains index, relation, history, overlap, and recurrence integrity. |
+| `knowledge-plan-sync` | Synchronizes only accepted durable plan decisions into existing Knowledge. |
 
-### Skill System
+### Kanboard
 
-Skill System skills integrate authored skills into this repository and maintain the generated bundle.
-
-| Skill                       | Role                                                                                                               |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `skill-system-repo-adapter` | Integrates accepted skill behavior into canonical source, routing, manifests, generated targets, and validation.  |
+| Skill | Role |
+| --- | --- |
+| `kanboard-plan-rollout` | Registers or bulk-syncs project plan workspaces through a dry-run-first onboarding workflow. |
+| `kanboard-plan-ops` | Operates push, pull-candidate, validation, and curation flows for an already registered board. |
 
 ## Design Timeline
 
@@ -285,6 +299,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.4.2 | Public bundle boundary | Consolidates temporal/relational Knowledge and workflow guidance with clean-install state protection. Retires the public external-source revision/license/adoption ledger, keeps project decisions in the declared local Knowledge Base, and prevents release validation from reintroducing that ledger. |
 | 9.4.3 | Work contracts & Report Canvas | Preserves user scope, verification ownership, local deferral, and non-blocking continuation across direct/Task/Loop work; adds implementation explanation, behavior discovery, and the shared offline Report Canvas. |
 | 9.4.4 | Implicit workflow routing & prototyping | Exposes clear intent-matched workflow and bounded support owners to natural-language routing while retaining explicit lifecycle and persistence gates; propagates selected skills across delegation and adds retained, isolated runnable prototypes for one unresolved decision. |
+| 9.4.5 | Direct specialist routing & surface consolidation | Removes standalone search/analysis/research routers, merges overlapping Knowledge, coordination, Kanboard, project-context, loop, and maintenance owners, retires the maintainer plugin, and cuts the canonical surface from 79 to 65 skills. |
 
 ## License
 

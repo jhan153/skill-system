@@ -13,7 +13,7 @@ disable-model-invocation: true
 - use_when:
   - the user asks to validate an existing artifact/change, or an active workflow has non-obvious multi-surface or agent/user evidence choices.
 - do_not_use_when:
-  - implementation is the requested outcome; one obvious repository check suffices; or the request belongs to usage eval (`evaluation-harness`) or a critical verdict (`report-critical`).
+  - implementation is the requested outcome; one obvious repository check suffices; or the request belongs to `evaluation-harness` or a critical verdict (`report-critical`).
 - expected_inputs:
   - material success conditions, target artifact/change, oracle or expected result, risk boundary, and available observations
 - expected_outputs:
@@ -23,6 +23,7 @@ disable-model-invocation: true
     - validation request, material conditions, and changed artifact or relevant plan/spec slice
   read_if_needed:
     - oracle source, actual path, validation contract, scripts, CI, or boundary state
+    - `workflow-recovery` when the same validation failure survives an intervention
   do_not_load_by_default:
     - full repo/memory, unrelated suites/evals, raw production data, or credentials
 - risk_profile:
@@ -40,6 +41,7 @@ disable-model-invocation: true
 3. Choose the smallest safe observation that can expose the realistic failure on the actual path; risk changes breadth, never evidence authority.
 4. Record `pass`, `fail`, `needs_review`, `unverified`, or `blocked` for each condition without promotion.
 5. When a material condition remains open, report one in-scope next observation if it already exists; otherwise mark `user_verification_needed` or `unverified` without proposing new test infrastructure.
+6. When the same failure fingerprint survives an intervention, hand the stuck slice to `workflow-recovery`.
 
 ## Evidence Boundaries
 

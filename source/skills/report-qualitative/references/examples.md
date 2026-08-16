@@ -94,7 +94,7 @@ Must include:
 
 Must not include:
 - changed-line diff blocks unless the user explicitly asks for them
-- raw patch presentation owned by `report-diff`
+- raw patch presentation owned by `report-implementation-explainer` in `compare` mode
 
 ## Negative Routing Examples
 
@@ -116,7 +116,7 @@ Reason: ordinary review or critical review may apply depending on risk framing; 
 바뀐 부분만 읽기 쉽게 보여줘.
 ```
 
-Reason: use `report-diff`.
+Reason: use `report-implementation-explainer` in `compare` mode.
 
 ```text
 보고해줘.

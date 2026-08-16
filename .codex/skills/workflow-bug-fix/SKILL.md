@@ -1,6 +1,6 @@
 ---
 name: workflow-bug-fix
-description: Fix a concrete test, build, runtime, regression, or user-visible failure by changing its production cause and verifying the original condition on the actual path.
+description: Fix a concrete test, build, runtime, regression, or user-visible failure by changing its production cause and verifying the original condition on the actual path. When the same failure fingerprint survives an intervention, hand the stuck slice to workflow-recovery.
 ---
 
 # Workflow Bug Fix
@@ -22,6 +22,7 @@ description: Fix a concrete test, build, runtime, regression, or user-visible fa
     - original failure, material expected condition, implicated production owner/path, and repository instructions
   read_if_needed:
     - canonical input/source, caller/state flow, boundary readback, existing tests, config/manifests, and validation contract
+    - `workflow-recovery` after the same material fingerprint survives an intervention
   do_not_load_by_default:
     - full repo/memory, broad reports, unrelated history, raw production data, or credentials
 - risk_profile:

@@ -18,8 +18,8 @@ disable-model-invocation: true
   - a task has explicit `SC-NNN` conditions, verifier map, retry policy, checkpoint state, and stop policy.
   - repeated implementation plus verifier feedback is expected to converge.
 - do_not_use_when:
-  - no accepted contract/LoopRun exists; use `plan-loop-term`, or `loop-readiness-router` if readiness is unclear.
-  - verifier ownership is unclear; use `loop-verifier-registry`.
+  - no accepted contract/LoopRun exists; use `plan-loop-term`, or `analysis-loop-readiness` if readiness is unclear.
+  - verifier ownership is unclear; use `plan-loop-term` in verifier-mapping mode.
   - work is one-shot or asks for a planning package.
 - expected_inputs:
   - accepted v3 runtime contract with `contract_id` and embedded user `work_contract`
@@ -42,6 +42,7 @@ disable-model-invocation: true
     - owning primary skill instructions
     - latest verifier outputs
     - failure logs for recovery handoff
+    - `workflow-recovery` when a material fingerprint repeats
   do_not_load_by_default:
     - full repo
     - all old plans
@@ -73,23 +74,17 @@ disable-model-invocation: true
 4. Choose the smallest in-contract action that can advance that condition. Prefer the production owner/path. A new test, mock, report, wrapper, or interface changes no target condition by itself; it counts only if the user contract permits it and the accepted condition required that artifact.
 5. Run one bounded implementation batch through the owning skill. Do not hide a canonical-source mismatch behind a successful legacy fallback, or move source/policy/fallback ownership into a translation adapter to make the check pass.
 6. Run the assigned verifier only when the contract assigns it to the agent and persist a schema-valid receipt. If verification belongs to the user, retain the manual condition for `user_verification_needed` handoff without creating substitute validation work.
-7. Apply evidence authority before changing status:
-   - mock evidence proves only the mock boundary; agent-authored tests are regression/self-check evidence, not sole authority for semantic or user-path success;
-   - source selection, migration, media/data transformation, external-boundary, and policy-owning adapter conditions require actual-path readback or an authoritative external oracle;
-   - `fail`, `needs_review`, `unverified`, `blocked`, and `user-verification-needed` stay open until the same condition has resolution and readback evidence;
-   - the local evaluator for v2/v3 contracts auto-passes only exact `artifact_exists`; non-attested `command_exit`, `manual_check`, and `diff_scope` claims remain open.
+7. Apply the accepted verifier's evidence authority before changing status. Use `references/loop-governance-gates.md` for semantic ceilings and finalization; lower-scope, mock, maker-authored, or unattested evidence cannot close a broader condition.
 8. Submit iteration `N+1` through the active host's compatible `evaluate_loop_run.py` tool, checkpoint condition/evidence deltas plus `deferred_actions`, and continue while any required runnable condition remains.
-9. At the configured repeated-failure threshold, hand off once to `workflow-recovery` or stop. Do not create more edits or tests around an unchanged failure signature.
+9. At the configured repeated-failure threshold, hand the failing slice to `workflow-recovery` once, or stop. Do not create more edits or tests around an unchanged fingerprint.
 
 ## Lifecycle And Governance
-- Use the active host's compatible `validate_loop_run.py` tool before success or resume, and `resume_loop_run.py` only to reopen terminal state. Lifecycle setup uses `init_loop_run.py` and `activate_loop_run.py` only when explicitly authorized by the handoff; never rerun activation merely because a pointer already exists. If the active host exposes no compatible lifecycle tools, stop `blocked`; never emulate their state transitions with direct YAML edits.
-- The Stop hook resolves the session-scoped active pointer; compatibility environment overrides do not prove activation or success. A terminal decision deactivates the pointer.
-- A permission request is denied without UI wait only when this is an active unattended Goal/Loop and its work contract forbids interaction. If interaction is allowed, preserve normal host approval. After a denial, defer that intent and continue another runnable condition.
-- Read `references/loop-run-state.md` only for initialization, recovery, migration, or state ambiguity. Read `references/loop-governance-gates.md` only for a triggered side effect, runtime/durability claim, untrusted input, metric-gaming, parallelism, stall, or finalization gate.
-- Treat deploy, delete, payment, notification, migration, or live-write retries with unclear prior results as `permission_required` unless the accepted contract provides approval plus an idempotency key, dry-run, rollback, or authoritative prior-result readback.
-- Keep unobserved scheduler, queue, daemon, Stop-hook, durable-resume, or knowledge-mutation capability `unverified`/`unsupported`. Knowledge output remains a reviewable candidate.
+
+Use the active host's compatible lifecycle tools; never emulate LoopRun state with direct YAML edits. Read `loop-run-state.md` only for initialization/recovery/migration/state ambiguity and `loop-governance-gates.md` only for a triggered side effect, runtime/durability, untrusted-input, metric-gaming, parallelism, stall, or finalization gate. Missing host capability is `blocked` or `unsupported`, not a reason to synthesize state.
+
+Preserve normal approval when interaction is allowed. In an accepted unattended no-interaction contract, defer the denied intent and continue another required runnable condition. Non-idempotent retries require the contract's approval plus idempotency, dry-run, rollback, or authoritative prior-result readback.
 
 ## Stop And Report
 Stop with the contract's precedence at `success`, `user_verification_needed`, `blocked`, `budget`, `unsafe`, or `fatal`. `user_verification_needed` is a normal terminal handoff when all non-user required conditions pass and the accepted verification owner is the user; it is not verifier success. Use `blocked` only after dependency reevaluation shows no required runnable work. Success requires every required condition to have a fresh evaluator-accepted receipt, a validated LoopRun, and a persisted `loop_stop_packet`; no unresolved lower state or approval gate may contribute.
 
-The LoopRun directory remains the machine-readable source of truth. Report only `contract_id`, `loop_run_id`, iteration, condition/receipt delta, next action, stop reason, and the one decision needed. Cite the validated LoopRun/stop packet on success. For nonterminal work report only changed conditions; for a stop report the highest-severity actionable blocker once and leave deferred gaps in checkpoint state.
+The LoopRun directory remains machine-readable truth. Report only `contract_id`, `loop_run_id`, iteration, condition/receipt delta, next action, stop reason, and one needed decision. Cite the validated stop packet on success; otherwise report only changed conditions or the highest-severity blocker once.

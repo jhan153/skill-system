@@ -16,7 +16,7 @@ Use this reference only when a claim genuinely needs more than one evidence lane
 | visual / accessibility | `design-visual-regression` / `design-a11y-audit` |
 | accepted memory | `memory-bank-harness` |
 | declared project knowledge | `knowledge-base-read` (read-only) |
-| explicitly selected LLM Wiki | `llm-wiki-context` (read-only) |
+| explicitly selected LLM Wiki | `analysis-llm-wiki-context` (read-only) |
 | current public facts | authoritative web sources |
 
 Lane selection grants no new write, network, runtime, credential, or mutation authority.

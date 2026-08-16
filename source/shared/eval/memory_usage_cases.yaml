@@ -1,4 +1,4 @@
-version: "9.4.4"
+version: "9.4.5"
 purpose: "Memory usage observation cases."
 cases:
   - case_id: memory-001
@@ -12,11 +12,11 @@ cases:
     friction_risk: "missing target memory path"
   - case_id: memory-002
     user_request: "내가 방금 정정한 내용을 반복 실수로 기록해."
-    expected_primary_skill: memory-bank-correction-capture
+    expected_primary_skill: memory-bank-update
     expected_supporting_skills: []
-    should_not_trigger: [memory-bank-update]
+    should_not_trigger: [memory-bank-maintenance]
     expected_context: [correction, masked evidence]
-    expected_output_shape: "candidate correction memory"
+    expected_output_shape: "candidate_mistake memory update"
     quality_notes: "Mask sensitive details."
     friction_risk: "overstating recurrence"
   - case_id: memory-003
@@ -49,8 +49,8 @@ cases:
   - case_id: memory-006
     user_request: "완료된 이전 플랜 원문은 빼고, 지금 작업에 필요한 결정만 context pack으로 골라줘."
     expected_primary_skill: memory-bank-harness
-    expected_supporting_skills: [plan-spec-curator]
-    should_not_trigger: [memory-bank-update, coordination-handoff]
+    expected_supporting_skills: [plan-short-term-docs]
+    should_not_trigger: [memory-bank-update, plan-task-handoff]
     expected_context: [active task, accepted memory, old plan summary]
     expected_output_shape: "small context pack with old-plan exclusion"
     quality_notes: "Completed raw plans are background, not active instructions."

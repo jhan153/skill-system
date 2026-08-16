@@ -1,41 +1,32 @@
 # source/plugins/core.yaml — plugin membership manifest (hand-authored input).
 name: skill-system-core
-version: "9.4.4"
-description: 'Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, search broker, validation/reporting contract, task state) used by all role plugins.'
+version: "9.4.5"
+description: 'Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, evidence, validation/reporting contract, task state) used by all role plugins.'
 skills:
-  - coordination-handoff
-  - kanboard-plan-ops
-  - kanboard-plan-rollout
-  - knowledge-algorithm-record
-  - knowledge-architecture-record
+  - plan-task-handoff
+  - kanboard-plan
+  - knowledge-base-record
   - knowledge-base-init
   - knowledge-base-maintenance
   - knowledge-base-read
   - knowledge-base-update
-  - knowledge-code-review-record
-  - knowledge-design-record
-  - knowledge-domain-record
-  - knowledge-plan-sync
-  - llm-wiki-context
-  - loop-readiness-router
-  - loop-verifier-registry
-  - memory-bank-correction-capture
+  - analysis-llm-wiki-context
+  - analysis-loop-readiness
   - memory-bank-harness
   - memory-bank-init
   - memory-bank-maintenance
   - memory-bank-update
+  - plan-decision-map
   - plan-long-term-package
   - plan-loop-term
   - plan-requirements-brief
   - plan-requirements-discovery
   - plan-short-term-docs
-  - plan-spec-curator
-  - project-context-checkpoint
-  - project-context-init
-  - project-context-update
+  - plan-stakeholder-questionnaire
+  - workflow-project-context-checkpoint
+  - workflow-project-context
   - report-lifecycle-artifacts
   - search-deep-evidence
-  - search-router
   - workflow-loop-runner
   - workflow-plan-runner
   - workflow-rigor

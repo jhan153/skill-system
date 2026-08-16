@@ -1,6 +1,6 @@
 ---
 name: report-implementation-explainer
-description: Create an explicitly requested, source- and runtime-anchored Report Canvas explanation of an existing implementation, including causal execution, evidence status, and productization gaps. Use when a user needs a working model for a concrete next decision; do not use for diff-only output, verdicts, pre-implementation algorithm choice, local line explanation, or an automatic post-implementation gate.
+description: Create an explicitly requested Report Canvas explanation of an existing implementation or a verified changed-lines comparison. Use `explain` for source/runtime causal understanding and `compare` for diff-only or before/after presentation; do not use for quality/readiness verdicts, pre-implementation algorithm choice, local line explanation, or an automatic post-implementation gate.
 disable-model-invocation: true
 ---
 
@@ -8,29 +8,41 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: report_primary
-- intent_signature: source-anchored implementation explanation, literate code review, algorithm walkthrough, or code-review-style HTML
+- intent_signature: source-anchored implementation explanation or verified readable diff/before-after HTML
 - use_when:
-  - the user explicitly requests an explanation artifact for a concrete implementation, change, branch, or pull request and a next decision benefits from causal understanding.
+  - the user requests a causal implementation artifact or verified changed-line/before-after comparison.
 - do_not_use_when:
-  - changed lines belong to `report-diff`; quality/readiness verdicts to `report-qualitative` or `report-critical`; approach selection to `analysis-algorithm`; code changes to `workflow-implementation`.
-  - a direct answer is sufficient, no concrete implementation target exists, or the artifact would be added automatically after ordinary implementation.
-- expected_inputs: concrete target and snapshot, reader/decision purpose, production path, and available runtime evidence
-- expected_outputs: Report Canvas `trace` or evidence-backed `spatial` HTML with a source-linked causal explanation, calibrated evidence/status, productization gaps, and one next handoff
+  - quality/readiness verdicts belong to `report-qualitative` or `report-critical`; approach selection to `analysis-algorithm`; code changes to `workflow-implementation`.
+  - a direct answer suffices, no concrete target exists, or the artifact would be automatic after ordinary implementation.
+- expected_inputs: selected mode; concrete target/snapshot and production path for `explain`, or an authoritative diff/baseline pair for `compare`
+- expected_outputs: Report Canvas `trace`/`spatial` causal explanation or verified `compare` HTML, with calibrated evidence and concise next handoff when applicable
 - context_targets:
   must_read:
     - requested target, format, audience, decision purpose, and canonical caller-to-output path
   read_if_needed:
-    - accepted intent, focused tests, runtime trace/readback, rationale history, and a material failure/counterexample
+    - accepted intent, focused tests, runtime readback, rationale history, and a material counterexample
+    - `references/compare-mode.md` for `compare`
   do_not_load_by_default:
     - full repository/history, unrelated plans, generated mirrors, or broad logs
 - risk_profile:
   reads: narrow source, config, tests, traces, and accepted decisions
   writes: one self-contained report HTML by default; no production source or instrumentation mutation
   tools: focused read-only inspection and safe local rendering; new production instrumentation belongs to implementation
-  sensitive_resources: credentials default deny; redact sensitive runtime data for the audience
+  sensitive_resources: deny credentials; redact sensitive runtime data
 - entry_scene: FINALIZE
 
-## Evidence Contract
+## Modes
+
+- `explain`: use the causal source/runtime workflow below.
+- `compare`: read [Compare Mode](references/compare-mode.md), preserve exact verified changed lines, and do not require a causal walkthrough or verdict.
+
+## Canvas Asset Resolution
+
+For every admitted invocation, set `REPORT_SKILL_DIR` to the directory containing this active skill's resolved `SKILL.md`; use the exact `file:` path exposed by the current skill catalog. The bundled contract documents the Codex plugin-cache layout explicitly. Never guess, glob, or select an install/cache version from the working directory.
+
+Require `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py`. `source/tools/generate_targets.py` projects repository assets; it is not the renderer. If either local file is missing, report an incomplete installed payload and use only the contract's allowed chat fallback.
+
+## Explain Evidence Contract
 
 Pin a commit, diff, branch, release, or clearly labeled current-worktree snapshot. Treat the explainer as a derived index, never evidence or a new source of truth:
 
@@ -43,9 +55,9 @@ Label material claims `intent_stated`, `source_established`, `runtime_observed`,
 
 Keep status axes separate when relevant: `core_capability` (operation exists), `integration` (real callers reach it), `operability` (a person can control and observe it), and `release` (acceptance/safety/performance/compatibility evidence). Never emit `understood: true` or credit scrolling; source and side-chat use are valid open-book navigation.
 
-## Artifact And Workflow
+## Explain Workflow
 
-- For every admitted invocation, read `references/report_canvas_contract.md` and render the primary human-facing explanation with `scripts/report-canvas/render_report.py` as Report Canvas `trace` HTML, or `spatial` when authoritative 3D data materially improves inspection. Return only a concise chat receipt with the outcome and artifact link. Use chat-only output only when the user explicitly prohibits file creation or the host has no safe artifact surface; use archival Markdown only when explicitly requested or required by the repository.
+- Resolve the skill directory and renderer per `references/report_canvas_contract.md`; never guess an install/cache path. Render `trace`, or `spatial` only from authoritative 3D data. Use only the contract's allowed fallback.
 - Add interactive, stepwise, or spatial views only from an authoritative production trace/readback. Never recreate the algorithm independently in JavaScript. Feed supplied geometry, stable IDs, state snapshots, and issue indices to the shared renderer; if trace points are missing, name the smallest readback seam for `workflow-implementation` and keep the view `unverified`.
 
 1. Name the target snapshot and the decision the reader should be able to make.
@@ -61,4 +73,4 @@ Artifact creation proves only `explainer_generated`. Report `scenario_exercised`
 
 If the user explicitly requests a comprehension check, keep it open-book and tied to a real decision. Name the exact target, underlying source/runtime anchor, initial state, observable difference, and decision consequence; require a falsifier only for high-risk or irreversible behavior.
 
-Before returning, confirm the snapshot, evidence label/anchor for each material claim, separate status axes, applicable counterexample/unknown, working links/navigation, no duplicated production logic, and no claim about the reader's mental state.
+Before returning, confirm the selected mode's baseline/snapshot, evidence labels, working links/navigation, and proof ceiling. In `explain`, also confirm separate status axes, applicable counterexample/unknown, no duplicated production logic, and no claim about the reader's mental state.

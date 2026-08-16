@@ -202,13 +202,13 @@ def continuation_prompt(action: str, reason_code: str, contract: dict[str, Any],
             target_text = f" Regressed condition: {target}." if target else ""
             return (
                 f"{prefix} Oscillation detected: a previously passing required condition regressed to fail.{target_text} "
-                "Switch to workflow-recovery: find what reverted the condition and fix that root cause; "
+                "Keep the current task owner and apply the shared recovery protocol: find what reverted the condition and fix that root cause; "
                 "do not re-break conditions that were already passing or weaken success conditions. "
                 "Record only evidence already required by the accepted contract."
             )
         return (
             f"{prefix} Repeated verifier failure reached the recovery threshold. "
-            "Switch to workflow-recovery: use one hypothesis, one diagnostic, and one fix. "
+            "Keep the current task owner and apply the shared recovery protocol: use one hypothesis, one diagnostic, and one fix. "
             "Do not weaken success conditions or expand write scope. "
             "Record only evidence already required by the accepted contract."
         )

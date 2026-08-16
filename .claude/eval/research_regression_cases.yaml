@@ -1,11 +1,11 @@
-version: "9.4.4"
+version: "9.4.5"
 purpose: "Research cluster regression cases."
 cases:
   - case_id: research-001
     user_request: "최신 논문 찾아서 evidence ledger 만들어줘."
     expected_primary_skill: search-paper-evidence
     expected_supporting_skills: []
-    should_not_trigger: [search-router, research-router, research-experiment-scaffold]
+    should_not_trigger: [research-experiment-scaffold]
     expected_context: [topic, date range, source constraints]
     expected_output_shape: "evidence ledger"
     quality_notes: "The explicit paper-acquisition stage routes directly; no fabricated citations."
@@ -86,7 +86,7 @@ cases:
     user_request: "이건 연구가 아니라 이미 정한 수식을 코드로 구현하는 일이야."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [research-router, research-hypothesis-planning]
+    should_not_trigger: [research-hypothesis-planning]
     expected_context: [source files, tests]
     expected_output_shape: "implementation"
     quality_notes: "Respect development mode."
@@ -139,12 +139,12 @@ cases:
   - case_id: research-edge-ideation-ledger-001
     schema_version: 2
     required_eval_mode: replay
-    behavior_contract_owners: [research-router, research-literature-ideation]
+    behavior_contract_owners: [research-literature-ideation]
     scenario_tags: [routing, upstream_boundary]
     user_request: "검증된 evidence ledger에 source-traceable contradiction과 missing comparison이 정리돼 있어. synthesis를 다시 만들지 말고 여기서 gap hypothesis 후보를 뽑아줘."
     expected_primary_skill: research-literature-ideation
     expected_supporting_skills: []
-    should_not_trigger: [research-router, research-literature-synthesis, search-paper-evidence, research-hypothesis-planning]
+    should_not_trigger: [research-literature-synthesis, search-paper-evidence, research-hypothesis-planning]
     expected_context: [verified evidence ledger, source-traceable gaps, ranking constraints]
     expected_output_shape: "provenance-linked gap classes and ranked falsifiable candidates"
     quality_notes: "A verified evidence ledger is a valid direct upstream for ideation when it already supports the gap relation."

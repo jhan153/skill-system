@@ -1,8 +1,8 @@
-# memory-bank-update Reference
+# Memory Bank Update Reference
 
 ## Scope And Enums
 
-- Entities: `goal|rule`
+- Entities: `goal|rule|mistake`
 - Actions: `create|update|deprecate`
 - Status: `active|candidate|deprecated`
 - Verification: `verified|unverified`
@@ -18,8 +18,8 @@ Do not add confidence, maturity, recurrence, usage, or satisfaction scores.
   "event_id": "evt_20260410T121000Z_0002",
   "at": "2026-04-10T12:10:00Z",
   "actor": "user|agent",
-  "workflow": "update|project-context-checkpoint",
-  "entity": "goal|rule",
+  "workflow": "update|candidate-mistake|workflow-project-context-checkpoint",
+  "entity": "goal|rule|mistake",
   "action": "create|update|deprecate",
   "item_id": "rule_001",
   "before": {},
@@ -43,6 +43,12 @@ Every item includes `id`, `status`, `verification`, `updated_at`, and `source_ev
 - Update: preserve the ID and replace only current operational fields.
 - Deprecate: preserve the item as deprecated or move its detail to archive while keeping an addressable current pointer.
 - Never hard-delete history or append implementation chronology to `current.md`.
+
+## Candidate Mistake Gate
+
+All conditions must hold: the correction changes future project interaction or execution behavior, is expected to matter across sessions, names a specific failure pattern, and has explicit persistence authorization. Do not record wording-only issues, one-time preferences, raw chats, or material that belongs as a goal/rule update.
+
+For `entity=mistake`, allow `create|update`; new items use `status=candidate` and `verification=unverified`. Store only a source pointer or minimal masked summary. Update only an obvious same-pattern item, and never activate a candidate from capture alone.
 
 ## Validation
 

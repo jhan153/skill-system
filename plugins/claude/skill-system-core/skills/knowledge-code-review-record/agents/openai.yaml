@@ -1,6 +1,0 @@
-interface:
-  display_name: "Knowledge Code Review Record"
-  short_description: "Record recurring repository review rules"
-  default_prompt: "Use $knowledge-code-review-record to separate dependent repetition from real recurrence, then update an existing rule or record one new repository-specific review identity."
-policy:
-  allow_implicit_invocation: false

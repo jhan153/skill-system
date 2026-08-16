@@ -34,6 +34,7 @@ disable-model-invocation: true
     - source outline and validation contract
     - `.claude/docs/planning_state_model.md` when state names or release gates could drift
     - `.claude/docs/delivery_slice_contract.md` when any phase needs multi-batch execution topology, including wide migration or non-feature decomposition
+    - `references/context-transition-decision-tree.md` only at a real authoring or execution phase boundary
   do_not_load_by_default:
     - full repo or memory bank
     - all prior plans or codebase-intel artifacts
@@ -75,6 +76,12 @@ On validation failure, inspect the validator message and failing document first;
 6. Decompose by independently verifiable concern and make hard predecessors explicit. For each multi-batch execution group, select `delivery_shape` as `vertical_slice`, `migration_sequence`, or `evidence_unit`; do not apply the slice contract to `single_batch` work. Reconcile every derived statement to its canonical owner.
 7. Validate the complete package and report unresolved claims, decisions, or evidence as `Unverified` or blockers.
 
+## Phase-Boundary Context Transition
+
+At the end of a real phase—not mid-phase—read `references/context-transition-decision-tree.md` and apply its ordered carryover gate: `continue -> clear -> handoff -> subagent -> compact`. Select the first outcome whose evidence and host mechanism are both available. Record the material to retain, safely discardable context, selection basis, mechanism, and information-loss risk in the procedural handoff index.
+
+The record is a recommendation, not an automatic host action. `handoff` changes primary ownership or location; `subagent` keeps primary ownership here while separating one bounded agent-runnable unit. `compact` is the last same-owner option when relevant context cannot fit. If current context remains necessary and sufficient, continue.
+
 ## Completion Gate
 - A phase needs bounded outcome/non-goals, target surface, canonical links, predecessors, first implementation step, and acceptance rows linking `Contract`, `Evidence`, `Test command`, and `Blocking`.
 - Logic, parity, lifecycle, performance, accessibility, or UX claims need a behavior oracle with scenario/input, observable result, verifier, evidence destination, and owner. Static presence checks close structural requirements only.
@@ -87,4 +94,4 @@ Run `scripts/validate_phase_plan_package.py` after each package update. Add `--s
 Run `scripts/self_test_phase_plan_package.py` only after changing this skill's scripts, schema, catalog, or templates. Document validation never proves production runtime or user-visible behavior.
 
 ## Reporting
-Return an index, not duplicated package content: canonical plan and `package_planned` evidence; package root and selection; changed spec/phase paths; validation commands/outcomes; blockers, residual risks, and `Unverified` items.
+Return an index, not duplicated package content: canonical plan and `package_planned` evidence; package root and selection; changed spec/phase paths; phase-boundary context transition when applicable; validation commands/outcomes; blockers, residual risks, and `Unverified` items.

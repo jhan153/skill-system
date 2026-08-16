@@ -12,8 +12,6 @@ ACTIVE_DOCS = [
     ".claude/docs/improvement_tracks.md",
     ".codex/docs/runtime_terms.md",
     ".claude/docs/runtime_terms.md",
-    ".codex/skills/evaluation-harness/SKILL.md",
-    ".claude/skills/evaluation-harness/SKILL.md",
 ]
 STALE_PATTERNS = [
     "Current 7.1 Watchlist",

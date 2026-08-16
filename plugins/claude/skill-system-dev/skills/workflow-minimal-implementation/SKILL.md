@@ -38,6 +38,8 @@ disable-model-invocation: true
 
 ## Decision Contract
 - Constrain solution shape; the primary workflow still owns implementation, correctness, and validation.
+- Accept the complete required behavior and investigation boundary from the primary owner; never use the minimum ladder to narrow evidence gathering or treat one convenient local path as the whole contract.
+- When evidence invalidates the working frame, the primary owner reconstructs it; this modifier does not redefine scope through a minimality review.
 - Optimize for the smallest coherent change that satisfies current requirements, not the fewest lines at any cost.
 - Preserve canonical-source ownership, fail-closed behavior, security, data integrity, accessibility, operability, and explicit scope.
 - Tests, mocks, interfaces, wrappers, and generated artifacts do not substitute for the requested production path.
@@ -55,9 +57,9 @@ Stop at the first rung that fully satisfies the current requirement:
 When two rungs are equally small, prefer the one that fits established local patterns and handles required edge cases better.
 
 ## Execution
-1. Before writing, identify `minimum_behavior`, its production owner, selected rung, and non-negotiable safeguards.
+1. Before writing, identify `minimum_behavior` inside the accepted complete behavior boundary, its production owner, selected rung, and non-negotiable safeguards.
 2. Justify each new package, file/layer, interface/adapter/wrapper, config option, or generic facility with a current requirement, existing repeated need, or present boundary. Future reuse is not justification. Keep source selection, policy, and fallback in their real owner.
-3. Let the primary workflow implement the smallest production change. Tests may preserve a known contract after it is understood; they do not discover or replace the requested path.
+3. Let the primary workflow implement the smallest production change that closes the accepted behavior boundary. Tests may preserve a known contract after it is understood; they do not discover or replace the requested path.
 4. Run one decisive check or readback on the affected real path. Lower-scope checks prove only their boundary; conflicting production evidence keeps the condition open.
 5. Re-evaluate minimality only when the diff adds a dependency, abstraction, config, file, boilerplate, or disproportionate churn.
 

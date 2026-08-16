@@ -1,0 +1,7 @@
+interface:
+  display_name: "Knowledge Base Record"
+  short_description: "Record one new durable project knowledge item"
+  default_prompt: "Use $knowledge-base-record to create one new accepted project Knowledge record in the declared store, selecting the correct category profile and routing existing identities to knowledge-base-update."
+
+policy:
+  allow_implicit_invocation: false

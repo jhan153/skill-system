@@ -1,5 +1,14 @@
 # Changelog
 
+## 9.4.5
+
+- Collapsed standalone `search-router`, `analysis-router`, and `research-router` owners so family entry now selects the matching specialist directly. Shared registry and host routing keep trigger/guardrail ownership; they no longer insert a duplicate navigator skill.
+- Merged overlapping surface IDs onto durable owners: Knowledge category writers and accepted-plan admission into `knowledge-base-record`/`knowledge-base-update`, coordination into `plan-task-handoff`, Kanboard rollout/ops into `kanboard-plan`, project-context init/update/checkpoint into `workflow-project-context` and `workflow-project-context-checkpoint`, loop readiness into `analysis-loop-readiness`, verifier mapping into `plan-loop-term`, Wiki context into `analysis-llm-wiki-context`, comment sync into `workflow-source-maintenance`, plan-spec curation into `plan-short-term-docs`, and correction capture into `memory-bank-update`.
+- Added `plan-decision-map` for durable multi-session decision readiness and `plan-stakeholder-questionnaire` for one explicit stakeholder question document. Retired `report-diff` as a standalone skill (`report-implementation-explainer` compare mode), `skill-system-repo-adapter`, `memory-bank-correction-capture`, and the `skill-system-maintainer` plugin.
+- Reduced the canonical surface from 79 to 65 skills and the generated plugin set from six to five. Legacy IDs remain compatibility aliases only; they do not recreate removed packages or slash commands.
+- Regenerated the Codex runtime, Claude runtime, and paired plugin packages under one 9.4.5 identity. The Go harness binaries are unchanged from the current 9.4.3/9.4.4 runtime line.
+- Cut the unified source/runtime/plugin/eval 9.4.5 release with the local annotated tag `v9.4.5`. Remote push, publication, archive creation, installation, and live cache mutation remain separate explicit operations.
+
 ## 9.4.4
 
 - Expanded natural-language model visibility from 20 to 33 of 79 canonical skills by making intent-matched workflow execution owners, coordination handoff, repository integration support, and two bounded design interpreters implicitly invocable. Invocation remains selection rather than authorization: persistent Memory/Knowledge writes, project-context mutation, Kanboard, LoopRun, lifecycle gates, explicitly selected Wiki context, evaluation, rigor, task-ledger, and validation owners remain explicit-only.

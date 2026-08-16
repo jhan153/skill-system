@@ -22,6 +22,12 @@ human-operable slice; an explicitly requested decision record is an input to a
 later owner, not a synthetic return to `scratch -> discovery` or implementation
 approval.
 
+`plan-decision-map` and `plan-stakeholder-questionnaire` also stay outside this state machine. A
+decision map records unresolved decisions, prerequisites, and their current
+readiness but is not an active implementation plan. A stakeholder questionnaire
+requests owned input; only returned answers may later be admitted into discovery
+or a requirements contract.
+
 ## Core Rule
 
 Planning skills may propose questions, summaries, candidate scopes, and next
@@ -48,8 +54,8 @@ In practice:
 | `executing` | task-specific workflow or `workflow-plan-runner` | Source, test, runtime config/build, or executable scaffold work is in progress. | Changed artifacts and command/manual observations. |
 | `validating` | execution owner or `workflow-validation` | Verification is being run against stated success conditions. | Validation output tied to changed artifacts or accepted manual checks. |
 | `completed` | execution owner | Required success conditions for the governed scope are satisfied. | Evidence for every required material success condition; an accepted residual risk may document a non-blocking exposure but cannot replace a required condition or gate. |
-| `closed_out` | `plan-spec-curator` | Plan is distilled into durable decisions, artifact pointers, and follow-ups. | Closeout summary and future load policy. |
-| `archived` | `plan-spec-curator` | Raw plan is historical material. | Archive/load policy: summary-only or explicit-request-only by default. |
+| `closed_out` | `plan-short-term-docs` (`curation`) | Plan is distilled into durable decisions, artifact pointers, and follow-ups. | Closeout summary and future load policy. |
+| `archived` | `plan-short-term-docs` (`curation`) | Raw plan is historical material. | Archive/load policy: summary-only or explicit-request-only by default. |
 
 Overlay states may attach to the main lifecycle:
 
@@ -66,7 +72,7 @@ When one approved change requires several execution batches, apply `delivery_sli
 
 | event | valid from | next state | preconditions |
 | --- | --- | --- | --- |
-| `ask_decision_question` | `scratch`, `discovery` | `discovery` | A requirements gap changes scope, acceptance, edge behavior, data ownership, or non-goals. |
+| `ask_decision_question` | `scratch`, `discovery` | `discovery` | One decision or a bounded round of mutually independent ready questions changes scope, acceptance, edge behavior, data ownership, or non-goals; dependent questions remain deferred. |
 | `record_decision` | `discovery` | `discovery` | The answer is decision-bearing and linked to the open question. |
 | `distill_requirements` | `discovery` | `requirements_contract` | Decisions are sufficient to state scope, non-goals, assumptions, and observable acceptance criteria. |
 | `deactivate_scratch_for_direct_work` | `scratch` | outside this model | Requirements are stable, no persisted planning artifact is needed, and the current request itself authorizes the direct task. Deactivation removes the artifact from active planning admission; it never deletes a file and is not execution or completion evidence. |
@@ -102,12 +108,14 @@ When one approved change requires several execution batches, apply `delivery_sli
 
 | skill | state responsibility |
 | --- | --- |
-| `plan-requirements-discovery` | `scratch -> discovery`; ask one decision-bearing question and record decisions. |
+| `plan-requirements-discovery` | `scratch -> discovery`; ask mutually independent ready questions in bounded rounds and record each decision. |
+| `plan-decision-map` | Outside persisted planning state; own a durable target/decision map until material decision work closes, without implying execution readiness. |
+| `plan-stakeholder-questionnaire` | Outside persisted planning state; create an explicit stakeholder input document, not returned answers or an accepted contract. |
 | `plan-requirements-brief` | `discovery -> requirements_contract`; stabilize scope, non-goals, assumptions, and acceptance criteria. |
 | `plan-short-term-docs` | `active_plan -> implementation_ready`; keep the current-horizon plan synchronized and gate implementation transition. |
 | `plan-loop-term` | `loop_contract_ready` overlay; define verifier-backed success, progress, retry, and stop terms before loop execution. |
 | `plan-long-term-package` | `package_planned` overlay; keep canonical contracts and package-derived docs from drifting. |
-| `plan-spec-curator` | `completed -> closed_out -> archived`; control raw-plan admission, closeout summaries, and memory/archive proposals. |
+| `plan-short-term-docs` (`curation`) | `completed -> closed_out -> archived`; control raw-plan admission, closeout summaries, and memory/archive proposals. |
 
 ## Reporting Requirement
 

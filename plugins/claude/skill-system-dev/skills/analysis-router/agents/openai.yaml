@@ -1,7 +1,0 @@
-interface:
-  display_name: "Analysis Router"
-  short_description: "Route deep analysis to the right specialist"
-  default_prompt: "Use $analysis-router to choose the right deep analysis mode and continue with bug diagnosis, algorithm recommendation, codebase design, architecture deepening, domain modeling, performance analysis, or a hybrid sequence. Treat requested brevity as output shape, not evidence scope."
-
-policy:
-  allow_implicit_invocation: true

@@ -56,4 +56,4 @@ Proceed only when the slice names a material condition, bounded surface or safe 
 Return anchors/batches, changed implementation and callers, condition authority/evidence/status, rollback or blocker, next batch, and directly known phase/plan status. Separate batch, requested-scope, phase, and plan completion.
 
 ## Cross-Skill Boundaries
-- `plan-short-term-docs` owns short plans; `workflow-implementation` owns and may write direct features; `workflow-validation` owns validation-only design; `coordination-handoff` owns handoffs; `workflow-recovery` owns repeated failure. Planning/reporting cannot implement or complete a batch.
+- `plan-short-term-docs` owns short plans; `workflow-implementation` owns and may write direct features; `workflow-validation` owns validation-only design; `plan-task-handoff` owns handoffs; `workflow-recovery` owns repeated failure. Planning/reporting cannot implement or complete a batch.

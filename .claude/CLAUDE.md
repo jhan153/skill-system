@@ -1,6 +1,6 @@
 # Global CLAUDE
 
-> Claude-side global working rules for the Skill System bundle (9.4.4). Claude keeps the
+> Claude-side global working rules for the Skill System bundle (9.4.5). Claude keeps the
 > proven 9.2.1 decision and execution model while using the current shared skill catalog.
 > Its routing, hooks, permissions, validation, and runtime behavior are owned independently
 > from Codex; both platform harnesses still ship under one bundle version and release tag.
@@ -30,6 +30,7 @@
 - Keep code identifiers, file paths, commands, logs, API names, and library names in their original language.
 - Do not translate code, errors, paths, logs, or technical identifiers unless explicitly requested.
 - Answer simple requests directly and briefly; add structure only when it improves clarity.
+- When the user says the immediately preceding explanation was unclear, replace it from the missing premise or reasoning connection using only already admitted evidence; a request for new facts or changes is a new task.
 - For reviews, critiques, or analysis, lead with actionable findings.
 
 ## Integrity
@@ -101,7 +102,7 @@
 ### Knowledge And Memory Boundary
 - Resolve project Memory Bank, Knowledge Base, plan, and named LLM Wiki locations from an exact user path or the nearest `project-context.yaml`; do not guess paths or merge parent manifests.
 - Treat those stores as context sources, not sources of truth. Current user instructions, repository files, tests, explicit decisions, and validated plans outrank them.
-- Use `memory-bank-harness`, `knowledge-base-read`, or explicit `llm-wiki-context` only when the route or user intent needs that context. Load the smallest task-relevant slice rather than full banks, archives, raw transcripts, or Wikis.
+- Use `memory-bank-harness`, `knowledge-base-read`, or explicit `analysis-llm-wiki-context` only when the route or user intent needs that context. Load the smallest task-relevant slice rather than full banks, archives, raw transcripts, or Wikis.
 - Mutate persistent Memory or Knowledge only through its explicit owning workflow. Do not auto-create stores or collect conversation history because a context path is missing.
 
 ### Conflict Precedence Summary

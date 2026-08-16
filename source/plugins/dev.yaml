@@ -1,6 +1,6 @@
 # source/plugins/dev.yaml — plugin membership manifest (hand-authored input).
 name: skill-system-dev
-version: "9.4.4"
+version: "9.4.5"
 description: 'Skill System dev — analysis, prototyping, implementation, refactoring, implementation understanding, behavior discovery, and failure recovery for the engineering role.'
 skills:
   - analysis-algorithm
@@ -10,12 +10,9 @@ skills:
   - analysis-codebase-design
   - analysis-domain-modeling
   - analysis-performance
-  - analysis-router
   - plan-behavior-discovery
-  - report-diff
   - report-implementation-explainer
   - workflow-bug-fix
-  - workflow-comment-maintenance
   - workflow-dependency-upgrade
   - workflow-implementation
   - workflow-minimal-implementation

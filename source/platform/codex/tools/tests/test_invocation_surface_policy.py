@@ -106,17 +106,14 @@ class InvocationSurfacePolicyTests(unittest.TestCase):
 
     def test_current_intent_matched_cohort_is_implicitly_exposed(self) -> None:
         expected = {
-            "coordination-handoff",
+            "plan-task-handoff",
             "design-layout-translator",
             "design-ui-decomposer",
-            "skill-system-repo-adapter",
             "workflow-bug-fix",
-            "workflow-comment-maintenance",
             "workflow-dependency-upgrade",
             "workflow-implementation",
             "workflow-plan-runner",
             "workflow-prototype",
-            "workflow-recovery",
             "workflow-refactor-safely",
             "workflow-source-maintenance",
         }

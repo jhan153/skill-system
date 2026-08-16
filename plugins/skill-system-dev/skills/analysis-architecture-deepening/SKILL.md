@@ -16,8 +16,8 @@ description: Rank evidence-backed improvements across deep modules, seams, adapt
   - domain concepts/invariants: `analysis-domain-modeling`
   - measured bottleneck: `analysis-performance`
   - direct production change: route by the selected candidate's change contract—`workflow-refactor-safely` for behavior-preserving live restructuring, `workflow-source-maintenance` for proven-obsolete deletion, or `workflow-implementation` for behavior changes
-- expected_inputs: bounded scope, pain/change signals, implementation appetite
-- expected_outputs: coverage, evidenced friction, ranked candidates, next candidate, handoff, unverified gaps
+- expected_inputs: user-named scope or bounded recent-change history, pain/change signals, implementation appetite
+- expected_outputs: sampling basis, coverage, evidenced friction, ranked candidates, next candidate, handoff, unverified gaps
 - context_targets:
   - must_read: goal, compact scope outline, and production path/owner evidence for shortlisted candidates
   - read_if_needed: discriminating callers, contracts, failures, diffs, metrics, or formal invariants
@@ -35,10 +35,12 @@ Rank moves that remove caller knowledge/change surface, return policy, isolate p
 ## Two-Pass Workflow
 
 ### 1. Discover cheaply
-1. Bound the scan by workflow, module cluster, product/service group, or explicit broad scope.
-2. Inventory modules, entrypoints, dependencies, usages, tests, churn, and complexity mechanically; keep raw data out of context. Sample one path per material group plus a low-signal control.
-3. Seek duplicated caller policy, ownership drift, delegation, boundaries, and observed change/failure pressure.
-4. Record inventory findings as hypotheses, never recommendations.
+1. Resolve the inspection boundary before collecting candidates. A user-named workflow, module, subsystem, or pain point is authoritative and cannot be displaced by repository history.
+2. With no named boundary, use recent change only to allocate inspection effort. Start with roughly 20 material non-merge commits, count recurrence at canonical owners and their production callers, and remove generated/vendor output, formatting-only edits, lockfiles, mechanical migrations, and mass renames from that sample.
+3. Promote a frequently touched path to deeper inspection, never directly to the candidate ranking. If the bounded history has no useful concentration, fall back to representative material groups. A less-changed path still enters the sample when the current failure, stated pressure, or user scope points to it.
+4. Inventory modules, entrypoints, dependencies, usages, tests, churn, and complexity mechanically; keep raw data out of context. Sample one path per material group plus a low-signal control.
+5. Seek duplicated caller policy, ownership drift, delegation, boundaries, and observed change/failure pressure.
+6. Record inventory findings as hypotheses, never recommendations.
 
 ### 2. Confirm narrowly
 1. Shortlist 3–5 hypotheses by leverage and evidence availability.
@@ -52,9 +54,10 @@ Rank moves that remove caller knowledge/change surface, return policy, isolate p
 - Preserve wrappers enforcing security, lifecycle, protocol/retry ordering, or anti-corruption rules. Collapse only when representative callers and the real path prove pure delegation.
 - A proven removal/deepening opportunity is itself a ranked candidate; identify that option rather than returning no candidate.
 - Exclude generated/vendor/migration churn without matching pressure in canonical owners and production callers.
+- History controls attention, not verdicts. Change frequency without owner/path friction stays out of the ranking; direct current evidence can admit a path regardless of its change frequency.
 
 ## Coverage, Ranking, And Stop
-Track material groups, enumerated/inspected counts, selection reason, evidence scope, confidence, exclusions, and gaps. Coverage means representative evidence, not every file.
+Track the scope decision, recent-history window when used, change-weighted priority paths, material groups, enumerated/inspected counts, selection reason, evidence scope, confidence, exclusions, and gaps. Coverage means representative evidence, not every file.
 
 Rank ordinally by leverage, knowledge/change removed, observed pressure, counterevidence, validation/reversibility, and cost/blast radius. Avoid fake precision.
 
@@ -63,6 +66,7 @@ Stop when groups are inventoried or excluded, 3–5 candidates have discriminati
 ## Output Contract
 Return only:
 - `scanned_scope` and `coverage_ledger`
+- `sampling_basis` as `user_named | recent_change_weighted | representative_widened`, including excluded mechanical churn when history was used
 - `friction_signals` with evidence scope and references
 - `candidates` with stable IDs, `ranking`, and counterevidence
 - `recommended_next_candidate` as a ranked candidate ID (never `none` when ranking an opportunity), plus the decisive tradeoff

@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Source Maintenance"
-  short_description: "Behavior-preserving source cleanup and pruning"
-  default_prompt: "Use $workflow-source-maintenance to prune dead code, remove stale scaffolding, and clean up source while preserving intended behavior."
+  short_description: "Prune obsolete source or synchronize code comments"
+  default_prompt: "Use $workflow-source-maintenance in source_prune mode for proven-obsolete code or comment_sync mode for behavior-preserving comment/docstring maintenance. Keep live restructuring, feature work, and concrete bug repair with their own owners."
 
 policy:
   allow_implicit_invocation: true

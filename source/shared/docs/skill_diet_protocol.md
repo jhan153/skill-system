@@ -1,5 +1,7 @@
 # Skill Diet Protocol
 
+This document preserves the 9.2.0 diet campaign and its then-current skill IDs. Some named candidates were consolidated later; use `skill_registry.md` for the current inventory and legacy-owner mapping.
+
 This is the maintenance protocol for the 9.2.0 instruction-surface diet. It is not normal routing context. Load it only when measuring, relocating, pruning, or release-validating canonical Skill System skills.
 
 ## Objective

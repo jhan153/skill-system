@@ -1,0 +1,20 @@
+interface:
+  display_name: "Stakeholder Questionnaire"
+  short_description: "Create one decision-linked stakeholder question document"
+  default_prompt: |
+    Use $plan-stakeholder-questionnaire only when the user explicitly requests a local Markdown questionnaire for one stakeholder. Bind the recipient and downstream decision, cover each needed answer once, permit uncertainty, and never send or upload the artifact.
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: one_shot
+  role: elicitation_artifact_owner
+  typical_agentic_duration: "one artifact turn"
+  legacy_equivalent: "single stakeholder input request"
+
+planning_altitude:
+  kind: requirements_discovery
+  artifact_level: stakeholder_questionnaire

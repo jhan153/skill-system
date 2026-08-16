@@ -86,34 +86,9 @@ Do not activate multiple profiles merely because a responsive dashboard has a mo
 8. **Validate and iterate.** Run declared family-policy commands, focused build/typecheck/lint/tests, and the strongest available preview. Exercise at least one critical user path for a task-bearing interactive route/screen; for a component/story, exercise its relevant states, events, keyboard behavior, and rendering. Capture exact viewport evidence, compare both to the target source and to declared family baselines, and fix material mismatches.
 9. **Report.** Name changed files/surface, pinned profile, source reference, UX decisions, component reuse/exception evidence, checks, screenshots/viewports, target and family-coherence verdicts, substitutions, unavailable evidence, and final status.
 
-## Implementation Rules
-- Preserve existing business logic, API/auth/analytics behavior, routing semantics, and data mutations unless explicitly in scope.
-- Do not add backend endpoints, database changes, server actions, global themes, or parallel design systems solely to match a local visual artifact.
-- Use existing fixtures, mocks, stories, or demo data when the design shows unwired data; do not invent product semantics.
-- Follow local file organization, typing, naming, formatting, component composition, and test style. Keep the diff focused and reviewable.
-- Prefer maintainable component boundaries over duplicating generated layer structure pixel by pixel.
-- At the app-surface call site, use the approved catalog component when its semantic role and required variant match. Raw/default/custom controls are not acceptable substitutes merely because they are faster to generate.
-- Allow semantic HTML/native primitives inside an approved design-system component; do not misclassify the component's internal implementation as an app-surface reuse violation.
-- If no approved component matches, mark the role `unmapped` and follow the pinned fallback policy. A custom control needs an explicit exception with rule, scope, reason, and authorizing source; never invent a catalog mapping.
-- Treat declared hard family rules as invariants. Do not hard-code values, import forbidden UI packages, or fork the theme when the profile requires tokens or named assets.
-- Treat family token registries, component internals, icon sets, and baseline assets as governance sources, not convenient page-style write targets. Consume them by default. Change one only when the user explicitly scopes that system change, the profile permits it, and authoritative values or behavior exist.
-- If a required family token, variant, or component state is absent, record the gap and use `design-tokens` or `design-component-mapper`; do not invent a token value, overwrite an approved component, or place page/component CSS inside a token registry.
-- Wire mutations through an existing API, action, callback, or accepted repo fixture. Never add a no-op, timer, local-success default, fake persistence, or swallowed failure merely to make a critical path appear complete. Keep a missing integration boundary explicit and the path `unverified`.
-- Preserve supplied product copy unless copy editing was requested.
-- Match source hierarchy, spacing, typography, imagery, icons, alignment, density, responsive order, overflow, and visible states. Mark screenshot-derived measurements as inferred.
-- Define behavior for text wrapping and relevant mobile/desktop breakpoints; do not claim responsive correctness from one viewport when the surface is responsive.
-- Use semantic HTML or native accessibility primitives, accessible names, logical focus/keyboard behavior, visible focus, and usable targets. Never sacrifice readability or operability for screenshot fidelity.
+## Conditional Guardrails
 
-## Product-Family Gate
-When the repo declares a product-family profile, load `references/product-family-profile.md` before editing. Apply its applicability, stable pinning, source ownership, write policy, fallback, exception, verification, and conformance rules; fail closed for declared hard rules and leave any claim affected by a missing or stale profile, catalog, baseline, or verifier `unverified` or `user-verification-needed`. Use `design-tokens` for applicable token rules or gaps, `design-component-mapper` for catalog reuse, `design-visual-regression` for separate target/family verdicts, and `design-a11y-audit` for accessibility.
-
-## Assets, Dependencies, and Generated Code
-- Search the repo before adding icons, images, fonts, tokens, or packages.
-- Add assets only to the established pipeline. Never commit private, expiring, Figma, or localhost asset URLs.
-- Do not replace a concrete asset with a generic placeholder unless it is unavailable; report every substitution.
-- Add no UI/CSS/icon/animation/font package unless required, compatible with project policy, and allowed by the active execution boundary.
-- Treat generated HTML/CSS/React/JavaScript as visual evidence. Extract intent and rewrite it into idiomatic, secure project code; do not blindly paste or execute it.
-- Do not request, expose, paste, or commit tokens, cookies, keys, credentials, or private asset URLs.
+Read [Implementation Guardrails](references/implementation-guardrails.md) before editing when the task touches product-family governance, app-surface controls, mutations/integration, assets/dependencies/generated code, an accepted loop, or a material status decision. Keep that detail out of the default context for simple general-profile surfaces.
 
 ## Conditional Evidence Gates
 Use a gate only when its evidence question is material; it never replaces implementation ownership.
@@ -126,30 +101,6 @@ Use a gate only when its evidence question is material; it never replaces implem
 | keyboard, focus, semantics, labels, contrast, target size | `design-a11y-audit` | interaction scope, evidence, manual gaps |
 
 For surface-specific constraints, load only the selected profile reference; load layout or quality references separately only when their evidence question is material.
-
-## Loop Contract Consumption
-When an accepted design loop is active:
-- read its success-condition ids and verifier map before editing;
-- implement the smallest batch that can change a failed/unverified condition;
-- return changed files, rendered target, and conditions ready for visual/a11y verification;
-- never mark loop success from implementation alone;
-- stop as `blocked` or `user-verification-needed` when a required reference, asset, font, route, preview, or private context is unavailable.
-
-## Validation and Status
-Visual proof is central. Use user/design viewports first; otherwise use project breakpoints and, for a responsive surface with no project standard, one mobile and one desktop viewport. Record exact dimensions. Compare hierarchy, layout, spacing, typography, color, imagery, state, responsive order, overflow, clipping, and text fit. When family baselines exist, keep exact-target fidelity and family coherence as separate verdicts.
-
-Use one final status:
-- `agent-verified`: code is integrated; a relevant preview ran; a task-bearing route/screen has critical-path evidence or a component/story has scoped interaction/state evidence; focused and declared family checks passed or unrelated failures are documented; applicable reuse evidence exists; target and applicable family visual evidence was captured; material mismatches were addressed.
-- `user-verification-needed`: implementation and available checks are complete, but fidelity/behavior depends on private design context, assets, fonts, authenticated state, device, or user-only review.
-- `unverified`: code changed, but the necessary preview/build/screenshot/simulator evidence could not run.
-- `blocked`: implementation cannot safely start because the artifact, repo access, target surface, or essential write boundary is missing.
-
-## Ask, Recover, or Stop
-- Proceed with explicit assumptions when the visible artifact and repo make the target safe; exact pixels or proprietary font metadata alone should not block work.
-- Ask only when missing frames, essential assets, private icons, target screen, or inaccessible context can change which code should be written.
-- If the target can be safely inferred from established repo structure, use it and report the inference. If several materially different surfaces remain plausible, ask before editing.
-- If preview is unavailable, run the strongest static/build checks and mark visual behavior `unverified`; do not claim fidelity.
-- If authenticated design/app access is unavailable, request safe exports, fixtures, or screenshots rather than credentials.
 
 ## Output Contract
 Lead with status, then report only applicable items:

@@ -50,5 +50,5 @@ termination:
 
 ## How a run progresses
 - Early iterations: claims lack traceable evidence or an explicit missing-evidence resolution → `check_evidence_ledger` FAILs → loop `continue` with the smallest discriminating acquisition.
-- Repeated identical failure → loop `recover` (hand to `workflow-recovery`).
+- Repeated identical failure → loop `recover` by handing the stuck slice to `workflow-recovery`.
 - All claims structurally resolved with source/limitation records → record the command output as audit evidence, but keep SC-002 open in local v2. Hand off only as `user-verification-needed`/`unverified`; do not report LoopRun success without host-authenticated command attestation.

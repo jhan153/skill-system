@@ -45,6 +45,71 @@ class SkillInstructionQualityTests(unittest.TestCase):
                     value = line.split(":", 1)[1].strip().strip('"')
                     self.assertLessEqual(len(value), 64, skill.parent.name)
 
+    def test_redefined_skill_ids_use_established_primary_families(self) -> None:
+        expected_families = {
+            "workflow-project-context-checkpoint": "workflow",
+            "workflow-project-context": "workflow",
+            "analysis-llm-wiki-context": "analysis",
+            "analysis-loop-readiness": "analysis",
+            "plan-task-handoff": "planning",
+            "plan-decision-map": "planning",
+            "plan-stakeholder-questionnaire": "planning",
+            "workflow-loop-runner": "workflow",
+            "knowledge-base-record": "knowledge",
+        }
+        retired_ids = {
+            "skill-system-repo-adapter",
+            "project-context-checkpoint",
+            "project-context-init",
+            "project-context-update",
+            "llm-wiki-context",
+            "loop-readiness-router",
+            "loop-verifier-registry",
+            "coordination-handoff",
+            "wayfinder",
+            "wait-what",
+            "to-questionnaire",
+            "workflow-skill-system-integration",
+            "workflow-evaluation-maintenance",
+            "workflow-explanation-repair",
+            "search-router",
+            "plan-loop-verification",
+            "knowledge-algorithm-record",
+            "knowledge-architecture-record",
+            "knowledge-code-review-record",
+            "knowledge-design-record",
+            "knowledge-domain-record",
+            "analysis-router",
+            "research-router",
+            "report-diff",
+            "workflow-comment-maintenance",
+            "plan-spec-curator",
+            "memory-bank-correction-capture",
+            "knowledge-plan-sync",
+            "workflow-project-context-init",
+            "workflow-project-context-update",
+            "kanboard-plan-rollout",
+            "kanboard-plan-ops",
+        }
+        registry = canonical("shared/docs/skill_registry.md").read_text(encoding="utf-8")
+        registry_rows = registry.split("## Registry", 1)[1].split("## Group Alias Map", 1)[0]
+        alias_map = registry.split("## Group Alias Map", 1)[1].split(
+            "## Legacy Skill Alias Migration", 1
+        )[0]
+
+        for skill_id, family in expected_families.items():
+            self.assertTrue((SOURCE / "skills" / skill_id / "SKILL.md").is_file(), skill_id)
+            row = next(
+                line for line in registry_rows.splitlines() if line.startswith(f"| `{skill_id}` |")
+            )
+            self.assertEqual(row.rsplit("|", 2)[1].strip(), f"`{family}`", skill_id)
+
+        for skill_id in retired_ids:
+            self.assertFalse((SOURCE / "skills" / skill_id).exists(), skill_id)
+        for retired_family in ("coordination", "loop", "skill_system"):
+            self.assertNotIn(f"| `{retired_family}` |", alias_map)
+        self.assertIn("| `evaluation` |", alias_map)
+
     def test_skill_frontmatter_metadata_is_complete_and_host_neutral(self) -> None:
         for skill in sorted((SOURCE / "skills").glob("*/SKILL.md")):
             with self.subTest(skill=skill.parent.name):
@@ -99,24 +164,28 @@ class SkillInstructionQualityTests(unittest.TestCase):
         text = canonical("platform/codex/AGENTS.md").read_text(encoding="utf-8")
         self.assertIn("intended outcome before drafting", text)
         self.assertIn("## Pre-Answer Depth Gate", text)
-        self.assertIn("investigation depth and answer length separately", text)
-        self.assertIn("This gate applies even if no router or specialist activates", text)
-        self.assertIn("direct source or runtime paths", text)
-        self.assertIn("counterexample or disconfirming observation", text)
+        self.assertIn("constrain presentation, not investigation depth", text)
+        self.assertIn("Speed, brevity, or immediately usable output", text)
+        self.assertIn("applies without a router or specialist", text)
+        self.assertIn("Minimal change shapes solutions only after the behavior boundary", text)
+        self.assertIn("smallest complete behavior", text)
+        self.assertIn("inspect source/runtime", text)
+        self.assertIn("one disconfirming case", text)
+        self.assertIn("invalidates the working frame", text)
+        self.assertIn("reconstruct the positive objective", text)
+        self.assertIn("partition topology", text)
         self.assertIn("Do not finalize until", text)
-        self.assertIn("evidence passes do not add owners", text)
+        self.assertIn("evidence passes add none", text)
         self.assertIn("up to three passes", text)
-        self.assertIn("distinct hypotheses with material consequences", text)
+        self.assertIn("distinct material hypotheses", text)
         self.assertIn("owner retains scope, synthesis, and final judgment", text.lower())
 
-    def test_analysis_router_treats_brevity_as_output_shape(self) -> None:
-        router = canonical("skills/analysis-router/SKILL.md").read_text(encoding="utf-8")
-        metadata = canonical("skills/analysis-router/agents/openai.yaml").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("requested brevity or conclusion-first formatting", router)
-        self.assertNotIn("needs only a quick answer", router)
-        self.assertIn("Treat requested brevity as output shape, not evidence scope", metadata)
+    def test_direct_analysis_selection_treats_brevity_as_output_shape(self) -> None:
+        routing = canonical("platform/codex/context-routing.md").read_text(encoding="utf-8")
+        self.assertIn("current owner selects one specialist directly", routing)
+        self.assertIn("### Technical analysis", routing)
+        self.assertIn("Requested brevity", routing)
+        self.assertIn("does not change the task owner", routing)
 
     def test_routing_docs_do_not_own_eval_payloads(self) -> None:
         routing = canonical("platform/codex/context-routing.md").read_text(encoding="utf-8")
@@ -148,15 +217,15 @@ class SkillInstructionQualityTests(unittest.TestCase):
             if line.startswith("- `search` secondary-tag (evidence lane) candidates:")
         )
         self.assertIn("`knowledge-base-read`", search_lane)
-        self.assertIn("`llm-wiki-context`", search_lane)
+        self.assertIn("`analysis-llm-wiki-context`", search_lane)
         self.assertIn("Do not maintain a second family-entry table here", claude_routing)
         self.assertNotIn("Family entry routing (Phase A):", claude_routing)
 
     def test_legacy_skill_aliases_map_to_current_owners_without_stub_packages(self) -> None:
         expected = {
-            "coordination-brief": ("coordination-handoff", "brief"),
-            "coordination-multi-agent": ("coordination-handoff", "multi_agent"),
-            "report-artifact-inventory": ("coordination-handoff", "artifact_inventory"),
+            "coordination-brief": ("plan-task-handoff", "brief"),
+            "coordination-multi-agent": ("plan-task-handoff", "multi_agent"),
+            "report-artifact-inventory": ("plan-task-handoff", "artifact_inventory"),
             "design-mobile-screen": ("design-frontend", "mobile"),
             "design-dashboard": ("design-frontend", "dashboard"),
             "design-section-web": ("design-frontend", "section-web"),
@@ -187,9 +256,7 @@ class SkillInstructionQualityTests(unittest.TestCase):
             self.assertEqual(alias_case.get("expected_mode"), mode)
             if owner == "task implementation owner":
                 self.assertEqual(alias_case.get("expected_route_class"), "direct_task_owner")
-                self.assertIn(
-                    "skill-system-repo-adapter", alias_case.get("expected_supporting_skills", [])
-                )
+                self.assertFalse(alias_case.get("expected_supporting_skills", []))
             else:
                 self.assertEqual(alias_case.get("expected_primary_skill"), owner)
 
@@ -204,11 +271,11 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertNotIn("`coordination-*`", routing)
 
     def test_handoff_propagates_selected_skills_without_guessing(self) -> None:
-        handoff = canonical("skills/coordination-handoff/SKILL.md").read_text(
+        handoff = canonical("skills/plan-task-handoff/SKILL.md").read_text(
             encoding="utf-8"
         )
         schema = canonical(
-            "skills/coordination-handoff/references/handoff-schemas.md"
+            "skills/plan-task-handoff/references/handoff-schemas.md"
         ).read_text(encoding="utf-8")
         team_patterns = canonical("shared/docs/team_patterns.md").read_text(
             encoding="utf-8"
@@ -222,12 +289,13 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn("selected_skills: []", team_patterns)
         self.assertIn("repeated in the worker instruction", team_patterns)
 
-    def test_research_router_disambiguates_search_and_development(self) -> None:
-        text = canonical("skills/research-router/SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("Explicit paper-only acquisition", text)
-        self.assertIn("lane-ambiguous evidence search belongs to `search-router`", text)
-        self.assertIn("does not turn a concrete development request into research", text)
-        self.assertIn("## Stage Decision", text)
+    def test_research_routing_disambiguates_search_and_development(self) -> None:
+        text = canonical("platform/codex/research-routing.md").read_text(encoding="utf-8")
+        self.assertIn("latest papers/evidence/citations", text)
+        self.assertIn("one claim needs independent evidence lanes", text)
+        self.assertIn("current task owner asks for the missing deliverable", text)
+        self.assertIn("Concrete implementation of an already selected method remains development work", text)
+        self.assertIn("## Route Matrix", text)
 
     def test_long_term_plan_uses_claims_and_behavior_oracles(self) -> None:
         skill = canonical("skills/plan-long-term-package/SKILL.md").read_text(encoding="utf-8")
@@ -251,32 +319,46 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn("only in `FullOrScored` mode", text)
         self.assertIn("do not reward static presence", text)
 
-    def test_recovery_keeps_one_hypothesis_and_original_signal(self) -> None:
-        text = canonical("skills/workflow-recovery/SKILL.md").read_text(encoding="utf-8")
-        self.assertIn("exactly one active hypothesis", text.lower())
+    def test_recovery_protocol_keeps_owner_one_hypothesis_and_original_signal(self) -> None:
+        text = canonical("shared/docs/recovery_protocol.md").read_text(encoding="utf-8")
+        self.assertIn("exactly one falsifiable hypothesis", text.lower())
         self.assertIn("original success check", text)
-        self.assertIn("If `unchanged` occurs twice", text)
+        self.assertIn("After two `unchanged` recovery actions", text)
+        self.assertIn("does not create another workflow owner", text)
 
-    def test_execution_modifiers_own_only_their_distinctive_delta(self) -> None:
+    def test_global_review_and_implementation_preserve_evidence_and_minimality(self) -> None:
+        agents = canonical("platform/codex/AGENTS.md").read_text(encoding="utf-8")
         rigor = canonical("skills/workflow-rigor/SKILL.md").read_text(encoding="utf-8")
-        minimal = canonical(
-            "skills/workflow-minimal-implementation/SKILL.md"
-        ).read_text(encoding="utf-8")
+        implementation = canonical("skills/workflow-implementation/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        minimal = canonical("skills/workflow-minimal-implementation/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("separate read-only review", agents)
+        self.assertIn("Contract/Spec", agents)
+        self.assertIn("Repository/Constraints", agents)
         self.assertIn("lite", rigor)
         self.assertIn("standard", rigor)
         self.assertIn("strict", rigor)
         self.assertIn("do not re-plan or reimplement", rigor)
+        self.assertIn("workflow-minimal-implementation", implementation)
+        self.assertIn("complete required behavior boundary", implementation)
+        self.assertIn("Classify the change as local only", implementation)
+        self.assertIn("smallest complete behavior", implementation)
+        self.assertIn("actual dependencies, overlapping writes, and unresolved decisions", implementation)
         self.assertIn("Stop at the first rung", minimal)
-        self.assertIn("only where a real complexity choice exists", minimal)
-        self.assertIn("No material minimality cut.", minimal)
-        self.assertIn("not a correctness or release verdict", minimal)
+        self.assertIn("Future reuse is not justification", minimal)
+        self.assertIn("role: execution_modifier", minimal)
+        self.assertIn("never use the minimum ladder to narrow evidence gathering", minimal)
+        self.assertIn("primary owner reconstructs it", minimal)
 
     def test_loop_quality_conditions_do_not_pass_from_report_presence(self) -> None:
         design = canonical(
             "skills/plan-loop-term/references/design-loop-contract.md"
         ).read_text(encoding="utf-8")
         catalog = canonical(
-            "skills/loop-verifier-registry/references/verifier-catalog.md"
+            "skills/plan-loop-term/references/verifier-catalog.md"
         ).read_text(encoding="utf-8")
         self.assertIn("Use `artifact_exists` only when the condition itself", design)
         self.assertIn("cannot prove framing, fidelity", design)
@@ -327,7 +409,6 @@ class SkillInstructionQualityTests(unittest.TestCase):
         for skill_id in (
             "memory-bank-init",
             "memory-bank-update",
-            "memory-bank-correction-capture",
             "memory-bank-maintenance",
         ):
             text = canonical(f"skills/{skill_id}/SKILL.md").read_text(encoding="utf-8")
@@ -365,16 +446,11 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertFalse((SOURCE / "shared/schemas/knowledge/context-pack.schema.json").exists())
 
         writers = (
-            "knowledge-algorithm-record",
-            "knowledge-architecture-record",
+            "knowledge-base-record",
             "knowledge-base-init",
             "knowledge-base-maintenance",
             "knowledge-base-update",
-            "knowledge-code-review-record",
-            "knowledge-design-record",
-            "knowledge-domain-record",
-            "knowledge-plan-sync",
-            "project-context-checkpoint",
+            "workflow-project-context-checkpoint",
         )
         for skill_id in writers:
             text = canonical(f"skills/{skill_id}/SKILL.md").read_text(encoding="utf-8")
@@ -399,16 +475,11 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn("The resolved root may be anywhere", contract)
         self.assertIn("records both bound values explicitly", contract)
         for skill_id in (
-            "knowledge-algorithm-record",
-            "knowledge-architecture-record",
+            "knowledge-base-record",
             "knowledge-base-init",
             "knowledge-base-read",
             "knowledge-base-update",
             "knowledge-base-maintenance",
-            "knowledge-code-review-record",
-            "knowledge-design-record",
-            "knowledge-domain-record",
-            "knowledge-plan-sync",
         ):
             text = canonical(f"skills/{skill_id}/SKILL.md").read_text(encoding="utf-8")
             self.assertIn("`knowledge_root`", text, skill_id)
@@ -431,17 +502,19 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn('json:"index_exists,omitempty"', resolver)
 
     def test_project_context_bootstrap_and_doctor_remain_explicit(self) -> None:
-        skill = canonical("skills/project-context-init/SKILL.md").read_text(encoding="utf-8")
+        skill = canonical("skills/workflow-project-context/SKILL.md").read_text(encoding="utf-8")
+        modes = canonical("skills/workflow-project-context/references/manifest-modes.md").read_text(
+            encoding="utf-8"
+        )
         for mode in ("`manifest-init`", "`doctor`", "`bootstrap`"):
             self.assertIn(mode, skill)
         self.assertIn("one exact transaction decision", skill)
-        self.assertIn("approve all listed actions or a stated subset", skill)
-        self.assertIn("Do not ask for a second approval", skill)
-        self.assertIn("do not pre-write the same section through two owners", skill)
-        self.assertIn("`initialized-empty`", skill)
-        self.assertIn("binds `knowledge_root` and `knowledge_index`", skill)
-        self.assertIn("ordinary task orchestrator", skill)
-        self.assertIn("Never discover or scan home/adjacent repositories", skill)
+        self.assertIn("all or a stated subset", modes)
+        self.assertIn("Do not pre-write the same section through two owners", modes)
+        self.assertIn("`initialized-empty`", modes)
+        self.assertIn("both `knowledge_root` and `knowledge_index`", skill)
+        self.assertIn("ordinary work", skill)
+        self.assertIn("Do not scan elsewhere", skill)
 
     def test_workflow_topology_and_delivery_shapes_do_not_orchestrate(self) -> None:
         registry = canonical("shared/docs/skill_registry.md").read_text(encoding="utf-8")
@@ -492,8 +565,13 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn("For irreversible/high-risk choices", discovery)
         self.assertIn("For reversible low-risk interaction choices", discovery)
 
-    def test_rigor_review_axes_preserve_epistemic_independence(self) -> None:
+    def test_global_review_axes_preserve_epistemic_independence(self) -> None:
+        agents = canonical("platform/codex/AGENTS.md").read_text(encoding="utf-8")
         rigor = canonical("skills/workflow-rigor/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("separate read-only review", agents)
+        self.assertIn("`Contract/Spec`", agents)
+        self.assertIn("`Repository/Constraints`", agents)
+        self.assertIn("maker-authored implementation and checks", agents)
         self.assertIn("## Review Axes And Independence", rigor)
         self.assertIn("`Contract/Spec`", rigor)
         self.assertIn("`Repository/Constraints`", rigor)
@@ -526,6 +604,9 @@ class SkillInstructionQualityTests(unittest.TestCase):
         ux = canonical(
             "skills/design-frontend/references/ux-pattern-decision-guide.md"
         ).read_text(encoding="utf-8")
+        guardrails = canonical(
+            "skills/design-frontend/references/implementation-guardrails.md"
+        ).read_text(encoding="utf-8")
         mapper = canonical("skills/design-component-mapper/SKILL.md").read_text(encoding="utf-8")
         visual = canonical("skills/design-visual-regression/SKILL.md").read_text(encoding="utf-8")
 
@@ -534,8 +615,8 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn("Do not invent a profile", frontend)
         self.assertIn("without a catalog", frontend)
         self.assertIn("task-bearing interactive route/screen", frontend)
-        self.assertIn("governance sources, not convenient page-style write targets", frontend)
-        self.assertIn("Never add a no-op, timer, local-success default", frontend)
+        self.assertIn("governed sources to consume", guardrails)
+        self.assertIn("Never fake persistence", guardrails)
         self.assertIn("A mutable path alone is not a stable claim", family)
         self.assertIn("Never claim “100% compliant”", family)
         for fallback_policy in ("approved_match_required", "native_when_unmapped", "explicit_exception_only"):
