@@ -1,0 +1,7 @@
+interface:
+  display_name: "Analysis Boundary Design"
+  short_description: "Judge module boundaries, deep modules, seams, and adapters"
+  default_prompt: "Use $analysis-boundary-design to make a targeted codebase design decision about module boundaries, deep modules, interfaces, seams, adapters, dependency direction, or testability before implementation. Return design_pressure, current_boundary, candidate_moves, abstraction_gate, recommended_design, and implementation_handoff."
+
+policy:
+  allow_implicit_invocation: true

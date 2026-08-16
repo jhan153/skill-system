@@ -2,7 +2,6 @@
   "schema_version": 1,
   "mode": "spatial",
   "language": "ko",
-  "eyebrow": "Topology mutation · spatial",
   "title": "세 번째 incident face가 생긴 edge를 직접 검사합니다",
   "summary": "After state에서 edge 0–1에 세 개 face가 연결됩니다. 빨간 overlay는 production trace가 제공한 non-manifold edge index이며 Canvas가 topology를 다시 계산한 결과가 아닙니다.",
   "status": "revise",

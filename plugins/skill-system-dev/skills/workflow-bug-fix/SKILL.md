@@ -42,7 +42,7 @@ description: Fix a concrete test, build, runtime, regression, or user-visible fa
 ## Workflow
 1. Lock the observed and expected result, current reproducibility, material conditions, and oracle origin. If reproduction is unavailable, mark that gap and inspect only evidence that can discriminate a cause.
 2. Trace the actual entry, production owner, state/data flow, canonical source when relevant, and one representative boundary/readback. Use the existing failure signal as the feedback loop; do not create a speculative test before the contract is known.
-3. Select one cause supported by the path and one smallest coherent production fix. Keep source/policy/fallback decisions at their domain owner and translation at adapters; keep cause and effect adjacent unless an existing boundary requires otherwise. If a boundary decision is needed, `workflow-bug-fix` remains the primary repair owner and `analysis-codebase-design` supports that decision before the edit.
+3. Select one cause supported by the path and one smallest coherent production fix. Keep source/policy/fallback decisions at their domain owner and translation at adapters; keep cause and effect adjacent unless an existing boundary requires otherwise. If a boundary decision is needed, `workflow-bug-fix` remains the primary repair owner and `analysis-boundary-design` supports that decision before the edit.
 4. Apply the production change before optional test scaffolding. Never weaken assertions, skip checks, widen mocks, add bypasses, or replace a required failure with a plausible fallback.
 5. Rerun the original signal and read back the actual affected path/output. Record condition-level pass/fail/needs review/unverified and evidence scope.
 6. Add or update regression coverage only when the expected contract is established and the check would remember the observed bug; it does not replace production readback.
@@ -56,4 +56,4 @@ Return only needed sections: material failure/condition, oracle and reproduction
 - `workflow-recovery` owns repeated same-signature failure after attempted fixes.
 - `workflow-implementation` owns ordinary feature work and refactoring without a current failure.
 - `workflow-validation` owns validation-only planning or revised check selection when installed or explicitly requested.
-- `analysis-codebase-design` supplies deep module, seam, and boundary decisions when needed; it does not replace `workflow-bug-fix` as owner of the concrete repair.
+- `analysis-boundary-design` supplies deep module, seam, and boundary decisions when needed; it does not replace `workflow-bug-fix` as owner of the concrete repair.

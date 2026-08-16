@@ -41,7 +41,8 @@
     },
     "eyebrow": {
       "type": "string",
-      "maxLength": 80
+      "maxLength": 80,
+      "description": "Optional dimension the title and mode do not already say (named target, snapshot, date). Omit rather than restating the product or mode."
     },
     "summary": {
       "type": "string",
@@ -696,6 +697,13 @@
       "properties": {
         "type": {
           "const": "spatial"
+        },
+        "purpose": {
+          "enum": [
+            "display",
+            "topology"
+          ],
+          "description": "display = inspectable sampled or supplied shape. topology = overlays or identity arrays are issue evidence."
         },
         "asset": {
           "$ref": "#/$defs/spatialAsset"

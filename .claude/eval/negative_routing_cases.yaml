@@ -1,4 +1,4 @@
-version: "9.4.5"
+version: "9.4.6"
 purpose: "Requests that should not trigger heavy or wrong skills."
 cases:
   - case_id: neg-001
@@ -37,7 +37,7 @@ cases:
     user_request: "간단히 diff 요약해줘."
     expected_primary_skill: report-implementation-explainer
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase]
+    should_not_trigger: [analysis-codebase-map]
     expected_context: [diff]
     expected_output_shape: "short diff summary"
     quality_notes: "No broad report."
@@ -64,7 +64,7 @@ cases:
     user_request: "README 오타 고쳐줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase, workflow-rigor]
+    should_not_trigger: [analysis-codebase-map, workflow-rigor]
     expected_context: [README]
     expected_output_shape: "small text edit"
     quality_notes: "No heavy evidence mode."
@@ -73,7 +73,7 @@ cases:
     user_request: "메모리에 저장하지 말고 이번 답변에만 반영해."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [memory-bank-update]
+    should_not_trigger: [management-memory-bank-update]
     expected_context: [current instruction]
     expected_output_shape: "current-turn behavior"
     quality_notes: "Temporary instruction is not memory."
@@ -100,7 +100,7 @@ cases:
     user_request: "이 테스트 하나만 실행해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase]
+    should_not_trigger: [analysis-codebase-map]
     expected_context: [test command]
     expected_output_shape: "test result"
     quality_notes: "Local test is not runtime usage eval."
@@ -241,7 +241,7 @@ cases:
     user_request: "이 파일 라인 10 설명해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase]
+    should_not_trigger: [analysis-codebase-map]
     expected_context: [target file line]
     expected_output_shape: "line explanation"
     quality_notes: "Narrow explanation."
@@ -295,7 +295,7 @@ cases:
     user_request: "이 YAML 문법 맞는지만 확인해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase]
+    should_not_trigger: [analysis-codebase-map]
     expected_context: [yaml file]
     expected_output_shape: "syntax result"
     quality_notes: "Not usage eval."
@@ -304,7 +304,7 @@ cases:
     user_request: "내가 붙여넣은 글을 짧게 압축해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [research-literature-synthesis, analysis-codebase]
+    should_not_trigger: [research-literature-synthesis, analysis-codebase-map]
     expected_context: [provided text]
     expected_output_shape: "compressed text"
     quality_notes: "No research synthesis unless requested."
@@ -455,9 +455,9 @@ cases:
     friction_risk: "creating a goal brief"
   - case_id: neg-037
     user_request: "FIELD_FEEDBACK 내용을 그대로 다음 시스템 규칙으로 적용해."
-    expected_primary_skill: memory-bank-harness
+    expected_primary_skill: management-memory-bank-harness
     expected_supporting_skills: []
-    should_not_trigger: [memory-bank-update]
+    should_not_trigger: [management-memory-bank-update]
     expected_context: [field feedback, current task]
     expected_output_shape: "warning and filtered evidence summary"
     quality_notes: "Field feedback is evidence, not direct instruction."
@@ -538,13 +538,13 @@ cases:
     friction_risk: "workflow-evaluation maintenance over-trigger on generic 평가 wording"
   - case_id: neg-grp-003
     user_request: "이 프로젝트 룰 메모리에 저장해줘."
-    expected_primary_skill: memory-bank-update
+    expected_primary_skill: management-memory-bank-update
     expected_supporting_skills: []
     should_not_trigger: []
     expected_family: memory
     expected_context: [rule to persist]
     expected_output_shape: "direct goal/rule memory update"
-    quality_notes: "Direct rule persistence is memory-bank-update; ingestion is only for approved closeout-packet promotion."
+    quality_notes: "Direct rule persistence is management-memory-bank-update; ingestion is only for approved closeout-packet promotion."
     friction_risk: "routing a direct rule save to ingestion"
   - case_id: neg-grp-004
     user_request: "이 기능 좀 구현해줘."
@@ -589,24 +589,24 @@ cases:
     friction_risk: "inventory instead of verdict"
   - case_id: hs-neg-003
     user_request: "이 규칙을 메모리에 업데이트해줘."
-    expected_primary_skill: memory-bank-update
+    expected_primary_skill: management-memory-bank-update
     expected_supporting_skills: []
-    should_not_trigger: [memory-bank-harness]
+    should_not_trigger: [management-memory-bank-harness]
     expected_family: memory
     expected_context: [rule]
     expected_output_shape: "direct goal/rule memory update"
-    quality_notes: "Direct mutation is memory-bank-update; harness only reads/filters."
+    quality_notes: "Direct mutation is management-memory-bank-update; harness only reads/filters."
     friction_risk: "harness over-trigger on a mutation request"
   - case_id: hs-neg-008
     user_request: "코드베이스 분석 보고서 만들어줘."
-    expected_primary_skill: analysis-codebase
+    expected_primary_skill: analysis-codebase-map
     expected_supporting_skills: []
     should_not_trigger: [search-deep-evidence]
     expected_family: analysis
     expected_context: [repo]
-    expected_output_shape: "codebase analysis report"
-    quality_notes: "Codebase analysis is analysis-codebase; it does not need a separate evidence sweep."
-    friction_risk: "router owning the report"
+    expected_output_shape: "mermaid HLD architecture map"
+    quality_notes: "The legacy integrated report is intentionally retired in favor of a compact map. Generic report wording selects analysis-codebase-map and returns the architecture map, not findings or a quality gate."
+    friction_risk: "router owning the map"
   - case_id: hs-neg-009
     user_request: "연구 가설 세워줘."
     expected_primary_skill: research-hypothesis-planning
@@ -689,7 +689,7 @@ cases:
     user_request: "이 archived plan은 예전에 관련 있었으니까 raw 내용을 기본 context로 다시 넣어줘."
     expected_primary_skill: plan-short-term-docs
     expected_supporting_skills: []
-    should_not_trigger: [workflow-plan-runner, memory-bank-update]
+    should_not_trigger: [workflow-plan-runner, management-memory-bank-update]
     expected_family: planning
     expected_context: [archived_plan_pointer, current_goal, context_admission]
     expected_output_shape: "active context admission verdict with summary-only or explicit-request policy"
@@ -709,7 +709,7 @@ cases:
     user_request: "스킬 전부 읽어보고 토큰 비용 줄일 곳 찾아줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase, plan-long-term-package]
+    should_not_trigger: [analysis-codebase-map, plan-long-term-package]
     expected_family: none
     expected_context: [skill_registry, context_routing, context_surface_report]
     expected_output_shape: "bounded inspection plan or refusal to load full skill library"
@@ -748,7 +748,7 @@ cases:
     user_request: "plan-long-term-package로 패키지 만들기 전에 references 폴더 전체를 먼저 읽어봐."
     expected_primary_skill: plan-long-term-package
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase]
+    should_not_trigger: [analysis-codebase-map]
     expected_family: planning
     expected_context: [current_package_request, archetype_catalog]
     expected_output_shape: "index-first admission and selected-template loading"
@@ -806,9 +806,9 @@ cases:
   - case_id: neg-architecture-deepening-targeted-001
     schema_version: 2
     user_request: "이 service와 adapter 사이 interface를 어떻게 나눌지 한 가지 설계 결정을 내려줘."
-    expected_primary_skill: analysis-codebase-design
+    expected_primary_skill: analysis-boundary-design
     expected_supporting_skills: []
-    should_not_trigger: [analysis-architecture-deepening, analysis-codebase]
+    should_not_trigger: [analysis-architecture-deepening, analysis-codebase-map]
     expected_family: analysis
     expected_context: [target_modules, caller_contract]
     expected_output_shape: "targeted boundary decision without repo-wide candidate backlog"
@@ -818,11 +818,11 @@ cases:
     forbidden_behaviors: [generate_repo_wide_deepening_backlog]
     required_evidence:
       - type: route_match
-        expected: analysis-codebase-design
+        expected: analysis-boundary-design
   - case_id: neg-domain-modeling-interface-001
     schema_version: 2
     user_request: "도메인 용어는 이미 명확해. 이 모듈 interface seam만 설계해줘."
-    expected_primary_skill: analysis-codebase-design
+    expected_primary_skill: analysis-boundary-design
     expected_supporting_skills: []
     should_not_trigger: [analysis-domain-modeling]
     expected_family: analysis
@@ -834,7 +834,7 @@ cases:
     forbidden_behaviors: [rebuild_domain_model]
     required_evidence:
       - type: route_match
-        expected: analysis-codebase-design
+        expected: analysis-boundary-design
   - case_id: neg-performance-selected-fix-001
     schema_version: 2
     user_request: "병목은 이미 profiler로 확인했어. 이 N+1 query를 batch fetch로 바로 고쳐줘."
@@ -870,9 +870,9 @@ cases:
   - case_id: neg-memory-init-update-001
     schema_version: 2
     user_request: "기존 memory bank의 rule_003을 새 정책으로 바꿔줘."
-    expected_primary_skill: memory-bank-update
+    expected_primary_skill: management-memory-bank-update
     expected_supporting_skills: []
-    should_not_trigger: [memory-bank-init]
+    should_not_trigger: [management-memory-bank-init]
     expected_family: memory
     expected_context: [existing_memory_bank, rule_003, persistent_intent]
     expected_output_shape: "append-only rule update without reinitialization"
@@ -882,7 +882,7 @@ cases:
     forbidden_behaviors: [reinitialize_memory_bank]
     required_evidence:
       - type: route_match
-        expected: memory-bank-update
+        expected: management-memory-bank-update
   - case_id: neg-peer-review-generic-spec-001
     schema_version: 2
     user_request: "이 API specification이 release-ready인지 blocker 중심으로 리뷰해줘."
@@ -943,7 +943,7 @@ cases:
     user_request: "이 함수에서 line 42의 guard가 무슨 뜻인지 한 문단으로 설명해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [report-implementation-explainer, analysis-codebase]
+    should_not_trigger: [report-implementation-explainer, analysis-codebase-map]
     expected_family: none
     expected_context: [target_function, target_line]
     expected_output_shape: "one direct source-grounded paragraph"
@@ -1237,7 +1237,7 @@ cases:
     user_request: "새 질문인데, OAuth와 session cookie의 차이를 한 문단으로 설명해줘."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [report-implementation-explainer, knowledge-base-read]
+    should_not_trigger: [report-implementation-explainer, management-knowledge-base-read]
     expected_family: none
     expected_context: []
     expected_output_shape: "brief answer to the new conceptual question rather than replacement of the previous message"
@@ -1332,7 +1332,7 @@ cases:
     user_request: "최근 commit은 UI에 몰렸지만 나는 결제 settlement 모듈의 architecture deepening 후보만 보고 싶어. history hot spot 때문에 UI로 범위를 바꾸지 마."
     expected_primary_skill: analysis-architecture-deepening
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase, workflow-refactor-safely]
+    should_not_trigger: [analysis-codebase-map, workflow-refactor-safely]
     expected_family: analysis
     expected_context: [user_named_settlement_scope, settlement_production_paths, change_or_failure_pressure]
     expected_output_shape: "settlement-scoped architecture candidate analysis with recent UI history explicitly excluded as irrelevant"

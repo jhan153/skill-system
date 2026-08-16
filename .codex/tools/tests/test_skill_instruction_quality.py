@@ -47,15 +47,15 @@ class SkillInstructionQualityTests(unittest.TestCase):
 
     def test_redefined_skill_ids_use_established_primary_families(self) -> None:
         expected_families = {
-            "workflow-project-context-checkpoint": "workflow",
-            "workflow-project-context": "workflow",
+            "management-project-context-checkpoint": "management",
+            "management-project-context": "management",
             "analysis-llm-wiki-context": "analysis",
             "analysis-loop-readiness": "analysis",
             "plan-task-handoff": "planning",
             "plan-decision-map": "planning",
             "plan-stakeholder-questionnaire": "planning",
             "workflow-loop-runner": "workflow",
-            "knowledge-base-record": "knowledge",
+            "management-knowledge-base-record": "management",
         }
         retired_ids = {
             "skill-system-repo-adapter",
@@ -88,6 +88,19 @@ class SkillInstructionQualityTests(unittest.TestCase):
             "knowledge-plan-sync",
             "workflow-project-context-init",
             "workflow-project-context-update",
+            "workflow-project-context",
+            "workflow-project-context-checkpoint",
+            "knowledge-base-record",
+            "knowledge-base-init",
+            "knowledge-base-read",
+            "knowledge-base-update",
+            "knowledge-base-maintenance",
+            "memory-bank-harness",
+            "memory-bank-init",
+            "memory-bank-update",
+            "memory-bank-maintenance",
+            "analysis-codebase",
+            "analysis-codebase-design",
             "kanboard-plan-rollout",
             "kanboard-plan-ops",
         }
@@ -106,7 +119,7 @@ class SkillInstructionQualityTests(unittest.TestCase):
 
         for skill_id in retired_ids:
             self.assertFalse((SOURCE / "skills" / skill_id).exists(), skill_id)
-        for retired_family in ("coordination", "loop", "skill_system"):
+        for retired_family in ("coordination", "loop", "skill_system", "knowledge", "memory"):
             self.assertNotIn(f"| `{retired_family}` |", alias_map)
         self.assertIn("| `evaluation` |", alias_map)
 
@@ -216,7 +229,7 @@ class SkillInstructionQualityTests(unittest.TestCase):
             for line in registry.splitlines()
             if line.startswith("- `search` secondary-tag (evidence lane) candidates:")
         )
-        self.assertIn("`knowledge-base-read`", search_lane)
+        self.assertIn("`management-knowledge-base-read`", search_lane)
         self.assertIn("`analysis-llm-wiki-context`", search_lane)
         self.assertIn("Do not maintain a second family-entry table here", claude_routing)
         self.assertNotIn("Family entry routing (Phase A):", claude_routing)
@@ -407,17 +420,17 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn("Never report success from a partial", contract)
         self.assertIn("retries reuse it", contract)
         for skill_id in (
-            "memory-bank-init",
-            "memory-bank-update",
-            "memory-bank-maintenance",
+            "management-memory-bank-init",
+            "management-memory-bank-update",
+            "management-memory-bank-maintenance",
         ):
             text = canonical(f"skills/{skill_id}/SKILL.md").read_text(encoding="utf-8")
             self.assertIn("memory_mutation_contract.md", text, skill_id)
-        init = canonical("skills/memory-bank-init/SKILL.md").read_text(encoding="utf-8")
+        init = canonical("skills/management-memory-bank-init/SKILL.md").read_text(encoding="utf-8")
         self.assertIn("never overwrite active history", init)
 
     def test_memory_context_uses_declared_narrow_current_slice(self) -> None:
-        memory = canonical("skills/memory-bank-harness/SKILL.md").read_text(encoding="utf-8")
+        memory = canonical("skills/management-memory-bank-harness/SKILL.md").read_text(encoding="utf-8")
         self.assertIn("project-context.yaml", memory)
         self.assertIn("active", memory)
         self.assertIn("candidate", memory)
@@ -446,26 +459,26 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertFalse((SOURCE / "shared/schemas/knowledge/context-pack.schema.json").exists())
 
         writers = (
-            "knowledge-base-record",
-            "knowledge-base-init",
-            "knowledge-base-maintenance",
-            "knowledge-base-update",
-            "workflow-project-context-checkpoint",
+            "management-knowledge-base-record",
+            "management-knowledge-base-init",
+            "management-knowledge-base-maintenance",
+            "management-knowledge-base-update",
+            "management-project-context-checkpoint",
         )
         for skill_id in writers:
             text = canonical(f"skills/{skill_id}/SKILL.md").read_text(encoding="utf-8")
             self.assertIn("knowledge_record_contract.md", text, skill_id)
 
-        update = canonical("skills/knowledge-base-update/SKILL.md").read_text(encoding="utf-8")
+        update = canonical("skills/management-knowledge-base-update/SKILL.md").read_text(encoding="utf-8")
         self.assertIn("amend|observe|reverify|supersede|deprecate|relink", update)
         self.assertIn("Shared provenance roots remain dependent", update)
         self.assertIn("not merely that its source exists", update)
-        maintenance = canonical("skills/knowledge-base-maintenance/SKILL.md").read_text(
+        maintenance = canonical("skills/management-knowledge-base-maintenance/SKILL.md").read_text(
             encoding="utf-8"
         )
         for operation in ("relation-check", "history-check", "overlap-check", "recurrence-report"):
             self.assertIn(operation, maintenance)
-        read = canonical("skills/knowledge-base-read/SKILL.md").read_text(encoding="utf-8")
+        read = canonical("skills/management-knowledge-base-read/SKILL.md").read_text(encoding="utf-8")
         self.assertIn("source --relation--> target", read)
         self.assertIn("never load the whole store as a graph dump", read)
         contract = canonical("shared/docs/knowledge_record_contract.md").read_text(
@@ -475,17 +488,17 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn("The resolved root may be anywhere", contract)
         self.assertIn("records both bound values explicitly", contract)
         for skill_id in (
-            "knowledge-base-record",
-            "knowledge-base-init",
-            "knowledge-base-read",
-            "knowledge-base-update",
-            "knowledge-base-maintenance",
+            "management-knowledge-base-record",
+            "management-knowledge-base-init",
+            "management-knowledge-base-read",
+            "management-knowledge-base-update",
+            "management-knowledge-base-maintenance",
         ):
             text = canonical(f"skills/{skill_id}/SKILL.md").read_text(encoding="utf-8")
             self.assertIn("`knowledge_root`", text, skill_id)
             self.assertIn("`knowledge_index`", text, skill_id)
 
-        init = canonical("skills/knowledge-base-init/SKILL.md").read_text(encoding="utf-8")
+        init = canonical("skills/management-knowledge-base-init/SKILL.md").read_text(encoding="utf-8")
         self.assertIn("materializes the bound index value", init)
 
         manifest = canonical("shared/docs/project_context_manifest.md").read_text(
@@ -502,8 +515,8 @@ class SkillInstructionQualityTests(unittest.TestCase):
         self.assertIn('json:"index_exists,omitempty"', resolver)
 
     def test_project_context_bootstrap_and_doctor_remain_explicit(self) -> None:
-        skill = canonical("skills/workflow-project-context/SKILL.md").read_text(encoding="utf-8")
-        modes = canonical("skills/workflow-project-context/references/manifest-modes.md").read_text(
+        skill = canonical("skills/management-project-context/SKILL.md").read_text(encoding="utf-8")
+        modes = canonical("skills/management-project-context/references/manifest-modes.md").read_text(
             encoding="utf-8"
         )
         for mode in ("`manifest-init`", "`doctor`", "`bootstrap`"):

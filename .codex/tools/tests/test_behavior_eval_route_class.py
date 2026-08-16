@@ -281,7 +281,7 @@ class BehaviorEvalRouteClassTests(unittest.TestCase):
     def test_host_assisted_rejects_placeholder_metadata_and_non_pass_result(self) -> None:
         case = {
             "case_id": "solar-release",
-            "expected_primary_skill": "analysis-codebase",
+            "expected_primary_skill": "analysis-codebase-map",
             "expected_behaviors": ["semantic_delta"],
             "forbidden_behaviors": [],
             "required_evidence": [],
@@ -295,7 +295,7 @@ class BehaviorEvalRouteClassTests(unittest.TestCase):
             "model_version": "unknown",
             "bundle_version": "9.1.1",
             "started_at": "2026-07-10T00:00:00Z",
-            "observed_route": "analysis-codebase",
+            "observed_route": "analysis-codebase-map",
             "observed_behaviors": ["semantic_delta"],
             "artifacts": [],
             "verification": [{"type": "qualitative_review", "value": "pass"}],
@@ -322,7 +322,7 @@ class BehaviorEvalRouteClassTests(unittest.TestCase):
     def test_host_assisted_binds_raw_artifact_and_review(self) -> None:
         case = {
             "case_id": "solar-release",
-            "expected_primary_skill": "analysis-codebase",
+            "expected_primary_skill": "analysis-codebase-map",
             "expected_behaviors": ["semantic_delta"],
             "forbidden_behaviors": [],
             "required_evidence": [
@@ -347,7 +347,7 @@ class BehaviorEvalRouteClassTests(unittest.TestCase):
                 "model_version": "gpt-5.6-sol",
                 "bundle_version": "9.1.1",
                 "started_at": "2026-07-10T13:30:56Z",
-                "observed_route": "analysis-codebase",
+                "observed_route": "analysis-codebase-map",
                 "observed_behaviors": ["semantic_delta"],
                 "artifacts": ["raw.md", "review.md"],
                 "verification": [

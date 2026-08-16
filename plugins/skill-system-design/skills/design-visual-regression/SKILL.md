@@ -40,6 +40,7 @@ description: "Capture, verify, and compare rendered UI screenshots for design ev
   read_if_needed:
     - `references/viewport-policy.md` only when viewport dimensions, capture rules, or framing policy must be selected
     - `references/visual-diff-report-schema.md` only for an explicit regression artifact or multi-viewport comparison
+    - `references/visual_decision_contract.md` when extras not in the source look like unchosen factory chrome
     - design token export
     - component contract mapping
     - accessibility evidence report
@@ -81,6 +82,7 @@ Use this skill for visual evidence, not for implementation ownership. It can sup
 5. Compare against the exact target reference:
    - Compare hierarchy, layout regions, spacing, typography, color, imagery, icons, states, responsive order, and overflow.
    - Separate objective mismatches from subjective polish.
+   - Extras that are not in the source — gradient headlines, restating kickers, decorative emoji, invented stat rows, unchosen Inter/indigo kits — are fidelity misses, not polish. Keep a sourced brand.
 6. Compare against family baselines when declared:
    - Pin each baseline source, state, viewport, theme mode, and version/digest.
    - Compare shared axes such as typography scale, token color use, spacing rhythm, radius/elevation, control height, icon family, density, shell/chrome, and recurring component states.

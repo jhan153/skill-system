@@ -34,6 +34,10 @@ REPORT_CANVAS_SOURCE = Path("shared/report-canvas")
 REPORT_CANVAS_CONTRACT_SOURCE = Path("shared/docs/report_canvas_contract.md")
 REPORT_CANVAS_SCRIPT_TARGET = Path("scripts/report-canvas")
 REPORT_CANVAS_REFERENCE_TARGET = Path("references/report_canvas_contract.md")
+REPORT_VISUAL_AUTHORING_SOURCE = Path("shared/docs/report_visual_authoring.md")
+REPORT_VISUAL_AUTHORING_TARGET = Path("references/report_visual_authoring.md")
+VISUAL_DECISION_SOURCE = Path("shared/docs/visual_decision_contract.md")
+VISUAL_DECISION_TARGET = Path("references/visual_decision_contract.md")
 
 # Platform-native trees: every top-level entry under source/platform/<p> is copied verbatim
 # into that one target only. AGENTS.md / CLAUDE.md live here as platform-native for Phase 1a;
@@ -215,12 +219,35 @@ def _attach_report_canvas_payload(source: Path, skill_dir: Path) -> None:
         source / REPORT_CANVAS_CONTRACT_SOURCE,
         skill_dir / REPORT_CANVAS_REFERENCE_TARGET,
     )
+    _copy(
+        source / REPORT_VISUAL_AUTHORING_SOURCE,
+        skill_dir / REPORT_VISUAL_AUTHORING_TARGET,
+    )
+
+
+def _wants_visual_decision(skill_dir: Path) -> bool:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return False
+    if _is_report_skill(skill_dir):
+        return True
+    return "references/visual_decision_contract.md" in skill_md.read_text(
+        encoding="utf-8"
+    )
+
+
+def _attach_visual_decision_payload(source: Path, skill_dir: Path) -> None:
+    """Project the shared visual-decision rule into report and opted-in design skills."""
+    if not _wants_visual_decision(skill_dir):
+        return
+    _copy(source / VISUAL_DECISION_SOURCE, skill_dir / VISUAL_DECISION_TARGET)
 
 
 def _attach_runtime_report_canvas_payloads(source: Path, runtime: Path) -> None:
     skills_root = runtime / "skills"
     for skill_dir in sorted(skills_root.iterdir()):
         _attach_report_canvas_payload(source, skill_dir)
+        _attach_visual_decision_payload(source, skill_dir)
     stale_root = runtime / "report-canvas"
     if stale_root.is_dir():
         shutil.rmtree(stale_root)
@@ -588,9 +615,11 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
             seen[sid] = name
             _copy_plugin_skill(source / "skills" / sid, codex_pkg / "skills" / sid)
             _attach_report_canvas_payload(source, codex_pkg / "skills" / sid)
+            _attach_visual_decision_payload(source, codex_pkg / "skills" / sid)
             written.append((codex_pkg / "skills" / sid).as_posix())
             _copy_plugin_skill(source / "skills" / sid, claude_pkg / "skills" / sid, claude=True)
             _attach_report_canvas_payload(source, claude_pkg / "skills" / sid)
+            _attach_visual_decision_payload(source, claude_pkg / "skills" / sid)
             written.append((claude_pkg / "skills" / sid).as_posix())
     uncovered = src_skills - seen.keys()
     if uncovered:

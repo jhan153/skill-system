@@ -17,6 +17,7 @@ Load only for the `section-web` profile of `design-frontend`: a landing, product
 - Keep the first viewport focused on the actual product/place/object/person or literal offer.
 - Make responsive section order explicit.
 - Avoid nested cards and decorative section cards unless the item itself is a repeated card.
+- If the source does not decide a look, do not invent indigo gradients, emoji feature grids, restating kickers, or 01/02/03 costume. Reuse repo tokens or ask.
 - Keep text fitting and avoid overlap across mobile and desktop.
 - Keep media focused on the relevant product, place, object, or person rather than vague atmosphere.
 - Verify the first viewport communicates the literal offer and that responsive section order preserves the content argument.

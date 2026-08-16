@@ -104,7 +104,7 @@ Recommend one next owner without invoking it automatically:
 - `plan-requirements-brief` for a requirements contract;
 - `plan-long-term-package` for a multi-document strategic package;
 - `plan-short-term-docs` for one persisted tactical plan;
-- `analysis-codebase-design` for one selected technical boundary; or
+- `analysis-boundary-design` for one selected technical boundary; or
 - the intent-matched execution owner only when the result already defines a bounded authorized change.
 
 Return the index path, target outcome, created or resolved item names, ready set, unshaped unknowns, exclusions, coordination conflicts, completion status, and recommended next owner.

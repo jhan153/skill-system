@@ -22,6 +22,7 @@ description: Package explicitly requested lifecycle artifacts and traceability a
     - packaging request, included sources, and evidence for claimed results
   read_if_needed:
     - `references/artifact-tiering.md` and only the relevant templates
+    - `$REPORT_SKILL_DIR/references/report_visual_authoring.md` when a packaged 3D/math/graphics artifact must be seen
     - narrow plan, specification, or validation files in scope
   do_not_load_by_default:
     - full repository, memory bank, plan inventory, unrelated logs, or generated mirrors
@@ -72,7 +73,7 @@ Prefer stable IDs: `REQ-*`, `AC-*`, `WBS-*`, `HLD-*`, `LLD-*`, `TEST-*`, `SEC-*`
 
 Return only needed sections: `artifact_scope`, `source_artifacts`, `artifact_pack`, `traceability_matrix`, `evidence_status`, `gaps`, and `handoff_targets`. Link completed claims to condition-scoped evidence.
 
-Persist the requested canonical artifacts in their required formats. Read `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and render the primary human-facing entry point with `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py` as Report Canvas `trace` HTML whose nodes identify the canonical artifacts and condition-scoped evidence. Declare `trace_kind: lifecycle` and set every node's typed `lifecycle_status` to the preserved lifecycle result while keeping node `status` limited to evidence confidence; the renderer rejects a lifecycle trace that omits either contract. Never collapse the two axes into label/detail prose. Return only a concise chat receipt with package status and the Canvas link. Use chat-only output only when the user explicitly prohibits file creation, the host has no safe artifact surface, or the resolved installed payload is incomplete. Canvas is navigation over the package, not the package or proof of lifecycle completion.
+Persist the requested canonical artifacts in their required formats. Read `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and render the primary human-facing entry point with `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py` as Report Canvas `trace` HTML whose nodes identify the canonical artifacts and condition-scoped evidence. Declare `trace_kind: lifecycle` and set every node's typed `lifecycle_status` to the preserved lifecycle result while keeping node `status` limited to evidence confidence; the renderer rejects a lifecycle trace that omits either contract. Never collapse the two axes into label/detail prose. If the inspectable visual gate fires for a packaged 3D/math/graphics artifact, also emit a `spatial` report from `references/report_visual_authoring.md` rather than restyling the trace. Never edit Canvas CSS/JS. Return only a concise chat receipt with package status and the Canvas link. Use chat-only output only when the user explicitly prohibits file creation, the host has no safe artifact surface, or the resolved installed payload is incomplete. Canvas is navigation over the package, not the package or proof of lifecycle completion.
 
 ## Owner Boundaries
 

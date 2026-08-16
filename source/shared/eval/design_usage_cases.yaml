@@ -1,4 +1,4 @@
-version: "9.4.5"
+version: "9.4.6"
 purpose: "Design cluster usage-quality cases."
 cases:
   - case_id: design-001
@@ -68,7 +68,7 @@ cases:
     user_request: "interactive states hover/focus/disabled를 디자인과 맞춰줘."
     expected_primary_skill: design-frontend
     expected_supporting_skills: [design-component-mapper, design-a11y-audit]
-    should_not_trigger: [analysis-codebase]
+    should_not_trigger: [analysis-codebase-map]
     expected_context: [state spec, component source]
     expected_output_shape: "implemented states"
     quality_notes: "Design implementation with state mapping."
@@ -605,3 +605,21 @@ cases:
         artifact_bound: true
       - type: qualitative_review
         expected: pass
+  - case_id: design-040
+    user_request: "디자인 시안은 없어. 이 repo 스타일로 설정 화면 첫 페이지만 구현해줘. AI 랜딩 페이지처럼 보이지 않게 해."
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-tokens]
+    should_not_trigger: [research-hypothesis-planning]
+    expected_context: [repo theme or tokens, settings route, no visual source]
+    expected_output_shape: "repo-neutral first screen with sourced chrome only"
+    quality_notes: "No source look means reuse repo tokens or ask; do not mint a generative kit."
+    friction_risk: "indigo gradient, emoji feature grid, restating kickers, Inter/Space Grotesk by default"
+  - case_id: design-041
+    user_request: "이 제품의 브랜드가 보라색이고 기존 카드가 glass야. 그 정체성은 유지한 채 설정 화면만 구현해줘."
+    expected_primary_skill: design-frontend
+    expected_supporting_skills: [design-tokens]
+    should_not_trigger: [design-ui-decomposer]
+    expected_context: [declared purple brand tokens, existing glass cards, settings route]
+    expected_output_shape: "settings screen that keeps the sourced brand"
+    quality_notes: "A chosen brand is not slop. Do not strip purple or glass the source already uses."
+    friction_risk: "rewriting a sourced identity into a generic paper/ink theme"

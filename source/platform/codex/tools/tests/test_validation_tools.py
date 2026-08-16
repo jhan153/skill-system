@@ -159,10 +159,10 @@ class RuntimeContractTests(unittest.TestCase):
         self.assertIn("disable-model-invocation: true", plugin_claude)
 
     def test_claude_skill_paths_are_projected_without_changing_codex_paths(self) -> None:
-        codex_read = (ROOT / ".codex" / "skills" / "knowledge-base-read" / "SKILL.md").read_text(
+        codex_read = (ROOT / ".codex" / "skills" / "management-knowledge-base-read" / "SKILL.md").read_text(
             encoding="utf-8"
         )
-        claude_read = (ROOT / ".claude" / "skills" / "knowledge-base-read" / "SKILL.md").read_text(
+        claude_read = (ROOT / ".claude" / "skills" / "management-knowledge-base-read" / "SKILL.md").read_text(
             encoding="utf-8"
         )
         self.assertIn(".codex/docs/project_context_manifest.md", codex_read)

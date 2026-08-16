@@ -21,6 +21,7 @@ description: Create an explicitly requested Report Canvas explanation of an exis
   read_if_needed:
     - accepted intent, focused tests, runtime readback, rationale history, and a material counterexample
     - `references/compare-mode.md` for `compare`
+    - `references/report_visual_authoring.md` when the inspectable visual gate fires
   do_not_load_by_default:
     - full repository/history, unrelated plans, generated mirrors, or broad logs
 - risk_profile:
@@ -56,8 +57,7 @@ Keep status axes separate when relevant: `core_capability` (operation exists), `
 
 ## Explain Workflow
 
-- Resolve the skill directory and renderer per `references/report_canvas_contract.md`; never guess an install/cache path. Render `trace`, or `spatial` only from authoritative 3D data. Use only the contract's allowed fallback.
-- Add interactive, stepwise, or spatial views only from an authoritative production trace/readback. Never recreate the algorithm independently in JavaScript. Feed supplied geometry, stable IDs, state snapshots, and issue indices to the shared renderer; if trace points are missing, name the smallest readback seam for `workflow-implementation` and keep the view `unverified`.
+- Resolve the renderer per `references/report_canvas_contract.md`. Render `trace` for causal explanation. If the inspectable visual gate fires, follow `references/report_visual_authoring.md` and render `spatial` from a supplied asset or sampled `buffer_geometry`. Never restyle Canvas or invent a mesh. Missing geometry stays `blocked` or `unverified`.
 
 1. Name the target snapshot and the decision the reader should be able to make.
 2. Trace the smallest production caller-to-output path, including policy ownership, identity/state transitions, and applicable failure boundaries.

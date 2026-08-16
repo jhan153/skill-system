@@ -1,5 +1,5 @@
 interface:
-  display_name: "Loop Readiness Analysis"
+  display_name: "Analysis Loop Readiness"
   short_description: "Classify when a loop is needed"
   default_prompt: "Use $analysis-loop-readiness to classify whether a request should be handled as one-shot work, needs a loop contract, or is loop-worthy before execution."
 

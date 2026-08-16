@@ -21,7 +21,7 @@ description: "Produce decision-first, evidence-grounded qualitative evaluations 
   - decision goal, audience, constraints, and user rubric when provided
   - evidence anchors or validation results when available
 - expected_outputs:
-  - Report Canvas `decision` HTML with no more than three material findings by default
+  - Report Canvas HTML with no more than three material findings by default; `spatial` when the claim must be seen in 3D/math/graphics
   - a full/scored report only on explicit request
   - a compact evidence report only for explicit `srq` or formal completion-report intent
 - context_targets:
@@ -33,6 +33,7 @@ description: "Produce decision-first, evidence-grounded qualitative evaluations 
     - `references/rubric.md` for explicitly scored or detailed criterion reports
     - `references/report_template.md` for full, table-heavy, or reusable reports
     - `references/examples.md` only for routing or prompt validation
+    - `$REPORT_SKILL_DIR/references/report_visual_authoring.md` when the inspectable visual gate fires
     - narrow validation output or evidence pack
   do_not_load_by_default:
     - detailed rubrics or templates for the default brief
@@ -81,7 +82,7 @@ Require `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and `$REPORT_SK
 - `DecisionBrief`: conclusion, zero to three material findings with evidence/impact/action/confidence, one next action, and material limits.
 - `FullOrScored`: read the report template and rubric, cover requested criteria, and avoid prose duplicating tables.
 - `CompactEvidence`: one-line conclusion, up to three verified facts with locations, one action, and relevant verification.
-- Render Report Canvas `decision`; use `compare` only for an authoritative before/after evidence pair. Return a concise receipt and use only contract-permitted chat fallback. Canvas never activates a deeper mode, adds findings, or strengthens evidence.
+- Render Report Canvas `decision` by default; use `compare` only for an authoritative before/after evidence pair. If the inspectable visual gate fires, read `$REPORT_SKILL_DIR/references/report_visual_authoring.md` and render `spatial` with supplied or sampled geometry instead of a card wall. Never edit Canvas CSS/JS or write a custom Three.js page. Return a concise receipt and use only contract-permitted chat fallback. Canvas never activates a deeper qualitative mode, adds findings, or strengthens evidence.
 
 ## Validation
 - Conclusion precedes method; every judgment is evidenced or explicitly uncertain; recommendations trace to findings.

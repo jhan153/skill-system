@@ -14,8 +14,8 @@ Use this reference only when a claim genuinely needs more than one evidence lane
 | source code / contracts | targeted code inspection or the owning analysis skill |
 | runtime | authorized runtime observation from the owning workflow |
 | visual / accessibility | `design-visual-regression` / `design-a11y-audit` |
-| accepted memory | `memory-bank-harness` |
-| declared project knowledge | `knowledge-base-read` (read-only) |
+| accepted memory | `management-memory-bank-harness` |
+| declared project knowledge | `management-knowledge-base-read` (read-only) |
 | explicitly selected LLM Wiki | `analysis-llm-wiki-context` (read-only) |
 | current public facts | authoritative web sources |
 

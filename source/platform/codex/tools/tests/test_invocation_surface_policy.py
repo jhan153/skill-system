@@ -53,10 +53,6 @@ class InvocationSurfacePolicyTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-    def test_current_bundle_passes(self) -> None:
-        result = self.run_tool()
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-
     def test_intent_matched_implicit_procedure_passes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

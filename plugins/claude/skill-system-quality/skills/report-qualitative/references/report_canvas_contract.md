@@ -79,6 +79,13 @@ Every material finding should reference the corresponding evidence IDs. Missing 
 evidence stays visible; the renderer must not turn `unverified`, `mixed`, `blocked`, `abstain`, or
 `user-verification-needed` into a visual pass.
 
+Authoring follows `references/visual_decision_contract.md`. Canvas chrome and
+model copy must be sourced decisions, not a factory costume. Do not fill the
+first viewport with restating kickers, decorative emoji, invented stat rows,
+highlighted-keyword prose, or “not just X — it's Y.” Title the outcome in a
+few words; keep the sentence in `summary`. Set `eyebrow` only when it adds a
+dimension the title and mode do not already say.
+
 The four modes are:
 
 | Mode | Use | Typical owners |
@@ -86,10 +93,25 @@ The four modes are:
 | `decision` | verdict, recommendation, option consequence, one next choice | `report-critical`, `report-qualitative` |
 | `compare` | verified before/after, changed behavior or artifact comparison | `report-implementation-explainer` (`compare`), qualitative comparison |
 | `trace` | causal path, lifecycle progression, state/ownership sequence | `report-implementation-explainer`, `report-lifecycle-artifacts` |
-| `spatial` | authoritative 3D geometry, topology, overlay, and mutation-state inspection | implementation explainer or another explicit 3D report owner |
+| `spatial` | inspectable 3D, mesh, math surface/field, or graphics geometry | any `report-*` skill when seeing the shape is the claim |
 
-Do not choose `spatial` merely for decoration. Use it only when 3D interaction changes what the
-reader can inspect.
+### Inspectable visual gate
+
+If the user asked to see 3D, a mesh, a math surface/field, or a graphics
+result, or the material claim cannot be checked without inspecting geometry,
+the core visual **must** be `spatial`. A `decision` or `trace` card wall is a
+failed delivery, not a fallback. Author the model; do not restyle Canvas CSS
+or write a custom Three.js page.
+
+Geometry may be a repo/user GLB/glTF **or** `buffer_geometry` sampled from a
+stated function or dataset (`purpose: display`). That sample is display data,
+not a browser reimplementation of a production topology algorithm. If no
+asset and no sampleable source exist, keep the result `blocked` or
+`unverified` and name the missing file. Do not invent a decorative mesh.
+
+Do not choose `spatial` merely for decoration or “interactivity.” An API
+comparison or a QA verdict with no geometry stays non-spatial and must not
+embed Three.js. When the gate fires, follow `references/report_visual_authoring.md`.
 
 In `trace`, declare `trace_kind: causal` or `trace_kind: lifecycle` and keep evidence confidence in
 node `status`. A lifecycle trace requires `lifecycle_status` on every node so its execution/result
@@ -135,6 +157,9 @@ only sections supported by the owning report.
 
 ## Theme
 
+Oblivion / Hagoromo is the chosen report identity. Apply it as paper and ink
+plus one chrome accent, not as a rainbow dashboard.
+
 - Dark mode is **Oblivion**: background `#303030`, text `#D3D7CF`, selection `#555753`, yellow
   `#EDD400`, blue `#729FCF`, green `#73D216`, orange `#FD971F`, red/error `#F92672`, and plum
   `#AD7FA8`.
@@ -143,6 +168,11 @@ only sections supported by the owning report.
   `#A40000`, plum `#75507B`, and yellow `#C4A000`.
 - Follow system preference initially, provide a manual three-state toggle, and print with the
   Hagoromo/light relationship.
+- Spend yellow on selection, focus, and the single next action. Spend the other hues only on
+  evidence/status labels and spatial overlays. Do not use them as page atmosphere.
+- Chrome stays a system sans, flat surfaces, a small held radius, and hairline rules. The
+  renderer must not introduce Inter, a decorative page grid, a restating default kicker,
+  display-size crushed tracking, pill + fog-shadow chrome, or left-bar finding cards.
 
 The digital palette derives from
 [`jbrooksuk/Oblivion`](https://github.com/jbrooksuk/Oblivion). The GMK Oblivion/Hagoromo keycap

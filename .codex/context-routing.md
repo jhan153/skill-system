@@ -36,7 +36,7 @@ Use `analysis-loop-readiness` only for explicit durable, repeated, event-driven,
 | --- | --- |
 | Why is behavior broken, incorrect, or recurring? | `analysis-bug` |
 | Which algorithm/model/retrieval/local approach fits concrete constraints? | `analysis-algorithm` |
-| What one module/interface/seam/adapter/dependency boundary should be selected? | `analysis-codebase-design` |
+| What one module/interface/seam/adapter/dependency boundary should be selected? | `analysis-boundary-design` |
 | Which structural/deep-module improvement candidate should come next? | `analysis-architecture-deepening` |
 | What concepts, identity, states, invariants, or business rules form the domain? | `analysis-domain-modeling` |
 | What measured latency/throughput/CPU/memory/query/render/startup/bundle bottleneck dominates? | `analysis-performance` |
@@ -64,12 +64,12 @@ Route an explicit, single-domain evidence request directly: papers/citations to 
 | goal/loop contract or verifier map | `plan-loop-term`; use verifier-mapping mode for an existing `SC-NNN` slice and do not execute checks |
 | short persisted plan | `plan-short-term-docs` |
 | accepted loop execution | `workflow-loop-runner` after a valid loop contract |
-| Memory read | current task owner using `memory-bank-harness` only for a declared, task-relevant slice |
+| Memory read | current task owner using `management-memory-bank-harness` only for a declared, task-relevant slice |
 | persistent Memory write | the explicit Memory mutation skill matching the requested operation |
-| Knowledge read | current task owner using `knowledge-base-read` for declared project knowledge |
-| Knowledge write | `knowledge-base-record` for one new identity, including an approved-plan decision; otherwise `knowledge-base-update` or `knowledge-base-maintenance` |
+| Knowledge read | current task owner using `management-knowledge-base-read` for declared project knowledge |
+| Knowledge write | `management-knowledge-base-record` for one new identity, including an approved-plan decision; otherwise `management-knowledge-base-update` or `management-knowledge-base-maintenance` |
 | named LLM Wiki context | `analysis-llm-wiki-context`, explicitly selected and read-only |
-| project context manifest init/bootstrap/doctor or location update | `workflow-project-context` in the matching explicit mode |
+| project context manifest init/bootstrap/doctor or location update | `management-project-context` in the matching explicit mode |
 | repository skill update | current implementation owner following the repository's canonical-source, generation, and validation instructions |
 | existing Skill System eval maintenance | `evaluation-harness`; authored cases prove only their declared regression contract, never field quality |
 | repeated failure after an attempted fix | `workflow-recovery`; do not keep stacking patches in the previous execution owner |

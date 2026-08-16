@@ -2,7 +2,6 @@
   "schema_version": 1,
   "mode": "decision",
   "language": "ko",
-  "eyebrow": "QA gate · decision",
   "title": "릴리스 후보는 수정 후 재검증이 필요합니다",
   "summary": "구조 검증은 통과했지만 실제 사용자 경로의 runtime evidence가 없어 현재 근거로는 pass를 뒷받침할 수 없습니다.",
   "status": "revise",

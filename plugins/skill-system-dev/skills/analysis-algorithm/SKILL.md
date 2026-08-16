@@ -14,7 +14,7 @@ description: Compare algorithms or technical approaches under concrete constrain
   - chosen method needs code: `workflow-implementation`
   - measured production bottleneck: `analysis-performance`
   - paper hypothesis, loss, ablation, or training plan: `research-hypothesis-planning`
-  - selected interface/boundary contract: `analysis-codebase-design`
+  - selected interface/boundary contract: `analysis-boundary-design`
   - business identities, states, or invariants: `analysis-domain-modeling`
 - expected_inputs: decision, current baseline, hard constraints, preferences, workload, success condition
 - expected_outputs: recommendation or unverified gap, decisive trade-off, mechanism, evidence scope, falsifier, handoff

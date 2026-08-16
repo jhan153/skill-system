@@ -1,5 +1,13 @@
 # Changelog
 
+## 9.4.6
+
+- Added a shared visual-decision contract so design and report owners refuse unchosen factory chrome (indigo kits, restating kickers, invented stats) while keeping a sourced brand or the chosen Oblivion identity.
+- Added an inspectable-visual gate: 3D, mesh, math-surface, and graphics claims must render Report Canvas `spatial` with real geometry instead of restyling CSS or stacking cards. A bundled `sample_display_surface.py` authors `buffer_geometry` from a stated `z=f(x,y)`; missing assets fail closed.
+- Aligned remaining management and analysis IDs onto `management-*`, `analysis-codebase-map`, and `analysis-boundary-design`. Legacy names stay aliases only. Canonical count remains 65 skills across five plugins.
+- Regenerated the Codex runtime, Claude runtime, and paired plugin packages under one 9.4.6 identity. The Go harness binaries are unchanged from the current 9.4.3/9.4.4 runtime line.
+- Cut the unified source/runtime/plugin/eval 9.4.6 release with the local annotated tag `v9.4.6`. Remote push, publication, archive creation, installation, and live cache mutation remain separate explicit operations.
+
 ## 9.4.5
 
 - Collapsed standalone `search-router`, `analysis-router`, and `research-router` owners so family entry now selects the matching specialist directly. Shared registry and host routing keep trigger/guardrail ownership; they no longer insert a duplicate navigator skill.

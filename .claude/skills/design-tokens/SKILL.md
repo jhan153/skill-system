@@ -26,6 +26,7 @@ disable-model-invocation: true
   read_if_needed:
     - `references/token-normalization.md` for multi-category normalization, alias/mode/naming normalization, platform export shape, or an explicit inventory/export artifact
     - `references/token-gap-policy.md` when names, values, aliases, modes, or source priority are incomplete
+    - `references/visual_decision_contract.md` when a missing look tempts a factory palette or type stack
     - component contract mapping
     - visual evidence manifest
     - repo theme or design-system files
@@ -55,6 +56,7 @@ For a narrow question, return only the mapping, conflict, or gap in scope. For a
 
 ## Validation And Limits
 - Never invent a missing value, semantic name, alias, hierarchy, or source priority. No source means `user-verification-needed` or `unverified`, not readiness.
+- Never fill a token gap with indigo/violet, Inter/Space Grotesk, or a framework semantic rainbow. A sourced brand, including a purple identity, stays.
 - Report parser failure with path/error. `scripts/inspect_tokens.py` is a read-only inventory aid, not correctness or design-system proof.
 - Keep subjective palette critique separate from verified mismatch. Screenshot values and visual taste are not token authority.
 - Do not broaden one surface into a redesign or exhaustive catalog. Accessibility contrast belongs to `design-a11y-audit`; visual, component-state, repo, and user-visible validation remain separate gates.

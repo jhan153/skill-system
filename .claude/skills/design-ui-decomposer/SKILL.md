@@ -25,6 +25,7 @@ description: Decompose UI references into source-traced hierarchy, layout, patte
     - supplied reference or design document
   read_if_needed:
     - `references/decomposition-schema.md`, selected repo conventions/contracts for requested implementation-ready mapping
+    - `references/visual_decision_contract.md` when a reference looks like a common generative template and intent must stay labeled
   do_not_load_by_default:
     - full repo, unrelated design files, credentials
 - risk_profile:
@@ -53,6 +54,7 @@ Use exact skill IDs; do not replace them with adjacent owner names. Stop before 
 ## Evidence Rules
 - Label each conclusion `observed`, `source_metadata`, `inferred`, or `unverified`.
 - A flat image proves visible pixels and spatial relationships only. It does not prove DOM nesting, offscreen content, scroll behavior, breakpoints, interaction behavior, reuse, or exact tokens/measurements.
+- A common landing-page costume (indigo fill, emoji tiles, restating kickers, invented stats) is observed only as pixels. Do not promote it to intended brand or required implementation unless source metadata says so.
 - Source metadata may confirm values it explicitly supplies. Screenshot-derived values stay inferred; never claim exact measurements without metadata.
 - Repetition supports a component candidate, not confirmed reuse. Confirm reuse only from source-component, repo, or approved-catalog evidence; keep a unique composition as one-off layout.
 - Visible state is observed. Required loading/empty/error/hover/focus/disabled/responsive states are gaps or hypotheses unless the reference or product contract supplies them.

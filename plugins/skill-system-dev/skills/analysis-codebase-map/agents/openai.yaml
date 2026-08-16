@@ -1,0 +1,7 @@
+interface:
+  display_name: "Analysis Codebase Map"
+  short_description: "Mermaid HLD/LLD maps of flow, structure, and state"
+  default_prompt: "Use $analysis-codebase-map to model a repository or named slice as evidence-linked Mermaid architecture maps. Honor an explicit HLD/LLD request; otherwise default whole-repo scope to HLD and a named slice to LLD. Generic codebase-report wording still returns the compact map. Include a sequence and add structure or state views only when evidenced."
+
+policy:
+  allow_implicit_invocation: true

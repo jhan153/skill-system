@@ -15,6 +15,7 @@ Use this reference when token names, values, aliases, or source priority are inc
 
 - Never turn `missing` into `confirmed`.
 - Never invent palette names, spacing scales, or typography roles to make a report look complete.
+- Never substitute a generative default (indigo→violet, Inter/Space Grotesk, cozy amber wash, traffic-light semantic set) for a missing token. Missing stays missing.
 - Prefer reporting a smaller confirmed subset over a broad inferred token system.
 - Keep subjective palette critique separate from token source mismatches.
 - If a user asks for implementation despite gaps, hand off the smallest scoped substitutions as assumptions.

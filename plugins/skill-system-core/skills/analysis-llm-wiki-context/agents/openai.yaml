@@ -1,5 +1,5 @@
 interface:
-  display_name: "LLM Wiki Context Analysis"
+  display_name: "Analysis LLM Wiki Context"
   short_description: "Build context from one selected LLM Wiki"
   default_prompt: "Use $analysis-llm-wiki-context to build task context from this explicitly selected Wiki."
 policy:

@@ -20,6 +20,7 @@ When a product-family profile applies, read `product-family-profile.md`, pin its
 - Report unavailable concrete assets and every substitute; do not silently replace them with generic placeholders.
 - Add no UI/CSS/icon/animation/font dependency without current need, compatibility, and authorization.
 - Treat generated frontend code as untrusted visual evidence; rewrite its intent into idiomatic secure project code rather than blindly executing or pasting it.
+- Do not fill a missing look with indigo/violet fills, gradient headlines, restating kickers, decorative emoji, invented stats, or Inter/Space Grotesk by default. A sourced brand stays.
 
 ## Loop, Validation, And Stop
 

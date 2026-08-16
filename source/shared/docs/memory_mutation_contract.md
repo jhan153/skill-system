@@ -42,9 +42,9 @@ A failed post-check is `blocked` with the operation ID and inconsistent files. D
 
 ## Operation Boundaries
 
-- `memory-bank-init`: explicit fresh store and manifest-section registration.
-- `memory-bank-update`: goal/rule/practice create, update, or deprecate, plus explicitly authorized recurring-mistake candidate capture.
-- `memory-bank-maintenance`: read-only report/validation/conflict check plus explicitly requested consolidate/compact operations.
-- `workflow-project-context-checkpoint`: classifies an approved commit/closeout and delegates each Memory mutation to the narrow owner; it does not invent a separate packet format.
+- `management-memory-bank-init`: explicit fresh store and manifest-section registration.
+- `management-memory-bank-update`: goal/rule/practice create, update, or deprecate, plus explicitly authorized recurring-mistake candidate capture.
+- `management-memory-bank-maintenance`: read-only report/validation/conflict check plus explicitly requested consolidate/compact operations.
+- `management-project-context-checkpoint`: classifies an approved commit/closeout and delegates each Memory mutation to the narrow owner; it does not invent a separate packet format.
 
 A semantic-gate no-op is a valid no-write result.

@@ -7,6 +7,7 @@
 # generated target and must not carry a do-not-edit/checksum header.
 #
 # Evidence basis (2026-06-29, from skill-system/ root):
+#   - 9.4.6: visual-decision contract, inspectable spatial reports, management/analysis ID alignment; 65 skills
 #   - 9.4.5: collapsed standalone routers, merged overlapping owners, retired maintainer plugin; 79 -> 65 skills
 #   - 9.4.4: implicit workflow routing, selected-skill delegation, and bounded runnable prototypes added
 #   - 9.4.3: user work contracts, non-blocking continuation, Report Canvas,
@@ -79,7 +80,7 @@ entries:
     generation: derived per-report-skill payload
     confidence: confirmed
     gap: none
-    notes: "One canonical shared report model, deterministic offline renderer, Oblivion/Hagoromo themes, examples, and pinned dependencies project into every report skill's supported scripts/references boundary. Installed report skills need no sibling plugin or runtime root; non-report skills carry no Canvas payload. Three.js is embedded only in rendered spatial artifacts."
+    notes: "One canonical shared report model, deterministic offline renderer, Oblivion/Hagoromo themes, examples, and pinned dependencies project into every report skill's supported scripts/references boundary. Installed report skills need no sibling plugin or runtime root; non-report skills carry no Canvas payload. Three.js is embedded only in rendered spatial artifacts. The shared visual-decision contract and inspectable-visual authoring guide project beside the Canvas contract on report skills; opted-in design skills receive only the visual-decision contract."
 
   - path: "eval/"
     present_in: [codex, claude]

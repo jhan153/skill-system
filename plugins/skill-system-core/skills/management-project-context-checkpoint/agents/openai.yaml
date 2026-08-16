@@ -1,0 +1,6 @@
+interface:
+  display_name: "Management Project Context Checkpoint"
+  short_description: "Record durable context at commit or closeout"
+  default_prompt: "Use $management-project-context-checkpoint to capture only durable current-task context, updating an existing Knowledge identity with provenance/history instead of creating duplicate records."
+policy:
+  allow_implicit_invocation: false

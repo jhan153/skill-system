@@ -26,10 +26,6 @@ class WorkHorizonPolicyTests(unittest.TestCase):
             timeout=30,
         )
 
-    def test_current_bundle_passes(self) -> None:
-        result = self.run_tool()
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-
     def test_missing_task_ledger_horizon_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

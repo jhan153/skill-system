@@ -207,6 +207,37 @@ class ReportCanvasTests(unittest.TestCase):
         self.assertNotIn("unpkg.com", rendered)
         self.assertNotIn("cdn.jsdelivr.net", rendered)
 
+    def test_spatial_display_example_embeds_three_without_invented_overlays(self) -> None:
+        rendered = self.render_example("spatial-display")
+        self.assertIn("SkillSystemSpatialDeps", rendered)
+        self.assertIn("ReportCanvasSpatial", rendered)
+        self.assertIn('"purpose":"display"', rendered)
+        self.assertIn("sin(x)*sin(y)", rendered)
+        self.assertNotIn('"kind":"non_manifold"', rendered)
+        self.assertNotIn("<script src=", rendered)
+
+    def test_display_surface_sampler_rejects_unsafe_expr_and_renders(self) -> None:
+        sampler_path = CANVAS / "sample_display_surface.py"
+        spec = importlib.util.spec_from_file_location(
+            "skill_system_sample_display_surface", sampler_path
+        )
+        assert spec and spec.loader
+        sampler = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(sampler)
+        with self.assertRaises(sampler.UnsafeExpression):
+            sampler.compile_expression("__import__('os').system('pwd')")
+        with self.assertRaises(sampler.UnsafeExpression):
+            sampler.compile_expression("open('/etc/passwd').read()")
+        asset = sampler.sample_surface(
+            "sin(x)*cos(y)", xmin=-1, xmax=1, ymin=-1, ymax=1, nx=4, ny=4
+        )
+        self.assertEqual(len(asset["geometry"]["positions"]), 4 * 4 * 3)
+        model = self.load_example("spatial-display")
+        model["visual"]["asset"] = asset
+        rendered = self.render_model(model)
+        self.assertIn("SkillSystemSpatialDeps", rendered)
+        self.assertIn('"format":"buffer_geometry"', rendered)
+
     def test_renderer_sets_explicit_document_language(self) -> None:
         self.assertIn('<html lang="ko"', self.render_example("decision"))
         model = self.load_example("decision")
@@ -580,6 +611,8 @@ class ReportCanvasTests(unittest.TestCase):
                 self.assertIn("source/tools/generate_targets.py", body)
                 self.assertIn("incomplete installed payload", body)
                 self.assertIn("one self-contained report HTML by default", body)
+                self.assertIn("inspectable visual gate", body)
+                self.assertIn("report_visual_authoring.md", body)
                 self.assertNotIn("../../docs/report_canvas_contract.md", body)
                 self.assertNotIn("../../report-canvas", body)
                 self.assertNotIn("For an explicitly requested persistent/HTML", body)
@@ -608,8 +641,13 @@ class ReportCanvasTests(unittest.TestCase):
             with self.subTest(skill=skill.parent.name):
                 payload = skill.parent / "scripts" / "report-canvas"
                 contract = skill.parent / "references" / "report_canvas_contract.md"
+                visual_decision = skill.parent / "references" / "visual_decision_contract.md"
+                visual_authoring = skill.parent / "references" / "report_visual_authoring.md"
                 self.assertTrue((payload / "render_report.py").is_file())
+                self.assertTrue((payload / "sample_display_surface.py").is_file())
                 self.assertTrue(contract.is_file())
+                self.assertTrue(visual_decision.is_file())
+                self.assertTrue(visual_authoring.is_file())
                 actual_files = {
                     path.relative_to(payload): hashlib.sha256(path.read_bytes()).hexdigest()
                     for path in payload.rglob("*")
@@ -692,6 +730,36 @@ class ReportCanvasTests(unittest.TestCase):
         )
         self.assertIn("`generate_targets.py` does not render reports", contract)
         self.assertIn("incomplete report payload", contract)
+        self.assertIn("visual_decision_contract.md", contract)
+        self.assertIn("not a factory costume", contract)
+        self.assertIn("Inspectable visual gate", contract)
+        self.assertIn("report_visual_authoring.md", contract)
+
+    def test_canvas_chrome_refuses_unchosen_factory_defaults(self) -> None:
+        css = (CANVAS / "static" / "report-canvas.css").read_text(encoding="utf-8")
+        js = (CANVAS / "static" / "report-canvas.js").read_text(encoding="utf-8")
+        self.assertNotRegex(css, r"font-family:\s*Inter\b")
+        self.assertNotIn("background-size: 28px 28px", css)
+        self.assertNotIn("letter-spacing: -0.045em", css)
+        self.assertNotIn("clamp(2rem, 5vw, 4.8rem)", css)
+        self.assertNotIn("box-shadow: 0 18px 50px", css)
+        self.assertNotIn("box-shadow: 0 14px 38px", css)
+        self.assertNotIn(".rc-finding::before", css)
+        self.assertNotIn("border-radius: 999px", css)
+        self.assertNotIn("Skill System · Report Canvas", js)
+        self.assertIn('model.eyebrow === "string"', js)
+
+    def test_renderer_omits_default_kicker_and_keeps_sourced_eyebrow(self) -> None:
+        js = (CANVAS / "static" / "report-canvas.js").read_text(encoding="utf-8")
+        self.assertIn("if (eyebrow)", js)
+        self.assertNotIn("Skill System · Report Canvas", js)
+        decision = self.render_example("decision")
+        self.assertNotIn("Skill System · Report Canvas", decision)
+        self.assertNotIn('"eyebrow"', decision)
+        model = self.load_example("decision")
+        model["eyebrow"] = "release candidate · v9.4.5-rc"
+        rendered = self.render_model(model)
+        self.assertIn("release candidate · v9.4.5-rc", rendered)
 
     def test_generated_plugins_keep_canvas_inside_report_skills(self) -> None:
         here = Path(__file__).resolve()
@@ -726,13 +794,28 @@ class ReportCanvasTests(unittest.TestCase):
                         continue
                     payload = skill / "scripts" / "report-canvas"
                     contract = skill / "references" / "report_canvas_contract.md"
+                    visual_decision = skill / "references" / "visual_decision_contract.md"
+                    visual_authoring = skill / "references" / "report_visual_authoring.md"
                     if skill.name.startswith("report-"):
                         report_skill_count += 1
                         self.assertTrue((payload / "render_report.py").is_file())
+                        self.assertTrue((payload / "sample_display_surface.py").is_file())
                         self.assertTrue(contract.is_file())
+                        self.assertTrue(visual_decision.is_file())
+                        self.assertTrue(visual_authoring.is_file())
                     else:
                         self.assertFalse(payload.exists())
                         self.assertFalse(contract.exists())
+                        self.assertFalse(visual_authoring.exists())
+                        if skill.name in {
+                            "design-frontend",
+                            "design-tokens",
+                            "design-ui-decomposer",
+                            "design-visual-regression",
+                        }:
+                            self.assertTrue(visual_decision.is_file())
+                        else:
+                            self.assertFalse(visual_decision.exists())
         self.assertGreater(report_skill_count, 0)
 
 

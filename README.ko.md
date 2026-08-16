@@ -12,9 +12,9 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 9.4.5 번들
+## 9.4.6 번들
 
-이 소스 트리는 9.4.4 암시적 라우팅·prototyping 라인을 잇는 9.4.5 릴리스입니다. 주요 구성은 다음과 같습니다.
+이 소스 트리는 9.4.5 라우팅 정리 라인을 잇는 9.4.6 릴리스입니다. 주요 구성은 다음과 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
 * `docs`: 스킬 목록, 사용 기준, 운영 참고 문서
@@ -27,15 +27,15 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 ## 9.x 방향: Neutral Source & Plugin Packaging
 
-현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인 `9.4.5 — Direct Specialist Routing & Surface Consolidation`은 `9.4.4 — Implicit Workflow Routing & Prototyping`을 직접 잇습니다. 로컬 설치는 명시적으로 수행하며 commit·tag·publish·push를 뜻하지 않습니다. Codex와 Claude는 하나의 bundle version과 tag를 공유하며, 하네스 변경도 별도 protocol version이 아니라 이 버전을 올립니다.
+현재 아키텍처 라인은 `9.x — Neutral Source & Plugin Packaging`입니다. 현재 번들 라인 `9.4.6 — Visual Decision & Inspectable Reports`는 `9.4.5 — Direct Specialist Routing & Surface Consolidation`을 직접 잇습니다. 로컬 설치는 명시적으로 수행하며 commit·tag·publish·push를 뜻하지 않습니다. Codex와 Claude는 하나의 bundle version과 tag를 공유하며, 하네스 변경도 별도 protocol version이 아니라 이 버전을 올립니다.
 
-9.4.5는 9.4.4 작업계약, Report Canvas, 암시적 specialist 선택, 격리된 prototype을 유지하면서 독립 router 스킬을 없애고 겹치는 owner를 합칩니다. family entry는 맞는 specialist를 바로 고르며, 옛 ID는 alias만 남깁니다. canonical 표면은 플러그인 5개의 스킬 65개입니다. 영속 상태, 외부 상태, LoopRun, lifecycle gate, 명시 선택 context를 다루는 스킬은 계속 explicit-only이며, 모델의 스킬 선택은 사용자 권한을 넓히지 않습니다. 상위에서 이미 선택한 canonical skill ID는 위임 worker에 그대로 전달하고, 상위 선택이 없으면 worker가 정상 라우팅합니다. 작성된 positive/negative case는 이 계약의 회귀 표면일 뿐 현장 라우팅 품질을 증명하지 않습니다.
+9.4.6은 9.4.5의 직접 specialist 표면을 유지하면서 visual-decision 계약과 inspectable-visual gate를 추가합니다. 디자인·리포트는 소스 없는 공장 크롬을 채우지 않고, 3D·수식·그래픽 주장은 카드 벽이나 CSS 손질 대신 Report Canvas `spatial`로 기하를 보여야 합니다. management/analysis ID는 `management-*`, `analysis-codebase-map`, `analysis-boundary-design`으로 맞추고 옛 이름은 alias만 남깁니다. canonical 표면은 플러그인 5개의 스킬 65개입니다. 영속 상태, 외부 상태, LoopRun, lifecycle gate, 명시 선택 context를 다루는 스킬은 계속 explicit-only이며, 모델의 스킬 선택은 사용자 권한을 넓히지 않습니다. 상위에서 이미 선택한 canonical skill ID는 위임 worker에 그대로 전달하고, 상위 선택이 없으면 worker가 정상 라우팅합니다. 작성된 positive/negative case는 이 계약의 회귀 표면일 뿐 현장 라우팅 품질을 증명하지 않습니다.
 
 Codex 라우터는 정확히 명시됐거나 분명히 일치하는 전문 스킬을 바로 사용하며, 여러 소유자가 실제로 경쟁할 때만 좁은 라우터 하나를 엽니다. implicit router는 선언되어 실제 노출된 읽기·분석 owner에만 자동 handoff할 수 있고, 무거운 writer와 명시적으로 선택하는 context는 explicit-only로 유지합니다. 하나의 canonical 호출 비트를 플랫폼별 native 계약으로 투영합니다. Codex는 `agents/openai.yaml`을 읽고, Claude에는 explicit-only 스킬에만 `disable-model-invocation: true`를 생성합니다. Codex 패키지는 기존 `plugins/<name>/skills`를 유지하고, Claude 패키지는 같은 이름·버전으로 `plugins/claude/<name>/skills`에 생성해 각 호스트가 자기 메타데이터만 탐색하게 합니다. 가장 가까운 `project-context.yaml`은 manifest 상대 경로나 정확히 승인된 절대 경로로 Memory Bank, Knowledge Base, plan, skill root, 이름 있는 LLM Wiki를 선언할 수 있습니다. 없는 항목은 사용할 수 없는 것으로 처리하며 홈이나 인접 저장소를 추측해 검색하지 않습니다. Knowledge 작업은 고정 디렉터리 대신 해석된 `knowledge_root`와 `knowledge_index` 변수를 소비합니다.
 
 Memory Bank는 세션을 넘는 목표·작업 규칙·반복 실수·검증된 작업 방식을 보존합니다. Knowledge Base는 도메인·디자인·알고리즘·아키텍처·리뷰·결정 지식을 현재 Markdown snapshot, typed relation, semantic revision, 출처가 추적되는 observation event로 보존합니다. 반복성은 confidence·maturity·importance·popularity 점수가 아니라 observation과 provenance의 분리된 차원에서 파생합니다. LLM Wiki는 명시적으로 선택하고 자체 탐색 규칙을 따르는 선택적 읽기 전용 컨텍스트입니다.
 
-명시적인 “다음에 어떤 흐름인가” 질문은 중복 registry navigator가 아니라 기존 Work Horizon과 Planning State 계약으로 풉니다. horizon은 지속성·산출물 고도를, planning state는 저장된 계획 산출물의 전이를 맡고, 현재 턴 owner는 host routing이 유지합니다. `workflow-project-context`는 manifest-init, guided bootstrap, update, read-only doctor를 명시적으로 지원하며, 한 transaction에서 분리 열거한 write 전부 또는 일부를 승인할 수 있습니다. maker/checker 위험이 실질적이면 Contract/Spec과 Repository/Constraints 리뷰를 분리하고, 다중 배치는 `vertical_slice`, `migration_sequence`, `evidence_unit` 중 하나를 선택합니다. 어느 항목도 자동 거대 오케스트레이터를 만들지 않습니다.
+명시적인 “다음에 어떤 흐름인가” 질문은 중복 registry navigator가 아니라 기존 Work Horizon과 Planning State 계약으로 풉니다. horizon은 지속성·산출물 고도를, planning state는 저장된 계획 산출물의 전이를 맡고, 현재 턴 owner는 host routing이 유지합니다. `management-project-context`는 manifest-init, guided bootstrap, update, read-only doctor를 명시적으로 지원하며, 한 transaction에서 분리 열거한 write 전부 또는 일부를 승인할 수 있습니다. maker/checker 위험이 실질적이면 Contract/Spec과 Repository/Constraints 리뷰를 분리하고, 다중 배치는 `vertical_slice`, `migration_sequence`, `evidence_unit` 중 하나를 선택합니다. 어느 항목도 자동 거대 오케스트레이터를 만들지 않습니다.
 
 기본 Codex hook map은 8개 lifecycle event를 하나의 Go 실행 파일로 직접 보냅니다. 교정 방어, 데스크톱 알림, 선언된 plan의 Kanboard 동기화, active LoopRun, 위치 전용 project context는 서로 독립된 제한 분기이며, commit/closeout 체크포인트도 선언된 저장소와 현재 작업의 명확한 사실만 다룹니다.
 
@@ -103,8 +103,8 @@ Analysis 스킬은 실패를 진단하거나, 접근 방식을 비교하거나, 
 | `analysis-router`    | 복잡한 기술 분석 요청에서 버그 진단, 알고리즘 비교, 코드베이스 설계, 도메인 모델링, 성능 분석 중 적절한 경로를 선택합니다.           |
 | `analysis-bug`       | 반복되거나 원인이 불분명하거나 위험도가 높은 실패를 재현하고, 주된 원인과 회귀 검증 경로를 정리합니다.         |
 | `analysis-algorithm` | 명시된 제약과 성공 기준에 맞춰 알고리즘, 아키텍처, 모델, 검색 전략, 구현 접근을 비교합니다.             |
-| `analysis-codebase`  | 저장소 전역 산출물, 아키텍처 맵, 의존성 관점, 품질 게이트 보고서가 필요할 때 코드베이스 수준의 분석을 수행합니다. |
-| `analysis-codebase-design` | 구현 전에 모듈 경계, deep module, interface, seam, adapter, 의존성 방향, testability를 판단합니다. |
+| `analysis-codebase-map`  | 저장소 전체 또는 지정 구간을 흐름·구조·상태의 Mermaid HLD/LLD 맵으로 모델링합니다. |
+| `analysis-boundary-design` | 구현 전에 모듈 경계, deep module, interface, seam, adapter, 의존성 방향, testability를 판단합니다. |
 | `analysis-architecture-deepening` | 전체 repo report 없이 architecture deepening 후보를 순위화합니다. 사용자가 범위를 지정하지 않았을 때 최근 canonical production 경로를 YAGNI용 sampling weight로 사용하되, 변경 이력만으로 추천하지 않습니다. |
 | `analysis-domain-modeling` | 소프트웨어 설계를 위해 도메인 개념, entity/value object 경계, state transition, invariant, business rule, naming language를 정리합니다. |
 | `analysis-performance` | latency, throughput, CPU, memory, query, rendering, startup, bundle, algorithmic bottleneck을 근거 중심으로 진단합니다. |
@@ -156,9 +156,6 @@ Workflow 스킬은 구현 작업의 실행 규율, 검증, 실패 복구를 통�
 | `workflow-source-maintenance` | 개발 후 obsolete임이 입증된 source를 intended behavior와 dynamic/public entry point를 보존하며 정리합니다. |
 | `workflow-comment-maintenance` | 동작을 바꾸지 않고 comment와 docstring을 현재 코드 의미에 맞춥니다. |
 | `workflow-task-ledger` | 작업이 turn 또는 session 경계를 넘을 것으로 명시된 경우에만 재개 가능한 단계와 발견 사항을 보존합니다. |
-| `workflow-project-context-init` | 프로젝트 컨텍스트 manifest를 초기화·진단하고 명시적으로 승인된 store setup만 제안합니다. |
-| `workflow-project-context-update` | 선택된 manifest 위치를 sibling과 unknown section을 보존하며 갱신합니다. |
-| `workflow-project-context-checkpoint` | 명시적 종료 checkpoint에서 현재 작업의 durable 항목을 기존에 선언된 Memory Bank 또는 Knowledge Base로 분류합니다. |
 
 ### Loop Engineering
 
@@ -221,30 +218,23 @@ Search 스킬은 근거를 찾거나 근거 수집 경로를 정하되, 종합�
 | `search-paper-evidence` | 논문 또는 출처 근거를 검색하거나 검색 계획을 세우고, 허구 인용을 만들지 않으면서 인용 상태를 추적할 수 있는 evidence ledger를 만듭니다. |
 | `search-deep-evidence`  | 여러 lane을 가로지르는 심층 다각도 근거 수집을 적대적 검증·인용 상태 라벨과 함께 수행해, report/synthesis 스킬이 소비할 검증된 근거 세트를 만듭니다. |
 
-### Memory
+### Management
 
-Memory 스킬은 장기 프로젝트 맥락을 관리합니다. 메모리 사용 또는 변경 의도가 명시된 경우에만 사용됩니다.
-
-| 스킬                               | 역할                                                           |
-| -------------------------------- | ------------------------------------------------------------ |
-| `memory-bank-harness`            | 승인된 메모리에서 현재 작업에 필요한 맥락 팩을 구성하되, 오래되었거나 충돌하거나 위험한 항목을 걸러냅니다. |
-| `memory-bank-init`               | 프로젝트 정체성과 쓰기 경계를 확인한 뒤, 프로젝트 범위의 지속 메모리 뱅크를 초기화합니다.          |
-| `memory-bank-update`             | 사용자가 장기 메모리 변경을 원할 때, 지속 목표나 규칙을 추가 전용 이력으로 갱신합니다.           |
-| `memory-bank-maintenance`        | 기존 메모리 상태를 검사하고, 검증하고, 통합하거나 복구합니다.                          |
-| `memory-bank-correction-capture` | 사용자의 명시적인 정정을 메모리 후보로 기록하되, 승인 절차와 민감 정보 경계를 유지합니다.          |
-
-### Knowledge
-
-Knowledge 스킬은 선언된 프로젝트 Knowledge Base에서만 동작합니다. 새 레코드는 다섯 작성 스킬을 따로 여는 대신 하나의 owner가 선택된 category profile을 적용합니다.
+Management 스킬은 프로젝트 Memory, Knowledge, `project-context.yaml` 위치·checkpoint 작업을 담당합니다. store 설정, 읽기, 변경 의도가 명시된 경우에만 사용합니다.
 
 | 스킬 | 역할 |
 | --- | --- |
-| `knowledge-base-record` | 공용 record contract와 선택한 category profile로 새 domain, design, algorithm, architecture, recurring code-review identity 하나를 만듭니다. |
-| `knowledge-base-read` | 현재 작업에 필요한 artifact anchor와 relation/history 경로만 제한적으로 읽습니다. |
-| `knowledge-base-init` | 명시적으로 승인된 빈 저장소와 manifest binding을 초기화합니다. |
-| `knowledge-base-update` | 기존 identity를 갱신, 재검증, 재연결, 대체 또는 폐기합니다. |
-| `knowledge-base-maintenance` | index, relation, history, overlap, recurrence 무결성을 점검·유지합니다. |
-| `knowledge-plan-sync` | 승인된 지속성 있는 plan 결정만 기존 Knowledge에 동기화합니다. |
+| `management-project-context` | 프로젝트 컨텍스트 manifest를 초기화·진단·갱신·bootstrap하고 unrelated section을 보존합니다. |
+| `management-project-context-checkpoint` | 명시적 종료 checkpoint에서 현재 작업의 durable 항목을 기존에 선언된 Memory Bank 또는 Knowledge Base로 분류합니다. |
+| `management-memory-bank-harness` | 승인된 메모리에서 현재 작업에 필요한 맥락 팩을 구성하되, 오래되었거나 충돌하거나 위험한 항목을 걸러냅니다. |
+| `management-memory-bank-init` | 프로젝트 정체성과 쓰기 경계를 확인한 뒤, 프로젝트 범위의 지속 메모리 뱅크를 초기화합니다. |
+| `management-memory-bank-update` | 사용자가 장기 메모리 변경을 원할 때, 지속 목표나 규칙을 추가 전용 이력으로 갱신합니다. |
+| `management-memory-bank-maintenance` | 기존 메모리 상태를 검사하고, 검증하고, 통합하거나 복구합니다. |
+| `management-knowledge-base-record` | 공용 record contract와 선택한 category profile로 새 domain, design, algorithm, architecture, recurring code-review identity 하나를 만듭니다. |
+| `management-knowledge-base-read` | 현재 작업에 필요한 artifact anchor와 relation/history 경로만 제한적으로 읽습니다. |
+| `management-knowledge-base-init` | 명시적으로 승인된 빈 저장소와 manifest binding을 초기화합니다. |
+| `management-knowledge-base-update` | 기존 identity를 갱신, 재검증, 재연결, 대체 또는 폐기합니다. |
+| `management-knowledge-base-maintenance` | index, relation, history, overlap, recurrence 무결성을 점검·유지합니다. |
 
 ### Kanboard
 
@@ -269,7 +259,7 @@ Knowledge 스킬은 선언된 프로젝트 Knowledge Base에서만 동작합니�
 | 7.1.x | portable skill bundle | 읽기 전용 구조 점검과 보수적인 명시 우선 라우팅을 갖춘 portable skill bundle로 다시 패키징했습니다.                                                                                                                               |
 | 7.2.x | 스킬 패밀리         | 사용자 관점의 패밀리 그룹, 패밀리 접두 기반 스킬명, search/coordination/evaluation 패밀리를 추가했습니다. 7.2.1에서는 workflow 실행 하위 패밀리와 `report-qualitative`를 추가했고, 7.2.5에서는 사용자가 스킬의 역할을 패밀리별로 파악할 수 있는 스킬 카탈로그를 추가했습니다. |
 | 7.3.x | 실행 보증          | context-layer 전환 전 호환 기준선으로 agent output validation, release verification profile, run evidence fixture를 안정화했습니다. |
-| 8.0.2 | Context compounding | Context Compounding 패키지를 8.0.2 field line으로 승격합니다. Wiki Bank, Runtime Projection, Context Pack, source-grounded claim, review-gated knowledge feedback, hook/runtime validation hardening, analysis-codebase hardening, home-install path 정리를 포함합니다. `7.4.x Context Assurance`는 legacy transition label로 취급합니다. |
+| 8.0.2 | Context compounding | Context Compounding 패키지를 8.0.2 field line으로 승격합니다. Wiki Bank, Runtime Projection, Context Pack, source-grounded claim, review-gated knowledge feedback, hook/runtime validation hardening, analysis-codebase-map hardening, home-install path 정리를 포함합니다. `7.4.x Context Assurance`는 legacy transition label로 취급합니다. |
 | 8.1.0 | Bounded verification loops | `/goal`과 명시적 loop 실행 전 readiness 판정, `plan-loop-term` 계약, verifier mapping, 최소 LoopRun runtime을 추가합니다. loop schema, state/checkpoint, progress/stall 판정, Stop-hook continuation, recovery handoff, 검증 근거, idempotency note, loop governance metric, Wiki feedback candidate, 실행 인계 문구를 다룹니다. |
 | 8.3.0 | Bounded loop 하드닝 | LoopRun 무결성 격차를 닫습니다: 세션 스코프 activation bridge(`activate_loop_run.py`/`deactivate_loop_run.py` + Stop hook이 `session_id`로 run 해석, generic agent-run manifest와 디커플링), 단조 iteration·terminal 불변·멱등 replay, `iterations/` 감사기록, precedence 반영 종료 + wall-time 집행, confirmed-only `search-deep-evidence` 수렴 검증기, 런타임 스키마 유효 `plan-loop-term` 계약을 포함합니다. |
 | 8.3.1 | 평가 프레이밍 정리 | 평가를 왜곡하는 배포/autonomy-negative 표현을 제거하고, runtime/hygiene 문서를 host-managed asset 언어로 정리하며, 검증 실행 후 cache cleanup이 안정적으로 유지되도록 합니다. |
@@ -282,8 +272,8 @@ Knowledge 스킬은 선언된 프로젝트 Knowledge Base에서만 동작합니�
 | 8.5.0 | WorkItem lifecycle governance | triage/explore/ready/implement/verify/review/closed를 따르는 schema-bound WorkItem 상태 모델, 검증 도구, execution-assurance coverage, TaskRun의 optional `work_item_ref` 연결을 추가합니다. 이는 lifecycle governance이며 queue runtime, scheduler, Kanboard source of truth, LoopRun replacement가 아닙니다. |
 | 8.5.1 | Work horizon routing clarification | Work Horizon 모델과 plan/workflow 스킬의 `work_horizon`, `planning_altitude`, `execution_mode` metadata를 추가합니다. one-shot, task/ticket, short-plan, long-plan, loop-overlay 라우팅을 명확히 하며 queue/runtime 동작은 추가하지 않습니다. |
 | 9.0.0 | Neutral source & plugin packaging | 중립 canonical `source/` 트리를 단일 소스로 두고 `.codex`/`.claude` 런타임 타깃을 거기서 byte-identical로 생성합니다(verbatim 공유 payload, mirror-from-canonical, platform overlay). generated-only cutover와 재생성 기반 무결성 게이트를 적용하고, 플랫폼 무관 schema 정의를 Claude 타깃에 공유하며, 직군형 Codex plugin 패키지(`skill-system-{core,dev,design,research,quality,maintainer}`)를 58개 skill 완전·중복 없는 분배로 추가합니다. |
-| 9.0.1 | Dev plugin skill expansion | 초기 9.0.0 컷 이후 `skill-system-dev` 엔지니어링 직군을 구체 실행 owner·분석 스킬로 확장합니다(`analysis-architecture-deepening`, `analysis-codebase-design`, `analysis-domain-modeling`, `analysis-performance`, `workflow-implementation`, `workflow-bug-fix`, `workflow-dependency-upgrade`, `workflow-refactor-safely`, `workflow-source-maintenance`, `workflow-comment-maintenance`). `source_maintenance_execution`/`comment_maintenance_execution` work-horizon 모드와 라우팅·레지스트리·runtime/negative eval 커버리지를 추가합니다. skill 수 58 → 68, 타깃 재생성·무결성 검증 완료. |
-| 9.0.2 | Legacy template cleanup | 9.0.1 이후 template hygiene·출력 품질 maintenance cut: short-term plan 템플릿과 `plan-short-term-docs` evidence 규칙에서 toy C++ before/after 예시를 제거하고, `plan-short-term-docs` 다이어그램 정책을 `workflow-rigor`·`report-critical`로 전파하며(plan lifecycle/approval/agent workflow는 기본 다이어그램 아님), long-term `ui-state-contract` 전이 다이어그램을 실제 전이가 있을 때만 그리도록 conditional 처리하고, `analysis-codebase` `report.py`의 unverified fallback 다이어그램(subsystem/path/class/metric)을 text notice로 변경합니다. 번들 버전 9.0.2로 상향, 타깃 재생성·무결성 검증 완료. |
+| 9.0.1 | Dev plugin skill expansion | 초기 9.0.0 컷 이후 `skill-system-dev` 엔지니어링 직군을 구체 실행 owner·분석 스킬로 확장합니다(`analysis-architecture-deepening`, `analysis-boundary-design`, `analysis-domain-modeling`, `analysis-performance`, `workflow-implementation`, `workflow-bug-fix`, `workflow-dependency-upgrade`, `workflow-refactor-safely`, `workflow-source-maintenance`, `workflow-comment-maintenance`). `source_maintenance_execution`/`comment_maintenance_execution` work-horizon 모드와 라우팅·레지스트리·runtime/negative eval 커버리지를 추가합니다. skill 수 58 → 68, 타깃 재생성·무결성 검증 완료. |
+| 9.0.2 | Legacy template cleanup | 9.0.1 이후 template hygiene·출력 품질 maintenance cut: short-term plan 템플릿과 `plan-short-term-docs` evidence 규칙에서 toy C++ before/after 예시를 제거하고, `plan-short-term-docs` 다이어그램 정책을 `workflow-rigor`·`report-critical`로 전파하며(plan lifecycle/approval/agent workflow는 기본 다이어그램 아님), long-term `ui-state-contract` 전이 다이어그램을 실제 전이가 있을 때만 그리도록 conditional 처리하고, `analysis-codebase-map` `report.py`의 unverified fallback 다이어그램(subsystem/path/class/metric)을 text notice로 변경합니다. 번들 버전 9.0.2로 상향, 타깃 재생성·무결성 검증 완료. |
 | 9.1.0 | Canonical quality, harness hardening & skill consolidation | canonical 스킬 표면을 71개에서 66개로 통합하고, schema-v2 hook evidence와 observe-default Recovery Guard를 강화하며, planning determinism과 token-cost 제어를 추가하고 `v9.0.2` 이후 release identity를 정합화합니다. Claude standalone 호환성 보완은 9.1.1로 연기합니다. |
 | 9.1.1 | Patch safety & evidence hardening | dev routing metadata를 host-neutral로 만들고, hook evidence를 durable per-run ledger로 이동하며, C/C++ 구조 근거가 없으면 fail-closed 처리합니다. 장기 패키지 cap/staged 생성, Kanboard pytest-absence SKIP 제거, Recovery Guard/output-gate mode 분리도 포함하며 호환성 영향은 `CHANGELOG.md`에 명시합니다. |
 | 9.1.2 | Design governance & pre-diet baseline | 제품군 규칙 탐색, 승인 컨트롤 재사용, UX 판단, target/family 시각 증거 분리를 강화합니다. 9.2.0 스킬 다이어트 전 강화된 66개 스킬의 행동과 instruction 크기를 고정한 미배포·비반영 비교 베이스라인입니다. |
@@ -300,6 +290,7 @@ Knowledge 스킬은 선언된 프로젝트 Knowledge Base에서만 동작합니�
 | 9.4.3 | 작업계약·Report Canvas | direct/Task/Loop 작업 전반에서 사용자 범위, 검증 소유권, 국소 보류, 비차단 continuation을 보존하고 구현 설명·행동 발견·공용 오프라인 Report Canvas를 추가합니다. |
 | 9.4.4 | 암시적 workflow 라우팅·prototyping | 명확한 자연어 의도에 맞는 workflow 및 제한된 support owner를 노출하면서 lifecycle·영속화 gate는 explicit-only로 유지합니다. 선택된 skill을 위임 경계에 전달하고, 하나의 미해결 결정을 위한 격리·보존형 runnable prototype을 추가합니다. |
 | 9.4.5 | 직접 specialist 라우팅·표면 정리 | 독립 search/analysis/research router를 제거하고 겹치는 Knowledge·coordination·Kanboard·project-context·loop·maintenance owner를 합치며 maintainer 플러그인을 폐기하고 canonical 표면을 79개에서 65개로 줄입니다. |
+| 9.4.6 | Visual decision·inspectable reports | visual-decision 계약을 추가하고, 3D·수식·그래픽 주장은 spatial Report Canvas를 강제하며, management/analysis 스킬 ID를 맞추면서 65개 표면은 유지합니다. |
 
 ## 라이선스
 

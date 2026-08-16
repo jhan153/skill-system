@@ -2,7 +2,6 @@
   "schema_version": 1,
   "mode": "trace",
   "language": "ko",
-  "eyebrow": "Implementation explainer · trace",
   "title": "사용자 입력이 topology commit으로 이어지는 경로",
   "summary": "입력과 preview는 분리되어 있고 Apply 단계에서만 production mutation path가 호출됩니다. 실패 atomicity는 runtime readback이 없어 아직 unverified입니다.",
   "status": "info",

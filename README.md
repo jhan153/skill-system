@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.4.5 Bundle
+## 9.4.6 Bundle
 
-This source tree carries the 9.4.5 release above the 9.4.4 implicit-routing and prototyping line. Its main components are:
+This source tree carries the 9.4.6 release above the 9.4.5 routing-consolidation line. Its main components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -27,15 +27,15 @@ This source tree carries the 9.4.5 release above the 9.4.4 implicit-routing and 
 
 ## 9.x Direction: Neutral Source & Plugin Packaging
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.4.5 — Direct Specialist Routing & Surface Consolidation`, directly succeeding `9.4.4 — Implicit Workflow Routing & Prototyping`. Local installation is explicit and does not imply committing, tagging, publishing, or pushing. Codex and Claude share one bundle version and release tag; harness changes advance that version instead of creating a second protocol-version axis.
+The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.4.6 — Visual Decision & Inspectable Reports`, directly succeeding `9.4.5 — Direct Specialist Routing & Surface Consolidation`. Local installation is explicit and does not imply committing, tagging, publishing, or pushing. Codex and Claude share one bundle version and release tag; harness changes advance that version instead of creating a second protocol-version axis.
 
-9.4.5 keeps the 9.4.4 work contracts, Report Canvas, implicit specialist selection, and isolated prototypes while collapsing standalone router skills and merging overlapping owners. Family entry now selects the matching specialist directly; legacy IDs remain aliases only. The canonical surface is 65 skills across five plugins. Governed persistence, external-state, LoopRun, lifecycle-gate, and explicitly selected context skills remain explicit-only, and model selection never expands user authority. Delegated workers receive exact canonical skill IDs already selected upstream; workers with no upstream selection route normally. Authored positive and negative cases cover these contracts but do not establish field-quality routing.
+9.4.6 keeps the 9.4.5 direct-specialist surface and adds a visual-decision contract plus an inspectable-visual gate. Design and report owners must not fill unspecified chrome with generative defaults, and a 3D/math/graphics claim must render Report Canvas `spatial` with real geometry instead of restyling or a card wall. Management and analysis IDs now use the `management-*`, `analysis-codebase-map`, and `analysis-boundary-design` names; legacy IDs remain aliases only. The canonical surface is 65 skills across five plugins. Governed persistence, external-state, LoopRun, lifecycle-gate, and explicitly selected context skills remain explicit-only, and model selection never expands user authority. Delegated workers receive exact canonical skill IDs already selected upstream; workers with no upstream selection route normally. Authored positive and negative cases cover these contracts but do not establish field-quality routing.
 
 The Codex router uses an exact specialist directly and opens at most one narrow router only when several owners genuinely compete. Clear intent-matched workflow owners and bounded design/support specialists may be implicitly selected, while model selection never expands user authority. Persistent Memory/Knowledge writes, project-context mutation, Kanboard, LoopRun, lifecycle gates, and explicitly selected context remain explicit-only. An implicit router may hand off only to a declared implicitly exposed target, and an already selected canonical skill ID is preserved across worker handoff. One canonical invocation bit is projected into each host's native contract: Codex reads `agents/openai.yaml`, while Claude receives `disable-model-invocation: true` only for explicit-only skills. Codex packages stay at `plugins/<name>/skills`; paired Claude packages are generated at `plugins/claude/<name>/skills` under the same plugin name and version so each host discovers only its native metadata. The nearest `project-context.yaml` may declare manifest-relative or exact approved absolute Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery. Knowledge operations consume resolved `knowledge_root` and `knowledge_index` variables rather than a fixed directory.
 
 Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, review, and decision knowledge as readable current snapshots with typed relations, semantic revisions, and source-traced observation events. Recurrence is derived from transparent observation/provenance dimensions rather than a confidence, maturity, importance, or popularity score. LLM Wikis remain optional read-only context sources selected explicitly and navigated using their own conventions.
 
-Explicit “what next” questions use the existing Work Horizon and Planning State contracts instead of a duplicate registry navigator: horizon owns persistence/altitude, planning state owns persisted-artifact transitions, and host routing retains the current-turn owner. `workflow-project-context` supports explicit manifest-init, guided bootstrap, update, and read-only doctor modes; one transaction may approve all or a subset of separately enumerated writes. Material maker/checker risk may separate Contract/Spec from Repository/Constraints review, while multi-batch work selects `vertical_slice`, `migration_sequence`, or `evidence_unit`. None of these additions creates an automatic mega-orchestrator.
+Explicit “what next” questions use the existing Work Horizon and Planning State contracts instead of a duplicate registry navigator: horizon owns persistence/altitude, planning state owns persisted-artifact transitions, and host routing retains the current-turn owner. `management-project-context` supports explicit manifest-init, guided bootstrap, update, and read-only doctor modes; one transaction may approve all or a subset of separately enumerated writes. Material maker/checker risk may separate Contract/Spec from Repository/Constraints review, while multi-batch work selects `vertical_slice`, `migration_sequence`, or `evidence_unit`. None of these additions creates an automatic mega-orchestrator.
 
 The default Codex hook map sends eight lifecycle events directly to one Go executable. Response correction, desktop notification, declared-plan Kanboard sync, active-only LoopRun, and location-only project context are independent bounded branches; commit/closeout checkpoint writes operate only on declared stores and clear current-task facts.
 
@@ -103,8 +103,8 @@ Analysis skills are used to diagnose failures, compare approaches, or build code
 | `analysis-router`    | Selects the appropriate analysis path for complex technical requests, such as bug diagnosis, algorithm comparison, codebase design, domain modeling, or performance analysis. |
 | `analysis-bug`       | Reproduces and diagnoses recurring, unclear, or high-risk failures, then summarizes the primary cause and regression validation path.          |
 | `analysis-algorithm` | Compares algorithms, architectures, models, search strategies, or implementation approaches against explicit constraints and success criteria. |
-| `analysis-codebase`  | Performs codebase-level analysis when repository-wide artifacts, architecture maps, dependency views, or quality-gate reports are needed.      |
-| `analysis-codebase-design` | Judges targeted module boundaries, deep modules, interfaces, seams, adapters, dependency direction, and testability before implementation. |
+| `analysis-codebase-map`  | Models a repository or named slice as Mermaid HLD/LLD maps of flow, structure, and state.      |
+| `analysis-boundary-design` | Judges targeted module boundaries, deep modules, interfaces, seams, adapters, dependency direction, and testability before implementation. |
 | `analysis-architecture-deepening` | Finds ranked architecture-deepening candidates without a full repo report, using recent canonical production paths as a YAGNI sampling weight when the user did not name a scope. |
 | `analysis-domain-modeling` | Clarifies domain concepts, entity/value-object boundaries, state transitions, invariants, business rules, and naming language for software design. |
 | `analysis-performance` | Diagnoses latency, throughput, CPU, memory, query, rendering, startup, bundle, or algorithmic bottlenecks with scoped evidence. |
@@ -156,9 +156,6 @@ Workflow skills control implementation discipline, validation, and failure recov
 | `workflow-source-maintenance` | Prunes source proven obsolete after development while preserving intended behavior and dynamic/public entry points. |
 | `workflow-comment-maintenance` | Synchronizes comments and docstrings with current code meaning without changing behavior. |
 | `workflow-task-ledger` | Preserves resumable task steps and findings only when work is expected to cross a turn or session boundary. |
-| `workflow-project-context-init` | Initializes or diagnoses the project context manifest and proposes only explicitly approved store setup. |
-| `workflow-project-context-update` | Updates selected manifest locations while preserving sibling and unknown sections. |
-| `workflow-project-context-checkpoint` | At an explicit closeout checkpoint, classifies durable current-task items into an existing declared Memory Bank or Knowledge Base. |
 
 ### Loop Engineering
 
@@ -221,30 +218,23 @@ Search skills find evidence or define evidence-gathering paths while keeping syn
 | `search-paper-evidence` | Searches for paper/source evidence or plans a search path, while tracking citation status in an evidence ledger without fabricating citations.   |
 | `search-deep-evidence`  | Runs a deep multi-angle evidence sweep across lanes with adversarial verification and citation-status labels, producing a verified evidence set for report or synthesis skills. |
 
-### Memory
+### Management
 
-Memory skills manage long-term project context. They are used only when memory use or memory changes are explicitly intended.
-
-| Skill                            | Role                                                                                                                             |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `memory-bank-harness`            | Builds a context pack from approved memory for the current task while filtering out stale, conflicting, or risky entries.        |
-| `memory-bank-init`               | Initializes a project-scoped persistent memory bank after confirming project identity and write boundaries.                      |
-| `memory-bank-update`             | Updates persistent goals or rules as append-only history when the user wants long-term memory changes.                           |
-| `memory-bank-maintenance`        | Inspects, validates, consolidates, or repairs existing memory state.                                                             |
-| `memory-bank-correction-capture` | Captures an explicit user correction as a memory candidate while preserving approval steps and sensitive-information boundaries. |
-
-### Knowledge
-
-Knowledge skills operate only on a declared project Knowledge Base. New records share one owner and select a category profile instead of loading five separate authoring skills.
+Management skills own project Memory, Knowledge, and `project-context.yaml` location or checkpoint operations. They are used only when store setup, read, or mutation is explicitly intended.
 
 | Skill | Role |
 | --- | --- |
-| `knowledge-base-record` | Creates one new accepted domain, design, algorithm, architecture, or recurring code-review identity using the shared record contract and one selected category profile. |
-| `knowledge-base-read` | Reads the smallest artifact-anchored current slice and only the relations or history needed by the task. |
-| `knowledge-base-init` | Initializes an explicitly approved empty store and its manifest binding. |
-| `knowledge-base-update` | Updates, reverifies, relinks, supersedes, or deprecates an existing identity. |
-| `knowledge-base-maintenance` | Validates and maintains index, relation, history, overlap, and recurrence integrity. |
-| `knowledge-plan-sync` | Synchronizes only accepted durable plan decisions into existing Knowledge. |
+| `management-project-context` | Initializes, diagnoses, updates, or bootstraps the project context manifest while preserving unrelated sections. |
+| `management-project-context-checkpoint` | At an explicit closeout checkpoint, classifies durable current-task items into an existing declared Memory Bank or Knowledge Base. |
+| `management-memory-bank-harness` | Builds a context pack from approved memory for the current task while filtering out stale, conflicting, or risky entries. |
+| `management-memory-bank-init` | Initializes a project-scoped persistent memory bank after confirming project identity and write boundaries. |
+| `management-memory-bank-update` | Updates persistent goals or rules as append-only history when the user wants long-term memory changes. |
+| `management-memory-bank-maintenance` | Inspects, validates, consolidates, or repairs existing memory state. |
+| `management-knowledge-base-record` | Creates one new accepted domain, design, algorithm, architecture, or recurring code-review identity using the shared record contract and one selected category profile. |
+| `management-knowledge-base-read` | Reads the smallest artifact-anchored current slice and only the relations or history needed by the task. |
+| `management-knowledge-base-init` | Initializes an explicitly approved empty store and its manifest binding. |
+| `management-knowledge-base-update` | Updates, reverifies, relinks, supersedes, or deprecates an existing identity. |
+| `management-knowledge-base-maintenance` | Validates and maintains index, relation, history, overlap, and recurrence integrity. |
 
 ### Kanboard
 
@@ -269,7 +259,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 |   7.1.x | Portable skill bundle              | Repackaged the system as a portable skill bundle with read-only structure checks and conservative explicit-first routing.                                                                                                                                                          |
 |   7.2.x | Skill families                     | Added user-facing family groups, family-prefixed skill names, and the search/coordination/evaluation families. Version 7.2.1 added workflow execution subfamilies and `report-qualitative`; version 7.2.5 added a skill catalog that helps users understand each skill by family. |
 |   7.3.x | Execution assurance                | Stabilized agent output validation, release verification profiles, and run evidence fixtures as the compatibility baseline before the context-layer transition. |
-| 8.0.2 | Context compounding            | Promotes the Context Compounding package to the 8.0.2 field line, including Wiki Bank, Runtime Projection, Context Packs, source-grounded claims, review-gated knowledge feedback, hook/runtime validation hardening, analysis-codebase hardening, and home-install path cleanup. `7.4.x Context Assurance` is treated as a legacy transition label. |
+| 8.0.2 | Context compounding            | Promotes the Context Compounding package to the 8.0.2 field line, including Wiki Bank, Runtime Projection, Context Packs, source-grounded claims, review-gated knowledge feedback, hook/runtime validation hardening, analysis-codebase-map hardening, and home-install path cleanup. `7.4.x Context Assurance` is treated as a legacy transition label. |
 | 8.1.0 | Bounded verification loops            | Adds loop readiness classification, `plan-loop-term` contracts, verifier mapping, and a minimal LoopRun runtime for explicit repeated agent work: loop schemas, state/checkpoints, progress/stall decisions, Stop-hook continuation, recovery handoff, verifier evidence, idempotency notes, loop governance metrics, Wiki feedback candidates, and execution handoff text. |
 | 8.3.0 | Bounded loop hardening                | Closes the LoopRun integrity gaps: a session-scoped activation bridge (`activate_loop_run.py`/`deactivate_loop_run.py` + Stop hook resolves the run by `session_id`, decoupled from the generic agent-run manifest), monotonic iteration with terminal immutability and idempotent replay, `iterations/` audit records, precedence-honored termination with wall-time enforcement, a confirmed-only `search-deep-evidence` convergence verifier, and a runtime-schema-valid `plan-loop-term` contract. |
 | 8.3.1 | Evaluation framing cleanup            | Removes evaluation-distorting deployment/autonomy-negative wording, updates runtime and hygiene docs to host-managed asset language, and keeps cache cleanup stable after verification runs. |
@@ -282,8 +272,8 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 8.5.0 | WorkItem lifecycle governance | Adds a schema-bound WorkItem state model for triage/explore/ready/implement/verify/review/closed, validation tooling, execution-assurance coverage, and optional `work_item_ref` linkage from TaskRun. This remains lifecycle governance, not a queue runtime, scheduler, Kanboard source of truth, or LoopRun replacement. |
 | 8.5.1 | Work horizon routing clarification | Adds the Work Horizon model plus `work_horizon`, `planning_altitude`, and `execution_mode` metadata for plan/workflow skills. This clarifies one-shot vs task/ticket vs short-plan vs long-plan vs loop-overlay routing without adding queue/runtime behavior. |
 | 9.0.0 | Neutral source & plugin packaging | Promotes a neutral canonical `source/` tree as the single source of truth and generates `.codex`/`.claude` runtime targets byte-identically from it (verbatim shared payload, mirror-from-canonical, platform overlay), with a generated-only cutover and regeneration-enforced integrity. Shares platform-agnostic schema definitions to the Claude target and adds initial role-based Codex plugin packages (`skill-system-{core,dev,design,research,quality,maintainer}`) with full disjoint coverage of the 58 skills. |
-| 9.0.1 | Dev plugin skill expansion | Expands the `skill-system-dev` engineering role beyond the initial 9.0.0 cut with concrete execution-owner and analysis skills (`analysis-architecture-deepening`, `analysis-codebase-design`, `analysis-domain-modeling`, `analysis-performance`, `workflow-implementation`, `workflow-bug-fix`, `workflow-dependency-upgrade`, `workflow-refactor-safely`, `workflow-source-maintenance`, `workflow-comment-maintenance`), adding `source_maintenance_execution` / `comment_maintenance_execution` work-horizon modes plus routing, registry, and runtime/negative eval coverage. Skill count 58 → 68; targets regenerated and integrity-verified. |
-| 9.0.2 | Legacy template cleanup | Template-hygiene and output-quality maintenance cut after 9.0.1: removes toy C++ before/after examples from the short-term plan template and `plan-short-term-docs` evidence rule, propagates the `plan-short-term-docs` diagram policy to `workflow-rigor` and `report-critical` (no default plan-lifecycle/approval/agent-workflow diagrams), makes the long-term `ui-state-contract` transition diagram conditional on real transitions, and converts `analysis-codebase` `report.py` unverified fallback diagrams (subsystem/path/class/metric) to plain text notices. Bundle version bumped to 9.0.2; targets regenerated and integrity-verified. |
+| 9.0.1 | Dev plugin skill expansion | Expands the `skill-system-dev` engineering role beyond the initial 9.0.0 cut with concrete execution-owner and analysis skills (`analysis-architecture-deepening`, `analysis-boundary-design`, `analysis-domain-modeling`, `analysis-performance`, `workflow-implementation`, `workflow-bug-fix`, `workflow-dependency-upgrade`, `workflow-refactor-safely`, `workflow-source-maintenance`, `workflow-comment-maintenance`), adding `source_maintenance_execution` / `comment_maintenance_execution` work-horizon modes plus routing, registry, and runtime/negative eval coverage. Skill count 58 → 68; targets regenerated and integrity-verified. |
+| 9.0.2 | Legacy template cleanup | Template-hygiene and output-quality maintenance cut after 9.0.1: removes toy C++ before/after examples from the short-term plan template and `plan-short-term-docs` evidence rule, propagates the `plan-short-term-docs` diagram policy to `workflow-rigor` and `report-critical` (no default plan-lifecycle/approval/agent-workflow diagrams), makes the long-term `ui-state-contract` transition diagram conditional on real transitions, and converts `analysis-codebase-map` `report.py` unverified fallback diagrams (subsystem/path/class/metric) to plain text notices. Bundle version bumped to 9.0.2; targets regenerated and integrity-verified. |
 | 9.1.0 | Canonical quality, harness hardening & skill consolidation | Consolidates the canonical surface from 71 to 66 skills, hardens schema-v2 hook evidence and the observe-default Recovery Guard, adds planning determinism and token-cost controls, and aligns the release identity after `v9.0.2`. Claude-specific standalone compatibility follow-up is deferred to 9.1.1. |
 | 9.1.1 | Patch safety & evidence hardening | Makes dev routing metadata host-neutral, moves hook evidence to durable per-run ledgers, fails C/C++ reports closed without semantic structure evidence, caps and stages long-term packages, removes the Kanboard pytest-absence SKIP, and reports Recovery Guard/output-gate modes independently. Compatibility changes are called out in `CHANGELOG.md`. |
 | 9.1.2 | Design governance & pre-diet baseline | Hardens product-family rule discovery, approved component reuse, UX decision handling, and separate target/family visual evidence lanes. Freezes the strengthened 66-skill source surface and measured instruction size before 9.2.0 skill-diet work; this is an unpublished, non-deployed comparison baseline rather than a release. |
@@ -300,6 +290,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.4.3 | Work contracts & Report Canvas | Preserves user scope, verification ownership, local deferral, and non-blocking continuation across direct/Task/Loop work; adds implementation explanation, behavior discovery, and the shared offline Report Canvas. |
 | 9.4.4 | Implicit workflow routing & prototyping | Exposes clear intent-matched workflow and bounded support owners to natural-language routing while retaining explicit lifecycle and persistence gates; propagates selected skills across delegation and adds retained, isolated runnable prototypes for one unresolved decision. |
 | 9.4.5 | Direct specialist routing & surface consolidation | Removes standalone search/analysis/research routers, merges overlapping Knowledge, coordination, Kanboard, project-context, loop, and maintenance owners, retires the maintainer plugin, and cuts the canonical surface from 79 to 65 skills. |
+| 9.4.6 | Visual decision & inspectable reports | Adds a visual-decision contract, requires spatial Report Canvas for 3D/math/graphics claims, and aligns management/analysis skill IDs while keeping 65 skills. |
 
 ## License
 

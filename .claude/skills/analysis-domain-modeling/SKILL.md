@@ -12,7 +12,7 @@ description: Clarify domain language, identity, state transitions, invariants, a
 - use_when:
   - a development decision depends on clarifying concepts, terminology, lifecycle, invalid states, or domain-policy ownership.
 - do_not_use_when:
-  - clear-term implementation (`workflow-implementation`), module/seam architecture (`analysis-codebase-design`), broad analysis, current failure RCA, persistent glossary/ADR/docs writing (documentation owner), memory/accepted-knowledge mutation, or product ideation.
+  - clear-term implementation (`workflow-implementation`), module/seam architecture (`analysis-boundary-design`), broad analysis, current failure RCA, persistent glossary/ADR/docs writing (documentation owner), memory/accepted-knowledge mutation, or product ideation.
 - expected_inputs:
   - decision area, material use case, current terms, relevant production owner/callers/schema/API, and explicit write scope if any
 - expected_outputs:
@@ -51,7 +51,7 @@ description: Clarify domain language, identity, state transitions, invariants, a
 Return only needed sections: decision scope, current evidence/language, concept and transition model, invariants/invalid states, naming/ownership decision, rejected alternatives, implementation/readback handoff, and unverified questions. Label each material rule established, inferred, or unresolved.
 
 ## Cross-Skill Boundaries
-- `analysis-codebase-design` owns module boundaries, deep modules, seams, and adapters.
+- `analysis-boundary-design` owns module boundaries, deep modules, seams, and adapters.
 - `workflow-implementation` owns direct code changes from a selected model.
 - `workflow-refactor-safely` owns behavior-preserving renames/extractions after the model is selected.
 - `analysis-bug` owns current failure RCA when the issue starts from a broken behavior.

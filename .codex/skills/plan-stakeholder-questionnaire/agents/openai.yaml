@@ -1,5 +1,5 @@
 interface:
-  display_name: "Stakeholder Questionnaire"
+  display_name: "Plan Stakeholder Questionnaire"
   short_description: "Create one decision-linked stakeholder question document"
   default_prompt: |
     Use $plan-stakeholder-questionnaire only when the user explicitly requests a local Markdown questionnaire for one stakeholder. Bind the recipient and downstream decision, cover each needed answer once, permit uncertainty, and never send or upload the artifact.

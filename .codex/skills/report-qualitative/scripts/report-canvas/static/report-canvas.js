@@ -109,12 +109,12 @@
   const firstView = create("section", { className: "rc-first-view" });
   const topbar = create("header", { className: "rc-topbar" });
   const heading = create("div", { className: "rc-heading" });
+  const eyebrow = typeof model.eyebrow === "string" ? model.eyebrow.trim() : "";
+  if (eyebrow) {
+    heading.appendChild(create("p", { className: "rc-kicker", text: eyebrow }));
+  }
   append(
     heading,
-    create("p", {
-      className: "rc-kicker",
-      text: model.eyebrow || "Skill System · Report Canvas",
-    }),
     create("h1", { className: "rc-title", text: model.title }),
     create("p", { className: "rc-summary", text: model.summary }),
   );
@@ -209,7 +209,7 @@
   });
   const nextIndex = create("span", {
     className: "rc-next-index",
-    text: actionKind === "none" ? "—" : "01",
+    text: actionKind === "none" ? "—" : "→",
   });
   const nextCopy = create("div", { className: "rc-next-copy" });
   append(

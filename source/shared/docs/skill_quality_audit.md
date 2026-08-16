@@ -53,8 +53,8 @@ The table below preserves the 9.1.2 ownership and behavior audit. The 9.2.0 size
 | `analysis-algorithm` | revised | Candidate count and report depth now follow genuine trade-offs; causal validation replaces fixed templates/metrics. |
 | `analysis-architecture-deepening` | prior + revalidated | Narrow candidate-ranking owner remains distinct from targeted design and full reports. |
 | `analysis-bug` | revised | Hypothesis depth and fix comparison are conditional; static leads cannot self-confirm runtime causes. |
-| `analysis-codebase-design` | prior + revalidated | Targeted boundary/deep-module decisions remain separate from full report generation. |
-| `analysis-codebase` | revised | Semantic comparison remains evidence-bound; C/C++ structure now records `Not evidenced` and fails closed until a compilation-aware symbol/class/call index exists. |
+| `analysis-boundary-design` | prior + revalidated | Targeted boundary/deep-module decisions remain separate from full report generation. |
+| `analysis-codebase-map` | revised | The integrated findings report and its collector/reporter pipeline are retired because they did not add decision-relevant information. Generic codebase-report wording now yields a read-only, evidence-linked map; explicit HLD/LLD requests outrank scope defaults. |
 | `analysis-domain-modeling` | retained | Domain language, invariant, and state-model ownership is distinct and already proportional. |
 | `analysis-performance` | retained | Measurement-first bottleneck selection is distinct; routing metadata is host-neutral. |
 | `analysis-router` | prior + revalidated | Specialist and hybrid routing boundaries remain explicit. |
@@ -79,14 +79,14 @@ The table below preserves the 9.1.2 ownership and behavior audit. The 9.2.0 size
 | `evaluation-harness` | restored | Case-quality review remains a dedicated explicit owner, separate from field quality and release verdicts. |
 | `kanboard-plan-ops` | retained | Existing-board push/pull/validation ownership remains distinct; metadata was shortened. |
 | `kanboard-plan-rollout` | retained | Onboarding/bulk-sync ownership remains distinct; metadata was shortened. |
-| `knowledge-base-init` | added | Explicitly creates only a minimal Markdown store and its project-context manifest entry. |
-| `knowledge-base-read` | added | Reads an index-first, artifact-anchored slice and prefers matching local rules over generic patterns. |
-| `knowledge-base-update` | added | Updates, supersedes, deprecates, or relinks existing records without crossing into Memory or Wiki mutation. |
-| `knowledge-base-maintenance` | revised | Maintains generic Markdown records and direct artifact links without claim graphs, projections, or scores. |
+| `management-knowledge-base-init` | added | Explicitly creates only a minimal Markdown store and its project-context manifest entry. |
+| `management-knowledge-base-read` | added | Reads an index-first, artifact-anchored slice and prefers matching local rules over generic patterns. |
+| `management-knowledge-base-update` | added | Updates, supersedes, deprecates, or relinks existing records without crossing into Memory or Wiki mutation. |
+| `management-knowledge-base-maintenance` | revised | Maintains generic Markdown records and direct artifact links without claim graphs, projections, or scores. |
 | `knowledge-plan-sync` | added | Admits only accepted durable plan decisions, never the whole plan or implementation chronology. |
 | `knowledge-*-record` | added | Five explicit domain, design, algorithm, architecture, and recurring code-review owners share one small record envelope. |
 | `analysis-llm-wiki-context` | added | Uses one explicitly selected Wiki's own navigation method and returns a minimum read-only task context. |
-| `workflow-project-context-checkpoint` | added | Classifies clear current-task durable items at explicit commit/closeout boundaries; Stop hooks and implicit collection are excluded. |
+| `management-project-context-checkpoint` | added | Classifies clear current-task durable items at explicit commit/closeout boundaries; Stop hooks and implicit collection are excluded. |
 
 ### Loop And Memory
 
@@ -95,10 +95,10 @@ The table below preserves the 9.1.2 ownership and behavior audit. The 9.2.0 size
 | `analysis-loop-readiness` | prior + revalidated | One-shot/checkpoint/LoopRun readiness remains a routing decision, not an executor. |
 | `plan-loop-verification` | prior + revalidated | Verifier mapping remains fail-closed and cannot self-pass from artifact presence. |
 | `memory-bank-correction-capture` | revised | Only explicitly persistent project mistakes enter as unverified candidates; complaints alone authorize no write. |
-| `memory-bank-harness` | revised | Reads only the manifest-declared bank and a small task-relevant slice of compact current state. |
-| `memory-bank-init` | revised | Fresh init creates the four-file bank and updates only the manifest's Memory path. |
-| `memory-bank-maintenance` | revised | Report, validation, conflict, consolidation, and compact-current modes use no maturity/confidence scores. |
-| `memory-bank-update` | revised | Cross-session goals, rules, and proven practices use one append-only event plus current/archive/meta reflection. |
+| `management-memory-bank-harness` | revised | Reads only the manifest-declared bank and a small task-relevant slice of compact current state. |
+| `management-memory-bank-init` | revised | Fresh init creates the four-file bank and updates only the manifest's Memory path. |
+| `management-memory-bank-maintenance` | revised | Report, validation, conflict, consolidation, and compact-current modes use no maturity/confidence scores. |
+| `management-memory-bank-update` | revised | Cross-session goals, rules, and proven practices use one append-only event plus current/archive/meta reflection. |
 
 ### Planning And Reporting
 

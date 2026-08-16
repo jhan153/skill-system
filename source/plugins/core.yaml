@@ -1,21 +1,21 @@
 # source/plugins/core.yaml — plugin membership manifest (hand-authored input).
 name: skill-system-core
-version: "9.4.5"
+version: "9.4.6"
 description: 'Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, evidence, validation/reporting contract, task state) used by all role plugins.'
 skills:
   - plan-task-handoff
   - kanboard-plan
-  - knowledge-base-record
-  - knowledge-base-init
-  - knowledge-base-maintenance
-  - knowledge-base-read
-  - knowledge-base-update
+  - management-knowledge-base-record
+  - management-knowledge-base-init
+  - management-knowledge-base-maintenance
+  - management-knowledge-base-read
+  - management-knowledge-base-update
   - analysis-llm-wiki-context
   - analysis-loop-readiness
-  - memory-bank-harness
-  - memory-bank-init
-  - memory-bank-maintenance
-  - memory-bank-update
+  - management-memory-bank-harness
+  - management-memory-bank-init
+  - management-memory-bank-maintenance
+  - management-memory-bank-update
   - plan-decision-map
   - plan-long-term-package
   - plan-loop-term
@@ -23,8 +23,8 @@ skills:
   - plan-requirements-discovery
   - plan-short-term-docs
   - plan-stakeholder-questionnaire
-  - workflow-project-context-checkpoint
-  - workflow-project-context
+  - management-project-context-checkpoint
+  - management-project-context
   - report-lifecycle-artifacts
   - search-deep-evidence
   - workflow-loop-runner

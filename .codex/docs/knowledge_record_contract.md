@@ -146,7 +146,7 @@ Do not turn one-off review comments, tentative plan language, generic industry a
 
 ### Approved Plan Admission
 
-An explicit plan-to-Knowledge request or approved project checkpoint may admit only accepted/current durable decisions or changed project rules. Exclude TODOs, estimates, implementation chronology, rejected proposals except bounded decision history, and speculative future state. Preserve stable plan/work-item/canonical pointers and classify overlap before writing; proximity inside a plan does not establish a causal relation. New identity uses `knowledge-base-record`; an existing identity, recurrence, amendment, reverification, relink, or supersession uses `knowledge-base-update`.
+An explicit plan-to-Knowledge request or approved project checkpoint may admit only accepted/current durable decisions or changed project rules. Exclude TODOs, estimates, implementation chronology, rejected proposals except bounded decision history, and speculative future state. Preserve stable plan/work-item/canonical pointers and classify overlap before writing; proximity inside a plan does not establish a causal relation. New identity uses `management-knowledge-base-record`; an existing identity, recurrence, amendment, reverification, relink, or supersession uses `management-knowledge-base-update`.
 
 ## Index And Retrieval Contract
 

@@ -1,0 +1,10 @@
+interface:
+  display_name: "Management Knowledge Base Update"
+  short_description: "Observe or revise existing project knowledge"
+  default_prompt: "Use $management-knowledge-base-update to classify overlap, then observe, amend, reverify, supersede, deprecate, or relink one existing record with provenance and semantic history."
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+  may_write: true
+  may_block_completion: false

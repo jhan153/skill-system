@@ -51,7 +51,7 @@ Static inspection can establish possible paths and contract mismatches; it canno
 ## Fix Boundary
 - Diagnosis-only stops after the causal finding or scoped hypothesis, repair direction, and verification target; it does not write code.
 - For RCA plus implementation, `workflow-bug-fix` remains the primary write owner and this skill supplies the causal decision. A direct fix routes there immediately; a repeated post-fix signature routes to `workflow-recovery`.
-- Correct-behavior bottleneck analysis routes to `analysis-performance`, a boundary-only decision to `analysis-codebase-design`, and no-failure feature work to `workflow-implementation`.
+- Correct-behavior bottleneck analysis routes to `analysis-performance`, a boundary-only decision to `analysis-boundary-design`, and no-failure feature work to `workflow-implementation`.
 - Compare repairs only when materially different choices remain after the cause is known; structural redesign belongs to its design owner.
 
 ## Output Contract

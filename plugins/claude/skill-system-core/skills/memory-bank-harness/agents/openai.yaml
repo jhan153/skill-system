@@ -1,5 +1,0 @@
-interface:
-  display_name: "Memory Bank Harness"
-  short_description: "Read a narrow declared project Memory slice"
-policy:
-  allow_implicit_invocation: true

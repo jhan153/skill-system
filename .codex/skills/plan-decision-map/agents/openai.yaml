@@ -1,5 +1,5 @@
 interface:
-  display_name: "Decision Map"
+  display_name: "Plan Decision Map"
   short_description: "Keep multi-session uncertainty in one decision map"
   default_prompt: |
     Use $plan-decision-map only for an explicitly requested durable decision map. Preserve one target outcome, bounded decision items, prerequisite links, a derived ready set, unshaped unknowns, and explicit exclusions. Keep implementation and unauthorized external mutations outside the map.

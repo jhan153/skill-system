@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the 9.4.5 platform-separated runtime contract."""
+"""Verify the 9.4.6 platform-separated runtime contract."""
 
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ REQUIRED_FILES = [
     ".claude/bin/skill-system-claude-harness-linux-amd64",
     ".claude/bin/skill-system-notify-overlay",
     ".codex/docs/project_context_manifest.md",
-    ".codex/skills/workflow-project-context/SKILL.md",
+    ".codex/skills/management-project-context/SKILL.md",
     ".codex/schemas/loop/loop-run.schema.json",
     ".codex/tools/evaluate_loop_run.py",
     ".codex/tools/task_ledger.py",

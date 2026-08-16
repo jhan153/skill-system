@@ -1,12 +1,12 @@
-version: "9.4.5"
+version: "9.4.6"
 purpose: "Verify concise output depth with a directly selected specialist and without any specialist, while keeping trivial work direct."
 cases:
   - case_id: runtime-pre-answer-depth-router-001
     schema_version: 2
     user_request: "source/shared/eval/forward-fixtures/9.1.0/codebase에서 candidate-dotnet을 legacy-qt의 checkout replacement로 채택하려면 어떤 boundary/adapter decision이 필요한지 직접 소스와 캡처된 runtime evidence로 분석해 주세요. 최종 답은 세 문장으로 결론부터 써 주세요."
-    expected_primary_skill: analysis-codebase-design
+    expected_primary_skill: analysis-boundary-design
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase, workflow-task-ledger]
+    should_not_trigger: [analysis-codebase-map, workflow-task-ledger]
     expected_context:
       - "fixture scope and workspace revision"
       - "legacy and candidate direct sources"
@@ -30,14 +30,14 @@ cases:
       - create_task_run_without_resumption_boundary
     required_evidence:
       - type: route_match
-        expected: analysis-codebase-design
+        expected: analysis-boundary-design
 
   - case_id: runtime-pre-answer-depth-global-001
     schema_version: 2
     user_request: "source/platform/codex/AGENTS.md와 source/platform/codex/context-routing.md가 '결론부터 세 문장' 요청에서도 조사 깊이와 final presentation을 별도 축으로 취급하는지 직접 문구와 관련 test를 확인해 주세요. 최종 답은 세 문장으로 써 주세요."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase, workflow-task-ledger]
+    should_not_trigger: [analysis-codebase-map, workflow-task-ledger]
     expected_context:
       - "global AGENTS depth contract"
       - "context-routing output modifiers"
@@ -68,7 +68,7 @@ cases:
     user_request: "직전 구현을 완료라고 했지만 shared Handle은 화면에 보이기만 하고 picking이 실패해서 기존 판정이 깨졌어요. 다음 수정 프롬프트를 지금 세 문장으로 써 주세요. 먼저 owner 생성→spatial identity→render routing→depth→visible geometry→picking 경계와 실제 source/caller를 다시 확인해 주세요."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [workflow-implementation, analysis-codebase, workflow-task-ledger]
+    should_not_trigger: [workflow-implementation, analysis-codebase-map, workflow-task-ledger]
     expected_context:
       - "positive objective and invalidated completion claim"
       - "canonical artifacts and owners"
@@ -101,7 +101,7 @@ cases:
     user_request: "source/platform/codex/AGENTS.md 10번째 줄이 하는 일을 한 문장으로 설명해 주세요."
     expected_primary_skill: null
     expected_supporting_skills: []
-    should_not_trigger: [analysis-codebase, workflow-task-ledger]
+    should_not_trigger: [analysis-codebase-map, workflow-task-ledger]
     expected_context: ["target file line"]
     expected_output_shape: "one-sentence direct explanation"
     quality_notes: "A narrow local explanation remains direct and does not activate the depth workflow."

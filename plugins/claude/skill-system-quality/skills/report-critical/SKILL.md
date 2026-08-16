@@ -19,7 +19,7 @@ disable-model-invocation: true
   - artifact or conversation slice
   - task goal, material success criteria, and evidence anchors
 - expected_outputs:
-  - Report Canvas `decision` HTML containing the primary problem or QA verdict, prioritized findings, missing evidence, and one next action
+  - Report Canvas HTML: `decision` by default, or `spatial` when the claim must be seen in 3D/math/graphics
 - context_targets:
   must_read:
     - smallest review target slice that can answer the request
@@ -28,6 +28,7 @@ disable-model-invocation: true
     - evidence pack, active plan, or validation output tied to a material criterion
     - `reference.md` only for explicitly requested external review-policy grounding
     - `docs/document.md` only for schema/evaluation design work on this skill
+    - `$REPORT_SKILL_DIR/references/report_visual_authoring.md` when the inspectable visual gate fires
   do_not_load_by_default:
     - full chat history
     - full repo
@@ -85,7 +86,7 @@ Require `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and `$REPORT_SK
 ## Output And Stop
 Start with one-line `primary_problem`, then only applicable fields: `mode`, `confidence`, `evidence_status`, up to two `root_causes`, up to three severity-ordered `top_findings`, `qa_verdict` and `risk_level` for `qa_gate`, decision-changing `missing_information`, exactly one `next_best_action`, and remaining `verification_items`.
 
-Read `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and render the primary human-facing review as Report Canvas `decision` HTML with `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py`. Return only a concise chat receipt with the outcome and artifact link. Use chat-only output only when the user explicitly prohibits file creation, the host has no safe artifact surface, or the resolved installed payload is incomplete. Canvas does not change the verdict, evidence threshold, three-finding ceiling, or one-action stop; set the closing action to `kind: next`.
+Read `$REPORT_SKILL_DIR/references/report_canvas_contract.md`. If the inspectable visual gate fires (the user asked to see 3D, a mesh, a math surface, or a graphics result, or the claim cannot be checked without geometry), read `$REPORT_SKILL_DIR/references/report_visual_authoring.md` and render Report Canvas `spatial` HTML with supplied or sampled geometry. Otherwise render `decision` HTML. Use `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py`. Never edit Canvas CSS/JS or write a custom Three.js page. A card wall is not a substitute for a required spatial visual. Return only a concise chat receipt with the outcome and artifact link. Use chat-only output only when the user explicitly prohibits file creation, the host has no safe artifact surface, or the resolved installed payload is incomplete. Canvas does not change the verdict, evidence threshold, three-finding ceiling, or one-action stop; set the closing action to `kind: next`.
 
 Keep `next_best_action` atomic. Do not dump a blank schema, rewrite the artifact, implement fixes, or soften `abstain` into pass. Stop after review. Route changed-line presentation to `report-implementation-explainer` in `compare` mode, qualitative assessment to `report-qualitative`, research peer review to `research-peer-review`, and implementation to its owning workflow.
 

@@ -10,8 +10,8 @@ description: Rank evidence-backed improvements across deep modules, seams, adapt
 - intent_signature: ranked architecture-improvement or deep-module opportunity scan
 - use_when: rank several improvements in a workflow, module cluster, or explicit broad scope before selecting one.
 - do_not_use_when:
-  - one boundary/interface is selected: `analysis-codebase-design`
-  - repo-wide integrated report or generated model: `analysis-codebase`
+  - one boundary/interface is selected: `analysis-boundary-design`
+  - architecture map, HLD/LLD modeling, or Mermaid flow/structure/state diagrams: `analysis-codebase-map`
   - recurring bug root cause: `analysis-bug`
   - domain concepts/invariants: `analysis-domain-modeling`
   - measured bottleneck: `analysis-performance`
@@ -70,7 +70,7 @@ Return only:
 - `friction_signals` with evidence scope and references
 - `candidates` with stable IDs, `ranking`, and counterevidence
 - `recommended_next_candidate` as a ranked candidate ID (never `none` when ranking an opportunity), plus the decisive tradeoff
-- `handoff` to `analysis-codebase-design` when one boundary still needs design, `workflow-refactor-safely` for selected behavior-preserving live restructuring, `workflow-source-maintenance` for selected proven-obsolete deletion, or `workflow-implementation` for selected behavior changes
+- `handoff` to `analysis-boundary-design` when one boundary still needs design, `workflow-refactor-safely` for selected behavior-preserving live restructuring, `workflow-source-maintenance` for selected proven-obsolete deletion, or `workflow-implementation` for selected behavior changes
 - `unverified_gaps`
 
 Do not implement, generate a repo-wide report, or expand the shortlist into an exhaustive backlog.

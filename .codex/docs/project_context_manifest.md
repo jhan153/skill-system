@@ -54,7 +54,7 @@ The example path above is only a default proposal. No reader, writer, maintenanc
 ## Ownership And Updates
 
 - Initializers update only their own section and preserve every unknown or unrelated section.
-- In a bootstrap transaction, `workflow-project-context` owns a new minimal manifest in `manifest-init` mode and approved declaration/registration changes to an existing manifest in `update` mode. A Memory or Knowledge `create-store` action delegates both its minimal target scaffold and its own manifest section to that store initializer, so two owners never write the same section.
+- In a bootstrap transaction, `management-project-context` owns a new minimal manifest in `manifest-init` mode and approved declaration/registration changes to an existing manifest in `update` mode. A Memory or Knowledge `create-store` action delegates both its minimal target scaffold and its own manifest section to that store initializer, so two owners never write the same section.
 - Persistent Memory or Knowledge writes still require the owning workflow and current user authorization.
 - `llm_wikis` is a map of named, independent Wikis. If several are declared, the user or calling task must select one; consumers do not merge them automatically.
 - A Wiki `guide` is its native navigation entrypoint. The manifest does not prescribe folder layout, page IDs, query syntax, or domain vocabulary.
