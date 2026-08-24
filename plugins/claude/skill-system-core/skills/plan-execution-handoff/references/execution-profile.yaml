@@ -1,0 +1,298 @@
+profile_id: plan-handoff-v6
+supersedes: plan-handoff-v5
+
+migration:
+  existing_pair_policy: preserve_copied_v1_through_v5_contract
+  explicit_upgrade_required: true
+
+# effort vocabulary: low | medium | high | xhigh (human_judgment keeps qualitative_grade)
+
+precedence:
+  - current_user_override
+  - canonical_plan_copy
+  - this_default_profile
+
+rules:
+  execution_item_contract: core-execution-items-v1
+  instantiate_only_used_roles: true
+  one_production_writer_per_checkout: true
+  copy_selected_skills_to_worker_handoff: true
+  unavailable_model_policy: decision_required
+  existing_plan_is_not_retroactively_updated: true
+  selected_skills_must_be_session_exposed_ids: true
+  coordinator_mode: event_consumer
+  canonical_execution_state: plan_handoff_pair
+  external_execution_runner_required: false
+  worker_auto_orchestration_required_when_available: true
+  coordinator_automatic_polling: false
+  coordinator_check_wait: false
+  coordinator_checks_per_external_notification: 1
+  lifecycle_delivery_recovery_limit: 1
+  fixed_interval_waits: false
+  busy_waits: false
+
+method_profile:
+  id: risk-adaptive-development-v1
+  exactly_one_graph_archetype: true
+  default_graph_archetype: phase_gate_delivery
+  allowed_graph_archetypes:
+    - single_node_execution
+    - phase_gate_delivery
+    - dependency_incremental
+    - risk_spiral
+    - assurance_v
+    - controlled_transition
+  routing:
+    durable_one_owner_no_inter_node_dependency: single_node_execution
+    clear_sequential_development: phase_gate_delivery
+    valuable_lock_safe_incremental_fanout: dependency_incremental
+    high_uncertainty_or_measurement: risk_spiral
+    high_assurance_or_paired_traceability: assurance_v
+    release_migration_or_external_state: controlled_transition
+  test_authority:
+    allowed:
+      - human_handoff
+      - agent_machine
+      - mixed
+    defaults:
+      single_node_execution: mixed
+      phase_gate_delivery: human_handoff
+      dependency_incremental: mixed
+      risk_spiral: human_handoff
+      assurance_v: mixed
+      controlled_transition: mixed
+  test_transition:
+    allowed:
+      - current_graph
+      - next_waterfall
+    defaults:
+      single_node_execution: current_graph
+      phase_gate_delivery: next_waterfall
+      dependency_incremental: current_graph
+      risk_spiral: current_graph
+      assurance_v: current_graph
+      controlled_transition: current_graph
+  fixed_outer_control:
+    - scope_acceptance
+    - method_selection
+    - graph_static_validation
+    - execution_approval
+    - integration
+    - verification
+    - repair_or_escalation
+    - close_eligibility
+  graph_rewrite:
+    literal_back_edges: forbidden
+    expansion: append_unique_node_ids
+    bounded_by_plan: true
+    on_budget_exhaustion: human_escalation_or_stop
+    same_problem_reviewed_repair_limit: 2
+    after_repair_limit: coordinator_records_known_bug_and_follows_existing_plan
+    known_bug_global_block: false
+    known_bug_wait_for_user: false
+    no_implementation_after_known_bug: follow_existing_plan_terminal
+  typed_edges:
+    - depends_on
+    - unblocks
+    - branches_to
+    - verified_by
+    - gates
+    - repairs
+    - reverifies
+    - approves
+  static_validation:
+    - pair_identity_sections_and_placeholders
+    - declared_enum_values
+    - table_columns_and_nonempty_cells
+    - one_baseline_and_full_reachability
+    - acyclic_compiled_dag
+    - typed_edge_coverage
+    - task_handoff_and_timing_row_identity
+    - termination_contract_shape
+    - timing_format_and_state_consistency
+
+worker_lifecycle:
+  capability_receipt: required_at_start
+  unavailable_policy: unresolved_do_not_emulate_with_coordinator_polling
+  automatic_actions:
+    - dispatch_input_detection
+    - worker_inbox_check
+    - follow_up_consumption
+    - heartbeat_send
+    - worker_done_send
+  heartbeat_policy: worker_originated_liveness_only_never_resume_coordinator
+  compact_body_fields:
+    - outcome
+    - execution_items
+    - artifact_anchors
+    - latest_decisive_evidence
+    - remaining_risk_or_open_question
+    - timing_observation
+
+timing_observation:
+  policy_id: worker-done-observation-v2
+  enforcement: advisory_only
+  observation_point: worker_done_only
+  worker_clock_reads:
+    - started_at
+    - completed_at
+  body_fields:
+    - expected_timing
+    - started_at_rfc3339_or_unknown
+    - completed_at_rfc3339_or_unknown
+    - elapsed_iso8601_or_unknown
+  assessments:
+    - pending
+    - on_track
+    - overrun_observed
+    - unknown
+  missing_observation: unknown_never_block
+  overrun_effect: planning_signal_only_never_fail_block_retry
+  coordinator_action: compare_once_when_consuming_worker_done
+  carry_forward: material_note_to_next_waterfall_only
+  forbidden_implementations:
+    - deadline_timer
+    - timeout_event
+    - stall_detector
+    - fixed_interval_check
+    - sleep_wait
+    - coordinator_polling
+
+coordinator_event_consumption:
+  wake_sources:
+    - orca_or_equivalent_host_notification
+    - user_notification
+  actionable_events:
+    - question
+    - escalation
+    - worker_done
+  inbox_check_mode: single_non_waiting_check_per_notification
+  mailbox_scope: coordinator_own_mailbox_only
+  worker_inbox_read_by_coordinator: forbidden
+  automatic_check_wait: forbidden
+  periodic_polling: forbidden
+  heartbeat_turns: forbidden
+  post_ack_polling: forbidden
+  baseline_source_read: once_before_dispatch
+  duplicate_worker_source_analysis: forbidden
+  result_intake: short_body_first
+  body_insufficient_fallback: one_relevant_artifact_or_report_slice_once
+  forbidden_context_intake:
+    - worker_read
+    - transcript_replay
+    - repeated_terminal_read
+    - repeated_large_git_status_or_diff
+    - repeated_source_or_plan_dump
+  normal_completion_signal: worker_done_only
+  terminal_cleanup: once_after_completion_event
+  confirmed_delivery_failure_recovery: one_bounded_resend_or_reconciliation_then_stop
+  independent_re_review: explicit_user_request_or_higher_priority_contract_only
+
+human_event_wait:
+  request_delivery: one_question_event
+  expected_response_latency: hours_possible_no_deadline
+  worker_active_turn: yielded_after_independent_authorized_work
+  worker_session: passive_and_resumable
+  resume_trigger: delivered_worker_inbox_follow_up_only
+  pending_state: awaiting_human_event
+  pending_is_not:
+    - worker_done
+    - timeout
+    - failure
+    - dag_blocked
+  coordinator_reminders: forbidden
+  timing_accounting: exclude_human_response_latency
+  denied_or_unavailable_interaction: follow_user_work_contract
+
+human_test_transition:
+  phase_gate_delivery_default: true
+  owner: user
+  readiness_condition: all_required_agent_nodes_complete_and_static_review_ready
+  current_plan_termination: human_test_ready
+  current_pair_policy: complete_and_never_resume_from_test_result
+  agent_wait_policy: handoff_and_stop_without_polling
+  result_disposition: create_new_plan_id_and_new_plan_handoff_pair
+  next_plan_inputs:
+    - human_test_observation
+    - pass_or_fail
+    - artifact_anchor_if_available
+    - new_worklist
+    - new_design_brief
+  failure_transition: new_waterfall_only
+  machine_check_boundary: pre_handoff_support_only_never_relabels_human_test
+
+resource_safety:
+  fixed_interval_sleep: forbidden_for_liveness
+  busy_wait: forbidden
+  prior_grok_wait_interval: unverified_15_seconds_or_15_minutes
+  prior_kernel_task_report: unverified_near_500_percent_cpu
+  causality_policy: resource_signal_not_proof_of_model_or_timeout_cause
+  pressure_signals:
+    - sustained_cpu_pressure
+    - thermal_pressure
+    - kernel_task_spike
+  response:
+    - capture_one_compact_observation
+    - stop_wait_or_process_loop
+    - no_automatic_retry
+    - escalate_for_operator_decision
+
+roles:
+  orchestrator:
+    agent: orchestrator
+    model: Opus 5
+    effort: medium
+    selected_skills: []
+    boundary: DAG, dispatch, lifecycle forwarding, escalation, and stop conditions only; no polling, wait turns, or production writes
+
+  coordinator:
+    agent: coordinator
+    model: Opus 5
+    effort: medium
+    selected_skills: []
+    boundary: follow the copied Plan/Handoff contract as an event-only Coordinator, consume compact results, apply existing edges, and record condition evidence; no planning skill, external runner, or duplicate worker analysis
+
+  architect:
+    agent: architect
+    model: gpt-5.6-sol
+    effort: xhigh
+    selected_skills:
+      - skill-system-dev:analysis-boundary-design
+    optional_skills:
+      - skill-system-dev:analysis-domain-modeling
+      - skill-system-dev:analysis-algorithm
+      - skill-system-dev:analysis-performance
+    boundary: evidence-backed recommendation; product authority stays with the declared owner
+
+  prototype_owner:
+    agent: prototype_owner
+    model: Fable 5
+    effort: high
+    selected_skills:
+      - skill-system-dev:workflow-prototype
+    boundary: one isolated throwaway discriminator; no production pre-implementation
+
+  implementation_owner:
+    agent: implementation_owner
+    model: Grok 4.6
+    effort: high
+    selected_skills:
+      - skill-system-dev:workflow-implementation
+    boundary: sole production writer for concrete delegated implementation slices
+
+  fresh_read_only_reviewer:
+    agent: fresh_read_only_reviewer
+    model: gpt-5.6-sol
+    effort: xhigh
+    selected_skills:
+      - skill-system-dev:workflow-code-review
+    optional_skills:
+      - skill-system-dev:analysis-codebase-map
+    boundary: optional explicit or higher-contract independent reviewer; same Core review-card contract, optional source map, and no writes or Plan transitions
+
+  human_judgment:
+    agent: user
+    model: human
+    effort: qualitative_grade
+    selected_skills: []
+    boundary: product meaning, interaction feel, visible quality, and final qualitative grade

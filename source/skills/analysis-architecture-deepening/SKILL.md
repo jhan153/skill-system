@@ -12,12 +12,12 @@ description: Rank evidence-backed improvements across deep modules, seams, adapt
 - do_not_use_when:
   - one boundary/interface is selected: `analysis-boundary-design`
   - architecture map, HLD/LLD modeling, or Mermaid flow/structure/state diagrams: `analysis-codebase-map`
-  - recurring bug root cause: `analysis-bug`
+  - recurring bug root cause: current task owner for diagnosis-only, or `workflow-bug-fix` when repair is requested
   - domain concepts/invariants: `analysis-domain-modeling`
   - measured bottleneck: `analysis-performance`
   - direct production change: route by the selected candidate's change contract—`workflow-refactor-safely` for behavior-preserving live restructuring, `workflow-source-maintenance` for proven-obsolete deletion, or `workflow-implementation` for behavior changes
 - expected_inputs: user-named scope or bounded recent-change history, pain/change signals, implementation appetite
-- expected_outputs: sampling basis, coverage, evidenced friction, ranked candidates, next candidate, handoff, unverified gaps
+- expected_outputs: sampling basis, coverage, evidenced friction, ranked candidates, an evidenced next candidate or exact discriminator, handoff, and unverified gaps
 - context_targets:
   - must_read: goal, compact scope outline, and production path/owner evidence for shortlisted candidates
   - read_if_needed: discriminating callers, contracts, failures, diffs, metrics, or formal invariants
@@ -61,7 +61,11 @@ Track the scope decision, recent-history window when used, change-weighted prior
 
 Rank ordinally by leverage, knowledge/change removed, observed pressure, counterevidence, validation/reversibility, and cost/blast radius. Avoid fake precision.
 
-Stop when groups are inventoried or excluded, 3–5 candidates have discriminating evidence (or an explicit deficit), a counter-sample preserves the leader, and it has a design question and validation path.
+Stop when groups are inventoried or excluded and either:
+- 3–5 established candidates have discriminating evidence, a counter-sample preserves the leader,
+  and the leader has a design question and validation path; or
+- the evidence deficit is explicit and one smallest discriminator is named, with no leader or
+  recommendation claimed.
 
 ## Output Contract
 Return only:
@@ -69,8 +73,11 @@ Return only:
 - `sampling_basis` as `user_named | recent_change_weighted | representative_widened`, including excluded mechanical churn when history was used
 - `friction_signals` with evidence scope and references
 - `candidates` with stable IDs, `ranking`, and counterevidence
-- `recommended_next_candidate` as a ranked candidate ID (never `none` when ranking an opportunity), plus the decisive tradeoff
+- `recommended_next_candidate` as an established ranked candidate ID plus the decisive tradeoff;
+  when no candidate is established, return `none` with the exact discriminator instead
 - `handoff` to `analysis-boundary-design` when one boundary still needs design, `workflow-refactor-safely` for selected behavior-preserving live restructuring, `workflow-source-maintenance` for selected proven-obsolete deletion, or `workflow-implementation` for selected behavior changes
 - `unverified_gaps`
 
-Do not implement, generate a repo-wide report, or expand the shortlist into an exhaustive backlog.
+This skill may identify and rank the next change question, but it never starts implementation,
+refactoring, deletion, or plan execution. Hand the selected candidate to its named Workflow. Do not
+generate a repo-wide report or expand the shortlist into an exhaustive backlog.

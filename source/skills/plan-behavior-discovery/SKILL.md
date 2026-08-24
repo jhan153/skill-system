@@ -13,18 +13,19 @@ description: Run an explicitly requested, one-question behavior discovery turn f
 - do_not_use_when:
   - greenfield elicitation belongs to `plan-requirements-discovery`; selected code work to `workflow-implementation`; explanation artifacts to `report-implementation-explainer`.
   - the user asks for recall testing, generic ideation, bug diagnosis, implementation verification, or an exhaustive release checklist.
-- expected_inputs: concrete capability/path, underlying current-behavior anchors, actor/constraints, accepted decisions, and open behavior gaps
-- expected_outputs: one evidence-grounded question, a ledger delta, and a bounded next-slice handoff
+- expected_inputs: concrete capability/path, underlying current-behavior anchors, actor/constraints, accepted decisions, open behavior gaps, and optional Execution Handoff package/plan id
+- expected_outputs: one evidence-grounded question, a ledger delta, and a bounded next-slice handoff; when package-bound, `inputs/behavior-decisions.md`
 - context_targets:
   must_read:
     - explicit discovery request, target capability/actor/path, and smallest underlying source/runtime evidence
   read_if_needed:
     - narrow production path, trace/readback, accepted product decisions, or an explainer used only to locate its cited anchors
+    - `references/execution_handoff_input_contract.md` and `references/behavior-decision-record.md` when persisting into an associated package
   do_not_load_by_default:
     - full repository/roadmap/release plan/history or every possible UX question
 - risk_profile:
   reads: supplied decisions and narrow source/runtime evidence
-  writes: none by default; persist a record only when explicitly requested
+  writes: none by default; when an associated package or explicit persistence request is supplied, update only `<package-root>/inputs/behavior-decisions.md`
   tools: focused read-only inspection; no implementation or validation execution
   sensitive_resources: credentials/private data default deny; prefer anonymized states
 - entry_scene: PREPARE
@@ -32,6 +33,11 @@ description: Run an explicitly requested, one-question behavior discovery turn f
 ## Decision Contract
 
 Own one `one_shot` decision turn within `core_capability_available -> next_vertical_slice_decision_ready`. The conversation may continue with another explicit turn, but no persisted plan state, implementation approval, operability, validation, or release completion follows automatically.
+
+When an Execution Handoff package is bound, record each delta in
+`inputs/behavior-decisions.md` under `execution-handoff-inputs-v1`. Only `decided` rows may
+constrain Plan compilation; `assumed`, `delegated`, and `open` rows stay visible but
+non-authoritative. Without a package or persistence request, keep the result inline.
 
 Ask only about what a person can do or observe. Open-book source, docs, and side-chat use is valid; progress is an observable product decision, not code recall or a claim of understanding.
 
@@ -53,6 +59,6 @@ For irreversible/high-risk choices—persistent data, topology mutation, externa
 
 ## Output And Handoff
 
-During the interview, return current evidence, the one question, and the latest delta when useful. At stop or explicit artifact request, return a compact `behavior_decision_record`: capability snapshot, next user path, decisions/open deferrals, observable acceptance/falsifiers where required, implementation handoff, and remaining productization gaps.
+During the interview, return current evidence, the one question, and the latest delta when useful. At stop or explicit artifact request, return a compact `behavior_decision_record`: capability snapshot, next user path, decisions/open deferrals, observable acceptance/falsifiers where required, implementation handoff, and remaining productization gaps. In package-bound mode, persist that shape with [Behavior Decision Record](references/behavior-decision-record.md) and return its path/status.
 
 Hand selected code work to `workflow-implementation`; explanation needs to `report-implementation-explainer`; use `plan-requirements-discovery` when no concrete capability/path exists. Before returning, confirm one active decision, an underlying evidence anchor, risk-proportional admission, observable options, and the next-slice stop. Emit no quiz score, `understood` flag, implementation permission, or release claim.

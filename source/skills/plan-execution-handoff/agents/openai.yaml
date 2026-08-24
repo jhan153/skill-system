@@ -1,0 +1,20 @@
+interface:
+  display_name: "Plan Execution Handoff"
+  short_description: "Create governed Plan and Handoff execution pairs"
+  default_prompt: "Use $plan-execution-handoff to create a plan-handoff-v6 typed DAG, consume Core execution-item cards without ceding Plan transitions to workers, and record advisory worker_done timing. Most plans use ordinary phase delivery; load repeated-work principles only for an admitted verifier-steered graph, and terminate phase_gate_delivery at human_test_ready."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: long_plan
+  role: durable_execution_handoff
+  contains:
+    - task_ticket
+  typical_agentic_duration: "multiple sessions"
+
+planning_altitude:
+  kind: durable_execution_handoff
+  artifact_level: plan_handoff_pair

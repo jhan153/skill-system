@@ -1,7 +1,0 @@
-interface:
-  display_name: "Management Memory Bank Harness"
-  short_description: "Read a narrow declared project Memory slice"
-policy:
-  invocation_surface: support_only
-  allow_implicit_invocation: true
-  may_own_execution: false

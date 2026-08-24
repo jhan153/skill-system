@@ -1,7 +1,0 @@
-interface:
-  display_name: "Workflow Minimal Implementation"
-  short_description: "Conditional YAGNI implementation policy"
-  default_prompt: "Use $workflow-minimal-implementation to stop at the first sufficient production-path change, justify every new layer, and require a decisive check or explicit gap."
-
-policy:
-  allow_implicit_invocation: false

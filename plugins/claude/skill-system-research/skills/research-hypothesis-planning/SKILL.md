@@ -32,23 +32,16 @@ description: Narrow a raw research premise into one falsifiable claim and the ch
     - credentials default deny
 - entry_scene: PREPARE
 
-## Exact Stage Route
-| Request | Owner |
-| --- | --- |
-| raw premise, mechanism, loss, or ablation validity | `research-hypothesis-planning` |
-| hypotheses derived from an evidence ledger | `research-literature-ideation` |
-| current paper evidence acquisition | `search-paper-evidence` |
-| selected claim to full protocol | `research-experiment-blueprint` |
-| approved blueprint to runnable code | `research-experiment-scaffold` |
-| real result analysis | `research-statistical-analysis` |
-| selected method implementation | `workflow-implementation` |
-
-Use the exact owner. Research vocabulary inside coding work does not change the route.
+## Stage Boundary
+Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
+intent, or Plan/Handoff mapping matters. This skill owns one claim and discriminator only. Research
+vocabulary inside coding work does not change the route, and completing this plan never starts a
+blueprint, scaffold, implementation, or evidence-search stage.
 
 ## Workflow
 1. Label each premise `supported`, `user_hypothesis`, `unverified`, `overgeneralized`, or `needs_current_evidence`; never invent literature, novelty, or results.
 2. Define one target with scope, intervention, mechanism, observable prediction, and falsifier. Request missing essentials instead of emitting a large plan.
-3. Keep two rival explanations until one observation separates their predictions. Mark broad field/dataset/model claims as non-assumptions and route current evidence acquisition to `search-paper-evidence`.
+3. Keep two rival explanations until one observation separates their predictions. Mark broad field/dataset/model claims as non-assumptions. When current paper evidence is missing, name the evidence gap and `search-paper-evidence` as its owner without invoking it automatically.
 4. Choose the cheapest Stage-0 discriminator: checkpoint/baseline evaluation, re-scoring, error analysis, or dataset/label audit. Train only for a gap Stage 0 cannot resolve.
 5. If needed, change one causal factor, freeze the rest, and defer architecture, data, schedule, and extra objectives.
 6. Predefine metric plus support, refute, and inconclusive signals.

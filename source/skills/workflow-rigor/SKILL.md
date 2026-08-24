@@ -1,103 +1,96 @@
 ---
 name: workflow-rigor
-description: Risk-proportional evidence, review, and completion control for behavior-changing work.
+description: Attach optional risk-proportional execution assurance to an active behavior-changing workflow when independent checker separation, rollback/readback, or explicit strict evidence is material. This is the Workflow family's non-node execution modifier; it never owns mutation, Plan transitions, or ordinary low-risk evidence handling.
 ---
 
 # Workflow Rigor
 
 ## Routing Card
+
+- family: workflow
 - role: execution_modifier
-- intent_signature:
-  - `strict-evidence`, `strict-reporting`, `execution-strict`, `evidence-workflow`, `실행통제`
+- intent_signature: strict evidence, independent checker, rollback/readback assurance, execution rigor, 실행 통제
 - use_when:
-  - implementation or another behavior-changing task needs risk-proportional proof, checker separation, rollback, or readback.
+  - an active behavior-changing workflow has a material maker/checker separation problem;
+  - destructive, auth/security, schema/data, infrastructure, external-write, or broad-refactor risk requires stronger assurance; or
+  - the user or an accepted contract explicitly requests strict execution evidence.
 - do_not_use_when:
-  - pure Q&A, harmless edits, or formatting-only work; or the primary workflow already provides the same gates.
-- expected_inputs:
-  - primary workflow, scope, material conditions/risks, and evidence surfaces
-- expected_outputs:
-  - mode/risk basis, condition evidence, review, and uncertainty
+  - no primary execution owner is active;
+  - the work is low-risk, explanation-only, formatting-only, or already covered by an equivalent specialist gate; or
+  - the request is merely to run ordinary validation or produce a report.
+- expected_inputs: active workflow or DAG node, fixed implementation snapshot, material conditions and risks, available evidence, and accepted exit gates
+- expected_outputs: assurance mode and basis, fixed point, independent review evidence when required, rollback/readback evidence when required, and remaining uncertainty
 - context_targets:
-  must_read:
-    - request, primary workflow scope, and planned/actual changed files
-  read_if_needed:
-    - risk-specific policy, validation contract, or failing output
-  do_not_load_by_default:
-    - full repo, memory, unrelated plans/reports, or policy copies
+  must_read: active request/contract, primary owner scope, fixed implementation snapshot, and the evidence directly tied to the selected assurance mode
+  read_if_needed: one governing Contract/Spec slice, one Repository/Constraints slice, or the exact rollback/readback surface
+  do_not_load_by_default: full repository, full Plan/Handoff, unrelated reports, worker transcripts, or previous reviewer reasoning
 - risk_profile:
-  reads: targeted evidence for the selected mode
-  writes: none directly; the primary workflow owns mutation
-  tools: risk-targeted checks, readback, and read-only review
-  sensitive_resources: credentials default deny; runtime policy owns approvals and side effects
-- entry_scene:
-  - PREPARE
+  reads: fixed snapshot, governing sources, and targeted evidence
+  writes: none; the primary workflow owns mutation
+  tools: targeted readback and independent read-only review only
+  sensitive_resources: runtime policy owns permission and side-effect boundaries
+- entry_scene: PREPARE
 
-## Modifier Contract
-- Attach rigor requirements to the primary workflow; do not re-plan or reimplement its task.
-- Runtime policy remains authoritative; this skill controls only proof depth, checker separation, and completion claims.
-- Select mode from consequence, coupling, reversibility, and verification difficulty—not file count or task duration.
-- Add only checks that discriminate a realistic material failure. Reuse equivalent specialist gates.
+## Identity
 
-## Modes
+`workflow-rigor` belongs to the Workflow family because it changes how active execution is
+assured. It is not an executable work node. Attach it to one primary workflow or declared DAG
+node; never schedule it as a successor, give it production ownership, or let it select the next
+node.
 
-If the task matches `do_not_use_when`, attach no rigor mode. `lite` applies only after a behavior-changing primary workflow is already active; it is not a reason to govern harmless text, formatting, or explanation work.
+The global harness already owns baseline evidence integrity, result labels, and the rule that a
+check proves only its matching condition. Do not invoke this skill to restate that baseline. Its
+only distinct job is optional assurance above the baseline.
 
-| mode | choose when | added gate |
-| --- | --- | --- |
-| `lite` | local, reversible, low-coupling change with an observable result | focused direct check; diff review only for remaining uncertainty |
-| `standard` | meaningful behavior change, moderate coupling, non-trivial regression surface, or a material semantic claim resting mainly on maker-authored implementation and checks | direct behavior/regression evidence plus one relevant independent review axis when available |
-| `strict` | destructive, auth/security, schema/data migration, infra, external-write, broad-refactor, or explicit highest-rigor work | separate independent Contract/Spec and Repository/Constraints passes when available, plus rollback/readback evidence where relevant |
+## Assurance Modes
 
-Escalate when evidence widens risk; de-escalate when it proves risk local. Size alone does not require `strict`.
+If neither mode is triggered, do not attach this skill.
+
+| Mode | Select when | Added assurance |
+|---|---|---|
+| `standard` | A material completion claim otherwise rests mainly on maker-authored implementation and checks, or moderate risk makes one independent challenge valuable. | Pin one fixed point and run the single `Contract/Spec` or `Repository/Constraints` pass most likely to falsify the claim. |
+| `strict` | Destructive, auth/security, schema/data migration, infrastructure, external-write, broad-refactor, or explicitly highest-rigor work is in scope. | Keep `Contract/Spec` and `Repository/Constraints` as separate independent passes and include rollback/readback evidence where relevant. |
+
+Reviewer availability does not create work. If an independent pass is material but unavailable,
+record that limitation and lower the task result label. It changes a node or plan state only when
+the accepted contract already names that assurance as an exit gate.
+
+## Review Axes
+
+- `Contract/Spec`: missing or partial requirements, wrong behavior, scope drift, and mismatch
+  against the accepted source.
+- `Repository/Constraints`: repository instructions, architecture and ownership boundaries,
+  compatibility, accepted local patterns, and material defects introduced by the fixed snapshot.
+
+Give an independent reviewer the fixed snapshot and only its governing axis. Do not seed the
+expected verdict, maker conclusion, or another review. Review judgment never replaces direct
+condition evidence or turns maker-authored checks into an independent product oracle.
+
+## Attachment Contract
+
+- The primary workflow retains scope, writes, validation ownership, finding resolution, and final
+  synthesis.
+- In a DAG, record `assurance: standard | strict` on the owning node or graph contract. Rigor itself
+  is not a node and creates no edge.
+- If the Plan requires a separate review node, the Coordinator schedules the declared review
+  workflow and consumes its normal result. `workflow-rigor` neither produces nor consumes Core
+  execution cards.
+- Rigor cannot edit Plan/Handoff, grant permission, choose a successor, finalize a Known Bug, or
+  turn unavailable evidence into `blocked` unless the accepted exit gate is genuinely unmet.
+- Reuse an equivalent specialist review or readback; never duplicate it only to satisfy a mode.
 
 ## Workflow
-At the primary workflow's checkpoints:
 
-1. `prepare`: select the mode; name each material condition, realistic failure, and deciding evidence.
-2. `before side effect`: identify the runtime approval plus rollback/readback signal. This skill grants no permission.
-3. `validate`: observe the direct result and smallest risk-specific regression surface.
-4. `review`: pin the fixed point and inspect the diff/results on the applicable axes below; the implementation owner resolves or carries findings.
-5. `finalize`: match material claims to deciding evidence and expose unresolved conditions.
-
-## Review Axes And Independence
-
-Pin one fixed point before review: the named commit/merge-base or the captured pre-change diff, plus the accepted request/spec/contract that defines intended behavior.
-
-- `Contract/Spec`: check missing or partial requirements, wrong behavior, scope creep, and mismatches against the accepted source.
-- `Repository/Constraints`: check repository instructions, architecture/ownership rules, accepted local patterns, compatibility, maintainability, and material defects introduced by the diff. Generic style preference is not authority unless the repository, accepted design, or an observable defect makes it relevant.
-
-Keep the axes separate. A pass on one never masks a failure or unavailable input on the other, and the implementation owner aggregates without merging or reranking their findings.
-
-For `strict`, run each applicable axis as a separate independent read-only review when subagents or equivalent reviewers are available. Give each reviewer the fixed point, raw diff/changed artifacts, and only its own governing sources; do not reveal the intended verdict, the maker's conclusion, or the other review. For `standard`, use at least one independent pass when a material completion claim otherwise depends mainly on maker-authored implementation, tests, or self-review; choose the axis most likely to falsify the claim. `lite` may remain self-reviewed.
-
-If an independent reviewer is unavailable, report that axis as unavailable and lower the result label where it is material; do not call the maker's second pass independent. A review is judgment evidence, not an execution verifier, and it never turns a maker-authored test into an independent product oracle.
-
-Reviewer availability changes execution states such as `batch_complete`, `phase_complete`, or `plan_complete` only when the accepted contract names review as an exit gate. Otherwise it changes the task-level evidence label while the underlying condition states remain governed by their direct evidence.
-
-## Semantic Evidence Gate
-- Name what each diff, command, validator, render, interaction, or readback proves. It decides only a matching condition.
-- Static checks prove structure; mocks prove their boundary; an agent-authored test is a self-check for its asserted contract, not an independent oracle for an inferred user contract. A test derived from the same mistaken interpretation can pass while the product requirement still fails.
-- A lower-scope pass, clean review, or command exit cannot override conflicting runtime evidence, a missing artifact, stale output, or an uncovered required condition. Fix a conflict in its actual production owner and repeat the same deciding observation.
-- Separate `validation_agent` (observed) from `validation_user` (user-only/unavailable, or `N/A` with reason). Name the exact user observation; GUI, credentialed, private-service, and unavailable conditions stay `user-verification-needed` or `unverified`.
-- Mark accepted risk only with approver, reason, affected condition, and revisit point.
-
-## Escalation and Stop
-- If the same failure survives an intervention, hand its slice to `workflow-recovery`; do not stack speculative patches.
-- Stop when the next required proof needs missing access, approval, external state, or user-only observation.
-- When blocked, return the exact blocked condition, up to three attempted steps, and one next action.
-- Never downgrade contradictory or missing evidence to completion because a lower-scope check passed.
+1. Confirm the active primary owner, material conditions, accepted exit gates, and fixed point.
+2. Select `standard`, `strict`, or no attachment from consequence, reversibility, coupling, and
+   evidence independence—not file count or duration.
+3. Run only the additional independent pass or rollback/readback observation selected by that
+   mode.
+4. Return the assurance evidence and its exact scope to the primary owner. Preserve contradictions
+   and unavailable inputs without changing the owner's task state.
 
 ## Output Contract
-Return fields, not a second workflow narrative:
 
-- all modes: `mode`, `risk_basis`, `scope`, `changed_files`, `decisive_evidence`, `validation_agent`, `validation_user`
-- `standard` and `strict`: `review_pass` with fixed point, axis, reviewer independence, findings, and unavailable inputs
-- `strict` when relevant: `rollback_or_readback`, `remaining_uncertainty`
-- blocked only: `blocked_condition`, `attempted_steps`, `next_action`
-
-Omit empty optional fields. A separately requested report skill may shape presentation without changing these evidence requirements.
-
-## Context Boundary
-- Read changed/implicated code, its validation contract, and risk policy. Expand one layer to a nearby owner/rule or failing output only when needed.
-- This modifier cannot grant permission, create missing evidence, replace a specialist verifier, or prove behavior outside observed checks.
-- Before returning, confirm the mode matches actual risk, checks discriminate material failures without duplicating specialist gates, contradictions remain visible, and claims do not exceed observed surfaces.
+Return only applicable fields: `assurance_mode`, `risk_basis`, `fixed_point`,
+`independent_review`, `rollback_or_readback`, `unavailable_inputs`, and
+`remaining_uncertainty`. Do not return changed files as if this modifier owned the implementation.

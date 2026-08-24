@@ -24,5 +24,7 @@ Load only for the `section-web` profile of `design-frontend`: a landing, product
 
 ## Handoff
 
-- Use `design-visual-regression` for first viewport, responsive order, overflow, and clipping checks.
-- Use `design-a11y-audit` for headings, landmarks, CTA names, focus order, and contrast.
+- When the user or accepted Plan assigns them, name `design-visual-regression` for first-viewport,
+  responsive-order, overflow, or clipping evidence and `design-a11y-audit` for headings,
+  landmarks, CTA names, focus order, or contrast evidence.
+- Do not invoke either evidence skill automatically from this profile.

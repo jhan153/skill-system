@@ -1,6 +1,6 @@
 ---
 name: design-frontend
-description: "Implement concrete Figma, screenshot, mockup, spec, or UI-reference designs as repo-integrated frontend/native code, including product-family governed surfaces, mobile/native screens, dense dashboards, and section-based web pages. Reuse approved components, tokens, assets, and repo patterns; validate source fidelity and family coherence when those contracts exist. Not for backend-only work, critique, ideation, refactors, or throwaway demos."
+description: "Implement a concrete visual artifact or Core design_result as repo-integrated frontend/native code for direct work or an assigned Plan DAG node. Reuse approved components, tokens, assets, and repo patterns; validate only the applicable source, family, interaction, and accessibility conditions. Not for creating the upstream visual design, backend-only work, critique, product ideation, refactors, or throwaway demos."
 ---
 
 # Design Frontend
@@ -43,11 +43,14 @@ description: "Implement concrete Figma, screenshot, mockup, spec, or UI-referenc
     - `references/mobile-screen-implementation.md` for mobile/native constraints
     - `references/dashboard-ui-implementation.md` for dense operational dashboards
     - `references/section-based-web-implementation.md` for section-based pages
-    - `references/layout-constraints.md` for Auto Layout/flex/grid translation
-    - `references/product-family-profile.md` when the repo declares a shared product-family theme, approved component catalog, or family baselines
+    - `references/design_stage_contract.md` when the task is part of a multi-stage request or Plan/Handoff DAG
+    - `references/design_evidence_contract.md` for shared evidence labels and proof ceilings
+    - `references/layout_constraint_contract.md` for Auto Layout/flex/grid translation
+    - `references/product_family_design_contract.md` when the repo declares a shared product-family theme, approved component catalog, or family baselines
     - `references/ux-pattern-decision-guide.md` when requirements leave a material interaction pattern or control choice open
-    - `references/ui-quality-checklist.md` for final visual review
     - `references/visual_decision_contract.md` when the source, family profile, or repo tokens do not already decide the look, or when filling unspecified chrome
+    - `references/identifier_readability_principle.md` when the implementation introduces or renames a related component, prop, state, event, or handler identifier set not already decided by repository conventions
+    - `references/execution_item_contract.md` when consuming `design_result` or returning implementation/review/repair evidence across a Coordinator, Plan/Handoff, or plugin boundary
   do_not_load_by_default:
     - backend-only modules
     - unrelated screens
@@ -64,8 +67,28 @@ description: "Implement concrete Figma, screenshot, mockup, spec, or UI-referenc
 - entry_scene:
   - PREPARE
 
+## Core Cards
+
+- produces: `references/core-execution-items-v1/cards/implementation_result.md`
+- consumes: `references/core-execution-items-v1/cards/design_result.md`, `references/core-execution-items-v1/cards/code_review_result.md`, `references/core-execution-items-v1/cards/bug_fix_result.md`, `references/core-execution-items-v1/cards/known_bug_record.md`
+
+Cross-owner review and repair follow `references/execution_item_contract.md`. This owner may report
+or consume the assigned items, but it never creates repair/re-review nodes, selects a successor, or
+turns a design artifact into implementation evidence.
+
+## Stage Boundary
+
+Apply `references/design_stage_contract.md`. This skill is the only production UI writer in the
+Design family. Consume design, analysis, mapping, and evidence inputs without starting their owners;
+return implementation and gaps only. Use `references/design_evidence_contract.md` to keep source,
+implementation, render, component, token, accessibility, and Human Test claims separate.
+
 ## Success Contract
-Success means real repository code renders the requested surface, follows the selected source artifact within available evidence, obeys any pinned product-family contract, and covers relevant responsive and interaction states. When a catalog applies, affected controls reuse approved components or carry an authorized exception; without a catalog, they reuse verified existing repo patterns or document the smallest justified local boundary. A task-bearing interactive route/screen needs a checked critical user path, while a component/story needs scoped state, event, keyboard, and rendering evidence. Any material open control choice needs an evidence-based decision. Visual/accessibility/build evidence or an honest unavailable-evidence status is required; an isolated mockup, unsupported reuse claim, or green build alone is not completion.
+Success means real repository code renders the requested surface and satisfies the material
+implementation conditions accepted by the user or Plan. Apply product-family, catalog, interaction,
+visual, and accessibility conditions only when they are applicable and in scope; unavailable
+supporting evidence changes only its condition label. An isolated mockup, unsupported reuse claim,
+or green build alone is not implementation evidence.
 
 ## Surface Profile
 Select at most one primary surface profile and load only its reference:
@@ -77,22 +100,23 @@ Select at most one primary surface profile and load only its reference:
 Do not activate multiple profiles merely because a responsive dashboard has a mobile viewport. Choose by the surface's primary interaction model; use the other reference only for a distinct nested surface that materially changes implementation.
 
 ## Workflow
-1. **Inspect the host project and resolve governance.** Identify framework, package manager, route/screen registration, components, tokens, styling, icons, assets, state/data patterns, nearby UI, preview path, and validation commands. Search for a product-family profile or equivalent repo policy; when found, pin its source plus a stable version or digest before editing. Do not invent a profile when none is declared.
+1. **Inspect the host project and resolve governance.** Identify framework, package manager, route/screen registration, components, tokens, styling, icons, assets, state/data patterns, nearby UI, preview path, and validation commands. Search for a product-family profile or equivalent repo policy; when found, apply `references/product_family_design_contract.md` and pin its source plus a stable version or digest before editing. Do not invent a profile when none is declared.
 2. **Lock the target.** Name the route/screen/component/story/native view, source artifact, viewport, state, variant, and write boundary. Integrate through the project's normal surface; create a standalone artifact only when explicitly requested.
-3. **Capture the source reference.** Save or identify the exact frame, screenshot, PDF page, or spec before coding when tooling permits. Let it own target content, hierarchy, geometry, state intent, and viewport composition; use nearby surfaces only as supporting evidence. Obtain required assets; if access is insufficient, request only the missing export/screenshot/asset that materially affects fidelity.
-4. **Extract the design contract.** Capture hierarchy, geometry, spacing, typography, color, border/radius/elevation, imagery/icons, density, breakpoints, text wrapping/overflow, states, interactions, motion, focus, and accessibility. Separate confirmed details, inferred measurements, unavailable assets/fonts, intentional family-token substitutions, missing family tokens, and conflicts. A missing look is not a license to invent one.
+3. **Capture the source reference.** Save or identify the exact frame, screenshot, PDF page, spec, or accepted Core `design_result` before coding when tooling permits. Let it own target content, hierarchy, geometry, state intent, and viewport composition within its stated authority; use nearby surfaces only as supporting evidence. Obtain required assets; if access is insufficient, request only the missing export/screenshot/asset that materially affects fidelity.
+4. **Extract the design contract.** Capture hierarchy, geometry, spacing, typography, color, border/radius/elevation, imagery/icons, density, breakpoints, text wrapping/overflow, states, interactions, motion, focus, and accessibility. Apply the evidence labels and proof ceilings from `references/design_evidence_contract.md`. A missing look is not a license to invent one.
 5. **Decide open UX patterns.** When the artifact and catalog do not already determine a material control or interaction pattern, identify the supplied primary user task, frequency/expertise, choice complexity, reversibility/error cost, latency/failure modes, platform/input, and required recovery states. Read `references/ux-pattern-decision-guide.md`, record the selected catalog control and rejected alternatives, and do not invent product strategy or KPIs.
-6. **Map to approved repo controls.** Search the approved catalog and similar local surfaces before adding any app-surface primitive. When a family profile declares a catalog, invoke `design-component-mapper` and produce planned mapping plus post-change app-surface import/use evidence. Treat a catalog match as mandatory unless the profile contains an applicable authorized exception.
-7. **Implement the smallest complete slice.** Change actual source files, preserve visible copy, include supplied assets or documented substitutes, implement visible/relevant states and recovery, and wire the surface into the project. Avoid unrelated screens, fake flows, broad restyling, parallel design systems, and decorative filler. If source, family, and repo tokens do not decide the look, read `references/visual_decision_contract.md` and keep unspecified chrome repo-neutral or ask; do not mint a generative landing-page kit. Keep a sourced brand, including a purple identity or glass the source actually uses.
+6. **Map to approved repo controls.** Search the approved catalog and similar local surfaces before adding any app-surface primitive. Consume an accepted component mapping when supplied. When mapping evidence is material but no separate Plan node exists, record the mapping and unresolved gaps within this implementation scope; do not invoke `design-component-mapper` automatically. Treat an applicable catalog match as mandatory unless the family contract contains an authorized exception.
+7. **Implement the smallest complete slice.** Change actual source files, preserve visible copy, include supplied assets or documented substitutes, implement visible/relevant states and recovery, and wire the surface into the project. Avoid unrelated screens, fake flows, broad restyling, parallel design systems, and decorative filler. If source, family, and repo tokens do not decide the look, read `references/visual_decision_contract.md` and keep unspecified chrome repo-neutral or ask; do not mint a generative landing-page kit. Keep a sourced brand, including a purple identity or glass the source actually uses. When `references/identifier_readability_principle.md` is active, own only identifiers introduced or renamed in this UI slice, preserve repo and domain naming authority, and hand material static ambiguity to `workflow-code-review`.
 8. **Validate and iterate.** Run declared family-policy commands, focused build/typecheck/lint/tests, and the strongest available preview. Exercise at least one critical user path for a task-bearing interactive route/screen; for a component/story, exercise its relevant states, events, keyboard behavior, and rendering. Capture exact viewport evidence, compare both to the target source and to declared family baselines, and fix material mismatches.
-9. **Report.** Name changed files/surface, pinned profile, source reference, UX decisions, component reuse/exception evidence, checks, screenshots/viewports, target and family-coherence verdicts, substitutions, unavailable evidence, and final status.
+9. **Report.** Name changed files/surface, consumed `design_result` when applicable, pinned profile, source reference, UX decisions, component reuse/exception evidence, checks, screenshots/viewports, target and family-coherence verdicts, substitutions, unavailable evidence, and final status. In graph mode, return Core `implementation_result` with `design_result_ref`; never select Code Review or the successor node.
 
 ## Conditional Guardrails
 
-Read [Implementation Guardrails](references/implementation-guardrails.md) before editing when the task touches product-family governance, app-surface controls, mutations/integration, assets/dependencies/generated code, an accepted loop, or a material status decision. Keep that detail out of the default context for simple general-profile surfaces.
+Read [Implementation Guardrails](references/implementation-guardrails.md) before editing when the task touches product-family governance, app-surface controls, mutations/integration, assets/dependencies/generated code, an accepted repeated-work Plan, or a material status decision. Keep that detail out of the default context for simple general-profile surfaces.
 
 ## Conditional Evidence Gates
-Use a gate only when its evidence question is material; it never replaces implementation ownership.
+Use a gate only when its evidence question is material and the user or accepted Plan selected it. A
+gate never replaces implementation ownership, starts itself, or globally blocks unrelated work.
 
 | need | gate | minimum handoff |
 | --- | --- | --- |
@@ -111,3 +135,4 @@ Lead with status, then report only applicable items:
 - `ux_decisions`: critical task, selected control/pattern, rejected alternatives, required recovery states
 - `validation`: commands/results, preview target, screenshot paths, exact viewports, comparison notes
 - `remaining_gaps`: substitutions, inferred measurements, unavailable states/evidence, and user checks
+- Core `implementation_result` when graph-mode identity is supplied

@@ -9,15 +9,21 @@ it is a factory default used to look finished.
 
 ## Rule
 
-Every visual or copy mark must be sourced or removed:
+Every visual or copy mark must be sourced, explicitly proposed by the delegated visual-design
+owner, or removed:
 
 - **Sourced:** user instruction, product-family profile, approved catalog, repo
   token/theme, measured evidence, or a named brand asset.
+- **Proposed:** only when the user explicitly delegated new UI visual design to
+  `workflow-ui-design`; tie the choice to accepted content hierarchy, product behavior, platform,
+  brand context, and required states, and label it as a proposed design decision rather than
+  existing product truth.
 - **Removed:** unspecified chrome filled with a generative default so the
   surface looks designed.
 
-When unsure, keep the existing sourced look or ask. Do not invent a prettier
-default.
+Outside delegated visual creation, keep the existing sourced look or ask when the choice changes
+the deliverable. During delegated creation, make one intentional proposed decision and state its
+rationale; do not fall back to a prettier factory default.
 
 ## Principles
 
@@ -60,10 +66,14 @@ A sourced instance of any item above is not this failure.
 
 ## Design
 
-Owners: `design-frontend`, with `design-tokens`, `design-ui-decomposer`, and
-`design-visual-regression` as gates.
+Owners: `workflow-ui-design` for delegated visual creation and `design-frontend` for production
+implementation, with `design-tokens`, `design-ui-decomposer`, and
+`design-visual-regression` as evidence/support owners.
 
 - Extract the source/family/repo look before adding chrome.
+- When visual creation is explicitly delegated, turn accepted requirements and content hierarchy
+  into one coherent proposed direction; record why its typography, color, composition, density,
+  imagery, and component language fit the target.
 - If no look is decided, reuse the repo theme or a neutral system stack. Do
   not mint a landing-page kit.
 - Token gaps stay gaps. Do not fill missing color/type/radius with framework
@@ -76,7 +86,8 @@ invent metrics, and do not turn an app into a marketing page.
 
 ## Report Canvas
 
-Owners: every `report-*` skill through `report_canvas_contract.md`.
+Owners: every `report-*` skill only when HTML is selected through
+`report_delivery_contract.md` and `report_canvas_contract.md`.
 
 - Oblivion / Hagoromo is the chosen report identity. Keep that palette.
 - Spend color on status, evidence, selection, and spatial overlays — not on

@@ -1,83 +1,103 @@
 ---
 name: report-lifecycle-artifacts
-description: Package explicitly requested lifecycle artifacts and traceability across requirements, design, implementation, validation, security, release, and retrospective, with a Report Canvas trace index as the default human-facing entry point.
+description: Package and trace explicitly selected existing lifecycle artifacts across requirements, design, implementation, review, validation, security, release, and retrospective evidence. Produce a content-first Markdown index and traceability matrix by default, with optional matching lifecycle HTML on explicit html/both intent. Do not generate empty SDLC shells, replace canonical Plan/Handoff or Core Cards, execute lifecycle work, infer completion, or run automatically at closeout.
 ---
 
 # Report Lifecycle Artifacts
 
 ## Routing Card
 - role: report_primary
-- intent_signature: lifecycle/SDLC artifacts, 개발 산출물, WBS/HLD/LLD/QA/security/release, traceability matrix
+- intent_signature: explicit lifecycle artifact package, SDLC traceability index, selected delivery evidence package
 - use_when:
-  - The user explicitly requests a lifecycle package, planned shells, or evidence-backed normalization.
-  - Lifecycle records must be linked in a formal traceability matrix.
+  - the user explicitly requests packaging or normalization of named lifecycle artifacts and their evidence links
 - do_not_use_when:
-  - Do not use for implementation, planning, `docs/plan` sync, validation execution, critique-only review, or memory promotion.
-  - Changed files plus validation notes use `plan-task-handoff`; blocker-first QA critique uses `report-critical`.
-  - Missing evidence does not cancel explicit packaging; preserve the unresolved result.
-- expected_inputs: package scope or sources; evidence anchors for result claims
-- expected_outputs: Report Canvas `trace` HTML index plus the requested canonical artifact pack, traceability matrix, condition-scoped statuses, and gaps
+  - implementation, planning, status tracking, validation execution, critique, task-local inventory, or automatic closeout is primary
+  - source artifacts do not exist and the request is merely to create generic planned shells
+- expected_inputs: selected source artifacts, package scope, result/evidence authority, destination, and delivery mode
+- expected_outputs: Markdown lifecycle index, selected artifact links/normalizations, traceability matrix, preserved gaps/statuses, and optional matching HTML trace
 - context_targets:
   must_read:
-    - packaging request, included sources, and evidence for claimed results
+    - explicit package scope, selected source artifacts, and evidence supporting represented results
+    - `references/report_delivery_contract.md`
   read_if_needed:
-    - `references/artifact-tiering.md` and only the relevant templates
-    - `$REPORT_SKILL_DIR/references/report_visual_authoring.md` when a packaged 3D/math/graphics artifact must be seen
-    - narrow plan, specification, or validation files in scope
+    - `references/artifact-tiering.md` only to bound an explicitly requested package
+    - `references/traceability-matrix-schema.md` for a persisted matrix
+    - applicable requirements, Plan/Handoff, Core execution-item cards, review, validation, security, release, or retrospective artifacts named by the request
+    - `references/report_canvas_contract.md` only for selected HTML delivery
+    - `references/report_visual_authoring.md` only when packaged spatial evidence must be inspected
   do_not_load_by_default:
-    - full repository, memory bank, plan inventory, unrelated logs, or generated mirrors
+    - full repository, plan inventory, memory store, unrelated logs, generic templates, or generated mirrors
 - risk_profile:
-  reads: provided artifacts and named evidence
-  writes: one self-contained report HTML by default; canonical lifecycle files only within the explicitly requested package scope
-  sensitive_resources: deny credentials; redact secrets
+  reads: explicitly selected artifacts and condition-matched evidence
+  writes: requested Markdown index/matrix, bounded normalization of selected artifacts, and only the selected optional HTML projection
+  tools: local readback and optional report rendering; no implementation, validation, release, or external publication
+  sensitive_resources: credentials denied; redact secrets and audience-sensitive data
 - entry_scene: PREPARE
+
+## Delivery And Ownership
+
+Apply `references/report_delivery_contract.md`. Markdown is the primary lifecycle index. HTML may
+only project the same artifact graph and statuses. A missing renderer never blocks the package or
+changes a represented lifecycle result.
+
+This skill packages and links existing evidence. It never creates a Plan/Handoff, changes its
+state, reinterprets Core Cards, selects a successor, runs a gate, or claims delivery from document
+presence. It is not an automatic closeout step.
 
 ## Package Contract
 
-Use the smallest requested tier; full packs stay explicit-only. Never execute implementation or validation.
+Select only artifacts explicitly requested or already present in the selected scope. Common source
+classes include requirements, decision/design records, Plan/Handoff, implementation and review
+results, validation evidence, security/risk records, release decisions, and retrospectives. Their
+owning contracts remain authoritative.
 
-Canonical artifacts, when present: `requirements-discovery-record`, `requirements-contract`, `delivery-architecture-package`, `implementation-design-record`, `implementation-evidence-record`, `verification-and-quality-report`, `security-risk-review`, `release-readiness-report`, `delivery-retrospective`, and `lifecycle-traceability-matrix`.
+Modes:
 
-Modes: `planned_artifacts`, `design_artifacts`, `verification_artifacts`, `closeout_artifacts`, and `full_lifecycle_pack`.
+- `traceability_index`: index and matrix over selected existing artifacts; default.
+- `selected_package`: index plus explicitly requested normalization/copy of named artifacts.
+- `full_lifecycle_pack`: only when the user explicitly names the complete package scope and source
+  artifacts; missing stages remain gaps rather than generated shells.
 
-## Semantic Completion Gate
+Never create empty milestone, HLD/LLD, QA, security, release, or retrospective documents merely to
+complete a list. A requested new report is authored only from identified source evidence and stays
+within that report's actual authority.
 
-Report package construction separately from every lifecycle result. For `planned` or `not_executed` results, state: `Package completion does not imply implementation completion.` Other results may remain `evidence_unavailable`, `needs_review`, `user_verification_needed`, `blocked`, or `fail`.
+## Status And Evidence
 
-Use `evidence_unavailable` when the required oracle or actual-path evidence is absent despite agent tests or mocks; reserve `not_executed` for intentionally unrun work and `needs_review` for available evidence awaiting judgment.
+Separate package construction from represented lifecycle results. Use typed lifecycle status only
+for the source condition it describes: `planned`, `not_executed`, `evidence_unavailable`,
+`needs_review`, `user_verification_needed`, `blocked`, `fail`, or the authoritative completed state
+supplied by the source contract.
 
-For each material result, record:
+For every material link, record the source condition/claim, evidence scope, oracle origin, exact
+reference, freshness, and preserved status. Structural checks close only structural link/matrix
+conditions. Mocks, generated files, hooks, schemas, and harnesses prove only their own boundary.
+Never lower an unresolved result because the package or a narrower check succeeded.
 
-- source condition and claim;
-- evidence scope: `structural`, `runtime`, `semantic`, or `user-only`;
-- oracle origin: user decision, canonical source, external contract, formal invariant, observed behavior, or agent-authored;
-- reference, freshness, and status.
+## Workflow
 
-Use `agent-verified` only when evidence directly covers the condition at its required scope. Command exits, artifact presence, hooks, schemas, and harnesses prove only their contract. An agent-authored test may preserve an established oracle; it cannot invent one and become independent semantic proof. When only mocks pass, state: `Mocks prove only the mock boundary`, then name the required real path.
+1. Bind package purpose, audience, selected source artifacts, destination, exact represented
+   conditions, status authority, redaction boundary, and delivery mode.
+2. Read each selected artifact once and preserve its identity, owner, status, evidence anchors,
+   unresolved items, and relation to other selected artifacts. Do not reconstruct missing stages.
+3. Build only the needed traceability rows using stable source IDs when available. A link records a
+   relation; it does not manufacture requirement coverage, validation, or completion.
+4. Normalize or copy an artifact only when explicitly requested and without replacing its canonical
+   owner. Otherwise link the authoritative source in place.
+5. Produce the Markdown lifecycle index and optional persisted matrix. If HTML is selected, project
+   the same graph as a lifecycle trace and render once without adding nodes or statuses.
 
-Source selection, migration, media/data transforms, external boundaries, and adapters require actual-path execution and material output readback. Preserve canonical-source or required-input mismatches as failure or explicit unresolved decisions; never report silent fallback as success.
+## Output Contract
 
-Never lower an unresolved status because a narrower check passed. Change the same condition only with resolution/readback evidence or the required user decision.
+Return only applicable fields:
 
-If the exact condition is structural, such as a matrix with valid stable links, a structural check may close only that condition. Planned-shell delivery may be package-complete while represented results remain planned or not executed.
+- `artifact_scope` and `source_artifacts`
+- Markdown lifecycle index
+- requested normalized artifacts, if any
+- traceability matrix
+- condition-scoped evidence/status and gaps
+- user-owned follow-ups
+- optional lifecycle HTML link
 
-## Canvas Asset Resolution
-
-For every admitted invocation, set `REPORT_SKILL_DIR` to the directory containing this active skill's resolved `SKILL.md`; use the exact `file:` path exposed by the current skill catalog. The bundled contract documents the Codex plugin-cache layout explicitly. Never guess, glob, or select an install/cache version from the current working directory.
-
-Require `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py`. `source/tools/generate_targets.py` only projects repository assets and is not the report renderer. If either local file is missing, report an incomplete installed payload and use the contract's allowed chat fallback; do not search sibling plugins, unrelated checkouts, alternate global skill roots, or app-managed system skills for substitutes.
-
-## Traceability And Output
-
-Prefer stable IDs: `REQ-*`, `AC-*`, `WBS-*`, `HLD-*`, `LLD-*`, `TEST-*`, `SEC-*`, `REL-*`, and `RETRO-*`.
-
-Return only needed sections: `artifact_scope`, `source_artifacts`, `artifact_pack`, `traceability_matrix`, `evidence_status`, `gaps`, and `handoff_targets`. Link completed claims to condition-scoped evidence.
-
-Persist the requested canonical artifacts in their required formats. Read `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and render the primary human-facing entry point with `$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py` as Report Canvas `trace` HTML whose nodes identify the canonical artifacts and condition-scoped evidence. Declare `trace_kind: lifecycle` and set every node's typed `lifecycle_status` to the preserved lifecycle result while keeping node `status` limited to evidence confidence; the renderer rejects a lifecycle trace that omits either contract. Never collapse the two axes into label/detail prose. If the inspectable visual gate fires for a packaged 3D/math/graphics artifact, also emit a `spatial` report from `references/report_visual_authoring.md` rather than restyling the trace. Never edit Canvas CSS/JS. Return only a concise chat receipt with package status and the Canvas link. Use chat-only output only when the user explicitly prohibits file creation, the host has no safe artifact surface, or the resolved installed payload is incomplete. Canvas is navigation over the package, not the package or proof of lifecycle completion.
-
-## Owner Boundaries
-
-- `plan-requirements-discovery`: elicitation; `plan-requirements-brief`: requirements contracts.
-- `plan-long-term-package`: heavy phase planning; `plan-short-term-docs`: active implementation design/status sync.
-- `workflow-plan-runner`: plan execution; `workflow-validation`: validation strategy/execution.
-- `plan-task-handoff`: small task-local inventories; `report-critical`: blocker-first critique.
+Return the Markdown link first. Canvas is an optional navigation view over the package, never the
+package or proof. A follow-up is a recommendation, not Handoff mutation or workflow dispatch.

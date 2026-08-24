@@ -1,7 +1,7 @@
 interface:
   display_name: "Management Knowledge Base Init"
   short_description: "Initialize a navigable Markdown Knowledge Base"
-  default_prompt: "Use $management-knowledge-base-init only after explicit initialization or bootstrap approval. Create a compact navigable index and category roots without inferred records or separate graph/score stores."
+  default_prompt: "Use $management-knowledge-base-init only after explicit initialization or bootstrap approval. Create one compact navigable index without inferred records, empty category placeholders, or separate graph/score stores."
 policy:
   invocation_surface: explicit_procedure
   allow_implicit_invocation: false

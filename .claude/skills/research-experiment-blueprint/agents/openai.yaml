@@ -1,9 +1,0 @@
-interface:
-  display_name: "Research Experiment Blueprint"
-  short_description: "Design an identifiable experiment from a selected hypothesis"
-  default_prompt: "Use $research-experiment-blueprint to turn one selected hypothesis into controls, matched data/metrics, falsification rules, and a reproducible experiment protocol without generating code or results."
-
-policy:
-  invocation_surface: explicit_procedure
-  allow_implicit_invocation: true
-  may_own_execution: true

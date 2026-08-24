@@ -1,9 +1,0 @@
-interface:
-  display_name: "Research Literature Ideation"
-  short_description: "Derive evidence-linked hypotheses from literature gaps"
-  default_prompt: "Use $research-literature-ideation to distinguish observed gaps from corpus coverage gaps, generate falsifiable candidates, and select an active hypothesis only when the user wants a decision."
-
-policy:
-  invocation_surface: explicit_procedure
-  allow_implicit_invocation: true
-  may_own_execution: true

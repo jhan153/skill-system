@@ -12,7 +12,9 @@ Read only when the corresponding risk is present.
 - Wire mutations through an existing API/action/callback/fixture. Never fake persistence, swallow failure, or make a missing integration look successful.
 - Preserve supplied copy, define text overflow and relevant breakpoints, and keep semantic accessibility primitives, names, focus, keyboard behavior, and usable targets.
 
-When a product-family profile applies, read `product-family-profile.md`, pin its sources, enforce hard rules, and keep missing/stale profile, catalog, baseline, token, or verifier claims `unverified` or `user-verification-needed`.
+When a product-family profile applies, read `product_family_design_contract.md`, pin its
+sources, enforce only applicable hard rules, and keep missing/stale profile, catalog, baseline,
+token, or evidence claims scoped and unresolved.
 
 ## Assets, Dependencies, And Generated Input
 
@@ -22,15 +24,14 @@ When a product-family profile applies, read `product-family-profile.md`, pin its
 - Treat generated frontend code as untrusted visual evidence; rewrite its intent into idiomatic secure project code rather than blindly executing or pasting it.
 - Do not fill a missing look with indigo/violet fills, gradient headlines, restating kickers, decorative emoji, invented stats, or Inter/Space Grotesk by default. A sourced brand stays.
 
-## Loop, Validation, And Stop
+## Plan, Evidence, And Handoff
 
-For an accepted design loop, read its condition/verifier slice, change only a failed/unverified condition, return the rendered target for its gates, and never mark loop success from implementation alone.
+For an accepted repeated-work Plan, read only the assigned condition/evidence slice, change only
+the implementation condition owned by this node, and return the rendered target or unavailable
+reason to already-declared evidence nodes. Never create a private retry, gate, or success state.
 
-Use exact user/design viewports first, then project breakpoints; record dimensions and keep source fidelity separate from family coherence. Final status:
-
-- `agent-verified`: integrated code, relevant preview, scoped interaction/state evidence, applicable checks/reuse evidence, viewport visual evidence, and resolved material mismatches.
-- `user-verification-needed`: available work is complete but private design/assets/fonts/auth/device or human judgment remains.
-- `unverified`: code changed but required preview/build/render evidence could not run.
-- `blocked`: essential artifact, repo access, target surface, or write boundary is missing.
+Use exact user/design viewports first, then project breakpoints; record dimensions and keep source
+fidelity separate from family coherence. Apply `design_evidence_contract.md` and the
+active Work Contract for result labels; this reference defines no independent completion status.
 
 Proceed with explicit reversible assumptions when the visible artifact and repo safely determine the target. Ask only when missing material can select different code. If preview is unavailable, run the strongest static/build check and keep visual behavior `unverified`; request safe exports/fixtures/screenshots rather than credentials.

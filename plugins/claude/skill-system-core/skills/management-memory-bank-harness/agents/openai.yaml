@@ -1,5 +1,6 @@
 interface:
   display_name: "Management Memory Bank Harness"
   short_description: "Read a narrow declared project Memory slice"
+  default_prompt: "Use $management-memory-bank-harness to read only the Memory records matching this task's concrete anchors and keep candidates or unverified records non-authoritative."
 policy:
   allow_implicit_invocation: true

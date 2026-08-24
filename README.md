@@ -12,36 +12,52 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 9.4.6 Bundle
+## 10.0.0 Release
 
-This source tree carries the 9.4.6 release above the 9.4.5 routing-consolidation line. Its main components are:
+This source tree is the 10.0.0 release baseline and the breaking successor to the 9.4.x line. Its
+current components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
-* `eval`: authored regression examples for structural and routing-contract maintenance; they are not field-quality evidence
 * `tools`: helper tools for inspecting the bundle structure
-* `work-contract`: shared TaskRun/WorkItem/LoopRun contracts plus a privacy-bounded Codex runtime projection that preserves user scope, verification ownership, and non-blocking continuation
-* `report-canvas`: one canonical offline report renderer and contract, projected into each generated `report-*` skill's `scripts/` and `references/` payload for installation-safe use
-* `integrations`: optional integration payloads — includes `integrations/kanboard-plan-sync`, a plan-centric MCP/CLI that projects Markdown plans onto a local Kanboard. The Kanboard app, DB, themes, and plugins are NOT bundled; only the integration code, the `kanboard-plan` Agent skill, MCP registration examples, and a local-host setup methodology are included.
+* `execution-handoff`: risk-adaptive finite DAGs, event-driven coordination, Core Cards, and Human Test handoff
+* `providers`: active Codex, Claude, Grok, and Antigravity package/rule declarations, with native harnesses only where the host owns one
+* `tests`: one Core-contract test, three Skill System-wide tests, and a reduced provider-neutral harness component suite
+* `work-contract`: privacy-bounded natural-language user-scope and interaction projection with no graph-state ownership
+* `report-delivery` + `report-canvas`: Markdown-first contracts in each Report skill plus one optional offline HTML renderer shared by the Core plugin
 * `CHANGELOG.md`, `TERMS.md`: change history and terminology notes
 
-## 9.x Direction: Neutral Source & Plugin Packaging
+## 10.x Direction: DAG Execution Handoff & Multi-Provider Harness
 
-The current architecture line is `9.x — Neutral Source & Plugin Packaging`. The current bundle line is `9.4.6 — Visual Decision & Inspectable Reports`, directly succeeding `9.4.5 — Direct Specialist Routing & Surface Consolidation`. Local installation is explicit and does not imply committing, tagging, publishing, or pushing. Codex and Claude share one bundle version and release tag; harness changes advance that version instead of creating a second protocol-version axis.
+The current architecture line is `10.x — DAG Execution Handoff & Multi-Provider Harness`. The
+10.0.0 release replaces the 9.x central evaluation and release-gate assumptions with current Core
+contracts and narrowly scoped system checks. Local installation remains a separate explicit action.
 
-9.4.6 keeps the 9.4.5 direct-specialist surface and adds a visual-decision contract plus an inspectable-visual gate. Design and report owners must not fill unspecified chrome with generative defaults, and a 3D/math/graphics claim must render Report Canvas `spatial` with real geometry instead of restyling or a card wall. Management and analysis IDs now use the `management-*`, `analysis-codebase-map`, and `analysis-boundary-design` names; legacy IDs remain aliases only. The canonical surface is 65 skills across five plugins. Governed persistence, external-state, LoopRun, lifecycle-gate, and explicitly selected context skills remain explicit-only, and model selection never expands user authority. Delegated workers receive exact canonical skill IDs already selected upstream; workers with no upstream selection route normally. Authored positive and negative cases cover these contracts but do not establish field-quality routing.
+10.0.0 makes `plan-execution-handoff` and its finite typed DAG the primary durable execution
+model, projects one Core Card contract into the Workflow producers and Handoff recorder, removes
+the central eval/Skill Diet/release-hygiene stack, and reduces persistent evaluation to four
+model-independent tests. TaskRun, LoopRun, and WorkItem runtime state have been removed; the useful
+repeated-work principles from Loop Term now live inside Execution Handoff.
 
-The Codex router uses an exact specialist directly and opens at most one narrow router only when several owners genuinely compete. Clear intent-matched workflow owners and bounded design/support specialists may be implicitly selected, while model selection never expands user authority. Persistent Memory/Knowledge writes, project-context mutation, Kanboard, LoopRun, lifecycle gates, and explicitly selected context remain explicit-only. An implicit router may hand off only to a declared implicitly exposed target, and an already selected canonical skill ID is preserved across worker handoff. One canonical invocation bit is projected into each host's native contract: Codex reads `agents/openai.yaml`, while Claude receives `disable-model-invocation: true` only for explicit-only skills. Codex packages stay at `plugins/<name>/skills`; paired Claude packages are generated at `plugins/claude/<name>/skills` under the same plugin name and version so each host discovers only its native metadata. The nearest `project-context.yaml` may declare manifest-relative or exact approved absolute Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery. Knowledge operations consume resolved `knowledge_root` and `knowledge_index` variables rather than a fixed directory.
+The Codex router uses an exact specialist directly and opens at most one narrow router only when several owners genuinely compete. Clear intent-matched workflow owners and bounded design/support specialists may be implicitly selected, while model selection never expands user authority. Persistent Memory/Knowledge writes, project-context mutation, lifecycle gates, and explicitly selected context remain explicit-only. An implicit router may hand off only to a declared implicitly exposed target, and an already selected canonical skill ID is preserved across worker handoff. One canonical invocation bit is projected into each host's native contract: Codex reads `agents/openai.yaml`, while Claude receives `disable-model-invocation: true` only for explicit-only skills. Codex packages stay at `plugins/<name>/skills`; paired Claude packages are generated at `plugins/claude/<name>/skills` under the same plugin name and version so each host discovers only its native metadata. The nearest `project-context.yaml` may declare manifest-relative or exact approved absolute Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery. Knowledge operations consume resolved `knowledge_root` and `knowledge_index` variables rather than a fixed directory.
 
 Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, review, and decision knowledge as readable current snapshots with typed relations, semantic revisions, and source-traced observation events. Recurrence is derived from transparent observation/provenance dimensions rather than a confidence, maturity, importance, or popularity score. LLM Wikis remain optional read-only context sources selected explicitly and navigated using their own conventions.
 
 Explicit “what next” questions use the existing Work Horizon and Planning State contracts instead of a duplicate registry navigator: horizon owns persistence/altitude, planning state owns persisted-artifact transitions, and host routing retains the current-turn owner. `management-project-context` supports explicit manifest-init, guided bootstrap, update, and read-only doctor modes; one transaction may approve all or a subset of separately enumerated writes. Material maker/checker risk may separate Contract/Spec from Repository/Constraints review, while multi-batch work selects `vertical_slice`, `migration_sequence`, or `evidence_unit`. None of these additions creates an automatic mega-orchestrator.
 
-The default Codex hook map sends eight lifecycle events directly to one Go executable. Response correction, desktop notification, declared-plan Kanboard sync, active-only LoopRun, and location-only project context are independent bounded branches; commit/closeout checkpoint writes operate only on declared stores and clear current-task facts.
+The default Codex hook map sends eight lifecycle events directly to one Go executable. Response correction, user Work Contract enforcement, desktop notification, and location-only project context are independent bounded branches. Stop performs no loop evaluation, child Python process, or graph continuation.
 
-For development-focused installs, use `skill-system-core` + `skill-system-dev` as the minimum profile. Add `skill-system-quality` as the recommended companion when you want validation matrix support, including `workflow-validation`; dev workflows still fall back to their local validation rules when quality skills are not installed.
+For development-focused installs, use `skill-system-core` + `skill-system-dev` as the minimum profile. Core includes the shared lifecycle, qualitative, and critical report skills; implementation and domain owners retain their own condition-matched validation.
 
-For local Codex plugin installation from this repository, see [Local Plugin Marketplace](LOCAL_PLUGIN_MARKETPLACE.md).
+The four plugins are installation profiles, not the eight user-facing skill families. Core contains
+cross-domain Planning, Management, Evidence, Workflow modifiers, and all Report skills; Dev contains
+engineering Analysis and Workflow owners; Design and Research carry their domain-specific families.
+Grok and Antigravity reuse the Claude-compatible portable package set instead of adding two more
+copies of every skill. Their generated global-rule companions bind Orca work to the same
+event-driven lifecycle: worker-side inbox/heartbeat/`worker_done`, no Coordinator polling, and no
+fixed/busy wait loop.
+
+For local installation on all four providers, see [Local Plugin Marketplace](LOCAL_PLUGIN_MARKETPLACE.md).
 
 ## Core Principles
 
@@ -112,10 +128,11 @@ Analysis skills are used to diagnose failures, compare approaches, or build code
 
 ### Design
 
-Design skills turn visual intent into implementable UI work or verifiable evidence.
+Design skills create concrete UI designs, implement them as repository UI, and return scoped design-system, visual, and accessibility evidence.
 
 | Skill                      | Role                                                                                                                                                                                                                |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `workflow-ui-design`       | Creates one concrete inspectable UI design from accepted requirements, product behavior, content, platform, and visual context, then returns an implementation handoff without writing production UI code. |
 | `design-frontend`          | Implements a concrete visual design as frontend code. It selects one conditional mobile, dashboard, section-web, or general profile, reuses repository components/tokens/assets, and validates the rendered result. |
 | `design-ui-decomposer`     | Breaks down UI references such as screenshots, Figma exports, mockups, or AI-generated images into hierarchy, layout, repeated patterns, component/token candidates, states, and validation items.                  |
 | `design-layout-translator` | Translates Auto Layout, flex/grid, resizing, overflow, and breakpoint constraints into layout rules that can be implemented in code.                                                                                |
@@ -131,12 +148,11 @@ Report skills organize evidence, reviews, changes, and work artifacts into resul
 | Skill                       | Role                                                                                                                       |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `report-qualitative`        | Produces qualitative evaluation reports with explicit criteria, evidence, interpretation, judgment, and recommendations.   |
-| `report-critical`           | Performs blocker-first critical review, risk review, and QA-style judgment on artifacts, plans, outputs, or conversations. |
-| `report-diff`               | Presents only actual changed lines or verified before/after snapshots in a readable grouped diff format.                   |
-| `report-implementation-explainer` | Creates a source/runtime-anchored causal explanation or interactive trace/spatial Canvas for an existing implementation and its next product decision. |
-| `report-lifecycle-artifacts` | Packages explicitly requested lifecycle artifacts and condition-scoped traceability without treating package presence as delivery completion. |
+| `report-critical`           | Produces an explicitly requested blocker, risk, critical-review, or QA-gate report without taking over ordinary diagnosis or Plan transitions. |
+| `report-implementation-explainer` | Creates a source/runtime-anchored causal explanation or verified changed-lines comparison without changing the target. |
+| `report-lifecycle-artifacts` | Packages and traces selected existing lifecycle artifacts without generating empty SDLC shells or treating package presence as delivery completion. |
 
-All report-family human-facing results use the shared offline Report Canvas by default, with Oblivion dark and Oblivion Hagoromo light themes. Generation projects the canonical contract and renderer into each `report-*` skill's own `references/` and `scripts/` folders, so an installed skill has no sibling-plugin or undeclared plugin-root dependency. The chat response is a concise outcome-and-link receipt; explicit chat-only/no-file and exact machine or canonical formats remain valid overrides. Report skills retain their own evidence, verdict, and handoff semantics; Canvas is only the common `decision` / `compare` / `trace` / `spatial` presentation layer.
+Report Markdown is the default content artifact. Explicit `html` or `both` requests add the shared offline Report Canvas as a readability projection of the same findings; inspectable 3D/math/graphics claims may require spatial HTML. All Report skills live in Core and share one renderer payload per provider package. HTML never adds evidence, findings, or workflow authority, and renderer failure never blocks the completed Markdown report.
 
 ### Workflow
 
@@ -147,27 +163,23 @@ Workflow skills control implementation discipline, validation, and failure recov
 | `workflow-implementation` | Owns direct coding requests from scoped requirement to the smallest coherent production change and focused validation. |
 | `workflow-bug-fix` | Fixes concrete software failures with a repro signal, targeted code/test change, and verification against the original failure. |
 | `workflow-dependency-upgrade` | Upgrades dependencies, runtimes, SDKs, frameworks, packages, and lockfiles with required compatibility fixes and validation. |
+| `workflow-code-review` | Reviews code-derived state, flow, reachability, ordering, and failure behavior with optional design comparison, then returns a compact Coordinator disposition and handoff. |
 | `workflow-refactor-safely` | Runs behavior-preserving refactors with a behavior contract, characterization checks, small batches, and validation. |
-| `workflow-rigor`       | Applies evidence-first execution, scoped changes, separated validation results, and review discipline for medium- and high-risk changes.                                |
+| `workflow-rigor`       | Attaches optional standard/strict assurance to an active Workflow without becoming a DAG node or owning writes. |
 | `workflow-prototype` | Builds one bounded throwaway UI comparison or one browser-openable HTML evidence page that lets a non-developer exercise a deterministic rule model. |
-| `workflow-plan-runner` | Executes approved plans, specifications, or packages as implementation batches, while managing scoped validation, rollback, or alternative choices.                     |
-| `workflow-validation`  | Plans or performs focused validation for completed or planned changes. It separates validation performed by the agent from validation that must be checked by the user. |
-| `workflow-recovery`    | Breaks repeated implementation or validation retry loops through single-hypothesis diagnosis, narrowed reproduction steps, rollback, or alternative decisions.          |
-| `workflow-source-maintenance` | Prunes source proven obsolete after development while preserving intended behavior and dynamic/public entry points. |
-| `workflow-comment-maintenance` | Synchronizes comments and docstrings with current code meaning without changing behavior. |
-| `workflow-task-ledger` | Preserves resumable task steps and findings only when work is expected to cross a turn or session boundary. |
+| `workflow-source-maintenance` | Prunes source proven obsolete or synchronizes comments/docstrings/TODO markers in explicit behavior-preserving modes. |
 
-### Loop Engineering
+### Conditional Repeated Work
 
-Loop Engineering skills decide when repeated execution is justified, turn success conditions into verifier ownership, and run accepted loop contracts without over-looping simple work. The 8.1.0 layer adds a bounded LoopRun runtime for explicit verification loops: contract/state schemas, checkpoints, progress/stall decisions, Stop-hook continuation, and recovery handoff. Host schedulers and external event triggers are treated as separate runtime capabilities when present and must be recorded through the orchestration capability contract before they are claimed as available.
+Most Execution Handoff plans use ordinary phase delivery and never load repeated-work rules.
+Only an already-needed durable graph whose verifier evidence will steer later actions more than
+once attaches the conditional `plan-execution-handoff` repeated-work profile.
 
 | Skill                    | Role                                                                                                                                                    |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `analysis-loop-readiness`  | Classifies an initial request as `one_shot`, `contract_needed`, or `loop_worthy` before execution, including governance prerequisites.                    |
-| `plan-loop-term`         | Defines the loop contract and maps success conditions to verifier owners, commands, evidence targets, pass/fail signals, fallbacks, and stop terms.       |
-| `workflow-loop-runner`   | Executes accepted loop contracts through observe/decide/act/verify/checkpoint batches, backed by LoopRun state tools for checkpointing, continuation, recovery, and stop decisions. |
+| `plan-execution-handoff` | For an admitted verifier-steered graph only, adds condition/verifier terms and evidence-delta expansion/stop rules to the ordinary bounded acyclic DAG. No LoopRun, Python evaluator, or continuation engine is created. |
 
-Runtime support also includes the tool/permission operating catalog and orchestration capability contract. TaskRun, Research/Evidence ledgers, and LoopRun remain explicit workflow-owned state; Codex Agent Run and hook-event evidence ledgers are not part of the current runtime.
+Runtime support also includes the provider-neutral orchestration capability contract. TaskRun, LoopRun, WorkItem schemas/tools, and the Stop-hook LoopRun branch are removed.
 
 ### Planning
 
@@ -178,12 +190,13 @@ Planning skills create or organize planning and specification artifacts without 
 | `plan-decision-map`      | Maintains one explicit multi-session decision map with a target outcome, prerequisite-linked decision items, a derived ready set, unshaped unknowns, and exclusions.       |
 | `plan-behavior-discovery` | Resolves one product-behavior decision at a time for an existing capability until the next human-operable vertical slice is ready. |
 | `plan-requirements-discovery` | Runs dependency-aware discovery: the agent resolves safely discoverable facts and asks up to three mutually independent ready questions per round.                         |
-| `plan-requirements-brief` | Distills accepted discovery notes and stakeholder answers into a bounded requirements contract or PRD/SRS-lite. |
-| `plan-stakeholder-questionnaire` | Creates one decision-linked Markdown question document for a stakeholder who owns missing answers; artifact delivery remains outside the skill.                  |
-| `plan-short-term-docs`   | Creates or updates persistent `docs/plan` work plans for near-term tasks, state, and implementation transitions.                                                           |
-| `plan-long-term-package` | Creates large multi-document planning packages for bulk work, migrations, rewrites, or milestone plans that future sessions must be able to continue from documents alone. |
-| `plan-loop-term`         | Creates goal/loop completion contracts with success conditions, verifier evidence, progress signals, retry terms, stop policy, checkpoints, and handoff text.             |
-| `plan-spec-curator`      | Organizes active context and outdated or superseded specifications/plans, and proposes archive/reload policies to prevent planning context from becoming overloaded.       |
+| `plan-requirements-brief` | Distills accepted discovery notes and returned question-document answers into a bounded requirements contract or PRD/SRS-lite. |
+| `plan-question-document` | Creates one decision-linked Markdown question document for the answer owner who holds missing information; artifact delivery remains outside the skill. |
+| `plan-execution-handoff` | Compiles one risk-adaptive archetype into a typed acyclic pair, conditionally applies repeated-work verifier/budget/stop principles, validates typed advisory timing once at `worker_done`, and terminates the default phase graph at `human_test_ready`. |
+
+When these Planning outputs belong to a durable execution package, they live under that package's
+`inputs/` tree rather than in unrelated global locations. `plan.md` records the consumed paths,
+statuses, authority, and scope; `handoff.md` remains execution state only.
 
 ### Coordination
 
@@ -195,11 +208,11 @@ Coordination skills provide lightweight structures for task splitting and handof
 
 ### Research
 
-Research skills organize scientific or paper-centered work from request routing through review.
+Research skills handle direct scientific artifacts and explicit Plan-assigned Research nodes without creating an automatic lifecycle.
 
 | Skill                           | Role                                                                                                                                                              |
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `research-router`               | Routes research requests to the appropriate research-stage skill and prevents research skills from being triggered accidentally for ordinary implementation work. |
+| `workflow-research`             | Manages one explicitly assigned Research DAG node, applies exactly one Plan-selected stage specialist, and returns `research_result` without choosing the next node. |
 | `research-literature-ideation`  | Converts gathered evidence into candidate research hypotheses and selects one active hypothesis to validate.                                                      |
 | `research-literature-synthesis` | Synthesizes a literature review structure, consensus, disagreements, contradictions, limitations, and claim boundaries from evidence lists or provided papers.    |
 | `research-hypothesis-planning`  | Plans hypotheses, ablations, loss-function design, training plans, and claim-development paths.                                                                   |
@@ -215,8 +228,8 @@ Search skills find evidence or define evidence-gathering paths while keeping syn
 
 | Skill                   | Role                                                                                                                                             |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `search-paper-evidence` | Searches for paper/source evidence or plans a search path, while tracking citation status in an evidence ledger without fabricating citations.   |
-| `search-deep-evidence`  | Runs a deep multi-angle evidence sweep across lanes with adversarial verification and citation-status labels, producing a verified evidence set for report or synthesis skills. |
+| `search-paper-evidence` | Acquires traceable paper evidence or returns a search plan without fabricating citations, metadata, datasets, metrics, or results. |
+| `search-deep-evidence`  | Cross-checks one claim across only the needed evidence lanes, preserves dependence and contradictions, and returns a traceable evidence set without claiming machine-verified truth. |
 
 ### Management
 
@@ -226,22 +239,15 @@ Management skills own project Memory, Knowledge, and `project-context.yaml` loca
 | --- | --- |
 | `management-project-context` | Initializes, diagnoses, updates, or bootstraps the project context manifest while preserving unrelated sections. |
 | `management-project-context-checkpoint` | At an explicit closeout checkpoint, classifies durable current-task items into an existing declared Memory Bank or Knowledge Base. |
-| `management-memory-bank-harness` | Builds a context pack from approved memory for the current task while filtering out stale, conflicting, or risky entries. |
-| `management-memory-bank-init` | Initializes a project-scoped persistent memory bank after confirming project identity and write boundaries. |
-| `management-memory-bank-update` | Updates persistent goals or rules as append-only history when the user wants long-term memory changes. |
-| `management-memory-bank-maintenance` | Inspects, validates, consolidates, or repairs existing memory state. |
-| `management-knowledge-base-record` | Creates one new accepted domain, design, algorithm, architecture, or recurring code-review identity using the shared record contract and one selected category profile. |
+| `management-memory-bank-harness` | Reads only the Memory records matching concrete current-task anchors and keeps candidates or unverified records non-authoritative. |
+| `management-memory-bank-init` | Initializes one readable project `memory.md` after confirming project identity and the exact write boundary. |
+| `management-memory-bank-update` | Mutates one explicitly persistent Memory record and appends one concise semantic revision. |
+| `management-memory-bank-maintenance` | Reports, integrity-checks, consolidates, compacts, or explicitly migrates one declared Memory Bank. |
+| `management-knowledge-base-record` | Creates one new accepted domain, design, algorithm, architecture, decision, or recurring code-review identity using the shared record contract and one selected category profile. |
 | `management-knowledge-base-read` | Reads the smallest artifact-anchored current slice and only the relations or history needed by the task. |
 | `management-knowledge-base-init` | Initializes an explicitly approved empty store and its manifest binding. |
 | `management-knowledge-base-update` | Updates, reverifies, relinks, supersedes, or deprecates an existing identity. |
-| `management-knowledge-base-maintenance` | Validates and maintains index, relation, history, overlap, and recurrence integrity. |
-
-### Kanboard
-
-| Skill | Role |
-| --- | --- |
-| `kanboard-plan-rollout` | Registers or bulk-syncs project plan workspaces through a dry-run-first onboarding workflow. |
-| `kanboard-plan-ops` | Operates push, pull-candidate, validation, and curation flows for an already registered board. |
+| `management-knowledge-base-maintenance` | Integrity-checks and maintains index, relation, history, overlap, and recurrence structure. |
 
 ## Design Timeline
 
@@ -264,7 +270,6 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 8.3.0 | Bounded loop hardening                | Closes the LoopRun integrity gaps: a session-scoped activation bridge (`activate_loop_run.py`/`deactivate_loop_run.py` + Stop hook resolves the run by `session_id`, decoupled from the generic agent-run manifest), monotonic iteration with terminal immutability and idempotent replay, `iterations/` audit records, precedence-honored termination with wall-time enforcement, a confirmed-only `search-deep-evidence` convergence verifier, and a runtime-schema-valid `plan-loop-term` contract. |
 | 8.3.1 | Evaluation framing cleanup            | Removes evaluation-distorting deployment/autonomy-negative wording, updates runtime and hygiene docs to host-managed asset language, and keeps cache cleanup stable after verification runs. |
 | 8.3.2 | Verification scope cleanup            | Scopes bundle verification to committed/distributable content: bundle validators no longer require local-only source-project paths (`docs/`, `.github/`, `.kanboard-plan`) to exist, and the local-only context-compounding release gate is removed from `core`. Adds a Claude-side `.claude/CLAUDE.md` mapping of the global working rules. |
-| 8.4.0 | Evidence-grounded harness refinement  | Adds observed-evidence completion with an `accepted_risk` terminal in `workflow-rigor`, a debugging hypothesis ladder in `analysis-bug`, capability-ceiling escalation in `workflow-recovery`, verification-grounding/noise-control eval cases, and an opt-in Claude observational hook adapter. |
 | 8.4.1 | Checkpointed execution + harness parity | Adds Claude-side strict-block parity and the `workflow-task-ledger` checkpointed-execution skill with a resume-safe step/finding ledger, observed `evidence_refs`, an `accepted_risk` terminal, and a findings completion gate. Historical measurement machinery was later removed. |
 | 8.4.2 | Runtime capability closure | Adds opt-in live agent-run manifest bootstrap, a tool/permission operating catalog, and an orchestration capability contract so hooks, permissions, and host schedulers are recorded as evidence-bound capabilities rather than implied package behavior. |
 | 8.4.3 | Live manifest finalization hardening | Updates live bootstrap finalization so structured final reports synchronize `result_label` and `C-###` task claims back into `run.yaml`, reducing placeholder-claim drift while keeping bootstrap opt-in and evidence-bound. |
@@ -277,7 +282,6 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.1.0 | Canonical quality, harness hardening & skill consolidation | Consolidates the canonical surface from 71 to 66 skills, hardens schema-v2 hook evidence and the observe-default Recovery Guard, adds planning determinism and token-cost controls, and aligns the release identity after `v9.0.2`. Claude-specific standalone compatibility follow-up is deferred to 9.1.1. |
 | 9.1.1 | Patch safety & evidence hardening | Makes dev routing metadata host-neutral, moves hook evidence to durable per-run ledgers, fails C/C++ reports closed without semantic structure evidence, caps and stages long-term packages, removes the Kanboard pytest-absence SKIP, and reports Recovery Guard/output-gate modes independently. Compatibility changes are called out in `CHANGELOG.md`. |
 | 9.1.2 | Design governance & pre-diet baseline | Hardens product-family rule discovery, approved component reuse, UX decision handling, and separate target/family visual evidence lanes. Freezes the strengthened 66-skill source surface and measured instruction size before 9.2.0 skill-diet work; this is an unpublished, non-deployed comparison baseline rather than a release. |
-| 9.2.0 | Full skill diet & bounded evidence | Reduces all 66 canonical skill bodies from 49,513 to 39,820 words (-19.58%) and resolves 38 merge/delete candidates as 32 merges plus 6 deletions, without moving detail into references. Preserves fail-closed design and adapter ownership corrections while keeping quality claims scoped to the checks and forward evidence that actually ran. Harness protocol 9.2.0 (historical) and 9.2.1 (current opt-in) remain independent of this bundle version. |
 | 9.2.1 | Conditional reference disclosure | Applies bounded progressive disclosure to six design skills while retaining routing selectors, evidence ceilings, and fail-closed decisions in the main bodies. Against `v9.2.0`, their main bodies fall by 638 words/4,723 UTF-8 bytes and main-plus-Markdown-reference surfaces fall by 450 words/3,184 bytes. Fresh admission observations cover only `design-visual-regression` and `design-frontend`; the other four skills remain admission-unverified rather than universally behavior-preserved. The opt-in harness monitor is narrowed to verifier-receipt freshness and has no task-result-label authority. |
 | 9.2.2 | Field-driven simplification | Removes the active skill-maturity and field-feedback persistence systems, deletes the usage-tracker skill and its Python validators/report generator, removes those proxy checks from core hygiene, and limits field input to problems the user explicitly reports in conversation. The active canonical surface is 65 skills; historical baselines remain historical only. |
 | 9.2.3 | Field-driven routing simplification | Keeps repository skill changes with the current task owner, reserves app-managed `skill-creator` for explicit or personal-skill creation, and fixes generated Claude manifests so all six local plugins install without the unsupported `displayName` key. |
@@ -291,6 +295,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.4.4 | Implicit workflow routing & prototyping | Exposes clear intent-matched workflow and bounded support owners to natural-language routing while retaining explicit lifecycle and persistence gates; propagates selected skills across delegation and adds retained, isolated runnable prototypes for one unresolved decision. |
 | 9.4.5 | Direct specialist routing & surface consolidation | Removes standalone search/analysis/research routers, merges overlapping Knowledge, coordination, Kanboard, project-context, loop, and maintenance owners, retires the maintainer plugin, and cuts the canonical surface from 79 to 65 skills. |
 | 9.4.6 | Visual decision & inspectable reports | Adds a visual-decision contract, requires spatial Report Canvas for 3D/math/graphics claims, and aligns management/analysis skill IDs while keeping 65 skills. |
+| 10.0.0 | DAG Execution Handoff & four-provider delivery | Establishes finite Execution Handoff DAGs, Core Cards, Human Test handoff, event-driven Orca coordination, four installation profiles across Codex/Claude/Grok/Antigravity, minimal model-independent contracts, and retirement of the old runner/eval/runtime-state stack. |
 
 ## License
 

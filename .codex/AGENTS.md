@@ -7,7 +7,7 @@
 ## Language And Response
 - Use the user's language and honorific Korean by default. Identify the user's intended outcome before drafting; lead with it and keep simple answers short.
 - Preserve identifiers, paths, commands, APIs, errors, and logs unless translation is requested; add only actionable rationale.
-- Keep ordinary answers concise. For `report-*`, follow `docs/report_canvas_contract.md`: Canvas HTML plus a short receipt unless chat-only/no-file or an exact format is requested. Canvas affects presentation, not ownership, evidence, or verdict.
+- Keep ordinary answers concise. For `report-*`, follow `docs/report_delivery_contract.md`: content-first Markdown is default; add Canvas HTML only for explicit `html`/`both` or required spatial evidence. Presentation never changes ownership, evidence, or verdict.
 
 ## Evidence And Integrity
 - Separate assumptions from facts and cite direct source, runtime, command, or observation. Checks and mocks prove only their contracts; use the smallest material one.
@@ -39,7 +39,7 @@
 - Read `$CODEX_HOME/context-routing.md` for ambiguous non-trivial routing or explicit goal, automation, Memory, or Knowledge operations.
 - Resolve skills by exact user path, current-session exposure, repository-declared local root, then `unresolved`; never fallback-search unrelated home or adjacent projects.
 - The nearest `project-context.yaml` declares project-local Memory, Knowledge, plans, and Wikis. An exact user path overrides it; missing declarations are unavailable, never auto-discovered/initialized.
-- Route explicit `/goal`, durable/event automation, or Stop-driven continuation through loop readiness. Start a LoopRun only after an accepted schema-valid contract defines verifier, checkpoint, budget, approval, and stop state.
+- Do not route `/goal`, duration, or event-runtime wording through a classifier. Use `plan-execution-handoff` only when durable execution state is actually needed; attach its repeated-work profile only when verifier evidence will steer later actions more than once. The Stop hook never owns continuation.
 - Treat an unknown or stale explicit skill alias as unresolved. Load references one layer at a time; heavy artifacts require explicit intent.
 - Pass already selected canonical skill IDs to delegated workers; otherwise let each worker resolve skills normally.
 - Treat Memory Bank, Knowledge Base, explicitly selected LLM Wikis, plans, and summaries as context; current instructions and verified evidence outrank them.
@@ -49,6 +49,10 @@
 - Preserve runtime config and automation state. Risky actions follow configured approval policy and user scope.
 - Invoke approved executables directly; use a wrapper only for real shell semantics so command-prefix approvals stay visible.
 - Keep artifacts out of temporary directories unless authorized or tool-required. `.codex/skills/.system` is app-managed and requires explicit intent to edit.
+- For an Orca-dispatched task or Plan/Handoff node, read `docs/orca_worker_runtime_contract.md`;
+  worker lifecycle is event-driven and never replaced by Coordinator polling, transcript reads, or
+  fixed/busy waits. Human approval may arrive hours later: send one question, yield the active
+  turn, and resume only from the delivered follow-up without treating the delay as timeout or block.
 - Hooks, harness records, checkpoints, and receipts do not grant permission or authorize repair.
 
 ## Result Reporting

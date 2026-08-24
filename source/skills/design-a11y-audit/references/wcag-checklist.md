@@ -17,5 +17,5 @@ Use this as a scoped evidence checklist. It is not a full conformance test plan.
 ## Reporting discipline
 
 - Cite source, DOM, screenshot, or tool output for each finding.
-- Mark unmeasured contrast, target size, and keyboard behavior as `Unverified`.
+- Mark unmeasured contrast, target size, and keyboard behavior as `unverified`.
 - Do not claim full WCAG pass from static scanning alone.

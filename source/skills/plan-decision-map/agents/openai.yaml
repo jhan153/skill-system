@@ -18,5 +18,5 @@ work_horizon:
   legacy_equivalent: "durable pre-plan decision work"
 
 planning_altitude:
-  kind: strategic_package
+  kind: strategic_decision_map
   artifact_level: decision_map

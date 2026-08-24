@@ -1,0 +1,8 @@
+# GENERATED TARGET — do not edit files in this tree directly.
+do_not_edit: true
+target: .grok
+generated_from: source/
+generator: source/tools/generate_targets.py --target runtime-grok
+note: |
+  This directory is regenerated from source/. Edit source/ instead.
+  Direct edits here are overwritten on regeneration.

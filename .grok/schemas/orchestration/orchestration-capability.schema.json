@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-orchestration-capability.schema.json",
+  "title": "Skill System Orchestration Capability",
+  "type": "object",
+  "required": ["schema_version", "capability"],
+  "properties": {
+    "schema_version": { "enum": [1] },
+    "capability": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "support_state",
+        "host_surface",
+        "task_scope",
+        "verification",
+        "evidence_refs"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^ORCH-[A-Za-z0-9_.-]+$" },
+        "type": {
+          "enum": ["cron", "webhook", "queue", "automation", "event_trigger", "manual_handoff", "other"]
+        },
+        "support_state": {
+          "enum": ["unsupported", "external_host_dependent", "supported", "verified"]
+        },
+        "host_surface": { "type": "string", "minLength": 1 },
+        "task_scope": { "type": "string", "minLength": 1 },
+        "verification": {
+          "type": "object",
+          "required": ["method"],
+          "properties": {
+            "method": {
+              "enum": ["command_exit", "connector_readback", "host_documentation", "manual_check", "not_available"]
+            },
+            "command": { "type": "string" },
+            "expected_exit_code": { "type": "integer" },
+            "unavailable_reason": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "expires_or_review_at": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": { "support_state": { "const": "verified" } },
+            "required": ["support_state"]
+          },
+          "then": {
+            "properties": { "evidence_refs": { "minItems": 1 } }
+          }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

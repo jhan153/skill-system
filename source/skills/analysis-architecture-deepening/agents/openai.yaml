@@ -1,7 +1,7 @@
 interface:
   display_name: "Analysis Architecture Deepening"
   short_description: "Find ranked deep-module and architecture improvement candidates"
-  default_prompt: "Use $analysis-architecture-deepening to scan a scoped codebase area for architecture friction and return ranked deep-module, seam, adapter, shallow-wrapper, or policy-move candidates without generating a full repo-wide report artifact."
+  default_prompt: "Use $analysis-architecture-deepening to scan a scoped codebase area for architecture friction and return evidenced deep-module, seam, adapter, shallow-wrapper, or policy-move candidates. Recommend a next candidate only when actual-path evidence establishes one; otherwise return the smallest discriminator. Do not implement the selected change or generate a repo-wide report artifact."
 
 policy:
   invocation_surface: explicit_procedure

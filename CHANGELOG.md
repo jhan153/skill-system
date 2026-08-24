@@ -1,7 +1,59 @@
 # Changelog
 
+## 10.0.0
+
+- Replaced the fragmented plan/runner/loop control line with one canonical `plan.md` + `handoff.md`
+  Execution Handoff pair and six finite DAG archetypes: `single_node_execution`,
+  `phase_gate_delivery`, `dependency_incremental`, `risk_spiral`, `assurance_v`, and
+  `controlled_transition`.
+- Made Waterfall-style phase delivery the default for clear development work. Design and
+  implementation may fan out, static review remains agent-owned, and the current graph terminates
+  at `human_test_ready`; Human Test observations and the next worklist/design start a fresh pair.
+- Standardized event-driven Orca execution across Codex, Claude, Grok, and Antigravity. Workers own
+  dispatch/inbox/follow-up/heartbeat/`worker_done`; Coordinators consume one notified event without
+  polling, transcript replay, fixed waits, or repeated context intake. Human approval may arrive
+  hours later as `awaiting_human_event` without becoming timeout, failure, or DAG-level `blocked`.
+- Centralized cross-skill execution items and Handoff-ready Markdown cards under Core. Workflow
+  Implementation, Code Review, Bug Fix, UI Design, Research, and the Coordinator consume the same
+  envelope and card meanings without redefining wrappers, node ownership, or successor selection.
+- Rebuilt Workflow Implementation around six selectable implementation paradigms—procedural,
+  object-oriented, functional, data-oriented, job-system, and template metaprogramming—while
+  keeping the selected workflow as the production implementation owner.
+- Added bounded static Code Review and Bug Fix ownership, including compact `continue|repair`
+  disposition, at most two assigned repair rounds, deferred-item carry-forward, and Coordinator-only
+  final Known Bug recording after terminal review evidence.
+- Added explicit `workflow-ui-design` and `workflow-research` node owners. Design and Research stage
+  skills retain specialist artifact meaning while the Workflow owns the Plan node envelope and
+  never selects the next node.
+- Centralized persisted Planning inputs under the associated Execution Handoff package. Decision
+  maps, behavior decisions, discovery records, accepted requirements contracts, and returned
+  question documents expose status and authority before Plan consumption; renamed the one-recipient
+  `plan-stakeholder-questionnaire` artifact to `plan-question-document`.
+- Modernized Management around declared `project-context.yaml` roots, a compact single-file Memory
+  Bank, and readable Knowledge snapshots with typed relations and provenance. Missing stores remain
+  unavailable and are never discovered by scanning home or adjacent repositories.
+- Made Report delivery content-first Markdown by default. All four Report skills now live in Core;
+  optional HTML uses one shared Report Canvas payload per physical package instead of duplicating
+  the renderer under every Report skill.
+- Reduced distribution to four installation profiles and 56 canonical skills. Codex has one native
+  package set; Claude, Grok, and Antigravity share one portable Claude-compatible set with a minimal
+  Antigravity/Grok root manifest. Grok and Antigravity receive rule/docs/schema companions while
+  Orca remains their lifecycle harness.
+- Retired generated runtime skill mirrors, the Quality plugin, duplicate plan/loop/task runners,
+  TaskRun/LoopRun/WorkItem state, lifecycle ledgers, runtime Python validators, the central eval and
+  Skill Diet corpus, release-identity/hygiene gates, and stale large template/reference payloads.
+- Replaced the former 300-plus persistent checks with one Core Card contract test and three
+  Skill System structural contract tests. Seventeen direct Go harness component tests remain
+  change-triggered rather than acting as an automatic release gate; no persistent per-skill model
+  quality suite remains.
+- Cut the 10.0.0 source/runtime/plugin bundle with local annotated tag `v10.0.0` and release archive
+  `export/Skill-System-10.0.0.zip`. Remote push, publication, live runtime installation, and plugin
+  cache mutation remain separate explicit operations.
+
 ## 9.4.6
 
+- Replaced the Python bundle-unit/regeneration-diff/hygiene pipeline with the Go `skill-system-verify` gate. Generation now writes deterministic source/file integrity manifests; verification checks them without rebuilding binaries and uses schema-backed semantic fixtures instead of inherited pass counts or substring tests.
+- Added the Core execution-item schema and provenance chain, aligned Code Review/Bug Fix producers plus WorkItem/LoopRun projections, and made final Known Bug exclusion require a Coordinator/current-owner record joined to terminal review evidence.
 - Added a shared visual-decision contract so design and report owners refuse unchosen factory chrome (indigo kits, restating kickers, invented stats) while keeping a sourced brand or the chosen Oblivion identity.
 - Added an inspectable-visual gate: 3D, mesh, math-surface, and graphics claims must render Report Canvas `spatial` with real geometry instead of restyling CSS or stacking cards. A bundled `sample_display_surface.py` authors `buffer_geometry` from a stated `z=f(x,y)`; missing assets fail closed.
 - Aligned remaining management and analysis IDs onto `management-*`, `analysis-codebase-map`, and `analysis-boundary-design`. Legacy names stay aliases only. Canonical count remains 65 skills across five plugins.

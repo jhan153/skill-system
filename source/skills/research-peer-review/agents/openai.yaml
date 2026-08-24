@@ -8,4 +8,4 @@ policy:
   allow_implicit_invocation: true
   may_own_execution: false
   may_write: false
-  may_block_completion: true
+  may_block_completion: false

@@ -1,6 +1,7 @@
 # Deep Evidence Method
 
-Use this reference only when a claim genuinely needs more than one evidence lane. The skill gathers and verifies evidence; a report or research-synthesis owner writes the final narrative.
+Use this reference only when a claim genuinely needs more than one evidence lane. The skill gathers
+and assesses evidence; a report or research-synthesis owner writes the final narrative.
 
 ## Claim decomposition
 - Split only where subclaims require different evidence or can fail independently.
@@ -19,7 +20,10 @@ Use this reference only when a claim genuinely needs more than one evidence lane
 | explicitly selected LLM Wiki | `analysis-llm-wiki-context` (read-only) |
 | current public facts | authoritative web sources |
 
-Lane selection grants no new write, network, runtime, credential, or mutation authority.
+Lane selection grants no new write, network, runtime, credential, or mutation authority. Named
+skill owners are optional routing hints: use them only when exposed in the current session. A
+missing owner leaves that lane unavailable; it does not require a sibling plugin, alias, or
+substitute evidence.
 
 ## Evidence record
 Record these axes separately:
@@ -37,7 +41,7 @@ Source identity is not claim verification. Dependent sources are not independent
 - Search for the strongest plausible contradiction and alternative explanation.
 - Compare evidence predictions and provenance, not agent/source counts.
 - Preserve `mixed` or `insufficient` conclusions when evidence conflicts or is unavailable.
-- Never delete a contradicted claim merely to make the ledger pass.
+- Never delete a contradicted claim to force a preferred conclusion.
 
 ## Handoff
 Return a resolved claim–evidence matrix and name the owning synthesis/review skill. A valid resolution may be `supported`, `contradicted`, `mixed`, or `insufficient` with explicit missing evidence.

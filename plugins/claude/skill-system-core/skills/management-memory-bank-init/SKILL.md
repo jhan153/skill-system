@@ -1,6 +1,6 @@
 ---
 name: management-memory-bank-init
-description: Initialize a project-scoped Memory Bank and register only its location in project-context.yaml. Use only for an explicit init or reinit request; never discover, overwrite, or merge an existing bank as fallback.
+description: Initialize the single-file project Memory Bank defined by the shared Memory contract and register its location in project-context.yaml. Use only for an explicit fresh init request or approved bootstrap action. Never discover a fallback bank, overwrite/reinitialize existing Memory, populate inferred records, or recreate the legacy four-file event ledger.
 disable-model-invocation: true
 ---
 
@@ -8,35 +8,40 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: memory_operation
-- intent_signature: initialize project Memory Bank, 메모리뱅크 초기화
-- use_when: the user explicitly requests fresh initialization or reinitialization
-- do_not_use_when: read, update, correction capture, checkpoint, or maintenance is primary
-- expected_inputs: verified project root/identity, exact target or manifest state, and explicit init/reinit intent
-- expected_outputs: four baseline files, first event, manifest section update, and readback result
+- intent_signature: explicit project Memory Bank initialization
+- use_when: the user explicitly requests a fresh init or approves one exact bootstrap action
+- do_not_use_when: reading, updating, checkpointing, maintenance, or automatic project setup is primary
+- expected_inputs: verified project identity, exact/approved empty target, manifest state, storage intent, and init authorization
+- expected_outputs: one empty canonical `memory.md`, manifest section update, and direct readback
 - context_targets:
-  must_read: exact project/target state, `reference.md`, `.claude/docs/memory_mutation_contract.md`, and existing `project-context.yaml` when present
-  read_if_needed: repository persistence convention
-  do_not_load_by_default: other banks, transcripts, full project history, common/home Memory
+  must_read:
+    - exact target and manifest state
+    - `references/project_context_manifest.md`
+    - `references/memory_mutation_contract.md`
+  read_if_needed: repository persistence convention and explicit legacy-migration decision
+  do_not_load_by_default: other stores, raw history, transcripts, full repository, or home Memory
 - risk_profile:
   reads: exact target and manifest only
-  writes: one project-local bank and only the manifest's `memory_bank` section
+  writes: one approved `memory.md` and only the manifest `memory_bank` section
   tools: local file operations and readback
-  sensitive_resources: credentials and raw private history denied
+  sensitive_resources: credentials denied; external paths require exact resolved-path approval
 - entry_scene: PREPARE
 
-## Initialization Contract
-Target precedence is: exact user path, declared `memory_bank.root`, then the default path from `reference.md` only because initialization itself was explicitly requested. Ordinary resolution never creates this default.
-
-If a bank already exists, ordinary init stops. Reinit requires explicit intent and a repository-approved preservation or migration path; never overwrite active history. When writing `project-context.yaml`, preserve all unknown and unrelated sections and update only `memory_bank`.
-
 ## Workflow
-1. Resolve project identity and target; inspect the exact bank and manifest state.
-2. Stage `current.md`, `archive.md`, `events.jsonl`, and `meta.json` under one operation ID.
-3. Append the first `entity=project`, `action=create` event and create the compact baseline snapshot.
-4. Add or update only the manifest `memory_bank` section.
-5. Commit the bank as one unit and read back all four files, shared event ID, snapshot version, project identity, and manifest path.
 
-Any partial creation, parse failure, identity mismatch, or manifest clobber remains failed/blocked.
+1. Bind `memory_root` from the exact approved directory or existing manifest declaration. Only an
+   explicit init with neither may propose `docs/memory-bank/`; obtain approval before writing.
+2. Bind `memory_file := memory_root/memory.md` and show the resolved target before external/home
+   writes. Stop when current or legacy Memory exists. Explicit legacy migration belongs to
+   `management-memory-bank-maintenance`; replacement requires a separately approved preservation
+   decision and a new empty target.
+3. Create the shared contract's `memory-bank-v1` header with project identity and no records.
+4. Update only `memory_bank.root` and `memory_bank.storage` in `project-context.yaml`, preserving
+   all other sections and the approved path representation.
+5. Read back the file header, empty record state, project identity, manifest section, and unchanged
+   sibling sections. Initialization creates storage, not Memory content.
 
 ## Output
-Report exact created/preserved paths, project/event IDs, four-file and manifest readback, and any portability uncertainty. Initialization creates storage; it does not populate inferred project rules or session history.
+
+Report created/preserved paths, project identity, storage intent, manifest readback, and any
+migration uncertainty. Partial creation never counts as success.

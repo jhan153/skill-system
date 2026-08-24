@@ -15,12 +15,13 @@ disable-model-invocation: true
 - do_not_use_when:
   - one discovery round, requirements brief, tactical plan, or implementation task can cover the work.
   - the requested artifact is a build backlog, phase package from settled decisions, status report, or execution queue.
-- expected_inputs: target outcome, decision owner, scope boundary, known constraints, authorized workspace, and optional existing map
-- expected_outputs: one canonical decision index, bounded decision items, prerequisite links, current ready set, unshaped unknowns, exclusions, and one next-owner recommendation when decision work closes
+- expected_inputs: target outcome, decision owner, scope boundary, known constraints, authorized workspace, optional Execution Handoff package/plan id, and optional existing map
+- expected_outputs: one canonical package-local decision index, bounded decision items, prerequisite links, current ready set, unshaped unknowns, exclusions, and one next-owner recommendation when decision work closes
 - context_targets:
   must_read:
     - current request or named decision index
     - repository instructions and the authorized artifact boundary
+    - `references/execution_handoff_input_contract.md` before resolving a persistent artifact path
     - [Decision-map schema](references/decision-map-schema.md) before creating or changing artifacts
   read_if_needed:
     - the selected item, its prerequisites, linked resolutions, and evidence that can change its answer
@@ -29,7 +30,7 @@ disable-model-invocation: true
     - all item bodies, full repository history, unrelated plans, or every prior session
 - risk_profile:
   reads: begin with the index and admit detail only for the selected item
-  writes: local Markdown inside the authorized workspace; a named external tracker still requires separate mutation authority
+  writes: local Markdown under the associated Execution Handoff `inputs/decision-map/`; a named external tracker still requires separate mutation authority
   tools: narrow evidence, prototype, or coordination tools only when their own routing and authority contracts are met
   sensitive_resources: credentials and production data denied; never store secrets in planning artifacts
 - entry_scene: PREPARE
@@ -76,7 +77,7 @@ If any answer is no, keep the task with the smaller existing owner. Do not creat
 
 ## Initialize
 
-1. Fix the target outcome, decision owner, in-scope boundary, and completion condition.
+1. Fix the target outcome, decision owner, in-scope boundary, completion condition, and associated Execution Handoff package root/`plan_id` under `execution-handoff-inputs-v1`.
 2. Survey the decision space breadth-first. Record precise current questions as items and leave later, premise-dependent uncertainty unshaped.
 3. Create item identities before adding prerequisite links so relationships never point at unstable names.
 4. Derive the ready set from item state; do not infer readiness from document order.
@@ -102,9 +103,8 @@ Decision mapping is complete when no in-scope unshaped unknown remains and every
 Recommend one next owner without invoking it automatically:
 
 - `plan-requirements-brief` for a requirements contract;
-- `plan-long-term-package` for a multi-document strategic package;
-- `plan-short-term-docs` for one persisted tactical plan;
+- `plan-execution-handoff` for a governed multi-session implementation Plan/Handoff pair;
 - `analysis-boundary-design` for one selected technical boundary; or
 - the intent-matched execution owner only when the result already defines a bounded authorized change.
 
-Return the index path, target outcome, created or resolved item names, ready set, unshaped unknowns, exclusions, coordination conflicts, completion status, and recommended next owner.
+Return the package root, index path, target outcome, created or resolved item names, ready set, unshaped unknowns, exclusions, coordination conflicts, completion status, and recommended next owner.

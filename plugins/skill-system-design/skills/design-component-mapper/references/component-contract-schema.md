@@ -93,8 +93,12 @@ component_reuse:
 
 ## Fallback outcomes
 
-- `approved_match_required`: a no-match role stays `unmapped` and blocks that required control until the catalog is authoritatively extended; no native/custom substitute is allowed.
+- `approved_match_required`: a no-match role stays `unmapped`; the assigned mapping condition
+  remains unresolved until the catalog is authoritatively extended, and no native/custom
+  substitute is allowed.
 - `native_when_unmapped`: after inspected-scope no-match evidence, allow a platform-semantic native control with call-site/accessibility evidence; custom controls still require an authorized exception.
-- `explicit_exception_only`: native or custom fallback requires the recorded waived rule, scope, reason, and authorizing source before implementation; otherwise remain blocked.
+- `explicit_exception_only`: native or custom fallback requires the recorded waived rule, scope,
+  reason, and authorizing source before implementation; otherwise the assigned mapping condition
+  remains unresolved.
 
 An approved match always remains mandatory unless the active policy explicitly permits and evidences a scoped deviation.

@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-"""Generate the Codex and Claude runtimes from canonical source/.
+"""Generate provider runtimes and plugins from canonical source/.
 
 Portable skills and data contracts are shared. Harness entry files, routing, hooks,
-permissions, and platform tools are owned by source/platform/{codex,claude} and can be
-generated independently. ``runtime`` remains the release aggregate that generates both.
+permissions, and platform tools are owned by source/platform/<provider> and can be generated
+independently. ``runtime`` generates all declared runtime companions in one command.
 
 Platform entries that overlap shared output are merged. Platform-only entries are replaced from
 source so deleted tools and hook files cannot survive in generated targets.
 
-Idempotency: verbatim trees copy unchanged bytes. Mirror files reuse the frozen
-generated_from/generated_at from source/mirror-meta.json, so regeneration is byte-stable.
+Idempotency: verbatim trees copy unchanged bytes.
 """
 from __future__ import annotations
 
@@ -17,6 +16,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -24,37 +24,113 @@ from pathlib import Path
 
 # (source_rel, target_rel) copied unchanged into either requested target.
 NEUTRAL_VERBATIM: list[tuple[str, str]] = [
-    ("skills", "skills"),
     ("shared/docs", "docs"),
-    ("shared/eval", "eval"),
     ("shared/schemas", "schemas"),  # Phase 1b: schema definitions are platform-neutral data contracts
 ]
 NEUTRAL_TARGET_ROOTS = {target_rel.split("/", 1)[0] for _, target_rel in NEUTRAL_VERBATIM}
 REPORT_CANVAS_SOURCE = Path("shared/report-canvas")
 REPORT_CANVAS_CONTRACT_SOURCE = Path("shared/docs/report_canvas_contract.md")
-REPORT_CANVAS_SCRIPT_TARGET = Path("scripts/report-canvas")
+REPORT_CANVAS_PLUGIN_TARGET = Path("shared/report-canvas")
 REPORT_CANVAS_REFERENCE_TARGET = Path("references/report_canvas_contract.md")
+REPORT_DELIVERY_CONTRACT_SOURCE = Path("shared/docs/report_delivery_contract.md")
+REPORT_DELIVERY_CONTRACT_TARGET = Path("references/report_delivery_contract.md")
 REPORT_VISUAL_AUTHORING_SOURCE = Path("shared/docs/report_visual_authoring.md")
 REPORT_VISUAL_AUTHORING_TARGET = Path("references/report_visual_authoring.md")
 VISUAL_DECISION_SOURCE = Path("shared/docs/visual_decision_contract.md")
 VISUAL_DECISION_TARGET = Path("references/visual_decision_contract.md")
+EXECUTION_ITEM_CONTRACT_SOURCE = Path("shared/docs/execution_item_contract.md")
+EXECUTION_ITEM_CONTRACT_TARGET = Path("references/execution_item_contract.md")
+EXECUTION_ITEM_VIEW_TARGET = Path("references/execution_item_view.md")
+EXECUTION_ITEM_SCHEMA_SOURCE = Path("shared/schemas/execution/execution-item.schema.json")
+EXECUTION_ITEM_SCHEMA_TARGET = Path("references/execution-item.schema.json")
+EXECUTION_CARD_SOURCE_ROOT = Path("shared/contracts/core-execution-items-v1/cards")
+EXECUTION_CARD_REFERENCE_RE = re.compile(
+    r"references/core-execution-items-v1/cards/[A-Za-z0-9][A-Za-z0-9_.-]*\.md"
+)
+DELIVERY_SLICE_CONTRACT_SOURCE = Path("shared/docs/delivery_slice_contract.md")
+DELIVERY_SLICE_CONTRACT_TARGET = Path("references/delivery_slice_contract.md")
+EXECUTION_HANDOFF_INPUT_CONTRACT_SOURCE = Path(
+    "shared/docs/execution_handoff_input_contract.md"
+)
+EXECUTION_HANDOFF_INPUT_CONTRACT_TARGET = Path(
+    "references/execution_handoff_input_contract.md"
+)
+BOUNDARY_DECISION_CONTRACT_SOURCE = Path("shared/docs/boundary_decision_contract.md")
+BOUNDARY_DECISION_CONTRACT_TARGET = Path("references/boundary_decision_contract.md")
+RESEARCH_STAGE_CONTRACT_SOURCE = Path("shared/docs/research_stage_contract.md")
+RESEARCH_STAGE_CONTRACT_TARGET = Path("references/research_stage_contract.md")
+DESIGN_SHARED_REFERENCE_PROJECTIONS = (
+    (Path("shared/docs/design_stage_contract.md"), Path("references/design_stage_contract.md")),
+    (Path("shared/docs/design_evidence_contract.md"), Path("references/design_evidence_contract.md")),
+    (
+        Path("shared/docs/product_family_design_contract.md"),
+        Path("references/product_family_design_contract.md"),
+    ),
+    (
+        Path("shared/docs/layout_constraint_contract.md"),
+        Path("references/layout_constraint_contract.md"),
+    ),
+)
+MANAGEMENT_SHARED_REFERENCE_PROJECTIONS = (
+    (
+        Path("shared/docs/project_context_manifest.md"),
+        Path("references/project_context_manifest.md"),
+    ),
+    (
+        Path("shared/docs/memory_mutation_contract.md"),
+        Path("references/memory_mutation_contract.md"),
+    ),
+    (
+        Path("shared/docs/knowledge_record_contract.md"),
+        Path("references/knowledge_record_contract.md"),
+    ),
+)
+MAINTAINABLE_CODE_PRINCIPLES_SOURCE = Path(
+    "shared/docs/maintainable_code_principles.md"
+)
+MAINTAINABLE_CODE_PRINCIPLES_TARGET = Path(
+    "references/maintainable_code_principles.md"
+)
+IDENTIFIER_READABILITY_PRINCIPLE_SOURCE = Path(
+    "shared/docs/identifier_readability_principle.md"
+)
+IDENTIFIER_READABILITY_PRINCIPLE_TARGET = Path(
+    "references/identifier_readability_principle.md"
+)
+DATABASE_PERSISTENCE_TRANSPARENCY_CONTRACT_SOURCE = Path(
+    "shared/docs/database_persistence_transparency_contract.md"
+)
+DATABASE_PERSISTENCE_TRANSPARENCY_CONTRACT_TARGET = Path(
+    "references/database_persistence_transparency_contract.md"
+)
 
 # Platform-native trees: every top-level entry under source/platform/<p> is copied verbatim
 # into that one target only. AGENTS.md / CLAUDE.md live here as platform-native for Phase 1a;
 # factoring them into a shared body + overlay (platform-template) is a Phase 1b refinement.
 PLATFORM_CODEX_ROOT = "platform/codex"
 PLATFORM_CLAUDE_ROOT = "platform/claude"
-REMOVED_CODEX_TARGET_ROOTS = ("research",)
+PLATFORM_GROK_ROOT = "platform/grok"
+PLATFORM_ANTIGRAVITY_ROOT = "platform/antigravity"
+REMOVED_CODEX_TARGET_ROOTS = ("research", "tools")
+REMOVED_CODEX_TARGET_FILES = (
+    "research-routing.md",
+    "tools/check_evidence_ledger.py",
+    "tools/validate_research_ledger.py",
+)
+REMOVED_SHARED_TARGET_ROOTS = ("eval", "skills", "report-canvas")
+REMOVED_VERIFIER_BINARIES = (
+    "skill-system-verify",
+    "skill-system-verify.exe",
+    "skill-system-verify-linux-amd64",
+)
 
-MIRROR_META_FILE = "mirror-meta.json"
+BINARY_BUILD_MANIFEST = ".build-manifest.json"
 
 # Portable skill bodies use Codex runtime paths as their canonical host spelling. Claude
 # packages must project only namespaces that have a Claude-owned equivalent; tool-dependent
 # instructions use host-neutral tool names in the canonical skill text instead.
 CLAUDE_SKILL_PATH_PROJECTIONS: tuple[tuple[str, str], ...] = (
-    (".codex/research-routing.md", ".claude/context-routing.md"),
     (".codex/docs/", ".claude/docs/"),
-    (".codex/eval/", ".claude/eval/"),
     (".codex/schemas/", ".claude/schemas/"),
     (".codex/skills/.system", ".claude/skills/.system"),
 )
@@ -62,11 +138,10 @@ CLAUDE_SKILL_PATH_PROJECTIONS: tuple[tuple[str, str], ...] = (
 _CACHE_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 
 PLUGIN_DISPLAY = {
-    "skill-system-core": ("Skill System Core", "Shared operating platform skills for Codex workflows."),
-    "skill-system-dev": ("Skill System Dev", "Engineering analysis, implementation, understanding, behavior discovery, refactoring, and recovery skills."),
+    "skill-system-core": ("Skill System Core", "Shared planning, management, evidence, and report delivery skills."),
+    "skill-system-dev": ("Skill System Dev", "Engineering analysis, implementation, bounded bug repair, code review, behavior discovery, and refactoring skills."),
     "skill-system-design": ("Skill System Design", "Frontend, UI, layout, component, token, and visual validation skills."),
-    "skill-system-research": ("Skill System Research", "Scientific research, synthesis, experiment, and manuscript skills."),
-    "skill-system-quality": ("Skill System Quality", "QA, qualitative review, critical review, and validation skills."),
+    "skill-system-research": ("Skill System Research", "Explicit Research node execution, scientific synthesis, experiment, analysis, manuscript, and review skills."),
 }
 
 
@@ -86,6 +161,31 @@ def _ignore(_dir: str, names: list[str]) -> set[str]:
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _tree_files(root: Path) -> list[Path]:
+    return sorted(
+        path
+        for path in root.rglob("*")
+        if path.is_file()
+        and not any(_is_junk(part) for part in path.relative_to(root).parts)
+    )
+
+
+def _go_command_build_digest(module: Path, command: str) -> str:
+    digest = hashlib.sha256()
+    for path in _tree_files(module):
+        if path.name.endswith("_test.go"):
+            continue
+        rel = path.relative_to(module).as_posix()
+        if rel not in {"go.mod", "go.sum"}:
+            if rel.startswith("cmd/") and not rel.startswith(f"cmd/{command}/"):
+                continue
+        digest.update(rel.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(_sha256(path).encode("ascii"))
+        digest.update(b"\n")
+    return digest.hexdigest()
 
 
 def _copy(src: Path, dst: Path) -> None:
@@ -186,12 +286,6 @@ def _project_claude_invocation(skill_dir: Path, target_dir: Path) -> None:
     skill_md.write_text(text, encoding="utf-8")
 
 
-def _project_claude_runtime_skills(source: Path, claude: Path) -> None:
-    for skill_dir in sorted((source / "skills").iterdir()):
-        if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file():
-            _project_claude_invocation(skill_dir, claude / "skills" / skill_dir.name)
-
-
 def _copy_plugin_skill(src: Path, dst: Path, *, claude: bool = False) -> None:
     _copy(src, dst)
     agent_manifest = dst / "agents" / "openai.yaml"
@@ -206,7 +300,7 @@ def _is_report_skill(skill_dir: Path) -> bool:
 
 
 def _attach_report_canvas_payload(source: Path, skill_dir: Path) -> None:
-    """Project the shared Canvas into one self-contained report skill package."""
+    """Project small report contracts into one report skill; renderer is plugin-shared."""
     if not _is_report_skill(skill_dir):
         return
     skill_text = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
@@ -214,7 +308,14 @@ def _attach_report_canvas_payload(source: Path, skill_dir: Path) -> None:
         raise SystemExit(
             f"report skill does not reference its local Canvas contract: {skill_dir}"
         )
-    _copy(source / REPORT_CANVAS_SOURCE, skill_dir / REPORT_CANVAS_SCRIPT_TARGET)
+    if "references/report_delivery_contract.md" not in skill_text:
+        raise SystemExit(
+            f"report skill does not reference its local delivery contract: {skill_dir}"
+        )
+    _copy(
+        source / REPORT_DELIVERY_CONTRACT_SOURCE,
+        skill_dir / REPORT_DELIVERY_CONTRACT_TARGET,
+    )
     _copy(
         source / REPORT_CANVAS_CONTRACT_SOURCE,
         skill_dir / REPORT_CANVAS_REFERENCE_TARGET,
@@ -243,50 +344,291 @@ def _attach_visual_decision_payload(source: Path, skill_dir: Path) -> None:
     _copy(source / VISUAL_DECISION_SOURCE, skill_dir / VISUAL_DECISION_TARGET)
 
 
-def _attach_runtime_report_canvas_payloads(source: Path, runtime: Path) -> None:
-    skills_root = runtime / "skills"
-    for skill_dir in sorted(skills_root.iterdir()):
-        _attach_report_canvas_payload(source, skill_dir)
-        _attach_visual_decision_payload(source, skill_dir)
-    stale_root = runtime / "report-canvas"
-    if stale_root.is_dir():
-        shutil.rmtree(stale_root)
-    elif stale_root.exists():
-        stale_root.unlink()
-
-
-def _render_yaml_mirror(canonical: Path, generated_from: str, generated_at: str, checksum: str) -> str:
-    body = canonical.read_text(encoding="utf-8")
-    return "\n".join(
-        [
-            f"generated_from: {generated_from}",
-            f"generated_at: {generated_at}",
-            f"source_checksum: {checksum}",
-            "do_not_edit: true",
-            "",
-            body.rstrip(),
-            "",
-        ]
+def _wants_execution_item_contract(skill_dir: Path) -> bool:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return False
+    text = skill_md.read_text(encoding="utf-8")
+    return (
+        "references/execution_item_contract.md" in text
+        or "references/execution_item_view.md" in text
+        or bool(EXECUTION_CARD_REFERENCE_RE.search(text))
     )
 
 
-def _render_json_mirror(canonical: Path, generated_from: str, generated_at: str, checksum: str) -> str:
-    data = json.loads(canonical.read_text(encoding="utf-8"))
-    mirrored = {
-        "x_generated_from": generated_from,
-        "x_generated_at": generated_at,
-        "x_source_checksum": checksum,
-        "x_do_not_edit": True,
+def _markdown_sections(text: str, level: int) -> dict[str, str]:
+    marker = "#" * level + " "
+    sections: dict[str, str] = {}
+    title: str | None = None
+    lines: list[str] = []
+    for line in text.splitlines():
+        if line.startswith(marker):
+            if title is not None:
+                sections[title] = "\n".join(lines).strip()
+            title = line[len(marker) :].strip()
+            lines = [line]
+        elif title is not None:
+            lines.append(line)
+    if title is not None:
+        sections[title] = "\n".join(lines).strip()
+    return sections
+
+
+def _render_execution_item_view(source: Path, skill_dir: Path, skill_text: str) -> None:
+    """Generate one role view from the canonical contract and declared Core Cards."""
+    contract_text = (source / EXECUTION_ITEM_CONTRACT_SOURCE).read_text(encoding="utf-8")
+    contract_sections = _markdown_sections(contract_text, 2)
+    skill_sections = _markdown_sections(skill_text, 2)
+    required_sections = (
+        "Authority",
+        "Common Envelope",
+        "Core Markdown Cards",
+        "Item Kinds",
+        "Worker-Done Body",
+    )
+    missing_sections = [name for name in required_sections if name not in contract_sections]
+    if missing_sections or "Core Cards" not in skill_sections:
+        raise SystemExit(
+            f"cannot project execution-item role view for {skill_dir}: "
+            f"missing contract sections {missing_sections} or skill Core Cards"
+        )
+
+    selected_kinds = {
+        Path(reference).stem
+        for reference in EXECUTION_CARD_REFERENCE_RE.findall(skill_sections["Core Cards"])
     }
-    mirrored.update(data)
-    return json.dumps(mirrored, indent=2, ensure_ascii=True) + "\n"
+    if not selected_kinds:
+        raise SystemExit(f"execution-item role view for {skill_dir} selects no Core Cards")
+    item_sections = _markdown_sections(contract_sections["Item Kinds"], 3)
+    selected_sections = [
+        section
+        for title, section in item_sections.items()
+        if title.strip("`") in selected_kinds
+    ]
+    projected_kinds = {
+        title.strip("`") for title in item_sections if title.strip("`") in selected_kinds
+    }
+    if projected_kinds != selected_kinds:
+        raise SystemExit(
+            f"execution-item role view for {skill_dir} has no canonical item section for "
+            f"{sorted(selected_kinds - projected_kinds)}"
+        )
+
+    preamble = contract_text.split("\n## ", 1)[0].splitlines()
+    canonical_metadata = "\n".join(preamble[2:]).strip()
+    role_cards = skill_sections["Core Cards"].replace("## Core Cards", "## Role Cards", 1)
+    parts = [
+        "# Core Execution Item Role View",
+        (
+            f"Generated from the canonical Core execution-item contract for `{skill_dir.name}`. "
+            "Do not edit this projection."
+        ),
+        canonical_metadata,
+        contract_sections["Authority"],
+        contract_sections["Common Envelope"],
+        contract_sections["Core Markdown Cards"],
+        role_cards,
+        "## Selected Item Kinds\n\n" + "\n\n".join(selected_sections),
+        contract_sections["Worker-Done Body"],
+    ]
+    target = skill_dir / EXECUTION_ITEM_VIEW_TARGET
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        "\n\n".join(part.strip() for part in parts if part.strip()) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _attach_execution_item_contract(source: Path, skill_dir: Path) -> None:
+    """Project the Core execution-item contract or a generated role view."""
+    if not _wants_execution_item_contract(skill_dir):
+        return
+    skill_text = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
+    wants_view = "references/execution_item_view.md" in skill_text
+    wants_full_contract = "references/execution_item_contract.md" in skill_text or not wants_view
+    if wants_full_contract:
+        _copy(
+            source / EXECUTION_ITEM_CONTRACT_SOURCE,
+            skill_dir / EXECUTION_ITEM_CONTRACT_TARGET,
+        )
+    if wants_view:
+        _render_execution_item_view(source, skill_dir, skill_text)
+    _copy(
+        source / EXECUTION_ITEM_SCHEMA_SOURCE,
+        skill_dir / EXECUTION_ITEM_SCHEMA_TARGET,
+    )
+    for target_text in sorted(set(EXECUTION_CARD_REFERENCE_RE.findall(skill_text))):
+        target = Path(target_text)
+        canonical = source / EXECUTION_CARD_SOURCE_ROOT / target.name
+        if not canonical.is_file():
+            raise SystemExit(
+                f"missing Core execution card {canonical} referenced by {skill_dir / 'SKILL.md'}"
+            )
+        _copy(canonical, skill_dir / target)
+
+
+def _wants_delivery_slice_contract(skill_dir: Path) -> bool:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return False
+    return "references/delivery_slice_contract.md" in skill_md.read_text(encoding="utf-8")
+
+
+def _attach_delivery_slice_contract(source: Path, skill_dir: Path) -> None:
+    """Project the shared delivery-slice contract into each opted-in skill package."""
+    if not _wants_delivery_slice_contract(skill_dir):
+        return
+    _copy(
+        source / DELIVERY_SLICE_CONTRACT_SOURCE,
+        skill_dir / DELIVERY_SLICE_CONTRACT_TARGET,
+    )
+
+
+def _wants_execution_handoff_input_contract(skill_dir: Path) -> bool:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return False
+    return "references/execution_handoff_input_contract.md" in skill_md.read_text(
+        encoding="utf-8"
+    )
+
+
+def _attach_execution_handoff_input_contract(source: Path, skill_dir: Path) -> None:
+    """Project the shared Planning-input contract into each opted-in skill package."""
+    if not _wants_execution_handoff_input_contract(skill_dir):
+        return
+    _copy(
+        source / EXECUTION_HANDOFF_INPUT_CONTRACT_SOURCE,
+        skill_dir / EXECUTION_HANDOFF_INPUT_CONTRACT_TARGET,
+    )
+
+
+def _wants_boundary_decision_contract(skill_dir: Path) -> bool:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return False
+    return "references/boundary_decision_contract.md" in skill_md.read_text(
+        encoding="utf-8"
+    )
+
+
+def _attach_boundary_decision_contract(source: Path, skill_dir: Path) -> None:
+    """Project the shared boundary-decision rule into each opted-in skill package."""
+    if not _wants_boundary_decision_contract(skill_dir):
+        return
+    _copy(
+        source / BOUNDARY_DECISION_CONTRACT_SOURCE,
+        skill_dir / BOUNDARY_DECISION_CONTRACT_TARGET,
+    )
+
+
+def _wants_research_stage_contract(skill_dir: Path) -> bool:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return False
+    return "references/research_stage_contract.md" in skill_md.read_text(
+        encoding="utf-8"
+    )
+
+
+def _attach_research_stage_contract(source: Path, skill_dir: Path) -> None:
+    """Project the shared Research stage rule into each opted-in skill package."""
+    if not _wants_research_stage_contract(skill_dir):
+        return
+    _copy(
+        source / RESEARCH_STAGE_CONTRACT_SOURCE,
+        skill_dir / RESEARCH_STAGE_CONTRACT_TARGET,
+    )
+
+
+def _attach_design_shared_references(source: Path, skill_dir: Path) -> None:
+    """Project only the shared Design references explicitly named by a skill."""
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return
+    text = skill_md.read_text(encoding="utf-8")
+    for source_path, target_path in DESIGN_SHARED_REFERENCE_PROJECTIONS:
+        if target_path.as_posix() in text:
+            _copy(source / source_path, skill_dir / target_path)
+
+
+def _attach_management_shared_references(source: Path, skill_dir: Path) -> None:
+    """Project only the shared Management references explicitly named by a skill."""
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return
+    text = skill_md.read_text(encoding="utf-8")
+    for source_path, target_path in MANAGEMENT_SHARED_REFERENCE_PROJECTIONS:
+        if target_path.as_posix() in text:
+            _copy(source / source_path, skill_dir / target_path)
+
+
+def _wants_maintainable_code_principles(skill_dir: Path) -> bool:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return False
+    return "references/maintainable_code_principles.md" in skill_md.read_text(
+        encoding="utf-8"
+    )
+
+
+def _attach_maintainable_code_principles(source: Path, skill_dir: Path) -> None:
+    """Project the maintainable-code principles into opted-in skill packages."""
+    if not _wants_maintainable_code_principles(skill_dir):
+        return
+    _copy(
+        source / MAINTAINABLE_CODE_PRINCIPLES_SOURCE,
+        skill_dir / MAINTAINABLE_CODE_PRINCIPLES_TARGET,
+    )
+
+
+def _wants_identifier_readability_principle(skill_dir: Path) -> bool:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return False
+    return "references/identifier_readability_principle.md" in skill_md.read_text(
+        encoding="utf-8"
+    )
+
+
+def _attach_identifier_readability_principle(
+    source: Path, skill_dir: Path
+) -> None:
+    """Project the identifier-readability principle into opted-in skill packages."""
+    if not _wants_identifier_readability_principle(skill_dir):
+        return
+    _copy(
+        source / IDENTIFIER_READABILITY_PRINCIPLE_SOURCE,
+        skill_dir / IDENTIFIER_READABILITY_PRINCIPLE_TARGET,
+    )
+
+
+def _wants_database_persistence_transparency_contract(skill_dir: Path) -> bool:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return False
+    return "references/database_persistence_transparency_contract.md" in skill_md.read_text(
+        encoding="utf-8"
+    )
+
+
+def _attach_database_persistence_transparency_contract(
+    source: Path, skill_dir: Path
+) -> None:
+    """Project the database-persistence contract into opted-in skill packages."""
+    if not _wants_database_persistence_transparency_contract(skill_dir):
+        return
+    _copy(
+        source / DATABASE_PERSISTENCE_TRANSPARENCY_CONTRACT_SOURCE,
+        skill_dir / DATABASE_PERSISTENCE_TRANSPARENCY_CONTRACT_TARGET,
+    )
 
 
 def _merge_copy(src: Path, dst: Path) -> None:
     """Overlay src onto dst, copying files without removing pre-existing target content.
 
     Used for platform overlay so a platform tree can supplement a shared tree
-    (e.g. codex-only schemas/workitem/examples on top of shared schema definitions).
+    (for example, Codex-only tool metadata on top of shared schema definitions).
     """
     if src.is_file():
         dst.parent.mkdir(parents=True, exist_ok=True)
@@ -337,6 +679,78 @@ def _go_executable() -> str:
     raise SystemExit("Go is required to generate the Codex runtime; set SKILL_SYSTEM_GO or install Go")
 
 
+def _load_binary_build_manifest(output_root: Path) -> dict:
+    path = output_root / BINARY_BUILD_MANIFEST
+    if not path.is_file():
+        return {"manifest_version": 1, "groups": {}}
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {"manifest_version": 1, "groups": {}}
+    if value.get("manifest_version") != 1 or not isinstance(value.get("groups"), dict):
+        return {"manifest_version": 1, "groups": {}}
+    return value
+
+
+def _cached_binary_group(
+    output_root: Path,
+    group: str,
+    build_key: str,
+    filenames: list[str],
+    written: list[str],
+) -> bool:
+    manifest = _load_binary_build_manifest(output_root)
+    entry = manifest["groups"].get(group)
+    if not isinstance(entry, dict) or entry.get("build_key") != build_key:
+        return False
+    outputs = entry.get("outputs")
+    if not isinstance(outputs, dict):
+        return False
+    for filename in filenames:
+        path = output_root / filename
+        if not path.is_file() or outputs.get(filename) != _sha256(path):
+            return False
+    written.extend((output_root / filename).as_posix() for filename in filenames)
+    return True
+
+
+def _record_binary_group(output_root: Path, group: str, build_key: str, filenames: list[str]) -> None:
+    manifest = _load_binary_build_manifest(output_root)
+    manifest["groups"][group] = {
+        "build_key": build_key,
+        "outputs": {filename: _sha256(output_root / filename) for filename in filenames},
+    }
+    (output_root / BINARY_BUILD_MANIFEST).write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _remove_path(path: Path) -> None:
+    if path.is_dir():
+        shutil.rmtree(path)
+    elif path.exists():
+        path.unlink()
+
+
+def _prune_retired_evaluation_payload(runtime: Path) -> None:
+    for root_name in REMOVED_SHARED_TARGET_ROOTS:
+        _remove_path(runtime / root_name)
+    _remove_path(runtime / ".generated-manifest.json")
+
+    output_root = runtime / "bin"
+    for filename in REMOVED_VERIFIER_BINARIES:
+        _remove_path(output_root / filename)
+    manifest_path = output_root / BINARY_BUILD_MANIFEST
+    if manifest_path.is_file():
+        manifest = _load_binary_build_manifest(output_root)
+        manifest["groups"].pop("go:skill-system-verify", None)
+        manifest_path.write_text(
+            json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+
 def _swiftc_executable() -> str:
     configured = os.environ.get("SKILL_SYSTEM_SWIFTC", "").strip()
     if configured:
@@ -361,6 +775,19 @@ def _build_go_dispatchers(
     if not (module / "go.mod").is_file():
         raise SystemExit(f"missing Go harness module: {module}")
     version = str(_load_manifest(source / "plugins" / "core.yaml")["version"])
+    filenames = [filename for _, _, filename in targets]
+    key_source = json.dumps(
+        {
+            "module_digest": _go_command_build_digest(module, command),
+            "command": command,
+            "targets": targets,
+            "version": version,
+        },
+        sort_keys=True,
+    ).encode("utf-8")
+    build_key = hashlib.sha256(key_source).hexdigest()
+    if _cached_binary_group(output_root, "go:" + command, build_key, filenames, written):
+        return
     go = _go_executable()
     for goos, goarch, filename in targets:
         output = output_root / filename
@@ -383,6 +810,7 @@ def _build_go_dispatchers(
             check=True,
         )
         written.append(output.as_posix())
+    _record_binary_group(output_root, "go:" + command, build_key, filenames)
 
 
 def _build_notification_overlay(source: Path, output_root: Path, written: list[str]) -> None:
@@ -390,6 +818,17 @@ def _build_notification_overlay(source: Path, output_root: Path, written: list[s
     if not overlay_source.is_file():
         raise SystemExit(f"missing Swift notification overlay source: {overlay_source}")
     overlay = output_root / "skill-system-notify-overlay"
+    build_key = hashlib.sha256(
+        ("swift:arm64-apple-macosx13.0:" + _sha256(overlay_source)).encode("utf-8")
+    ).hexdigest()
+    if _cached_binary_group(
+        output_root,
+        "swift:notification-overlay",
+        build_key,
+        [overlay.name],
+        written,
+    ):
+        return
     with tempfile.TemporaryDirectory(prefix="skill-system-swift-cache-") as module_cache:
         subprocess.run(
             [
@@ -407,13 +846,17 @@ def _build_notification_overlay(source: Path, output_root: Path, written: list[s
         )
     overlay.chmod(0o755)
     written.append(overlay.as_posix())
+    _record_binary_group(
+        output_root,
+        "swift:notification-overlay",
+        build_key,
+        [overlay.name],
+    )
 
 
 def _build_codex_harness(source: Path, codex: Path, written: list[str]) -> None:
     """Build the Codex Go dispatchers and packaged macOS notification overlay."""
     output_root = codex / "bin"
-    if output_root.exists():
-        shutil.rmtree(output_root)
     output_root.mkdir(parents=True, exist_ok=True)
     _build_go_dispatchers(
         source,
@@ -431,8 +874,6 @@ def _build_codex_harness(source: Path, codex: Path, written: list[str]) -> None:
 def _build_claude_harness(source: Path, claude: Path, written: list[str]) -> None:
     """Build Claude-native dispatchers plus the packaged macOS notification overlay."""
     output_root = claude / "bin"
-    if output_root.exists():
-        shutil.rmtree(output_root)
     output_root.mkdir(parents=True, exist_ok=True)
     _build_go_dispatchers(
         source,
@@ -448,68 +889,73 @@ def _build_claude_harness(source: Path, claude: Path, written: list[str]) -> Non
     _build_notification_overlay(source, output_root, written)
 
 
-def _write_mirror(source: Path, claude: Path, dst_rel: str, spec: dict) -> None:
-    canonical = source / spec["canonical"]
-    if not canonical.is_file():
-        raise SystemExit(f"missing mirror canonical: {canonical}")
-    checksum = _sha256(canonical)
-    if checksum != spec["source_checksum"]:
-        raise SystemExit(
-            f"mirror canonical changed for {dst_rel}: source_checksum {checksum} != "
-            f"frozen {spec['source_checksum']}. Update source/mirror-meta.json under Phase 1b, "
-            f"not Phase 1a baseline."
-        )
-    if spec["kind"] == "yaml":
-        content = _render_yaml_mirror(canonical, spec["generated_from"], spec["generated_at"], checksum)
-    elif spec["kind"] == "json":
-        content = _render_json_mirror(canonical, spec["generated_from"], spec["generated_at"], checksum)
-    else:
-        raise SystemExit(f"unknown mirror kind: {spec['kind']}")
-    out = claude / dst_rel
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(content, encoding="utf-8")
-
-
 def generate_codex_runtime(source: Path, codex: Path) -> list[str]:
     written: list[str] = []
     _copy_neutral(source, codex, written)
-    _attach_runtime_report_canvas_payloads(source, codex)
     _copy_platform(source / PLATFORM_CODEX_ROOT, codex, written)
-    # Research ledger data and its validation schema are maintainer fixtures, not
-    # live runtime payload. Remove the former generated root so an upgrade cannot
-    # retain or redeploy the historical ledger.
+    # Retired Codex-only Research/Python-tool roots have no current owner. Remove them so an
+    # upgrade cannot retain historical validators, ledgers, or lifecycle payload.
     for root_name in REMOVED_CODEX_TARGET_ROOTS:
         stale = codex / root_name
         if stale.is_dir():
             shutil.rmtree(stale)
         elif stale.exists():
             stale.unlink()
+    for file_name in REMOVED_CODEX_TARGET_FILES:
+        stale = codex / file_name
+        if stale.is_dir():
+            shutil.rmtree(stale)
+        elif stale.exists():
+            stale.unlink()
     _build_codex_harness(source, codex, written)
+    _prune_retired_evaluation_payload(codex)
     return written
 
 
 def generate_claude_runtime(source: Path, claude: Path) -> list[str]:
     written: list[str] = []
     _copy_neutral(source, claude, written)
-    _project_claude_runtime_skills(source, claude)
-    _attach_runtime_report_canvas_payloads(source, claude)
     _copy_platform(source / PLATFORM_CLAUDE_ROOT, claude, written)
     # 9.3.4 removes the Python-only Claude runtime. Prune the now-absent
     # platform-owned root so stale adapters cannot survive regeneration.
     if not (source / PLATFORM_CLAUDE_ROOT / "tools").exists() and (claude / "tools").exists():
         shutil.rmtree(claude / "tools")
     _build_claude_harness(source, claude, written)
-    # Claude keeps the checksum-bearing eval-schema mirror of shared canonical data.
-    meta = json.loads((source / MIRROR_META_FILE).read_text(encoding="utf-8"))
-    for dst_rel, spec in meta["mirrors"].items():
-        _write_mirror(source, claude, dst_rel, spec)
-        written.append((claude / dst_rel).as_posix() + " (mirror)")
+    _prune_retired_evaluation_payload(claude)
     return written
 
 
-def generate_runtime(source: Path, codex: Path, claude: Path) -> list[str]:
-    """Release aggregate: generate both platform runtimes under one bundle identity."""
-    return generate_codex_runtime(source, codex) + generate_claude_runtime(source, claude)
+def generate_rule_only_runtime(source: Path, platform_root: str, target: Path) -> list[str]:
+    """Generate a provider rule/docs companion with no native lifecycle harness."""
+    written: list[str] = []
+    _copy_neutral(source, target, written)
+    _copy_platform(source / platform_root, target, written)
+    _prune_retired_evaluation_payload(target)
+    return written
+
+
+def generate_grok_runtime(source: Path, grok: Path) -> list[str]:
+    return generate_rule_only_runtime(source, PLATFORM_GROK_ROOT, grok)
+
+
+def generate_antigravity_runtime(source: Path, antigravity: Path) -> list[str]:
+    return generate_rule_only_runtime(source, PLATFORM_ANTIGRAVITY_ROOT, antigravity)
+
+
+def generate_runtime(
+    source: Path,
+    codex: Path,
+    claude: Path,
+    grok: Path,
+    antigravity: Path,
+) -> list[str]:
+    """Generate all provider runtime companions."""
+    return (
+        generate_codex_runtime(source, codex)
+        + generate_claude_runtime(source, claude)
+        + generate_grok_runtime(source, grok)
+        + generate_antigravity_runtime(source, antigravity)
+    )
 
 
 def _load_manifest(path: Path) -> dict:
@@ -596,6 +1042,19 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
         claude_plugin_json.parent.mkdir(parents=True, exist_ok=True)
         claude_plugin_json.write_text(json.dumps(claude_manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         written.append(claude_plugin_json.as_posix())
+        # The Claude-projected package is also the portable Grok/Antigravity package. Grok reads
+        # Claude plugins natively; Antigravity requires this minimal root marker and discovers the
+        # same skills/ tree. Keeping one package avoids two more generated copies of every skill.
+        portable_manifest = {
+            "name": name,
+            "description": spec["description"],
+        }
+        portable_plugin_json = claude_pkg / "plugin.json"
+        portable_plugin_json.write_text(
+            json.dumps(portable_manifest, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        written.append(portable_plugin_json.as_posix())
         # Catalog entry for the Claude repo-local marketplace (source is a path relative to the
         # marketplace root = the plugins/ dir that hosts .claude-plugin/marketplace.json).
         marketplace_plugins.append(
@@ -616,11 +1075,50 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
             _copy_plugin_skill(source / "skills" / sid, codex_pkg / "skills" / sid)
             _attach_report_canvas_payload(source, codex_pkg / "skills" / sid)
             _attach_visual_decision_payload(source, codex_pkg / "skills" / sid)
+            _attach_execution_item_contract(source, codex_pkg / "skills" / sid)
+            _attach_delivery_slice_contract(source, codex_pkg / "skills" / sid)
+            _attach_execution_handoff_input_contract(source, codex_pkg / "skills" / sid)
+            _attach_boundary_decision_contract(source, codex_pkg / "skills" / sid)
+            _attach_research_stage_contract(source, codex_pkg / "skills" / sid)
+            _attach_design_shared_references(source, codex_pkg / "skills" / sid)
+            _attach_management_shared_references(source, codex_pkg / "skills" / sid)
+            _attach_maintainable_code_principles(source, codex_pkg / "skills" / sid)
+            _attach_identifier_readability_principle(
+                source, codex_pkg / "skills" / sid
+            )
+            _attach_database_persistence_transparency_contract(
+                source, codex_pkg / "skills" / sid
+            )
             written.append((codex_pkg / "skills" / sid).as_posix())
             _copy_plugin_skill(source / "skills" / sid, claude_pkg / "skills" / sid, claude=True)
             _attach_report_canvas_payload(source, claude_pkg / "skills" / sid)
             _attach_visual_decision_payload(source, claude_pkg / "skills" / sid)
+            _attach_execution_item_contract(source, claude_pkg / "skills" / sid)
+            _attach_delivery_slice_contract(source, claude_pkg / "skills" / sid)
+            _attach_execution_handoff_input_contract(source, claude_pkg / "skills" / sid)
+            _attach_boundary_decision_contract(source, claude_pkg / "skills" / sid)
+            _attach_research_stage_contract(source, claude_pkg / "skills" / sid)
+            _attach_design_shared_references(source, claude_pkg / "skills" / sid)
+            _attach_management_shared_references(source, claude_pkg / "skills" / sid)
+            _attach_maintainable_code_principles(source, claude_pkg / "skills" / sid)
+            _attach_identifier_readability_principle(
+                source, claude_pkg / "skills" / sid
+            )
+            _attach_database_persistence_transparency_contract(
+                source, claude_pkg / "skills" / sid
+            )
             written.append((claude_pkg / "skills" / sid).as_posix())
+        if any(sid.startswith("report-") for sid in spec["skills"]):
+            _copy(
+                source / REPORT_CANVAS_SOURCE,
+                codex_pkg / REPORT_CANVAS_PLUGIN_TARGET,
+            )
+            _copy(
+                source / REPORT_CANVAS_SOURCE,
+                claude_pkg / REPORT_CANVAS_PLUGIN_TARGET,
+            )
+            written.append((codex_pkg / REPORT_CANVAS_PLUGIN_TARGET).as_posix())
+            written.append((claude_pkg / REPORT_CANVAS_PLUGIN_TARGET).as_posix())
     uncovered = src_skills - seen.keys()
     if uncovered:
         raise SystemExit(f"plugin coverage gap: {len(uncovered)} skills in no plugin: {sorted(uncovered)}")
@@ -630,13 +1128,14 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
     marketplace = {
         "name": "skill-system-local",
         "owner": {"name": "Skill System Maintainers"},
-        "description": "Skill System role-based plugin packages (local marketplace).",
+        "description": "Skill System installation-profile packages (local marketplace).",
         "plugins": marketplace_plugins,
     }
     marketplace_json = plugins_root / ".claude-plugin" / "marketplace.json"
     marketplace_json.parent.mkdir(parents=True, exist_ok=True)
     marketplace_json.write_text(json.dumps(marketplace, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     written.append(marketplace_json.as_posix())
+    _remove_path(plugins_root / ".generated-manifest.json")
     return written
 
 
@@ -644,21 +1143,40 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--target",
-        choices=["runtime", "runtime-codex", "runtime-claude", "plugins"],
+        choices=[
+            "runtime",
+            "runtime-codex",
+            "runtime-claude",
+            "runtime-grok",
+            "runtime-antigravity",
+            "plugins",
+        ],
         required=True,
     )
     parser.add_argument("--source", default="source")
     parser.add_argument("--codex", default=".codex")
     parser.add_argument("--claude", default=".claude")
+    parser.add_argument("--grok", default=".grok")
+    parser.add_argument("--antigravity", default=".antigravity")
     parser.add_argument("--plugins", default="plugins")
     args = parser.parse_args()
 
     if args.target == "runtime":
-        written = generate_runtime(Path(args.source), Path(args.codex), Path(args.claude))
+        written = generate_runtime(
+            Path(args.source),
+            Path(args.codex),
+            Path(args.claude),
+            Path(args.grok),
+            Path(args.antigravity),
+        )
     elif args.target == "runtime-codex":
         written = generate_codex_runtime(Path(args.source), Path(args.codex))
     elif args.target == "runtime-claude":
         written = generate_claude_runtime(Path(args.source), Path(args.claude))
+    elif args.target == "runtime-grok":
+        written = generate_grok_runtime(Path(args.source), Path(args.grok))
+    elif args.target == "runtime-antigravity":
+        written = generate_antigravity_runtime(Path(args.source), Path(args.antigravity))
     else:
         written = generate_plugins(Path(args.source), Path(args.plugins))
     for path in written:

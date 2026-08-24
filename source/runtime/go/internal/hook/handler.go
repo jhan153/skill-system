@@ -5,8 +5,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"skill-system.local/harness/internal/kanboard"
-	"skill-system.local/harness/internal/looprun"
 	"skill-system.local/harness/internal/notify"
 	"skill-system.local/harness/internal/projectcontext"
 	"skill-system.local/harness/internal/responseguard"
@@ -34,7 +32,6 @@ type Event struct {
 	Trigger                 string          `json:"trigger"`
 	Model                   string          `json:"model"`
 	TaskSubject             string          `json:"task_subject"`
-	SkillSystemLoopRunDir   string          `json:"skill_system_loop_run_dir"`
 	SkillSystemNotifyDryRun bool            `json:"skill_system_notify_dry_run"`
 }
 
@@ -65,8 +62,6 @@ func sessionStart(event Event) map[string]any {
 		_ = responseguard.Clear(event.SessionID)
 		_ = workcontract.Clear(event.SessionID)
 	}
-	syncLoopWorkContract(event)
-	kanboard.MaybeSync(event.Cwd, false)
 	var contexts []string
 	result, err := projectcontext.Resolve(event.Cwd, "")
 	if err == nil {
@@ -98,7 +93,6 @@ func userPrompt(event Event) map[string]any {
 		contexts = append(contexts, responseguard.CorrectionContext)
 	}
 	_, _, _ = workcontract.Capture(event.SessionID, event.Prompt)
-	syncLoopWorkContract(event)
 	if state, contractErr := workcontract.Load(event.SessionID); contractErr == nil {
 		if context := workcontract.Context(state); context != "" {
 			contexts = append(contexts, context)
@@ -117,7 +111,6 @@ func userPrompt(event Event) map[string]any {
 }
 
 func preToolUse(event Event) map[string]any {
-	syncLoopWorkContract(event)
 	decision, err := workcontract.Preflight(event.SessionID, event.ToolName, event.ToolInput)
 	if err != nil {
 		return nil
@@ -145,7 +138,6 @@ func preToolUse(event Event) map[string]any {
 }
 
 func permission(event Event) map[string]any {
-	syncLoopWorkContract(event)
 	decision, err := workcontract.Permission(event.SessionID, event.ToolName, event.ToolInput)
 	if err == nil && decision.Deny {
 		return map[string]any{
@@ -174,7 +166,6 @@ func permission(event Event) map[string]any {
 }
 
 func compact(event Event) map[string]any {
-	syncLoopWorkContract(event)
 	state, err := workcontract.Load(event.SessionID)
 	if err != nil {
 		return nil
@@ -196,7 +187,6 @@ func stop(event Event) map[string]any {
 			"reason":   "A user correction is pending, but the response only acknowledges it and promises later action. Re-answer the current correction now: state the corrected premise, invalidate affected conclusions, and provide the direct answer, completed action, or concrete requested plan.",
 		}
 	}
-	syncLoopWorkContract(event)
 	if needsInput(event.LastAssistantMessage) && !reportsBlocked(event.LastAssistantMessage) {
 		if resume, contractErr := workcontract.ContinueWithoutInput(event.SessionID); contractErr == nil && resume {
 			return map[string]any{
@@ -207,78 +197,12 @@ func stop(event Event) map[string]any {
 			}
 		}
 	}
-	report, loopOutput := looprun.Evaluate(event.SessionID, event.SkillSystemLoopRunDir)
-	kanboard.MaybeSync(event.Cwd, false)
-	if report.Status != "" {
-		topic := "progress"
-		if report.Status == "error" || report.Decision.Action == "recover" {
-			topic = "error"
-		} else if report.Decision.Action == "success" {
-			topic = "done"
-		} else if report.Decision.Action == "blocked" || report.Decision.Action == "user_verification_needed" {
-			topic = "input"
-		}
-		body := strings.Trim(strings.Join([]string{
-			report.LoopRunID,
-			report.ResultLabel,
-			report.Decision.Action,
-			report.Decision.ReasonCode,
-		}, " "), " ")
-		if body == "" {
-			body = report.Reason
-		}
-		notify.Send(notify.Message{Event: "loop-iteration", Topic: topic, Title: "Codex LoopRun", Body: notify.SafeText(body), Model: shortModel(event.Model), Session: label(event)})
-	} else if needsInput(event.LastAssistantMessage) {
+	if needsInput(event.LastAssistantMessage) {
 		notify.Send(notify.Message{Event: "input-needed", Topic: "input", Title: "Codex input needed", Body: notify.SafeText(firstLine(event.LastAssistantMessage)), Model: shortModel(event.Model), Session: label(event)})
 	} else {
 		notify.Send(notify.Message{Event: "turn-complete", Topic: "done", Title: "Codex task complete", Body: completionMessage(event), Model: shortModel(event.Model), Session: label(event)})
 	}
-	if loopOutput == nil {
-		if report.Status != "" && terminalLoopAction(report.Decision.Action) {
-			_ = workcontract.Clear(event.SessionID)
-		}
-		return nil
-	}
-	output := map[string]any{}
-	if loopOutput.Continue != nil {
-		output["continue"] = *loopOutput.Continue
-	}
-	if loopOutput.Decision != "" {
-		output["decision"] = loopOutput.Decision
-	}
-	if loopOutput.Reason != "" {
-		output["reason"] = loopOutput.Reason
-	}
-	if loopOutput.SystemMessage != "" {
-		output["systemMessage"] = loopOutput.SystemMessage
-	}
-	return output
-}
-
-func syncLoopWorkContract(event Event) {
-	projection, err := looprun.WorkContract(event.SessionID, event.SkillSystemLoopRunDir)
-	if err != nil || !projection.Active || projection.ExecutionMode == "" {
-		return
-	}
-	_, _, _ = workcontract.AdoptLoopContract(
-		event.SessionID,
-		workcontract.LoopProjection{
-			SourceDigest:          projection.SourceDigest,
-			ExecutionMode:         projection.ExecutionMode,
-			VerificationOwner:     projection.VerificationOwner,
-			InteractionMode:       projection.InteractionMode,
-			ExcludedActionClasses: projection.ExcludedActionClasses,
-		},
-	)
-}
-
-func terminalLoopAction(action string) bool {
-	switch action {
-	case "success", "user_verification_needed", "blocked", "budget_exhausted", "unsafe", "fatal", "stalled":
-		return true
-	default:
-		return false
-	}
+	return nil
 }
 
 func reportsBlocked(message string) bool {

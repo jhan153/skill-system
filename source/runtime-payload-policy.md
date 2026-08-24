@@ -1,128 +1,64 @@
-# Runtime Payload Policy (Phase 0)
+# Skill System 10.0 Runtime Payload Policy
 
-> Phase 0 deliverable of `docs/plan/2026-06-29-skill-system-plugin-neutral-source.md`.
-> Defines how each runtime-payload class in `source/runtime-inventory.yaml` maps to the
-> neutral source layout and to generated targets. This is policy/classification only —
-> no generator and no target content is changed in Phase 0.
+## Canonical Boundary
 
-## 1) Classification basis
-Evidence collected 2026-06-29 from `skill-system/` root:
-- `diff -qr .codex/skills .claude/skills` → only `.DS_Store` differs (skill bodies already mirrored).
-- `diff -q .codex/context-routing.md .claude/context-routing.md` → identical.
-- Shared docs generate verbatim; platform-owned document overlays remain intentionally distinct.
-- `diff -qr .codex/eval .claude/eval` → only `eval/eval-case.schema.json` differs.
-- `.codex` has 15 top-level entries; `.claude` has 9. `.codex/tools` has 29 top-level files plus `tests/`; generated Claude runtime has no tools root.
-- `.gitignore` excludes `/docs/`, `/.github/`, `/.kanboard-plan/`, `/.kanboard-plan.yml`.
+`source/` is canonical. Generated `.codex/`, `.claude/`, `.grok/`, `.antigravity/`, and `plugins/`
+paths are replaceable distribution output and are never edited by hand.
 
-Current counts (`source/runtime-inventory.yaml`, 29 entries): shared-neutral 5,
-platform-native 3, codex-only 8, maintainer-only 9, claude-only 2, and
-local-only/ignored 2. Four entries remain `provisional`, three carry an explicit gap,
-and Phase 1b decisions are recorded for eight inventory entries.
+## Skill Distribution
 
-## 2) Bucket → source/target mapping
+Skills ship through marketplace plugins only:
 
-| class | source location | generated into | strategy |
-|---|---|---|---|
-| shared-neutral | `source/skills/`, `source/shared/docs`, `source/shared/eval`, `source/shared/schemas` | `.codex` AND `.claude` | `neutral-verbatim`, `platform-projected`, or `mirror-from-canonical` |
-| codex-only | `source/platform/codex/` | `.codex` only | `codex-native` |
-| claude-only | `source/platform/claude/` | `.claude` only | `claude-native` |
-| maintainer-only | `source/maintainer/` (or kept under `.codex/tools` as canonical tooling) | maintainer/CI surface, not per-platform parity | `tooling` |
-| plugin-packageable | `source/plugins/*.yaml` membership (Phase 2) | Codex `plugins/skill-system-*`; Claude `plugins/claude/skill-system-*` | Phase 2 |
-| local-only/ignored | n/a | n/a (gitignored) | `local-ignored` |
+- Codex: `plugins/skill-system-*`
+- Claude: `plugins/claude/skill-system-*`
+- Grok: the same Claude-compatible package roots
+- Antigravity: the same package roots with generated root `plugin.json` markers
 
-### Generation strategies
-- `neutral-verbatim` — copy unchanged to either generated target (e.g. `docs/`, `eval/`, `schemas/`).
-- `platform-projected` — copy one canonical skill body, then translate the canonical invocation bit into host-native metadata. Codex keeps `agents/openai.yaml`; Claude adds `disable-model-invocation: true` only to explicit-only generated skills. Codex packages stay under `plugins/<name>` and paired Claude packages under `plugins/claude/<name>`, sharing one plugin name and version.
-- `mirror-from-canonical` — generate the Claude copy from shared canonical data with a
-  `generated_from` / `source_checksum` / `do_not_edit` header. The current instance is
-  `eval/eval-case.schema.json`.
-- `platform-template` — one neutral body + a per-platform overlay yields divergent output
-  (e.g. `AGENTS.md` ↔ `CLAUDE.md`).
-- `codex-native` / `claude-native` — lives in only one target.
-- `tooling` — generator/CI machinery; not shipped as per-platform runtime content.
+The former `.codex/skills` and `.claude/skills` full mirrors are retired. Runtime companion
+generation removes them. Grok and Antigravity reuse the Claude-compatible package set instead of
+creating two more copies of every skill.
 
-Since 9.3.1, `AGENTS.md`/`CLAUDE.md` and each platform's `context-routing.md` are platform-native harness surfaces. `runtime-codex` and `runtime-claude` generate and check them independently; `runtime` is the unified release aggregate. This split does not create platform-specific product versions or tags.
+Plugins are installation profiles, not user-facing families. The registry's eight families own
+routing language; the four plugin profiles own convenient installation boundaries.
 
-## 3) Phase 1a scope (regression baseline)
-Phase 1a must regenerate **byte-identical** output for every confirmed committed path in both
-`.codex` and `.claude`. No content changes, no allowlist diff. This includes shared-neutral,
-codex-only, claude-only, and maintainer-only entries as they exist today. Only
-`local-only/ignored` paths are excluded.
+## Shared Plugin Payloads
 
-The existing `eval-case.schema.json` mirror is the proven precedent: Phase 1a generalizes that
-mechanism to the full payload without changing any byte of current output.
+Small contracts and Core Cards may be projected into each consuming skill so plugin packages remain
+self-contained. Large executable assets are plugin-shared instead:
 
-**Byte-identical constraint — mirror headers carry a frozen timestamp.** The current
-`.claude/eval/eval-case.schema.json` header contains a frozen `generated_at` plus a
-`source_checksum`. A naive regenerate would emit a *new* timestamp and break byte-identity.
-Phase 1a's generator must therefore be **idempotent**: when the canonical source content is
-unchanged, it preserves the existing target's `generated_at` (and only refreshes the timestamp
-when `source_checksum` actually changes). This keeps mirror-from-canonical files byte-identical
-on regeneration. Implement this before claiming Phase 1a byte-identity for the mirror files.
-Recommended sub-batch order for Phase 1a:
-1. neutral-verbatim payload (skills, context-routing.md, docs/ and eval/ except the eval-schema mirror) — no timestamp concern.
-2. mirror-from-canonical eval schema (idempotent timestamp preservation).
-3. platform split (`AGENTS.md`/`CLAUDE.md`, hooks, codex-only/claude-only trees, maintainer tools).
+- Report Markdown contracts remain skill-local.
+- Core carries one `shared/report-canvas` renderer payload per packaging provider.
+- Report skills never carry their own Three.js/renderer copy.
 
-## 4) Phase 1b scope (gap remediation) — DONE
-Phase 1b closed genuine Claude mirror gaps. **Content inspection narrowed the four candidates to
-one real shared gap (schema definitions); the other three were correct platform divergence, not
-gaps.** Applied to live: `.codex` byte-identical (no regression), `.claude` gained `schemas/` only.
+## Runtime Companions
 
-Applied:
-- **`schemas/` → shared-neutral**: 24 schema definitions + neutral examples moved to
-  `source/shared/schemas`, generated to BOTH targets. The one codex-tool-referencing example
-  (`schemas/workitem/examples/work-item.example.yaml`, refs `.codex/tools/validate_work_item.py`)
-  stays codex-only in `source/platform/codex` and is merge-overlaid onto `.codex` only.
-  Result: `.codex/schemas` = 25 (byte-identical), `.claude/schemas` = 24 (new, no `.codex` leak).
+Runtime companions contain host policy and executable integration only: provider instructions,
+routing, hooks, rules where applicable, portable docs/schemas, and prebuilt harness binaries when a
+provider owns one. Grok and Antigravity companions contain global rules plus portable docs/schemas;
+Orca owns their worker lifecycle, so no provider-local polling harness or binary is generated. No
+companion contains a skill mirror, Python validator, eval corpus, lifecycle ledger, or installation
+state.
 
-Corrected after content inspection (recorded decisions overridden by evidence):
-- `research/` (ledger + schema) → **maintainer-only** (was `codex-only`). The only
-  active consumer is the repository-relative research verification profile; no skill,
-  hook, execution-assurance check, or live-home runtime reads `<CODEX_HOME>/research/`.
-  Both files live under `source/maintainer/fixtures/research-ledger/` and are not
-  generated into `.codex`, `.claude`, or plugins.
-- `research-routing.md` → **codex-only** (was "shared"). It references codex-only/dangling assets
-  (`codex-research-lifecycle` skill and `.codex/references/...`, neither of which exists even under
-  `.codex`). Generating to `.claude` would ship a broken doc. Sharing would require a content
-  rewrite — out of Phase 1b scope.
-- Desktop notification → **shared Go OS core with platform-native event mapping**. Both generated
-  dispatchers use the redacted Go notification package and packaged macOS Swift overlay. Claude
-  consumes native `Notification` types while Codex keeps its own permission/Stop event branches.
-- `harness/README.md` → **codex-only** (was "shared"). Documents `.codex/harness/` paths; Claude
-  already has its own `hooks/README.md`.
+Plugin installation never enables runtime companions automatically. Runtime companion installation
+is a separate explicit operation that preserves host-owned configuration and credentials.
 
-Review record (the "reviewed allowlist diff"): post-cutover the integrity gate enforces
-`live == generator(source)`, so a standalone allowlist file is redundant. The Phase 1b change is
-the git-visible `+ .claude/schemas/` (24 files) and nothing else; `.codex` stayed byte-identical
-and the applicable `verify_bundle` profiles pass.
+## Provider Boundary
 
-## 5) Recorded Phase 1b decisions
-These decisions intentionally keep Claude lightweight for v1. Executable runtime tools stay
-Codex-only unless there is an explicit Claude-side runtime contract. Platform-neutral contracts
-can be shared.
+- Codex has a native Codex package set. Claude, Grok, and Antigravity share one portable
+  Claude-compatible package set.
+- Codex and Claude retain provider-native Go harnesses. Grok and Antigravity receive rule-only
+  companions and use Orca for dispatch, inbox/follow-up, heartbeat, and `worker_done` delivery.
+- Plugin or global-rule installation never proves Orca capability. The current worker receipt does,
+  under `docs/orca_worker_runtime_contract.md`.
 
-1. **Loop engine tools** (`init/activate/resume/deactivate/evaluate_loop_run.py`, `loop_policy.py`) — `codex-only` for v1.
-2. **`tools/task_ledger.py`** — `codex-only` explicit workflow runtime. Codex Agent Run was removed in 9.3.2.
-3. **Active portable schemas** (knowledge/loop/orchestration/task/tools/workitem) — `shared-neutral`; removed Agent Run and lifecycle-ledger schemas are not platform payload.
-4. **`research/`** (ledger + schema) — originally recorded as `codex-only` for v1;
-   current consumer inspection supersedes that classification with a source-only
-   `maintainer` fixture outside all runtime targets.
-5. **`tools/requirements.txt`** — `codex-only` for v1, because no runtime-logic tools move to Claude.
-6. **`rules/default.rules`** — `codex-only` for v1; no Claude equivalent is generated.
+## Portability
 
-Phase 1b implementation scope after these decisions:
-- Add/generate `research-routing.md` to Claude as `shared-neutral`.
-- Keep notification implementations platform-owned.
-- Reconcile `harness/README.md` against Claude's `hooks/README.md`.
-- Add/generate `schemas/` to Claude as `shared-neutral`.
+Shared files contain no developer-machine absolute paths. Installation resolves repository and host
+roots on each computer. Multi-platform harness binaries remain tracked for personal multi-PC use.
 
-## 6) Non-goals (restated)
-- No 1:1 tool/hook/schema parity is forced; only `shared-neutral` items reach both targets.
-- No new security/artifacts skills, no marketplace/runtime/config changes, no edits to
-  `.codex/skills/.system` or app-managed runtime.
+## Validation Boundary
 
-## 7) Next phase entry conditions
-- Phase 1a may start now: inventory + policy exist and the regeneration set is enumerated.
-- Phase 1b may start for the recorded `shared-neutral` items above. The decisions are recorded
-  back into `source/runtime-inventory.yaml`.
+- Four repository contract tests cover Core Cards and Skill System packaging/wiring.
+- Seventeen direct Go component tests run only for a changed harness component.
+- There is no persistent per-skill quality suite, runtime Python validator, automatic all-suite
+  command, release identity gate, or hygiene pipeline.

@@ -19,9 +19,9 @@ description: At an explicitly requested project context checkpoint during commit
 - expected_inputs: current request, relevant diff/artifacts, accepted decisions, manifest, and existing target indexes/current snapshots
 - expected_outputs: no-op or minimal delegated Memory/Knowledge mutations plus exact changed-file/staging report
 - context_targets:
-  must_read: current task outcome, relevant diff/accepted decision slice, nearest `project-context.yaml`, and matching target current/index entries
-  read_if_needed: direct plan/source/design refs needed to establish durability or avoid duplicates; `.codex/docs/knowledge_record_contract.md` for any Knowledge candidate
-  do_not_load_by_default: full chat, full plan history, full stores, events/archive, unrelated repo history, home/common context
+  must_read: current task outcome, relevant diff/accepted decision slice, nearest `project-context.yaml`, `references/project_context_manifest.md`, and matching target current/index entries
+  read_if_needed: direct plan/source/design refs needed to establish durability or avoid duplicates; `references/memory_mutation_contract.md` for a Memory candidate; `references/knowledge_record_contract.md` for a Knowledge candidate
+  do_not_load_by_default: full chat, full plan history, full stores, unrelated records, legacy Memory files, unrelated repo history, home/common context
 - risk_profile:
   reads: current-task evidence and declared stores only
   writes: existing exact/declared stores only within the current checkpoint authorization
@@ -51,7 +51,7 @@ Respect manifest persistence:
 If one statement could fit both stores, choose its primary future use: agent interaction/working behavior goes to Memory; product/project truth and artifact-linked rules go to Knowledge. Never duplicate it for convenience.
 
 ## Workflow
-1. Resolve the nearest manifest and verify each declared target exists. For Knowledge, bind `knowledge_root` and `knowledge_index` once and reuse them through the delegated operation. Missing targets are no-write; do not initialize or search elsewhere.
+1. Resolve the nearest manifest and verify each declared target exists. Bind `memory_root`/`memory_file` or `knowledge_root`/`knowledge_index` once for the selected destination and reuse them through the delegated operation. Missing targets are no-write; do not initialize or search elsewhere.
 2. Read the current task diff/artifacts and only accepted decision slices. Derive candidate statements without copying raw chat.
 3. Classify each candidate as Memory, Knowledge, or transient. Exclude ambiguous, speculative, sensitive, and one-off material; treat an already-recorded fact as a possible source-traced observation or no-op rather than a duplicate record.
 4. For Knowledge candidates, admit only accepted/current durable statements, exclude TODOs/estimates/chronology/speculation, then classify same identity, dependent recurrence, amendment, replacement, scope overlap, conflict, or new identity. Preserve stable plan/work/canonical refs and a provenance root; never infer causality from plan proximity or turn repeated wording into confidence.

@@ -1,9 +1,11 @@
 interface:
   display_name: "Management Memory Bank Init"
-  short_description: "Create project memory files and baseline state"
-  default_prompt: "Use $management-memory-bank-init to initialize persistent project memory after resolving project identity and validating file creation."
+  short_description: "Initialize one readable project Memory file"
+  default_prompt: "Use $management-memory-bank-init to create one empty canonical memory.md and register its approved root without inferred records or legacy ledgers."
 
 policy:
   invocation_surface: explicit_procedure
   allow_implicit_invocation: false
   may_own_execution: true
+  may_write: true
+  may_block_completion: false

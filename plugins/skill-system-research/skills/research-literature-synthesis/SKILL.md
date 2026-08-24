@@ -1,6 +1,6 @@
 ---
 name: research-literature-synthesis
-description: Synthesize an existing paper set or evidence ledger into an evidence-calibrated map of themes, methods, consensus, disagreements, contradictions, limitations, and gaps. Use for literature understanding; use manuscript writing to turn an accepted synthesis into publication prose.
+description: Synthesize an existing paper or evidence set into an evidence-calibrated map of themes, methods, consensus, disagreements, contradictions, limitations, and gaps. Use for literature understanding; manuscript writing separately turns an accepted synthesis into publication prose.
 ---
 
 # Research Literature Synthesis
@@ -8,13 +8,18 @@ description: Synthesize an existing paper set or evidence ledger into an evidenc
 ## Routing Card
 - role: primary
 - intent_signature: literature review, survey synthesis, evidence map, related-work analysis, 문헌 종합
-- use_when: an existing paper set/evidence ledger must be interpreted collectively
+- use_when: an existing paper or evidence set must be interpreted collectively
 - do_not_use_when: acquisition, gap-derived hypothesis selection, or venue-ready manuscript prose is primary
 - expected_inputs: identified evidence set, review question/scope, and search/coverage status
 - expected_outputs: evidence-calibrated themes, agreements, contradictions, limitations, and corpus gaps
 - context_targets: read the named set and scope; load search/inclusion rules and full-text loci only for disputed claims, excluding unrelated corpus, code, backlog, and manuscript templates
 - risk_profile: no acquisition by default and write a review artifact only when requested; credentials denied
 - entry_scene: PREPARE
+
+## Stage Boundary
+Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
+intent, or Plan/Handoff mapping matters. This skill owns only the requested synthesis and never
+starts ideation, hypothesis selection, manuscript writing, or another Research stage.
 
 ## Synthesis Standard
 1. State the review scope, search date/coverage, and whether the evidence set is narrative, systematic, or opportunistic.

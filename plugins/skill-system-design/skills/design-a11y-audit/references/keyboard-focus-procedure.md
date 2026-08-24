@@ -17,4 +17,4 @@ Use this reference when a rendered target or interactive preview is available.
 
 ## Composite widgets
 
-Use WAI-ARIA APG patterns for tabs, menus, listboxes, comboboxes, dialogs, grids, and tree views. If implementation does not follow a known pattern, mark behavior as `Unverified` and record the observed keys.
+Use WAI-ARIA APG patterns for tabs, menus, listboxes, comboboxes, dialogs, grids, and tree views. If implementation does not follow a known pattern, mark behavior as `unverified` and record the observed keys.

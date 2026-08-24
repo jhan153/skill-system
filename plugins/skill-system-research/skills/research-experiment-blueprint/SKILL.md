@@ -18,7 +18,7 @@ description: Turn one selected hypothesis into the smallest identifiable, reprod
   must_read:
     - selected hypothesis/mechanism, target outcome, and constraints
   read_if_needed:
-    - evidence ledger, checkpoints/results, dataset cards, metric definitions, prior protocol
+    - evidence set, checkpoints/results, dataset cards, metric definitions, prior protocol
   do_not_load_by_default:
     - full corpus, scaffold, manuscript, unrelated experiments
 - risk_profile:
@@ -32,18 +32,11 @@ description: Turn one selected hypothesis into the smallest identifiable, reprod
     - credentials/private datasets default deny
 - entry_scene: PREPARE
 
-## Exact Stage Route
-| Request | Owner |
-| --- | --- |
-| selected claim to protocol | `research-experiment-blueprint` |
-| raw claim formation | `research-hypothesis-planning` |
-| evidence-ledger gap ideation | `research-literature-ideation` |
-| current paper acquisition | `search-paper-evidence` |
-| approved protocol to code | `research-experiment-scaffold` |
-| real result analysis | `research-statistical-analysis` |
-| manuscript drafting | `research-manuscript-writing` |
-
-Use exact owners. A missing selected claim returns to hypothesis planning rather than producing a generic blueprint.
+## Stage Boundary
+Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
+intent, or Plan/Handoff mapping matters. This skill owns the protocol only. A missing selected
+claim remains an explicit upstream gap owned by `research-hypothesis-planning`; do not invoke that
+stage or produce a generic blueprint.
 
 ## Identification Workflow
 1. Rewrite the claim as intervention → mechanism → observable outcome, with scope and falsifier.

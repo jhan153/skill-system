@@ -1,7 +1,7 @@
 {
   "name": "skill-system-core",
-  "version": "9.4.6",
-  "description": "Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, evidence, validation/reporting contract, task state) used by all role plugins.",
+  "version": "10.0.0",
+  "description": "Skill System core — shared operational platform for routing, planning, execution handoff, memory/knowledge, evidence, and all report delivery.",
   "author": {
     "name": "Skill System Maintainers"
   },
@@ -14,8 +14,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Skill System Core",
-    "shortDescription": "Shared operating platform skills for Codex workflows.",
-    "longDescription": "Skill System core — shared operational platform (routing, planning, memory/knowledge, loop, evidence, validation/reporting contract, task state) used by all role plugins.",
+    "shortDescription": "Shared planning, management, evidence, and report delivery skills.",
+    "longDescription": "Skill System core — shared operational platform for routing, planning, execution handoff, memory/knowledge, evidence, and all report delivery.",
     "developerName": "Skill System Maintainers",
     "category": "Developer Tools",
     "capabilities": [

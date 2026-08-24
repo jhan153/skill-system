@@ -1,7 +1,0 @@
-interface:
-  display_name: "Report Critical"
-  short_description: "Review blockers and QA evidence in Canvas HTML"
-  default_prompt: "Use $report-critical to run an evidence-first blocker or QA review and deliver the result as Report Canvas HTML."
-
-policy:
-  allow_implicit_invocation: false

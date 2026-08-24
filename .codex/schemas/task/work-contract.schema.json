@@ -25,7 +25,7 @@
       "required": ["kind"],
       "properties": {
         "kind": {
-          "enum": ["natural_language", "requirements_contract", "plan", "loop_contract"]
+          "enum": ["natural_language", "requirements_contract", "plan", "execution_handoff"]
         },
         "digest": {
           "type": "string",

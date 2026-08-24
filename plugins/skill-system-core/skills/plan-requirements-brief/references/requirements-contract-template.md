@@ -2,6 +2,11 @@
 
 ```yaml
 requirements_contract:
+  kind: requirements_contract
+  plan_id:
+  status: proposed | accepted
+  authority_owner:
+  source_refs: []
   problem:
   goals: []
   target_users: []

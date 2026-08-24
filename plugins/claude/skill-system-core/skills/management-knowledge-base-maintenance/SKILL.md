@@ -1,6 +1,6 @@
 ---
 name: management-knowledge-base-maintenance
-description: Validate, reindex, inspect typed relations and semantic history, classify overlap, derive recurrence profiles, compact, and explicitly reconcile an existing Markdown Knowledge Base. Use for store-wide or cross-record maintenance; never auto-merge similarity, compute scores, auto-repair read-only findings, or mutate Memory and LLM Wikis.
+description: Integrity-check, reindex, inspect typed relations and semantic history, classify overlap, derive recurrence profiles, compact, and explicitly reconcile an existing Markdown Knowledge Base. Use for store-wide or cross-record maintenance; never auto-merge similarity, compute scores, auto-repair read-only findings, or mutate Memory and LLM Wikis.
 disable-model-invocation: true
 ---
 
@@ -8,28 +8,28 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: knowledge_operation
-- intent_signature: Knowledge Base validate, reindex, relation/history check, overlap/conflict reconciliation, recurrence report
+- intent_signature: Knowledge Base integrity-check, reindex, relation/history check, overlap/conflict reconciliation, recurrence report
 - use_when: the user explicitly requests maintenance of an exact or manifest-declared store
 - do_not_use_when: task context read, one known record update, new category authoring, plan sync, Memory, or Wiki work is primary
-- expected_inputs: declared store, `report|validate|reindex|link-check|relation-check|history-check|overlap-check|conflict-check|recurrence-report|compact` operation, and affected IDs when bounded
+- expected_inputs: declared store, `report|integrity-check|reindex|link-check|relation-check|history-check|overlap-check|conflict-check|recurrence-report|compact` operation, and affected IDs when bounded
 - expected_outputs: structural findings and only explicitly requested store/index changes with readback
 - context_targets:
-  must_read: manifest, index, affected records, and `.claude/docs/knowledge_record_contract.md`
+  must_read: manifest, index, affected records, `references/project_context_manifest.md`, and `references/knowledge_record_contract.md`
   read_if_needed: direct canonical/evidence refs or superseded records needed for one finding
   do_not_load_by_default: full external sources, unrelated Memory/Wikis/plans, raw transcripts
 - risk_profile:
   reads: one declared Knowledge Base
   writes: only explicit reindex/reconcile/compact changes
-  tools: targeted local search/edit/readback; no required Python validator
+  tools: targeted local search/edit/readback
   sensitive_resources: private refs require explicit scoped access
 - entry_scene: PREPARE
 
 ## Operations
 - `report`: summarize layout, categories, statuses, navigation coverage, and unresolved structural issues; byte-read-only.
-- `validate`: check required envelope fields, stable IDs, category/path match, index/record agreement, typed field shape, and reciprocal supersession links; byte-read-only. Treat untouched 9.3 envelopes as readable legacy records, not fabricated history.
+- `integrity-check`: check required envelope fields, stable IDs, category/path match, index/record agreement, typed field shape, and reciprocal supersession links; byte-read-only. Treat unadopted legacy envelopes as readable legacy records, not fabricated history.
 - `link-check`: inspect declared repo/design/component/verifier targets without broad external retrieval; byte-read-only.
 - `relation-check`: check relation vocabulary, target existence, basis refs, and invalid lifecycle cycles; byte-read-only. Reverse edges are derived and need not be duplicated.
-- `history-check`: compare current snapshot, `updated_at`, semantic revisions, and supersession state without reconstructing missing pre-9.4 history; byte-read-only.
+- `history-check`: compare current snapshot, `updated_at`, semantic revisions, and supersession state without reconstructing missing legacy history; byte-read-only.
 - `overlap-check`: classify exact identity, dependent duplication, stable-identity amendment, replacement, scope overlap, and contradiction. Similarity proposes candidates but never authorizes merge; byte-read-only.
 - `conflict-check`: identify duplicate active rules, contradictory scope, or competing canonical refs; byte-read-only.
 - `recurrence-report`: derive observation count, distinct verified provenance roots, first/last dates, scopes, unresolved roots, and counterexamples. Treat source existence separately from verification of the asserted relationship to the record. Keep dimensions separate and return no rank or score; byte-read-only.

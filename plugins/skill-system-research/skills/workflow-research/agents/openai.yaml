@@ -1,0 +1,7 @@
+interface:
+  display_name: "Workflow Research"
+  short_description: "Manage one explicitly assigned Research stage node"
+  default_prompt: "Use $workflow-research to execute exactly one Plan-assigned Research stage with its named specialist, preserve the stage evidence ceiling, and return research_result without selecting another node."
+
+policy:
+  allow_implicit_invocation: false

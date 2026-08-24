@@ -1,9 +1,0 @@
-interface:
-  display_name: "Research Statistical Analysis"
-  short_description: "Run design-aware, reproducible statistical analysis"
-  default_prompt: "Use $research-statistical-analysis to establish the estimand and analysis unit, compute reproducibly from real data, report effects and uncertainty, and return a plan only when inputs are insufficient."
-
-policy:
-  invocation_surface: explicit_procedure
-  allow_implicit_invocation: true
-  may_own_execution: true

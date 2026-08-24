@@ -1,0 +1,9 @@
+interface:
+  display_name: "Workflow UI Design"
+  short_description: "Create concrete UI design artifacts from accepted requirements"
+  default_prompt: "Use $workflow-ui-design to turn accepted product behavior, content, brand or product-family context, platform constraints, states, and viewports into one concrete inspectable UI design plus an implementation handoff. Do not write production UI code or start the next workflow."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: true
+  may_own_execution: true

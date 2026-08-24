@@ -1,6 +1,6 @@
 ---
 name: management-memory-bank-maintenance
-description: Report, validate, conflict-check, or explicitly consolidate an existing declared project Memory Bank while preserving append-only history. Read-only operations never repair; consolidation never uses maturity or confidence scoring.
+description: Inspect, integrity-check, conflict-check, consolidate, compact, or explicitly migrate one existing declared project Memory Bank under the shared single-file contract. Read-only operations never repair, and write operations preserve stable IDs, source refs, status, and semantic revisions. Never score records, infer authority, or silently migrate the legacy four-file layout.
 disable-model-invocation: true
 ---
 
@@ -8,36 +8,49 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: memory_operation
-- intent_signature: Memory status, validate, conflict-check, consolidate, compact current snapshot
-- use_when: the user explicitly requests maintenance of an exact or manifest-declared bank
-- do_not_use_when: ordinary task context, initialization, direct goal/rule update, or new correction capture is primary
-- expected_inputs: exact bank and `report|validate|conflict-check|consolidate|compact-current` operation
-- expected_outputs: evidence-backed findings and only the explicitly requested append-only changes
+- intent_signature: explicit Memory report, integrity/conflict check, consolidation, compaction, or legacy migration
+- use_when: the user explicitly requests one maintenance operation on an exact/declared bank
+- do_not_use_when: ordinary task context, initialization, direct record mutation, or implicit migration is primary
+- expected_inputs: exact bank and `report|integrity-check|conflict-check|consolidate|compact|migrate-legacy` operation
+- expected_outputs: bounded findings and only explicitly requested target changes with readback
 - context_targets:
-  must_read: manifest/exact target, meta, current, targeted events, `.claude/docs/memory_mutation_contract.md`, and `reference.md`
-  read_if_needed: matching archive blocks
-  do_not_load_by_default: unrelated banks, raw transcripts, full archive, full event ledger
+  must_read:
+    - exact/manifest target and affected records
+    - `references/project_context_manifest.md`
+    - `references/memory_mutation_contract.md`
+  read_if_needed: exact legacy files only for approved `migrate-legacy`
+  do_not_load_by_default: unrelated banks, raw transcripts, full unrelated Memory, or undeclared legacy stores
 - risk_profile:
-  reads: one declared bank
-  writes: only explicit consolidate or compact-current operations
-  tools: targeted parsing/mutation/readback
+  reads: one declared Memory root and operation-relevant records/files
+  writes: only explicit consolidate, compact, or migrate-legacy output
+  tools: targeted local search/edit/readback
   sensitive_resources: credentials and raw private evidence denied
 - entry_scene: PREPARE
 
-## Maintenance Contract
-- `report`, `validate`, and `conflict-check` are byte-read-only and never auto-repair.
-- `consolidate` writes only when identity/equivalence or supersession is directly evidenced. It does not compute maturity, confidence, usage, recurrence, or quality scores.
-- `compact-current` removes chronology and deprecated detail from the operational snapshot while preserving stable pointers and append-only history in events/archive.
-- Candidate activation requires explicit user acceptance or current verified project policy; repeated appearance or a numerical threshold is insufficient.
-- Missing/mismatched paths and legacy enum mismatch are reported, never replaced or migrated as fallback.
+## Operations
+
+- `report`: summarize document identity, record states, navigation anchors, and unresolved issues;
+  read-only.
+- `integrity-check`: check the shared format, stable IDs, required fields, source refs, and duplicate
+  revisions; read-only.
+- `conflict-check`: identify duplicate identities, contradictory active rules, broken anchors, and
+  candidate overlap; read-only.
+- `consolidate`: merge only directly equivalent identities under one stable record and revision.
+- `compact`: shorten duplicated prose/revisions while preserving current meaning and source trail.
+- `migrate-legacy`: create one new `memory.md` from an explicitly selected former four-file bank,
+  preserve uncertainty, read back the new file, and leave legacy files untouched.
 
 ## Workflow
-1. Resolve the exact or nearest manifest-declared bank and requested operation.
-2. Parse meta/current and only events/archive records required by affected item IDs.
-3. Check stable IDs, canonical enums, event/current/archive agreement, conflicts, stale pointers, and snapshot monotonicity.
-4. Stop after findings for read-only operations.
-5. For a write operation, stage one event and all current/archive/meta reflections under the shared stable operation; never hard-delete history.
-6. Read back every affected artifact. Partial writes remain failed/blocked.
+
+1. Bind the exact/nearest declared target and requested operation. Missing paths are unavailable,
+   never replaced by a default.
+2. Read only affected records or exact legacy inputs. Separate structural format, identity,
+   authority, current truth, and source verification.
+3. Stop after findings for read-only operations.
+4. For writes, apply one bounded shared-contract mutation or approved migration and read back the
+   target plus unchanged unrelated content. Ambiguous mappings remain no-write.
 
 ## Output
-Lead with the requested operation result, exact affected IDs/files, latest decisive structural evidence, and remaining semantic uncertainty. Structural consistency does not prove every active Memory item is still correct.
+
+Lead with operation, affected IDs/files, decisive findings, mutation/readback when applicable, and
+one unresolved decision only when required. Structural consistency never proves a Memory claim true.

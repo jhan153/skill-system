@@ -4,6 +4,7 @@ Use this schema when reporting rendered UI differences against an exact design r
 
 ```yaml
 visual_diff_report:
+  assigned_condition_ids: []
   target:
   source_reference:
   comparison_lanes: [target_fidelity, family_coherence]
@@ -22,7 +23,7 @@ visual_diff_report:
         type: hierarchy | layout | spacing | typography | color | asset | icon | state | overflow | clipping | responsive_order
         source_evidence:
         implementation_evidence:
-        severity: blocker | major | minor | note
+        severity: critical | major | minor | note
         suggested_fix:
   family_coherence:
     verdict: pass | fail | unverified | user-verification-needed | not_applicable
@@ -41,7 +42,7 @@ visual_diff_report:
         axis: typography | color_tokens | spacing_rhythm | radius_elevation | control_height | icon_family | density | shell | component_state
         baseline_evidence:
         implementation_evidence:
-        severity: blocker | major | minor | note
+        severity: critical | major | minor | note
         suggested_fix:
   unavailable_evidence:
     - item:
@@ -54,9 +55,12 @@ visual_diff_report:
 
 ## Severity guidance
 
-- `blocker`: target is blank, wrong route, unusable, inaccessible primary content, or essential content missing.
+- `critical`: target is blank, wrong route, unusable, inaccessible primary content, or essential
+  content is missing. This is finding severity, not Plan/DAG status.
 - `major`: hierarchy, responsive behavior, state, or layout differs enough to affect intended use.
 - `minor`: spacing, color, type, icon, or polish differences that do not block use.
 - `note`: implementation choice or assumption that needs user awareness.
 
-Keep the two lane verdicts independent. Compare family baselines only on applicable shared axes; never interpret unrelated full-screen pixel differences as family drift by themselves.
+Keep the two lane verdicts independent. Compare family baselines only on applicable shared axes;
+never interpret unrelated full-screen pixel differences as family drift by themselves. The report
+closes only its assigned visual conditions and never selects a successor or repair.

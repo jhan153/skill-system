@@ -1,4 +1,4 @@
-# 9.4.6 Terms
+# 10.0.0 Terms
 
 ## version_cut
 
@@ -6,14 +6,17 @@ A version cut is a named snapshot of Skill System artifacts for a compatibility 
 
 ## skill_system_bundle
 
-A Skill System bundle is a portable set of skills, docs, eval cases, tools, and integration source. Host runtime configuration remains under the user's local policy and explicit choices.
+A Skill System bundle is a portable set of skills, docs, schemas, tools, and integration source. Host runtime configuration remains under the user's local policy and explicit choices.
 
 ## runtime_canonical
 
 The location that an agent should treat as the source of runtime guidance.
 
-- Codex: `.codex/docs`, `.codex/eval`, `.codex/tools`, `.codex/bin`
-- Claude: `.claude/docs`, `.claude/eval`
+- Codex: `.codex/AGENTS.md`, `.codex/docs`, `.codex/bin`
+- Claude: `.claude/CLAUDE.md`, `.claude/docs`, `.claude/bin`
+- Grok: `.grok/AGENTS.md`, `.grok/docs` (rule companion; Orca owns lifecycle)
+- Antigravity: `.antigravity/GEMINI.md`, `.antigravity/docs` (staged companion;
+  deployment maps it to the host's actual global root and Orca owns lifecycle)
 - Root: packaging documents only
 
 ## runtime_config_policy

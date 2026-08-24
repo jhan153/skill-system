@@ -1,7 +1,7 @@
 {
   "name": "skill-system-research",
-  "version": "9.4.6",
-  "description": "Skill System research — literature, hypothesis, experiment, statistics, manuscript, paper evidence for the research role.",
+  "version": "10.0.0",
+  "description": "Skill System research — explicit Research node execution, literature, hypothesis, experiment, statistics, manuscript, review, and paper evidence.",
   "author": {
     "name": "Skill System Maintainers"
   },
@@ -14,8 +14,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Skill System Research",
-    "shortDescription": "Scientific research, synthesis, experiment, and manuscript skills.",
-    "longDescription": "Skill System research — literature, hypothesis, experiment, statistics, manuscript, paper evidence for the research role.",
+    "shortDescription": "Explicit Research node execution, scientific synthesis, experiment, analysis, manuscript, and review skills.",
+    "longDescription": "Skill System research — explicit Research node execution, literature, hypothesis, experiment, statistics, manuscript, review, and paper evidence.",
     "developerName": "Skill System Maintainers",
     "category": "Developer Tools",
     "capabilities": [

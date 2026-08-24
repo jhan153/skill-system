@@ -2,15 +2,21 @@
 
 ```yaml
 traceability:
-  - requirement_id: REQ-001
-    acceptance_criteria: []
-    wbs_items: []
-    milestones: []
-    hld_sections: []
-    lld_sections: []
-    implementation_batches: []
-    tests: []
-    security_checks: []
-    release_gates: []
-    retrospective_items: []
+  - relation_id: TRACE-001
+    source:
+      id:
+      kind:
+      ref:
+      owner:
+    condition:
+    targets:
+      - id:
+        kind:
+        ref:
+    evidence_refs: []
+    status:
+    gaps: []
 ```
+
+Use source-native IDs and kinds. Add no fixed lifecycle column when the selected package has no
+matching artifact. A relation is a locator, not proof that its condition passed.

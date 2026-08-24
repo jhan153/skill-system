@@ -2,6 +2,10 @@
 
 ```yaml
 discovery_record:
+  kind: requirements_discovery_record
+  plan_id:
+  status: active | ready_for_distillation | stopped_with_open_questions
+  source_refs: []
   goal:
   target_users: []
   decisions:

@@ -34,6 +34,6 @@ Record why the rule matters in this repository without copying reviewer identity
 
 ## Decision
 
-Admit one accepted durable project decision whose identity is not better owned by the domain, design, algorithm, architecture, or code-review categories. Require the accepted decision source plus stable plan/work-item and affected canonical anchors.
+Admit one accepted durable project decision whose identity is not better owned by the domain, design, algorithm, architecture, or code-review categories. Require the accepted decision source plus stable plan/task-or-ticket and affected canonical anchors.
 
 Record context, accepted decision, effective scope, consequences, rejected or superseded alternatives with reasons, and implementation/consumer links. Reject tentative plan language, TODOs, estimates, execution chronology, and a decision that merely restates an existing category identity.

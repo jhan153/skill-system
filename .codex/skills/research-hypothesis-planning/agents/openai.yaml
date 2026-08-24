@@ -1,9 +1,0 @@
-interface:
-  display_name: "Research Hypothesis Planning"
-  short_description: "Turn a research premise into a falsifiable primary claim"
-  default_prompt: "Use $research-hypothesis-planning to narrow a research premise into a falsifiable claim, cheapest Stage-0 discriminator, minimal experiment, and disciplined ablation backlog; leave selected-method implementation to development workflows."
-
-policy:
-  invocation_surface: explicit_procedure
-  allow_implicit_invocation: true
-  may_own_execution: true

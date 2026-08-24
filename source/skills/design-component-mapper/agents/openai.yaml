@@ -6,5 +6,5 @@ policy:
   invocation_surface: evidence_gate
   allow_implicit_invocation: false
   may_own_execution: false
-  may_write: false
-  may_block_completion: true
+  may_write: true
+  may_block_completion: false

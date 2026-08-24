@@ -13,7 +13,7 @@ description: Read a minimum task-relevant slice of a declared Knowledge Base, in
 - expected_inputs: current task, exact path or nearest manifest, and file/symbol/component/topic/decision anchors
 - expected_outputs: small source-traced current summaries plus only the typed relation/revision/observation path needed by the task owner
 - context_targets:
-  must_read: current request, manifest declaration, Knowledge index, and matching active records
+  must_read: current request, manifest declaration, `references/project_context_manifest.md`, `references/knowledge_record_contract.md`, Knowledge index, and matching active records
   read_if_needed: canonical/evidence refs needed to resolve one conflict or verify freshness
   do_not_load_by_default: full store, unrelated categories, Memory, Wikis, raw sources, transcripts
 - risk_profile:
@@ -24,7 +24,7 @@ description: Read a minimum task-relevant slice of a declared Knowledge Base, in
 - entry_scene: PREPARE
 
 ## Workflow
-1. Bind `knowledge_root` and `knowledge_index` from the exact path or nearest manifest declaration according to `.codex/docs/project_context_manifest.md`. Missing means `unavailable`; do not scan, initialize, or substitute a default.
+1. Bind `knowledge_root` and `knowledge_index` from the exact path or nearest manifest declaration according to `references/project_context_manifest.md`. Missing means `unavailable`; do not scan, initialize, or substitute a default.
 2. Derive task anchors and search `knowledge_index` first. Resolve every selected record path under the bound `knowledge_root` unless the index contains an explicit approved external record path.
 3. Select matching current records by title, accepted aliases, search terms, `applies_to`, consumers, relation targets, and canonical anchors. Surface matching unverified records; admit superseded/deprecated records only for a material history path.
 4. Choose the edge family that answers the question: causal/decision links for why, semantic/scope links for overlap or applicability, lifecycle/revisions for change history, and observations/provenance roots for recurrence.

@@ -1,37 +1,61 @@
 # source/ — neutral canonical (post Phase 1.5 cutover)
 
-As of the Phase 1.5 cutover, **`.codex/` and `.claude/` are generated targets. Do not edit them
+**`.codex/`, `.claude/`, `.grok/`, and `.antigravity/` are generated targets. Do not edit them
 directly.** Edit `source/` and regenerate.
 
 ## Layout
-- `source/skills/` — 74 skills (neutral; generated verbatim into both targets)
-- `source/shared/` — portable `docs/`, `eval/`, and schemas (generated into both)
-- `source/platform/codex/` — Codex-owned harness (AGENTS.md, context-routing.md, hooks, rules, schemas, research, harness, tools)
-- `source/platform/claude/` — Claude-owned harness (CLAUDE.md, context-routing.md, hooks, tools)
-- `source/mirror-meta.json` — frozen `generated_from`/`generated_at`/`source_checksum` for the eval-schema mirror (keeps regeneration byte-identical)
-- `source/runtime-inventory.yaml`, `source/runtime-payload-policy.md` — Phase 0 classification + policy
+- `source/skills/` — 56 canonical skills packaged into one Codex set and one portable
+  Claude/Grok/Antigravity set
+- `source/shared/` — portable `docs/`, schemas, and Core-owned contract/card sources projected into their declared consumers
+- `source/platform/codex/` — Codex-owned runtime companion instructions, routing, hooks, rules, and harness docs
+- `source/platform/claude/` — Claude-owned runtime companion instructions, routing, and hook docs
+- `source/platform/grok/` — Grok global rules; Orca owns worker lifecycle
+- `source/platform/antigravity/` — Antigravity global rules; Orca owns worker lifecycle
+- `source/runtime-inventory.yaml`, `source/runtime-payload-policy.md` — current 10.0 distribution inventory and policy
 - `source/tools/` — build system (not generated into any target)
 
 ## Workflow
 1. Edit files under `source/`.
-2. Regenerate only the platform changed by the harness edit:
+2. Regenerate runtime companions and/or plugin packages for the changed distribution surface:
    ```
    python3 source/tools/generate_targets.py --target runtime-codex
    python3 source/tools/generate_targets.py --target runtime-claude
+   python3 source/tools/generate_targets.py --target runtime-grok
+   python3 source/tools/generate_targets.py --target runtime-antigravity
    ```
-   Use `--target runtime` only as the release aggregate that regenerates both.
-3. Verify byte-identity / detect stray target edits for the affected platform:
-   ```
-   python3 source/tools/check_generated_targets.py --target runtime-codex --baseline
-   python3 source/tools/check_generated_targets.py --target runtime-claude --baseline
-   ```
-   PASS = every generated file matches the live target. FAIL = a target was hand-edited or
-   `source/` changed without regenerating. Run this before committing target changes.
+   Runtime generation never creates skill mirrors; skills ship through plugins.
+3. Read back the affected generated paths. There is no unconditional all-change evaluation gate;
+   run only the approved test category whose declared surface changed.
+
+The repository-wide contract surface has exactly four Go tests. The Core Card check runs only for
+Core Card, execution-item kind/binding, or Plan/Handoff ledger-table changes:
+
+```text
+go test ./internal/corecards -run TestCoreCardsMatchPlanExecutionHandoff
+```
+
+Run it only when a Core Card, execution-item kind, `## Core Cards` binding, or the Plan Execution
+Handoff ledger tables change.
+
+The remaining three repository-wide tests are under `internal/systemcontract`:
+
+```text
+go test ./internal/systemcontract -v
+```
+
+They cover canonical skill/plugin ownership, active-provider package/manifest/resource closure, and
+declared global-rule plus harness wiring. Run them only when those system surfaces change; ordinary
+skill prose and model changes do not trigger them.
+
+Five Go harness components retain 17 direct unit tests: Codex hook, Claude hook, desktop notify,
+project-context resolver, and user Work Contract. Run only the package whose runtime behavior
+changed. They are component tests, not a release gate or a Skill System-wide suite.
+
+There is no persistent per-skill behavior-test category, no automatic all-suite command, and no
+runtime Python validator. Model-dependent skill behavior is observed only through an explicitly
+requested, non-gating fresh task. Plan/Handoff authoring performs one bounded structural readback
+inside the owning task instead of invoking a validator executable.
 
 ## Notes
 - The `.generated` marker at each target root declares the do-not-edit policy.
-- Integrity is enforced by regeneration (`check_generated_targets.py`), not a stored checksum
-  manifest — re-deriving the target is stronger than comparing a stored hash.
-- The `eval/eval-case.schema.json` mirror keeps its frozen `generated_at`; changing the
-  canonical requires updating `source/mirror-meta.json` (Phase 1b).
 - Generation updates repository targets only. Installing into a home directory or live plugin cache is a separate, explicit deployment action.

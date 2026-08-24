@@ -10,7 +10,8 @@
 4. Resolve declared relative paths from the manifest directory. An absolute path is allowed only when the user supplied or approved that exact path; do not infer or normalize a relative declaration into an unrelated external location.
 5. A missing section or missing declared path is `unavailable`. Do not scan home directories, adjacent repositories, or guessed defaults, and do not initialize a store while resolving it.
 
-Repository `AGENTS.md`, `CLAUDE.md`, or other platform instructions should point to this manifest instead of duplicating its paths.
+Repository or provider instructions should point to this manifest instead of duplicating its
+paths.
 
 ## Minimal Shape
 
@@ -18,11 +19,8 @@ Repository `AGENTS.md`, `CLAUDE.md`, or other platform instructions should point
 schema_version: 1
 project_id: example-project
 
-skill_roots:
-  - .codex/skills
-
 memory_bank:
-  root: docs/memory-bank/projects/example-project
+  root: docs/memory-bank
   storage: local
 
 knowledge_base:
@@ -31,7 +29,7 @@ knowledge_base:
   storage: repository
 
 plans:
-  root: docs/plan
+  root: docs/plans
 
 llm_wikis:
   product_docs:
@@ -42,12 +40,26 @@ llm_wikis:
 
 All sections except `schema_version` and `project_id` are optional. `storage` documents persistence intent; it does not authorize a write. `local` means locally persisted and not necessarily committed or located under the repository, while `repository` means the project expects normal repository persistence.
 
+`skill_roots` may be declared when a project intentionally exposes repository-local skills, but
+the example omits it because provider-managed Codex, Claude, Grok, and Antigravity locations are
+deployment state rather than portable project data.
+
 For Knowledge consumers, bind location once and use the resolved variables everywhere:
 
 ```text
 knowledge_root  := exact approved path, otherwise resolve knowledge_base.root from the nearest manifest
 knowledge_index := resolve knowledge_base.index when declared, otherwise knowledge_root/index.md
 ```
+
+For Memory consumers, bind the single readable state file once:
+
+```text
+memory_root := exact approved directory, otherwise resolve memory_bank.root from the nearest manifest
+memory_file := memory_root/memory.md
+```
+
+Readers and writers never reconstruct the former multi-file event/archive layout implicitly. An
+explicit Memory maintenance migration owns that conversion.
 
 The example path above is only a default proposal. No reader, writer, maintenance operation, or hygiene check may substitute `docs/knowledge-base/` after `knowledge_root` is bound. Show the resolved absolute target before an external or home-level write. If `knowledge_index` resolves outside `knowledge_root`, show and authorize it as a second exact target. Exact path approval does not authorize scanning either target's parent or neighboring stores.
 

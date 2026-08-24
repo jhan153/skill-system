@@ -1,9 +1,0 @@
-interface:
-  display_name: "Research Literature Synthesis"
-  short_description: "Synthesize papers into calibrated themes and contradictions"
-  default_prompt: "Use $research-literature-synthesis to compare an existing evidence set by method, data, metric, and study design, preserving contradictions and coverage limits instead of counting papers as consensus."
-
-policy:
-  invocation_surface: explicit_procedure
-  allow_implicit_invocation: true
-  may_own_execution: true

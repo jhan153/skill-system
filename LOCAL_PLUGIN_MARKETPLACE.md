@@ -1,7 +1,7 @@
 # Local Plugin Marketplace
 
-This repository can be used as a local plugin marketplace for both **Codex** and
-**Claude Code**. The marketplace catalogs are stored in the repo at:
+This repository distributes the same Skill System profiles to **Codex**, **Claude Code**,
+**Grok**, and **Antigravity**. Codex and Claude use local marketplace catalogs:
 
 ```text
 .agents/plugins/marketplace.json         # Codex
@@ -11,8 +11,11 @@ plugins/.claude-plugin/marketplace.json  # Claude Code
 Plugin packages and the Claude catalog are generated from `source/plugins/*.yaml` by
 `python3 source/tools/generate_targets.py --target plugins`; the stable Codex catalog
 keeps its local source entries in `.agents/plugins/marketplace.json`. The sections below that
-use `codex plugin ...` are the Codex flow; see the **Claude Code (Local Marketplace)**
-section near the end for the `/plugin ...` equivalents.
+use `codex plugin ...` are the Codex flow. Claude uses its marketplace; Grok and Antigravity
+install the portable package roots directly with their official CLIs.
+
+These packages are installation profiles rather than user-facing skill families. Core is the
+shared profile, Dev adds engineering work, and Design/Research add domain-specific capabilities.
 
 Codex packages keep their existing paths:
 
@@ -21,41 +24,40 @@ plugins/skill-system-core
 plugins/skill-system-dev
 plugins/skill-system-design
 plugins/skill-system-research
-plugins/skill-system-quality
 ```
 
-Claude packages use paired platform-owned roots with the same names and versions:
+The paired Claude-compatible roots are also the portable Grok/Antigravity packages:
 
 ```text
 plugins/claude/skill-system-core
 plugins/claude/skill-system-dev
 plugins/claude/skill-system-design
 plugins/claude/skill-system-research
-plugins/claude/skill-system-quality
 ```
 
 ## Ecosystem Parity
 
-Both Codex and Claude Code are reflected from the same canonical `source/`, and
-both receive the same skill set. Their manifests, package roots, and invocation
-frontmatter are projected per host. The rule holds for both ecosystems:
+All four providers are reflected from the same canonical `source/` and receive the same skill
+set. Codex has its native package set; Claude, Grok, and Antigravity share the portable set.
 
 > Marketplace plugins ship **skills only**. Anything that can change execution
 > policy — hooks, tools, rules, schemas — is **runtime companion payload**,
 > enabled separately after a reviewed dry-run, never by a plugin install.
 
-| Asset | Codex | Claude Code | How it ships |
-| --- | --- | --- | --- |
-| Skills | `plugins/<name>/.codex-plugin/` + `skills/` | `plugins/claude/<name>/.claude-plugin/` + `skills/` | **Marketplace plugin** — one canonical body with host-native invocation metadata |
-| Plugin manifest | `.codex-plugin/plugin.json` | `.claude-plugin/plugin.json` | generated per package |
-| Marketplace catalog | `.agents/plugins/marketplace.json` | `plugins/.claude-plugin/marketplace.json` | generated |
-| Hooks | `.codex/hooks.json` + `.codex/bin/skill-system-harness*` | `.claude/hooks/settings.example.json` + `.claude/bin/skill-system-claude-harness*` | **Runtime companion** — host registration is separate, NOT via plugin install |
-| Runtime docs / rules / schemas | `.codex/...` | `.claude/...` | runtime companion |
-| MCP integration | `integrations/kanboard-plan-sync` | same (MCP is runtime-agnostic) | separate integration, not in plugins |
-| Slash commands / subagents | — | supported by Claude, unused here | bundle expresses everything as skills |
+| Asset | Codex | Claude Code | Grok | Antigravity |
+| --- | --- | --- | --- | --- |
+| Skills | `plugins/<name>/skills` | `plugins/claude/<name>/skills` | same portable root | same portable root |
+| Manifest | `.codex-plugin/plugin.json` | `.claude-plugin/plugin.json` | Claude manifest compatibility | root `plugin.json` |
+| Install | Codex marketplace | Claude marketplace | `grok plugin install <root>` | `agy plugin install <root>` |
+| Global rules | `.codex/AGENTS.md` | `.claude/CLAUDE.md` | `.grok/AGENTS.md` | `.antigravity/GEMINI.md` |
+| Lifecycle | Codex Go harness | Claude Go harness | Orca | Orca |
 
-So `codex plugin add` and `/plugin install` both install **skills and nothing
-else**. The two marketplaces are full peers; neither carries hooks.
+Plugin installation installs skills, not runtime policy. Global rules, docs/schemas, hooks, and
+harnesses remain explicit runtime-companion deployment. Grok and Antigravity get no polling
+harness; Orca owns dispatch/inbox/heartbeat/`worker_done` for those workers.
+
+The former `.codex/skills` and `.claude/skills` repository mirrors are retired. Generated runtime
+companions contain no skills; marketplace plugins are the sole skill distribution surface.
 
 ## Register On This Machine
 
@@ -77,7 +79,6 @@ skill-system-core@skill-system-local
 skill-system-dev@skill-system-local
 skill-system-design@skill-system-local
 skill-system-research@skill-system-local
-skill-system-quality@skill-system-local
 ```
 
 ## Install Plugins
@@ -87,12 +88,6 @@ Install only the profiles you need. For development work, start with:
 ```bash
 codex plugin add skill-system-core@skill-system-local
 codex plugin add skill-system-dev@skill-system-local
-```
-
-Add quality support when validation-matrix and QA workflow skills are needed:
-
-```bash
-codex plugin add skill-system-quality@skill-system-local
 ```
 
 Design and research plugins can be installed the same way:
@@ -108,9 +103,8 @@ skill set is picked up cleanly.
 ## Runtime Companion Payload
 
 Plugins install skills. They do not automatically install or enable Codex runtime
-files such as hooks, tools, rules, schemas, research ledgers, or harness assets.
-Those files can affect local execution policy and should be copied only after a
-reviewed dry-run.
+files such as hooks, tools, rules, schemas, or harness assets. Install those files
+only when the user explicitly requests runtime companion installation.
 
 Runtime companion candidates are generated under `.codex/` from `source/`:
 
@@ -118,16 +112,10 @@ Runtime companion candidates are generated under `.codex/` from `source/`:
 .codex/AGENTS.md
 .codex/context-routing.md
 .codex/docs/
-.codex/eval/
-.codex/field-feedback/
 .codex/harness/
 .codex/hooks.json
-.codex/hooks/
-.codex/research-routing.md
-.codex/research/
 .codex/rules/default.rules
 .codex/schemas/
-.codex/tools/
 ```
 
 Do not copy app-managed or host-local state:
@@ -139,30 +127,16 @@ Do not copy app-managed or host-local state:
 .codex/plugins/cache/
 ```
 
-Recommended workflow: ask an Agent to inspect the companion payload before it
-writes anything to `~/.codex`.
-
-Use this prompt from the repository root:
+Use this prompt from the repository root when installation is wanted:
 
 ```text
-Review the Skill System runtime companion payload for my local Codex home.
-Compare this repo's generated .codex runtime files against ~/.codex, including
-hooks.json, hooks/, tools/, rules/default.rules, schemas/, research/, harness/,
-field-feedback/, context-routing.md, docs/, eval/, and AGENTS.md.
-
-First show a dry-run summary and the exact files that would be added, changed,
-or skipped. Do not copy anything yet. Do not touch .codex/skills/.system,
+Install the declared Skill System runtime companion files into my local Codex
+home. Resolve the repository and Codex home on this computer, do not persist
+absolute paths in shared data, and do not touch .codex/skills/.system,
 config.toml, automations, plugins/cache, credentials, or unrelated local state.
-Ask me for explicit approval before applying the sync.
 ```
 
-After approval, the Agent should copy only the reviewed files, preserve local
-host-managed state, and run a focused verification such as:
-
-```bash
-python3 .codex/tools/verify_bundle.py --root . --profile core --format text
-python3 .codex/tools/verify_bundle.py --root . --profile execution --format text
-```
+The Agent should copy only declared files and preserve local host-managed state.
 
 If hook or rule files changed, review them against the local machine's policy
 before enabling or trusting them in Codex. Runtime companion sync is intentionally
@@ -174,11 +148,11 @@ The marketplace registration is stable as long as the repo path and marketplace
 name stay the same. A later bundle version only needs regenerated plugin
 packages and reinstall commands.
 
-After updating `source/` or `source/plugins/*.yaml`, regenerate and verify:
+After updating `source/` or `source/plugins/*.yaml`, regenerate:
 
 ```bash
+python3 source/tools/generate_targets.py --target runtime
 python3 source/tools/generate_targets.py --target plugins
-python3 source/tools/check_generated_targets.py --target plugins --baseline
 ```
 
 Then reinstall the plugins you use:
@@ -227,8 +201,8 @@ commands (the marketplace directory is the repo's `plugins/` folder, which holds
 /plugin install skill-system-dev@skill-system-local
 ```
 
-Add other roles the same way: `skill-system-quality@skill-system-local`,
-`skill-system-design@skill-system-local`, and `skill-system-research@skill-system-local`.
+Add other roles the same way: `skill-system-design@skill-system-local` and
+`skill-system-research@skill-system-local`.
 After install / enable / disable, run
 `/reload-plugins` to apply changes without restarting.
 
@@ -261,11 +235,11 @@ restrict which marketplaces are allowed with `strictKnownMarketplaces`.
 
 ### Update to a new bundle version
 
-Regenerating rebuilds both the Codex and Claude catalogs at once:
+Regenerating rebuilds the Codex package set, the shared portable package set, and both catalogs:
 
 ```bash
+python3 source/tools/generate_targets.py --target runtime
 python3 source/tools/generate_targets.py --target plugins
-python3 source/tools/check_generated_targets.py --target plugins --baseline
 ```
 
 Then in Claude Code refresh with `/plugin marketplace update skill-system-local`
@@ -287,8 +261,41 @@ ledger, transcript Output Gate, measurement, and notification adapters are not
 part of 9.4.2; they were removed in 9.3.4.
 
 Other Claude runtime-companion files generated under `.claude/` (docs,
-`context-routing.md`, `eval/`, `schemas/`, hooks, and binaries) are likewise NOT installed by
-`/plugin install`. Sync them the same review-gated way as the Codex companion
-payload above: ask an Agent for a dry-run diff against your `~/.claude` first,
-approve, then copy only the reviewed files. Do not copy app-managed state
-(`.claude/skills/.system`) or host-local `settings.json`.
+`context-routing.md`, `schemas/`, hooks, and binaries) are likewise NOT installed by
+`/plugin install`. Install them only on explicit request, resolving the Claude home
+on that computer. Do not copy app-managed state (`.claude/skills/.system`) or
+host-local `settings.json`.
+
+## Grok (Portable Package)
+
+Grok officially reads Claude Code plugins and skill frontmatter. Install selected profiles from the
+portable roots; no Grok-specific skill copy or marketplace catalog is generated.
+
+```bash
+grok plugin install /absolute/path/to/this/repo/plugins/claude/skill-system-core
+grok plugin install /absolute/path/to/this/repo/plugins/claude/skill-system-dev
+grok plugin list
+```
+
+The optional rule companion is generated under `.grok/`. An explicit runtime deployment maps
+`.grok/AGENTS.md`, `.grok/docs/`, and `.grok/schemas/` into the actual `GROK_HOME` while preserving
+`config.toml`, credentials, sessions, memories, hooks, and plugin state.
+
+## Antigravity (Portable Package)
+
+Each portable package has a generated root `plugin.json` marker for Antigravity while retaining the
+Claude manifest used by Claude and Grok.
+
+```bash
+agy plugin install /absolute/path/to/this/repo/plugins/claude/skill-system-core
+agy plugin install /absolute/path/to/this/repo/plugins/claude/skill-system-dev
+agy plugin list
+```
+
+The optional rule companion is generated under `.antigravity/`. An explicit runtime deployment maps
+`GEMINI.md`, `docs/`, and `schemas/` to Antigravity's actual global root while preserving
+`settings.json`, credentials, conversations, hooks, and plugin state.
+
+For Grok and Antigravity, plugin/rule presence proves only package discovery. Orca lifecycle support
+is confirmed per worker receipt and follows `docs/orca_worker_runtime_contract.md`: no automatic
+Coordinator polling, transcript replay, fixed wait interval, or provider-local liveness loop.

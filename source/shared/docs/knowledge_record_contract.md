@@ -8,7 +8,7 @@ Every Knowledge operation binds `knowledge_root` and `knowledge_index` from `pro
 
 ```text
 ${knowledge_root}/
-  domain/
+  domain/       # category directories are created lazily
   design/
   algorithm/
   architecture/
@@ -18,11 +18,13 @@ ${knowledge_root}/
 ${knowledge_index}  # compact catalog; normally ${knowledge_root}/index.md
 ```
 
-For a brand-new store with no supplied path, an initializer may propose `docs/knowledge-base/` and `${knowledge_root}/index.md` as defaults, but they become operative only after approval and manifest registration. A new initializer records both bound values explicitly; the index fallback remains a compatibility rule for existing manifests that omit `knowledge_base.index`. `knowledge_index` may be configured separately; if it resolves outside `knowledge_root`, that exact second target requires the same explicit visibility and write approval as any other external target. Consumers never migrate or scan for alternatives implicitly. Relations, observations, and revision events stay with their canonical Markdown record; do not create separate claim, edge, score, or Runtime Projection stores.
+For a brand-new store with no supplied path, an initializer may propose `docs/knowledge-base/` and `${knowledge_root}/index.md` as defaults, but they become operative only after approval and manifest registration. A new initializer records both bound values explicitly; the index fallback remains a compatibility rule for existing manifests that omit `knowledge_base.index`. `knowledge_index` may be configured separately; if it resolves outside `knowledge_root`, that exact second target requires the same explicit visibility and write approval as any other external target. Consumers never migrate or scan for alternatives implicitly. Relations, observations, and revision events stay with their canonical Markdown record; do not create separate claim, edge, score, or derived runtime/context stores.
 
 ## Common Record Envelope
 
-Keep the current usable snapshot first. Existing 9.3 records with the original required fields remain readable; every new or materially touched record should add the applicable 9.4 navigation and history fields below.
+Keep the current usable snapshot first. Every current record uses the envelope below. A legacy
+record missing current navigation or history fields remains read-only until an explicit
+maintenance operation adopts it; never fabricate missing history.
 
 ```yaml
 id: KB-DOMAIN-001
@@ -56,7 +58,7 @@ updated_at: YYYY-MM-DD
 - `consumers`: files, components, skills, or workflows expected to use the knowledge.
 - `supersedes` and `superseded_by`: reciprocal lifecycle links for identity replacement. Superseded records remain addressable.
 
-Use repo-relative paths and stable symbols, component/node IDs, WorkItem IDs, ticket URLs/IDs, decision IDs, and Git refs when available. Do not store credentials, raw chat, private identities, or copied large source bodies.
+Use repo-relative paths and stable symbols, component/node IDs, task or ticket URLs/IDs, decision IDs, and Git refs when available. Do not store credentials, raw chat, private identities, or copied large source bodies.
 
 ## Typed Relations: Spatial And Causal Navigation
 
@@ -65,7 +67,7 @@ Use an embedded relation only when it answers a future navigation question. Each
 ```yaml
 relations:
   - type: motivated_by | raised_by | resolved_by | resulted_in | implemented_by | depends_on | generalizes | specializes | overlaps_with | conflicts_with | amends | revisits | recurrence_of
-    target: KB-DECISION-004 | work-item:WI-20260718-001 | ticket:142 | plan:docs/plan/example.md | source/path#symbol
+    target: KB-DECISION-004 | task:T-001 | ticket:142 | plan:docs/plans/example/plan.md | source/path#symbol
     basis_refs: []
 ```
 
@@ -128,7 +130,8 @@ revisions:
 
 - Git or another VCS owns literal line deltas. Knowledge revisions store the semantic reason, effective change, and evidence pointers.
 - `updated_at` matches the newest semantic revision or observation that changed the record.
-- When adopting a 9.3 record, use `adopted_snapshot` and state that earlier semantic history was not reconstructed; never fabricate prior revisions.
+- When explicitly adopting a legacy record, use `adopted_snapshot` and state that earlier semantic
+  history was not reconstructed; never fabricate prior revisions.
 - Update a stable identity in place. Create a new record only when the meaning or ownership identity changed materially, then set reciprocal `supersedes`/`superseded_by` links.
 
 ## Category Body
@@ -146,7 +149,7 @@ Do not turn one-off review comments, tentative plan language, generic industry a
 
 ### Approved Plan Admission
 
-An explicit plan-to-Knowledge request or approved project checkpoint may admit only accepted/current durable decisions or changed project rules. Exclude TODOs, estimates, implementation chronology, rejected proposals except bounded decision history, and speculative future state. Preserve stable plan/work-item/canonical pointers and classify overlap before writing; proximity inside a plan does not establish a causal relation. New identity uses `management-knowledge-base-record`; an existing identity, recurrence, amendment, reverification, relink, or supersession uses `management-knowledge-base-update`.
+An explicit plan-to-Knowledge request or approved project checkpoint may admit only accepted/current durable decisions or changed project rules. Exclude TODOs, estimates, implementation chronology, rejected proposals except bounded decision history, and speculative future state. Preserve stable plan/task-or-ticket/canonical pointers and classify overlap before writing; proximity inside a plan does not establish a causal relation. New identity uses `management-knowledge-base-record`; an existing identity, recurrence, amendment, reverification, relink, or supersession uses `management-knowledge-base-update`.
 
 ## Index And Retrieval Contract
 
@@ -158,7 +161,7 @@ ID | Category | Title / summary | Search anchors | Related | Path | Status
 
 - `Search anchors` compacts accepted aliases, main `applies_to` anchors, and discriminating search terms from the accepted current snapshot. Terms found only in an unverified observation do not silently become current search anchors; keep them inside the record or mark them explicitly during an authorized reindex.
 - `Related` lists only the few record/work targets needed to choose a next hop; it is not a popularity ranking.
-- Existing 9.3 index columns remain valid until an explicitly requested reindex.
+- A legacy index shape remains read-only until an explicitly requested reindex.
 
 Readers start at the index, select a record, and expand one typed edge at a time. For a why/history question, prefer `motivated_by`, `raised_by`, `amends`, `revisits`, revisions, and supersession. For a scope question, prefer `applies_to`, `implemented_by`, `depends_on`, `generalizes`, and `specializes`. For repeated work, inspect observations, `provenance_root`, and `recurrence_of`. Track visited targets, stop on cycles, and stop as soon as the question is answered.
 

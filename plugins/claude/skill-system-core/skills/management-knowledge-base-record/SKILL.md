@@ -11,12 +11,12 @@ disable-model-invocation: true
 - intent_signature: create one new durable project Knowledge record by category, including one approved-plan decision
 - use_when: the user explicitly requests recording or syncing one accepted project-specific fact, rule, boundary, or decision that does not already have a Knowledge identity
 - do_not_use_when: the item is unresolved, generic, temporary, one-off, belongs to Memory, lacks authoritative anchors, or updates an existing record
-- expected_inputs: category, accepted statement or approved plan slice, aliases/search terms, scope, canonical/evidence/work-item refs, consumers, overlap candidates, and declared store
+- expected_inputs: category, accepted statement or approved plan slice, aliases/search terms, scope, canonical/evidence/task-or-ticket refs, consumers, overlap candidates, and declared store
 - expected_outputs: one category-valid record, one index row, typed relations or observations when applicable, and direct readback
 - context_targets:
   must_read:
     - exact or manifest-declared Knowledge root/index
-    - matching records and `.claude/docs/knowledge_record_contract.md`
+    - matching records, `references/project_context_manifest.md`, and `references/knowledge_record_contract.md`
     - direct canonical/evidence anchors for the selected category
   read_if_needed:
     - `references/knowledge-category-profiles.md` for the selected category's admission and body fields
@@ -47,7 +47,7 @@ Create a record only when the statement is accepted, project-specific, durable, 
 4. For a new identity, create one full current envelope with the selected `category`, aliases/search anchors, scope, canonical refs, consumers, typed relations/observations when supported, and one `created` semantic revision.
 5. Add one navigable index row and read back the record, index, anchors, relations/history, provenance, consumers, and any supersession or conflict links.
 
-## Output And Validation
+## Output And Readback
 Report `category`, record ID, identity classification, accepted source/provenance root, record/index paths, anchor and relation readback, affected consumers, and unresolved conflicts. Do not emit the full store or claim that structural consistency proves the recorded knowledge true.
 
 Completion requires one new identity, all profile-required fields and anchors, the shared envelope, a matching index row, and target-only readback. Existing identities, missing anchors, unresolved acceptance, or unavailable stores remain no-write.

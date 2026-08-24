@@ -16,6 +16,9 @@ Load only for the `mobile` profile of `design-frontend`: a mobile/native screen 
 
 ## Handoff
 
-- Use `design-a11y-audit` for keyboard/focus/label/target-size evidence.
-- Use `design-visual-regression` for mobile screenshot and overflow evidence.
-- Keep platform-specific claims `Unverified` when no platform documentation or simulator evidence is available.
+- When the user or accepted Plan assigns keyboard/focus/label/target-size evidence, name
+  `design-a11y-audit` as that condition owner.
+- When the user or accepted Plan assigns mobile screenshot or overflow evidence, name
+  `design-visual-regression` as that condition owner.
+- Do not invoke either evidence skill automatically from this profile.
+- Keep platform-specific claims `unverified` when no platform documentation or simulator evidence is available.

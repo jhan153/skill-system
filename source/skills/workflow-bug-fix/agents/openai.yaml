@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Bug Fix"
-  short_description: "Fix concrete failures with repro and verification"
-  default_prompt: "Use $workflow-bug-fix to repair a concrete failing test, build error, runtime exception, regression, or broken behavior. Lock the failure signal, create the fastest useful feedback loop, apply one targeted fix, verify the original failure, and keep ownership while applying the shared recovery protocol if the same signature repeats."
+  short_description: "Run one DAG repair or a bounded standalone fix"
+  default_prompt: "Use $workflow-bug-fix to repair one concrete failure. With Plan node_id/round/source_review_item_ref input, perform exactly that one intervention, observe the original signal once, return the canonical Core repair item and attempt status, and leave Code Review, final Known Bug registration, and Plan successor selection to their owners. Without Plan fields, retain the bounded two-round standalone behavior."
 
 policy:
   invocation_surface: explicit_procedure
@@ -15,3 +15,8 @@ work_horizon:
 execution_mode:
   kind: bug_fix_execution
   owns_execution: true
+  dag_repairs_per_node: 1
+  standalone_max_reviewed_rounds: 2
+  dag_known_bug_output: candidate_only
+  standalone_known_bug_output: final_after_local_review
+  plan_or_handoff_write: false

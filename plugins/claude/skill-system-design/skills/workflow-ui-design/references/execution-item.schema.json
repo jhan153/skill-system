@@ -1,0 +1,431 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-system-execution-item.schema.json",
+  "title": "Skill System Core Execution Item",
+  "type": "object",
+  "required": [
+    "contract_id",
+    "item_id",
+    "kind",
+    "producer",
+    "plan_ref",
+    "node_id",
+    "scope_ref",
+    "artifact_refs",
+    "evidence_refs",
+    "payload"
+  ],
+  "properties": {
+    "contract_id": { "const": "core-execution-items-v1" },
+    "item_id": { "$ref": "#/$defs/item_ref" },
+    "kind": {
+      "enum": [
+        "design_result",
+        "research_result",
+        "implementation_result",
+        "code_review_result",
+        "deferred_item",
+        "bug_fix_result",
+        "known_bug_candidate",
+        "known_bug_record"
+      ]
+    },
+    "producer": { "type": "string", "minLength": 1 },
+    "plan_ref": { "type": ["string", "null"] },
+    "node_id": { "type": ["string", "null"] },
+    "scope_ref": { "type": "string", "minLength": 1 },
+    "artifact_refs": { "$ref": "#/$defs/string_array" },
+    "evidence_refs": { "$ref": "#/$defs/string_array" },
+    "payload": { "type": "object" }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": { "kind": { "const": "design_result" } },
+        "required": ["kind"]
+      },
+      "then": {
+        "properties": {
+          "producer": { "const": "skill-system-design:workflow-ui-design" },
+          "payload": { "$ref": "#/$defs/design_result" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "research_result" } },
+        "required": ["kind"]
+      },
+      "then": {
+        "properties": {
+          "producer": { "const": "skill-system-research:workflow-research" },
+          "payload": { "$ref": "#/$defs/research_result" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "implementation_result" } },
+        "required": ["kind"]
+      },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/implementation_result" } } }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "code_review_result" } },
+        "required": ["kind"]
+      },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/code_review_result" } } }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "deferred_item" } },
+        "required": ["kind"]
+      },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/deferred_item" } } }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "bug_fix_result" } },
+        "required": ["kind"]
+      },
+      "then": {
+        "properties": {
+          "producer": { "const": "skill-system-dev:workflow-bug-fix" },
+          "payload": { "$ref": "#/$defs/bug_fix_result" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "known_bug_candidate" } },
+        "required": ["kind"]
+      },
+      "then": {
+        "properties": {
+          "producer": { "const": "skill-system-dev:workflow-bug-fix" },
+          "payload": { "$ref": "#/$defs/known_bug_candidate" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "known_bug_record" } },
+        "required": ["kind"]
+      },
+      "then": {
+        "properties": {
+          "producer": {
+            "enum": [
+              "skill-system-core:plan-execution-handoff",
+              "skill-system-dev:workflow-bug-fix"
+            ]
+          },
+          "payload": { "$ref": "#/$defs/known_bug_record" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "item_ref": {
+      "type": "string",
+      "pattern": "^EI-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+    },
+    "string_array": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "item_ref_array": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/item_ref" },
+      "uniqueItems": true
+    },
+    "design_result": {
+      "type": "object",
+      "required": [
+        "design_snapshot",
+        "target_surfaces",
+        "requirements_refs",
+        "viewports_and_states",
+        "visual_decisions",
+        "token_and_component_intent",
+        "implementation_handoff",
+        "unresolved_decisions"
+      ],
+      "properties": {
+        "design_snapshot": { "type": "string", "minLength": 1 },
+        "target_surfaces": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "requirements_refs": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "viewports_and_states": { "$ref": "#/$defs/string_array" },
+        "visual_decisions": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "token_and_component_intent": { "$ref": "#/$defs/string_array" },
+        "implementation_handoff": { "type": "string", "minLength": 1 },
+        "unresolved_decisions": { "$ref": "#/$defs/string_array" }
+      },
+      "additionalProperties": false
+    },
+    "research_result": {
+      "type": "object",
+      "required": [
+        "stage_skill",
+        "input_refs",
+        "result_summary",
+        "result_ceiling",
+        "unresolved_inputs",
+        "user_checks"
+      ],
+      "properties": {
+        "stage_skill": {
+          "type": "string",
+          "pattern": "^skill-system-research:research-[a-z0-9][a-z0-9-]*$"
+        },
+        "input_refs": { "$ref": "#/$defs/string_array" },
+        "result_summary": { "type": "string", "minLength": 1 },
+        "result_ceiling": { "type": "string", "minLength": 1 },
+        "unresolved_inputs": { "$ref": "#/$defs/string_array" },
+        "user_checks": { "$ref": "#/$defs/string_array" }
+      },
+      "additionalProperties": false
+    },
+    "implementation_result": {
+      "type": "object",
+      "required": [
+        "implementation_snapshot",
+        "changed_artifacts",
+        "implemented_conditions",
+        "review_slice",
+        "unresolved_conditions"
+      ],
+      "properties": {
+        "implementation_snapshot": { "type": "string", "minLength": 1 },
+        "design_result_ref": {
+          "type": ["string", "null"],
+          "pattern": "^EI-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "changed_artifacts": { "$ref": "#/$defs/string_array" },
+        "implemented_conditions": { "$ref": "#/$defs/string_array" },
+        "review_slice": { "type": "string", "minLength": 1 },
+        "unresolved_conditions": { "$ref": "#/$defs/string_array" }
+      },
+      "additionalProperties": false
+    },
+    "review_finding": {
+      "type": "object",
+      "required": ["id", "claim", "priority", "code_refs", "impact", "fix_direction"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "claim": { "type": "string", "minLength": 1 },
+        "priority": { "enum": ["P0", "P1", "P2", "P3"] },
+        "code_refs": { "$ref": "#/$defs/string_array" },
+        "baseline_refs": { "$ref": "#/$defs/string_array" },
+        "impact": { "type": "string", "minLength": 1 },
+        "fix_direction": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "code_review_result": {
+      "type": "object",
+      "required": [
+        "input_item_ref",
+        "review_round",
+        "implementation_snapshot",
+        "review_slice",
+        "review_disposition",
+        "findings",
+        "deferred_item_refs",
+        "known_bug_exclusions",
+        "transition_intent"
+      ],
+      "properties": {
+        "input_item_ref": { "$ref": "#/$defs/item_ref" },
+        "design_baseline_ref": {
+          "type": ["string", "null"],
+          "pattern": "^EI-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "review_round": { "type": "string", "minLength": 1 },
+        "implementation_snapshot": { "type": "string", "minLength": 1 },
+        "review_slice": { "type": "string", "minLength": 1 },
+        "review_disposition": {
+          "enum": ["pass", "repair_required", "complete_with_deferred_items"]
+        },
+        "findings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/review_finding" }
+        },
+        "deferred_item_refs": { "$ref": "#/$defs/item_ref_array" },
+        "known_bug_exclusions": { "$ref": "#/$defs/item_ref_array" },
+        "transition_intent": { "enum": ["continue", "repair"] }
+      },
+      "additionalProperties": false
+    },
+    "deferred_item": {
+      "type": "object",
+      "required": [
+        "deferred_kind",
+        "description",
+        "impact",
+        "code_refs",
+        "baseline_refs",
+        "carry_to"
+      ],
+      "properties": {
+        "deferred_kind": {
+          "enum": [
+            "design_decision",
+            "runtime_observation",
+            "out_of_scope_work",
+            "static_evidence_gap",
+            "ambiguous_requirement"
+          ]
+        },
+        "description": { "type": "string", "minLength": 1 },
+        "impact": { "type": "string", "minLength": 1 },
+        "code_refs": { "$ref": "#/$defs/string_array" },
+        "baseline_refs": { "$ref": "#/$defs/string_array" },
+        "carry_to": {
+          "enum": ["human_test", "next_waterfall_design", "next_waterfall_worklist"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "bug_fix_result": {
+      "type": "object",
+      "required": [
+        "round",
+        "source_review_item_ref",
+        "source_findings",
+        "bug_scope",
+        "failure_fingerprint",
+        "hypothesis",
+        "changed_artifacts",
+        "changed_snapshot",
+        "original_signal_observation",
+        "attempt_status",
+        "change_disposition",
+        "review_anchor",
+        "postcondition",
+        "known_bug_candidate_ref"
+      ],
+      "properties": {
+        "round": { "enum": ["A1", "A2"] },
+        "source_review_item_ref": { "$ref": "#/$defs/item_ref" },
+        "source_findings": { "$ref": "#/$defs/string_array" },
+        "bug_scope": { "type": "string", "minLength": 1 },
+        "failure_fingerprint": { "type": "string", "minLength": 1 },
+        "hypothesis": { "type": "string", "minLength": 1 },
+        "changed_artifacts": { "$ref": "#/$defs/string_array" },
+        "changed_snapshot": { "type": ["string", "null"] },
+        "original_signal_observation": { "type": "string", "minLength": 1 },
+        "attempt_status": {
+          "enum": ["resolved", "narrowed", "moved", "unchanged", "unreproducible"]
+        },
+        "change_disposition": {
+          "enum": ["kept", "rolled_back", "retained_with_known_bug"]
+        },
+        "review_anchor": { "type": ["string", "null"] },
+        "postcondition": {
+          "enum": ["changed_snapshot_ready_for_review", "no_change_unresolved"]
+        },
+        "known_bug_candidate_ref": {
+          "type": ["string", "null"],
+          "pattern": "^EI-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "known_bug_candidate": {
+      "type": "object",
+      "required": [
+        "bug_scope",
+        "failure_fingerprint",
+        "expected",
+        "latest_observed",
+        "attempt_refs",
+        "latest_attempt_status",
+        "change_disposition",
+        "reopen_when"
+      ],
+      "properties": {
+        "bug_scope": { "type": "string", "minLength": 1 },
+        "failure_fingerprint": { "type": "string", "minLength": 1 },
+        "expected": { "type": "string", "minLength": 1 },
+        "latest_observed": { "type": "string", "minLength": 1 },
+        "attempt_refs": {
+          "allOf": [
+            { "$ref": "#/$defs/item_ref_array" },
+            { "minItems": 1, "maxItems": 2 }
+          ]
+        },
+        "latest_attempt_status": {
+          "enum": ["narrowed", "moved", "unchanged", "unreproducible"]
+        },
+        "change_disposition": {
+          "enum": ["kept", "rolled_back", "retained_with_known_bug"]
+        },
+        "reopen_when": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "known_bug_record": {
+      "type": "object",
+      "required": [
+        "known_bug_id",
+        "candidate_ref",
+        "bug_scope",
+        "failure_fingerprint",
+        "expected",
+        "observed",
+        "attempt_refs",
+        "terminal_review_ref",
+        "latest_attempt_status",
+        "change_disposition",
+        "condition_status",
+        "reopen_when"
+      ],
+      "properties": {
+        "known_bug_id": {
+          "type": "string",
+          "pattern": "^BUG-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "candidate_ref": { "$ref": "#/$defs/item_ref" },
+        "bug_scope": { "type": "string", "minLength": 1 },
+        "failure_fingerprint": { "type": "string", "minLength": 1 },
+        "expected": { "type": "string", "minLength": 1 },
+        "observed": { "type": "string", "minLength": 1 },
+        "attempt_refs": {
+          "allOf": [
+            { "$ref": "#/$defs/item_ref_array" },
+            { "minItems": 1, "maxItems": 2 }
+          ]
+        },
+        "terminal_review_ref": { "$ref": "#/$defs/item_ref" },
+        "latest_attempt_status": {
+          "enum": ["narrowed", "moved", "unchanged", "unreproducible"]
+        },
+        "change_disposition": {
+          "enum": ["kept", "rolled_back", "retained_with_known_bug"]
+        },
+        "condition_status": { "const": "excluded_known_bug" },
+        "reopen_when": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

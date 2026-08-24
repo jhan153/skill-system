@@ -1,6 +1,6 @@
 ---
 name: research-literature-ideation
-description: Derive research-gap hypotheses from an evidence ledger or literature synthesis, preserving claim provenance and distinguishing observed gaps from speculative novelty. Use to generate/rank candidates and, when requested, select one active hypothesis for validation.
+description: Derive research-gap hypotheses from an evidence set or literature synthesis, preserving claim provenance and distinguishing observed gaps from speculative novelty. Use to generate/rank candidates and, when requested, select one active hypothesis for validation.
 ---
 
 # Research Literature Ideation
@@ -8,13 +8,19 @@ description: Derive research-gap hypotheses from an evidence ledger or literatur
 ## Routing Card
 - role: primary
 - intent_signature: research gaps, candidate hypotheses from literature, active hypothesis, 문헌 기반 연구 아이디어
-- use_when: an existing evidence ledger/synthesis can support gap-derived hypotheses or ranking
+- use_when: an existing evidence set or synthesis can support gap-derived hypotheses or ranking
 - do_not_use_when: papers need acquisition/synthesis, or a raw premise has no literature dependency
 - expected_inputs: identified evidence artifact, scope, and ranking/selection constraints
 - expected_outputs: provenance-linked gap classes, falsifiable candidates, ranking, optional active hypothesis, and evidence needs
-- context_targets: read the named ledger/synthesis and scope; expand only sources needed to resolve candidate provenance, not the full corpus, scaffold, manuscript, or unrelated results
+- context_targets: read the named evidence set/synthesis and scope; expand only sources needed to resolve candidate provenance, not the full corpus, scaffold, manuscript, or unrelated results
 - risk_profile: no search by default and write an ideation artifact only when requested; credentials denied
 - entry_scene: PREPARE
+
+## Stage Boundary
+Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
+intent, or Plan/Handoff mapping matters. This skill owns candidate generation/ranking and selects
+one active hypothesis only on explicit decision intent; it never starts hypothesis planning or an
+experiment stage.
 
 ## Ideation Contract
 1. Identify evidence-supported contradictions, boundary conditions, method/data/metric mismatches, failure modes, or missing comparisons.

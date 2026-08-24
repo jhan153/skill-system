@@ -1,8 +1,0 @@
-interface:
-  display_name: "Evaluation Harness"
-  short_description: "Review existing eval cases without field-quality claims."
-  default_prompt: "Use $evaluation-harness only to inspect or repair existing Skill System eval cases, and keep scenario results separate from field quality."
-policy:
-  invocation_surface: explicit_procedure
-  allow_implicit_invocation: false
-  may_own_execution: true

@@ -21,7 +21,7 @@ description: Cross-check a claim across explicitly needed evidence lanes, preser
     - target claim/question and source constraints
   read_if_needed:
     - prior ledger; `references/deep-evidence-method.md` for a complex sweep
-    - `references/evidence-ledger-v2.md` only for an explicit ledger artifact or legacy-ledger migration
+    - `references/evidence-set.md` only for an explicitly requested persisted evidence artifact
   do_not_load_by_default:
     - full repo/memory, unrelated lanes, downstream report templates
 - risk_profile:
@@ -32,7 +32,10 @@ description: Cross-check a claim across explicitly needed evidence lanes, preser
 - entry_scene: PREPARE
 
 ## Activation Boundary
-Own acquisition only when two or more discriminating lanes are needed for the same claim. Send paper/citation-only work to `search-paper-evidence`; leave final synthesis, implementation, and ordinary analysis with their owner. Do not fan out merely because several sources exist.
+Own acquisition only when two or more discriminating lanes are needed for the same claim. Send
+paper/citation-only work to `search-paper-evidence` when that owner is exposed; leave final
+synthesis, implementation, and ordinary analysis with their owner. Do not fan out merely because
+several sources exist, and do not require or install a sibling plugin to complete another lane.
 
 ## Evidence Model
 Record separate axes; never overload one `verified` label:
@@ -48,7 +51,9 @@ Source existence does not verify a claim. Verified identity and user-provided pr
 ## Workflow
 1. Define claim scope, freshness, and observations that would support or contradict it; split only independently falsifiable subclaims.
 2. Select only lanes expected to discriminate the claim; never target a fixed count.
-3. Acquire through each lane owner within existing authority. Keep inaccessible or partial lanes visible.
+3. Acquire through each exposed lane owner within existing authority. If an owner or evidence
+   surface is unavailable, keep that lane unavailable and continue independent discriminating
+   lanes; never invent an alias or substitute another lane's evidence.
 4. Record provenance, basis, locator, directness, authority, independence, recency, and limitations.
 5. Search for disconfirming evidence and alternative explanations.
 6. Collapse duplicate/dependent sources before weighing agreement.
@@ -56,7 +61,11 @@ Source existence does not verify a claim. Verified identity and user-provided pr
 8. Return the evidence set and named synthesis/review handoff, without performing that synthesis.
 
 ## Output
-For one focused claim, return the strongest supporting and contradicting evidence, verdict limits, and links. Use a full ledger only for an explicit artifact or multiple claims; then read `references/evidence-ledger-v2.md` and run `check_evidence_ledger.py`. Conclusions are `supported | contradicted | mixed | insufficient`, with underlying records and uncertainty retained.
+For one focused claim, return the strongest supporting and contradicting evidence, conclusion
+limits, and links. Multiple claims may remain a compact inline matrix. Only when the user explicitly
+requests a persisted evidence artifact, read `references/evidence-set.md` and write that
+provider-neutral shape. Conclusions are `supported | contradicted | mixed | insufficient`, with
+underlying records and uncertainty retained. No script or validator establishes the conclusion.
 
 ## Validation
 - Every retained claim relation has an exact evidence locator and basis.

@@ -1,7 +1,7 @@
 interface:
   display_name: "Management Memory Bank Maintenance"
-  short_description: "Validate, consolidate, and report memory state"
-  default_prompt: "Use $management-memory-bank-maintenance to inspect, validate, or consolidate an existing project memory bank with explicit write boundaries."
+  short_description: "Check, compact, or migrate one Memory Bank"
+  default_prompt: "Use $management-memory-bank-maintenance for one explicit report, integrity-check, conflict-check, consolidation, compaction, or legacy migration on the declared bank."
 
 policy:
   allow_implicit_invocation: false

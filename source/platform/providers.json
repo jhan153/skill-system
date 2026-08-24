@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "providers": [
+    {
+      "id": "codex",
+      "status": "active",
+      "source_root": "source/platform/codex",
+      "runtime_root": ".codex",
+      "global_rule": ".codex/AGENTS.md",
+      "plugin_skill_pattern": "plugins/{plugin}/skills",
+      "plugin_manifest_pattern": "plugins/{plugin}/.codex-plugin/plugin.json",
+      "capabilities": ["plugins", "global_rules", "runtime_harness"],
+      "harness": {
+        "config": "source/platform/codex/hooks.json",
+        "source_entrypoints": [
+          "source/runtime/go/cmd/skill-system-harness/main.go"
+        ],
+        "generated_entrypoints": [
+          ".codex/bin/skill-system-harness",
+          ".codex/bin/skill-system-harness.exe"
+        ],
+        "config_markers": [
+          "skill-system-harness",
+          "skill-system-harness.exe"
+        ]
+      }
+    },
+    {
+      "id": "claude",
+      "status": "active",
+      "source_root": "source/platform/claude",
+      "runtime_root": ".claude",
+      "global_rule": ".claude/CLAUDE.md",
+      "plugin_skill_pattern": "plugins/claude/{plugin}/skills",
+      "plugin_manifest_pattern": "plugins/claude/{plugin}/.claude-plugin/plugin.json",
+      "capabilities": ["plugins", "global_rules", "runtime_harness"],
+      "harness": {
+        "config": "source/platform/claude/hooks/settings.example.json",
+        "source_entrypoints": [
+          "source/runtime/go/cmd/skill-system-claude-harness/main.go"
+        ],
+        "generated_entrypoints": [
+          ".claude/bin/skill-system-claude-harness",
+          ".claude/bin/skill-system-claude-harness.exe",
+          ".claude/bin/skill-system-claude-harness-linux-amd64"
+        ],
+        "config_markers": [
+          "__ABSOLUTE_SKILL_SYSTEM_CLAUDE_HARNESS__"
+        ]
+      }
+    },
+    {
+      "id": "grok",
+      "status": "active",
+      "source_root": "source/platform/grok",
+      "runtime_root": ".grok",
+      "global_rule": ".grok/AGENTS.md",
+      "plugin_skill_pattern": "plugins/claude/{plugin}/skills",
+      "plugin_manifest_pattern": "plugins/claude/{plugin}/plugin.json",
+      "capabilities": ["plugins", "global_rules", "orca_dispatch"]
+    },
+    {
+      "id": "antigravity",
+      "status": "active",
+      "source_root": "source/platform/antigravity",
+      "runtime_root": ".antigravity",
+      "global_rule": ".antigravity/GEMINI.md",
+      "plugin_skill_pattern": "plugins/claude/{plugin}/skills",
+      "plugin_manifest_pattern": "plugins/claude/{plugin}/plugin.json",
+      "capabilities": ["plugins", "global_rules", "orca_dispatch"]
+    }
+  ]
+}

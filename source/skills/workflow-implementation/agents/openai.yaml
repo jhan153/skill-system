@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Implementation"
   short_description: "Direct coding execution workflow"
-  default_prompt: "Use $workflow-implementation to change the requested production path, observe the material behavior, and keep tests or mocks subordinate to the user/canonical contract."
+  default_prompt: "Use $workflow-implementation to implement the complete requested behavior through one canonical internal contract, prefer direct concrete code and composition over speculative indirection, honor explicit paradigm choices at their owning boundaries, and verify the actual path."
 
 policy:
   invocation_surface: explicit_procedure

@@ -1,328 +1,126 @@
-# source/runtime-inventory.yaml
-#
-# Phase 0 deliverable of docs/plan/2026-06-29-skill-system-plugin-neutral-source.md.
-# Classifies the current .codex / .claude runtime payload into neutral-source buckets.
-#
-# This file is HAND-AUTHORED classification input for the generator. It is NOT a
-# generated target and must not carry a do-not-edit/checksum header.
-#
-# Evidence basis (2026-06-29, from skill-system/ root):
-#   - 9.4.6: visual-decision contract, inspectable spatial reports, management/analysis ID alignment; 65 skills
-#   - 9.4.5: collapsed standalone routers, merged overlapping owners, retired maintainer plugin; 79 -> 65 skills
-#   - 9.4.4: implicit workflow routing, selected-skill delegation, and bounded runnable prototypes added
-#   - 9.4.3: user work contracts, non-blocking continuation, Report Canvas,
-#     implementation-understanding skills, and post-9.4.2 maintenance added
-#   - 9.4.2: Knowledge relation/history and workflow guidance added; Research fixtures remain
-#     source-only; public provenance ledger retired with release guards against reintroduction
-#   - 9.3.4: skill bodies remain shared; Claude frontmatter projects explicit-only invocation
-#   - diff -q  .codex/context-routing.md .claude/.. -> IDENTICAL
-#   - shared docs generate verbatim; platform-owned overlays remain intentionally distinct
-#   - diff -qr .codex/eval .claude/eval            -> only eval/eval-case.schema.json differs
-#   - ls .codex (15 top-level) vs .claude (9 top-level)
-#   - .codex/tools = 29 top-level files + tests/; generated Claude runtime has no tools root
-#   - .gitignore excludes /docs/ /.github/ /.kanboard-plan/ /.kanboard-plan.yml
+schema_version: 10
+canonical_root: source
 
-meta:
-  plan: docs/plan/2026-06-29-skill-system-plugin-neutral-source.md
-  phase: "0"
-  basis: "diff -qr / ls of .codex and .claude (2026-06-29); see runtime-payload-policy.md"
-  buckets:
-    shared-neutral: "single neutral source; generated to BOTH .codex and .claude (verbatim, via overlay, or mirror-from-canonical)"
-    codex-only: "Codex-platform runtime; no Claude equivalent intended"
-    claude-only: "Claude-platform runtime; no Codex equivalent intended"
-    maintainer-only: "bundle self-maintenance / CI assets; not part of per-platform end-user runtime parity"
-    plugin-packageable: "destined for Phase 2 plugin packages (none classified yet at Phase 0)"
-    local-only/ignored: "gitignored; never in release payload"
-  generation_strategies:
-    neutral-verbatim: "copy neutral source to both targets unchanged"
-    mirror-from-canonical: "generate a Claude copy from shared canonical data with header + source_checksum"
-    platform-projected: "copy one canonical skill body and inject only the host-native invocation metadata"
-    platform-template: "neutral body + per-platform overlay produces divergent codex/claude output"
-    codex-native: "lives only in the .codex target"
-    claude-native: "lives only in the .claude target"
-    tooling: "generator/CI machinery, not shipped per-platform runtime content"
-    local-ignored: "not generated, not committed"
-  confidence:
-    confirmed: "backed by diff/ls evidence in this session"
-    provisional: "bucket needs a content read or an explicit Phase 0 policy decision (see decision_needed / runtime-payload-policy.md)"
+skill_distribution:
+  mode: plugins_only
+  canonical_root: source/skills
+  runtime_skill_mirrors: retired
+  providers:
+    codex:
+      package_pattern: plugins/{plugin}/skills
+      marketplace: .agents/plugins/marketplace.json
+    claude:
+      package_pattern: plugins/claude/{plugin}/skills
+      marketplace: plugins/.claude-plugin/marketplace.json
+    grok:
+      package_pattern: plugins/claude/{plugin}/skills
+      manifest_pattern: plugins/claude/{plugin}/plugin.json
+      install: grok plugin install <package-root>
+      compatibility: claude_code
+    antigravity:
+      package_pattern: plugins/claude/{plugin}/skills
+      manifest_pattern: plugins/claude/{plugin}/plugin.json
+      install: agy plugin install <package-root>
 
-# ---------------------------------------------------------------------------
-# shared-neutral: already mirrored -> neutral source seed + Phase 1a baseline
-# ---------------------------------------------------------------------------
-entries:
-  - path: "skills/"
-    present_in: [codex, claude]
-    class: shared-neutral
-    generation: platform-projected
-    confidence: confirmed
-    gap: none
-    notes: "Canonical SKILL.md stays Codex-neutral. Codex receives agents/openai.yaml unchanged; Claude explicit-only skills receive disable-model-invocation: true in generated frontmatter."
+plugin_profiles:
+  - id: skill-system-core
+    purpose: shared planning, management, evidence, workflow modifiers, and report delivery
+  - id: skill-system-dev
+    purpose: engineering analysis and implementation workflows
+  - id: skill-system-design
+    purpose: UI design creation, implementation, and design evidence
+  - id: skill-system-research
+    purpose: research-stage execution and paper evidence
 
-  - path: "context-routing.md (codex) | context-routing.md (claude)"
-    present_in: [codex, claude]
-    class: platform-native
-    generation: codex-native + claude-native
-    confidence: confirmed
-    gap: none
-    notes: "Split in 9.3.1: Codex keeps the compact exception router; Claude keeps its 9.2.1 structured routing line. Both ship under one bundle identity."
+shared_plugin_payloads:
+  report_canvas:
+    owner: skill-system-core
+    canonical: source/shared/report-canvas
+    generated_target: shared/report-canvas
+    physical_package_sets: 2
+    copies_per_physical_package: 1
 
-  - path: "docs/"
-    present_in: [codex, claude]
-    class: shared-neutral
-    generation: neutral-verbatim
-    confidence: confirmed
-    gap: none
-    notes: "Shared contracts generate to both platforms; harness lifecycle and Agent Output documents are platform-owned overlays because Codex and Claude runtimes intentionally differ."
+runtime_companions:
+  codex:
+    root: .codex
+    files:
+      - AGENTS.md
+      - context-routing.md
+      - hooks.json
+      - rules/default.rules
+      - docs/
+      - schemas/
+      - harness/README.md
+      - bin/skill-system-harness
+      - bin/skill-system-harness.exe
+      - bin/skill-system-notify-overlay
+  claude:
+    root: .claude
+    files:
+      - CLAUDE.md
+      - context-routing.md
+      - hooks/settings.example.json
+      - hooks/README.md
+      - docs/
+      - schemas/
+      - bin/skill-system-claude-harness
+      - bin/skill-system-claude-harness.exe
+      - bin/skill-system-claude-harness-linux-amd64
+      - bin/skill-system-notify-overlay
+  grok:
+    root: .grok
+    files:
+      - AGENTS.md
+      - docs/
+      - schemas/
+    lifecycle_owner: orca
+  antigravity:
+    root: .antigravity
+    install_root: <ANTIGRAVITY_GLOBAL_ROOT>
+    files:
+      - GEMINI.md
+      - docs/
+      - schemas/
+    lifecycle_owner: orca
 
-  - path: "skills/report-*/scripts/report-canvas/ + skills/report-*/references/report_canvas_contract.md"
-    present_in: [codex, claude, report-skill plugins]
-    class: shared-canonical + skill-local projection
-    generation: derived per-report-skill payload
-    confidence: confirmed
-    gap: none
-    notes: "One canonical shared report model, deterministic offline renderer, Oblivion/Hagoromo themes, examples, and pinned dependencies project into every report skill's supported scripts/references boundary. Installed report skills need no sibling plugin or runtime root; non-report skills carry no Canvas payload. Three.js is embedded only in rendered spatial artifacts. The shared visual-decision contract and inspectable-visual authoring guide project beside the Canvas contract on report skills; opted-in design skills receive only the visual-decision contract."
+provider_roles:
+  packaging:
+    - codex
+    - claude
+    - grok
+    - antigravity
+  native_harness:
+    - codex
+    - claude
+  rule_companion:
+    - grok
+    - antigravity
+  orca_execution:
+    - codex
+    - claude
+    - grok
+    - antigravity
 
-  - path: "eval/"
-    present_in: [codex, claude]
-    class: shared-neutral
-    generation: neutral-verbatim
-    confidence: confirmed
-    gap: none
-    notes: "all identical except eval/eval-case.schema.json (mirror entry) and eval/observed-runs/ (fixtures, see maintainer)."
+retired_payloads:
+  - .codex/skills
+  - .claude/skills
+  - .codex/tools
+  - .claude/tools
+  - runtime Python validators
+  - research-routing.md
+  - eval/
+  - TaskRun
+  - LoopRun
+  - WorkItem
+  - Agent Run
+  - lifecycle ledgers
 
-  - path: "eval/eval-case.schema.json"
-    present_in: [codex, claude]
-    class: shared-neutral
-    generation: mirror-from-canonical
-    confidence: confirmed
-    gap: none
-    notes: "already generated codex->claude by sync_generated_mirrors.py."
+generation:
+  runtime: python3 source/tools/generate_targets.py --target runtime
+  plugins: python3 source/tools/generate_targets.py --target plugins
 
-  # platform-variant root: one neutral body + per-platform overlay
-  - path: "AGENTS.md (codex) | CLAUDE.md (claude)"
-    present_in: [codex, claude]
-    class: platform-native
-    generation: codex-native + claude-native
-    confidence: confirmed
-    gap: none
-    notes: "Independent platform-owned global instructions. Portable skills and contracts remain shared."
-
-# ---------------------------------------------------------------------------
-# claude-only
-# ---------------------------------------------------------------------------
-  - path: "bin/skill-system-claude-harness, bin/skill-system-claude-harness.exe, bin/skill-system-claude-harness-linux-amd64, bin/skill-system-notify-overlay"
-    present_in: [claude]
-    class: claude-only
-    generation: tooling
-    confidence: confirmed
-    notes: "Generator cross-builds the Claude-native dispatcher for darwin/arm64, windows/amd64, and linux/amd64 and packages the macOS Swift overlay. It shares bounded core packages with Codex but owns Claude event normalization."
-
-  - path: "hooks/README.md, hooks/settings.example.json"
-    present_in: [claude]
-    class: claude-only
-    generation: claude-native
-    confidence: confirmed
-    notes: "Host-owned four-event exec-form registration template. Generation does not edit live Claude settings."
-
-# ---------------------------------------------------------------------------
-# codex-only platform runtime
-# ---------------------------------------------------------------------------
-  - path: "bin/skill-system-harness, bin/skill-system-harness.exe, bin/skill-system-notify-overlay"
-    present_in: [codex]
-    class: codex-only
-    generation: tooling
-    confidence: confirmed
-    notes: "Generator cross-builds the Go dispatcher for darwin/arm64 and windows/amd64 with CGO disabled and precompiles the darwin/arm64 Swift/Cocoa notification overlay. Target machines need neither Go nor Swift tooling."
-
-  - path: "hooks.json"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: confirmed
-    notes: "Sole base registration owner. POSIX invokes the Go binary directly; Windows uses a bounded cmd conditional to honor CODEX_HOME with the default fallback. Stop has a 12-second host timeout; plugins register no duplicate hooks."
-
-  - path: "rules/default.rules"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: provisional
-    phase_1b_decision: "codex-only for v1; no Claude equivalent is generated."
-    decision_rationale: "Codex rules are a Codex permission/rules format. Claude permission behavior is governed by its own settings/permission model, not this file."
-
-# ---------------------------------------------------------------------------
-# platform-variant tools (present in both but divergent, or shared deps)
-# ---------------------------------------------------------------------------
-  - path: "desktop notification runtime"
-    present_in: [codex, claude]
-    class: platform-native
-    generation: codex-native + claude-native
-    confidence: confirmed
-    gap: none
-    phase_1b_decision: "platform-native and independent."
-    decision_rationale: "Both dispatchers reuse the Go redaction and OS notification package, while event mapping remains platform-native. Claude listens to native Notification types rather than inferring approval or input from Stop. Neither branch owns validation or Kanboard; Codex alone owns its active LoopRun branch. Kanboard separately uses one atomic pending lease per workspace and stamps only successful stable syncs."
-
-  - path: "tools/requirements.txt"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: provisional
-    gap: missing-in-claude
-    phase_1b_decision: "codex-only for v1."
-    decision_rationale: "No runtime-logic tools are being made shared-neutral in v1 except schemas/docs. Claude does not need a Python dependency file for schemas-only parity."
-
-# ---------------------------------------------------------------------------
-# GAP candidates: codex runtime logic missing from claude (Phase 1b decision)
-# Default bucket is codex-only until policy approves neutralization, because
-# making these shared-neutral materially changes what the Claude runtime is.
-# ---------------------------------------------------------------------------
-  - path: "tools/ loop engine: init_loop_run.py, activate_loop_run.py, resume_loop_run.py, deactivate_loop_run.py, evaluate_loop_run.py, loop_policy.py"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: provisional
-    gap: missing-in-claude
-    phase_1b_decision: "codex-only for v1."
-    decision_rationale: "Moving the loop engine would materially expand the Claude runtime. Keep Codex as the primary loop runtime until there is explicit Claude-side runtime demand and validation."
-
-  - path: "tools/task_ledger.py"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: provisional
-    gap: missing-in-claude
-    phase_1b_decision: "codex-only explicit workflow runtime."
-    decision_rationale: "TaskRun is independent of the removed Agent Run hook artifact and remains owned by workflow-task-ledger."
-
-  - path: "schemas/ (harness, knowledge, loop, orchestration, task, tools, workitem)"
-    present_in: [codex, claude]
-    class: shared-neutral
-    generation: neutral-verbatim
-    confidence: confirmed
-    gap: closed
-    phase_1b_decision: "Portable active schemas remain shared-neutral. Removed Agent Run and lifecycle-ledger schemas are not regenerated into either platform."
-    decision_rationale: "Schemas follow active owners. WorkItem's Codex example remains platform-specific; the removed Claude hook ledger schema is not regenerated."
-
-  - path: "research-routing.md"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: confirmed
-    gap: none
-    phase_1b_decision: "codex-only — CORRECTED from the recorded 'shared-neutral' after content inspection."
-    decision_rationale: "research-routing.md references Codex-specific assets. The independently owned Claude context-routing.md does not import that file."
-
-  - path: "harness/README.md"
-    present_in: [codex]
-    class: codex-only
-    generation: codex-native
-    confidence: confirmed
-    gap: none
-    phase_1b_decision: "codex-only — CORRECTED from the recorded 'shared-neutral' after content inspection."
-    decision_rationale: "Documents the Go hook dispatcher and source/runtime boundary. Agent Run compatibility and diagnostic commands were removed."
-
-# ---------------------------------------------------------------------------
-# maintainer-only: bundle CI / self-maintenance, not platform runtime parity
-# ---------------------------------------------------------------------------
-  - path: "maintainer/fixtures/research-ledger/ (valid.yaml, research-ledger.schema.json)"
-    present_in: [source]
-    class: maintainer-only
-    generation: tooling
-    confidence: confirmed
-    notes: "The repository research profile consumes this ledger fixture and schema directly from source/maintainer. They are not generated into .codex, .claude, or plugins; no skill, hook, or live-home runtime consumes CODEX_HOME/research."
-
-  - path: "tools/verify_bundle.py"
-    present_in: [codex]
-    class: maintainer-only
-    generation: tooling
-    confidence: confirmed
-    notes: "bundle gate; profiles core/integrations/execution/research/loop. Agent Output is no longer a Codex profile."
-
-  - path: "tools/validate_*.py"
-    present_in: [codex]
-    class: maintainer-only
-    generation: tooling
-    confidence: confirmed
-    notes: "validate_eval_cases, _loop_run, _research_ledger, _task_run, _work_item."
-
-  - path: "tools/check_*.py"
-    present_in: [codex]
-    class: maintainer-only
-    generation: tooling
-    confidence: confirmed
-    notes: "check_doc_freshness, _evidence_ledger, _execution_assurance, _invocation_surface_policy, _reference_targets, _release_identity, _tool_requirements, _work_horizon_policy (8)."
-
-  - path: "tools/run_*.py"
-    present_in: [codex]
-    class: maintainer-only
-    generation: tooling
-    confidence: confirmed
-    notes: "run_behavior_evals, run_validator_unit_tests, run_verification_pipeline (3)."
-
-  - path: "tools/ analysis+report: analyze_context_surface.py, _validation.py"
-    present_in: [codex]
-    class: maintainer-only
-    generation: tooling
-    confidence: confirmed
-
-  - path: "tools/sync_generated_mirrors.py"
-    present_in: [codex]
-    class: maintainer-only
-    generation: tooling
-    confidence: confirmed
-    notes: "current 2-file generator; Phase 1a generate_targets.py supersedes or wraps it."
-
-  - path: "tools/tests/"
-    present_in: [codex]
-    class: maintainer-only
-    generation: tooling
-    confidence: confirmed
-    notes: "tool unit tests + fixtures."
-
-  - path: "eval/observed-runs/"
-    present_in: [codex, claude]
-    class: maintainer-only
-    generation: tooling
-    confidence: confirmed
-    notes: "Small validator fixtures may remain, but historical 9.1.x release replay packages and the synthetic harness comparison gate were removed."
-
-# ---------------------------------------------------------------------------
-# local-only / ignored
-# ---------------------------------------------------------------------------
-  - path: "docs/ , .github/ , .kanboard-plan/ , .kanboard-plan.yml"
-    present_in: [local]
-    class: local-only/ignored
-    generation: local-ignored
-    confidence: confirmed
-    notes: "skill-system/.gitignore excludes these; the plan doc itself lives under the gitignored docs/. source/ is NOT under docs/ and is committed."
-
-  - path: "**/.DS_Store , ._* , __MACOSX/ , Thumbs.db , __pycache__/ , *.py[cod] , .pytest_cache/ , .mypy_cache/ , .ruff_cache/"
-    present_in: [local]
-    class: local-only/ignored
-    generation: local-ignored
-    confidence: confirmed
-    notes: "OS / build residue."
-
-# ---------------------------------------------------------------------------
-# Phase scoping derived from the above
-# ---------------------------------------------------------------------------
-phase_scope:
-  phase_1a_regression_baseline:
-    description: "Every confirmed committed path in .codex AND .claude must regenerate byte-identical from source. No content change."
-    includes:
-      - "all shared-neutral (incl. the eval-schema mirror and platform-template entries)"
-      - "all codex-only and claude-only entries as-is"
-      - "all maintainer-only entries as-is"
-    excludes:
-      - "local-only/ignored"
-  phase_1b_gap_remediation:
-    status: "DONE (applied to live; .codex byte-identical, .claude gained schemas/ only)"
-    description: "Close real Claude mirror gaps. After content inspection, the only genuine shared gap was schema definitions; the other candidates were correct platform divergence, not gaps."
-    applied:
-      - "schemas/ -> shared-neutral: 24 definitions+examples generated to .claude (codex-only work-item.example.yaml kept out -> .claude/schemas=24, .codex/schemas=25, no .codex path leak)"
-    corrected_after_content_inspection:
-      - "research-routing.md -> codex-only (NOT shared): references codex-only/dangling assets (codex-research-lifecycle skill, .codex/references/...) -> would create a broken Claude doc"
-      - "desktop notification -> shared Go OS core with platform-native event mapping; Claude uses Notification rather than Stop inference"
-      - "harness/README.md -> codex-only (NOT shared): documents .codex/harness/ paths; Claude has its own hooks/README.md"
-    decisions_recorded_codex_only_for_v1:
-      - "loop engine tools, task_ledger.py, research/ ledger+schema, tools/requirements.txt, rules/default.rules"
-    review_record: "Phase 1b claude diff = + .claude/schemas/ (24 files) only. Verified at that cut: .codex byte-identical, .claude/schemas had no .codex refs, and core/loop profiles passed. Post-cutover the gate (live==source) replaces a separate allowlist file."
+validation:
+  repository_contract_tests: 4
+  harness_component_tests: 17
+  per_skill_persistent_tests: 0
+  automatic_all_suite_gate: false

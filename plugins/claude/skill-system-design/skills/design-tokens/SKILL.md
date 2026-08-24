@@ -24,6 +24,9 @@ disable-model-invocation: true
     - token source or design reference
     - target styling conventions
   read_if_needed:
+    - `references/design_stage_contract.md` when this work is one node in a Design DAG or its ownership boundary is unclear
+    - `references/design_evidence_contract.md` when classifying source authority, proof, or an unavailable condition
+    - `references/product_family_design_contract.md` when the repository declares shared token governance or a product-family profile
     - `references/token-normalization.md` for multi-category normalization, alias/mode/naming normalization, platform export shape, or an explicit inventory/export artifact
     - `references/token-gap-policy.md` when names, values, aliases, modes, or source priority are incomplete
     - `references/visual_decision_contract.md` when a missing look tempts a factory palette or type stack
@@ -42,14 +45,26 @@ disable-model-invocation: true
 - entry_scene:
   - PREPARE
 
-This is a token-evidence gate. It supports implementation but does not own UI code changes unless token artifact edits are explicitly requested.
+This is a token-evidence owner. It may create or edit a requested token artifact, but it never
+owns production UI code or a later Design stage.
+
+## Stage Boundary
+
+Apply `references/design_stage_contract.md`. Close only the assigned token authority, mapping, or
+gap condition. A result from this skill does not start component mapping, implementation, visual
+review, or accessibility review. Use `references/design_evidence_contract.md` for evidence labels
+and proof ceilings.
 
 ## Workflow
-1. Pin source pointers and declared authority. Use a declared canonical source; otherwise keep the conflict unresolved without inventing precedence. Screenshot/rendered values remain inferred, and a canonical winner does not erase displaced live/legacy mismatches.
+1. Pin source pointers and declared authority. When an applicable product-family profile exists,
+   apply `references/product_family_design_contract.md`. Use a declared canonical source;
+   otherwise keep the conflict unresolved without inventing precedence. Screenshot/rendered values
+   remain inferred, and a canonical winner does not erase displaced live/legacy mismatches.
 2. Answer narrow authority, conflict, gap, or same-system mappings directly. Load `references/token-normalization.md` only for multi-category, alias/mode/naming, platform-export, or explicit inventory/export work. Preserve repo naming, shape, typing, modes, and platform conventions; create no unrequested export.
 3. For incomplete names, values, aliases, modes, or priority, load `references/token-gap-policy.md`. Keep gaps missing and inferences labeled; a required gap needs canonical evidence or an explicit scoped user decision before readiness.
 4. For requested edits, read the resulting value, alias, and mode through the real consumer path. If it resolves another source, keep the condition open, correct selection in the owning module, and repeat the same-path readback. A parser inventory, mock, or generated file proves only its boundary.
-5. Hand the scoped mapping and unresolved items to `design-frontend`, `design-component-mapper`, or visual review; do not claim UI completion from token readiness.
+5. Return the scoped mapping, decisive evidence, and unresolved items. Name the relevant owner only
+   as a handoff hint; do not invoke it or claim UI completion from token readiness.
 
 ## Output
 For a narrow question, return only the mapping, conflict, or gap in scope. For an explicit inventory/export artifact, use the shape in `references/token-normalization.md` and omit empty fields.
@@ -60,3 +75,5 @@ For a narrow question, return only the mapping, conflict, or gap in scope. For a
 - Report parser failure with path/error. `scripts/inspect_tokens.py` is a read-only inventory aid, not correctness or design-system proof.
 - Keep subjective palette critique separate from verified mismatch. Screenshot values and visual taste are not token authority.
 - Do not broaden one surface into a redesign or exhaustive catalog. Accessibility contrast belongs to `design-a11y-audit`; visual, component-state, repo, and user-visible validation remain separate gates.
+- An unavailable token source affects only the assigned token condition. It does not block an
+  unrelated node or authorize a substitute palette, alias, or source.

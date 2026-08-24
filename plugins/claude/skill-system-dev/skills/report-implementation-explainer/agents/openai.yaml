@@ -1,7 +1,0 @@
-interface:
-  display_name: "Report Implementation Explainer"
-  short_description: "Explain implementation or present a verified diff"
-  default_prompt: "Use $report-implementation-explainer in explain mode for source/runtime causal understanding or compare mode for verified changed lines. Keep claims within the selected evidence and do not turn either mode into a readiness verdict."
-
-policy:
-  allow_implicit_invocation: false

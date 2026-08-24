@@ -9,4 +9,4 @@ capability:
     method: not_available
     unavailable_reason: current session has not inspected or verified host scheduler configuration
   evidence_refs: []
-  expires_or_review_at: before any loop contract claims scheduled execution
+  expires_or_review_at: before any durable Plan/Handoff claims scheduled execution

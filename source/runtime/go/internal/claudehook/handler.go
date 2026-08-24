@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"skill-system.local/harness/internal/kanboard"
 	"skill-system.local/harness/internal/notify"
 	"skill-system.local/harness/internal/projectcontext"
 	"skill-system.local/harness/internal/responseguard"
@@ -65,7 +64,6 @@ func sessionStart(event Event) map[string]any {
 		_ = responseguard.Clear(event.SessionID)
 		_ = clearTurnState(event.SessionID)
 	}
-	kanboard.MaybeSync(event.Cwd, false)
 	result, err := projectcontext.Resolve(event.Cwd, "")
 	if err != nil {
 		return nil
@@ -114,7 +112,6 @@ func stop(event Event) map[string]any {
 			}
 		}
 	}
-	kanboard.MaybeSync(event.Cwd, false)
 	return nil
 }
 

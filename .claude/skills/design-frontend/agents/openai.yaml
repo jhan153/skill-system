@@ -1,9 +1,0 @@
-interface:
-  display_name: "Design Frontend"
-  short_description: "Implement concrete UI designs in repository code"
-  default_prompt: "Use $design-frontend to implement the supplied design artifact as real source code in this repository. Pin any applicable product-family profile, preserve governance-source write policies and real mutation boundaries, reuse approved components with evidence, make open UX control decisions from supplied context, and validate target fidelity plus family coherence when declared."
-
-policy:
-  invocation_surface: explicit_procedure
-  allow_implicit_invocation: true
-  may_own_execution: true

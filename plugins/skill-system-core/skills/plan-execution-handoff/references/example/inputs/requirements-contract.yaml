@@ -1,0 +1,29 @@
+requirements_contract:
+  kind: requirements_contract
+  plan_id: example-csv-export
+  status: accepted
+  authority_owner: product owner
+  source_refs:
+    - request:example-csv-export
+  problem: Users cannot export the current report table from the report screen.
+  goals:
+    - Export the current row order as UTF-8 CSV.
+  target_users:
+    - report screen user
+  scope:
+    - current report table CSV export
+  non_goals:
+    - XLSX export
+    - PDF export
+  acceptance_criteria:
+    - id: AC-001
+      statement: Export preserves the visible row order.
+      evidence: human export observation
+    - id: AC-002
+      statement: The CSV header and values are UTF-8.
+      evidence: human export observation
+  assumptions: []
+  risks: []
+  open_questions: []
+  handoff_notes:
+    recommended_next_skill: plan-execution-handoff

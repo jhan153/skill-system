@@ -19,7 +19,7 @@ description: Acquire traceable paper evidence for an explicit literature/citatio
   must_read:
     - search question and source/date constraints
   read_if_needed:
-    - provided papers and prior evidence ledger
+    - provided papers and prior paper/evidence set
   do_not_load_by_default:
     - full repo/memory, experiment scaffold, manuscript templates
 - risk_profile:
@@ -55,9 +55,9 @@ Track separate fields; never collapse them into `verified`:
 Match depth to intent:
 - Simple list: concise citations/links, relevance, access limit, search date.
 - Claim check: supporting/contradicting records with basis and locators.
-- Explicit ledger: structured acquisition/source/claim fields, query plan, gaps, limits.
+- Explicit evidence artifact: structured acquisition/source/claim fields, query plan, gaps, and limits.
 
-Never force a full ledger around a short reference request.
+Never force a persisted evidence artifact around a short reference request.
 
 ## Validation
 - No source is returned without a retrievable locator.

@@ -4,90 +4,38 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
+	"sort"
+	"strings"
 	"testing"
 )
 
-func TestClaudeEventSurfaceAndPromptIDCorrection(t *testing.T) {
-	state := t.TempDir()
-	t.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", state)
-	t.Setenv("SKILL_SYSTEM_DESKTOP_NOTIFY", "dry-run")
-	want := map[string]bool{
-		"SessionStart": true, "UserPromptSubmit": true, "Stop": true, "Notification": true,
-	}
-	if len(supportedEvents) != len(want) {
-		t.Fatalf("event count=%d want=%d", len(supportedEvents), len(want))
-	}
-	for name := range want {
-		if !supportedEvents[name] {
-			t.Fatalf("missing event %s", name)
-		}
-	}
-	for _, forbidden := range []string{"PreToolUse", "PermissionRequest", "PostToolUse", "PreCompact", "PostCompact"} {
-		if supportedEvents[forbidden] {
-			t.Fatalf("unexpected Claude event %s", forbidden)
-		}
-	}
+type declaredClaudeHook struct {
+	Matcher string `json:"matcher"`
+}
 
-	output := Handle(Event{HookEventName: "UserPromptSubmit", SessionID: "s", PromptID: "prompt-1", Prompt: "아니 그게 아니라 설명해"})
-	if output == nil {
-		t.Fatal("correction context missing")
+func TestDeclaredClaudeEventsMatchHandlerSurface(t *testing.T) {
+	config := loadClaudeHookConfig(t)
+	declared := map[string]bool{}
+	for event := range config {
+		declared[event] = true
 	}
-	specific := output["hookSpecificOutput"].(map[string]any)
-	if specific["hookEventName"] != "UserPromptSubmit" || specific["additionalContext"] == "" {
-		t.Fatalf("unexpected correction output: %#v", output)
+	if missing, unexpected := claudeSetDifference(declared, supportedEvents), claudeSetDifference(supportedEvents, declared); len(missing) > 0 || len(unexpected) > 0 {
+		t.Fatalf("Claude hook events differ: missing=%v unexpected=%v", missing, unexpected)
 	}
-	output = Handle(Event{HookEventName: "Stop", SessionID: "s", PromptID: "prompt-1", LastAssistantMessage: "맞습니다. 지금부터 다시 확인하겠습니다."})
-	if output == nil || output["decision"] != "block" || output["reason"] == "" {
-		t.Fatalf("recovery stop was not blocked: %#v", output)
-	}
-	if _, present := output["continue"]; present {
-		t.Fatalf("Stop continuation must use decision block: %#v", output)
-	}
-	output = Handle(Event{HookEventName: "Stop", SessionID: "s", PromptID: "prompt-1", StopHookActive: true, LastAssistantMessage: "원인은 요청을 잘못 분류한 것입니다."})
-	if output != nil {
-		t.Fatalf("active Stop hook was re-blocked: %#v", output)
+	if output := Handle(Event{HookEventName: "UnsupportedEvent"}); output != nil {
+		t.Fatalf("unsupported event did not fail open: %#v", output)
 	}
 }
 
-func TestClaudeFallbackSequenceDoesNotReuseOlderCorrection(t *testing.T) {
-	state := t.TempDir()
-	t.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", state)
-	t.Setenv("SKILL_SYSTEM_DESKTOP_NOTIFY", "dry-run")
-	if Handle(Event{HookEventName: "UserPromptSubmit", SessionID: "legacy", Prompt: "아니 요청한 게 아니야"}) == nil {
-		t.Fatal("legacy correction context missing")
-	}
-	if output := Handle(Event{HookEventName: "Stop", SessionID: "legacy", LastAssistantMessage: "맞습니다. 앞으로 다시 보겠습니다."}); output == nil || output["decision"] != "block" {
-		t.Fatalf("legacy correction did not block: %#v", output)
-	}
-	if output := Handle(Event{HookEventName: "UserPromptSubmit", SessionID: "legacy", Prompt: "다음 작업을 시작해"}); output != nil {
-		t.Fatalf("ordinary prompt produced context: %#v", output)
-	}
-	if output := Handle(Event{HookEventName: "Stop", SessionID: "legacy", LastAssistantMessage: "맞습니다. 앞으로 다시 보겠습니다."}); output != nil {
-		t.Fatalf("older correction leaked into a later turn: %#v", output)
-	}
-
-	entries, err := os.ReadDir(filepath.Join(state, "claude-turns"))
-	if err != nil || len(entries) != 1 {
-		t.Fatalf("turn state entries=%d err=%v", len(entries), err)
-	}
-	raw, err := os.ReadFile(filepath.Join(state, "claude-turns", entries[0].Name()))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(raw) == "" || json.Valid(raw) == false || containsRaw(string(raw), "legacy") {
-		t.Fatalf("turn state is invalid or contains raw identity: %q", raw)
-	}
-}
-
-func TestClaudeSessionContextAndNotificationMapping(t *testing.T) {
-	state := t.TempDir()
-	t.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", state)
+func TestClaudeSessionContextAndDeclaredNotifications(t *testing.T) {
+	t.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", t.TempDir())
 	t.Setenv("SKILL_SYSTEM_DESKTOP_NOTIFY", "dry-run")
 	root := t.TempDir()
 	if err := os.Mkdir(filepath.Join(root, ".git"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	manifest := "schema_version: 1\nproject_id: demo\nknowledge_base:\n  root: docs/knowledge\n"
+	manifest := "schema_version: 1\nproject_id: demo\nknowledge_base:\n  root: private-knowledge\n"
 	if err := os.WriteFile(filepath.Join(root, "project-context.yaml"), []byte(manifest), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -96,26 +44,70 @@ func TestClaudeSessionContextAndNotificationMapping(t *testing.T) {
 		t.Fatal("manifest context missing")
 	}
 	specific := output["hookSpecificOutput"].(map[string]any)
-	if specific["hookEventName"] != "SessionStart" || specific["additionalContext"] == "" {
-		t.Fatalf("unexpected context output: %#v", output)
+	context := specific["additionalContext"].(string)
+	if !strings.Contains(context, "project-context.yaml") || strings.Contains(context, "private-knowledge") {
+		t.Fatalf("unexpected context output: %q", context)
 	}
 
-	for _, kind := range []string{"permission_prompt", "idle_prompt", "elicitation_dialog", "agent_needs_input", "agent_completed"} {
-		message, ok := notificationMessage(Event{NotificationType: kind, Message: "status", Cwd: root, Effort: Effort{Level: "max"}})
-		if !ok || message.Topic == "" || message.Model != "claude-max" {
-			t.Fatalf("notification %s not mapped: %#v ok=%v", kind, message, ok)
+	config := loadClaudeHookConfig(t)
+	declaredTypes := map[string]bool{}
+	for _, registration := range config["Notification"] {
+		for _, value := range strings.Split(registration.Matcher, "|") {
+			if value = strings.TrimSpace(value); value != "" {
+				declaredTypes[value] = true
+			}
 		}
 	}
-	if _, ok := notificationMessage(Event{NotificationType: "auth_success"}); ok {
-		t.Fatal("unregistered notification type was mapped")
+	if len(declaredTypes) == 0 {
+		t.Fatal("Claude Notification hook declares no notification types")
+	}
+	for notificationType := range declaredTypes {
+		message, ok := notificationMessage(Event{NotificationType: notificationType, Message: "status", Cwd: root, Effort: Effort{Level: "max"}})
+		if !ok || message.Topic == "" {
+			t.Errorf("declared notification %s is not mapped: %#v ok=%v", notificationType, message, ok)
+		}
+	}
+	if _, ok := notificationMessage(Event{NotificationType: "unsupported_notification"}); ok {
+		t.Fatal("undeclared notification type was mapped")
 	}
 }
 
-func containsRaw(value, part string) bool {
-	for index := 0; index+len(part) <= len(value); index++ {
-		if value[index:index+len(part)] == part {
-			return true
+func loadClaudeHookConfig(t *testing.T) map[string][]declaredClaudeHook {
+	t.Helper()
+	root := claudeHookRepositoryRoot(t)
+	raw, err := os.ReadFile(filepath.Join(root, "source/platform/claude/hooks/settings.example.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var config struct {
+		Hooks map[string][]declaredClaudeHook `json:"hooks"`
+	}
+	if err := json.Unmarshal(raw, &config); err != nil {
+		t.Fatal(err)
+	}
+	return config.Hooks
+}
+
+func claudeHookRepositoryRoot(t *testing.T) string {
+	t.Helper()
+	_, file, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("cannot resolve Claude hook test path")
+	}
+	root, err := filepath.Abs(filepath.Join(filepath.Dir(file), "../../../../.."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return root
+}
+
+func claudeSetDifference(left, right map[string]bool) []string {
+	var result []string
+	for value := range left {
+		if !right[value] {
+			result = append(result, value)
 		}
 	}
-	return false
+	sort.Strings(result)
+	return result
 }

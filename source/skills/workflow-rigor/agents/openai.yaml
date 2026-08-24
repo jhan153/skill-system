@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Rigor"
-  short_description: "Mode-based evidence-first execution control"
-  default_prompt: "Use $workflow-rigor when execution risk or maker/checker separation needs extra proof: select lite/standard/strict, pin the fixed point, and keep Contract/Spec separate from Repository/Constraints review. Use independent passes only when material and never promote maker-authored checks into independent evidence."
+  short_description: "Optional non-node execution assurance"
+  default_prompt: "Attach $workflow-rigor to an active behavior-changing owner only when standard or strict assurance is material. Pin the fixed point, keep Contract/Spec separate from Repository/Constraints, and return read-only assurance evidence without owning writes, Core cards, or DAG transitions."
 
 policy:
   invocation_surface: support_only

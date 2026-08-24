@@ -25,6 +25,8 @@ description: Decompose UI references into source-traced hierarchy, layout, patte
     - supplied reference or design document
   read_if_needed:
     - `references/decomposition-schema.md`, selected repo conventions/contracts for requested implementation-ready mapping
+    - `references/design_stage_contract.md` when the task is part of a multi-stage request or Plan/Handoff DAG
+    - `references/design_evidence_contract.md` for shared evidence labels and proof ceilings
     - `references/visual_decision_contract.md` when a reference looks like a common generative template and intent must stay labeled
   do_not_load_by_default:
     - full repo, unrelated design files, credentials
@@ -39,17 +41,11 @@ description: Decompose UI references into source-traced hierarchy, layout, patte
     - private assets and authenticated design sessions default deny
 - entry_scene: PREPARE
 
-## Exact Route
-| Request | Owner |
-| --- | --- |
-| reference/section decomposition | `design-ui-decomposer` |
-| repo implementation | `design-frontend` |
-| token normalization | `design-tokens` |
-| rendered screenshot comparison | `design-visual-regression` |
-| Figma hug/fill/gap/padding to CSS rules | `design-layout-translator` |
-| component candidate confirmation or repo mapping | `design-component-mapper` |
+## Stage Boundary
 
-Use exact skill IDs; do not replace them with adjacent owner names. Stop before code changes.
+Apply `references/design_stage_contract.md`. This skill owns decomposition only, never code,
+confirmed repo mapping, or another stage. Apply `references/design_evidence_contract.md` before
+adding source-specific decomposition limits below.
 
 ## Evidence Rules
 - Label each conclusion `observed`, `source_metadata`, `inferred`, or `unverified`.
@@ -67,7 +63,7 @@ Use exact skill IDs; do not replace them with adjacent owner names. Stop before 
 4. Identify repeated patterns and one-off layout separately; list component/token candidates with their evidence basis.
 5. Record visible states, contract-required state gaps, responsive hypotheses, and validation needs without promoting them to observed facts.
 6. For multiple screens, analyze only the user-selected screen; never merge unrelated screens.
-7. Hand component candidates that need repo/catalog confirmation, reuse proof, or variant/state coverage to `design-component-mapper`; hand implementation-ready decomposition to `design-frontend` without claiming the mapping is already confirmed.
+7. Return component candidates that still need repo/catalog confirmation and the implementation-ready decomposition with their current evidence labels. Name the relevant owner when useful, but do not invoke it or claim the mapping is already confirmed.
 
 ## Output
 For one screen or question, answer directly. Use this shape only for an explicit design-contract artifact; omit empty fields.
@@ -93,4 +89,6 @@ evidence:
 ## Completion Boundary
 - A decomposition is complete only when every material claim has an evidence label and missing/occluded evidence remains visible.
 - This skill does not write code, verify rendered output, confirm component reuse, normalize tokens, certify accessibility, or claim user-visible implementation success.
-- If component candidates need confirmation, hand them to `design-component-mapper`. If implementation begins, hand the decomposition plus any confirmed/unresolved mapping status to `design-frontend`; read the reference schema only when the explicit artifact needs its extra checklist.
+- If another owner will need this result, name the relevant component-confirmation or implementation
+  input as a handoff hint. Do not invoke `design-component-mapper` or `design-frontend`; read the
+  reference schema only when the explicit artifact needs its extra checklist.

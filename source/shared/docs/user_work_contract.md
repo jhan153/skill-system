@@ -1,9 +1,9 @@
 # User Work Contract
 
-The user work contract is the execution authority shared by direct work,
-TaskRun, and LoopRun. It is formed from explicit natural-language intent; users
-do not need to author YAML or know field names. Persisted execution artifacts
-use `schemas/task/work-contract.schema.json`.
+The user work contract is the execution authority shared by direct work and canonical
+Plan/Handoff execution. It is formed from explicit natural-language intent; users do not need to
+author YAML or know field names. A portable machine shape remains available at
+`schemas/task/work-contract.schema.json`.
 
 ## Priority And Ownership
 
@@ -62,12 +62,10 @@ Deferred work is not successful work.
 
 ## Attended Versus Unattended Execution
 
-`interaction.mode: forbidden` becomes a runtime non-waiting deny only when the
-active natural-language or accepted v3 LoopRun projection also declares
-`execution.mode: unattended_goal_loop`. LoopRun activation alone does not
-convert an `attended` contract into this profile. Ordinary attended work and
-Goal/Loop contracts that allow interaction retain the host's normal approval
-behavior.
+`interaction.mode: forbidden` becomes a runtime non-waiting deny only when the active
+natural-language projection also declares `execution.mode: unattended_goal_loop`. A plan, graph,
+or mention of a loop does not convert an `attended` contract into this profile. Ordinary attended
+work and Goal/Loop contracts that allow interaction retain the host's normal approval behavior.
 
 In an unattended Goal/Loop, an approval or question is denied/deferred before
 the UI wait begins. The executor then continues other required runnable work.
@@ -92,8 +90,7 @@ solely to promote the label.
 
 ## Runtime Projection And Privacy
 
-Host hooks may persist a bounded projection containing normalized execution
-mode, verification owner, interaction mode, excluded action classes, prompt
-digest, and deferred intent keys. They must not persist raw prompts, command
-text, transcripts, or credentials. TaskRun and LoopRun own their explicit
-contract references and condition/step state.
+Host hooks may persist a bounded projection containing normalized execution mode, verification
+owner, interaction mode, excluded action classes, prompt digest, and deferred intent keys. They
+must not persist raw prompts, command text, transcripts, credentials, or graph state. Durable node
+and condition state belongs only to the canonical Plan/Handoff pair.

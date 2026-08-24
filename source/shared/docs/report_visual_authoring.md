@@ -9,7 +9,7 @@ Report Canvas. Do not restyle the renderer.
 2. Choose the mode from that claim, not from a desire to look interactive.
 3. Author the JSON model. Run the bundled renderer. Stop.
 
-Never edit `scripts/report-canvas/static/*.css`, the template, Pico, or
+Never edit `$REPORT_CANVAS_DIR/static/*.css`, the template, Pico, or
 Three.js. Never hand-author a custom Three.js scene, CDN, or second HTML
 shell. A prettier card wall is not a report.
 
@@ -24,9 +24,8 @@ Then the first viewport's `visual` must be `spatial` with real geometry:
 1. A repo or user GLB/glTF, path relative to the model file.
 2. Else `buffer_geometry` from a production dump or an explicit sample of a
    stated function/dataset.
-3. If neither exists, do not invent a cube, statue, or indigo scene. Render
-   is `blocked` or `unverified` and name the missing asset. Chat-only cards
-   are not a substitute.
+3. If neither exists, do not invent a cube, statue, or indigo scene. Mark only the spatial HTML
+   projection `unverified`, name the missing asset, and deliver the content-primary Markdown.
 
 Sampling a stated `z = f(x, y)` (or loading a small mesh) is **authoring
 display data**. It is not reimplementing a production topology algorithm in
@@ -44,7 +43,7 @@ geometry, or “make it interactive.” That stays `decision`, `compare`, or
 Prefer the bundled sampler over hand-typed coordinates:
 
 ```bash
-python3 "$REPORT_SKILL_DIR/scripts/report-canvas/sample_display_surface.py" \
+python3 "$REPORT_CANVAS_DIR/sample_display_surface.py" \
   --expr "sin(x)*sin(y)" \
   --xmin -3 --xmax 3 --ymin -3 --ymax 3 --nx 24 --ny 24 \
   --out /absolute/path/surface.geometry.json

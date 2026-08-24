@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"skill-system.local/harness/internal/claudehook"
-	"skill-system.local/harness/internal/kanboard"
 	"skill-system.local/harness/internal/projectcontext"
 )
 
@@ -26,8 +25,6 @@ func main() {
 		case "context":
 			contextCLI(os.Args[2:])
 			return
-		case "kanboard-sync-worker":
-			os.Exit(kanboardWorkerCLI(os.Args[2:]))
 		}
 	}
 	hookCLI()
@@ -46,24 +43,6 @@ func configureStateRoot() {
 	if root != "" {
 		_ = os.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", filepath.Join(root, "harness"))
 	}
-}
-
-func kanboardWorkerCLI(args []string) int {
-	set := flag.NewFlagSet("kanboard-sync-worker", flag.ContinueOnError)
-	set.SetOutput(io.Discard)
-	workspace := set.String("workspace", "", "workspace root")
-	mode := set.String("mode", "", "apply or dry-run")
-	fingerprint := set.String("fingerprint", "", "expected plan fingerprint")
-	leaseToken := set.String("lease-token", "", "pending lease owner token")
-	if set.Parse(args) != nil {
-		return 2
-	}
-	result := kanboard.RunWorker(*workspace, *mode, *fingerprint, *leaseToken)
-	_ = json.NewEncoder(os.Stdout).Encode(result)
-	if result.Status == "synced" {
-		return 0
-	}
-	return 1
 }
 
 func hookCLI() {

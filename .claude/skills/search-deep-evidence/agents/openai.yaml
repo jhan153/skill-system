@@ -1,9 +1,0 @@
-interface:
-  display_name: "Search Deep Evidence"
-  short_description: "Cross-check claims across independent evidence lanes"
-  default_prompt: "Use $search-deep-evidence for a stated multi-lane fact-checking need. Separate source identity from claim relation, preserve contradictions, assess independence, and stop at a traceable evidence set."
-
-policy:
-  invocation_surface: explicit_procedure
-  allow_implicit_invocation: true
-  may_own_execution: true

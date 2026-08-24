@@ -15,7 +15,7 @@ work_horizon:
   level: one_shot
   role: requirements_discovery_owner
   typical_agentic_duration: "30-90 minutes"
-  legacy_equivalent: "1-2 weeks of stakeholder discovery"
+  legacy_equivalent: "1-2 weeks of requirements discovery"
 
 planning_altitude:
   kind: requirements_discovery

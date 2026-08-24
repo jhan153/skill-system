@@ -18,7 +18,9 @@ description: Translate evidenced design layout constraints into bounded, code-re
   must_read:
     - supplied layout reference, specification, or relevant source
   read_if_needed:
-    - `references/layout-translation-map.md` for common constraint mappings, a breakpoint report, or a multi-region contract
+    - `references/layout_constraint_contract.md` for common constraint mappings, a breakpoint report, or a multi-region contract
+    - `references/design_stage_contract.md` when the task is part of a multi-stage request or Plan/Handoff DAG
+    - `references/design_evidence_contract.md` for shared evidence labels and proof ceilings
     - repo conventions or visual evidence when the mapping depends on them
   do_not_load_by_default:
     - unrelated routes, history, credentials
@@ -26,23 +28,18 @@ description: Translate evidenced design layout constraints into bounded, code-re
   reads:
     - scoped design/layout sources
   writes:
-    - analysis artifact only unless implementation is authorized
+    - analysis artifact only when explicitly requested; production UI belongs to `design-frontend`
   tools:
     - source/visual inspection
   sensitive_resources:
     - private design sessions default deny
 - entry_scene: PREPARE
 
-## Exact Route
-| Request | Owner |
-| --- | --- |
-| constraint/Auto Layout/flex/grid translation | `design-layout-translator` |
-| implementation | `design-frontend` |
-| rendered comparison | `design-visual-regression` |
-| component contract mapping | `design-component-mapper` |
-| unclear information hierarchy | `design-ui-decomposer` |
+## Stage Boundary
 
-Use exact skill IDs. This skill may support implementation but does not write or claim it.
+Apply `references/design_stage_contract.md`. This skill owns layout rules only and never writes or
+claims production UI. Apply `references/design_evidence_contract.md` before the layout-specific
+proof limits below.
 
 ## Constraint Rules
 - Confirm only stated fields supported by explicit requirements, metadata, or repo source; cite conflicts.
@@ -58,10 +55,11 @@ Use exact skill IDs. This skill may support implementation but does not write or
 2. Classify axis, regions, fixed/flexible children, and size dependencies.
 3. Translate sizing, spacing, overflow, text-fit, and responsive order with evidence labels.
 4. State the chosen repo-system mapping and unresolved assumptions; keep alternatives separate.
-5. Hand code to `design-frontend` and rendered proof to `design-visual-regression`.
+5. Return code-ready rules and the exact evidence still needed for rendered proof. Name another
+   owner only as a handoff hint; do not invoke it.
 
 ## Output
-For a narrow question, return the decisive rule and assumptions. For an explicit multi-region contract, use the shape in `references/layout-translation-map.md` and omit empty fields.
+For a narrow question, return the decisive rule and assumptions. For an explicit multi-region contract, use the shape in `references/layout_constraint_contract.md` and omit empty fields.
 
 ## Completion Boundary
 - Every material rule names evidence or remains inferred/unverified; exact and responsive claims need authoritative inputs.

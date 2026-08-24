@@ -1,8 +1,8 @@
 # Claude Harness Lifecycle Hooks
 
 Claude owns a native Go dispatcher separate from the Codex dispatcher. Shared
-packages provide the response guard, project-context resolution, Kanboard
-lease/stamp logic, redaction, and OS notification implementation; the Claude
+packages provide the response guard, project-context resolution, redaction,
+and OS notification implementation; the Claude
 package owns Claude input normalization and output contracts.
 
 Only `SessionStart`, `UserPromptSubmit`, `Stop`, and `Notification` are
@@ -13,8 +13,7 @@ eventually-written transcript as current-turn evidence.
 
 Native `Notification` payloads own approval, idle, elicitation, background
 input, and background completion alerts. Stop does not infer those states.
-Project context remains location-only, and Kanboard work remains conditional,
-leased, detached, and success-stamped.
+Project context remains location-only.
 
 The Claude runtime contains no hook-event ledger, Agent Run, Output Gate,
 harness measurement, compact record, or Python adapter. Hook registration is a

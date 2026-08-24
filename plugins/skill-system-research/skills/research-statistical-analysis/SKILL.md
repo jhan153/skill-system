@@ -16,6 +16,11 @@ description: Analyze real experimental data or supplied statistics with an expli
 - risk_profile: privacy-check row data; write analysis code/report only when requested; use reproducible local computation for new statistics; credentials default deny
 - entry_scene: PREPARE
 
+## Stage Boundary
+Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
+intent, or Plan/Handoff mapping matters. This skill owns statistical analysis or a clearly labeled
+analysis plan only; it never starts data acquisition, experimentation, or manuscript writing.
+
 ## Analysis Contract
 1. Fix the question, estimand, treatment/comparator, outcome scale, and experimental, sampling, and analysis units before selecting a method. Establish independent, paired, repeated, or hierarchical structure and planned versus exploratory status.
 2. Bind computation to the named canonical data/version and record provenance, row counts, exclusions, and transformations. Missing or mismatched canonical results fail closed; never substitute a stale source silently.

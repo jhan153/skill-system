@@ -1,53 +1,48 @@
 # Report Canvas Contract
 
-Report Canvas is the Skill System's shared human-facing report presentation. It turns one
-evidence-calibrated report model into a self-contained HTML artifact that is faster to inspect
-than a long linear document. It is a presentation layer, not a report owner, router, evidence
-source, validator, or claim of user understanding.
+Report Canvas is the Skill System's optional human-facing HTML projection. It turns one already
+completed, evidence-calibrated Markdown report into a self-contained artifact when HTML or an
+inspectable spatial view is actually requested. It is a presentation layer, not a report owner,
+content source, router, evidence source, quality validator, or claim of user understanding.
 
 ## Selection Gate
 
 Use owner and output intent, not document length, to select the projection:
 
-1. Once a `report-*` skill admits a task, render its primary human-facing result as Report Canvas
-   HTML by default. The user does not need to repeat “HTML,” “persistent,” or “interactive.”
+1. Follow `references/report_delivery_contract.md`. Markdown is the default report output; select
+   Canvas only for explicit `html`/`both` delivery or when inspectable spatial evidence is required.
 2. Keep ordinary non-report answers, status updates, implementation closeouts, and one-step
-   factual replies in concise chat. Do not attach a report automatically after implementation;
-   the active report skill's admission gate still applies.
+   factual replies in concise chat. Never attach a report or HTML automatically after a task.
 3. Honor an explicit `chat-only`, `no file`, exact non-HTML format, raw patch, or machine-only
    request. If the host has no safe writable artifact surface, return the same calibrated result
-   in concise chat and state that HTML delivery was unavailable; never invent a file or link.
+   in concise chat; never invent a file or link.
 4. Preserve canonical lifecycle, machine, patch, schema, and repository-required formats. Canvas
-   is the default human navigation layer over those artifacts, not a replacement for them.
-5. Keep archival Markdown only when the user or repository contract requires it. Markdown, chat,
-   and Canvas are projections of the same report model; none outranks the underlying source,
-   runtime, test, diff, or accepted decision.
+   is an optional readability/navigation layer over those artifacts, not a replacement for them.
+5. Keep Markdown as the content-primary report. Markdown, chat, and Canvas never outrank the
+   underlying source, runtime, test, diff, or accepted decision.
 
-The owning skill determines the claims, verdict, evidence boundary, and next action. Canvas only
-determines how those already-supported claims are navigated.
+The owning skill and its Markdown report determine the claims, verdict, evidence boundary, and
+next action. Canvas only determines how that same content is navigated.
 
 ## Runtime Asset Resolution
 
-Before reading this contract or rendering, set `REPORT_SKILL_DIR` to the directory containing the
-active report skill's resolved `SKILL.md`. The current skill catalog's exact `file:` path is the
-authority; the current working directory, repository root, and an inferred install root are not.
-For a Codex local-plugin install, the resolved path normally has this shape:
+Only after HTML is selected, set `REPORT_SKILL_DIR` to the directory containing the active report
+skill's resolved `SKILL.md`, then resolve the renderer inside that same package:
 
 ```text
-~/.codex/plugins/cache/skill-system-local/<plugin-id>/<version>/skills/<report-skill>/SKILL.md
+REPORT_PLUGIN_ROOT := parent(parent(REPORT_SKILL_DIR))
+REPORT_CANVAS_DIR  := REPORT_PLUGIN_ROOT/shared/report-canvas
 ```
 
-Expand `~` and use the exact exposed path. `<plugin-id>` and `<version>` are placeholders: never
-glob cache versions, choose a presumed latest version, or infer plugin ownership from the skill
-name. A bundle runtime may instead expose `.codex/skills/<report-skill>/SKILL.md`; the same
-resolved-`SKILL.md` rule applies.
+This relation is identical for canonical `source/skills/<skill>` and generated Core plugin skills.
+The exposed `SKILL.md` path is the authority; the working directory, inferred install root, or
+presumed latest plugin version is not.
 
-Require both `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and
-`$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py`. If either is absent, treat the active
-installation as an incomplete report payload, name the missing local asset, and use the Selection
-Gate's allowed chat fallback. Do not wander through sibling plugins, another cache version,
-`~/.codex/skills`, unrelated repository checkouts, or `.codex/skills/.system` looking for a
-substitute.
+Require `$REPORT_SKILL_DIR/references/report_canvas_contract.md` and
+`$REPORT_CANVAS_DIR/render_report.py`. If either is absent, treat the active package as incomplete
+for HTML only. Name the missing asset and deliver the completed Markdown result. Do not wander
+through sibling plugins, another provider root/cache version, unrelated checkouts, or app-managed
+system-skill directories looking for a substitute.
 
 Repository authoring uses `source/shared/docs/report_canvas_contract.md`,
 `source/shared/report-canvas/`, and `source/tools/generate_targets.py`. Those paths are only for
@@ -56,7 +51,8 @@ be run during an ordinary report invocation.
 
 ## Shared Model
 
-Author a JSON model conforming to `scripts/report-canvas/report-model.schema.json`. The first viewport
+For selected HTML delivery, derive one JSON model from the completed Markdown report and conform it
+to `$REPORT_CANVAS_DIR/report-model.schema.json`. The first viewport
 must contain:
 
 - one outcome title and concise summary;
@@ -106,8 +102,8 @@ or write a custom Three.js page.
 Geometry may be a repo/user GLB/glTF **or** `buffer_geometry` sampled from a
 stated function or dataset (`purpose: display`). That sample is display data,
 not a browser reimplementation of a production topology algorithm. If no
-asset and no sampleable source exist, keep the result `blocked` or
-`unverified` and name the missing file. Do not invent a decorative mesh.
+asset and no sampleable source exist, mark the spatial projection `unverified`,
+name the missing file, and preserve the Markdown result. Do not invent a decorative mesh.
 
 Do not choose `spatial` merely for decoration or “interactivity.” An API
 comparison or a QA verdict with no geometry stays non-spatial and must not
@@ -120,40 +116,45 @@ result in a label merely to bypass the typed model.
 
 ## Rendering
 
-After resolving the active skill directory, invoke its bundled renderer by absolute path; the
+For selected HTML delivery, invoke the resolved skill's bundled renderer by absolute path; the
 working directory need not be the skill directory:
 
 ```bash
 REPORT_SKILL_DIR="/absolute/path/to/active/report-skill"
-python3 "$REPORT_SKILL_DIR/scripts/report-canvas/render_report.py" \
+REPORT_PLUGIN_ROOT="$(cd "$REPORT_SKILL_DIR/../.." && pwd)"
+REPORT_CANVAS_DIR="$REPORT_PLUGIN_ROOT/shared/report-canvas"
+python3 "$REPORT_CANVAS_DIR/render_report.py" \
   --input /absolute/path/report-model.json \
   --output /absolute/path/report.html
 ```
 
-The renderer, template, schema, examples, static files, and vendored dependencies are all local to
-that skill under `scripts/report-canvas/`; no sibling plugin or runtime root is required. The
+The renderer, template, schema, examples, static files, and vendored dependencies are stored once
+under the active Core package's `shared/report-canvas/`; no sibling plugin or runtime root is
+required. The
 output is a single offline HTML file. Pico CSS is vendored as a small semantic base. Three.js,
 `OrbitControls`, and `GLTFLoader` are pinned and bundled locally, then embedded only when
 `mode: spatial`; decision, compare, and trace reports do not pay the Three.js payload cost.
 The renderer fails when the output already exists. Pass `--force` only for an intentional
 replacement; the input and output paths must always differ.
 
-Use `scripts/report-canvas/examples/` as structural examples, never as claim or domain templates. Populate
-only sections supported by the owning report.
+Use `$REPORT_CANVAS_DIR/examples/` as structural examples, never as claim or domain templates. Populate
+only sections already supported by the Markdown report. Render after content stabilizes; do not
+generate variants or enter a visual-polish loop.
 
 ### Artifact delivery
 
-1. Use a user-specified path first, then an existing repository report/artifact convention, then
+1. Preserve the Markdown report as the primary content artifact. For the HTML projection, use a
+   user-specified path first, then an existing repository report/artifact convention, then
    the host's writable task-artifact directory. Otherwise choose a descriptive, non-colliding
    `.html` path in the current writable workspace. The renderer rejects an existing output by
    default; use `--force` only after intentionally selecting that exact replacement target.
 2. Treat the JSON model as renderer input, not as the document the user must read. Retain or remove
    it according to the repository's artifact policy.
-3. Return a concise chat receipt containing the outcome, a clickable HTML artifact link, the
-   calibrated result/evidence label, and the single closing action state. Do not duplicate the
-   report body in chat.
+3. Return a concise chat receipt containing the outcome and Markdown link first, then the HTML
+   link, calibrated result/evidence label, and closing action state. Do not duplicate the report
+   body in chat.
 4. If the report owns canonical non-HTML artifacts, deliver those in their required formats and
-   make Canvas the first human-facing index over them.
+   let Markdown remain the first human-facing index. Canvas is an optional readability view.
 
 ## Theme
 
@@ -231,17 +232,18 @@ the evidence drawers are legitimate navigation aids, not cheating.
   sanitized `http`, `https`, or same-document anchors.
 - Redact credentials and audience-sensitive runtime data before model creation. Rendering is not a
   redaction boundary.
-- Keep dependency versions and SHA-256 values in `scripts/report-canvas/vendor/versions.json`, with
+- Keep dependency versions and SHA-256 values in `$REPORT_CANVAS_DIR/vendor/versions.json`, with
   upstream MIT licenses beside the vendored files.
 
 ## Validation
 
-Before delivery:
+For selected HTML delivery:
 
 1. validate the model and render it with the deterministic renderer;
 2. confirm no remote dependency or unresolved template marker exists;
 3. confirm non-spatial reports exclude the Three.js payload;
-4. inspect the first viewport, keyboard focus, both themes, narrow layout, and evidence drawers;
+4. perform one bounded readback of the first viewport and evidence navigation; do not run a broad
+   browser/theme/viewport suite unless the user or report claim requires it;
 5. for `spatial`, inspect one representative asset, selection, state change, overlay source IDs,
    and the no-reimplementation boundary;
 6. keep actual user comprehension and field usefulness `unverified` until observed in use.

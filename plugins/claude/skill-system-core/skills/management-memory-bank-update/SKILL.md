@@ -1,6 +1,6 @@
 ---
 name: management-memory-bank-update
-description: Add, change, or deprecate an explicitly persistent project goal, cross-session rule, proven working practice, or recurring-mistake candidate in an existing declared Memory Bank. Use append-only events and compact current/archive/meta reflection; never infer persistence, activate a mistake candidate automatically, or initialize a bank.
+description: Create, update, activate, or deprecate one explicitly persistent goal, rule, proven practice, or recurring-mistake candidate in an existing declared single-file Memory Bank. Append one concise semantic revision to the target record and read it back. Never infer persistence, initialize a bank, write raw chat, activate from recurrence alone, or update multiple records.
 disable-model-invocation: true
 ---
 
@@ -8,39 +8,47 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: memory_operation
-- intent_signature: persistent goal/rule/practice mutation or recurring-mistake candidate capture
-- use_when: the user explicitly requests persistence, or an approved `management-project-context-checkpoint` supplies one identified durable item
-- do_not_use_when: the bank is undeclared/absent, the item is temporary/inferred, or init/maintenance is primary
-- expected_inputs: mode, exact item or failure pattern, operation, declared bank, persistence authorization, and masked evidence when applicable
-- expected_outputs: one append-only event plus compact current/archive/meta reflection and readback
+- intent_signature: explicit durable Memory record mutation
+- use_when: the user explicitly requests persistence or an approved context checkpoint supplies one exact durable item
+- do_not_use_when: the bank is unavailable, the item is temporary/inferred, or init/read/maintenance is primary
+- expected_inputs: exact item, operation, persistence authority, declared bank, stable source refs, and affected scope
+- expected_outputs: one target record mutation, one semantic revision, and target-only readback
 - context_targets:
-  must_read: manifest declaration, targeted current item, latest meta/event state, `.claude/docs/memory_mutation_contract.md`, and `reference.md`
-  read_if_needed: matching archive block for supersession or directly matching mistake candidates for duplicate identity
-  do_not_load_by_default: full bank, unrelated items, raw chat, implementation history
+  must_read:
+    - manifest declaration and target/nearest matching Memory records
+    - `references/project_context_manifest.md`
+    - `references/memory_mutation_contract.md`
+  read_if_needed: one deprecated or candidate record needed for supersession/equivalence
+  do_not_load_by_default: full bank, unrelated records, legacy ledgers, raw chat, or implementation history
 - risk_profile:
-  reads: one declared bank and target item
-  writes: one goal/rule/practice item or one candidate mistake across the four-file operation
-  tools: targeted local mutation/readback
-  sensitive_resources: private evidence is summarized
+  reads: one declared Memory file and target identity candidates
+  writes: one target record plus its revision in `memory.md`
+  tools: targeted local mutation and readback
+  sensitive_resources: private evidence is reduced to a stable pointer or masked summary
 - entry_scene: PREPARE
 
-## Modes And Mutation Gate
-The exact existing bank must come from a user path or nearest `project-context.yaml`.
+## Modes
 
-- `durable_item`: one identifiable `goal` or `rule`; a successful recurring workflow is `entity=rule` with `kind=practice`.
-- `candidate_mistake`: one explicitly persistent, cross-session interaction or execution failure pattern. New items are always `entity=mistake`, `status=candidate`, and `verification=unverified`; capture never activates or scores them.
+- `durable_item`: one project goal, constraint, or proven reusable practice.
+- `candidate_mistake`: one explicitly persistent cross-session failure pattern; new records remain
+  `candidate` and `unverified`.
 
-Temporary instructions, one-turn preferences/corrections, generic dissatisfaction, raw chat, and inferred preferences never become Memory. Mask mistake evidence and update only an obvious same-pattern candidate; uncertain matches stay separate for explicit maintenance.
-
-Deprecation sets `status=deprecated` and preserves history. A candidate is never promoted by a score; activation requires explicit acceptance or directly verified project policy.
+Allowed operations are `create`, `update`, `activate`, and `deprecate`. Multi-record consolidation
+belongs to `management-memory-bank-maintenance`.
+Activation requires explicit acceptance or directly verified project policy. Similar wording,
+frequency, elapsed time, or a score never authorizes activation or consolidation.
 
 ## Workflow
-1. Resolve the declared target item and latest snapshot version.
-2. Select `durable_item` or `candidate_mistake` and confirm update ownership rather than init, Knowledge, or maintenance.
-3. Build one event and the expected compact current/archive/meta result under one stable operation ID.
-4. Apply the shared mutation contract and read back all four artifacts, snapshot advancement, history preservation, and target-only change.
 
-Partial reflection, manifest mismatch, or unrelated snapshot churn remains failed/blocked.
+1. Bind the declared `memory_file`, project identity, requested mode/operation, and current target
+   snapshot. Missing/mismatched stores remain `unavailable`; do not initialize or migrate.
+2. Confirm cross-session usefulness, explicit persistence authority, Memory ownership, stable source
+   refs, and duplicate/conflict classification.
+3. Apply the shared contract to one record. Preserve its stable ID, current statement, status,
+   verification, applicability, exclusions, and source refs; append one concise revision.
+4. Read back the target record/revision and confirm unrelated records are unchanged.
 
 ## Output
-Report mode, gate decision, item/event IDs, masked-evidence status when applicable, final status/verification, cross-file readback, and unresolved conflict. Do not emit the full bank or raw conversation.
+
+Report mode, operation, record ID, authority/source refs, resulting status/verification, readback,
+and unresolved conflict. A semantic no-op is a valid no-write result.

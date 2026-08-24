@@ -11,7 +11,6 @@ func monokaiAccent(_ topic: String) -> NSColor {
     case "error": return NSColor(srgbRed: 249/255.0, green: 38/255.0, blue: 114/255.0, alpha: 1.0)
     case "approval", "input": return NSColor(srgbRed: 102/255.0, green: 217/255.0, blue: 239/255.0, alpha: 1.0)
     case "progress": return NSColor(srgbRed: 230/255.0, green: 219/255.0, blue: 116/255.0, alpha: 1.0)
-    case "kanboard": return NSColor(srgbRed: 174/255.0, green: 129/255.0, blue: 255/255.0, alpha: 1.0)
     default: return NSColor(srgbRed: 248/255.0, green: 248/255.0, blue: 242/255.0, alpha: 1.0)
     }
 }

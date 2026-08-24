@@ -13,7 +13,7 @@ description: Manage an explicitly requested project-context.yaml through minimal
 - expected_inputs: selected mode, exact repository root/manifest, requested keys or capabilities, resolved targets, and exact transaction approval for writes
 - expected_outputs: minimal manifest/readback, read-only diagnosis, selected-key update, or approved delegated store bootstrap
 - context_targets:
-  must_read: exact manifest/root state, nearest repository instructions, and `.codex/docs/project_context_manifest.md`
+  must_read: exact manifest/root state, nearest repository instructions, and `references/project_context_manifest.md`
   read_if_needed: `references/manifest-modes.md`, exact approved targets, and the owning store initializer for an approved `create-store` action
   do_not_load_by_default: full repo, store contents, transcripts, home/global context, adjacent repositories, or undeclared Wikis
 - risk_profile:

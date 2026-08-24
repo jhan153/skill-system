@@ -1,15 +1,13 @@
 # Global CLAUDE
 
-> Claude-side global working rules for the Skill System bundle (9.4.6). Claude keeps the
-> proven 9.2.1 decision and execution model while using the current shared skill catalog.
-> Its routing, hooks, permissions, validation, and runtime behavior are owned independently
+> Claude-side global working rules for the Skill System bundle (10.0.0). Claude keeps the
+> current 10.0 decision and execution model with the shared canonical skill catalog.
+> Its routing, hooks, permissions, and runtime behavior are owned independently
 > from Codex; both platform harnesses still ship under one bundle version and release tag.
 
 ## Bundle Boundary
-- `.claude/skills` contains the skill texts.
-- `.claude/docs` contains runtime guidance mirrored from `.codex/docs`.
-- `.claude/eval` contains usage-quality cases mirrored from `.codex/eval`.
-- `optional-system-skills-snapshot/.claude/skills/.system` contains comparison material for app-managed system skills.
+- Claude marketplace plugins contain the skill texts; `.claude/skills` is not a generated bundle surface.
+- `.claude/docs` contains provider runtime guidance projected from shared canonical docs.
 - Mutating live settings requires explicit user intent.
 - Preserve existing runtime config, hooks, and app-managed system skills unless the user explicitly requests replacement.
 
@@ -64,7 +62,7 @@
 - For refactoring, define how behavior preservation will be checked before editing.
 - Split multi-step work into short `change -> validation` units, and adjust the next step from validation results.
 - Continue until success conditions are verified, user verification is required, or a concrete blocker or stop boundary is reached.
-- A normal `change -> validation` cycle remains ordinary task execution; it does not by itself activate `/loop` or a formal `LoopRun`.
+- A normal `change -> validation` cycle remains ordinary task execution; it does not by itself require a formal repeated-work contract or Execution Handoff DAG.
 - Documentation, plan, status, or synchronization-only edits are not implementation completion unless explicitly requested.
 - Implementation completion requires a source, test, runtime config/build, or executable scaffold change tied to the requested behavior.
 - `blocked` and analysis-only reports are distinct outcomes, not implementation completion.
@@ -94,10 +92,10 @@
 - Do not use heavyweight artifact-producing skills unless the user explicitly asks for the artifact, package, or report.
 - Before WRITE, DELETE, CALL_PROCESS, NETWORK, CREDENTIALS, GIT_PUSH, broad report generation, or memory mutation, identify the risk boundary and validation context.
 
-### Loop Readiness Gate
-- Route explicit `/loop`, automation, durable repeated-agent execution, or Stop-driven continuation through loop readiness before execution.
-- Activate `LoopRun` only after an accepted schema-valid runtime contract and verifier map have been initialized into a `LoopRun` with checkpoint state, budgets, applicable approval gates, and stop terms.
-- Do not escalate ordinary one-shot `change -> validation` work into formal `LoopRun`.
+### Repeated Work Profile
+- Do not invoke a classifier for `/loop`, automation, duration, cost, or agent count.
+- Use `plan-execution-handoff` only when durable execution state is needed, and attach its repeated-work profile only when verifier evidence will steer later actions more than once.
+- Ordinary Waterfall, one-shot `change -> validation`, and bounded static-review repair do not load repeated-work principles.
 
 ### Knowledge And Memory Boundary
 - Resolve project Memory Bank, Knowledge Base, plan, and named LLM Wiki locations from an exact user path or the nearest `project-context.yaml`; do not guess paths or merge parent manifests.
@@ -122,14 +120,18 @@
 - Runtime config and automation assets, including `settings.json` and hooks, are managed by the host environment and local policy.
 - Preserve existing runtime settings unless the user explicitly requests replacement.
 - Project-local hooks may run after project trust and hook approval. They operate under permission modes and settings policy.
+- For an Orca-dispatched task or Plan/Handoff node, read `.claude/docs/orca_worker_runtime_contract.md`;
+  worker lifecycle is event-driven and never replaced by Coordinator polling, transcript reads, or
+  fixed/busy waits. Human approval may arrive hours later: send one question, yield the active
+  turn, and resume only from the delivered follow-up without treating the delay as timeout or block.
 - Review `settings.json` permissions, and any project-local `.claude/settings.json`, against local policy before applying.
-- The bundle ships a Claude-native Go dispatcher under `.claude/bin`. It is not auto-installed: merge the four-event exec-form template from `.claude/hooks/settings.example.json` into host settings only through an explicit installation step. The dispatcher handles correction context, the one-shot recovery-only Stop guard, project-context location resolution, conditional Kanboard sync, and native Claude notifications. It creates no hook ledger, Agent Run, transcript-derived Output Gate, or measurement record.
+- The bundle ships a Claude-native Go dispatcher under `.claude/bin`. It is not auto-installed: merge the four-event exec-form template from `.claude/hooks/settings.example.json` into host settings only through an explicit installation step. The dispatcher handles correction context, the one-shot recovery-only Stop guard, project-context location resolution, and native Claude notifications. It creates no hook ledger, Agent Run, transcript-derived Output Gate, or measurement record.
 - `.claude/skills/.system` is app-managed; replacing it requires explicit user intent.
 
 ### Harness And Stop Boundary
 - Hooks and harness records are evidence/control surfaces; they do not grant permission, replace permission policy, or authorize broad repair.
-- Stop validation is observational by default, except that an explicitly active `LoopRun` may apply its accepted bounded-continuation policy.
-- Generic Stop or agent-run validation success is not task or `LoopRun` success evidence by itself.
+- Stop validation is observational and never runs a continuation engine.
+- Generic Stop or agent-run validation success is not task or Plan/Handoff success evidence by itself.
 
 ## Edit Boundary
 - Do not modify code or configuration files for pure explanation, analysis, or review requests.
@@ -142,9 +144,9 @@
 - For analysis, review, and code changes, cite relevant files, lines, commands, outputs, or observed behavior.
 - Separate confirmed facts from assumptions and inferences; do not say “works”, “no issue”, or “done” without evidence.
 - Prefer direct CLI validation when available, but keep test/build/hook/harness pass status separate from user success conditions.
-- These labels apply only to final user-task result reporting; internal test, verifier, hook, harness, and `LoopRun` states retain their own schemas.
+- These labels apply only to final user-task result reporting; internal test, verifier, hook, harness, and Plan/Handoff states retain their own contracts.
 - Use only `agent-verified`, `user-verification-needed`, `unverified`, or `blocked`; `agent-verified` requires evidence for every material success condition.
-- Generic Stop or harness success is not sufficient task or `LoopRun` success evidence; active `LoopRun` success also requires accepted condition and `LoopRun` validation.
+- Generic Stop or harness success is not sufficient task or graph success evidence; the owning Workflow and Plan/Handoff conditions still require matching evidence.
 - Report only what changed, decisive validation evidence, and remaining risks or user checks.
 - For implementation diagrams, show actual runtime participants and state changes; omit meta participants unless explicitly requested.
 
@@ -152,7 +154,7 @@
 - If blocked, report only the exact blocking point, what was tried, and the next single action needed.
 - Do not list many options unnecessarily.
 - If user input is required, ask only for the decision that is needed.
-- In an active loop, debounce non-terminal observations into checkpoint state and report only actionable stop conditions.
+- In an active Plan/Handoff, record only changed condition evidence and actionable stop conditions; do not create a parallel checkpoint state.
 
 ## Anti-Fake-Fix
 - Do not make superficial fixes that only aim to pass tests.
@@ -167,4 +169,4 @@
 - Long planning formats, review formats, document style rules, and repeated workflows belong in separate documents or Skills.
 - Keep global CLAUDE limited to minimal working principles used across tasks.
 - Do not put repository-specific, project-specific, or document-specific style rules in the global file.
-- Keep ordinary non-report answers concise. Once a `report-*` skill owns the task, use `.claude/docs/report_canvas_contract.md` and deliver its primary human-facing result as Report Canvas HTML by default, with only a concise chat receipt. Honor explicit chat-only/no-file or exact machine/canonical-format requests; the Canvas changes presentation only, never ownership, evidence, or verdict semantics.
+- Keep ordinary non-report answers concise. Once a `report-*` skill owns the task, use `.claude/docs/report_delivery_contract.md`: deliver content-first Markdown by default and add Canvas HTML only for explicit `html`/`both` or required spatial evidence. Honor chat-only/no-file and exact formats; presentation never changes ownership, evidence, or verdict.

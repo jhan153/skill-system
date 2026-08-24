@@ -39,6 +39,9 @@ disable-model-invocation: true
     - rendered target URL, artifact path, or screenshot path
     - source visual reference or acceptance criteria
   read_if_needed:
+    - `references/design_stage_contract.md` when this check is a Design DAG node or its ownership boundary is unclear
+    - `references/design_evidence_contract.md` for evidence labels, proof ceilings, and unavailable rendered evidence
+    - `references/product_family_design_contract.md` when family coherence or a shared visual baseline is in scope
     - `references/viewport-policy.md` only when viewport dimensions, capture rules, or framing policy must be selected
     - `references/visual-diff-report-schema.md` only for an explicit regression artifact or multi-viewport comparison
     - `references/visual_decision_contract.md` when extras not in the source look like unchosen factory chrome
@@ -64,13 +67,22 @@ disable-model-invocation: true
 
 Use this skill for visual evidence, not for implementation ownership. It can support `design-frontend` after a UI is rendered.
 
+## Stage Boundary
+
+Apply `references/design_stage_contract.md`. This skill owns only the visual condition assigned by
+the user or accepted Plan. It never edits the UI, starts another gate, triggers repair/retry, or
+selects a successor. Use `references/design_evidence_contract.md` for evidence labels and proof
+ceilings.
+
 ## Workflow
 1. Determine the rendered target:
    - Use a local URL, Storybook story, static HTML, native preview, screenshot file, or simulator output.
    - If no target exists, report the missing target and stop visual proof.
 2. Determine comparison lanes and viewport set:
    - Use `target_fidelity` for the exact selected frame/spec/screenshot.
-   - Also use `family_coherence` when an applicable product-family profile declares pinned component-state or surface-archetype baselines.
+   - Also use `family_coherence` when an applicable product-family profile declares pinned
+     component-state or surface-archetype baselines. Apply
+     `references/product_family_design_contract.md` to that lane.
    - Keep the verdicts separate: a target can match an off-family mockup, or fit the family while missing the target.
    - Prefer user-specified viewport, design frame size, or project breakpoints.
    - If no viewport is specified and the surface is responsive, check at least one mobile and one desktop viewport.
@@ -88,10 +100,9 @@ Use this skill for visual evidence, not for implementation ownership. It can sup
    - Pin each baseline source, state, viewport, theme mode, and version/digest.
    - Compare shared axes such as typography scale, token color use, spacing rhythm, radius/elevation, control height, icon family, density, shell/chrome, and recurring component states.
    - Compare like with like. Do not apply full-screen pixel thresholds between unrelated screens or use one sibling screenshot as the entire family standard.
-7. Hand off unresolved gaps:
-   - Token mismatches go to `design-tokens`.
-   - Missing variants/states go to `design-component-mapper`.
-   - Focus/keyboard/contrast/target-size issues go to `design-a11y-audit`.
+7. Return unresolved gaps with their current evidence label. Name token, component, accessibility,
+   or implementation ownership only as a handoff hint; do not invoke another skill or convert a
+   visual result into a repair decision.
 
 ## Output
 Return single-view findings, evidence paths, and scoped status directly. Structured regression or multi-viewport artifacts follow the conditionally loaded schema; keep lane verdicts separate and missing evidence explicit.
@@ -106,21 +117,24 @@ Return single-view findings, evidence paths, and scoped status directly. Structu
 - Do not invent a universal pixel threshold for coherence. Use project-declared thresholds when present and reasoned shared-axis findings otherwise.
 - Missing source, screenshot, font, asset, viewport, or baseline evidence prevents a pass in the affected lane.
 - If only the user can supply or judge it, use `user-verification-needed`; otherwise use `unverified`.
-- If `scripts/check_screenshot_nonblank.py` is used, include the command and mark it as a nonblank/framing aid only.
 - Do not turn a single clipping or blank-render check into a full fidelity review.
 
-## Loop Contract Consumption
-When invoked as a loop verifier:
-- Read the accepted `loop_term` and verifier map.
-- Verify only the visual success conditions assigned to `design-visual-regression`.
-- Return status per success condition id: `pass`, `fail`, `unverified`, or `blocked`.
-- Include screenshot paths, viewport dimensions, nonblank/framing result, visual gaps, and unavailable-evidence reasons.
-- Treat unchanged screenshot failures as no-progress signals for `workflow-loop-runner`.
-- Do not verify accessibility, source-code correctness, or build readiness from screenshots alone.
+## Plan/Handoff Condition Result
 
-## Do not invent / Unverified policy
+When the accepted Plan names this skill as an evidence owner:
+
+- Verify only the assigned visual condition IDs.
+- Return `pass`, `fail`, `unverified`, or `user-verification-needed` per condition with screenshot
+  paths, viewport/state, decisive comparison evidence, and unavailable reason.
+- An unchanged failure is only evidence for that condition. The Coordinator applies an existing
+  Plan edge; this skill never creates a retry, repair node, or back-edge.
+- Do not infer accessibility, source correctness, build readiness, Human Test, or overall Design
+  completion from screenshots.
+
+## Do Not Invent / Unverified Policy
 - Do not invent source reference details that are not visible.
 - Keep subjective visual polish separate from confirmed visual mismatch.
 
 ## Completion Boundary
-Do not mark design implementation complete from this gate alone. Visual evidence must be combined with token, component contract, accessibility, and repo validation gates.
+Close only the assigned visual condition. Do not require token, component, accessibility, or repo
+gates unless the user or accepted Plan separately names those conditions.

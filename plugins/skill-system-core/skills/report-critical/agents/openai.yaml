@@ -1,0 +1,7 @@
+interface:
+  display_name: "Report Critical"
+  short_description: "Write evidence-first blocker and QA reports"
+  default_prompt: "Use $report-critical to produce a bounded evidence-first blocker or QA report in Markdown, adding matching HTML only when I explicitly request it."
+
+policy:
+  allow_implicit_invocation: false

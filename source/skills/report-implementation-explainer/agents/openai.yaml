@@ -1,7 +1,7 @@
 interface:
   display_name: "Report Implementation Explainer"
-  short_description: "Explain implementation or present a verified diff"
-  default_prompt: "Use $report-implementation-explainer in explain mode for source/runtime causal understanding or compare mode for verified changed lines. Keep claims within the selected evidence and do not turn either mode into a readiness verdict."
+  short_description: "Explain implementation paths or verified changes"
+  default_prompt: "Use $report-implementation-explainer to explain this implementation or verified change set in content-first Markdown, adding the same trace or comparison as HTML only when I request it."
 
 policy:
   invocation_surface: explicit_procedure

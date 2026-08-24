@@ -1,9 +1,0 @@
-interface:
-  display_name: "Management Knowledge Base Record"
-  short_description: "Record one new durable project knowledge item"
-  default_prompt: "Use $management-knowledge-base-record to create one new accepted project Knowledge record in the declared store, selecting the correct category profile and routing existing identities to management-knowledge-base-update."
-
-policy:
-  invocation_surface: explicit_procedure
-  allow_implicit_invocation: false
-  may_own_execution: true

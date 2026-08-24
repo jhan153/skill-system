@@ -1,7 +1,0 @@
-interface:
-  display_name: "Workflow Validation"
-  short_description: "Design or run focused validation plans for changed artifacts"
-  default_prompt: "Use $workflow-validation to bind each material condition to an authoritative oracle and scope-matched evidence; keep lower-scope passes, mocks, and agent-authored tests from upgrading unresolved semantic conditions."
-
-policy:
-  allow_implicit_invocation: false

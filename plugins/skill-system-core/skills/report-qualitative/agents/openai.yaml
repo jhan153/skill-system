@@ -1,0 +1,7 @@
+interface:
+  display_name: "Report Qualitative"
+  short_description: "Evaluate quality with explicit context-bound criteria"
+  default_prompt: "Use $report-qualitative to evaluate this target under supplied or explicitly delegated criteria in content-first Markdown, adding the same report as HTML only when I request it."
+
+policy:
+  allow_implicit_invocation: false

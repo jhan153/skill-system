@@ -1,9 +1,0 @@
-interface:
-  display_name: "Search Paper Evidence"
-  short_description: "Find traceable paper evidence without fabricated metadata"
-  default_prompt: "Use $search-paper-evidence for explicit paper or citation acquisition. Verify source identity, record evidence basis and claim relation separately, deduplicate versions, and match output depth to the request."
-
-policy:
-  invocation_surface: explicit_procedure
-  allow_implicit_invocation: true
-  may_own_execution: true

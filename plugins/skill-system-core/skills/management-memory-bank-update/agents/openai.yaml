@@ -1,7 +1,7 @@
 interface:
   display_name: "Management Memory Bank Update"
-  short_description: "Persist a durable item or mistake candidate"
-  default_prompt: "Use $management-memory-bank-update to mutate one explicitly persistent goal, rule, proven practice, or recurring-mistake candidate in the declared bank. Apply one append-only four-file operation, mask mistake evidence, and read back the target state."
+  short_description: "Update one durable Memory record and revision"
+  default_prompt: "Use $management-memory-bank-update to change one explicitly persistent goal, rule, practice, or mistake candidate in memory.md and read back only that record and revision."
 
 policy:
   allow_implicit_invocation: false

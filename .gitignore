@@ -1,8 +1,9 @@
 /docs/
 /.github/
+/.cache/
 /.kanboard-plan/
 /.kanboard-plan.yml
-
+/export/
 .DS_Store
 ._*
 __MACOSX/

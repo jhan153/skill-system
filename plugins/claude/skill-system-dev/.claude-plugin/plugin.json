@@ -1,7 +1,7 @@
 {
   "name": "skill-system-dev",
-  "version": "9.4.6",
-  "description": "Skill System dev — analysis, prototyping, implementation, refactoring, implementation understanding, behavior discovery, and failure recovery for the engineering role.",
+  "version": "10.0.0",
+  "description": "Skill System dev — engineering analysis, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.",
   "author": {
     "name": "Skill System Maintainers"
   },

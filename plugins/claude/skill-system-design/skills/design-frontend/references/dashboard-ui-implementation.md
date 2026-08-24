@@ -26,6 +26,7 @@ Load only for the `dashboard` profile of `design-frontend`: an admin, SaaS, anal
 
 ## Handoff
 
-- Use `design-component-mapper` for table, filter, chart, card, and state component contracts.
-- Use `design-visual-regression` for viewport-specific density and overflow evidence.
-- Use `design-a11y-audit` for table semantics, filter labels, focus order, and chart alternatives.
+- When the user or accepted Plan assigns them, name `design-component-mapper` for table/filter/
+  chart/card contracts, `design-visual-regression` for viewport density/overflow, and
+  `design-a11y-audit` for semantics, labels, focus order, or chart alternatives.
+- Do not invoke those evidence skills automatically from this profile.

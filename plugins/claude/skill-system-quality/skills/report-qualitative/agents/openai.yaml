@@ -1,7 +1,0 @@
-interface:
-  display_name: "Report Qualitative"
-  short_description: "Evaluate quality and readiness in Canvas HTML"
-  default_prompt: "Use $report-qualitative to produce a decision-first, evidence-grounded Report Canvas HTML evaluation."
-
-policy:
-  allow_implicit_invocation: false

@@ -16,6 +16,11 @@ description: Write or revise scientific manuscript prose from verified research 
 - risk_profile: write manuscript files only when requested; formatting/build tools may verify presentation, while search/analysis remains with its owner; credentials denied
 - entry_scene: PREPARE
 
+## Stage Boundary
+Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
+intent, or Plan/Handoff mapping matters. This skill owns only requested manuscript prose. Missing
+evidence, statistics, or results remain named gaps and never start another stage automatically.
+
 ## Writing Contract
 1. Identify section purpose, audience, contribution boundary, named canonical artifacts, and their evidence stage. Missing/mismatched artifacts remain gaps; never substitute stale results.
 2. Build a compact claim map: claim → source/result → exact locator → strength/limitation.

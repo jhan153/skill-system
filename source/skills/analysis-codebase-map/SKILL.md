@@ -1,6 +1,6 @@
 ---
 name: analysis-codebase-map
-description: Model a repository or named slice as evidence-linked Mermaid architecture maps. Honor an explicit HLD/LLD request; otherwise use HLD for whole-repo/product scope and LLD for a named module, path, or flow. Generic codebase-analysis report wording resolves to this map, not the retired findings report. Do not use for one-boundary decisions, ranked improvement scans, bug RCA, or explicit findings/quality-gate requests.
+description: Model a repository or named slice as evidence-linked Mermaid architecture maps. Honor an explicit HLD/LLD request; otherwise use HLD for whole-repo/product scope and LLD for a named module, path, or flow. Generic codebase-analysis report wording resolves to this map, not the retired findings report. Do not use for one-boundary decisions, ranked improvement scans, bug RCA, explicit findings/quality-gate requests, or design-informed code review of an implementation.
 ---
 
 # Analysis Codebase Map
@@ -15,7 +15,8 @@ description: Model a repository or named slice as evidence-linked Mermaid archit
 - do_not_use_when:
   - one module/seam/adapter decision is needed; use `analysis-boundary-design`.
   - the user wants ranked improvement candidates; use `analysis-architecture-deepening`.
-  - the cause of a failure is unknown; use `analysis-bug`.
+  - the cause of a failure is unknown; keep diagnosis-only work with the current task owner or use `workflow-bug-fix` when repair is requested.
+  - implemented code or a diff needs findings and a review disposition, with or without a design baseline; use `workflow-code-review`.
   - the request is domain language, performance RCA, direct implementation, or an explicit findings/quality-gate artifact.
 - expected_inputs: repo root or named slice, the question to understand, any explicit HLD/LLD choice, and any required runtime/state focus
 - expected_outputs: altitude (`hld` or `lld`), Mermaid diagrams with captions and source refs, and explicit `Unverified` gaps

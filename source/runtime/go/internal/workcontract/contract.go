@@ -52,7 +52,6 @@ type State struct {
 	SchemaVersion          int      `json:"schema_version"`
 	Revision               int      `json:"revision"`
 	SourceDigest           string   `json:"source_digest"`
-	LoopContractDigest     string   `json:"loop_contract_digest,omitempty"`
 	VerificationOwner      string   `json:"verification_owner"`
 	InteractionMode        string   `json:"interaction_mode"`
 	ExecutionMode          string   `json:"execution_mode"`
@@ -69,14 +68,6 @@ type Decision struct {
 	Intent       Intent
 	Reason       string
 	UpdatedInput map[string]any
-}
-
-type LoopProjection struct {
-	SourceDigest          string
-	ExecutionMode         string
-	VerificationOwner     string
-	InteractionMode       string
-	ExcludedActionClasses []string
 }
 
 type promptSignals struct {
@@ -192,81 +183,6 @@ func Load(sessionID string) (State, error) {
 	return state, nil
 }
 
-// AdoptLoopContract merges the bounded fields from an accepted active v3
-// LoopRun. The merge is monotonic with respect to user restrictions: activating
-// a loop cannot relax an explicit natural-language exclusion or interaction
-// restriction. Relaxing an accepted loop contract requires a new contract.
-func AdoptLoopContract(sessionID string, projection LoopProjection) (State, bool, error) {
-	if projection.ExecutionMode == "" || projection.SourceDigest == "" {
-		return defaultState(), false, nil
-	}
-	if projection.ExecutionMode != ExecutionAttended &&
-		projection.ExecutionMode != ExecutionUnattendedGoalLoop {
-		return defaultState(), false, errors.New("unsupported LoopRun execution mode")
-	}
-	if projection.InteractionMode != InteractionAllowed &&
-		projection.InteractionMode != InteractionForbidden {
-		return defaultState(), false, errors.New("unsupported LoopRun interaction mode")
-	}
-	switch projection.VerificationOwner {
-	case "agent", "user", "shared", "external":
-	default:
-		return defaultState(), false, errors.New("unsupported LoopRun verification owner")
-	}
-	current, err := Load(sessionID)
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return defaultState(), false, err
-	}
-	if errors.Is(err, os.ErrNotExist) {
-		current = defaultState()
-	}
-	previousExecution := current.ExecutionMode
-	previousInteraction := current.InteractionMode
-	previousVerification := current.VerificationOwner
-	previousExcluded := strings.Join(current.ExcludedActionClasses, "\x00")
-	changedContract := current.LoopContractDigest != projection.SourceDigest
-	if changedContract {
-		current.DeferredIntents = []Intent{}
-		current.InputContinuationCount = 0
-	}
-	current.LoopContractDigest = projection.SourceDigest
-	if projection.ExecutionMode == ExecutionUnattendedGoalLoop {
-		current.ExecutionMode = ExecutionUnattendedGoalLoop
-	}
-	if projection.InteractionMode == InteractionForbidden {
-		current.InteractionMode = InteractionForbidden
-	}
-	if projection.VerificationOwner == VerificationUser {
-		current.VerificationOwner = VerificationUser
-	} else if current.VerificationOwner == "" || current.VerificationOwner == VerificationAgent {
-		current.VerificationOwner = projection.VerificationOwner
-	}
-	excluded := make(map[string]bool)
-	for _, class := range current.ExcludedActionClasses {
-		excluded[class] = true
-	}
-	for _, class := range projection.ExcludedActionClasses {
-		if strings.TrimSpace(class) != "" {
-			excluded[class] = true
-		}
-	}
-	current.ExcludedActionClasses = sortedKeys(excluded)
-	if !changedContract &&
-		current.ExecutionMode == previousExecution &&
-		current.InteractionMode == previousInteraction &&
-		current.VerificationOwner == previousVerification &&
-		strings.Join(current.ExcludedActionClasses, "\x00") == previousExcluded {
-		return current, true, nil
-	}
-	current.SchemaVersion = schemaVersion
-	current.Revision++
-	current.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-	if err := writeState(sessionID, current); err != nil {
-		return defaultState(), false, err
-	}
-	return current, true, nil
-}
-
 func Clear(sessionID string) error {
 	path := statePath(sessionID)
 	if path == "" {
@@ -289,9 +205,6 @@ func Context(state State) string {
 		"- Verification owner: " + state.VerificationOwner + ".",
 		"- Additional interaction: " + state.InteractionMode + ".",
 		"- Execution mode: " + state.ExecutionMode + ".",
-	}
-	if state.LoopContractDigest != "" {
-		lines = append(lines, "- Accepted LoopRun work-contract projection is active.")
 	}
 	if state.VerificationOwner == VerificationUser {
 		lines = append(lines, "- Missing user-only evidence is a normal user-verification-needed handoff; do not create substitute tests or validation artifacts.")

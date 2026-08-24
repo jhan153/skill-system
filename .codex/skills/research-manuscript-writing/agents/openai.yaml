@@ -1,9 +1,0 @@
-interface:
-  display_name: "Research Manuscript Writing"
-  short_description: "Write evidence-traceable scientific manuscript prose"
-  default_prompt: "Use $research-manuscript-writing to draft the requested scientific prose from actual evidence and result artifacts, keep planned work separate from completed results, and report citation gaps outside polished prose."
-
-policy:
-  invocation_surface: explicit_procedure
-  allow_implicit_invocation: false
-  may_own_execution: true

@@ -1,7 +1,7 @@
 interface:
   display_name: "Management Knowledge Base Maintenance"
   short_description: "Check Knowledge overlap, relations, history, recurrence"
-  default_prompt: "Use $management-knowledge-base-maintenance for an explicit declared-store operation. Keep overlap classification, typed relations, semantic history, provenance roots, and recurrence dimensions inspectable; never auto-merge or score them."
+  default_prompt: "Use $management-knowledge-base-maintenance for one explicit integrity-check, reindex, relation/history/overlap check, recurrence report, compaction, or reconciliation on the declared store."
 policy:
   invocation_surface: explicit_procedure
   allow_implicit_invocation: false

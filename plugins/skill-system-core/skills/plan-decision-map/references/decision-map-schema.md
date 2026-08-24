@@ -1,15 +1,21 @@
 # Plan Decision Map Schema
 
-Use an exact user-provided path when supplied. Otherwise place local artifacts under `docs/decision-map/<topic>/`, with `index.md` as the canonical overview and item files under `items/`. Use an external tracker only when the user separately authorizes that service, project, and mutation.
+Use the associated package resolved by `references/execution_handoff_input_contract.md`. Place the
+canonical overview at `<package-root>/inputs/decision-map/index.md` and item files under
+`<package-root>/inputs/decision-map/items/`. An exact user-provided package path overrides the
+default. Use an external tracker only when the user separately authorizes that service, project,
+and mutation.
 
 ## Canonical Index
 
 ```markdown
 ---
 kind: decision_map
+plan_id: <associated execution handoff plan id>
 decision_owner: <person, role, or accepted rule>
 storage: local_markdown | <authorized tracker>
 status: framing | active | decision_complete | closed
+source_refs: []
 ---
 
 # <Decision-map title>

@@ -28,13 +28,13 @@ An exact path is authoritative for discovery but does not broaden the skill's de
 
 ## Narrow Routing Gate
 
-Use `analysis-loop-readiness` only for explicit durable, repeated, event-driven, or Stop-driven execution whose readiness is not established. Otherwise the current owner selects one specialist directly and stops routing; it does not acquire evidence or attach validation, reporting, Memory, or Knowledge merely by topic.
+Do not invoke a classifier for `/goal`, duration, automation, or repeated wording. The current owner uses `plan-execution-handoff` only when durable execution state is actually needed and attaches its repeated-work profile only when verifier evidence will steer later actions more than once. Otherwise select one specialist directly and stop routing; do not acquire evidence or attach validation, reporting, Memory, or Knowledge merely by topic.
 
 ### Technical analysis
 
 | Dominant question | Direct owner |
 | --- | --- |
-| Why is behavior broken, incorrect, or recurring? | `analysis-bug` |
+| Why is a concrete failure occurring, with no repair requested? | current task owner, read-only causal diagnosis; no specialist skill |
 | Which algorithm/model/retrieval/local approach fits concrete constraints? | `analysis-algorithm` |
 | What one module/interface/seam/adapter/dependency boundary should be selected? | `analysis-boundary-design` |
 | Which structural/deep-module improvement candidate should come next? | `analysis-architecture-deepening` |
@@ -45,25 +45,29 @@ Choose by the requested decision, not incidental nouns. Incorrect behavior beats
 
 ## Evidence Lane Selection
 
-Route an explicit, single-domain evidence request directly: papers/citations to `search-paper-evidence`, multi-angle verification of one claim to `search-deep-evidence`, a concrete failure to `analysis-bug`, rendered UI evidence to the fitting design gate, declared Memory or Knowledge to its read harness, and an explicitly selected LLM Wiki to `analysis-llm-wiki-context`. Runtime/change evidence stays with the active task owner. If the user asks only which lane applies, the current owner returns that choice without loading a routing skill. Do not open several lanes speculatively; use `search-deep-evidence` only when the same claim genuinely requires independent lanes.
+Route an explicit, single-domain evidence request directly: papers/citations to `search-paper-evidence`, multi-angle verification of one claim to `search-deep-evidence`, diagnosis-only concrete failures to the current task owner under the read-only boundary, rendered UI evidence to the fitting design gate, declared Memory or Knowledge to its read harness, and an explicitly selected LLM Wiki to `analysis-llm-wiki-context`. Runtime/change evidence stays with the active task owner. If the user asks only which lane applies, the current owner returns that choice without loading a routing skill. Do not open several lanes speculatively; use `search-deep-evidence` only when the same claim genuinely requires independent lanes.
 
 ## Direct Owners
 
 | Request | Owner |
 | --- | --- |
 | direct implementation or refactor | current implementation owner or one clear specialist |
-| approved plan/spec execution | `workflow-plan-runner` |
-| bug fix with an unclear cause | `workflow-bug-fix`; use `analysis-bug` only for the unresolved cause |
-| existing implementation explanation or verified changed-line compare HTML | `report-implementation-explainer`, only on explicit explanation/compare artifact intent |
+| ordinary single-stage Research artifact | the narrow `research-*` specialist matching the requested artifact; do not add a node manager |
+| accepted Plan-assigned `RES-*` node | `workflow-research` plus exactly one stage skill already selected by the Plan; neither selects a successor |
+| approved plan/spec execution | the current Orchestrator follows an existing canonical Plan/Handoff; without one, route one bounded approved slice to its task-specific workflow |
+| concrete failure repair, including an unclear cause | `workflow-bug-fix`; DAG input owns one assigned intervention/result, while direct standalone repair may own at most two locally reviewed rounds |
+| static code review of a bound implementation or diff | `workflow-code-review`; select diagrams from code risk, treat design as optional evidence, and return only a compact `continue|repair` intent for the Coordinator |
+| existing implementation explanation or verified changed-line comparison report | `report-implementation-explainer`, only on explicit explanation/compare artifact intent; Markdown is default and HTML is optional |
 | product behavior discovery for an existing capability | `plan-behavior-discovery`, only on explicit one-question decision intent |
 | unresolved decisions need a durable multi-session map | `plan-decision-map`, only on explicit decision-map intent; local Markdown unless a remote tracker is separately authorized |
 | requirements discovery interview | `plan-requirements-discovery`, only on explicit interview intent; ask up to three mutually independent ready questions per round |
-| one-recipient stakeholder question document | `plan-stakeholder-questionnaire`, only on explicit questionnaire artifact intent; keep external delivery separate |
+| one-recipient question document | `plan-question-document`, only on explicit question-document artifact intent; keep external delivery separate |
 | runnable prototype for one unresolved UI, interaction, state, or logic question | `workflow-prototype`; use discovery only when the question itself is not selected |
 | repair the immediately preceding explanation | current task owner; replace the explanation using admitted evidence only, with no inspection or mutation |
-| goal/loop contract or verifier map | `plan-loop-term`; use verifier-mapping mode for an existing `SC-NNN` slice and do not execute checks |
-| short persisted plan | `plan-short-term-docs` |
-| accepted loop execution | `workflow-loop-runner` after a valid loop contract |
+| goal/repeated-work terms or verifier map | `plan-execution-handoff` with its conditional repeated-work principles; author conditions and graph terms without executing checks |
+| persisted execution plan | `plan-execution-handoff`; use `single_node_execution` for one durable executable node |
+| durable canonical Plan/Handoff pair | `plan-execution-handoff`, only on explicit pair, long-running execution DAG, graph-method/ownership/lock routing, advisory timing, or cross-session continuation intent; typed timing is inspected once at `worker_done`, never enforced by polling; `phase_gate_delivery` terminates at `human_test_ready` and later Test results/worklist/design start a new Waterfall |
+| accepted verifier-steered execution | let the Orchestrator follow the bounded DAG copied into the accepted `plan-execution-handoff` pair |
 | Memory read | current task owner using `management-memory-bank-harness` only for a declared, task-relevant slice |
 | persistent Memory write | the explicit Memory mutation skill matching the requested operation |
 | Knowledge read | current task owner using `management-knowledge-base-read` for declared project knowledge |
@@ -71,10 +75,9 @@ Route an explicit, single-domain evidence request directly: papers/citations to 
 | named LLM Wiki context | `analysis-llm-wiki-context`, explicitly selected and read-only |
 | project context manifest init/bootstrap/doctor or location update | `management-project-context` in the matching explicit mode |
 | repository skill update | current implementation owner following the repository's canonical-source, generation, and validation instructions |
-| existing Skill System eval maintenance | `evaluation-harness`; authored cases prove only their declared regression contract, never field quality |
-| repeated failure after an attempted fix | `workflow-recovery`; do not keep stacking patches in the previous execution owner |
-| explicit YAGNI, smallest-correct, or over-engineering check | attach `workflow-minimal-implementation` to the current implementation or refactor owner |
-| explicit evidence-first completion control for active behavior-changing work | `workflow-rigor` as a read-only execution modifier; the current execution owner retains mutation and final synthesis |
+| existing Skill System eval maintenance | current implementation owner; authored cases prove only their declared regression contract, never field quality |
+| same problem after a reviewed repair attempt | preserve attempt history; a DAG repair runs only its explicitly assigned `BF1/A1` or `BF2/A2` node and returns evidence to Code Review/Coordinator, while standalone repair may use its remaining bounded round |
+| explicit evidence-first completion control for active behavior-changing work | `workflow-rigor` as a read-only, non-node Workflow modifier; the current execution owner retains mutation and final synthesis |
 | personal skill creation | system `skill-creator` when explicitly named or clearly requested |
 
 Requested brevity, a status question, a correction, or a complaint does not change the task owner. A report of harm or undesired behavior is not permission to inspect or mutate external state.
@@ -101,14 +104,14 @@ The nearest `project-context.yaml` declares project-local skill roots, Memory Ba
 - Development requests execute source work; an active plan is input, not a substitute for implementation.
 - Use one `change -> validation` owner. A verifier does not become a second workflow owner.
 - When delegation follows an already selected specialist, pass its exact canonical skill ID to the worker. With no upstream selection, let the worker resolve normally instead of inventing a recommendation.
-- When a material semantic completion claim would rest mainly on code and checks produced by that same owner, attach `workflow-rigor` in `standard` mode and use an independent pass on the most falsifying `Contract/Spec` or `Repository/Constraints` axis when available. Medium/high-risk behavior changes may also attach it for proof depth, rollback, or readback; `strict` keeps both axes separate. Low-risk work with direct decisive observation stays self-reviewed, and harmless text/formatting or explanation-only work attaches no rigor mode.
+- When a material semantic completion claim would rest mainly on code and checks produced by that same owner, attach the non-node `workflow-rigor` modifier in `standard` mode and use an independent pass on the most falsifying `Contract/Spec` or `Repository/Constraints` axis when available. High-risk behavior changes may attach `strict` for separate axes plus rollback/readback. Low-risk work uses the global evidence baseline without a rigor mode. Rigor never owns writes, Core cards, or Plan successors.
 - Invoke routine approved executables directly. Use a shell wrapper only when pipeline, redirection, globbing, or other shell semantics are required.
 - Live home configuration, plugin caches, app-managed `.system` skills, and other sessions are deployment state. Modify them only on an explicit deployment or live-runtime request.
-- Explicit `/goal`, automation, durable repeated execution, or Stop continuation requires loop readiness and an accepted contract before execution.
+- Explicit `/goal`, automation, or Stop continuation does not itself select a workflow. Durable verifier-steered execution requires an accepted `plan-execution-handoff` pair; ordinary work stays with its direct owner.
 
 ## Heavy Artifacts And Evidence
 
-- Plans, decision maps, stakeholder questionnaires, reports, lifecycle packages, synthetic eval suites, and other heavy artifacts require explicit artifact intent. Explicit decision-map/questionnaire intent grants one local artifact, not a remote tracker write or external delivery.
+- Plans, decision maps, recipient question documents, reports, lifecycle packages, synthetic eval suites, and other heavy artifacts require explicit artifact intent. Explicit decision-map/question-document intent grants one local artifact, not a remote tracker write or external delivery.
 - An implementation explainer proves only that a source/runtime-anchored aid was generated. Do not claim human understanding; prefer an observable scenario comparison or product decision when the task continues.
 - Scenario/replay files prove only their authored contracts; they are not field-quality evidence.
 - Hooks, harness records, and verifier receipts do not prove user intent and do not authorize repair.
@@ -116,4 +119,7 @@ The nearest `project-context.yaml` declares project-local skill roots, Memory Ba
 
 ## Registry Boundary
 
-Skill names, families, aliases, plugin membership, and legacy replacements belong to `docs/skill_registry.md` and skill Routing Cards. This file does not duplicate the full inventory or group matrix. Unknown or stale explicit aliases are `unresolved`; do not invent an installed skill.
+Current skill names, families, family aliases, and plugin membership belong to
+`docs/skill_registry.md`, plugin manifests, and skill Routing Cards. This file does not duplicate
+the inventory or group matrix. Unknown or stale skill IDs are `unresolved`; do not invent an
+installed replacement.
