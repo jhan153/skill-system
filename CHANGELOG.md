@@ -1,5 +1,25 @@
 # Changelog
 
+## 10.0.1
+
+- Clarified Codex global execution guidance to prefer purpose-built tools and direct executable
+  interfaces over convenience shell composition. Text creation and edits use `apply_patch`, command
+  calls use their working-directory option, and shell redirection, heredocs, substitutions,
+  expansions, pipelines, or compound shell strings remain reserved for operations that genuinely
+  require shell semantics.
+- Simplified Codex command approval policy to allow Git and `codex plugin` prefixes by default while
+  keeping `git reset --hard` and forced `git clean` variants forbidden. Recursive deletion,
+  dependency installation, process/debugger control, `curl`, `sh`/`bash`/`zsh -c/-lc`,
+  `claude plugin`, `launchctl setenv`, and `open -R` remain prompt-gated.
+- Verified restrictive-rule precedence and representative argv decisions with `codex execpolicy`,
+  including forbidden destructive Git, allowed Git dry-run, allowed Codex plugin management, and
+  prompt-gated shell/plugin/deletion commands.
+- Advanced the unified four-profile bundle metadata to 10.0.1 without changing skill bodies or
+  provider harness binaries.
+- Cut the 10.0.1 source/runtime/plugin bundle with local annotated tag `v10.0.1` and release archive
+  `export/Skill-System-10.0.1.zip`. Remote push, publication, live runtime installation, and plugin
+  cache mutation remain separate explicit operations.
+
 ## 10.0.0
 
 - Replaced the fragmented plan/runner/loop control line with one canonical `plan.md` + `handoff.md`

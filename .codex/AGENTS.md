@@ -47,7 +47,15 @@
 
 ## Runtime And Managed Assets
 - Preserve runtime config and automation state. Risky actions follow configured approval policy and user scope.
-- Invoke approved executables directly; use a wrapper only for real shell semantics so command-prefix approvals stay visible.
+- Prefer purpose-built tools and direct executable interfaces over shell composition.
+- Do not use shell redirection (`>`, `>>`, `<`, `2>`), heredocs, command substitution, variable
+  expansion, pipelines, or compound `sh`/`bash`/`zsh -c`/`-lc` strings merely for convenience when
+  a direct tool or executable can express the operation.
+- Treat file writing as one application of this rule: use `apply_patch` for text creation and edits
+  instead of `cat`, `tee`, `echo`, heredocs, or redirection.
+- Use the command tool's working-directory option instead of `cd`, and keep one direct executable
+  per call unless the operation genuinely requires shell semantics that no direct interface can
+  express.
 - Keep artifacts out of temporary directories unless authorized or tool-required. `.codex/skills/.system` is app-managed and requires explicit intent to edit.
 - For an Orca-dispatched task or Plan/Handoff node, read `docs/orca_worker_runtime_contract.md`;
   worker lifecycle is event-driven and never replaced by Coordinator polling, transcript reads, or

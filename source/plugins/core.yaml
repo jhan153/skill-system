@@ -1,6 +1,6 @@
 # source/plugins/core.yaml — plugin membership manifest (hand-authored input).
 name: skill-system-core
-version: "10.0.0"
+version: "10.0.1"
 description: 'Skill System core — shared operational platform for routing, planning, execution handoff, memory/knowledge, evidence, and all report delivery.'
 skills:
   - plan-execution-handoff

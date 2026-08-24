@@ -1,8 +1,12 @@
 # Destructive local operations.
 prefix_rule(pattern=["git", "reset", "--hard"], decision="forbidden", justification="Use a targeted restore or revert instead.")
-prefix_rule(pattern=["git", "clean", ["-fd", "-df", "-fdx", "-xdf", "-dxf"]], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "clean", ["-f", "--force", "-fd", "-df", "-fdx", "-fxd", "-dfx", "-dxf", "-xfd", "-xdf"]], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
 prefix_rule(pattern=["git", "clean", "-f", "-d"], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
 prefix_rule(pattern=["git", "clean", "-f", "-d", "-x"], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "clean", "-d", "-f"], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "clean", ["-d", "--directories", "-x", "--ignored", "-X"], ["-f", "--force"]], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "clean", ["-d", "--directories", "-x", "--ignored", "-X"], ["-d", "--directories", "-x", "--ignored", "-X"], ["-f", "--force"]], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "-c", ["clean.requireForce=false", "clean.requireforce=false"], "clean"], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
 
 # Operations that still require review.
 prefix_rule(pattern=["rm", ["-rf", "-fr"]], decision="prompt", justification="Review recursive deletion before execution.")
@@ -12,15 +16,10 @@ prefix_rule(pattern=[["python", "python3"], "-m", "pip", "install"], decision="p
 prefix_rule(pattern=["uv", "pip", "install"], decision="prompt", justification="Dependency installation changes the environment.")
 prefix_rule(pattern=[["npm", "pnpm", "yarn", "bun"], ["install", "i", "add"]], decision="prompt", justification="Dependency installation changes the workspace.")
 prefix_rule(pattern=["cargo", "add"], decision="prompt", justification="Adding dependencies changes the manifest and lockfile.")
-prefix_rule(pattern=["git", ["add", "apply", "commit", "fetch", "ls-remote", "pull", "push", "rebase", "merge", "switch"]], decision="prompt", justification="Git writes, network access, publication, and branch integration require local review.")
-prefix_rule(pattern=["git", "branch", ["-D", "-f", "-m"]], decision="prompt", justification="Branch deletion, force movement, and rename require local review.")
-prefix_rule(pattern=["git", "restore", "--staged"], decision="prompt", justification="Index mutation requires local review.")
-prefix_rule(pattern=["git", "checkout", "--ours"], decision="prompt", justification="Conflict resolution writes require local review.")
-prefix_rule(pattern=["git", "worktree", "add"], decision="prompt", justification="Creating a worktree writes a new checkout and requires local review.")
 prefix_rule(pattern=[["kill", "pkill", "lldb"]], decision="prompt", justification="Process termination and debugger attachment require review.")
 prefix_rule(pattern=["curl"], decision="prompt", justification="Network requests can transmit task or local data; review the destination and payload.")
 prefix_rule(pattern=[["sh", "bash", "zsh", "/bin/sh", "/bin/bash", "/bin/zsh"], ["-c", "-lc"]], decision="prompt", justification="Shell-evaluated command strings can combine operations and hide executable boundaries; review the full script.")
-prefix_rule(pattern=[["codex", "claude"], "plugin"], decision="prompt", justification="Plugin operations can change installed runtime state and require local review.")
+prefix_rule(pattern=["claude", "plugin"], decision="prompt", justification="Claude plugin operations can change installed runtime state and require local review.")
 prefix_rule(pattern=["launchctl", "setenv"], decision="prompt", justification="Changing process-manager environment state requires local review.")
 prefix_rule(pattern=["open", "-R"], decision="prompt", justification="Launching a host GUI requires local review.")
 
@@ -28,4 +27,5 @@ prefix_rule(pattern=["open", "-R"], decision="prompt", justification="Launching 
 prefix_rule(pattern=[["mmdc", "rg"]], decision="allow")
 prefix_rule(pattern=["cmake", ["-S", "--build", "--preset"]], decision="allow")
 prefix_rule(pattern=["ctest", ["--test-dir", "--preset"]], decision="allow")
-prefix_rule(pattern=["git", ["status", "merge-tree"]], decision="allow")
+prefix_rule(pattern=["git"], decision="allow")
+prefix_rule(pattern=["codex", "plugin"], decision="allow")

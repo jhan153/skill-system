@@ -12,10 +12,10 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 10.0.0 릴리즈
+## 10.0.1 릴리즈
 
-이 소스 트리는 9.4.x 라인의 breaking successor인 10.0.0 릴리즈 기준점입니다. 현재 구성은
-다음과 같습니다.
+이 소스 트리는 breaking 10.0 기준선의 10.0.1 patch 릴리즈입니다. 현재 구성은 다음과
+같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
 * `docs`: 스킬 목록, 사용 기준, 운영 참고 문서
@@ -295,6 +295,7 @@ Management 스킬은 프로젝트 Memory, Knowledge, `project-context.yaml` 위�
 | 9.4.4 | 암시적 workflow 라우팅·prototyping | 명확한 자연어 의도에 맞는 workflow 및 제한된 support owner를 노출하면서 lifecycle·영속화 gate는 explicit-only로 유지합니다. 선택된 skill을 위임 경계에 전달하고, 하나의 미해결 결정을 위한 격리·보존형 runnable prototype을 추가합니다. |
 | 9.4.5 | 직접 specialist 라우팅·표면 정리 | 독립 search/analysis/research router를 제거하고 겹치는 Knowledge·coordination·Kanboard·project-context·loop·maintenance owner를 합치며 maintainer 플러그인을 폐기하고 canonical 표면을 79개에서 65개로 줄입니다. |
 | 9.4.6 | Visual decision·inspectable reports | visual-decision 계약을 추가하고, 3D·수식·그래픽 주장은 spatial Report Canvas를 강제하며, management/analysis 스킬 ID를 맞추면서 65개 표면은 유지합니다. |
+| 10.0.1 | 직접 도구·Codex 승인 정책 | 편의성 shell composition보다 직접 도구를 우선하고 Git·Codex plugin은 기본 allow로 두되 파괴적 Git과 shell·dependency·process·network 검토 경계는 유지합니다. |
 | 10.0.0 | DAG Execution Handoff·4-provider 배포 | 유한 Execution Handoff DAG, Core Card, Human Test 인계, event-driven Orca coordination, Codex·Claude·Grok·Antigravity 4개 provider의 4개 설치 profile, 최소 모델 독립 계약, 구형 runner/eval/runtime-state 퇴역을 고정합니다. |
 
 ## 라이선스
