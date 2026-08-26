@@ -1,6 +1,6 @@
 {
   "name": "skill-system-core",
-  "version": "10.0.1",
+  "version": "10.0.2",
   "description": "Skill System core — shared operational platform for routing, planning, execution handoff, memory/knowledge, evidence, and all report delivery.",
   "author": {
     "name": "Skill System Maintainers"

@@ -114,7 +114,7 @@ Runtime companion candidates are generated under `.codex/` from `source/`:
 .codex/docs/
 .codex/harness/
 .codex/hooks.json
-.codex/rules/default.rules
+.codex/rules/skill-system.rules
 .codex/schemas/
 ```
 
@@ -125,6 +125,7 @@ Do not copy app-managed or host-local state:
 .codex/config.toml
 .codex/automations/
 .codex/plugins/cache/
+.codex/rules/default.rules
 ```
 
 Use this prompt from the repository root when installation is wanted:
@@ -133,7 +134,9 @@ Use this prompt from the repository root when installation is wanted:
 Install the declared Skill System runtime companion files into my local Codex
 home. Resolve the repository and Codex home on this computer, do not persist
 absolute paths in shared data, and do not touch .codex/skills/.system,
-config.toml, automations, plugins/cache, credentials, or unrelated local state.
+config.toml, rules/default.rules, automations, plugins/cache, credentials, or
+unrelated local state. Copy only rules/skill-system.rules from the generated
+rules directory.
 ```
 
 The Agent should copy only declared files and preserve local host-managed state.

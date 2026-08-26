@@ -4,6 +4,10 @@ The Claude runtime ships a dedicated Go dispatcher. It reuses the bounded
 response guard, project-context resolver, redaction, and OS notification
 packages without reusing the Codex event dispatcher.
 
+Claude owns the independent `source/runtime/go/claude` module. It receives the distributed common
+harness baseline plus the Claude-specific event handler; it does not import Codex execution
+admission or another provider's hook wire contract.
+
 The runtime handles only four Claude events:
 
 | Event | Behavior |

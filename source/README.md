@@ -47,9 +47,13 @@ They cover canonical skill/plugin ownership, active-provider package/manifest/re
 declared global-rule plus harness wiring. Run them only when those system surfaces change; ordinary
 skill prose and model changes do not trigger them.
 
-Five Go harness components retain 17 direct unit tests: Codex hook, Claude hook, desktop notify,
-project-context resolver, and user Work Contract. Run only the package whose runtime behavior
-changed. They are component tests, not a release gate or a Skill System-wide suite.
+Direct harness tests live with each provider-owned Go module. Run only the provider module whose
+runtime behavior changed. They are component tests, not a release gate or a Skill System-wide
+suite.
+
+Harness modules are provider-owned under `source/runtime/go/{codex,claude,grok,antigravity}`.
+Run `go test ./...` from each affected provider module. The root `source/runtime/go` module owns
+repository contract tests only; provider modules never import one another.
 
 There is no persistent per-skill behavior-test category, no automatic all-suite command, and no
 runtime Python validator. Model-dependent skill behavior is observed only through an explicitly

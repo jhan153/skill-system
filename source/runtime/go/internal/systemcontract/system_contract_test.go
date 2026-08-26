@@ -51,6 +51,7 @@ type providerContract struct {
 
 type harnessContract struct {
 	Config               string   `json:"config"`
+	ModuleRoot           string   `json:"module_root"`
 	SourceEntrypoints    []string `json:"source_entrypoints"`
 	GeneratedEntrypoints []string `json:"generated_entrypoints"`
 	ConfigMarkers        []string `json:"config_markers"`
@@ -199,19 +200,25 @@ func TestProviderHarnessWiring(t *testing.T) {
 		} else if provider.RuntimeRoot != "" || provider.GlobalRule != "" {
 			t.Errorf("provider %s declares runtime/global rule paths without global_rules capability", provider.ID)
 		}
-		if !capabilities["runtime_harness"] {
+		hasHarness := capabilities["runtime_harness"] || capabilities["common_harness"]
+		if !hasHarness {
 			if provider.Harness != nil {
-				t.Errorf("provider %s declares harness data without runtime_harness capability", provider.ID)
+				t.Errorf("provider %s declares harness data without a harness capability", provider.ID)
 			}
 			continue
 		}
 		if provider.Harness == nil {
-			t.Errorf("provider %s declares runtime_harness without harness data", provider.ID)
+			t.Errorf("provider %s declares a harness capability without harness data", provider.ID)
 			continue
 		}
 
 		harness := provider.Harness
 		validateRelativeRepoPath(t, provider.ID+" harness config", harness.Config)
+		validateRelativeRepoPath(t, provider.ID+" harness module_root", harness.ModuleRoot)
+		moduleRoot := filepath.Join(root, filepath.FromSlash(harness.ModuleRoot))
+		if _, err := os.Stat(filepath.Join(moduleRoot, "go.mod")); err != nil {
+			t.Errorf("provider %s harness module_root: %v", provider.ID, err)
+		}
 		configPath := filepath.Join(root, filepath.FromSlash(harness.Config))
 		configRaw, err := os.ReadFile(configPath)
 		if err != nil {
@@ -237,6 +244,13 @@ func TestProviderHarnessWiring(t *testing.T) {
 			validateRelativeRepoPath(t, provider.ID+" harness entrypoint", relative)
 			if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(relative))); err != nil {
 				t.Errorf("provider %s harness entrypoint %s: %v", provider.ID, relative, err)
+			}
+		}
+		for _, relative := range harness.SourceEntrypoints {
+			entrypoint := filepath.Join(root, filepath.FromSlash(relative))
+			withinModule, err := filepath.Rel(moduleRoot, entrypoint)
+			if err != nil || withinModule == ".." || strings.HasPrefix(withinModule, ".."+string(filepath.Separator)) {
+				t.Errorf("provider %s harness source entrypoint escapes module_root: %s", provider.ID, relative)
 			}
 		}
 	}

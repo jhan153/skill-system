@@ -135,16 +135,41 @@ Codex 홈 경로에 동기화합니다.
 | `.codex/context-routing.md` | `<CODEX_HOME>/context-routing.md` |
 | `.codex/hooks.json` | `<CODEX_HOME>/hooks.json` |
 | `.codex/bin/` | `<CODEX_HOME>/bin/`의 Skill System 관리 실행 파일 |
-| `.codex/rules/` | `<CODEX_HOME>/rules/`의 Skill System 관리 파일 |
+| `.codex/rules/skill-system.rules` | `<CODEX_HOME>/rules/skill-system.rules` |
 | `.codex/schemas/` | `<CODEX_HOME>/schemas/`의 Skill System 관리 파일 |
 | `.codex/docs/` | `<CODEX_HOME>/docs/`의 Skill System 관리 파일 |
 | `.codex/harness/README.md` | `<CODEX_HOME>/harness/README.md` |
+| `.codex/harness/config.toml.fragment` | `<CODEX_HOME>/harness/config.toml.fragment` 참고 조각 |
 
 외부 source의 revision, license, 채택·거부 판단을 모은 원장은 설치 대상으로
 선언되지 않았으므로 동기화하지 않습니다.
 
 `CODEX_HOME`이 별도로 설정되지 않았다면 실제 기본 Codex 홈을
 사용합니다. 경로를 추측해 다른 홈을 만들지 않습니다.
+
+#### Codex 전용 실행 하네스
+
+이 실행 하네스는 Codex의 `UserPromptSubmit`, `PreToolUse`,
+`PermissionRequest`, `PostToolUse` 입력·출력 계약과 `permission_mode`를 소유하는
+Codex 전용 런타임입니다. Claude, Grok, Antigravity 또는 다른 에이전트의 실행
+하네스로 복사하거나 공용 분류기로 사용하지 않습니다. 각 에이전트는 해당 도구명,
+승인 모드, hook wire format에 맞는 별도 하네스를 가져야 합니다.
+
+Codex 설치에서는 다음을 하나의 경계로 적용합니다.
+
+- `hooks.json`과 `bin/skill-system-harness`를 함께 갱신합니다.
+- Skill System 정책은 `rules/skill-system.rules`에만 설치합니다.
+- Codex TUI가 영구 승인을 누적하는 `<CODEX_HOME>/rules/default.rules`와 그 백업은
+  생성·교체·정리하지 않습니다. 설치 전후 바이트 동일성을 확인합니다.
+- `harness/config.toml.fragment`의 `allow_login_shell = false`는 사용자가 해당 키
+  병합을 명시적으로 요청한 경우에만 host-owned `config.toml`에 추가합니다. 기존
+  TOML의 다른 키와 주석은 보존합니다.
+- 설치 후 새 Codex 작업을 시작하여 safe direct command, wrapper rewrite,
+  `python3 -c`/`zsh -ic` 같은 opaque evaluator의 승인 전 거부,
+  `dontAsk` 즉시 종료, 승인 1회 제한을 실제 hook 경로에서 확인합니다.
+
+실행 상태는 `<CODEX_HOME>/harness/exec-guard/` 아래의 bounded digest 상태만
+사용하며 raw prompt, command, patch, tool output 또는 자격 증명을 저장하지 않습니다.
 
 ### Claude에서 Skill System이 동기화하는 정적 런타임
 
@@ -166,12 +191,16 @@ Claude 훅 설정은 선택된 체크아웃의
 
 ### Grok에서 Skill System이 동기화하는 정적 런타임
 
-Grok에는 별도 lifecycle binary를 설치하지 않습니다. Orca가 worker lifecycle을
-소유하며, 아래 rule companion만 `<GROK_HOME>`에 동기화합니다.
+Grok에는 독립 공용 Go 하네스 모듈의 binary를 설치하지만 native hook adapter로
+사용하지 않습니다. Orca가 worker lifecycle을 소유하며, 아래 companion을
+`<GROK_HOME>`에 동기화합니다.
 
 | 소스 | 대상 |
 | --- | --- |
 | `.grok/AGENTS.md` | `<GROK_HOME>/AGENTS.md` |
+| `.grok/harness.json` | `<GROK_HOME>/harness.json` |
+| `.grok/harness/` | `<GROK_HOME>/harness/`의 공용 하네스 설명 |
+| `.grok/bin/` | `<GROK_HOME>/bin/`의 Grok 공용 하네스 실행 파일 |
 | `.grok/docs/` | `<GROK_HOME>/docs/`의 Skill System 관리 파일 |
 | `.grok/schemas/` | `<GROK_HOME>/schemas/`의 Skill System 관리 파일 |
 
@@ -179,12 +208,16 @@ Grok에는 별도 lifecycle binary를 설치하지 않습니다. Orca가 worker 
 
 ### Antigravity에서 Skill System이 동기화하는 정적 런타임
 
-Antigravity에도 별도 lifecycle binary를 설치하지 않습니다. Orca가 worker lifecycle을
-소유하며, 생성된 companion을 Antigravity가 실제로 읽는 global root에 동기화합니다.
+Antigravity에도 독립 공용 Go 하네스 모듈의 binary를 설치하지만 native hook adapter로
+사용하지 않습니다. Orca가 worker lifecycle을 소유하며, 생성된 companion을
+Antigravity가 실제로 읽는 global root에 동기화합니다.
 
 | 소스 | 대상 |
 | --- | --- |
 | `.antigravity/GEMINI.md` | `<ANTIGRAVITY_GLOBAL_ROOT>/GEMINI.md` |
+| `.antigravity/harness.json` | `<ANTIGRAVITY_GLOBAL_ROOT>/harness.json` |
+| `.antigravity/harness/` | `<ANTIGRAVITY_GLOBAL_ROOT>/harness/`의 공용 하네스 설명 |
+| `.antigravity/bin/` | `<ANTIGRAVITY_GLOBAL_ROOT>/bin/`의 Antigravity 공용 하네스 실행 파일 |
 | `.antigravity/docs/` | `<ANTIGRAVITY_GLOBAL_ROOT>/docs/`의 Skill System 관리 파일 |
 | `.antigravity/schemas/` | `<ANTIGRAVITY_GLOBAL_ROOT>/schemas/`의 Skill System 관리 파일 |
 
@@ -196,6 +229,7 @@ Antigravity에도 별도 lifecycle binary를 설치하지 않습니다. Orca가 
 Codex:
 
 - `<CODEX_HOME>/config.toml`
+- `<CODEX_HOME>/rules/default.rules`와 그 백업·사용자 규칙 파일
 - `<CODEX_HOME>/automations/`
 - `<CODEX_HOME>/skills/.system`
 - 사용자 또는 앱 관리 스킬
@@ -325,6 +359,7 @@ agy plugin list
 - Codex 플러그인 목록이 현재 마켓플레이스 매니페스트와 일치함
 - Claude가 대상이면 마켓플레이스와 플러그인 목록이 현재 매니페스트와 일치함
 - Grok 또는 Antigravity가 대상이면 해당 공식 CLI의 plugin 목록이 선택한 profile과 일치함
+- 선택한 플랫폼의 Go 하네스 binary가 `--version`에 현재 bundle version을 반환함
 - 훅과 설정 파일이 구문상 읽히며 선택된 체크아웃 내용과 일치함
 - 설치를 위해 새 설치 프로그램이나 래퍼가 생성되지 않음
 - 공유 manifest나 설치 기록에 현재 컴퓨터의 절대 경로를 기록하지 않음

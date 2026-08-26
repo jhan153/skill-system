@@ -1,5 +1,22 @@
 # Changelog
 
+## 10.0.2
+
+- Distributed the common Go harness baseline into independent Codex, Claude, Grok, and
+  Antigravity modules. Codex alone adds execution admission; Claude retains its native hook
+  handler; Grok and Antigravity expose common version/context utilities while Orca continues to
+  own their worker lifecycle.
+- Added Codex `PreToolUse` execution admission that safely removes reducible `sh`/`bash`/`zsh`
+  wrappers, rejects shell text authoring in favor of `apply_patch`, stops unchanged duplicate
+  attempts, and denies opaque shell or inline interpreter evaluators such as `python3 -c` before
+  they can create an approval prompt.
+- Split Skill System-owned Codex policy into `rules/skill-system.rules`, preserved Codex/user-owned
+  `rules/default.rules` and its approval backups, and added the opt-in
+  `allow_login_shell = false` configuration fragment plus matching clean-install guidance.
+- Added provider-local harness generation, inventory, wiring contracts, and prebuilt binaries for
+  all four profiles without changing skill bodies. Advanced the unified bundle metadata to
+  10.0.2; tagging, archiving, publication, and live runtime installation remain separate actions.
+
 ## 10.0.1
 
 - Clarified Codex global execution guidance to prefer purpose-built tools and direct executable

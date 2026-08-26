@@ -1,0 +1,3 @@
+# Merge this key into the host-owned Codex config.toml when execution-admission
+# runtime installation is explicitly authorized. Never replace config.toml.
+allow_login_shell = false

@@ -12,16 +12,16 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 10.0.1 Release
+## 10.0.2 Release
 
-This source tree is the 10.0.1 patch release on the breaking 10.0 baseline. Its current components
+This source tree is the 10.0.2 patch release on the breaking 10.0 baseline. Its current components
 are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
 * `tools`: helper tools for inspecting the bundle structure
 * `execution-handoff`: risk-adaptive finite DAGs, event-driven coordination, Core Cards, and Human Test handoff
-* `providers`: active Codex, Claude, Grok, and Antigravity package/rule declarations, with native harnesses only where the host owns one
+* `providers`: active Codex, Claude, Grok, and Antigravity package/rule declarations with independent provider-owned Go harness modules and native hook adapters only where the host owns one
 * `tests`: one Core-contract test, three Skill System-wide tests, and a reduced provider-neutral harness component suite
 * `work-contract`: privacy-bounded natural-language user-scope and interaction projection with no graph-state ownership
 * `report-delivery` + `report-canvas`: Markdown-first contracts in each Report skill plus one optional offline HTML renderer shared by the Core plugin
@@ -295,6 +295,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.4.4 | Implicit workflow routing & prototyping | Exposes clear intent-matched workflow and bounded support owners to natural-language routing while retaining explicit lifecycle and persistence gates; propagates selected skills across delegation and adds retained, isolated runnable prototypes for one unresolved decision. |
 | 9.4.5 | Direct specialist routing & surface consolidation | Removes standalone search/analysis/research routers, merges overlapping Knowledge, coordination, Kanboard, project-context, loop, and maintenance owners, retires the maintainer plugin, and cuts the canonical surface from 79 to 65 skills. |
 | 9.4.6 | Visual decision & inspectable reports | Adds a visual-decision contract, requires spatial Report Canvas for 3D/math/graphics claims, and aligns management/analysis skill IDs while keeping 65 skills. |
+| 10.0.2 | Provider-owned Go harnesses & Codex execution admission | Distributes the common Go baseline into four independent provider modules, adds Codex pre-approval normalization and opaque evaluator blocking, and preserves host-owned approval rules during generation and installation. |
 | 10.0.1 | Direct-tool and Codex approval policy | Prefers direct tools over convenience shell composition, allows Git and Codex plugin commands by default, and preserves stricter destructive Git plus shell/dependency/process/network review boundaries. |
 | 10.0.0 | DAG Execution Handoff & four-provider delivery | Establishes finite Execution Handoff DAGs, Core Cards, Human Test handoff, event-driven Orca coordination, four installation profiles across Codex/Claude/Grok/Antigravity, minimal model-independent contracts, and retirement of the old runner/eval/runtime-state stack. |
 

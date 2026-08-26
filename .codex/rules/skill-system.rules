@@ -1,0 +1,60 @@
+# Destructive local operations that a turn-level grant must never broaden.
+prefix_rule(pattern=["git", "reset", "--hard"], decision="forbidden", justification="Use a targeted restore or revert instead.")
+prefix_rule(pattern=["git", "clean", ["-f", "--force", "-fd", "-df", "-fdx", "-fxd", "-dfx", "-dxf", "-xfd", "-xdf"]], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "clean", "-f", "-d"], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "clean", "-f", "-d", "-x"], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "clean", "-d", "-f"], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "clean", ["-d", "--directories", "-x", "--ignored", "-X"], ["-f", "--force"]], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "clean", ["-d", "--directories", "-x", "--ignored", "-X"], ["-d", "--directories", "-x", "--ignored", "-X"], ["-f", "--force"]], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+prefix_rule(pattern=["git", "-c", ["clean.requireForce=false", "clean.requireforce=false"], "clean"], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
+
+# The PreToolUse guard rewrites a safe single command first. Any surviving
+# shell evaluator depends on semantics that cannot be normalized safely.
+prefix_rule(
+    pattern=[["sh", "bash", "zsh", "/bin/sh", "/bin/bash", "/bin/zsh"], ["-c", "-lc", "-ic", "-ilc", "-cl", "-lic"]],
+    decision="forbidden",
+    justification="Use the direct command produced by the execution guard or a checked-in script.",
+    match=["zsh -lc 'rg -n execguard source'"],
+    not_match=["rg -n execguard source"],
+)
+
+# General-purpose inline evaluators hide file, process, credential, and network
+# behavior behind an interpreter prefix. PreToolUse handles normalized and
+# wrapped forms; these representative direct forms fail closed without a popup.
+prefix_rule(pattern=[["python", "python3", "/usr/bin/python", "/usr/bin/python3"], "-c"], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
+prefix_rule(pattern=["node", ["-e", "--eval", "-p", "--print"]], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
+prefix_rule(pattern=[["ruby", "perl", "osascript", "lua", "Rscript"], ["-e", "-E"]], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
+prefix_rule(pattern=[["pwsh", "powershell"], ["-c", "-Command", "-command", "-EncodedCommand", "-encodedcommand"]], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
+prefix_rule(pattern=["php", "-r"], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
+prefix_rule(pattern=["deno", "eval"], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
+
+# Effects that may require new authority. PermissionRequest auto-allows these
+# when the current user turn already grants the same effect and target.
+prefix_rule(pattern=["rm"], decision="prompt", justification="Deletion requires an explicit in-scope cleanup grant.")
+prefix_rule(pattern=["find"], decision="prompt", justification="Read-only find is auto-allowed; deletion or execution requires current-turn authority.")
+prefix_rule(pattern=[["rsync", "cp", "mv", "mkdir", "install"]], decision="prompt", justification="Filesystem mutation must stay within the current turn's declared target.")
+prefix_rule(pattern=[["python", "python3"], "-m", "pip", "install"], decision="prompt", justification="Dependency installation changes the environment and may use the network.")
+prefix_rule(pattern=["uv", "pip", "install"], decision="prompt", justification="Dependency installation changes the environment and may use the network.")
+prefix_rule(pattern=[["npm", "pnpm", "yarn", "bun"], ["install", "i", "add", "update", "upgrade"]], decision="prompt", justification="Package operations change the workspace or environment and may use the network.")
+prefix_rule(pattern=["cargo", ["add", "install", "update"]], decision="prompt", justification="Cargo dependency operations change manifests, caches, or installed tools.")
+prefix_rule(pattern=["brew", ["install", "upgrade"]], decision="prompt", justification="Homebrew operations change the host environment and use the network.")
+prefix_rule(pattern=[["curl", "wget"]], decision="prompt", justification="Network requests can transmit task or local data.")
+prefix_rule(pattern=["git", ["clone", "fetch", "ls-remote", "pull", "push", "submodule"]], decision="prompt", justification="Remote Git operations require an explicit current-turn network or publication grant.")
+prefix_rule(pattern=["git", "branch", ["-D", "-d", "-f", "-m"]], decision="prompt", justification="Branch deletion or force movement requires explicit current-turn authority.")
+prefix_rule(pattern=["git", "rebase"], decision="prompt", justification="History rewriting requires an explicit current-turn grant.")
+prefix_rule(pattern=["git", "restore", "--staged"], decision="prompt", justification="Git index mutation must remain inside the current implementation scope.")
+prefix_rule(pattern=["git", "checkout", "--ours"], decision="prompt", justification="Conflict resolution must remain inside the current implementation scope.")
+prefix_rule(pattern=["git", "worktree", "add"], decision="prompt", justification="Creating another checkout requires an explicit current-turn target.")
+prefix_rule(pattern=[["kill", "pkill", "lldb"]], decision="prompt", justification="Process termination and debugger attachment require an explicit process grant.")
+prefix_rule(pattern=[["codex", "claude"], ["plugin", "mcp", "app-server"]], decision="prompt", justification="Agent runtime operations can change installed or running host state.")
+prefix_rule(pattern=["launchctl", "setenv"], decision="prompt", justification="Changing process-manager environment state requires an explicit host-runtime grant.")
+prefix_rule(pattern=["open", "-R"], decision="prompt", justification="Launching a host GUI requires an explicit process-launch grant.")
+
+# Stable local reads, diagnostics, builds, and tests. User work-contract
+# exclusions still take precedence in PreToolUse.
+prefix_rule(pattern=[["mmdc", "rg"]], decision="allow")
+prefix_rule(pattern=["cmake", ["-S", "--build", "--preset"]], decision="allow")
+prefix_rule(pattern=["ctest", ["--test-dir", "--preset"]], decision="allow")
+prefix_rule(pattern=[["ps", "pgrep", "lsof", "sample"]], decision="allow")
+prefix_rule(pattern=[["log", "/usr/bin/log"], "show"], decision="allow")
+prefix_rule(pattern=["git"], decision="allow")

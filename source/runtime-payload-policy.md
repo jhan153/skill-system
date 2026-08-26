@@ -33,21 +33,27 @@ self-contained. Large executable assets are plugin-shared instead:
 ## Runtime Companions
 
 Runtime companions contain host policy and executable integration only: provider instructions,
-routing, hooks, rules where applicable, portable docs/schemas, and prebuilt harness binaries when a
-provider owns one. Grok and Antigravity companions contain global rules plus portable docs/schemas;
-Orca owns their worker lifecycle, so no provider-local polling harness or binary is generated. No
-companion contains a skill mirror, Python validator, eval corpus, lifecycle ledger, or installation
-state.
+routing, hooks, rules where applicable, portable docs/schemas, and one provider-owned Go harness
+module/binary set. The former common Go implementation is distributed into four independent
+modules. Codex receives the common baseline plus execution admission; Claude, Grok, and
+Antigravity receive the common baseline, with Claude retaining its native event handler. Grok and
+Antigravity expose only version and project-context CLI surfaces while Orca remains their worker
+lifecycle owner. No companion contains a skill mirror, Python validator, eval corpus, lifecycle
+ledger, or installation state.
 
 Plugin installation never enables runtime companions automatically. Runtime companion installation
 is a separate explicit operation that preserves host-owned configuration and credentials.
+For Codex, `rules/skill-system.rules` is generated policy while `rules/default.rules` is
+user/Codex-owned approval state and is never copied, replaced, or pruned by Skill System.
 
 ## Provider Boundary
 
 - Codex has a native Codex package set. Claude, Grok, and Antigravity share one portable
   Claude-compatible package set.
-- Codex and Claude retain provider-native Go harnesses. Grok and Antigravity receive rule-only
-  companions and use Orca for dispatch, inbox/follow-up, heartbeat, and `worker_done` delivery.
+- All four providers own separate Go harness modules and build digests. Codex and Claude retain
+  provider-native hook handlers. Grok and Antigravity receive the distributed common harness
+  surface without a fabricated native hook adapter and use Orca for dispatch, inbox/follow-up,
+  heartbeat, and `worker_done` delivery.
 - Plugin or global-rule installation never proves Orca capability. The current worker receipt does,
   under `docs/orca_worker_runtime_contract.md`.
 
@@ -59,6 +65,7 @@ roots on each computer. Multi-platform harness binaries remain tracked for perso
 ## Validation Boundary
 
 - Four repository contract tests cover Core Cards and Skill System packaging/wiring.
-- Seventeen direct Go component tests run only for a changed harness component.
+- Direct Go component tests live in each provider module and run only for the changed provider
+  harness surface.
 - There is no persistent per-skill quality suite, runtime Python validator, automatic all-suite
   command, release identity gate, or hygiene pipeline.

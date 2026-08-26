@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "platform": "grok",
+  "binary": "skill-system-grok-harness",
+  "surface": ["version", "context.resolve"],
+  "lifecycle_owner": "orca"
+}

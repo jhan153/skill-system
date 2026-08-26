@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "platform": "antigravity",
+  "binary": "skill-system-antigravity-harness",
+  "surface": ["version", "context.resolve"],
+  "lifecycle_owner": "orca"
+}

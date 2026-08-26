@@ -47,10 +47,11 @@ runtime_companions:
       - AGENTS.md
       - context-routing.md
       - hooks.json
-      - rules/default.rules
+      - rules/skill-system.rules
       - docs/
       - schemas/
       - harness/README.md
+      - harness/config.toml.fragment
       - bin/skill-system-harness
       - bin/skill-system-harness.exe
       - bin/skill-system-notify-overlay
@@ -71,16 +72,28 @@ runtime_companions:
     root: .grok
     files:
       - AGENTS.md
+      - harness.json
+      - harness/README.md
       - docs/
       - schemas/
+      - bin/skill-system-grok-harness
+      - bin/skill-system-grok-harness.exe
+      - bin/skill-system-grok-harness-linux-amd64
+      - bin/skill-system-notify-overlay
     lifecycle_owner: orca
   antigravity:
     root: .antigravity
     install_root: <ANTIGRAVITY_GLOBAL_ROOT>
     files:
       - GEMINI.md
+      - harness.json
+      - harness/README.md
       - docs/
       - schemas/
+      - bin/skill-system-antigravity-harness
+      - bin/skill-system-antigravity-harness.exe
+      - bin/skill-system-antigravity-harness-linux-amd64
+      - bin/skill-system-notify-overlay
     lifecycle_owner: orca
 
 provider_roles:
@@ -92,6 +105,11 @@ provider_roles:
   native_harness:
     - codex
     - claude
+  common_harness:
+    - codex
+    - claude
+    - grok
+    - antigravity
   rule_companion:
     - grok
     - antigravity
@@ -121,6 +139,6 @@ generation:
 
 validation:
   repository_contract_tests: 4
-  harness_component_tests: 17
+  harness_component_test_mode: provider_local
   per_skill_persistent_tests: 0
   automatic_all_suite_gate: false

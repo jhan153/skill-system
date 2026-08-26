@@ -9,11 +9,12 @@
       "global_rule": ".codex/AGENTS.md",
       "plugin_skill_pattern": "plugins/{plugin}/skills",
       "plugin_manifest_pattern": "plugins/{plugin}/.codex-plugin/plugin.json",
-      "capabilities": ["plugins", "global_rules", "runtime_harness"],
+      "capabilities": ["plugins", "global_rules", "common_harness", "runtime_harness"],
       "harness": {
         "config": "source/platform/codex/hooks.json",
+        "module_root": "source/runtime/go/codex",
         "source_entrypoints": [
-          "source/runtime/go/cmd/skill-system-harness/main.go"
+          "source/runtime/go/codex/cmd/skill-system-harness/main.go"
         ],
         "generated_entrypoints": [
           ".codex/bin/skill-system-harness",
@@ -33,11 +34,12 @@
       "global_rule": ".claude/CLAUDE.md",
       "plugin_skill_pattern": "plugins/claude/{plugin}/skills",
       "plugin_manifest_pattern": "plugins/claude/{plugin}/.claude-plugin/plugin.json",
-      "capabilities": ["plugins", "global_rules", "runtime_harness"],
+      "capabilities": ["plugins", "global_rules", "common_harness", "runtime_harness"],
       "harness": {
         "config": "source/platform/claude/hooks/settings.example.json",
+        "module_root": "source/runtime/go/claude",
         "source_entrypoints": [
-          "source/runtime/go/cmd/skill-system-claude-harness/main.go"
+          "source/runtime/go/claude/cmd/skill-system-claude-harness/main.go"
         ],
         "generated_entrypoints": [
           ".claude/bin/skill-system-claude-harness",
@@ -57,7 +59,22 @@
       "global_rule": ".grok/AGENTS.md",
       "plugin_skill_pattern": "plugins/claude/{plugin}/skills",
       "plugin_manifest_pattern": "plugins/claude/{plugin}/plugin.json",
-      "capabilities": ["plugins", "global_rules", "orca_dispatch"]
+      "capabilities": ["plugins", "global_rules", "common_harness", "orca_dispatch"],
+      "harness": {
+        "config": "source/platform/grok/harness.json",
+        "module_root": "source/runtime/go/grok",
+        "source_entrypoints": [
+          "source/runtime/go/grok/cmd/skill-system-grok-harness/main.go"
+        ],
+        "generated_entrypoints": [
+          ".grok/bin/skill-system-grok-harness",
+          ".grok/bin/skill-system-grok-harness.exe",
+          ".grok/bin/skill-system-grok-harness-linux-amd64"
+        ],
+        "config_markers": [
+          "skill-system-grok-harness"
+        ]
+      }
     },
     {
       "id": "antigravity",
@@ -67,7 +84,22 @@
       "global_rule": ".antigravity/GEMINI.md",
       "plugin_skill_pattern": "plugins/claude/{plugin}/skills",
       "plugin_manifest_pattern": "plugins/claude/{plugin}/plugin.json",
-      "capabilities": ["plugins", "global_rules", "orca_dispatch"]
+      "capabilities": ["plugins", "global_rules", "common_harness", "orca_dispatch"],
+      "harness": {
+        "config": "source/platform/antigravity/harness.json",
+        "module_root": "source/runtime/go/antigravity",
+        "source_entrypoints": [
+          "source/runtime/go/antigravity/cmd/skill-system-antigravity-harness/main.go"
+        ],
+        "generated_entrypoints": [
+          ".antigravity/bin/skill-system-antigravity-harness",
+          ".antigravity/bin/skill-system-antigravity-harness.exe",
+          ".antigravity/bin/skill-system-antigravity-harness-linux-amd64"
+        ],
+        "config_markers": [
+          "skill-system-antigravity-harness"
+        ]
+      }
     }
   ]
 }

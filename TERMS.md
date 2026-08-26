@@ -1,4 +1,4 @@
-# 10.0.1 Terms
+# 10.0.2 Terms
 
 ## version_cut
 
@@ -14,14 +14,18 @@ The location that an agent should treat as the source of runtime guidance.
 
 - Codex: `.codex/AGENTS.md`, `.codex/docs`, `.codex/bin`
 - Claude: `.claude/CLAUDE.md`, `.claude/docs`, `.claude/bin`
-- Grok: `.grok/AGENTS.md`, `.grok/docs` (rule companion; Orca owns lifecycle)
-- Antigravity: `.antigravity/GEMINI.md`, `.antigravity/docs` (staged companion;
+- Grok: `.grok/AGENTS.md`, `.grok/docs`, `.grok/bin` (common Go harness; Orca owns lifecycle)
+- Antigravity: `.antigravity/GEMINI.md`, `.antigravity/docs`, `.antigravity/bin` (staged common Go harness;
   deployment maps it to the host's actual global root and Orca owns lifecycle)
 - Root: packaging documents only
 
 ## runtime_config_policy
 
 Runtime configuration and automation assets, including `.codex/config.toml` and `automations`, are host-managed. Preserve existing local settings unless the user explicitly chooses to replace them.
+
+Codex `rules/default.rules` is also host/user-managed because Codex appends persistent TUI
+approvals there. Skill System owns only `rules/skill-system.rules`; generation and installation
+must preserve `default.rules` and its backups.
 
 The default Codex hook map keeps eight lifecycle events and invokes the generated Go harness directly on POSIX. Windows uses one bounded environment-path resolver so custom `CODEX_HOME` and the default home both work. Hook registration, live home installation, and project-local overrides remain under explicit runtime policy; plugins do not add a duplicate base hook map.
 

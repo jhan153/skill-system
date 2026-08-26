@@ -1,4 +1,4 @@
-module skill-system.local/harness
+module skill-system.local/repository-contracts
 
 go 1.26
 

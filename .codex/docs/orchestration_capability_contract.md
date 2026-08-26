@@ -14,8 +14,11 @@ runtime capability outside the current turn.
   skills are not copied two additional times.
 - `native_harness_provider`: ships a provider-owned lifecycle harness. Current owners are Codex and
   Claude.
-- `rule_companion_provider`: ships portable global rules and shared docs/schemas but no lifecycle
-  binary. Current owners are Grok and Antigravity.
+- `common_harness_provider`: owns an independent Go module containing the distributed common
+  harness baseline. All four providers hold this role; Codex alone adds execution admission.
+- `rule_companion_provider`: ships portable global rules and shared docs/schemas but no native hook
+  adapter. Current owners are Grok and Antigravity; their common Go binaries expose version and
+  project-context utilities while Orca owns lifecycle delivery.
 - `orca_execution_provider`: can receive an Orca-dispatched node when the current worker receipt
   proves lifecycle delivery. All four providers may hold this role for a task.
 

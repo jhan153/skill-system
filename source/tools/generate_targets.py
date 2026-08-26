@@ -766,12 +766,13 @@ def _swiftc_executable() -> str:
 
 def _build_go_dispatchers(
     source: Path,
+    module_name: str,
     output_root: Path,
     command: str,
     targets: tuple[tuple[str, str, str], ...],
     written: list[str],
 ) -> None:
-    module = source / "runtime" / "go"
+    module = source / "runtime" / "go" / module_name
     if not (module / "go.mod").is_file():
         raise SystemExit(f"missing Go harness module: {module}")
     version = str(_load_manifest(source / "plugins" / "core.yaml")["version"])
@@ -860,6 +861,7 @@ def _build_codex_harness(source: Path, codex: Path, written: list[str]) -> None:
     output_root.mkdir(parents=True, exist_ok=True)
     _build_go_dispatchers(
         source,
+        "codex",
         output_root,
         "skill-system-harness",
         (
@@ -877,12 +879,51 @@ def _build_claude_harness(source: Path, claude: Path, written: list[str]) -> Non
     output_root.mkdir(parents=True, exist_ok=True)
     _build_go_dispatchers(
         source,
+        "claude",
         output_root,
         "skill-system-claude-harness",
         (
             ("darwin", "arm64", "skill-system-claude-harness"),
             ("windows", "amd64", "skill-system-claude-harness.exe"),
             ("linux", "amd64", "skill-system-claude-harness-linux-amd64"),
+        ),
+        written,
+    )
+    _build_notification_overlay(source, output_root, written)
+
+
+def _build_grok_harness(source: Path, grok: Path, written: list[str]) -> None:
+    """Build the Grok-owned common Go harness; Orca retains lifecycle ownership."""
+    output_root = grok / "bin"
+    output_root.mkdir(parents=True, exist_ok=True)
+    _build_go_dispatchers(
+        source,
+        "grok",
+        output_root,
+        "skill-system-grok-harness",
+        (
+            ("darwin", "arm64", "skill-system-grok-harness"),
+            ("windows", "amd64", "skill-system-grok-harness.exe"),
+            ("linux", "amd64", "skill-system-grok-harness-linux-amd64"),
+        ),
+        written,
+    )
+    _build_notification_overlay(source, output_root, written)
+
+
+def _build_antigravity_harness(source: Path, antigravity: Path, written: list[str]) -> None:
+    """Build the Antigravity-owned common Go harness; Orca retains lifecycle ownership."""
+    output_root = antigravity / "bin"
+    output_root.mkdir(parents=True, exist_ok=True)
+    _build_go_dispatchers(
+        source,
+        "antigravity",
+        output_root,
+        "skill-system-antigravity-harness",
+        (
+            ("darwin", "arm64", "skill-system-antigravity-harness"),
+            ("windows", "amd64", "skill-system-antigravity-harness.exe"),
+            ("linux", "amd64", "skill-system-antigravity-harness-linux-amd64"),
         ),
         written,
     )
@@ -925,8 +966,8 @@ def generate_claude_runtime(source: Path, claude: Path) -> list[str]:
     return written
 
 
-def generate_rule_only_runtime(source: Path, platform_root: str, target: Path) -> list[str]:
-    """Generate a provider rule/docs companion with no native lifecycle harness."""
+def generate_orca_runtime(source: Path, platform_root: str, target: Path) -> list[str]:
+    """Generate a common Go companion while Orca retains provider lifecycle ownership."""
     written: list[str] = []
     _copy_neutral(source, target, written)
     _copy_platform(source / platform_root, target, written)
@@ -935,11 +976,15 @@ def generate_rule_only_runtime(source: Path, platform_root: str, target: Path) -
 
 
 def generate_grok_runtime(source: Path, grok: Path) -> list[str]:
-    return generate_rule_only_runtime(source, PLATFORM_GROK_ROOT, grok)
+    written = generate_orca_runtime(source, PLATFORM_GROK_ROOT, grok)
+    _build_grok_harness(source, grok, written)
+    return written
 
 
 def generate_antigravity_runtime(source: Path, antigravity: Path) -> list[str]:
-    return generate_rule_only_runtime(source, PLATFORM_ANTIGRAVITY_ROOT, antigravity)
+    written = generate_orca_runtime(source, PLATFORM_ANTIGRAVITY_ROOT, antigravity)
+    _build_antigravity_harness(source, antigravity, written)
+    return written
 
 
 def generate_runtime(
