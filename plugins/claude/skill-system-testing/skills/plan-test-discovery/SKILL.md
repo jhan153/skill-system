@@ -1,7 +1,6 @@
 ---
 name: plan-test-discovery
 description: Resolve human-owned test-basis, oracle, tolerance, baseline, horizon, or accepted-uncertainty decisions when Test Design cannot proceed from authoritative evidence. Persist only the decided scope into an Execution Handoff input record when a package is bound; do not design or implement tests, edit Plan/Handoff, or replace Human Test.
-disable-model-invocation: true
 ---
 
 # Plan Test Discovery
@@ -12,12 +11,12 @@ disable-model-invocation: true
 - intent_signature: human-in-loop test decision, oracle discussion, tolerance approval, baseline approval, test discovery
 - use_when:
   - `workflow-test-design` identifies one named condition that needs a human-owned judgment before a test contract can be completed
-  - the user explicitly asks to decide how an executable behavior should be judged or what uncertainty is acceptable
+  - the user explicitly asks to decide how an executable or accepted externally contracted behavior should be judged or what uncertainty is acceptable
 - do_not_use_when:
   - a canonical requirement, mathematical property, accepted interface contract, or observation already accepted by a named authority decides the field
   - the open question is product requirements, user behavior, algorithm choice, test implementation, production repair, or Human Test
 - expected_inputs:
-  - target snapshot and representative actual path
+  - target snapshot and representative actual path, or an accepted external-contract boundary and revision
   - blocked Test Design condition IDs
   - admitted evidence, unresolved judgment, options, consequences, and recommendation
   - authority owner and optional Execution Handoff package/plan identity
@@ -62,6 +61,11 @@ Use exact neighboring owners:
 
 ## Discovery Admission
 
+Implicit invocation is allowed only as conditional support from an active `workflow-test-design`
+that supplies the complete Discovery request below. Standalone Discovery requires an explicit user
+request. Generic uncertainty, a missing request payload, or an unbound condition never starts an
+implicit interview.
+
 Admit a decision only when all are true:
 
 1. one or more exact Test Design condition IDs are blocked;
@@ -70,15 +74,20 @@ Admit a decision only when all are true:
    tradeoff, or accepted risk; and
 4. the named answer owner has authority to choose.
 
-Resolve discoverable facts before asking. Do not ask a person to invent a numeric threshold without
-showing representative observations or to approve a baseline without the compared artifact. If the
-SUT is not executable or lacks necessary observability, return the testability gap to its production
-or prototype owner instead of opening Discovery.
+Resolve discoverable facts before asking. An accepted external contract may supply the intended
+boundary, observable signal, and normative authority before an executable SUT exists; Discovery may
+then resolve a human-owned contractual oracle, tolerance, horizon, or accepted-risk choice. An
+empirical choice about current variability, performance, rendering, or output distribution requires
+representative observations, and an empirical baseline approval requires the compared artifact. If
+neither an executable SUT nor accepted external-contract evidence can frame the options—or an
+empirical choice lacks its required observations—return the exact evidence/testability gap to the
+production, prototype, or contract owner instead of asking a person to invent it.
 
 ## Workflow
 
-1. Bind target snapshot, actual path, blocked conditions, current observations, authority owner,
-   and the decision consequence. Separate observed current behavior from accepted behavior.
+1. Bind target snapshot, actual path or accepted external-contract boundary/revision, blocked
+   conditions, available evidence/observations, authority owner, and the decision consequence.
+   Separate normative contract authority, observed current behavior, and accepted behavior.
 2. Prepare 2–4 mutually exclusive options when a real choice exists. For each, state what it can
    detect, may miss, costs to run or maintain, and how it changes the proof ceiling. Put the
    recommended option first with its basis.

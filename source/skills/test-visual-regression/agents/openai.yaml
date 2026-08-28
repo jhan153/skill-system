@@ -1,10 +1,10 @@
 interface:
   display_name: "Test Visual Regression"
-  short_description: "Compare rendered regressions against accepted baselines"
-  default_prompt: "Use $test-visual-regression to capture or compare a named rendered state against an accepted versioned testing baseline, preserving viewport/environment and limiting the verdict to pixels and framing."
+  short_description: "Design or observe visual regression in one explicit mode"
+  default_prompt: "Use $test-visual-regression in exactly one explicit mode. `design` authors the frozen state/viewport/baseline/comparison contract without capture or verdict; `evidence` consumes that accepted contract to capture/diff and never redesigns or updates the baseline to pass."
 
 policy:
-  invocation_surface: evidence_gate
+  invocation_surface: explicit_procedure
   allow_implicit_invocation: false
   may_own_execution: false
   may_write: true

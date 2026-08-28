@@ -1,6 +1,6 @@
 # source/plugins/testing.yaml — plugin membership manifest (hand-authored input).
 name: skill-system-testing
-version: "10.0.2"
+version: "10.1.0"
 description: 'Skill System testing — human-in-loop oracle discovery, test design, test-only implementation, replay/visual/statistical evidence, and false-green review.'
 skills:
   - plan-test-discovery

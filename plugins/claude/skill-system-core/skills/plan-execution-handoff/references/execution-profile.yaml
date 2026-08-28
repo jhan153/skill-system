@@ -293,7 +293,7 @@ roles:
       - skill-system-testing:test-replay-corpus
       - skill-system-testing:test-visual-regression
       - skill-system-testing:test-statistical-oracle
-    boundary: one implementation-ready test contract for the assigned executable target; conditional Test Discovery may request human authority, but this role writes no test or production code and selects no successor
+    boundary: one implementation-ready test contract for the assigned executable or externally contracted target; visual regression is explicit design mode only; conditional Test Discovery may request human authority, but this role writes no test or production code and selects no successor
 
   test_implementation_owner:
     agent: test_implementation_owner
@@ -305,7 +305,7 @@ roles:
       - skill-system-testing:test-replay-corpus
       - skill-system-testing:test-visual-regression
       - skill-system-testing:test-statistical-oracle
-    boundary: bounded test-only writer and condition observer; no hidden Test Design, oracle weakening, production repair, Human Test substitution, or Plan transition
+    boundary: bounded test-only writer and condition observer; visual regression is explicit evidence mode only; no hidden Test Design, oracle weakening, production repair, Human Test substitution, or Plan transition
 
   fresh_read_only_reviewer:
     agent: fresh_read_only_reviewer

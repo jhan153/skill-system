@@ -1,5 +1,22 @@
 # Changelog
 
+## 10.1.0
+
+- Added the fifth installation profile, `skill-system-testing`, with 10 canonical skills for
+  conditional human test-decision discovery, Test Design, test-only implementation, SUT/scope,
+  scenario, oracle, replay/corpus, visual-regression, statistical-oracle, and evidence review work.
+- Added Core `test_design_result` and `test_implementation_result`, Execution Handoff `TD`/`TI`
+  routing, and condition-scoped verdicts that never turn a test failure into automatic repair
+  authority or Workflow completion into product Pass.
+- Allowed Test Design and Test Discovery to operate from an executable SUT or an accepted external
+  contract while requiring representative observations for empirical thresholds, baselines, or
+  current-behavior claims.
+- Split `test-visual-regression` into explicit `design` and `evidence` modes without adding another
+  skill: Design writes no capture/diff/verdict, and Evidence consumes a frozen contract without
+  redesign or baseline/tolerance drift.
+- Advanced all five plugin profiles and generated provider harness version identities to 10.1.0.
+  Publication, tagging, archives, and live runtime/plugin installation remain separate actions.
+
 ## 10.0.2
 
 - Distributed the common Go harness baseline into independent Codex, Claude, Grok, and

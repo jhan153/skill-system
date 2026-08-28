@@ -114,7 +114,7 @@ payload:
   test_profile: []
   test_basis_refs: []
   condition_ids: []
-  actual_path: <representative production path>
+  actual_path: <representative executable or accepted external-contract path; mark unobserved when contract-only>
   oracle_contracts: []
   environment_and_horizon: []
   diagnostic_and_falsifier_contract: []

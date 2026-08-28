@@ -19,10 +19,10 @@ source_refs:
 
 ## Target Snapshot
 
-- **SUT / path:**
-- **Implementation or prototype snapshot:**
+- **SUT / actual path or accepted external-contract boundary:**
+- **Implementation/prototype snapshot or contract revision:**
 - **Blocked Test Design conditions:**
-- **Observed evidence:**
+- **Source evidence and representative observations when empirical:**
 
 ## Decision Ledger
 

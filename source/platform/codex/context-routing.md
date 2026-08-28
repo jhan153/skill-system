@@ -60,8 +60,8 @@ Route an explicit, single-domain evidence request directly: papers/citations to 
 | existing implementation explanation or verified changed-line comparison report | `report-implementation-explainer`, only on explicit explanation/compare artifact intent; Markdown is default and HTML is optional |
 | product behavior discovery for an existing capability | `plan-behavior-discovery`, only on explicit one-question decision intent |
 | human-owned test judgment surfaced by Test Design | `plan-test-discovery`, only from a named blocked test condition with evidence/options; it records decisions but never designs or implements the test |
-| software Test Design after an executable SUT exists | `workflow-test-design`; use only the material testing specialists selected by its actual boundary/scenario/oracle/evidence question |
-| test-only implementation and scoped execution | `workflow-test-implementation`; direct mode requires a complete authoritative inline contract, otherwise consume Core `test_design_result` |
+| software Test Design after an executable SUT or accepted external contract exists | `workflow-test-design`; use only the material testing specialists selected by its actual/contract boundary, scenario, oracle, or evidence question; visual regression is explicit `design` mode |
+| test-only implementation and scoped execution | `workflow-test-implementation`; direct mode requires a complete authoritative inline contract, otherwise consume Core `test_design_result`; visual regression is explicit `evidence` mode |
 | bounded false-green or test-evidence credibility review | `test-evidence-review`; it reviews authority/path/oracle/falsifier/proof ceiling without repair or product-quality claims |
 | unresolved decisions need a durable multi-session map | `plan-decision-map`, only on explicit decision-map intent; local Markdown unless a remote tracker is separately authorized |
 | requirements discovery interview | `plan-requirements-discovery`, only on explicit interview intent; ask up to three mutually independent ready questions per round |

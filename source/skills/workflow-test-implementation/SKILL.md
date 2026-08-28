@@ -32,7 +32,7 @@ description: Implement and execute a complete test contract as test-only code, f
   read_if_needed:
     - existing nearby test conventions, runner/config, fixtures, baselines, and diagnostics
     - `references/execution_item_view.md` in graph mode or when the result crosses another Workflow/plugin
-    - `test-replay-corpus`, `test-visual-regression`, or another Plan-selected testing specialist only when the contract names that evidence surface
+    - `test-replay-corpus`, `test-visual-regression` in explicit `evidence` mode, or another Plan-selected testing specialist only when the contract names that evidence surface
   do_not_load_by_default:
     - full repo, unrelated tests, broad design reports, open human decisions, raw production data, or credentials
 - risk_profile:
@@ -81,6 +81,8 @@ Do not perform hidden Test Design inside this Workflow.
 3. Implement the prescribed inputs, scenarios, oracle, environment/horizon controls, and
    diagnostics. Reuse production loaders, validators, canonicalizers, composition roots, or public
    boundaries named by the design; a test-only semantic model or bypass is a contract violation.
+   When visual evidence is assigned, invoke `test-visual-regression` only in frozen `evidence` mode;
+   a missing visual contract is `design_required`, never permission for hidden redesign.
 4. Run the smallest condition-matched command or observation. Preserve expected/actual values,
    seed/state history, screenshots/diffs, traces/profiles/dumps, build identity, and selected-source
    readback required by the contract.

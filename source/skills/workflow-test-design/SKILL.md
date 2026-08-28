@@ -10,7 +10,7 @@ description: Design an implementation-ready software test contract after a minim
 - role: execution_primary
 - intent_signature: test design node, test plan for executable behavior, oracle and scenario synthesis, 테스트 설계
 - use_when:
-  - the user requests a concrete test design artifact for an executable SUT
+  - the user requests a concrete test design artifact for an executable SUT or accepted external contract
   - an accepted Plan assigns a Test Design node after a minimum implementation, prototype, or external contract exists
   - multiple scenario, oracle, data, environment, or horizon decisions must be made before test code can be implemented
 - do_not_use_when:
@@ -18,7 +18,7 @@ description: Design an implementation-ready software test contract after a minim
   - the SUT is not executable and no accepted external contract exposes the required behavior
   - the open question is product requirements, algorithm selection, production repair, test-only implementation, or Human Test
 - expected_inputs:
-  - target snapshot, SUT, representative actual path, and observable signals
+  - target snapshot and executable SUT/representative actual path, or accepted external-contract boundary/revision and intended observable signals
   - accepted requirements, invariants, behavior decisions, external contracts, or explicitly accepted characterization
   - known failures, representative data, environment constraints, and optional graph identity
 - expected_outputs:
@@ -27,7 +27,7 @@ description: Design an implementation-ready software test contract after a minim
   - explicit human decision, testability, or authority gaps without fabricated defaults
 - context_targets:
   must_read:
-    - target snapshot, SUT/actual path, accepted basis, and material failure risk
+    - target snapshot, executable SUT/actual path or accepted external-contract path, accepted basis, and material failure risk
     - `references/testing_stage_contract.md`
     - `references/testing_strategy_contract.md`
   read_if_needed:
@@ -38,7 +38,7 @@ description: Design an implementation-ready software test contract after a minim
     - `test-oracle-design` for competing oracle regimes or independence questions
     - `test-statistical-oracle` for stochastic, chaotic, ensemble, or distributional behavior
     - `test-replay-corpus` for capture, recording, replay, or corpus provenance
-    - `test-visual-regression` only when a rendered regression condition and accepted baseline exist
+    - `test-visual-regression` in explicit `design` mode only when a rendered regression condition and accepted baseline/external contract exist
   do_not_load_by_default:
     - full repo, all test methods, unrelated plans, raw production data, credentials, or every existing test
 - risk_profile:
@@ -67,9 +67,9 @@ conditions. Current implementation output remains observation unless accepted by
 
 ## Workflow
 
-1. Bind the target snapshot, test object and largest real boundary, accepted basis, failure risk,
-   representative path, observable signal, and non-goals. State one positive plus one material
-   negative, edge, or falsifying condition.
+1. Bind the target snapshot, test object and largest real or externally contracted boundary,
+   accepted basis, failure risk, representative actual or contract path, observable signal, and
+   non-goals. State one positive plus one material negative, edge, or falsifying condition.
 2. Build a multi-axis test profile instead of assigning one overloaded test label: execution
    mode, level, purpose, design technique, change relation, data/oracle strategy, environment, and
    horizon. Use `test-scope-selection` only when this boundary/profile is materially open.
@@ -79,7 +79,9 @@ conditions. Current implementation output remains observation unless accepted by
 4. Bind each condition to an oracle authority and proof ceiling. Prefer exact or invariant
    authority where valid; use metamorphic, differential, statistical, golden, or direct human
    judgment only under their actual contracts. Use `test-oracle-design` or
-   `test-statistical-oracle` when those choices are material.
+   `test-statistical-oracle` when those choices are material. A visual-regression subquestion uses
+   `test-visual-regression` only in frozen `design` mode and returns no capture, diff, or condition
+   verdict.
 5. If one named condition requires a human-owned judgment that admitted evidence cannot resolve,
    prepare the complete Discovery request required by `references/testing_stage_contract.md` and
    invoke `plan-test-discovery`. Send one question and yield without polling. In an approved graph,
@@ -88,13 +90,15 @@ conditions. Current implementation output remains observation unless accepted by
    from a decided record within its unchanged accepted envelope. Never reinterpret an open/assumed
    row as authority.
 6. Specify testability prerequisites: inputs, clock/seed, viewport/assets, workload, repetitions,
-   duration/state history, instrumentation, diagnostic artifacts, and accepted variability. A
-   missing production hook or representative path is a testability gap, not permission to invent a
-   test-only semantic model.
+   duration/state history, instrumentation, diagnostic artifacts, and accepted variability. When
+   the selected condition or human choice is empirical, a missing production hook, executable path,
+   or representative observation is a current testability gap. In contract-only design, record the
+   missing runtime surface as a later Test Implementation prerequisite and never claim runtime
+   evidence or invent a test-only semantic model.
 7. Produce one bounded implementation handoff naming condition IDs, test-only write scope,
    forbidden design changes, existing framework/runner, required artifacts, and the falsifier that
    must challenge the implemented test.
-8. Read back every designed condition against its basis and actual path. Emit Core
+8. Read back every designed condition against its basis and actual or accepted contract path. Emit Core
    `test_design_result` in graph mode; never claim that the test exists or the product passes.
 
 ## Discovery Request Gate
