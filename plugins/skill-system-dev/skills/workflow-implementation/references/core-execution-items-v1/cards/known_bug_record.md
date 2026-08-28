@@ -8,7 +8,7 @@
     "plan-execution-handoff",
     "workflow-bug-fix"
   ],
-  "required_consumers": ["workflow-code-review"],
+  "required_consumers": ["workflow-code-review", "workflow-test-implementation"],
   "recorders": ["plan-execution-handoff"]
 }
 ---

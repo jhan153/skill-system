@@ -10,4 +10,4 @@
 }
 ---
 
-| `<item_id>` | `code_review_result` | `<producer>` / `<node_id-or-none>` | input/design: `<implementation_result-or-bug_fix_result-item-id>` / `<design_result-item-id-or-none>`; round/snapshot: `<review_round>` / `<implementation_snapshot>`; disposition: `<pass-or-repair_required-or-complete_with_deferred_items>`; findings: `<findings-or-none>`; deferred: `<deferred_item_refs-or-none>`; exclusions: `<known_bug_exclusions-or-none>`; intent: `<continue-or-repair>` | `<artifact_refs-or-none>` / `<evidence_refs-or-none>` |
+| `<item_id>` | `code_review_result` | `<producer>` / `<node_id-or-none>` | input/design/test-design: `<implementation_result-or-test_implementation_result-or-bug_fix_result-item-id>` / `<design_result-item-id-or-none>` / `<test_design_result-item-id-or-none>`; round/snapshot: `<review_round>` / `<implementation_snapshot>`; disposition: `<pass-or-repair_required-or-complete_with_deferred_items>`; findings: `<findings-or-none>`; deferred: `<deferred_item_refs-or-none>`; exclusions: `<known_bug_exclusions-or-none>`; intent: `<continue-or-repair>` | `<artifact_refs-or-none>` / `<evidence_refs-or-none>` |

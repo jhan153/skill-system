@@ -51,11 +51,19 @@ Plan skills are separated by artifact altitude:
 | `requirements_discovery` | `plan-requirements-discovery` | human-in-loop elicitation before PRD/HLD/LLD planning |
 | `requirements_discovery` | `plan-question-document` | explicit question document for one answer owner; returned answers are not implied |
 | `requirements_contract` | `plan-requirements-brief` | PRD/SRS-lite requirements contract from discovery notes and decisions |
+| `test_discovery` | `plan-test-discovery` | conditional human-owned test-basis/oracle decision record surfaced by Test Design and consumable through Execution Handoff revision |
 | `strategic_decision_map` | `plan-decision-map` | durable target/decision map for unresolved multi-session dependencies before implementation decomposition |
 | `durable_execution_handoff` | `plan-execution-handoff` | governed Plan/Handoff pair with one typed execution DAG and human boundary |
 | `repeated_work_profile` | `plan-execution-handoff` | verifier-steering admission, condition/verifier terms, and evidence-delta expansion/stop rules compiled into an already-needed durable DAG |
 
-Each `behavior_discovery` question or requirements ready-question round is a non-persisted `one_shot` turn. A `plan-question-document` file is a one-shot answer request, not a discovery result. A conversation may continue through another explicit round without creating a persisted execution plan; use `task_ticket` only when one task genuinely needs durable resume state. `plan-decision-map` is durable `long_plan` context but remains a decision map rather than an implementation plan. `behavior_discovery` does not reopen requirements discovery or authorize implementation. A requirements contract is input to direct work or Execution Handoff, not an implementation plan by itself.
+Each `behavior_discovery`, `test_discovery`, or requirements ready-question round is a bounded
+`one_shot` turn. A `plan-question-document` file is a one-shot answer request, not a discovery
+result. A conversation may continue through another explicit round without creating a persisted
+execution plan; use `task_ticket` only when one task genuinely needs durable resume state.
+`plan-decision-map` is durable `long_plan` context but remains a decision map rather than an
+implementation plan. Behavior/Test Discovery does not reopen requirements discovery or authorize
+implementation. A requirements contract or decided test-discovery scope is input to direct work or
+Execution Handoff, not an implementation plan by itself.
 
 Use `planning_state_model.md` when a planning artifact might move between lifecycle states. Work horizon answers "how large and durable is this work?"; Planning State answers "which event and invariant admit this artifact into the next state?"
 
@@ -78,6 +86,8 @@ Workflow skills are separated by how they control execution:
 | execution_mode | owner | role |
 | --- | --- | --- |
 | `implementation_execution` | `workflow-implementation` | own direct coding and refactoring from requirement to validated diff |
+| `test_design_execution` | `workflow-test-design` | own one implementation-ready test contract after an executable SUT exists, including conditional human Test Discovery without test-code writes |
+| `test_implementation_execution` | `workflow-test-implementation` | own bounded test-only assets and condition-scoped execution without changing the accepted oracle or production code |
 | `bug_fix_execution` | `workflow-bug-fix` | own one assigned DAG repair intervention/result, or a bounded standalone repair from failure signal through local review |
 | `prototype_execution` | `workflow-prototype` | build and preserve one isolated runnable discriminator for a selected UI question or one self-contained offline HTML state/logic model through decision-owner observation, then stop before production hardening |
 | `dependency_upgrade_execution` | `workflow-dependency-upgrade` | own dependency/runtime/package upgrades and compatibility validation |

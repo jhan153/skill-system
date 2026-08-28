@@ -1,0 +1,17 @@
+interface:
+  display_name: "Workflow Test Design"
+  short_description: "Design implementation-ready tests after an executable SUT exists"
+  default_prompt: "Use $workflow-test-design to bind an executable SUT to authoritative test conditions, scenarios, data, oracle, environment, horizon, diagnostics, and proof ceiling. Invoke $plan-test-discovery only for a named human-owned judgment, and do not write test or production code."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: true
+  may_own_execution: true
+
+work_horizon:
+  level: cross_horizon
+  role: test_design_owner
+
+execution_mode:
+  kind: test_design_execution
+  owns_execution: true

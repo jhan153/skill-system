@@ -1,0 +1,7 @@
+interface:
+  display_name: "Test Replay Corpus"
+  short_description: "Design production-path capture, replay, and reality corpora"
+  default_prompt: "Use $test-replay-corpus to design provenance-preserving capture, recording, replay, and corpus contracts through the production loader/validator path, while keeping replay evidence separate from correctness."
+
+policy:
+  allow_implicit_invocation: true

@@ -19,6 +19,8 @@ boundaries. A direct single-owner task may use its ordinary compact output.
 | concrete UI design artifact and implementation handoff | `workflow-ui-design` |
 | one explicitly assigned Research-stage node result | `workflow-research` using one selected Research specialist |
 | production implementation result | the assigned implementation Workflow |
+| implementation-ready software test contract | `workflow-test-design` |
+| test-only implementation and scoped execution result | `workflow-test-implementation` |
 | read-only static disposition and review findings | `workflow-code-review` or the named review owner |
 | one assigned repair intervention and attempt observation | `workflow-bug-fix` |
 | Human Test observation and product/design judgment | user or explicitly declared human owner |
@@ -35,8 +37,9 @@ Use the smallest applicable fields. `plan_ref` and `node_id` are required only i
 execution_item:
   contract_id: core-execution-items-v1
   item_id: <stable task-local id>
-  kind: design_result | research_result | implementation_result | code_review_result | deferred_item |
-        bug_fix_result | known_bug_candidate | known_bug_record
+  kind: design_result | research_result | implementation_result | test_design_result |
+        test_implementation_result | code_review_result | deferred_item | bug_fix_result |
+        known_bug_candidate | known_bug_record
   producer: <canonical plugin:skill id or current owner>
   plan_ref: <plan id/revision or null>
   node_id: <Plan node id or null>
@@ -133,6 +136,66 @@ payload:
 The producer reports the implemented scope and snapshot. It does not mark a review pass or choose
 the review/next node.
 
+### `test_design_result`
+
+Producer: `workflow-test-design`. Consumers: `workflow-test-implementation`, Code Review when it
+reviews test implementation against the contract, and the execution owner.
+
+```yaml
+payload:
+  test_design_snapshot: <test-design artifact identity>
+  test_design_scope: <bounded SUT and condition scope>
+  target_snapshot: <SUT implementation/prototype/external-contract identity>
+  test_profile: []
+  test_basis_refs: []
+  condition_ids: []
+  actual_path: <representative production path>
+  oracle_contracts: []
+  environment_and_horizon: []
+  diagnostic_and_falsifier_contract: []
+  implementation_handoff: <bounded test-only implementation contract>
+  proof_ceiling: <what the designed test may and may not establish>
+  human_decision_refs: []
+  unresolved_decisions_or_testability_gaps: []
+```
+
+The producer reports an implementation-ready test contract. It does not claim test code, execution,
+condition Pass/Fail, production repair, Human Test, or successor selection. An open material field
+produces no card; a human-owned gap uses package-local Test Discovery and the required Plan revision.
+
+### `test_implementation_result`
+
+Producer: `workflow-test-implementation`. Consumers: Code Review and the execution owner.
+
+```yaml
+payload:
+  implementation_scope: <bounded test-only write and condition scope>
+  test_design_result_ref: <test_design_result item id or null for direct authoritative mode>
+  inline_contract_refs: []
+  target_snapshot: <tested SUT identity>
+  test_asset_snapshot: <test implementation identity>
+  changed_test_artifacts: []
+  condition_results:
+    - condition_id: <accepted condition id>
+      status: pass | fail | inconclusive | unavailable | skipped_known_bug
+      observation: <bounded observed result>
+      evidence_refs: []
+      known_bug_ref: <known_bug_record item id or null>
+  execution_summary: <bounded observed result or unavailable reason>
+  falsifier_result: <required challenge observation or unavailable reason>
+  design_conformance: <contract conformance and deviations>
+  proof_ceiling: <observed evidence ceiling>
+  known_bug_exclusions: []
+  review_slice: <bounded test files/flow>
+  unresolved_design_testability_or_environment_gaps: []
+```
+
+The producer reports test-only implementation and honest condition-scoped observation. Workflow
+completion is not product Pass. A failing condition does not authorize repair, and a direct-mode
+result still requires a complete authoritative inline test contract. A material design,
+authority, testability, environment, required-asset, or required-falsifier gap returns lifecycle
+`not_produced` and emits no partial card.
+
 ### `code_review_result`
 
 Producer: `workflow-code-review` or the named read-only review owner. Consumers: Coordinator and,
@@ -140,8 +203,9 @@ for concrete findings only, Bug Fix.
 
 ```yaml
 payload:
-  input_item_ref: <implementation_result or bug_fix_result item id>
+  input_item_ref: <implementation_result, test_implementation_result, or bug_fix_result item id>
   design_baseline_ref: <design_result item id or null>
+  test_design_baseline_ref: <test_design_result item id or null>
   review_round: <R0, R1, R2, or local review id>
   implementation_snapshot: <reviewed identity>
   review_slice: <bounded files/flow>
@@ -255,6 +319,8 @@ normal terminal node such as `human_test_ready`; there is no `partial_handoff` f
 design_result -> assigned UI implementation or existing Plan successor
 research_result -> existing Plan successor
 implementation_result -> assigned Code Review
+test_design_result -> assigned Test Implementation or existing Plan successor
+test_implementation_result -> assigned Code Review or existing Plan successor
 code_review_result repair_required -> assigned BF1 or BF2
 bug_fix_result changed_snapshot_ready_for_review -> assigned CR1 or CR2
 code_review_result pass -> existing Plan successor
@@ -281,7 +347,9 @@ matrices, source analysis, and raw logs in their owning artifact or worker conte
 | `skill-system-research:workflow-research` | `research_result` | predecessor `research_result` items named by its assigned node |
 | `skill-system-design:design-frontend` | `implementation_result` | `design_result`, final review/repair evidence when it is the current execution owner |
 | `skill-system-dev:workflow-implementation` | `implementation_result` | final review/repair evidence when it is the current execution owner |
-| `skill-system-dev:workflow-code-review` | `code_review_result`, `deferred_item` | optional `design_result` baseline, `implementation_result`, `bug_fix_result`, `known_bug_record` exclusions |
+| `skill-system-testing:workflow-test-design` | `test_design_result` | optional `implementation_result` target snapshot |
+| `skill-system-testing:workflow-test-implementation` | `test_implementation_result` | optional `test_design_result`, `known_bug_record` exclusions |
+| `skill-system-dev:workflow-code-review` | `code_review_result`, `deferred_item` | optional `design_result` or `test_design_result` baseline, `implementation_result`, `test_implementation_result`, `bug_fix_result`, `known_bug_record` exclusions |
 | `skill-system-dev:workflow-bug-fix` | `bug_fix_result`, `known_bug_candidate`, and standalone-only `known_bug_record` | concrete repair findings from `code_review_result` |
 | `skill-system-core:plan-execution-handoff` | `known_bug_record` and ledger transition | all graph-mode items |
 

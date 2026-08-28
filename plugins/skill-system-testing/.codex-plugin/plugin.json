@@ -1,0 +1,32 @@
+{
+  "name": "skill-system-testing",
+  "version": "10.0.2",
+  "description": "Skill System testing — human-in-loop oracle discovery, test design, test-only implementation, replay/visual/statistical evidence, and false-green review.",
+  "author": {
+    "name": "Skill System Maintainers"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-system",
+    "codex",
+    "testing"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Skill System Testing",
+    "shortDescription": "Human-in-loop test decisions, test design, test-only implementation, and evidence specialists.",
+    "longDescription": "Skill System testing — human-in-loop oracle discovery, test design, test-only implementation, replay/visual/statistical evidence, and false-green review.",
+    "developerName": "Skill System Maintainers",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Skill System Testing skills for this task."
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
+}

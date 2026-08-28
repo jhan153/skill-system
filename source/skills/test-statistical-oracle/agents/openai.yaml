@@ -1,0 +1,9 @@
+interface:
+  display_name: "Test Statistical Oracle"
+  short_description: "Design ensemble oracles for nondeterministic software"
+  default_prompt: "Use $test-statistical-oracle to define an estimand, run/seed unit, workload, repetitions, uncertainty, and authoritative decision rule for stochastic or chaotic software without inventing thresholds or overgeneralizing one replay."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: true
+  may_own_execution: false

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Test Oracle Design"
+  short_description: "Select an authoritative, non-circular test oracle"
+  default_prompt: "Use $test-oracle-design to select the smallest authoritative oracle for one named condition, reject circular expected values and unapproved baselines, and report its exact proof ceiling."
+
+policy:
+  allow_implicit_invocation: true

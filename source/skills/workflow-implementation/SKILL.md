@@ -1,6 +1,6 @@
 ---
 name: workflow-implementation
-description: Primary workflow for direct or DAG-assigned software implementation nodes. Use when the user or an accepted Plan node requests production code, API, script, config, build, or explicitly scoped test changes. Do not use to coordinate or advance an entire Plan, for behavior-preserving refactors, concrete bug fixes, or analysis/validation-only work; review findings that require repair enter the bounded workflow-bug-fix cycle without blocking unrelated implementation nodes.
+description: Primary workflow for direct or DAG-assigned production software implementation nodes. Use when the user or an accepted Plan node requests production code, API, script, config, build, or production-coupled regression test changes. Do not use for standalone test design/test-only implementation owned by the Testing plugin, Plan coordination, behavior-preserving refactors, concrete bug fixes, or analysis/validation-only work; review findings that require repair enter the bounded workflow-bug-fix cycle without blocking unrelated implementation nodes.
 ---
 
 # Workflow Implementation
@@ -10,11 +10,11 @@ description: Primary workflow for direct or DAG-assigned software implementation
 - intent_signature:
   - direct implementation
   - code change
-  - add tests
+  - add production-coupled regression tests
   - implement feature
   - 구현
 - use_when:
-  - the user asks for a concrete code, test, script, API, config, or build change.
+  - the user asks for a concrete production code, script, API, config, or build change, including bounded regression tests that are part of that production slice.
   - requirements are sufficient for a current-turn implementation slice.
   - the task is ordinary development work not already owned by a narrower specialist.
 - do_not_use_when:
@@ -25,6 +25,7 @@ description: Primary workflow for direct or DAG-assigned software implementation
   - the user wants a causal source/runtime explanation of existing code; use `report-implementation-explainer`.
   - an existing capability's product-facing behavior is still undecided and the user asks to resolve it; use `plan-behavior-discovery`.
   - the request is pure analysis, planning, review, validation-only, or other report generation.
+  - the requested outcome is standalone Test Design or test-only implementation/execution; use `workflow-test-design` or `workflow-test-implementation`.
 - expected_inputs:
   - requested behavior or change
   - relevant repository files and existing local patterns

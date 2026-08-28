@@ -23,6 +23,8 @@
         "design_result",
         "research_result",
         "implementation_result",
+        "test_design_result",
+        "test_implementation_result",
         "code_review_result",
         "deferred_item",
         "bug_fix_result",
@@ -70,6 +72,30 @@
         "required": ["kind"]
       },
       "then": { "properties": { "payload": { "$ref": "#/$defs/implementation_result" } } }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "test_design_result" } },
+        "required": ["kind"]
+      },
+      "then": {
+        "properties": {
+          "producer": { "const": "skill-system-testing:workflow-test-design" },
+          "payload": { "$ref": "#/$defs/test_design_result" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "test_implementation_result" } },
+        "required": ["kind"]
+      },
+      "then": {
+        "properties": {
+          "producer": { "const": "skill-system-testing:workflow-test-implementation" },
+          "payload": { "$ref": "#/$defs/test_implementation_result" }
+        }
+      }
     },
     {
       "if": {
@@ -226,6 +252,175 @@
       },
       "additionalProperties": false
     },
+    "test_design_result": {
+      "type": "object",
+      "required": [
+        "test_design_snapshot",
+        "test_design_scope",
+        "target_snapshot",
+        "test_profile",
+        "test_basis_refs",
+        "condition_ids",
+        "actual_path",
+        "oracle_contracts",
+        "environment_and_horizon",
+        "diagnostic_and_falsifier_contract",
+        "implementation_handoff",
+        "proof_ceiling",
+        "human_decision_refs",
+        "unresolved_decisions_or_testability_gaps"
+      ],
+      "properties": {
+        "test_design_snapshot": { "type": "string", "minLength": 1 },
+        "test_design_scope": { "type": "string", "minLength": 1 },
+        "target_snapshot": { "type": "string", "minLength": 1 },
+        "test_profile": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "test_basis_refs": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "condition_ids": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "actual_path": { "type": "string", "minLength": 1 },
+        "oracle_contracts": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "environment_and_horizon": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "diagnostic_and_falsifier_contract": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "implementation_handoff": { "type": "string", "minLength": 1 },
+        "proof_ceiling": { "type": "string", "minLength": 1 },
+        "human_decision_refs": { "$ref": "#/$defs/string_array" },
+        "unresolved_decisions_or_testability_gaps": { "$ref": "#/$defs/string_array" }
+      },
+      "additionalProperties": false
+    },
+    "test_condition_result": {
+      "type": "object",
+      "required": ["condition_id", "status", "observation", "evidence_refs", "known_bug_ref"],
+      "properties": {
+        "condition_id": { "type": "string", "minLength": 1 },
+        "status": {
+          "enum": ["pass", "fail", "inconclusive", "unavailable", "skipped_known_bug"]
+        },
+        "observation": { "type": "string", "minLength": 1 },
+        "evidence_refs": { "$ref": "#/$defs/string_array" },
+        "known_bug_ref": {
+          "type": ["string", "null"],
+          "pattern": "^EI-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "skipped_known_bug" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": { "known_bug_ref": { "type": "string" } }
+          },
+          "else": {
+            "properties": { "known_bug_ref": { "type": "null" } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "unavailable" } },
+            "required": ["status"]
+          },
+          "else": {
+            "properties": {
+              "evidence_refs": { "minItems": 1 }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "test_implementation_result": {
+      "type": "object",
+      "required": [
+        "implementation_scope",
+        "test_design_result_ref",
+        "inline_contract_refs",
+        "target_snapshot",
+        "test_asset_snapshot",
+        "changed_test_artifacts",
+        "condition_results",
+        "execution_summary",
+        "falsifier_result",
+        "design_conformance",
+        "proof_ceiling",
+        "known_bug_exclusions",
+        "review_slice",
+        "unresolved_design_testability_or_environment_gaps"
+      ],
+      "properties": {
+        "implementation_scope": { "type": "string", "minLength": 1 },
+        "test_design_result_ref": {
+          "type": ["string", "null"],
+          "pattern": "^EI-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "inline_contract_refs": { "$ref": "#/$defs/string_array" },
+        "target_snapshot": { "type": "string", "minLength": 1 },
+        "test_asset_snapshot": { "type": "string", "minLength": 1 },
+        "changed_test_artifacts": { "$ref": "#/$defs/string_array" },
+        "condition_results": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/test_condition_result" },
+          "minItems": 1
+        },
+        "execution_summary": { "type": "string", "minLength": 1 },
+        "falsifier_result": { "type": "string", "minLength": 1 },
+        "design_conformance": { "type": "string", "minLength": 1 },
+        "proof_ceiling": { "type": "string", "minLength": 1 },
+        "known_bug_exclusions": { "$ref": "#/$defs/item_ref_array" },
+        "review_slice": { "type": "string", "minLength": 1 },
+        "unresolved_design_testability_or_environment_gaps": { "$ref": "#/$defs/string_array" }
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "test_design_result_ref": { "type": "string" },
+                "inline_contract_refs": { "maxItems": 0 }
+              }
+            },
+            {
+              "properties": {
+                "test_design_result_ref": { "type": "null" },
+                "inline_contract_refs": { "minItems": 1 }
+              }
+            }
+          ]
+        }
+      ],
+      "additionalProperties": false
+    },
     "review_finding": {
       "type": "object",
       "required": ["id", "claim", "priority", "code_refs", "impact", "fix_direction"],
@@ -256,6 +451,10 @@
       "properties": {
         "input_item_ref": { "$ref": "#/$defs/item_ref" },
         "design_baseline_ref": {
+          "type": ["string", "null"],
+          "pattern": "^EI-[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "test_design_baseline_ref": {
           "type": ["string", "null"],
           "pattern": "^EI-[A-Za-z0-9][A-Za-z0-9_.-]*$"
         },

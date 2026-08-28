@@ -15,7 +15,7 @@ artifact contracts without entering this state machine.
 | `discovery` | `plan-requirements-discovery` | Material requirement gaps are being converted into explicit decisions. | Decisions plus unresolved assumptions and their owners. |
 | `requirements_contract` | `plan-requirements-brief` | Scope, non-goals, assumptions, and observable acceptance criteria are stable. | Accepted or explicitly referenced contract ready for direct work or Execution Handoff authoring. |
 
-`plan-behavior-discovery`, `plan-decision-map`, and `plan-question-document` stay outside
+`plan-behavior-discovery`, `plan-test-discovery`, `plan-decision-map`, and `plan-question-document` stay outside
 this state model. They provide bounded decision input but do not imply requirements acceptance,
 implementation approval, or execution completion.
 
@@ -47,6 +47,7 @@ implementation approval, or execution completion.
 | `plan-requirements-discovery` | Move `scratch` into bounded `discovery` and record decision-bearing answers. |
 | `plan-requirements-brief` | Distill accepted discovery into `requirements_contract`. |
 | `plan-behavior-discovery` | Resolve one existing-capability behavior decision outside this state model. |
+| `plan-test-discovery` | Resolve one human-owned test judgment surfaced by Test Design outside this state model; decided scope becomes Execution Handoff input only through its own admission/revision contract. |
 | `plan-decision-map` | Hold durable unresolved decision dependencies without implying execution readiness. |
 | `plan-question-document` | Request one answer owner's input; returned answers enter discovery only through a later explicit action. |
 | `plan-execution-handoff` | Consume accepted requirements or explicit current scope and create its own durable execution pair. |

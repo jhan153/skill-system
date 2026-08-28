@@ -1,0 +1,18 @@
+interface:
+  display_name: "Workflow Test Implementation"
+  short_description: "Implement and run an authoritative test contract"
+  default_prompt: "Use $workflow-test-implementation to realize a complete test contract as test-only assets and condition-scoped execution evidence. Admit direct simple tests only when every material field is authoritative; never invent or weaken the oracle, alter production code, or turn Workflow completion into product Pass."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: true
+  may_own_execution: true
+  may_write: true
+
+work_horizon:
+  level: cross_horizon
+  role: test_implementation_owner
+
+execution_mode:
+  kind: test_implementation_execution
+  owns_execution: true

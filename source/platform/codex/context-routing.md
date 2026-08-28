@@ -59,6 +59,10 @@ Route an explicit, single-domain evidence request directly: papers/citations to 
 | static code review of a bound implementation or diff | `workflow-code-review`; select diagrams from code risk, treat design as optional evidence, and return only a compact `continue|repair` intent for the Coordinator |
 | existing implementation explanation or verified changed-line comparison report | `report-implementation-explainer`, only on explicit explanation/compare artifact intent; Markdown is default and HTML is optional |
 | product behavior discovery for an existing capability | `plan-behavior-discovery`, only on explicit one-question decision intent |
+| human-owned test judgment surfaced by Test Design | `plan-test-discovery`, only from a named blocked test condition with evidence/options; it records decisions but never designs or implements the test |
+| software Test Design after an executable SUT exists | `workflow-test-design`; use only the material testing specialists selected by its actual boundary/scenario/oracle/evidence question |
+| test-only implementation and scoped execution | `workflow-test-implementation`; direct mode requires a complete authoritative inline contract, otherwise consume Core `test_design_result` |
+| bounded false-green or test-evidence credibility review | `test-evidence-review`; it reviews authority/path/oracle/falsifier/proof ceiling without repair or product-quality claims |
 | unresolved decisions need a durable multi-session map | `plan-decision-map`, only on explicit decision-map intent; local Markdown unless a remote tracker is separately authorized |
 | requirements discovery interview | `plan-requirements-discovery`, only on explicit interview intent; ask up to three mutually independent ready questions per round |
 | one-recipient question document | `plan-question-document`, only on explicit question-document artifact intent; keep external delivery separate |
@@ -103,6 +107,9 @@ The nearest `project-context.yaml` declares project-local skill roots, Memory Ba
 
 - Development requests execute source work; an active plan is input, not a substitute for implementation.
 - Use one `change -> validation` owner. A verifier does not become a second workflow owner.
+- Test Design and Test Implementation are explicit owners, not automatic post-implementation
+  attachments. A failing test condition is evidence, not repair authority; the Coordinator or
+  direct task owner applies the accepted repair/design/decision boundary.
 - When delegation follows an already selected specialist, pass its exact canonical skill ID to the worker. With no upstream selection, let the worker resolve normally instead of inventing a recommendation.
 - When a material semantic completion claim would rest mainly on code and checks produced by that same owner, attach the non-node `workflow-rigor` modifier in `standard` mode and use an independent pass on the most falsifying `Contract/Spec` or `Repository/Constraints` axis when available. High-risk behavior changes may attach `strict` for separate axes plus rollback/readback. Low-risk work uses the global evidence baseline without a rigor mode. Rigor never owns writes, Core cards, or Plan successors.
 - Invoke routine approved executables directly. Use a shell wrapper only when pipeline, redirection, globbing, or other shell semantics are required.

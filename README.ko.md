@@ -49,9 +49,11 @@ Memory Bank는 세션을 넘는 목표·작업 규칙·반복 실수·검증된 
 
 개발 중심 설치에서는 `skill-system-core` + `skill-system-dev`를 최소 profile로 사용합니다. Core에는 lifecycle·정성평가·critical report 스킬이 포함되며, 구현 및 도메인 owner는 각자의 조건 일치 검증을 유지합니다.
 
-4개 plugin은 8개 사용자-facing skill family가 아니라 설치 profile입니다. Core는 cross-domain
+5개 plugin은 9개 사용자-facing skill family가 아니라 설치 profile입니다. Core는 cross-domain
 Planning·Management·Evidence·Workflow modifier와 모든 Report를, Dev는 engineering Analysis와
-Workflow owner를 담으며, Design과 Research는 각 도메인 전용 profile입니다. Grok과
+Workflow owner를 담으며, Design·Research·Testing은 각 도메인 전용 profile입니다. Testing은
+사람이 개입하는 테스트 판단, Test Design, 테스트 전용 구현, scope·oracle·scenario·replay·
+visual regression·통계적 동작·false-green 리뷰 specialist를 제공합니다. Grok과
 Antigravity는 스킬 복제를 두 벌 더 만들지 않고 Claude-compatible portable package를 함께
 소비합니다. 생성된 전역 규칙 companion은 worker inbox·heartbeat·`worker_done`을 Orca에
 맡기고 Coordinator polling과 fixed/busy wait를 금지합니다.

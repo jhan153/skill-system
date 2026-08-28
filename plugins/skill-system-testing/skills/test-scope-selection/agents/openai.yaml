@@ -1,0 +1,7 @@
+interface:
+  display_name: "Test Scope Selection"
+  short_description: "Choose the real SUT boundary and test profile"
+  default_prompt: "Use $test-scope-selection to choose the smallest real SUT and observation boundary that can expose the named failure, while keeping test level separate from purpose, technique, automation, oracle, and environment."
+
+policy:
+  allow_implicit_invocation: true

@@ -280,6 +280,33 @@ roles:
       - skill-system-dev:workflow-implementation
     boundary: sole production writer for concrete delegated implementation slices
 
+  test_design_owner:
+    agent: test_design_owner
+    model: gpt-5.6-sol
+    effort: xhigh
+    selected_skills:
+      - skill-system-testing:workflow-test-design
+    optional_skills:
+      - skill-system-testing:test-scope-selection
+      - skill-system-testing:test-oracle-design
+      - skill-system-testing:test-scenario-design
+      - skill-system-testing:test-replay-corpus
+      - skill-system-testing:test-visual-regression
+      - skill-system-testing:test-statistical-oracle
+    boundary: one implementation-ready test contract for the assigned executable target; conditional Test Discovery may request human authority, but this role writes no test or production code and selects no successor
+
+  test_implementation_owner:
+    agent: test_implementation_owner
+    model: Grok 4.6
+    effort: high
+    selected_skills:
+      - skill-system-testing:workflow-test-implementation
+    optional_skills:
+      - skill-system-testing:test-replay-corpus
+      - skill-system-testing:test-visual-regression
+      - skill-system-testing:test-statistical-oracle
+    boundary: bounded test-only writer and condition observer; no hidden Test Design, oracle weakening, production repair, Human Test substitution, or Plan transition
+
   fresh_read_only_reviewer:
     agent: fresh_read_only_reviewer
     model: gpt-5.6-sol

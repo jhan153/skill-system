@@ -36,6 +36,7 @@ do not guess a path.
     ├── behavior-decisions.md
     ├── requirements-discovery.yaml
     ├── requirements-contract.yaml
+    ├── test-decisions.md
     └── question-documents/
         └── <topic>.md
 ```
@@ -64,6 +65,7 @@ generic payload merely to satisfy this contract.
 | `plan-behavior-discovery` | `inputs/behavior-decisions.md` | `decision_ready` artifact with `decided` rows | A decided observable product behavior may constrain a node. Assumed, delegated, and open rows remain non-authoritative. |
 | `plan-requirements-discovery` | `inputs/requirements-discovery.yaml` | `ready_for_distillation` | Discovery evidence and decisions are input to distillation; the record is not an accepted requirements contract. |
 | `plan-requirements-brief` | `inputs/requirements-contract.yaml` | `accepted` | Accepted scope, non-goals, and observable criteria may govern Plan compilation. `proposed` remains review input only. |
+| `plan-test-discovery` | `inputs/test-decisions.md` | `decision_ready` artifact with `decided` rows | Only decided test-basis, oracle, tolerance, baseline, horizon, or accepted-uncertainty judgments with authority/source refs may constrain the named Test Design conditions. Current implementation observations, `assumed|open` rows, and rejected candidates remain non-authoritative. |
 | `plan-question-document` | `inputs/question-documents/<topic>.md` | `answered` | Only returned answers with owner/source attribution may feed Discovery or the Requirements Contract. `awaiting_response` is a request, not evidence. |
 
 ## Plan Consumption
@@ -77,6 +79,10 @@ their full content.
 - A missing or non-consumable input remains explicit. Do not silently promote it, fabricate an
   answer, or replace it with agent preference.
 - Input artifacts never select a successor node or mutate `handoff.md`.
+- `workflow-test-design` may conditionally request `plan-test-discovery` for one admitted
+  human-owned judgment. The active Worker remains in progress and sends one lifecycle question;
+  `awaiting_human_event` belongs to Handoff, not the input artifact. A file write alone never
+  resumes the Worker or makes the decision authoritative for an approved Plan.
 
 ## Freeze And Revision
 
@@ -84,6 +90,13 @@ Inputs may evolve while the execution pair is still `proposed`. When execution i
 Plan pins the consumed paths, statuses, and source/evidence anchors.
 
 - Do not silently rewrite a pinned input during execution.
+- When Test Discovery resolves a judgment during an approved Test Design node, the decision record
+  remains unconsumed until `plan-execution-handoff` applies Scope Admission and explicitly revises
+  the pinned path, `decision_ready` status, decision IDs, and source anchors. The same node may
+  resume only when positive outcome, owner/boundary, DAG, and completion oracle remain the same;
+  otherwise create a sibling package. The Discovery owner requests that decision through one
+  `escalation`; it never edits the pair, selects a successor, or emits `worker_done` for the still
+  active Test Design node.
 - A correction that preserves the same outcome, owner/boundary, DAG, and completion oracle uses an
   explicit Plan revision before Task State synchronization.
 - A material change to any of those axes creates a sibling package with a new `plan_id` through

@@ -71,6 +71,16 @@ DESIGN_SHARED_REFERENCE_PROJECTIONS = (
         Path("references/layout_constraint_contract.md"),
     ),
 )
+TESTING_SHARED_REFERENCE_PROJECTIONS = (
+    (
+        Path("shared/docs/testing_strategy_contract.md"),
+        Path("references/testing_strategy_contract.md"),
+    ),
+    (
+        Path("shared/docs/testing_stage_contract.md"),
+        Path("references/testing_stage_contract.md"),
+    ),
+)
 MANAGEMENT_SHARED_REFERENCE_PROJECTIONS = (
     (
         Path("shared/docs/project_context_manifest.md"),
@@ -142,6 +152,7 @@ PLUGIN_DISPLAY = {
     "skill-system-dev": ("Skill System Dev", "Engineering analysis, implementation, bounded bug repair, code review, behavior discovery, and refactoring skills."),
     "skill-system-design": ("Skill System Design", "Frontend, UI, layout, component, token, and visual validation skills."),
     "skill-system-research": ("Skill System Research", "Explicit Research node execution, scientific synthesis, experiment, analysis, manuscript, and review skills."),
+    "skill-system-testing": ("Skill System Testing", "Human-in-loop test decisions, test design, test-only implementation, and evidence specialists."),
 }
 
 
@@ -548,6 +559,16 @@ def _attach_design_shared_references(source: Path, skill_dir: Path) -> None:
         return
     text = skill_md.read_text(encoding="utf-8")
     for source_path, target_path in DESIGN_SHARED_REFERENCE_PROJECTIONS:
+        if target_path.as_posix() in text:
+            _copy(source / source_path, skill_dir / target_path)
+
+
+def _attach_testing_shared_references(source: Path, skill_dir: Path) -> None:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return
+    text = skill_md.read_text(encoding="utf-8")
+    for source_path, target_path in TESTING_SHARED_REFERENCE_PROJECTIONS:
         if target_path.as_posix() in text:
             _copy(source / source_path, skill_dir / target_path)
 
@@ -1126,6 +1147,7 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
             _attach_boundary_decision_contract(source, codex_pkg / "skills" / sid)
             _attach_research_stage_contract(source, codex_pkg / "skills" / sid)
             _attach_design_shared_references(source, codex_pkg / "skills" / sid)
+            _attach_testing_shared_references(source, codex_pkg / "skills" / sid)
             _attach_management_shared_references(source, codex_pkg / "skills" / sid)
             _attach_maintainable_code_principles(source, codex_pkg / "skills" / sid)
             _attach_identifier_readability_principle(
@@ -1144,6 +1166,7 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
             _attach_boundary_decision_contract(source, claude_pkg / "skills" / sid)
             _attach_research_stage_contract(source, claude_pkg / "skills" / sid)
             _attach_design_shared_references(source, claude_pkg / "skills" / sid)
+            _attach_testing_shared_references(source, claude_pkg / "skills" / sid)
             _attach_management_shared_references(source, claude_pkg / "skills" / sid)
             _attach_maintainable_code_principles(source, claude_pkg / "skills" / sid)
             _attach_identifier_readability_principle(

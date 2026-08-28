@@ -1,0 +1,10 @@
+interface:
+  display_name: "Test Evidence Review"
+  short_description: "Audit tests for false-green and proof inflation"
+  default_prompt: "Use $test-evidence-review to trace a bounded test from authority through the real SUT to its oracle and falsifier, report false-green risks and exact proof ceilings, and hand findings to the correct owner without repair."
+
+policy:
+  invocation_surface: evidence_gate
+  allow_implicit_invocation: false
+  may_own_execution: false
+  may_block_completion: false

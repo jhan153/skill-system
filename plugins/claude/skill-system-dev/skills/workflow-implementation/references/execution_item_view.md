@@ -21,6 +21,8 @@ boundaries. A direct single-owner task may use its ordinary compact output.
 | concrete UI design artifact and implementation handoff | `workflow-ui-design` |
 | one explicitly assigned Research-stage node result | `workflow-research` using one selected Research specialist |
 | production implementation result | the assigned implementation Workflow |
+| implementation-ready software test contract | `workflow-test-design` |
+| test-only implementation and scoped execution result | `workflow-test-implementation` |
 | read-only static disposition and review findings | `workflow-code-review` or the named review owner |
 | one assigned repair intervention and attempt observation | `workflow-bug-fix` |
 | Human Test observation and product/design judgment | user or explicitly declared human owner |
@@ -37,8 +39,9 @@ Use the smallest applicable fields. `plan_ref` and `node_id` are required only i
 execution_item:
   contract_id: core-execution-items-v1
   item_id: <stable task-local id>
-  kind: design_result | research_result | implementation_result | code_review_result | deferred_item |
-        bug_fix_result | known_bug_candidate | known_bug_record
+  kind: design_result | research_result | implementation_result | test_design_result |
+        test_implementation_result | code_review_result | deferred_item | bug_fix_result |
+        known_bug_candidate | known_bug_record
   producer: <canonical plugin:skill id or current owner>
   plan_ref: <plan id/revision or null>
   node_id: <Plan node id or null>
@@ -105,8 +108,9 @@ for concrete findings only, Bug Fix.
 
 ```yaml
 payload:
-  input_item_ref: <implementation_result or bug_fix_result item id>
+  input_item_ref: <implementation_result, test_implementation_result, or bug_fix_result item id>
   design_baseline_ref: <design_result item id or null>
+  test_design_baseline_ref: <test_design_result item id or null>
   review_round: <R0, R1, R2, or local review id>
   implementation_snapshot: <reviewed identity>
   review_slice: <bounded files/flow>

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Test Visual Regression"
+  short_description: "Compare rendered regressions against accepted baselines"
+  default_prompt: "Use $test-visual-regression to capture or compare a named rendered state against an accepted versioned testing baseline, preserving viewport/environment and limiting the verdict to pixels and framing."
+
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Test Scenario Design"
+  short_description: "Derive a minimal discriminating test scenario set"
+  default_prompt: "Use $test-scenario-design to derive traceable positive, negative, edge, state, sequence, data, and horizon scenarios from accepted conditions and an actual SUT path without inventing the oracle."
+
+policy:
+  allow_implicit_invocation: true

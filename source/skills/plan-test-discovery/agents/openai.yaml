@@ -1,0 +1,17 @@
+interface:
+  display_name: "Plan Test Discovery"
+  short_description: "Resolve human-owned test and oracle decisions"
+  default_prompt: "Use $plan-test-discovery only when Test Design has a named human-owned decision about test basis, oracle, tolerance, baseline, horizon, or accepted uncertainty that authoritative evidence cannot resolve. Present evidence and tradeoffs, record only decided scope, and never design or implement the test."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: false
+  may_own_execution: true
+
+work_horizon:
+  level: one_shot
+  role: test_decision_discovery_owner
+
+planning_altitude:
+  kind: test_discovery
+  artifact_level: test_discovery_record

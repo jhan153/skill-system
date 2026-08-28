@@ -77,6 +77,9 @@ test transition: `current_graph` or `next_waterfall`. `phase_gate_delivery` defa
 
 - agent-owned build, lint, static analysis, or narrow smoke work is a pre-handoff check, not the
   Test phase and not a substitute for the user's observation;
+- explicitly selected `workflow-test-design` and `workflow-test-implementation` nodes may produce
+  agent-machine test contracts/evidence inside `current_graph`; their condition verdicts remain
+  scoped evidence and do not replace a later Human Test when authority is `human_handoff|mixed`;
 - all runnable agent nodes proceed through static review and terminate at `human_test_ready`
   without waiting for the user;
 - Human Test is outside the current Task DAG. The current plan may complete at the pre-test

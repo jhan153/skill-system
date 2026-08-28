@@ -5,7 +5,7 @@
   "handoff_section": "Execution Items",
   "handoff_columns": ["Item ID", "Kind", "Producer / node", "Compact outcome", "Artifact / evidence refs"],
   "allowed_producers": ["design-frontend", "workflow-implementation"],
-  "required_consumers": ["workflow-code-review"],
+  "required_consumers": ["workflow-code-review", "workflow-test-design"],
   "recorders": ["plan-execution-handoff"]
 }
 ---

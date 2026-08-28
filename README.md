@@ -49,9 +49,12 @@ The default Codex hook map sends eight lifecycle events directly to one Go execu
 
 For development-focused installs, use `skill-system-core` + `skill-system-dev` as the minimum profile. Core includes the shared lifecycle, qualitative, and critical report skills; implementation and domain owners retain their own condition-matched validation.
 
-The four plugins are installation profiles, not the eight user-facing skill families. Core contains
+The five plugins are installation profiles, not the nine user-facing skill families. Core contains
 cross-domain Planning, Management, Evidence, Workflow modifiers, and all Report skills; Dev contains
-engineering Analysis and Workflow owners; Design and Research carry their domain-specific families.
+engineering Analysis and Workflow owners; Design, Research, and Testing carry their domain-specific
+families. Testing adds human-in-loop test decisions, Test Design, test-only implementation, and
+specialists for scope, oracle, scenarios, replay, visual regression, statistical behavior, and
+false-green review.
 Grok and Antigravity reuse the Claude-compatible portable package set instead of adding two more
 copies of every skill. Their generated global-rule companions bind Orca work to the same
 event-driven lifecycle: worker-side inbox/heartbeat/`worker_done`, no Coordinator polling, and no

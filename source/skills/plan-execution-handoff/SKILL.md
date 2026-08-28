@@ -1,6 +1,6 @@
 ---
 name: plan-execution-handoff
-description: Create or update a canonical plan.md plus mutable handoff.md pair for durable single-node, decision-gated, multi-session, or multi-agent implementation work. Compile one typed risk-adaptive DAG—defaulting clear phase work to design/implementation → static review → human_test_ready—into a self-contained contract for an event-driven Orchestrator. Apply repeated-work principles only to an admitted verifier-steered graph. Do not use for direct one-session implementation, status-only reporting, polling, strict timing enforcement, or unrelated sibling scope.
+description: Create or update a canonical plan.md plus mutable handoff.md pair for durable single-node, decision-gated, multi-session, or multi-agent implementation work. Compile one typed risk-adaptive DAG—defaulting clear phase work to design/implementation → static review → human_test_ready and admitting explicit Test Design/Test Implementation nodes when selected—into a self-contained contract for an event-driven Orchestrator. Apply repeated-work principles only to an admitted verifier-steered graph. Do not use for direct one-session implementation, status-only reporting, polling, strict timing enforcement, or unrelated sibling scope.
 ---
 
 # Plan Execution Handoff
@@ -58,6 +58,11 @@ design-to-code implementation, or Design evidence nodes. Include only stages and
 conditions explicitly requested or already accepted by the Plan; a Design artifact or gate result
 never creates the next node automatically.
 
+Read `references/testing_stage_contract.md` only when the requested DAG includes software Test
+Design, Test Implementation, or a conditional Test Discovery decision. Bind `TD*` and `TI*` nodes
+to their exact Testing Workflow owners, preserve Test Discovery as Planning support rather than a
+DAG node, and keep agent-machine test evidence separate from Human Test authority.
+
 Use `assets/plan.md.tpl` and `assets/handoff.md.tpl` as the minimum output shape;
 `references/example/` holds one minimal valid pair for shape reference. Replace every
 placeholder and delete template commentary the task does not need, but keep every section
@@ -66,7 +71,7 @@ literal `|` inside a table cell as `\|`.
 
 ## Core Cards
 
-- records: `references/core-execution-items-v1/cards/design_result.md`, `references/core-execution-items-v1/cards/research_result.md`, `references/core-execution-items-v1/cards/implementation_result.md`, `references/core-execution-items-v1/cards/code_review_result.md`, `references/core-execution-items-v1/cards/deferred_item.md`, `references/core-execution-items-v1/cards/bug_fix_result.md`, `references/core-execution-items-v1/cards/known_bug_candidate.md`, `references/core-execution-items-v1/cards/known_bug_record.md`
+- records: `references/core-execution-items-v1/cards/design_result.md`, `references/core-execution-items-v1/cards/research_result.md`, `references/core-execution-items-v1/cards/implementation_result.md`, `references/core-execution-items-v1/cards/test_design_result.md`, `references/core-execution-items-v1/cards/test_implementation_result.md`, `references/core-execution-items-v1/cards/code_review_result.md`, `references/core-execution-items-v1/cards/deferred_item.md`, `references/core-execution-items-v1/cards/bug_fix_result.md`, `references/core-execution-items-v1/cards/known_bug_candidate.md`, `references/core-execution-items-v1/cards/known_bug_record.md`
 - produces after combining an eligible candidate with terminal review evidence: `references/core-execution-items-v1/cards/known_bug_record.md`
 
 ## Pair Location and Identity

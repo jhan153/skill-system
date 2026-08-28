@@ -18,8 +18,8 @@ The former `.codex/skills` and `.claude/skills` full mirrors are retired. Runtim
 generation removes them. Grok and Antigravity reuse the Claude-compatible package set instead of
 creating two more copies of every skill.
 
-Plugins are installation profiles, not user-facing families. The registry's eight families own
-routing language; the four plugin profiles own convenient installation boundaries.
+Plugins are installation profiles, not user-facing families. The registry's nine families own
+routing language; the five plugin profiles own convenient installation boundaries.
 
 ## Shared Plugin Payloads
 

@@ -31,6 +31,8 @@ plugin_profiles:
     purpose: UI design creation, implementation, and design evidence
   - id: skill-system-research
     purpose: research-stage execution and paper evidence
+  - id: skill-system-testing
+    purpose: human-in-loop test decisions, test design, test-only implementation, and test evidence
 
 shared_plugin_payloads:
   report_canvas:

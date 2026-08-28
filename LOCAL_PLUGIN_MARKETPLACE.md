@@ -15,7 +15,8 @@ use `codex plugin ...` are the Codex flow. Claude uses its marketplace; Grok and
 install the portable package roots directly with their official CLIs.
 
 These packages are installation profiles rather than user-facing skill families. Core is the
-shared profile, Dev adds engineering work, and Design/Research add domain-specific capabilities.
+shared profile, Dev adds engineering work, and Design/Research/Testing add domain-specific
+capabilities.
 
 Codex packages keep their existing paths:
 
@@ -24,6 +25,7 @@ plugins/skill-system-core
 plugins/skill-system-dev
 plugins/skill-system-design
 plugins/skill-system-research
+plugins/skill-system-testing
 ```
 
 The paired Claude-compatible roots are also the portable Grok/Antigravity packages:
@@ -33,6 +35,7 @@ plugins/claude/skill-system-core
 plugins/claude/skill-system-dev
 plugins/claude/skill-system-design
 plugins/claude/skill-system-research
+plugins/claude/skill-system-testing
 ```
 
 ## Ecosystem Parity
@@ -79,6 +82,7 @@ skill-system-core@skill-system-local
 skill-system-dev@skill-system-local
 skill-system-design@skill-system-local
 skill-system-research@skill-system-local
+skill-system-testing@skill-system-local
 ```
 
 ## Install Plugins
@@ -90,11 +94,12 @@ codex plugin add skill-system-core@skill-system-local
 codex plugin add skill-system-dev@skill-system-local
 ```
 
-Design and research plugins can be installed the same way:
+Design, research, and testing plugins can be installed the same way:
 
 ```bash
 codex plugin add skill-system-design@skill-system-local
 codex plugin add skill-system-research@skill-system-local
+codex plugin add skill-system-testing@skill-system-local
 ```
 
 Start a new Codex thread after installing or reinstalling plugins so the new
@@ -204,8 +209,8 @@ commands (the marketplace directory is the repo's `plugins/` folder, which holds
 /plugin install skill-system-dev@skill-system-local
 ```
 
-Add other roles the same way: `skill-system-design@skill-system-local` and
-`skill-system-research@skill-system-local`.
+Add other roles the same way: `skill-system-design@skill-system-local`,
+`skill-system-research@skill-system-local`, and `skill-system-testing@skill-system-local`.
 After install / enable / disable, run
 `/reload-plugins` to apply changes without restarting.
 
