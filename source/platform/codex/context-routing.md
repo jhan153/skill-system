@@ -81,7 +81,7 @@ Route an explicit, single-domain evidence request directly: papers/citations to 
 | repository skill update | current implementation owner following the repository's canonical-source, generation, and validation instructions |
 | existing Skill System eval maintenance | current implementation owner; authored cases prove only their declared regression contract, never field quality |
 | same problem after a reviewed repair attempt | preserve attempt history; a DAG repair runs only its explicitly assigned `BF1/A1` or `BF2/A2` node and returns evidence to Code Review/Coordinator, while standalone repair may use its remaining bounded round |
-| explicit evidence-first completion control for active behavior-changing work | `workflow-rigor` as a read-only, non-node Workflow modifier; the current execution owner retains mutation and final synthesis |
+| explicit evidence-first completion control for active behavior-changing work | the current execution owner applies `docs/execution_assurance_contract.md`; assurance remains read-only and non-node while that owner retains mutation and final synthesis |
 | personal skill creation | system `skill-creator` when explicitly named or clearly requested |
 
 Requested brevity, a status question, a correction, or a complaint does not change the task owner. A report of harm or undesired behavior is not permission to inspect or mutate external state.
@@ -111,7 +111,7 @@ The nearest `project-context.yaml` declares project-local skill roots, Memory Ba
   attachments. A failing test condition is evidence, not repair authority; the Coordinator or
   direct task owner applies the accepted repair/design/decision boundary.
 - When delegation follows an already selected specialist, pass its exact canonical skill ID to the worker. With no upstream selection, let the worker resolve normally instead of inventing a recommendation.
-- When a material semantic completion claim would rest mainly on code and checks produced by that same owner, attach the non-node `workflow-rigor` modifier in `standard` mode and use an independent pass on the most falsifying `Contract/Spec` or `Repository/Constraints` axis when available. High-risk behavior changes may attach `strict` for separate axes plus rollback/readback. Low-risk work uses the global evidence baseline without a rigor mode. Rigor never owns writes, Core cards, or Plan successors.
+- When a material semantic completion claim would rest mainly on code and checks produced by that same owner, apply `docs/execution_assurance_contract.md` in `standard` mode and use an independent pass on the most falsifying `Contract/Spec` or `Repository/Constraints` axis when available. High-risk behavior changes may use `strict` for separate axes plus rollback/readback. Low-risk work uses the global evidence baseline without an assurance mode. Assurance never owns writes, Core cards, or Plan successors.
 - Invoke routine approved executables directly. Use a shell wrapper only when pipeline, redirection, globbing, or other shell semantics are required.
 - Live home configuration, plugin caches, app-managed `.system` skills, and other sessions are deployment state. Modify them only on an explicit deployment or live-runtime request.
 - Explicit `/goal`, automation, or Stop continuation does not itself select a workflow. Durable verifier-steered execution requires an accepted `plan-execution-handoff` pair; ordinary work stays with its direct owner.

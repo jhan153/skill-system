@@ -1,6 +1,6 @@
 {
   "name": "skill-system-dev",
-  "version": "10.1.0",
+  "version": "10.1.1",
   "description": "Skill System dev — engineering analysis, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.",
   "author": {
     "name": "Skill System Maintainers"

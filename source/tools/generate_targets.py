@@ -55,6 +55,8 @@ EXECUTION_HANDOFF_INPUT_CONTRACT_SOURCE = Path(
 EXECUTION_HANDOFF_INPUT_CONTRACT_TARGET = Path(
     "references/execution_handoff_input_contract.md"
 )
+EXECUTION_ASSURANCE_CONTRACT_SOURCE = Path("shared/docs/execution_assurance_contract.md")
+EXECUTION_ASSURANCE_CONTRACT_TARGET = Path("references/execution_assurance_contract.md")
 BOUNDARY_DECISION_CONTRACT_SOURCE = Path("shared/docs/boundary_decision_contract.md")
 BOUNDARY_DECISION_CONTRACT_TARGET = Path("references/boundary_decision_contract.md")
 RESEARCH_STAGE_CONTRACT_SOURCE = Path("shared/docs/research_stage_contract.md")
@@ -124,8 +126,6 @@ PLATFORM_ANTIGRAVITY_ROOT = "platform/antigravity"
 REMOVED_CODEX_TARGET_ROOTS = ("research", "tools")
 REMOVED_CODEX_TARGET_FILES = (
     "research-routing.md",
-    "tools/check_evidence_ledger.py",
-    "tools/validate_research_ledger.py",
 )
 REMOVED_SHARED_TARGET_ROOTS = ("eval", "skills", "report-canvas")
 REMOVED_VERIFIER_BINARIES = (
@@ -514,6 +514,25 @@ def _attach_execution_handoff_input_contract(source: Path, skill_dir: Path) -> N
     )
 
 
+def _wants_execution_assurance_contract(skill_dir: Path) -> bool:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return False
+    return "references/execution_assurance_contract.md" in skill_md.read_text(
+        encoding="utf-8"
+    )
+
+
+def _attach_execution_assurance_contract(source: Path, skill_dir: Path) -> None:
+    """Project the shared execution-assurance contract into each opted-in skill package."""
+    if not _wants_execution_assurance_contract(skill_dir):
+        return
+    _copy(
+        source / EXECUTION_ASSURANCE_CONTRACT_SOURCE,
+        skill_dir / EXECUTION_ASSURANCE_CONTRACT_TARGET,
+    )
+
+
 def _wants_boundary_decision_contract(skill_dir: Path) -> bool:
     skill_md = skill_dir / "SKILL.md"
     if not skill_md.is_file():
@@ -643,6 +662,24 @@ def _attach_database_persistence_transparency_contract(
         source / DATABASE_PERSISTENCE_TRANSPARENCY_CONTRACT_SOURCE,
         skill_dir / DATABASE_PERSISTENCE_TRANSPARENCY_CONTRACT_TARGET,
     )
+
+
+def _attach_plugin_skill_payloads(source: Path, skill_dir: Path) -> None:
+    """Project every shared payload selected by one generated skill package."""
+    _attach_report_canvas_payload(source, skill_dir)
+    _attach_visual_decision_payload(source, skill_dir)
+    _attach_execution_item_contract(source, skill_dir)
+    _attach_delivery_slice_contract(source, skill_dir)
+    _attach_execution_handoff_input_contract(source, skill_dir)
+    _attach_execution_assurance_contract(source, skill_dir)
+    _attach_boundary_decision_contract(source, skill_dir)
+    _attach_research_stage_contract(source, skill_dir)
+    _attach_design_shared_references(source, skill_dir)
+    _attach_testing_shared_references(source, skill_dir)
+    _attach_management_shared_references(source, skill_dir)
+    _attach_maintainable_code_principles(source, skill_dir)
+    _attach_identifier_readability_principle(source, skill_dir)
+    _attach_database_persistence_transparency_contract(source, skill_dir)
 
 
 def _merge_copy(src: Path, dst: Path) -> None:
@@ -1139,42 +1176,10 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
                 raise SystemExit(f"skill '{sid}' assigned to both {seen[sid]} and {name}")
             seen[sid] = name
             _copy_plugin_skill(source / "skills" / sid, codex_pkg / "skills" / sid)
-            _attach_report_canvas_payload(source, codex_pkg / "skills" / sid)
-            _attach_visual_decision_payload(source, codex_pkg / "skills" / sid)
-            _attach_execution_item_contract(source, codex_pkg / "skills" / sid)
-            _attach_delivery_slice_contract(source, codex_pkg / "skills" / sid)
-            _attach_execution_handoff_input_contract(source, codex_pkg / "skills" / sid)
-            _attach_boundary_decision_contract(source, codex_pkg / "skills" / sid)
-            _attach_research_stage_contract(source, codex_pkg / "skills" / sid)
-            _attach_design_shared_references(source, codex_pkg / "skills" / sid)
-            _attach_testing_shared_references(source, codex_pkg / "skills" / sid)
-            _attach_management_shared_references(source, codex_pkg / "skills" / sid)
-            _attach_maintainable_code_principles(source, codex_pkg / "skills" / sid)
-            _attach_identifier_readability_principle(
-                source, codex_pkg / "skills" / sid
-            )
-            _attach_database_persistence_transparency_contract(
-                source, codex_pkg / "skills" / sid
-            )
+            _attach_plugin_skill_payloads(source, codex_pkg / "skills" / sid)
             written.append((codex_pkg / "skills" / sid).as_posix())
             _copy_plugin_skill(source / "skills" / sid, claude_pkg / "skills" / sid, claude=True)
-            _attach_report_canvas_payload(source, claude_pkg / "skills" / sid)
-            _attach_visual_decision_payload(source, claude_pkg / "skills" / sid)
-            _attach_execution_item_contract(source, claude_pkg / "skills" / sid)
-            _attach_delivery_slice_contract(source, claude_pkg / "skills" / sid)
-            _attach_execution_handoff_input_contract(source, claude_pkg / "skills" / sid)
-            _attach_boundary_decision_contract(source, claude_pkg / "skills" / sid)
-            _attach_research_stage_contract(source, claude_pkg / "skills" / sid)
-            _attach_design_shared_references(source, claude_pkg / "skills" / sid)
-            _attach_testing_shared_references(source, claude_pkg / "skills" / sid)
-            _attach_management_shared_references(source, claude_pkg / "skills" / sid)
-            _attach_maintainable_code_principles(source, claude_pkg / "skills" / sid)
-            _attach_identifier_readability_principle(
-                source, claude_pkg / "skills" / sid
-            )
-            _attach_database_persistence_transparency_contract(
-                source, claude_pkg / "skills" / sid
-            )
+            _attach_plugin_skill_payloads(source, claude_pkg / "skills" / sid)
             written.append((claude_pkg / "skills" / sid).as_posix())
         if any(sid.startswith("report-") for sid in spec["skills"]):
             _copy(

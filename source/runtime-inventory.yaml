@@ -24,7 +24,7 @@ skill_distribution:
 
 plugin_profiles:
   - id: skill-system-core
-    purpose: shared planning, management, evidence, workflow modifiers, and report delivery
+    purpose: shared planning, management, evidence, execution assurance, and report delivery
   - id: skill-system-dev
     purpose: engineering analysis and implementation workflows
   - id: skill-system-design

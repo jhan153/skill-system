@@ -23,6 +23,7 @@ description: Upgrade one dependency, runtime, framework, SDK, package, or lockfi
   read_if_needed:
     - authoritative release/migration contract, dependency graph, build/CI output, generated code, or actual integration readback
     - `references/execution_item_contract.md` when a concrete compatibility failure is delegated to Bug Fix and the upgrade owner must consume repair/review/Known Bug items
+    - `references/execution_assurance_contract.md` when the upgrade has material maker/checker separation or auth/security, schema/data, infrastructure, external-write, destructive, or broad-migration risk
     - `workflow-implementation` paradigm references as non-owning shape context when the requested/required migration names a paradigm or implementation model; `workflow-dependency-upgrade` remains the migration owner
   do_not_load_by_default:
     - full repo/memory, unrelated dependency trees/reports, credentials, or raw production data
@@ -43,7 +44,8 @@ description: Upgrade one dependency, runtime, framework, SDK, package, or lockfi
 2. Trace the current selected version and representative production use path through config, imports/call sites, every internal representation, unavoidable external translation, generated state, and runtime resolution. Use a user/public/canonical/external contract for required behavior; agent-authored tests may record that contract but do not create it.
 3. Apply the canonical dependency change and every required lockfile, config, and production call-site migration directly. Canonical dependency state is real progress even when no code migration is required; interface/mock/test-only work is not. Keep one authoritative resolution and internal contract, update all in-scope consumers, and do not preserve an old package/source, adapter, shim, dual model, or fallback to make the diff smaller. An unmodifiable external SDK edge may use only thin stateless validation/translation to one canonical value or typed failure.
 4. Validate each material condition with matching evidence: review lockfile graph churn, confirm the actually selected version, run compiler/build checks where applicable, and read back a representative actual integration when calls or runtime behavior are affected. A deterministic metadata-only lockfile request may use structural diff plus package-manager readback when those directly cover the user condition.
-5. Preserve every unresolved `fail`, `needs_review`, `unverified`, or `blocked` condition. Complete only the conditions directly covered; otherwise correct or roll back the scoped change and state the next evidence-producing action.
+5. Apply `references/execution_assurance_contract.md` only when its trigger is material; preserve the upgrade owner and reuse equivalent compatibility review/readback instead of duplicating it.
+6. Preserve every unresolved `fail`, `needs_review`, `unverified`, or `blocked` condition. Complete only the conditions directly covered; otherwise correct or roll back the scoped change and state the next evidence-producing action.
 
 ## Upgrade Rules
 - Preserve the complete migration with the least conceptual machinery. Prefer direct calls, concrete types, existing package/runtime primitives, and composition; reject Clean Code-style wrapper/service/interface layers introduced only to isolate the upgrade or enable mocks.

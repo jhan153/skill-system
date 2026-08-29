@@ -30,6 +30,7 @@ description: Repair one concrete failure with proportional diagnosis, one bounde
     - `references/execution_item_contract.md` in DAG mode or whenever a repair result/candidate crosses a Workflow, Coordinator, Plan/Handoff, or plugin boundary
     - `references/causal-diagnosis.md` when the cause is unclear, recurring, intermittent, high-risk, or needs a discriminator before repair
     - `references/attempt-and-known-bug.md` whenever a prior repair attempt exists or the bug sits inside a graph/handoff
+    - `references/execution_assurance_contract.md` when a repair has material maker/checker separation or destructive, auth/security, schema/data, infrastructure, external-write, or broad-refactor risk
   do_not_load_by_default:
     - full repo/memory, broad reports, unrelated history, raw production data, or credentials
 - risk_profile:
@@ -52,6 +53,7 @@ description: Repair one concrete failure with proportional diagnosis, one bounde
 - A required `fail`, `needs_review`, blocked, or unverified condition stays unresolved until evidence from that same condition resolves it. Do not report complete or agent-verified from a narrower pass.
 - Source selection, migration, media/data transformation, and external boundaries require canonical-input identification plus actual selected/output readback. Missing or mismatched canonical input fails closed; never substitute legacy data silently.
 - A review or test is an observation surface, not an unquestionable oracle. When evidence shows the test or harness contract is wrong, repair that owner directly; never expand validation merely to keep the bug-fix loop alive.
+- Apply `references/execution_assurance_contract.md` only for its additional independent pass or rollback/readback evidence. It never adds a repair round, resets attempt history, or becomes another repair owner.
 
 ## Mode And Attempt Boundary
 

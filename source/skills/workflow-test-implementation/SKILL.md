@@ -33,6 +33,7 @@ description: Implement and execute a complete test contract as test-only code, f
     - existing nearby test conventions, runner/config, fixtures, baselines, and diagnostics
     - `references/execution_item_view.md` in graph mode or when the result crosses another Workflow/plugin
     - `test-replay-corpus`, `test-visual-regression` in explicit `evidence` mode, or another Plan-selected testing specialist only when the contract names that evidence surface
+    - `references/execution_assurance_contract.md` when test implementation or evidence consumption has material maker/checker separation or standard/strict assurance requirements
   do_not_load_by_default:
     - full repo, unrelated tests, broad design reports, open human decisions, raw production data, or credentials
 - risk_profile:

@@ -14,7 +14,9 @@ description: "Perform behavior-preserving source maintenance in one of two modes
 - expected_outputs: classified candidates, bounded edits, preserved items with reasons, behavior-preservation evidence, and remaining risk
 - context_targets:
   must_read: current request, targeted source, and the code/callers/contracts needed to establish current meaning or reachability
-  read_if_needed: `references/comment-sync.md` in `comment_sync`; public exports, dynamic entrypoints, generated-source policy, build/lint/doc checks, or framework conventions
+  read_if_needed:
+    - `references/comment-sync.md` in `comment_sync`; public exports, dynamic entrypoints, generated-source policy, build/lint/doc checks, or framework conventions
+    - `references/execution_assurance_contract.md` when source pruning has material maker/checker separation or destructive, external-write, or broad-refactor risk
   do_not_load_by_default: full repo, broad reports, unrelated docs/memory, or package-manager state
 - risk_profile:
   reads: targeted source, callers/contracts, comments, tests, exports, and validation configuration
@@ -37,6 +39,7 @@ Feature work remains with `workflow-implementation`; concrete repair with `workf
 3. Classify candidates and defer uncertainty. Absence of static references or a stale comment is a lead, not proof.
 4. Apply one coherent batch. Change the canonical owner, regenerate owned projections, and make no unrelated structural or behavior change.
 5. Run the narrowest discriminating existing check and review the diff. Actual-path evidence outranks static, mock, or agent-authored checks when source selection or a production boundary is material.
+6. Apply `references/execution_assurance_contract.md` only when its trigger is material; preserve this maintenance workflow as the sole mutation owner and reuse equivalent reachability/review/readback evidence.
 
 ## Source-Prune Gate
 

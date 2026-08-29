@@ -5,9 +5,9 @@ workflow for the node and only the support skills that its actual question requi
 Copy canonical IDs exactly. If a skill is not exposed in the current session, mark the
 routing unresolved instead of inventing an alias.
 
-Workflow-family roles are explicit: `execution_primary` skills may own executable DAG nodes;
-`execution_modifier` skills such as `skill-system-core:workflow-rigor` attach to an owning node
-and never become nodes or select successors.
+Workflow-family roles are explicit: `execution_primary` skills may own executable DAG nodes.
+Execution assurance is a contract attached to an owning node, not a skill, node, or successor
+selector; load `references/execution_assurance_contract.md` only on its risk trigger.
 
 Select the graph archetype first from `graph-method-profiles.md`; then route each compiled node.
 The node code is not a role or an agent identity.
@@ -34,7 +34,7 @@ The node code is not a role or an agent identity.
 | `RF` behavior-preserving restructure | Implementation owner | `skill-system-dev:workflow-refactor-safely` | Preserve the established observable contract and validate each reversible batch. |
 | `DEP` dependency/runtime upgrade | Implementation owner | `skill-system-dev:workflow-dependency-upgrade` | Keep migration and verification bounded to one dependency or runtime. |
 | `M` obsolete-code/comment maintenance | Implementation owner | `skill-system-dev:workflow-source-maintenance` | Use only after behavior is established; do not hide feature or refactor work here. |
-| `R-STATIC` / `CR0` / `CR1` / `CR2` static review | Coordinator or declared review owner | `skill-system-dev:workflow-code-review`; optional `analysis-codebase-map` aid; `skill-system-core:workflow-rigor` only as a node modifier on its risk trigger | Return `pass`, `repair_required`, or `complete_with_deferred_items` under the Core item contract. Rigor never becomes another node, and the mandatory Workflow does not by itself require a fresh independent agent. |
+| `R-STATIC` / `CR0` / `CR1` / `CR2` static review | Coordinator or declared review owner | `skill-system-dev:workflow-code-review`; optional `analysis-codebase-map` aid; execution assurance only on the owning node's risk trigger | Return `pass`, `repair_required`, or `complete_with_deferred_items` under the Core item contract. Assurance never becomes another node, and the mandatory Workflow does not by itself require a fresh independent agent. |
 | `I` fan-in integration | Coordinator | none; copied Plan/Handoff contract | Integrate only completed predecessors with non-overlapping ownership and keep increment status separate from integrated status. |
 | `V` integration evidence | Coordinator | none unless the Plan names a verifier skill | Consume the compact `worker_done` body or Core `test_implementation_result` first; read one relevant artifact slice only if the decision otherwise cannot be made. Run only the verifier already named by the plan. Condition Fail does not create repair authority or a successor. |
 | `V-DESIGN` scoped design evidence | Declared evidence owner | one of `design-tokens`, `design-component-mapper`, `design-visual-regression`, or `design-a11y-audit` only when named by the Plan | Verify only the assigned condition. Return compact evidence/gaps without implementation edits, successor selection, automatic retry, or relabeling the Human Test phase. |

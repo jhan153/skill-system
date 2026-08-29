@@ -39,6 +39,7 @@ description: Design an implementation-ready software test contract after a minim
     - `test-statistical-oracle` for stochastic, chaotic, ensemble, or distributional behavior
     - `test-replay-corpus` for capture, recording, replay, or corpus provenance
     - `test-visual-regression` in explicit `design` mode only when a rendered regression condition and accepted baseline/external contract exist
+    - `references/execution_assurance_contract.md` when validation work itself has material maker/checker separation or standard/strict assurance requirements
   do_not_load_by_default:
     - full repo, all test methods, unrelated plans, raw production data, credentials, or every existing test
 - risk_profile:

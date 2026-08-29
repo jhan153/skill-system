@@ -63,6 +63,11 @@ Design, Test Implementation, or a conditional Test Discovery decision. Bind `TD*
 to their exact Testing Workflow owners, preserve Test Discovery as Planning support rather than a
 DAG node, and keep agent-machine test evidence separate from Human Test authority.
 
+Read `references/execution_assurance_contract.md` only when the Plan or user requires
+`assurance: standard | strict` on an owning node whose primary contract declares that local
+reference or an accepted equivalent gate. Assurance changes evidence handling, not graph topology,
+production ownership, Core Card identity, or successor selection.
+
 Use `assets/plan.md.tpl` and `assets/handoff.md.tpl` as the minimum output shape;
 `references/example/` holds one minimal valid pair for shape reference. Replace every
 placeholder and delete template commentary the task does not need, but keep every section
@@ -143,8 +148,8 @@ node through the available host orchestration capability.
 - If the work later requires another independent owner, mandatory review/repair node, fan-out, or
   feedback-driven expansion, it no longer satisfies the single-node archetype. Apply Scope
   Admission and select an appropriate new pair rather than silently adding a runner.
-- Execution modifiers such as `workflow-rigor` attach to an owning node and never become graph
-  nodes or successor selectors.
+- Execution assurance attaches to an owning node under `references/execution_assurance_contract.md`
+  and never becomes a graph node or successor selector.
 
 ## Advisory Timing Observation
 

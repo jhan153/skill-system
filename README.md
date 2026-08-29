@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 10.1.0 Release
+## 10.1.1 Release
 
-This source tree is the 10.1.0 feature release on the breaking 10.0 baseline. Its current components
+This source tree is the 10.1.1 consolidation release on the breaking 10.0 baseline. Its current components
 are:
 
 * `skills`: skill packages intended for actual use
@@ -111,146 +111,26 @@ This structure keeps skills from becoming disposable instructions. Instead, they
 
 ## Skill Catalog
 
-Skills are organized by family. Instead of memorizing every skill name, users can start from the intent of the task and find the appropriate family and skill.
+Skills are routed through nine stable user-facing families. This README owns only that front-door
+taxonomy; the exact skill membership, current entry owners, aliases, and routing notes live in the
+canonical [Skill Registry](source/shared/docs/skill_registry.md).
 
-### Analysis
-
-Analysis skills are used to diagnose failures, compare approaches, or build codebase-level understanding.
-
-| Skill                | Role                                                                                                                                           |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `analysis-router`    | Selects the appropriate analysis path for complex technical requests, such as bug diagnosis, algorithm comparison, codebase design, domain modeling, or performance analysis. |
-| `analysis-bug`       | Reproduces and diagnoses recurring, unclear, or high-risk failures, then summarizes the primary cause and regression validation path.          |
-| `analysis-algorithm` | Compares algorithms, architectures, models, search strategies, or implementation approaches against explicit constraints and success criteria. |
-| `analysis-codebase-map`  | Models a repository or named slice as Mermaid HLD/LLD maps of flow, structure, and state.      |
-| `analysis-boundary-design` | Judges targeted module boundaries, deep modules, interfaces, seams, adapters, dependency direction, and testability before implementation. |
-| `analysis-architecture-deepening` | Finds ranked architecture-deepening candidates without a full repo report, using recent canonical production paths as a YAGNI sampling weight when the user did not name a scope. |
-| `analysis-domain-modeling` | Clarifies domain concepts, entity/value-object boundaries, state transitions, invariants, business rules, and naming language for software design. |
-| `analysis-performance` | Diagnoses latency, throughput, CPU, memory, query, rendering, startup, bundle, or algorithmic bottlenecks with scoped evidence. |
-| `analysis-llm-wiki-context` | Builds a minimum read-only task context from one explicitly selected LLM Wiki using that Wiki's own navigation rules. |
-
-### Design
-
-Design skills create concrete UI designs, implement them as repository UI, and return scoped design-system, visual, and accessibility evidence.
-
-| Skill                      | Role                                                                                                                                                                                                                |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workflow-ui-design`       | Creates one concrete inspectable UI design from accepted requirements, product behavior, content, platform, and visual context, then returns an implementation handoff without writing production UI code. |
-| `design-frontend`          | Implements a concrete visual design as frontend code. It selects one conditional mobile, dashboard, section-web, or general profile, reuses repository components/tokens/assets, and validates the rendered result. |
-| `design-ui-decomposer`     | Breaks down UI references such as screenshots, Figma exports, mockups, or AI-generated images into hierarchy, layout, repeated patterns, component/token candidates, states, and validation items.                  |
-| `design-layout-translator` | Translates Auto Layout, flex/grid, resizing, overflow, and breakpoint constraints into layout rules that can be implemented in code.                                                                                |
-| `design-tokens`            | Normalizes design token sources and maps them to platform values. It does not invent values, and reports missing, conflicting, or drifting tokens with evidence.                                                    |
-| `design-component-mapper`  | Maps design components, variants, states, slots, and events to existing repository components and identifies unresolved implementation gaps.                                                                        |
-| `design-visual-regression` | Captures or reviews rendered UI screenshots and reports blank states, framing issues, overflow, and visual differences across screen sizes.                                                                         |
-| `design-a11y-audit`        | Reviews accessibility evidence for implemented UI, including keyboard reachability, focus visibility, semantic structure, contrast, target size, and responsive readability.                                        |
-
-### Report
-
-Report skills organize evidence, reviews, changes, and work artifacts into results that are easy for users to read.
-
-| Skill                       | Role                                                                                                                       |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `report-qualitative`        | Produces qualitative evaluation reports with explicit criteria, evidence, interpretation, judgment, and recommendations.   |
-| `report-critical`           | Produces an explicitly requested blocker, risk, critical-review, or QA-gate report without taking over ordinary diagnosis or Plan transitions. |
-| `report-implementation-explainer` | Creates a source/runtime-anchored causal explanation or verified changed-lines comparison without changing the target. |
-| `report-lifecycle-artifacts` | Packages and traces selected existing lifecycle artifacts without generating empty SDLC shells or treating package presence as delivery completion. |
-
-Report Markdown is the default content artifact. Explicit `html` or `both` requests add the shared offline Report Canvas as a readability projection of the same findings; inspectable 3D/math/graphics claims may require spatial HTML. All Report skills live in Core and share one renderer payload per provider package. HTML never adds evidence, findings, or workflow authority, and renderer failure never blocks the completed Markdown report.
-
-### Workflow
-
-Workflow skills control implementation discipline, validation, and failure recovery.
-
-| Skill                  | Role                                                                                                                                                                    |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workflow-implementation` | Owns direct coding requests from scoped requirement to the smallest coherent production change and focused validation. |
-| `workflow-bug-fix` | Fixes concrete software failures with a repro signal, targeted code/test change, and verification against the original failure. |
-| `workflow-dependency-upgrade` | Upgrades dependencies, runtimes, SDKs, frameworks, packages, and lockfiles with required compatibility fixes and validation. |
-| `workflow-code-review` | Reviews code-derived state, flow, reachability, ordering, and failure behavior with optional design comparison, then returns a compact Coordinator disposition and handoff. |
-| `workflow-refactor-safely` | Runs behavior-preserving refactors with a behavior contract, characterization checks, small batches, and validation. |
-| `workflow-rigor`       | Attaches optional standard/strict assurance to an active Workflow without becoming a DAG node or owning writes. |
-| `workflow-prototype` | Builds one bounded throwaway UI comparison or one browser-openable HTML evidence page that lets a non-developer exercise a deterministic rule model. |
-| `workflow-source-maintenance` | Prunes source proven obsolete or synchronizes comments/docstrings/TODO markers in explicit behavior-preserving modes. |
-
-### Conditional Repeated Work
-
-Most Execution Handoff plans use ordinary phase delivery and never load repeated-work rules.
-Only an already-needed durable graph whose verifier evidence will steer later actions more than
-once attaches the conditional `plan-execution-handoff` repeated-work profile.
-
-| Skill                    | Role                                                                                                                                                    |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plan-execution-handoff` | For an admitted verifier-steered graph only, adds condition/verifier terms and evidence-delta expansion/stop rules to the ordinary bounded acyclic DAG. No LoopRun, Python evaluator, or continuation engine is created. |
-
-Runtime support also includes the provider-neutral orchestration capability contract. TaskRun, LoopRun, WorkItem schemas/tools, and the Stop-hook LoopRun branch are removed.
-
-### Planning
-
-Planning skills create or organize planning and specification artifacts without performing the actual implementation.
-
-| Skill                    | Role                                                                                                                                                                       |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plan-decision-map`      | Maintains one explicit multi-session decision map with a target outcome, prerequisite-linked decision items, a derived ready set, unshaped unknowns, and exclusions.       |
-| `plan-behavior-discovery` | Resolves one product-behavior decision at a time for an existing capability until the next human-operable vertical slice is ready. |
-| `plan-requirements-discovery` | Runs dependency-aware discovery: the agent resolves safely discoverable facts and asks up to three mutually independent ready questions per round.                         |
-| `plan-requirements-brief` | Distills accepted discovery notes and returned question-document answers into a bounded requirements contract or PRD/SRS-lite. |
-| `plan-question-document` | Creates one decision-linked Markdown question document for the answer owner who holds missing information; artifact delivery remains outside the skill. |
-| `plan-execution-handoff` | Compiles one risk-adaptive archetype into a typed acyclic pair, conditionally applies repeated-work verifier/budget/stop principles, validates typed advisory timing once at `worker_done`, and terminates the default phase graph at `human_test_ready`. |
-
-When these Planning outputs belong to a durable execution package, they live under that package's
-`inputs/` tree rather than in unrelated global locations. `plan.md` records the consumed paths,
-statuses, authority, and scope; `handoff.md` remains execution state only.
-
-### Coordination
-
-Coordination skills provide lightweight structures for task splitting and handoff without creating permanent workflow machinery.
-
-| Skill                      | Role                                                                                                                                              |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plan-task-handoff`     | Creates explicit goal briefs, task DAGs, multi-agent/session handoffs, lock scopes, validation ownership, and task-local artifact inventories.     |
-
-### Research
-
-Research skills handle direct scientific artifacts and explicit Plan-assigned Research nodes without creating an automatic lifecycle.
-
-| Skill                           | Role                                                                                                                                                              |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workflow-research`             | Manages one explicitly assigned Research DAG node, applies exactly one Plan-selected stage specialist, and returns `research_result` without choosing the next node. |
-| `research-literature-ideation`  | Converts gathered evidence into candidate research hypotheses and selects one active hypothesis to validate.                                                      |
-| `research-literature-synthesis` | Synthesizes a literature review structure, consensus, disagreements, contradictions, limitations, and claim boundaries from evidence lists or provided papers.    |
-| `research-hypothesis-planning`  | Plans hypotheses, ablations, loss-function design, training plans, and claim-development paths.                                                                   |
-| `research-experiment-blueprint` | Produces an experiment blueprint from a selected hypothesis, including baseline experiments, metrics, ablations, and falsification checks.                        |
-| `research-experiment-scaffold`  | Generates a minimal experiment code scaffold from an approved experiment blueprint within explicit write boundaries.                                              |
-| `research-statistical-analysis` | Analyzes result tables, metrics, and uncertainty with statistical evidence, while separating pre-planned analysis from exploratory analysis.                      |
-| `research-manuscript-writing`   | Writes or revises scientific manuscript sections based on validated research artifacts, citation status, and results.                                             |
-| `research-peer-review`          | Critiques manuscripts, proposals, or research plans in peer-review format across novelty, evidence, reproducibility, limitations, and reporting quality.          |
-
-### Search
-
-Search skills find evidence or define evidence-gathering paths while keeping synthesis and implementation responsibilities separate.
-
-| Skill                   | Role                                                                                                                                             |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `search-paper-evidence` | Acquires traceable paper evidence or returns a search plan without fabricating citations, metadata, datasets, metrics, or results. |
-| `search-deep-evidence`  | Cross-checks one claim across only the needed evidence lanes, preserves dependence and contradictions, and returns a traceable evidence set without claiming machine-verified truth. |
-
-### Management
-
-Management skills own project Memory, Knowledge, and `project-context.yaml` location or checkpoint operations. They are used only when store setup, read, or mutation is explicitly intended.
-
-| Skill | Role |
+| Family | Start here when the task is primarily about |
 | --- | --- |
-| `management-project-context` | Initializes, diagnoses, updates, or bootstraps the project context manifest while preserving unrelated sections. |
-| `management-project-context-checkpoint` | At an explicit closeout checkpoint, classifies durable current-task items into an existing declared Memory Bank or Knowledge Base. |
-| `management-memory-bank-harness` | Reads only the Memory records matching concrete current-task anchors and keeps candidates or unverified records non-authoritative. |
-| `management-memory-bank-init` | Initializes one readable project `memory.md` after confirming project identity and the exact write boundary. |
-| `management-memory-bank-update` | Mutates one explicitly persistent Memory record and appends one concise semantic revision. |
-| `management-memory-bank-maintenance` | Reports, integrity-checks, consolidates, compacts, or explicitly migrates one declared Memory Bank. |
-| `management-knowledge-base-record` | Creates one new accepted domain, design, algorithm, architecture, decision, or recurring code-review identity using the shared record contract and one selected category profile. |
-| `management-knowledge-base-read` | Reads the smallest artifact-anchored current slice and only the relations or history needed by the task. |
-| `management-knowledge-base-init` | Initializes an explicitly approved empty store and its manifest binding. |
-| `management-knowledge-base-update` | Updates, reverifies, relinks, supersedes, or deprecates an existing identity. |
-| `management-knowledge-base-maintenance` | Integrity-checks and maintains index, relation, history, overlap, and recurrence structure. |
+| Analysis | Choosing a technical approach, mapping a codebase, deciding a boundary, modeling a domain, diagnosing performance, or reading an explicitly selected LLM Wiki. |
+| Design | Creating or interpreting UI designs, translating layout, implementing frontend visuals, or reviewing design evidence. |
+| Report | Producing an explicitly requested evaluation, critical review, implementation explanation, or lifecycle-artifact report. |
+| Workflow | Implementing, repairing, upgrading, reviewing, refactoring, prototyping, or maintaining production source. |
+| Planning | Discovering requirements or behavior, recording decisions, or preparing lightweight or durable execution handoffs. |
+| Research | Synthesizing literature, shaping hypotheses, designing experiments, analyzing results, writing manuscripts, or peer review. |
+| Testing | Discovering human test decisions, designing or implementing tests, choosing scopes/oracles/scenarios, or reviewing evidence. |
+| Search | Acquiring paper evidence or cross-checking a claim across multiple evidence lanes. |
+| Management | Working explicitly with project context, Memory Bank, or Knowledge Base. |
+
+Installation profiles and skill families are different boundaries: a provider plugin may contain
+skills from several families. Provider-specific triggers and guardrails remain in each provider's
+declared rule or routing surface; the registry is the single source of truth for current family
+membership.
 
 ## Design Timeline
 
@@ -298,10 +178,11 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 9.4.4 | Implicit workflow routing & prototyping | Exposes clear intent-matched workflow and bounded support owners to natural-language routing while retaining explicit lifecycle and persistence gates; propagates selected skills across delegation and adds retained, isolated runnable prototypes for one unresolved decision. |
 | 9.4.5 | Direct specialist routing & surface consolidation | Removes standalone search/analysis/research routers, merges overlapping Knowledge, coordination, Kanboard, project-context, loop, and maintenance owners, retires the maintainer plugin, and cuts the canonical surface from 79 to 65 skills. |
 | 9.4.6 | Visual decision & inspectable reports | Adds a visual-decision contract, requires spatial Report Canvas for 3D/math/graphics claims, and aligns management/analysis skill IDs while keeping 65 skills. |
-| 10.1.0 | Testing plugin & oracle-governed evidence | Adds the 10-skill Testing profile, conditional human Test Discovery, separate Test Design/Test Implementation Core results, replay/visual/statistical specialists, explicit visual `design`/`evidence` modes, and false-green/proof-ceiling review. |
-| 10.0.2 | Provider-owned Go harnesses & Codex execution admission | Distributes the common Go baseline into four independent provider modules, adds Codex pre-approval normalization and opaque evaluator blocking, and preserves host-owned approval rules during generation and installation. |
-| 10.0.1 | Direct-tool and Codex approval policy | Prefers direct tools over convenience shell composition, allows Git and Codex plugin commands by default, and preserves stricter destructive Git plus shell/dependency/process/network review boundaries. |
 | 10.0.0 | DAG Execution Handoff & four-provider delivery | Establishes finite Execution Handoff DAGs, Core Cards, Human Test handoff, event-driven Orca coordination, four installation profiles across Codex/Claude/Grok/Antigravity, minimal model-independent contracts, and retirement of the old runner/eval/runtime-state stack. |
+| 10.0.1 | Direct-tool and Codex approval policy | Prefers direct tools over convenience shell composition, allows Git and Codex plugin commands by default, and preserves stricter destructive Git plus shell/dependency/process/network review boundaries. |
+| 10.0.2 | Provider-owned Go harnesses & Codex execution admission | Distributes the common Go baseline into four independent provider modules, adds Codex pre-approval normalization and opaque evaluator blocking, and preserves host-owned approval rules during generation and installation. |
+| 10.1.0 | Testing plugin & oracle-governed evidence | Adds the 10-skill Testing profile, conditional human Test Discovery, separate Test Design/Test Implementation Core results, replay/visual/statistical specialists, explicit visual `design`/`evidence` modes, and false-green/proof-ceiling review. |
+| 10.1.1 | Shared execution assurance | Retires `workflow-rigor` as a public skill, preserves standard/strict assurance in one shared contract projected into its owning workflows, and keeps assurance outside DAG node and mutation ownership. |
 
 ## License
 

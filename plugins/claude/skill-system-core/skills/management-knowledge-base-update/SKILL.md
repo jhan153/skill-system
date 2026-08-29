@@ -15,7 +15,7 @@ disable-model-invocation: true
 - expected_outputs: target record and index change with current snapshot, semantic revision or observation event, preserved lifecycle links, and readback
 - context_targets:
   must_read: manifest, target record/index row, current canonical refs, `references/project_context_manifest.md`, and `references/knowledge_record_contract.md`
-  read_if_needed: directly superseded records or accepted decision/plan slice
+  read_if_needed: directly superseded records or accepted decision/plan slice; `references/execution_assurance_contract.md` when a material write requires standard/strict maker-checker assurance or rollback/readback
   do_not_load_by_default: full store, unrelated categories, Memory, Wiki, raw chat
 - risk_profile:
   reads: one target record and direct refs

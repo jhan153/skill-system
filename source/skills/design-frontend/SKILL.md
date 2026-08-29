@@ -51,6 +51,7 @@ description: "Implement a concrete visual artifact or Core design_result as repo
     - `references/visual_decision_contract.md` when the source, family profile, or repo tokens do not already decide the look, or when filling unspecified chrome
     - `references/identifier_readability_principle.md` when the implementation introduces or renames a related component, prop, state, event, or handler identifier set not already decided by repository conventions
     - `references/execution_item_contract.md` when consuming `design_result` or returning implementation/review/repair evidence across a Coordinator, Plan/Handoff, or plugin boundary
+    - `references/execution_assurance_contract.md` when maker/checker separation or destructive, auth/security, schema/data, infrastructure, external-write, or broad UI-refactor risk requires standard/strict assurance
   do_not_load_by_default:
     - backend-only modules
     - unrelated screens

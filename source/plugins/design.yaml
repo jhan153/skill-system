@@ -1,6 +1,6 @@
 # source/plugins/design.yaml — plugin membership manifest (hand-authored input).
 name: skill-system-design
-version: "10.1.0"
+version: "10.1.1"
 description: 'Skill System design — UI design creation, design-to-code implementation, design systems, layout/component mapping, and visual/accessibility evidence.'
 skills:
   - workflow-ui-design

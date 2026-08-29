@@ -20,6 +20,7 @@ description: Create one new accepted domain, design, algorithm, architecture, de
   read_if_needed:
     - `references/knowledge-category-profiles.md` for the selected category's admission and body fields
     - one representative consumer, counterexample, benchmark, or design source when the category profile requires it
+    - `references/execution_assurance_contract.md` when a material write requires standard/strict maker-checker assurance or rollback/readback
   do_not_load_by_default:
     - full store or repository, unrelated categories, Memory, LLM Wiki, transcripts, review history, or benchmark history
 - risk_profile:

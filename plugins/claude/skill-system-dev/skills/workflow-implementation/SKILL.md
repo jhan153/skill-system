@@ -48,6 +48,7 @@ description: Primary workflow for direct or DAG-assigned production software imp
     - `references/execution_item_view.md` when a delegated node result will cross into Code Review, a Coordinator, Plan/Handoff, or another plugin
     - `references/paradigm-composition.md` as the paradigm reference index when the user names an implementation paradigm/model, supplies paradigm research, asks to combine approaches, or the choice would materially alter state ownership, data layout, dispatch, effects, or execution boundaries; then load only the paradigm files routed by that index
     - `references/delivery_slice_contract.md` when any requested change needs multiple executable batches, including a wide migration or non-feature decomposition
+    - `references/execution_assurance_contract.md` when maker/checker separation, standard/strict assurance, or high-risk rollback/readback is material
   do_not_load_by_default:
     - full repo
     - full memory bank
@@ -114,7 +115,7 @@ Apply conditional references without transferring workflow ownership:
 - If direct observation needs unavailable GUI, credentials, or external state, return task state `user-verification-needed` or `unverified`; do not add a surrogate path and call it complete.
 - If an optional verifier or permission is unavailable, defer that semantic intent and continue independent required implementation. Do not retry it as another command, GUI path, wrapper, probe, or new test; use `blocked` only when no required runnable work remains.
 - If no suitable verifier exists, keep the implementation scope complete but lower its evidence label. Do not create validation-only work or repeat an unchanged check to promote the label.
-- If a material semantic completion claim otherwise depends mainly on code and checks produced by the same agent, attach the non-node `workflow-rigor` modifier in `standard` mode when available. Its independent pass does not replace direct condition evidence, own Core cards, or become a second implementation owner.
+- If a material semantic completion claim otherwise depends mainly on code and checks produced by the same agent, apply `references/execution_assurance_contract.md` in `standard` mode. Its independent pass does not replace direct condition evidence, own Core cards, or become a second implementation owner.
 - When review exposes a concrete failure, dispatch only the assigned `workflow-bug-fix` round and consume its changed snapshot/attempt result. Another round requires a concrete review disposition and its owning execution context. Plan/Handoff records a final `known_bug_record` in graph mode; standalone Bug Fix may record it only after its bounded final review. This Workflow consumes the record and never produces it.
 - When node/Coordinator identity is supplied, return the Core `implementation_result` item from `references/execution_item_view.md`: changed snapshot/artifacts, implemented conditions, bounded review slice, and unresolved conditions. Never choose the review or successor node.
 

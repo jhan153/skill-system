@@ -15,7 +15,7 @@ disable-model-invocation: true
 - expected_outputs: structural findings and only explicitly requested store/index changes with readback
 - context_targets:
   must_read: manifest, index, affected records, `references/project_context_manifest.md`, and `references/knowledge_record_contract.md`
-  read_if_needed: direct canonical/evidence refs or superseded records needed for one finding
+  read_if_needed: direct canonical/evidence refs or superseded records needed for one finding; `references/execution_assurance_contract.md` when an explicit material mutation requires standard/strict maker-checker assurance or rollback/readback
   do_not_load_by_default: full external sources, unrelated Memory/Wikis/plans, raw transcripts
 - risk_profile:
   reads: one declared Knowledge Base

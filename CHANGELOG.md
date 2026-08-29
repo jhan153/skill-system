@@ -1,5 +1,23 @@
 # Changelog
 
+## 10.1.1
+
+- Retired `workflow-rigor` as a public Core skill and moved its standard/strict maker-checker,
+  fixed-point, independent review-axis, rollback/readback, and evidence-ceiling semantics into one
+  shared execution-assurance contract.
+- Projected the contract as a skill-local reference into the owning Planning, Dev, Design, Testing,
+  and Knowledge workflows so plugin-only Codex and portable Claude/Grok/Antigravity packages remain
+  self-contained without a Core-plugin or runtime-companion dependency.
+- Kept assurance as a conditional non-node contract: the primary owner retains mutation and final
+  synthesis, Plan/Handoff retains topology, and equivalent specialist review/readback is reused.
+- Advanced all five plugin profiles and generated provider harness version identities to 10.1.1.
+  Publication, tagging, archives, and live runtime/plugin installation remain separate actions.
+- Replaced the drifting per-skill README catalogs with a stable nine-family entry table whose exact
+  membership and routing ownership remain canonical in the shared Skill Registry.
+- Centralized Codex and portable plugin payload projection through one ordered helper and removed two
+  Codex file tombstones already covered by the retired `tools/` target root; staged outputs remain
+  the compatibility boundary for this behavior-preserving maintenance.
+
 ## 10.1.0
 
 - Added the fifth installation profile, `skill-system-testing`, with 10 canonical skills for

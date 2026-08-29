@@ -1,11 +1,11 @@
 {
   "groups": {
     "go:skill-system-grok-harness": {
-      "build_key": "e0f402a62aee65adda9b162c76a5d366652e6b7fd29d275c6942ad8b2103715e",
+      "build_key": "8e62c9f1c3688c4c65ce9c26ec5a57c4769c22a4a4d160ffee37a310524a8cde",
       "outputs": {
-        "skill-system-grok-harness": "288c51bfcef2b52f9a3f44906be8f33d6d5fb62329e412aab70b83c166c8818d",
-        "skill-system-grok-harness-linux-amd64": "d0dccdd7cd7b4b6675880d71eeb40355df19944abddfad93f618dd07b9560ff4",
-        "skill-system-grok-harness.exe": "f758fc6655ba1b482125de9286c75676c031ee1ac84be91b584d65d59b3ada2f"
+        "skill-system-grok-harness": "a4ee50e40fcb64eb4111b168555a598f4f66fc5a3d85b65037b9d3205b4f9fe1",
+        "skill-system-grok-harness-linux-amd64": "1f337fc276ea24ca59206733f9147f4569f2fb6ab587793961ea0081c46c5a27",
+        "skill-system-grok-harness.exe": "f66016919ec8241247823cdc2506994514ca90b3b88b5f2638be8089a37d67c8"
       }
     },
     "swift:notification-overlay": {

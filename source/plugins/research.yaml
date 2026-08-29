@@ -1,6 +1,6 @@
 # source/plugins/research.yaml — plugin membership manifest (hand-authored input).
 name: skill-system-research
-version: "10.1.0"
+version: "10.1.1"
 description: 'Skill System research — explicit Research node execution, literature, hypothesis, experiment, statistics, manuscript, review, and paper evidence.'
 skills:
   - workflow-research

@@ -93,14 +93,17 @@ Workflow skills are separated by how they control execution:
 | `dependency_upgrade_execution` | `workflow-dependency-upgrade` | own dependency/runtime/package upgrades and compatibility validation |
 | `source_maintenance_execution` | `workflow-source-maintenance` | own post-development source cleanup/dead-code pruning in `source_prune` mode or behavior-preserving comment/docstring/TODO-FIXME sync in `comment_sync` mode |
 | `safe_refactor_execution` | `workflow-refactor-safely` | own behavior-preserving refactors with characterization checks |
-| `rigor_modifier` | `workflow-rigor` | attach optional standard/strict assurance to an active owner without becoming a DAG node or taking over implementation |
+
+Execution assurance is a conditional shared contract, not an execution mode, skill, or DAG node.
+The active owner loads its local `references/execution_assurance_contract.md` only when standard or
+strict maker-checker separation or rollback/readback is material.
 
 ## Decision Table
 
 | user intent | route |
 | --- | --- |
 | "작은 오타 하나만 고쳐" | direct one-shot execution; no ledger or plan |
-| "이 기능 구현해줘" | `workflow-implementation`; its directness rules remain active, and `workflow-rigor` attaches only when medium/high risk or maker/checker separation is material |
+| "이 기능 구현해줘" | `workflow-implementation`; its directness rules remain active, and the execution-assurance contract applies only when medium/high risk or maker/checker separation is material |
 | "이 failing test 고쳐줘" | `workflow-bug-fix`; without Plan node fields use bounded standalone mode, while an assigned DAG `BF1/BF2` returns after exactly one round for Code Review/Coordinator consumption |
 | "검색 결과 배치를 결정할 수 있게 구조가 다른 프로토타입 3개를 만들어줘" | `workflow-prototype`; keep the comparison throwaway and hand a selected result to production implementation separately |
 | "React 버전 올리고 깨지는 call site까지 고쳐줘" | `workflow-dependency-upgrade` |

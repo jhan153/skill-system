@@ -12,9 +12,9 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 10.1.0 릴리즈
+## 10.1.1 릴리즈
 
-이 소스 트리는 breaking 10.0 기준선의 10.1.0 기능 릴리즈입니다. 현재 구성은 다음과
+이 소스 트리는 breaking 10.0 기준선의 10.1.1 통합 정리 릴리즈입니다. 현재 구성은 다음과
 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
@@ -109,146 +109,25 @@ flowchart TB
 
 ## 스킬 카탈로그
 
-스킬은 패밀리별로 구성되어 있습니다. 사용자는 모든 스킬 이름을 외우기보다, 자신이 하려는 일의 의도에서 출발해 적절한 패밀리와 스킬을 찾을 수 있습니다.
+스킬은 사용자 관점에서 안정적인 아홉 개 family를 통해 라우팅됩니다. 이 README는 진입용
+분류만 소유하며, 정확한 스킬 구성·현재 entry owner·alias·라우팅 주석은 canonical
+[Skill Registry](source/shared/docs/skill_registry.md)가 소유합니다.
 
-### Analysis
-
-Analysis 스킬은 실패를 진단하거나, 접근 방식을 비교하거나, 코드베이스 수준의 이해를 구축할 때 사용합니다.
-
-| 스킬                   | 역할                                                                 |
-| -------------------- | ------------------------------------------------------------------ |
-| `analysis-router`    | 복잡한 기술 분석 요청에서 버그 진단, 알고리즘 비교, 코드베이스 설계, 도메인 모델링, 성능 분석 중 적절한 경로를 선택합니다.           |
-| `analysis-bug`       | 반복되거나 원인이 불분명하거나 위험도가 높은 실패를 재현하고, 주된 원인과 회귀 검증 경로를 정리합니다.         |
-| `analysis-algorithm` | 명시된 제약과 성공 기준에 맞춰 알고리즘, 아키텍처, 모델, 검색 전략, 구현 접근을 비교합니다.             |
-| `analysis-codebase-map`  | 저장소 전체 또는 지정 구간을 흐름·구조·상태의 Mermaid HLD/LLD 맵으로 모델링합니다. |
-| `analysis-boundary-design` | 구현 전에 모듈 경계, deep module, interface, seam, adapter, 의존성 방향, testability를 판단합니다. |
-| `analysis-architecture-deepening` | 전체 repo report 없이 architecture deepening 후보를 순위화합니다. 사용자가 범위를 지정하지 않았을 때 최근 canonical production 경로를 YAGNI용 sampling weight로 사용하되, 변경 이력만으로 추천하지 않습니다. |
-| `analysis-domain-modeling` | 소프트웨어 설계를 위해 도메인 개념, entity/value object 경계, state transition, invariant, business rule, naming language를 정리합니다. |
-| `analysis-performance` | latency, throughput, CPU, memory, query, rendering, startup, bundle, algorithmic bottleneck을 근거 중심으로 진단합니다. |
-| `analysis-llm-wiki-context` | 명시적으로 선택한 LLM Wiki 하나의 자체 탐색 규칙을 따라 최소 읽기 전용 작업 컨텍스트를 구성합니다. |
-
-### Design
-
-Design 스킬은 실제 UI 디자인을 제작하고 저장소 UI로 구현한 뒤, 필요한 디자인 시스템·시각·접근성 근거를 반환합니다.
-
-| 스킬                         | 역할                                                                                            |
-| -------------------------- | --------------------------------------------------------------------------------------------- |
-| `workflow-ui-design`       | 승인된 요구사항·제품 동작·콘텐츠·플랫폼·시각 맥락에서 실제로 볼 수 있는 UI 디자인 하나를 만들고, production UI code 없이 구현 인계를 반환합니다. |
-| `design-frontend`          | 구체적인 시각 디자인을 실제 프론트엔드 코드로 구현합니다. mobile, dashboard, section-web, general 중 한 profile만 선택하고 저장소의 컴포넌트·토큰·자산을 재사용해 렌더링 결과를 검증합니다. |
-| `design-ui-decomposer`     | 스크린샷, Figma 내보내기, 목업, AI 이미지 같은 UI 참조물을 계층, 레이아웃, 반복 패턴, 컴포넌트·토큰 후보, 상태, 검증 항목으로 분해합니다.       |
-| `design-layout-translator` | Auto Layout, flex/grid, 크기 조정, 오버플로, 브레이크포인트 제약을 코드로 옮길 수 있는 레이아웃 규칙으로 번역합니다.                 |
-| `design-tokens`            | 디자인 토큰 소스를 정규화하고 플랫폼 값에 매핑합니다. 값을 임의로 만들지 않고, 누락·충돌·드리프트가 있는 토큰을 근거와 함께 보고합니다.                |
-| `design-component-mapper`  | 디자인 컴포넌트, 변형, 상태, 슬롯, 이벤트를 저장소의 기존 컴포넌트와 연결하고, 아직 해결되지 않은 구현 간극을 식별합니다.                       |
-| `design-visual-regression` | 렌더링된 UI 스크린샷을 캡처하거나 검토하고, 빈 화면 여부, 프레이밍, 오버플로, 화면 크기별 시각 차이를 보고합니다.                           |
-| `design-a11y-audit`        | 구현된 UI의 접근성 근거를 검토합니다. 키보드 도달성, 포커스 표시, 의미 구조, 대비, 대상 크기, 반응형 가독성을 포함합니다.                     |
-
-### Report
-
-Report 스킬은 근거, 검토, 변경 내용, 작업 산출물을 사용자가 읽기 쉬운 결과물로 정리합니다.
-
-| 스킬                          | 역할                                                      |
-| --------------------------- | ------------------------------------------------------- |
-| `report-qualitative`        | 명시적 기준, 근거, 해석, 판단, 권고를 갖춘 정성 평가 보고서를 만듭니다.             |
-| `report-critical`           | 일반 진단이나 Plan 전이를 가로채지 않고 명시적으로 요청된 blocker·risk·critical-review·QA-gate 보고서를 만듭니다. |
-| `report-implementation-explainer` | 대상 변경 없이 source/runtime anchor 기반 인과 설명 또는 검증된 changed-lines 비교를 만듭니다. |
-| `report-lifecycle-artifacts` | 빈 SDLC shell을 생성하지 않고 선택된 기존 lifecycle 산출물을 패키징하고 추적합니다. |
-
-Report Markdown이 기본 내용 산출물입니다. 명시적인 `html` 또는 `both` 요청은 같은 finding을 공용 offline Report Canvas로 추가 투영하며, 3D·수식·그래픽을 실제로 확인해야 할 때만 spatial HTML이 필요합니다. 모든 Report 스킬은 Core에 속하며 provider package마다 renderer payload 하나를 공유합니다. HTML은 evidence·finding·workflow 권한을 추가할 수 없고 renderer 실패도 완성된 Markdown 보고서를 막지 않습니다.
-
-### Workflow
-
-Workflow 스킬은 구현 작업의 실행 규율, 검증, 실패 복구를 통제합니다.
-
-| 스킬                     | 역할                                                                                |
-| ---------------------- | --------------------------------------------------------------------------------- |
-| `workflow-implementation` | 범위가 정해진 요구에서 가장 작은 일관된 production 변경, 산출물, 집중 검증까지 담당합니다. |
-| `workflow-bug-fix` | concrete failure를 재현 신호, targeted code/test change, original failure 검증으로 수정합니다. |
-| `workflow-dependency-upgrade` | dependency, runtime, SDK, framework, package, lockfile upgrade와 필요한 호환성 수정을 담당합니다. |
-| `workflow-code-review` | 코드에서 상태·흐름·도달성·순서·실패 동작을 정적으로 리뷰하고 설계 비교는 선택적으로 수행한 뒤 compact Coordinator disposition과 handoff를 반환합니다. |
-| `workflow-refactor-safely` | behavior contract, characterization check, 작은 batch, validation으로 동작 보존 refactor를 수행합니다. |
-| `workflow-rigor`       | DAG 노드나 변경 owner가 되지 않고 활성 Workflow에 선택적 standard/strict assurance를 부착합니다. |
-| `workflow-prototype` | 하나의 결정만 풀기 위한 bounded throwaway UI 비교 또는 비개발자가 결정론적 규칙 모델을 직접 조작할 수 있는 브라우저용 HTML 증거 파일 하나를 만듭니다. |
-| `workflow-source-maintenance` | 명시적인 동작 보존 모드로 obsolete source를 제거하거나 comment·docstring·TODO marker를 동기화합니다. |
-
-### 조건부 반복 작업
-
-대부분의 Execution Handoff Plan은 일반 phase delivery를 사용하며 repeated-work 규칙을 읽지
-않습니다. durable graph가 이미 필요하고 verifier evidence가 이후 행동을 여러 번 바꾸는
-경우에만 `plan-execution-handoff`의 조건부 repeated-work 프로필을 부착합니다.
-
-| 스킬                       | 역할                                                                                       |
-| ------------------------ | ---------------------------------------------------------------------------------------- |
-| `plan-execution-handoff` | 승인된 verifier-steered graph에만 condition/verifier 계약과 evidence-delta 기반 expansion/stop 규칙을 추가합니다. LoopRun·Python evaluator·continuation engine은 만들지 않습니다. |
-
-Runtime 지원에는 provider-neutral orchestration capability contract도 포함됩니다. TaskRun·LoopRun·WorkItem schema/tool과 Stop-hook LoopRun 분기는 제거됐습니다.
-
-### Planning
-
-Planning 스킬은 실제 구현을 대신하지 않고, 계획·명세 산출물을 만들거나 정리합니다.
-
-| 스킬                       | 역할                                                                    |
-| ------------------------ | --------------------------------------------------------------------- |
-| `plan-decision-map`      | 목표 결과, 의존 관계가 있는 결정 항목, 현재 처리 가능한 항목, 아직 질문으로 만들기 어려운 불확실성, 제외 범위를 하나의 다중 세션 결정 지도로 유지합니다. |
-| `plan-behavior-discovery` | 기존 capability의 제품 행동 결정을 한 번에 하나씩 해결해 다음 human-operable vertical slice를 준비합니다. |
-| `plan-requirements-discovery` | 결정 의존성을 기록하고 안전하게 확인 가능한 사실은 agent가 조사하며, 서로 독립적인 준비된 질문을 한 라운드에 최대 3개까지 묻습니다. |
-| `plan-requirements-brief` | 승인된 discovery note와 반환된 질문 문서 답변을 bounded requirements contract 또는 PRD/SRS-lite로 정리합니다. |
-| `plan-question-document` | 빠진 정보의 답변 소유자 한 명을 위해 downstream decision과 연결된 Markdown 질문 문서를 만들며, 외부 전달은 별도 작업으로 남깁니다. |
-| `plan-execution-handoff` | risk-adaptive typed acyclic pair를 만들고 필요할 때만 반복 작업 verifier/budget/stop 원칙을 적용하며, 기본 phase graph는 `human_test_ready`에서 종료합니다. |
-
-이 Planning 산출물들이 durable execution package에 속하면 별도 전역 위치가 아니라 해당
-package의 `inputs/` 아래에 저장합니다. `plan.md`는 소비한 경로·상태·권위·범위를 기록하고,
-`handoff.md`는 실행 상태만 소유합니다.
-
-### Coordination
-
-Coordination 스킬은 영구적인 워크플로 장치를 만들지 않고, 작업 분할과 인계를 위한 가벼운 구조를 제공합니다.
-
-| 스킬                       | 역할                                                                                   |
-| -------------------------- | -------------------------------------------------------------------------------------- |
-| `plan-task-handoff`     | 명시적인 목표 브리프, 작업 DAG, 멀티 에이전트·세션 인계, 잠금 범위, 검증 소유권, 작업별 산출물 목록을 만듭니다. |
-
-### Research
-
-Research 스킬은 자동 lifecycle을 만들지 않고 직접적인 과학 산출물과 Plan에 명시된 Research 노드를 처리합니다.
-
-| 스킬                              | 역할                                                                  |
-| ------------------------------- | ------------------------------------------------------------------- |
-| `workflow-research`             | Plan에 명시된 Research DAG 노드 하나를 관리하고, 선택된 단계 전문 스킬 하나만 적용한 뒤 다음 노드를 고르지 않고 `research_result`를 반환합니다. |
-| `research-literature-ideation`  | 확보된 근거를 후보 연구 가설로 바꾸고, 검증할 활성 가설 하나를 선택합니다.                         |
-| `research-literature-synthesis` | 근거 목록이나 제공된 논문을 바탕으로 문헌 검토 구조, 합의, 이견, 모순, 한계, 주장 경계를 종합합니다.        |
-| `research-hypothesis-planning`  | 가설, 어블레이션, 손실 함수 설계, 학습 계획, 주장 전개 경로를 계획합니다.                        |
-| `research-experiment-blueprint` | 선택된 가설에서 기준 실험, 지표, 어블레이션, 반증 확인을 포함한 실험 청사진을 만듭니다.                 |
-| `research-experiment-scaffold`  | 승인된 실험 청사진을 바탕으로, 명시된 쓰기 경계 안에서 최소 실험 코드 골격을 생성합니다.                 |
-| `research-statistical-analysis` | 결과 표, 지표, 불확실성을 통계적 근거와 함께 분석하고, 사전 계획 분석과 탐색적 분석을 구분합니다.           |
-| `research-manuscript-writing`   | 검증된 연구 산출물, 인용 상태, 결과를 바탕으로 과학 원고 섹션을 작성하거나 수정합니다.                  |
-| `research-peer-review`          | 원고, 제안서, 연구 계획을 새로움, 근거, 재현성, 한계, 보고 품질 관점에서 피어 리뷰 형식으로 비평합니다.      |
-
-### Search
-
-Search 스킬은 근거를 찾거나 근거 수집 경로를 정하되, 종합과 구현 책임이 섞이지 않도록 분리합니다.
-
-| 스킬                      | 역할                                                                                    |
-| ----------------------- | ------------------------------------------------------------------------------------- |
-| `search-paper-evidence` | 인용·메타데이터·데이터셋·지표·결과를 꾸며내지 않고 추적 가능한 논문 근거를 수집하거나 검색 계획을 반환합니다. |
-| `search-deep-evidence`  | 하나의 주장을 필요한 evidence lane에서만 교차검증하고 의존성·모순을 보존하며, machine-verified truth를 주장하지 않는 추적 가능한 evidence set을 반환합니다. |
-
-### Management
-
-Management 스킬은 프로젝트 Memory, Knowledge, `project-context.yaml` 위치·checkpoint 작업을 담당합니다. store 설정, 읽기, 변경 의도가 명시된 경우에만 사용합니다.
-
-| 스킬 | 역할 |
+| Family | 다음 작업에서 시작 |
 | --- | --- |
-| `management-project-context` | 프로젝트 컨텍스트 manifest를 초기화·진단·갱신·bootstrap하고 unrelated section을 보존합니다. |
-| `management-project-context-checkpoint` | 명시적 종료 checkpoint에서 현재 작업의 durable 항목을 기존에 선언된 Memory Bank 또는 Knowledge Base로 분류합니다. |
-| `management-memory-bank-harness` | 현재 작업의 구체적인 anchor와 일치하는 Memory record만 읽고 candidate·unverified 항목은 비권위로 유지합니다. |
-| `management-memory-bank-init` | 프로젝트 정체성과 쓰기 경계를 확인한 뒤 읽기 쉬운 `memory.md` 하나를 초기화합니다. |
-| `management-memory-bank-update` | 명시적으로 지속할 Memory record 하나와 짧은 semantic revision 하나만 갱신합니다. |
-| `management-memory-bank-maintenance` | 선언된 Memory Bank 하나를 report·integrity-check·통합·압축하거나 명시적으로 migration합니다. |
-| `management-knowledge-base-record` | 공용 record contract와 선택한 category profile로 새 domain, design, algorithm, architecture, decision, recurring code-review identity 하나를 만듭니다. |
-| `management-knowledge-base-read` | 현재 작업에 필요한 artifact anchor와 relation/history 경로만 제한적으로 읽습니다. |
-| `management-knowledge-base-init` | 명시적으로 승인된 빈 저장소와 manifest binding을 초기화합니다. |
-| `management-knowledge-base-update` | 기존 identity를 갱신, 재검증, 재연결, 대체 또는 폐기합니다. |
-| `management-knowledge-base-maintenance` | index, relation, history, overlap, recurrence 구조를 integrity-check하고 유지합니다. |
+| Analysis | 기술 접근법 비교, 코드베이스 맵, 경계 결정, 도메인 모델링, 성능 진단, 명시적으로 선택한 LLM Wiki 읽기 |
+| Design | UI 디자인 생성·해석, 레이아웃 변환, 프런트엔드 시각 구현, 디자인 근거 검토 |
+| Report | 명시적으로 요청된 평가, critical review, 구현 설명, lifecycle artifact 보고 |
+| Workflow | 프로덕션 소스의 구현, 버그 수정, 업그레이드, 코드 리뷰, 리팩터링, 프로토타입, 유지보수 |
+| Planning | 요구사항·행동 발견, 결정 기록, 경량 또는 지속형 실행 인계 준비 |
+| Research | 문헌 종합, 가설 구체화, 실험 설계, 결과 분석, 논문 작성, 동료평가 |
+| Testing | 사람 소유 테스트 결정, 테스트 설계·구현, scope·oracle·scenario 선택, 근거 검토 |
+| Search | 논문 근거 수집 또는 여러 evidence lane에 걸친 주장 교차검증 |
+| Management | project context, Memory Bank, Knowledge Base 작업 |
+
+설치 profile과 skill family는 서로 다른 경계입니다. 하나의 provider plugin이 여러 family의
+스킬을 포함할 수 있습니다. provider별 trigger와 guardrail은 각 provider가 선언한 rule
+또는 routing surface가 계속 소유하며, 현재 family 구성의 단일 진실 원천은 registry입니다.
 
 ## 설계 타임라인
 
@@ -297,10 +176,11 @@ Management 스킬은 프로젝트 Memory, Knowledge, `project-context.yaml` 위�
 | 9.4.4 | 암시적 workflow 라우팅·prototyping | 명확한 자연어 의도에 맞는 workflow 및 제한된 support owner를 노출하면서 lifecycle·영속화 gate는 explicit-only로 유지합니다. 선택된 skill을 위임 경계에 전달하고, 하나의 미해결 결정을 위한 격리·보존형 runnable prototype을 추가합니다. |
 | 9.4.5 | 직접 specialist 라우팅·표면 정리 | 독립 search/analysis/research router를 제거하고 겹치는 Knowledge·coordination·Kanboard·project-context·loop·maintenance owner를 합치며 maintainer 플러그인을 폐기하고 canonical 표면을 79개에서 65개로 줄입니다. |
 | 9.4.6 | Visual decision·inspectable reports | visual-decision 계약을 추가하고, 3D·수식·그래픽 주장은 spatial Report Canvas를 강제하며, management/analysis 스킬 ID를 맞추면서 65개 표면은 유지합니다. |
-| 10.1.0 | Testing plugin·oracle-governed evidence | 10개 Testing 스킬, 조건부 인간 Test Discovery, 분리된 Test Design/Test Implementation Core 결과, replay·visual·통계 specialist, 명시적 visual `design`/`evidence` 모드, false-green·proof-ceiling 리뷰를 추가합니다. |
-| 10.0.2 | Provider별 Go 하네스·Codex 실행 admission | 공용 Go baseline을 4개 provider 독립 모듈로 분배하고, Codex 승인 전 정규화와 opaque evaluator 차단을 추가하며, 생성·설치 중 host-owned 승인 규칙을 보존합니다. |
-| 10.0.1 | 직접 도구·Codex 승인 정책 | 편의성 shell composition보다 직접 도구를 우선하고 Git·Codex plugin은 기본 allow로 두되 파괴적 Git과 shell·dependency·process·network 검토 경계는 유지합니다. |
 | 10.0.0 | DAG Execution Handoff·4-provider 배포 | 유한 Execution Handoff DAG, Core Card, Human Test 인계, event-driven Orca coordination, Codex·Claude·Grok·Antigravity 4개 provider의 4개 설치 profile, 최소 모델 독립 계약, 구형 runner/eval/runtime-state 퇴역을 고정합니다. |
+| 10.0.1 | 직접 도구·Codex 승인 정책 | 편의성 shell composition보다 직접 도구를 우선하고 Git·Codex plugin은 기본 allow로 두되 파괴적 Git과 shell·dependency·process·network 검토 경계는 유지합니다. |
+| 10.0.2 | Provider별 Go 하네스·Codex 실행 admission | 공용 Go baseline을 4개 provider 독립 모듈로 분배하고, Codex 승인 전 정규화와 opaque evaluator 차단을 추가하며, 생성·설치 중 host-owned 승인 규칙을 보존합니다. |
+| 10.1.0 | Testing plugin·oracle-governed evidence | 10개 Testing 스킬, 조건부 인간 Test Discovery, 분리된 Test Design/Test Implementation Core 결과, replay·visual·통계 specialist, 명시적 visual `design`/`evidence` 모드, false-green·proof-ceiling 리뷰를 추가합니다. |
+| 10.1.1 | 공용 execution assurance | `workflow-rigor`를 public skill에서 퇴역시키고 standard/strict assurance를 owning workflow에 투영되는 하나의 shared contract로 보존하며, assurance를 DAG node와 mutation owner 밖에 둡니다. |
 
 ## 라이선스
 

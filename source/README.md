@@ -4,7 +4,7 @@
 directly.** Edit `source/` and regenerate.
 
 ## Layout
-- `source/skills/` — 66 canonical skills packaged into one Codex set and one portable
+- `source/skills/` — 65 canonical skills packaged into one Codex set and one portable
   Claude/Grok/Antigravity set
 - `source/shared/` — portable `docs/`, schemas, and Core-owned contract/card sources projected into their declared consumers
 - `source/platform/codex/` — Codex-owned runtime companion instructions, routing, hooks, rules, and harness docs
