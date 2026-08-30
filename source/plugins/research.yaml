@@ -1,7 +1,8 @@
-# source/plugins/research.yaml — plugin membership manifest (hand-authored input).
+# source/plugins/research.yaml — plugin profile manifest (hand-authored input).
 name: skill-system-research
-version: "10.1.1"
 description: 'Skill System research — explicit Research node execution, literature, hypothesis, experiment, statistics, manuscript, review, and paper evidence.'
+short_description: 'Explicit Research node execution, scientific synthesis, experiment, analysis, manuscript, and review skills.'
+codex_catalog_order: 40
 skills:
   - workflow-research
   - research-experiment-blueprint

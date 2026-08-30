@@ -1,5 +1,9 @@
 # Object-Oriented Implementation
 
+Cross-stage selection authority lives in `references/programming-paradigms/object-oriented.md`. This file owns
+concrete realization and actual-path verification; it may narrow implementation admission from
+production evidence but never broadens the accepted trigger or scope.
+
 Use object boundaries where identity, protected state, lifetime, or behavioral substitution is the property the code must own. Object-oriented design is not “put functions in classes”; it assigns responsibility for state and valid behavior to stable owners.
 
 ## Core Model

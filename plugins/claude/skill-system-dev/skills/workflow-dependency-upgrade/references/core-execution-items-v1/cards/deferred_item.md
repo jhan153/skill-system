@@ -10,4 +10,4 @@
 }
 ---
 
-| `<item_id>` | `<design_decision-or-runtime_observation-or-out_of_scope_work-or-static_evidence_gap-or-ambiguous_requirement>` | `<precise-unresolved-item>` / `<bounded-consequence>` | `<human_test-or-next_waterfall_design-or-next_waterfall_worklist>` | `<source-item-id>` |
+| `<item_id>` | `<design_decision-or-runtime_observation-or-out_of_scope_work-or-static_evidence_gap-or-ambiguous_requirement>` | `<material-later-owned-unresolved-item>` / `<bounded-consequence>` | `<human_test-or-next_waterfall_design-or-next_waterfall_worklist>` | `<source-item-id>` |

@@ -16,8 +16,10 @@ A repair intervention is one code, configuration, test, or harness change intend
 Cross-owner output must validate as `execution_item.kind: bug_fix_result` under the Core schema
 referenced by `references/execution_item_contract.md`. This file does not redefine its envelope or
 payload. `source_findings` must name concrete findings in `source_review_item_ref`; the Core
-validator checks that reference. `changed_snapshot` and `review_anchor` identify what a later
-review can inspect and are never review verdicts.
+validator checks that reference. Each source finding's `required_condition` is the repair contract;
+an optional `suggested_solution` is non-normative and never authorizes a broader rewrite.
+`changed_snapshot` and `review_anchor` identify what a later review can inspect and are never
+review verdicts.
 
 ## Attempt Observation
 

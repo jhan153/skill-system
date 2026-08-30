@@ -22,7 +22,7 @@
     {
       "name": "skill-system-dev",
       "source": "./claude/skill-system-dev",
-      "description": "Skill System dev — engineering analysis, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.",
+      "description": "Skill System dev — engineering analysis, architecture design, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.",
       "version": "10.1.1",
       "category": "Developer Tools"
     },

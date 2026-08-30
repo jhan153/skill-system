@@ -4,8 +4,10 @@
 directly.** Edit `source/` and regenerate.
 
 ## Layout
-- `source/skills/` — 65 canonical skills packaged into one Codex set and one portable
+- `source/skills/` — 66 canonical skills packaged into one Codex set and one portable
   Claude/Grok/Antigravity set
+- `source/distribution.json` — canonical bundle version, publisher, and marketplace identity
+- `source/plugins/*.yaml` — installation-profile membership and profile presentation metadata
 - `source/shared/` — portable `docs/`, schemas, and Core-owned contract/card sources projected into their declared consumers
 - `source/platform/codex/` — Codex-owned runtime companion instructions, routing, hooks, rules, and harness docs
 - `source/platform/claude/` — Claude-owned runtime companion instructions, routing, and hook docs
@@ -43,9 +45,9 @@ The remaining three repository-wide tests are under `internal/systemcontract`:
 go test ./internal/systemcontract -v
 ```
 
-They cover canonical skill/plugin ownership, active-provider package/manifest/resource closure, and
-declared global-rule plus harness wiring. Run them only when those system surfaces change; ordinary
-skill prose and model changes do not trigger them.
+They cover canonical skill/plugin ownership, bundle/catalog closure, active-provider
+package/manifest/resource closure, and declared global-rule plus harness wiring. Run them only when
+those system surfaces change; ordinary skill prose and model changes do not trigger them.
 
 Direct harness tests live with each provider-owned Go module. Run only the provider module whose
 runtime behavior changed. They are component tests, not a release gate or a Skill System-wide

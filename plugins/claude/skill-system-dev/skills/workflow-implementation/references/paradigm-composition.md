@@ -1,69 +1,70 @@
-# Implementation Paradigm Composition Index
+# Implementation Paradigm Method Index
 
-Use this index only when the user names or supplies research about a programming paradigm or adjacent implementation model, asks to combine approaches, or when the implementation choice would materially change state ownership, data layout, side-effect boundaries, dispatch, specialization, or concurrency. It is not a reason to debate architecture during an already-shaped trivial edit.
+Apply `programming_paradigm_contract.md` first whenever paradigm selection, scope, composition, or
+architecture impact is material. That shared contract owns the cross-stage meanings, application
+record, architecture-impact gate, thin selection profiles, authority, and proof ceilings.
+
+This file owns only progressive loading of Implementation's detailed method profiles. Those
+profiles define concrete code rules, language/runtime mechanics, examples, misapplications, and
+actual-path verification after the paradigm boundary is selected.
+
+Where a method profile repeats selection language, the shared contract is authoritative for
+cross-stage trigger, non-trigger, minimum closure, maximum scope, architecture impact, and proof
+ceiling. A method profile may narrow implementation admission from actual-path evidence but cannot
+broaden the accepted application.
 
 ## Progressive Loading
 
-Read this index first, then load only the files implicated by the request and actual production path.
+Read only the files implicated by the accepted paradigm application, a user- or agent-selected
+local choice, and the actual production path.
 
-| Task signal | Load |
-| --- | --- |
-| ordered algorithm, explicit pipeline, state machine, C ABI/FFI/callback | `paradigms/procedural.md` |
-| identity, invariant, lifecycle, resource owner, runtime substitution | `paradigms/object-oriented.md` |
-| deterministic value transformation, reducer, pure core, effect isolation | `paradigms/functional.md` |
-| bulk processing, memory layout, SIMD/GPU, ECS question, measured hot path | `paradigms/data-oriented.md` |
-| compile-time types, static invariants, closed policy combinations, TMP | `paradigms/template-metaprogramming.md` |
-| task DAG, CPU work decomposition, dependency scheduling, Job System | `paradigms/job-system.md` |
-| file/network/GPU progress, streaming input, large parallel fill, or another staged-construction exception | start with `paradigms/composition-examples.md`, then load only the one method file that owns the unresolved state/data/execution decision; load object-oriented only when identity/lifetime/invariant ownership is material |
-| two or more approaches must be combined, or their boundaries conflict | `paradigms/composition-examples.md` plus only the named approach files |
-
-Do not load every paradigm file to make a routine implementation decision. If the user names one approach, start with that file. If production evidence introduces a second material axis, load that second file and the composition examples. Stop when the boundary map is decidable.
-
-## Core Rule
-
-An implementation does not need one repository-wide paradigm. Select and compose approaches at the smallest boundary that owns the property they govern.
-
-Boundary-specific composition is not permission to narrow an explicit user scope. If the user selected an approach for a module, subsystem, or repository, map every materially affected boundary in that stated scope and preserve the selection wherever it is compatible.
-
-Treat these as different, composable axes rather than one mutually exclusive list:
-
-| Axis | Examples | Governing question |
+| Task signal | Shared selection profile | Implementation method |
 | --- | --- | --- |
-| Runtime computation and state | procedural, object-oriented, functional | How are control flow, identity, state, mutation, and effects represented? |
-| Data representation and access | data-oriented layout, packed AoS, SoA/AoSoA, ECS | What data is processed together, how often, and in what memory/access order? |
-| Compile-time specialization | generic programming, `constexpr`, Concepts, template metaprogramming | Which types, invariants, layouts, or closed policy combinations must be decided before runtime? |
-| Execution architecture | Job System, task DAG, pipelines, actors | How are independent work, dependencies, scheduling, completion, and cancellation represented? |
+| ordered algorithm, explicit pipeline, state machine, C ABI/FFI/callback | `programming-paradigms/procedural.md` | `paradigms/procedural.md` |
+| identity, invariant, lifecycle, resource owner, runtime substitution | `programming-paradigms/object-oriented.md` | `paradigms/object-oriented.md` |
+| deterministic value transformation, reducer, pure core, effect isolation | `programming-paradigms/functional.md` | `paradigms/functional.md` |
+| bulk processing, memory layout, SIMD/GPU, ECS question, measured hot path | `programming-paradigms/data-oriented.md` | `paradigms/data-oriented.md` |
+| compile-time types, static invariants, closed policy combinations, TMP | `programming-paradigms/template-metaprogramming.md` | `paradigms/template-metaprogramming.md` |
+| file/network/device/timer/process progress, readiness/completion, structured task lifetime | `programming-paradigms/structured-async.md` | `paradigms/structured-async.md` |
+| task DAG, CPU work decomposition, dependency scheduling, Job System | `programming-paradigms/job-system.md` | `paradigms/job-system.md` |
+| shared mutable invariant, publication/visibility, locks/atomics, reclamation | `programming-paradigms/shared-memory-concurrency.md` | `paradigms/shared-memory-concurrency.md` |
+| GPU progress, streaming input plus CPU transform, large parallel fill, or another staged-construction exception | selected state/data/execution profiles | start with `paradigms/composition-examples.md`, then load only the method files that own the unresolved decision |
+| two or more approaches must be combined, or their boundaries conflict | only the material axis profiles | `paradigms/composition-examples.md` plus only the named method files |
 
-`ECS` is one possible data/runtime architecture, not a synonym for data-oriented design. A Job System is an execution architecture, not another alternative to object-oriented or functional programming. Template metaprogramming operates at compile time and does not determine the whole runtime model.
+Do not load every profile for a routine implementation. If the user names one approach, start with
+that file. If production evidence introduces a second material axis, load that second file and the
+composition examples. Stop when the code realization and one disconfirming case are decidable.
 
-Construction validity crosses these axes: a final domain/resource value is valid when created, while unavoidable external or bulk progress is modeled as a separate valid staged operation. Do not relax the final type's invariant merely because the work is better executed procedurally, over data-oriented buffers, or through a Job/event system.
+## Implementation Handoff
 
-## Authority And Conflict
+- Treat an accepted architecture `pattern_application` with either
+  `kind: programming_paradigm` or `kind: adjacent_implementation_model` as a binding
+  owner/axis/scope/interaction contract. Do not reselect, mutate, or broaden it while coding.
+- Treat accepted `boundary_decision.paradigm_constraints` as the equivalent binding source for an
+  `atomic_boundary` choice; cite that boundary decision as `application_ref` in the downstream
+  `paradigm_conformance` observation.
+- Apply the shared impact/decision-owner gate to every new or changed material choice, whether
+  user-explicit or agent-selected, before loading method details. Keep only
+  `decision_owner: implementation`; route `atomic_boundary` to `analysis-boundary-design` and
+  `coupled_architecture` to `workflow-architecture-design`.
+- Without an explicit or accepted choice, preserve the coherent local model. Do not create a
+  paradigm discussion for an already-shaped trivial edit.
+- If concrete evidence conflicts with an accepted axis, owner, maximum scope, cross-view
+  interaction, or architecture delta, stop only the dependent implementation and return the
+  conflict to the accepted decision owner. Do not manufacture or rewrite an architecture/boundary
+  artifact inside Implementation.
+- Translate the selected application into observable code rules for state/identity ownership,
+  inputs/outputs/failures, mutation/effects, construction/publication, data layout,
+  dispatch/specialization, and execution dependencies only where material.
 
-1. Capture the user's exact words and any user-supplied paradigm material. Do not replace an explicit technique with a nearby alternative because the alternative is more familiar.
-2. Inspect the actual production owner, representative caller-to-output path, and the local contracts that constrain the choice.
-3. Translate the selected approach into observable code rules. A label alone is not an implementation contract.
-4. If a hard safety/security, language, ABI, framework, canonical-data, compatibility, or measured performance constraint contradicts the requested shape, state the exact collision and ask for the decision when it would change the deliverable. Do not silently weaken either side.
-5. If there is no conflict, user intent outranks agent taste. Existing patterns guide unspecified details but do not cancel an explicit user choice.
-6. If the user did not choose an approach, preserve the coherent local model. Introduce a new paradigm only when the requested behavior or an evidenced production constraint requires it.
+## Method-Profile Proof Boundary
 
-Do not silently reinterpret a broad request such as “make it object-oriented” as “add one manager class,” or “make it functional” as “ban every local mutation.” Determine which boundary and observable properties the user means from supplied context; ask only when materially different interpretations remain.
+The detailed profiles may close concrete source shape and actual-path behavior for the implemented
+slice. They never modify an accepted application or silently upgrade its planned fitness. Return a
+separate `paradigm_conformance` observation with only the matching test, trace, benchmark, or
+readback and preserve every profile-specific proof ceiling from the shared contract.
 
-## Boundary Map
-
-For a material choice, make this map internally before editing. Report it only when it helps the user verify the outcome.
-
-| Boundary | Problem evidence | Selected approach | Observable implementation rules | Forbidden drift |
-| --- | --- | --- | --- | --- |
-| named production owner/path | identity, invariants, transformation, access pattern, static variability, dependency graph, or explicit user choice | one or more approaches | state owner; mutation/effect location; data layout; dispatch/specialization; execution dependencies | one realistic way the implementation could violate the choice while still compiling or passing a shallow test |
-
-Answer only the dimensions material to the task:
-
-- Who owns long-lived state and invariants?
-- Is the core operation an ordered procedure, an object collaboration, or an input-to-output value transformation?
-- Where may mutation and external side effects occur?
-- Which data is read or written together on the representative path?
-- Is variability open and runtime-driven, or small, closed, and compile-time-known?
-- Does concurrency require a dependency graph and completion semantics, or merely one asynchronous call?
-- Does construction produce a final valid value, or does an evidenced staged-operation exception own progress and the only final-value publication boundary?
-- Where does each selected approach stop so it does not spread into unrelated code?
+Return the accepted application reference or task-local application, loaded method profiles,
+observable code rules, forbidden drift, `paradigm_conformance`, and unresolved owner conflict only
+inside the owning Implementation output. This index creates no separate architecture artifact or
+workflow transition.

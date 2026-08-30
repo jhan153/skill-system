@@ -1,5 +1,9 @@
 # Data-Oriented Implementation
 
+Cross-stage selection authority lives in `references/programming-paradigms/data-oriented.md`. This file owns
+concrete realization and actual-path verification; it may narrow implementation admission from
+production evidence but never broadens the accepted trigger or scope.
+
 Use data-oriented design when a representative bulk path processes many similar items and data movement, access order, branching, batching, SIMD/GPU transfer, or tail latency materially shapes the result. The design question is not “what object does this datum resemble?” but “which bytes does this operation need, in what order, at what frequency?”
 
 ## Distinguish The Concepts
@@ -47,6 +51,7 @@ A thousand items processed thousands of times per second may matter more than a 
 - L1/L2/LLC or TLB misses;
 - low IPC with backend memory stalls;
 - high DRAM bandwidth pressure;
+- cache-to-cache/coherence transfers or false sharing between logically disjoint hot writers;
 - branch and instruction-cache disruption from mixed types;
 - many small allocations or pointer indirections;
 - poor multicore scaling after memory bandwidth saturation;
@@ -68,6 +73,11 @@ If the current algorithm is unnecessarily `O(N^2)`, change the algorithm before 
 | varying entity composition and recurring component queries | ECS candidate |
 
 Do not decide from type aesthetics. Inspect the bytes each representative pass actually reads and writes, including alignment, prefetch behavior, update locality, and whether fields are consumed together.
+
+For parallel writers, semantic range disjointness is insufficient when hot writes share a
+coherence line. Check the target hardware before choosing sharding, alignment, or padding, because
+reducing coherence traffic can increase footprint and working-set pressure. Treat thread, memory,
+and queue placement as one locality question only when NUMA or migration evidence makes it material.
 
 ## Observable Implementation Contract
 
@@ -200,6 +210,8 @@ For each, choose layout from the specific pass. A shader that always consumes `x
 - Use an **object-oriented** shell for documents, resources, sessions, and entity identity.
 - Expose **functional** or **procedural** kernels over views/ranges.
 - Use a **Job System** when ranges and read/write sets support a dependency graph; DOD alone does not schedule work.
+- Use **Shared-Memory Concurrency** only when ranges still overlap, publish across workers, or own
+  reclamation; disjoint owner-exclusive ranges should keep the simpler partition/commit contract.
 - Use **TMP** only for bounded static layouts, SIMD widths, coordinate-frame types, or kernels where compile-time specialization has evidence.
 
 ## Misapplications
@@ -220,6 +232,8 @@ For each, choose layout from the specific pass. A shader that always consumes `x
 - AoS/SoA/AoSoA/ECS alternatives were rejected for concrete reasons.
 - Ownership, identity, and structural mutation remain at a clear boundary.
 - Kernel ranges, temporary buffers, and allocation behavior are explicit.
+- Parallel write partitions were checked for coherence-line interference when multicore scaling
+  motivated the layout.
 - Large staged fills reuse an existing primitive when sufficient; any new builder owns real coverage/lifetime/publication invariants, and only successful commit publishes the final canonical buffer.
 - Performance claims use the same representative workload and metric before and after.
 - Tail latency and memory traffic are checked when they motivated the design.

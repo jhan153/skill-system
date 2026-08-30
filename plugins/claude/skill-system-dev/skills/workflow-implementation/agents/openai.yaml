@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Implementation"
   short_description: "Direct coding execution workflow"
-  default_prompt: "Use $workflow-implementation to implement the complete requested behavior through one canonical internal contract, prefer direct concrete code and composition over speculative indirection, honor explicit paradigm choices at their owning boundaries, and verify the actual path."
+  default_prompt: "Use $workflow-implementation to implement the complete requested behavior through one canonical internal contract. Preserve accepted paradigm/model applications immutably and return a separate paradigm_conformance observation. Apply the shared impact/owner gate to every new material choice: keep local_implementation, route atomic_boundary to $analysis-boundary-design, and route coupled_architecture to $workflow-architecture-design. Load only the selected thin profiles and needed implementation method files, then verify the actual path."
 
 policy:
   allow_implicit_invocation: true

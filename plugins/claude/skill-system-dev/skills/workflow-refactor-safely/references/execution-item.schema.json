@@ -102,7 +102,12 @@
         "properties": { "kind": { "const": "code_review_result" } },
         "required": ["kind"]
       },
-      "then": { "properties": { "payload": { "$ref": "#/$defs/code_review_result" } } }
+      "then": {
+        "properties": {
+          "artifact_refs": { "minItems": 1 },
+          "payload": { "$ref": "#/$defs/code_review_result" }
+        }
+      }
     },
     {
       "if": {
@@ -423,15 +428,77 @@
     },
     "review_finding": {
       "type": "object",
-      "required": ["id", "claim", "priority", "code_refs", "impact", "fix_direction"],
+      "required": ["id", "claim", "priority", "code_refs", "impact", "required_condition"],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "claim": { "type": "string", "minLength": 1 },
-        "priority": { "enum": ["P0", "P1", "P2", "P3"] },
-        "code_refs": { "$ref": "#/$defs/string_array" },
+        "priority": { "enum": ["P0", "P1", "P2"] },
+        "code_refs": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
         "baseline_refs": { "$ref": "#/$defs/string_array" },
         "impact": { "type": "string", "minLength": 1 },
-        "fix_direction": { "type": "string", "minLength": 1 }
+        "required_condition": { "type": "string", "minLength": 1 },
+        "suggested_solution": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "review_advisory": {
+      "type": "object",
+      "required": ["id", "observation", "code_refs", "impact"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "observation": { "type": "string", "minLength": 1 },
+        "code_refs": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "baseline_refs": { "$ref": "#/$defs/string_array" },
+        "impact": { "type": "string", "minLength": 1 },
+        "suggestion": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "review_coverage": {
+      "type": "object",
+      "required": [
+        "covered_effect_ids",
+        "activated_risk_axes",
+        "material_unassessed",
+        "conformance_scope"
+      ],
+      "properties": {
+        "covered_effect_ids": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "activated_risk_axes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "contract_invariant",
+              "state_flow_reachability",
+              "failure_recovery",
+              "ownership_dependency",
+              "resource_lifetime_concurrency",
+              "data_integrity_compatibility",
+              "trust_boundary_security",
+              "performance_resource",
+              "observability_diagnostics"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "material_unassessed": { "$ref": "#/$defs/string_array" },
+        "conformance_scope": { "enum": ["intrinsic_only", "baseline_compared"] }
       },
       "additionalProperties": false
     },
@@ -442,11 +509,13 @@
         "review_round",
         "implementation_snapshot",
         "review_slice",
+        "review_coverage",
+        "review_ceiling",
         "review_disposition",
         "findings",
+        "advisories",
         "deferred_item_refs",
-        "known_bug_exclusions",
-        "transition_intent"
+        "known_bug_exclusions"
       ],
       "properties": {
         "input_item_ref": { "$ref": "#/$defs/item_ref" },
@@ -461,6 +530,8 @@
         "review_round": { "type": "string", "minLength": 1 },
         "implementation_snapshot": { "type": "string", "minLength": 1 },
         "review_slice": { "type": "string", "minLength": 1 },
+        "review_coverage": { "$ref": "#/$defs/review_coverage" },
+        "review_ceiling": { "type": "string", "minLength": 1 },
         "review_disposition": {
           "enum": ["pass", "repair_required", "complete_with_deferred_items"]
         },
@@ -468,10 +539,51 @@
           "type": "array",
           "items": { "$ref": "#/$defs/review_finding" }
         },
+        "advisories": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/review_advisory" }
+        },
         "deferred_item_refs": { "$ref": "#/$defs/item_ref_array" },
-        "known_bug_exclusions": { "$ref": "#/$defs/item_ref_array" },
-        "transition_intent": { "enum": ["continue", "repair"] }
+        "known_bug_exclusions": { "$ref": "#/$defs/item_ref_array" }
       },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "review_disposition": { "const": "repair_required" } },
+            "required": ["review_disposition"]
+          },
+          "then": { "properties": { "findings": { "minItems": 1 } } }
+        },
+        {
+          "if": {
+            "properties": {
+              "review_disposition": { "const": "complete_with_deferred_items" }
+            },
+            "required": ["review_disposition"]
+          },
+          "then": {
+            "properties": {
+              "findings": { "maxItems": 0 },
+              "deferred_item_refs": { "minItems": 1 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "review_disposition": { "const": "pass" } },
+            "required": ["review_disposition"]
+          },
+          "then": {
+            "properties": {
+              "findings": { "maxItems": 0 },
+              "deferred_item_refs": { "maxItems": 0 },
+              "review_coverage": {
+                "properties": { "material_unassessed": { "maxItems": 0 } }
+              }
+            }
+          }
+        }
+      ],
       "additionalProperties": false
     },
     "deferred_item": {

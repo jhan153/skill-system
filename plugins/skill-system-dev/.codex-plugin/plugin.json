@@ -1,7 +1,7 @@
 {
   "name": "skill-system-dev",
   "version": "10.1.1",
-  "description": "Skill System dev — engineering analysis, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.",
+  "description": "Skill System dev — engineering analysis, architecture design, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.",
   "author": {
     "name": "Skill System Maintainers"
   },
@@ -14,8 +14,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Skill System Dev",
-    "shortDescription": "Engineering analysis, implementation, bounded bug repair, code review, behavior discovery, and refactoring skills.",
-    "longDescription": "Skill System dev — engineering analysis, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.",
+    "shortDescription": "Engineering analysis, architecture design, implementation, bounded repair, code review, behavior discovery, and refactoring skills.",
+    "longDescription": "Skill System dev — engineering analysis, architecture design, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.",
     "developerName": "Skill System Maintainers",
     "category": "Developer Tools",
     "capabilities": [

@@ -26,7 +26,7 @@ plugin_profiles:
   - id: skill-system-core
     purpose: shared planning, management, evidence, execution assurance, and report delivery
   - id: skill-system-dev
-    purpose: engineering analysis and implementation workflows
+    purpose: engineering analysis, architecture design, and implementation workflows
   - id: skill-system-design
     purpose: UI design creation, implementation, and design evidence
   - id: skill-system-research

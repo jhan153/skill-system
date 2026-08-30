@@ -1,5 +1,9 @@
 # Template Metaprogramming Implementation
 
+Cross-stage selection authority lives in `references/programming-paradigms/template-metaprogramming.md`. This
+file owns concrete realization and actual-path verification; it may narrow implementation admission
+from production evidence but never broadens the accepted trigger or scope.
+
 Use template metaprogramming (TMP) only when compile-time-known inputs must produce types, signatures, layouts, overload sets, static invariants, or a small closed set of specialized policy combinations. TMP solves a compile-time problem; it is not a general replacement for runtime control flow or object interfaces.
 
 ## Distinguish The Mechanisms

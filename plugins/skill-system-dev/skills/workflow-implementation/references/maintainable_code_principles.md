@@ -29,7 +29,8 @@ Continuity of intent shall take precedence over function count.
 
 ## Five Review Questions
 
-1. Can the purpose of this code be explained within one screen?
+1. Can a maintainer recover this code's purpose and the material impact of a change within its
+   bounded owning context, without tracing unrelated files?
 2. When one rule changes, are the required edit locations clear?
 3. Are the normal flow and the failure and side-effect boundaries visible?
 4. Are invalid states rejected before they enter the internal flow?

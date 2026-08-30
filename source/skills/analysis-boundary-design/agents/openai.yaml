@@ -1,7 +1,7 @@
 interface:
   display_name: "Analysis Boundary Design"
-  short_description: "Judge module boundaries, deep modules, seams, and adapters"
-  default_prompt: "Use $analysis-boundary-design to make a targeted codebase design decision about module boundaries, deep modules, interfaces, seams, adapters, dependency direction, or testability before implementation. Return design_pressure, current_boundary, candidate_moves, abstraction_gate, recommended_design, and implementation_handoff."
+  short_description: "Decide one boundary while preserving accepted architecture"
+  default_prompt: "Use $analysis-boundary-design to decide exactly one module boundary, seam, interface, adapter, or dependency before implementation. Preserve any accepted architecture constraints. For a material paradigm/model choice, apply the shared owner gate: return local choices to Implementation, store one atomic_boundary selection only in boundary_decision.paradigm_constraints, and defer coupled_architecture or accepted paradigm/delta conflicts to $workflow-architecture-design."
 
 policy:
   invocation_surface: explicit_procedure

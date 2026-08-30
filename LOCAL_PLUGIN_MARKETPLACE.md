@@ -8,11 +8,10 @@ This repository distributes the same Skill System profiles to **Codex**, **Claud
 plugins/.claude-plugin/marketplace.json  # Claude Code
 ```
 
-Plugin packages and the Claude catalog are generated from `source/plugins/*.yaml` by
-`python3 source/tools/generate_targets.py --target plugins`; the stable Codex catalog
-keeps its local source entries in `.agents/plugins/marketplace.json`. The sections below that
-use `codex plugin ...` are the Codex flow. Claude uses its marketplace; Grok and Antigravity
-install the portable package roots directly with their official CLIs.
+Plugin packages and both catalogs are generated from `source/distribution.json` and
+`source/plugins/*.yaml` by `python3 source/tools/generate_targets.py --target plugins`.
+The sections below that use `codex plugin ...` are the Codex flow. Claude uses its marketplace;
+Grok and Antigravity install the portable package roots directly with their official CLIs.
 
 These packages are installation profiles rather than user-facing skill families. Core is the
 shared profile, Dev adds engineering work, and Design/Research/Testing add domain-specific

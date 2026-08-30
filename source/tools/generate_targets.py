@@ -22,6 +22,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+DISTRIBUTION_METADATA_SOURCE = Path("distribution.json")
+
 # (source_rel, target_rel) copied unchanged into either requested target.
 NEUTRAL_VERBATIM: list[tuple[str, str]] = [
     ("shared/docs", "docs"),
@@ -57,6 +59,8 @@ EXECUTION_HANDOFF_INPUT_CONTRACT_TARGET = Path(
 )
 EXECUTION_ASSURANCE_CONTRACT_SOURCE = Path("shared/docs/execution_assurance_contract.md")
 EXECUTION_ASSURANCE_CONTRACT_TARGET = Path("references/execution_assurance_contract.md")
+ARCHITECTURE_DESIGN_CONTRACT_SOURCE = Path("shared/docs/architecture_design_contract.md")
+ARCHITECTURE_DESIGN_CONTRACT_TARGET = Path("references/architecture_design_contract.md")
 BOUNDARY_DECISION_CONTRACT_SOURCE = Path("shared/docs/boundary_decision_contract.md")
 BOUNDARY_DECISION_CONTRACT_TARGET = Path("references/boundary_decision_contract.md")
 RESEARCH_STAGE_CONTRACT_SOURCE = Path("shared/docs/research_stage_contract.md")
@@ -81,6 +85,20 @@ TESTING_SHARED_REFERENCE_PROJECTIONS = (
     (
         Path("shared/docs/testing_stage_contract.md"),
         Path("references/testing_stage_contract.md"),
+    ),
+)
+DEV_SHARED_REFERENCE_PROJECTIONS = (
+    (
+        Path("shared/docs/static_code_review_contract.md"),
+        Path("references/static_code_review_contract.md"),
+    ),
+    (
+        Path("shared/docs/programming_paradigm_contract.md"),
+        Path("references/programming_paradigm_contract.md"),
+    ),
+    (
+        Path("shared/docs/programming-paradigms"),
+        Path("references/programming-paradigms"),
     ),
 )
 MANAGEMENT_SHARED_REFERENCE_PROJECTIONS = (
@@ -147,14 +165,6 @@ CLAUDE_SKILL_PATH_PROJECTIONS: tuple[tuple[str, str], ...] = (
 
 _CACHE_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 
-PLUGIN_DISPLAY = {
-    "skill-system-core": ("Skill System Core", "Shared planning, management, evidence, and report delivery skills."),
-    "skill-system-dev": ("Skill System Dev", "Engineering analysis, implementation, bounded bug repair, code review, behavior discovery, and refactoring skills."),
-    "skill-system-design": ("Skill System Design", "Frontend, UI, layout, component, token, and visual validation skills."),
-    "skill-system-research": ("Skill System Research", "Explicit Research node execution, scientific synthesis, experiment, analysis, manuscript, and review skills."),
-    "skill-system-testing": ("Skill System Testing", "Human-in-loop test decisions, test design, test-only implementation, and evidence specialists."),
-}
-
 
 def _is_junk(name: str) -> bool:
     return (
@@ -172,6 +182,47 @@ def _ignore(_dir: str, names: list[str]) -> set[str]:
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _load_distribution(source: Path) -> dict:
+    path = source / DISTRIBUTION_METADATA_SOURCE
+    try:
+        metadata = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"invalid distribution metadata {path}: {exc}") from exc
+    if metadata.get("schema_version") != 1:
+        raise SystemExit(
+            f"distribution metadata schema_version must be 1: {path}"
+        )
+    required = (
+        ("bundle_version", metadata.get("bundle_version")),
+        ("publisher.name", metadata.get("publisher", {}).get("name")),
+        ("marketplace.name", metadata.get("marketplace", {}).get("name")),
+        (
+            "marketplace.display_name",
+            metadata.get("marketplace", {}).get("display_name"),
+        ),
+        (
+            "marketplace.description",
+            metadata.get("marketplace", {}).get("description"),
+        ),
+        ("marketplace.category", metadata.get("marketplace", {}).get("category")),
+    )
+    missing = [
+        name
+        for name, value in required
+        if not isinstance(value, str) or not value
+    ]
+    if missing:
+        raise SystemExit(
+            f"distribution metadata has missing string fields {missing}: {path}"
+        )
+    codex_policy = metadata.get("marketplace", {}).get("codex_policy")
+    if not isinstance(codex_policy, dict) or not codex_policy:
+        raise SystemExit(
+            f"distribution metadata has no Codex marketplace policy: {path}"
+        )
+    return metadata
 
 
 def _tree_files(root: Path) -> list[Path]:
@@ -533,6 +584,25 @@ def _attach_execution_assurance_contract(source: Path, skill_dir: Path) -> None:
     )
 
 
+def _wants_architecture_design_contract(skill_dir: Path) -> bool:
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return False
+    return "references/architecture_design_contract.md" in skill_md.read_text(
+        encoding="utf-8"
+    )
+
+
+def _attach_architecture_design_contract(source: Path, skill_dir: Path) -> None:
+    """Project the shared architecture-design contract into opted-in skill packages."""
+    if not _wants_architecture_design_contract(skill_dir):
+        return
+    _copy(
+        source / ARCHITECTURE_DESIGN_CONTRACT_SOURCE,
+        skill_dir / ARCHITECTURE_DESIGN_CONTRACT_TARGET,
+    )
+
+
 def _wants_boundary_decision_contract(skill_dir: Path) -> bool:
     skill_md = skill_dir / "SKILL.md"
     if not skill_md.is_file():
@@ -588,6 +658,17 @@ def _attach_testing_shared_references(source: Path, skill_dir: Path) -> None:
         return
     text = skill_md.read_text(encoding="utf-8")
     for source_path, target_path in TESTING_SHARED_REFERENCE_PROJECTIONS:
+        if target_path.as_posix() in text:
+            _copy(source / source_path, skill_dir / target_path)
+
+
+def _attach_dev_shared_references(source: Path, skill_dir: Path) -> None:
+    """Project only the shared Development references explicitly named by a skill."""
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return
+    text = skill_md.read_text(encoding="utf-8")
+    for source_path, target_path in DEV_SHARED_REFERENCE_PROJECTIONS:
         if target_path.as_posix() in text:
             _copy(source / source_path, skill_dir / target_path)
 
@@ -672,10 +753,12 @@ def _attach_plugin_skill_payloads(source: Path, skill_dir: Path) -> None:
     _attach_delivery_slice_contract(source, skill_dir)
     _attach_execution_handoff_input_contract(source, skill_dir)
     _attach_execution_assurance_contract(source, skill_dir)
+    _attach_architecture_design_contract(source, skill_dir)
     _attach_boundary_decision_contract(source, skill_dir)
     _attach_research_stage_contract(source, skill_dir)
     _attach_design_shared_references(source, skill_dir)
     _attach_testing_shared_references(source, skill_dir)
+    _attach_dev_shared_references(source, skill_dir)
     _attach_management_shared_references(source, skill_dir)
     _attach_maintainable_code_principles(source, skill_dir)
     _attach_identifier_readability_principle(source, skill_dir)
@@ -833,7 +916,7 @@ def _build_go_dispatchers(
     module = source / "runtime" / "go" / module_name
     if not (module / "go.mod").is_file():
         raise SystemExit(f"missing Go harness module: {module}")
-    version = str(_load_manifest(source / "plugins" / "core.yaml")["version"])
+    version = str(_load_distribution(source)["bundle_version"])
     filenames = [filename for _, _, filename in targets]
     key_source = json.dumps(
         {
@@ -1062,7 +1145,7 @@ def generate_runtime(
 
 
 def _load_manifest(path: Path) -> dict:
-    """Minimal YAML manifest reader (name/version/description/skills) without a yaml dep."""
+    """Minimal YAML profile reader without a YAML dependency."""
     spec: dict = {"skills": []}
     in_skills = False
     for raw in path.read_text(encoding="utf-8").splitlines():
@@ -1082,6 +1165,12 @@ def _load_manifest(path: Path) -> dict:
 
 def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
     written: list[str] = []
+    distribution = _load_distribution(source)
+    bundle_version = str(distribution["bundle_version"])
+    publisher_name = distribution["publisher"]["name"]
+    marketplace_spec = distribution["marketplace"]
+    marketplace_name = marketplace_spec["name"]
+    marketplace_category = marketplace_spec["category"]
     manifests = sorted((source / "plugins").glob("*.yaml"))
     if not manifests:
         raise SystemExit(f"no plugin manifests under {source / 'plugins'}")
@@ -1092,6 +1181,7 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
     src_skills = {p.name for p in (source / "skills").iterdir() if p.is_dir()}
     seen: dict[str, str] = {}
     marketplace_plugins: list[dict] = []
+    codex_marketplace_plugins: list[tuple[int, dict]] = []
     claude_packages_root = plugins_root / "claude"
     if claude_packages_root.exists():
         shutil.rmtree(claude_packages_root)
@@ -1102,15 +1192,13 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
         claude_pkg = claude_packages_root / name
         if codex_pkg.exists():
             shutil.rmtree(codex_pkg)
-        display_name, short_description = PLUGIN_DISPLAY.get(
-            name,
-            (name.replace("-", " ").title(), spec["description"]),
-        )
+        display_name = name.replace("-", " ").title()
+        short_description = spec["short_description"]
         manifest = {
             "name": name,
-            "version": str(spec["version"]),
+            "version": bundle_version,
             "description": spec["description"],
-            "author": {"name": "Skill System Maintainers"},
+            "author": {"name": publisher_name},
             "license": "MIT",
             "keywords": ["skill-system", "codex", name.removeprefix("skill-system-")],
             "skills": "./skills/",
@@ -1118,8 +1206,8 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
                 "displayName": display_name,
                 "shortDescription": short_description,
                 "longDescription": spec["description"],
-                "developerName": "Skill System Maintainers",
-                "category": "Developer Tools",
+                "developerName": publisher_name,
+                "category": marketplace_category,
                 "capabilities": ["Interactive", "Read", "Write"],
                 "defaultPrompt": [f"Use {display_name} skills for this task."],
                 "brandColor": "#2563EB",
@@ -1134,9 +1222,9 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
         # `capabilities` blocks; components are directory-discovered, skills declared by path.
         claude_manifest = {
             "name": name,
-            "version": str(spec["version"]),
+            "version": bundle_version,
             "description": spec["description"],
-            "author": {"name": "Skill System Maintainers"},
+            "author": {"name": publisher_name},
             "license": "MIT",
             "keywords": ["skill-system", "claude", name.removeprefix("skill-system-")],
             "skills": "./skills/",
@@ -1165,9 +1253,23 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
                 "name": name,
                 "source": f"./claude/{name}",
                 "description": spec["description"],
-                "version": str(spec["version"]),
-                "category": "Developer Tools",
+                "version": bundle_version,
+                "category": marketplace_category,
             }
+        )
+        codex_marketplace_plugins.append(
+            (
+                int(spec["codex_catalog_order"]),
+                {
+                    "name": name,
+                    "source": {
+                        "source": "local",
+                        "path": f"./{plugins_root.name}/{name}",
+                    },
+                    "policy": marketplace_spec["codex_policy"],
+                    "category": marketplace_category,
+                },
+            )
         )
         for sid in spec["skills"]:
             if sid not in src_skills:
@@ -1199,15 +1301,40 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
     # `name` + `owner`, plugins listed with relative-path `source`. Register with
     # `/plugin marketplace add <repo>/plugins`; install `<name>@skill-system-local`.
     marketplace = {
-        "name": "skill-system-local",
-        "owner": {"name": "Skill System Maintainers"},
-        "description": "Skill System installation-profile packages (local marketplace).",
+        "name": marketplace_name,
+        "owner": {"name": publisher_name},
+        "description": marketplace_spec["description"],
         "plugins": marketplace_plugins,
     }
     marketplace_json = plugins_root / ".claude-plugin" / "marketplace.json"
     marketplace_json.parent.mkdir(parents=True, exist_ok=True)
-    marketplace_json.write_text(json.dumps(marketplace, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    marketplace_json.write_text(
+        json.dumps(marketplace, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
     written.append(marketplace_json.as_posix())
+    codex_marketplace = {
+        "name": marketplace_name,
+        "interface": {"displayName": marketplace_spec["display_name"]},
+        "plugins": [
+            entry
+            for _, entry in sorted(
+                codex_marketplace_plugins,
+                key=lambda ordered_entry: ordered_entry[0],
+            )
+        ],
+    }
+    codex_marketplace_json = (
+        plugins_root.parent / ".agents" / "plugins" / "marketplace.json"
+    )
+    # Keep custom plugin generation self-contained: /stage/plugins projects its Codex
+    # catalog into /stage/.agents instead of mutating the current checkout catalog.
+    codex_marketplace_json.parent.mkdir(parents=True, exist_ok=True)
+    codex_marketplace_json.write_text(
+        json.dumps(codex_marketplace, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    written.append(codex_marketplace_json.as_posix())
     _remove_path(plugins_root / ".generated-manifest.json")
     return written
 

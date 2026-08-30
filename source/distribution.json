@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "bundle_version": "10.1.1",
+  "publisher": {
+    "name": "Skill System Maintainers"
+  },
+  "marketplace": {
+    "name": "skill-system-local",
+    "display_name": "Skill System Local",
+    "description": "Skill System installation-profile packages (local marketplace).",
+    "category": "Developer Tools",
+    "codex_policy": {
+      "installation": "AVAILABLE",
+      "authentication": "ON_INSTALL"
+    }
+  }
+}

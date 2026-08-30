@@ -22,6 +22,8 @@ description: Diagnose a current latency, throughput, CPU, memory, query, renderi
     - request, metric/workload/environment, affected actual path, and available baseline/profile/trace
   read_if_needed:
     - targeted code/query/config, benchmark method, recent regression diff, data-size assumptions, or observability contract
+    - `references/systems-bottleneck-map.md` only when CPU microarchitecture, memory hierarchy,
+      scheduler/synchronization, and I/O/queue hypotheses compete on the same representative path
   do_not_load_by_default:
     - full repo/memory, unrelated logs/reports, raw production data, or credentials
 - risk_profile:
@@ -35,7 +37,7 @@ description: Diagnose a current latency, throughput, CPU, memory, query, renderi
 ## Workflow
 1. Bind each material condition: metric, representative workload/input size, environment, acceptable threshold, and correctness, freshness, security, accessibility, or side-effect constraints. Identify when the user condition is itself structural, such as exact emitted bytes.
 2. Establish a baseline and trace the actual user/resource path through relevant code, query, cache, adapter, renderer, bundle, process, or IO boundary. Prefer direct observed behavior; an agent-authored benchmark, fixture, test, or mock proves only its exercised scope.
-3. Hold only enough bottleneck hypotheses to discriminate them with a profile, trace, counterexample, or comparable measurement. Representative actual-path evidence outranks a conflicting helper benchmark; retain any `fail`, `needs_review`, `unverified`, or blocked measurement gap.
+3. Hold only enough bottleneck hypotheses to discriminate them with a profile, trace, counterexample, or comparable measurement. When several systems resource layers remain plausible, use `references/systems-bottleneck-map.md` to choose the next discriminating observation without treating its taxonomy as a diagnosis. Representative actual-path evidence outranks a conflicting helper benchmark; retain any `fail`, `needs_review`, `unverified`, or blocked measurement gap.
 4. Select one primary bottleneck only when evidence separates it from alternatives. Report percentage or before/after improvement only for the same material metric under comparable workload and environment, with required result and side-effect readback.
 5. If the user requested a fix and the bottleneck is verified, hand the smallest optimization and comparable validation target to `workflow-implementation`. Do not imply the optimization ran; after implementation, verify on the same relevant path before claiming improvement.
 

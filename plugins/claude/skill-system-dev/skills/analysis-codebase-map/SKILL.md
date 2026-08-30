@@ -1,6 +1,6 @@
 ---
 name: analysis-codebase-map
-description: Model a repository or named slice as evidence-linked Mermaid architecture maps. Honor an explicit HLD/LLD request; otherwise use HLD for whole-repo/product scope and LLD for a named module, path, or flow. Generic codebase-analysis report wording resolves to this map, not the retired findings report. Do not use for one-boundary decisions, ranked improvement scans, bug RCA, explicit findings/quality-gate requests, or design-informed code review of an implementation.
+description: Model the current repository or named slice as evidence-linked Mermaid architecture maps. Honor an explicit HLD/LLD request; otherwise use HLD for whole-repo/product scope and LLD for a named module, path, or flow. Generic codebase-analysis report wording resolves to this map, not the retired findings report. Do not use for normative target/transition architecture, one-boundary decisions, ranked improvement scans, bug RCA, explicit findings/quality-gate requests, or design-informed code review of an implementation.
 ---
 
 # Analysis Codebase Map
@@ -15,6 +15,8 @@ description: Model a repository or named slice as evidence-linked Mermaid archit
 - do_not_use_when:
   - one module/seam/adapter decision is needed; use `analysis-boundary-design`.
   - the user wants ranked improvement candidates; use `analysis-architecture-deepening`.
+  - the user wants a normative target/transition architecture across several interacting
+    boundaries; use `workflow-architecture-design`.
   - the cause of a failure is unknown; keep diagnosis-only work with the current task owner or use `workflow-bug-fix` when repair is requested.
   - implemented code or a diff needs findings and a review disposition, with or without a design baseline; use `workflow-code-review`.
   - the request is domain language, performance RCA, direct implementation, or an explicit findings/quality-gate artifact.
@@ -59,4 +61,4 @@ Return only:
 - `source_refs` per diagram
 - `unverified_gaps`
 
-Generic codebase-analysis/report wording still returns this map contract. Do not recreate the retired 10-chapter report, `findings.json`, `quality-gate-result.json`, or an improvement backlog. Route a selected boundary to `analysis-boundary-design` and a selected change to an implementation workflow.
+Generic codebase-analysis/report wording still returns this map contract. Do not recreate the retired 10-chapter report, `findings.json`, `quality-gate-result.json`, or an improvement backlog. Route a selected boundary to `analysis-boundary-design`, a requested multi-view target design to `workflow-architecture-design`, and a selected change whose design is accepted to an implementation workflow.

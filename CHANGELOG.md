@@ -17,6 +17,9 @@
 - Centralized Codex and portable plugin payload projection through one ordered helper and removed two
   Codex file tombstones already covered by the retired `tools/` target root; staged outputs remain
   the compatibility boundary for this behavior-preserving maintenance.
+- Centralized bundle version and marketplace identity in `source/distribution.json`, moved
+  profile presentation metadata beside profile membership, and generated both Codex and Claude
+  marketplace catalogs from those canonical owners.
 
 ## 10.1.0
 

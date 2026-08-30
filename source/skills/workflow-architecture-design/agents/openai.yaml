@@ -1,0 +1,9 @@
+interface:
+  display_name: "Workflow Architecture Design"
+  short_description: "Design target architecture across multiple ownership boundaries"
+  default_prompt: "Use $workflow-architecture-design when accepted behavior or quality scenarios require a target or transition architecture across multiple module/API, data-owner, protocol/event, runtime/thread/failure, deployment, or trust boundaries. For every material programming paradigm or adjacent model, apply the shared impact/owner gate and own only coupled_architecture applications; route atomic_boundary choices to $analysis-boundary-design and leave local mechanics to Implementation. Return one coherent architecture_design."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: true
+  may_own_execution: true

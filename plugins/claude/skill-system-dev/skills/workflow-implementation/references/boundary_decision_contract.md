@@ -30,6 +30,19 @@ boundary_decision:
   boundary_cost:
   representative_scenario:
   falsifier:
+  paradigm_constraints:
+    profile_ref:
+    kind: programming_paradigm | adjacent_implementation_model
+    governed_axis:
+    owner:
+    authority_ref:
+    claimed_properties: []
+    minimum_closure: []
+    maximum_scope:
+    interactions: []
+    forbidden_drift: []
+    design_proof_ceiling:
+    delta_relation:
   decision: keep_local | create | merge | split | move | defer
 ```
 
@@ -49,6 +62,10 @@ boundary_decision:
 - `representative_scenario`: one actual or required path that exercises the proposed boundary.
 - `falsifier`: a concrete scenario that would show the grouping, separation, contract, direction,
   or strength to be wrong.
+- `paradigm_constraints`: optional only when `programming_paradigm_contract.md` selects
+  `decision_owner: atomic_boundary`. It preserves the selected thin profile and cross-stage
+  property owner/paradigm-model meaning inside this one boundary record; it is not a second
+  architecture artifact.
 - `decision`: the smallest evidenced move. `keep_local` is a first-class result.
 
 ## Evidence Rules
@@ -71,6 +88,16 @@ boundary_decision:
 - `analysis-domain-modeling` uses this contract when concept, invariant, lifecycle, or policy
   ownership requires grouping or separation. It owns domain meaning and may leave structural
   enforcement `defer` when that decision needs code-boundary evidence.
-- `analysis-boundary-design` uses this contract for every selected structural boundary decision. It
-  owns the minimum contract, dependency direction, enforcement strength, cost comparison, and
-  `keep_local | create | merge | split | move | defer` recommendation.
+- `analysis-boundary-design` uses this contract for every standalone or explicitly assigned atomic
+  structural boundary decision. It owns the minimum contract, dependency direction, enforcement
+  strength, cost comparison, and `keep_local | create | merge | split | move | defer`
+  recommendation for that one decision. When an accepted `architecture_design` explicitly
+  constrains the target, it preserves the relevant architecture fields including accepted
+  architecture-delta scope and returns the design reference plus one decision; a delta expansion,
+  coupled-view move, or accepted-constraint conflict is `defer` and returns to the architecture
+  owner. When the shared paradigm gate selects `atomic_boundary`, this owner writes the selected
+  profile/scope/proof ceiling only into `paradigm_constraints` on that same decision.
+- `workflow-architecture-design` uses the same record fields for coupled boundaries that must be
+  selected together inside one multi-view target and transition architecture. It owns their
+  cross-view coherence without invoking a second owner for each boundary; a request whose whole
+  outcome is one contested structural boundary stays with `analysis-boundary-design`.

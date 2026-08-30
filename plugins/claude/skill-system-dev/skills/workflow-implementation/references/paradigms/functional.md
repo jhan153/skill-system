@@ -1,5 +1,9 @@
 # Functional Implementation
 
+Cross-stage selection authority lives in `references/programming-paradigms/functional.md`. This file owns
+concrete realization and actual-path verification; it may narrow implementation admission from
+production evidence but never broadens the accepted trigger or scope.
+
 Use a functional boundary for deterministic calculations, value transformations, reducers, rules, and state transitions that benefit from explicit inputs, outputs, and isolated effects. The practical target is usually **observable purity at a useful boundary**, not ideological elimination of every local mutation.
 
 ## Core Model

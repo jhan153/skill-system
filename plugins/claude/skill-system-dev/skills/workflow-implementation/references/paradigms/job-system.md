@@ -1,5 +1,9 @@
 # Job System Implementation
 
+Cross-stage selection authority lives in `references/programming-paradigms/job-system.md`. This file owns
+concrete realization and actual-path verification; it may narrow implementation admission from
+production evidence but never broadens the accepted trigger or scope.
+
 A Job System is an execution architecture, not a replacement for procedural, object-oriented, functional, or data-oriented design. Use it when CPU work decomposition also needs explicit dependencies, scheduling, completion, cancellation/error propagation, or resource-access coordination.
 
 ## Classification
@@ -41,14 +45,23 @@ One million vertices should not automatically produce one million Job nodes. Chu
 ## Cost And Grain Model
 
 ```text
-total time
-  ~= useful work / effective parallelism
-   + critical path
+T1 = serial useful work
+T∞ = longest dependency chain / span
+P  = available workers
+
+ideal floor >= max(T1 / P, T∞)
+
+observed time
+  ~= ideal floor
    + job creation and queueing
    + dependency and synchronization cost
    + cache/memory movement
    + load imbalance
+   + blocking or preemption delay
 ```
+
+The scheduler can redistribute ready work, but it cannot remove `T∞`. Record total work and span
+separately; high aggregate utilization can still miss a deadline when the critical chain is long.
 
 Smaller chunks improve balance but increase allocation, queue operations, atomics, dependency counters, cache traffic, wakeups, and tracing. Larger chunks reduce overhead but may leave workers idle.
 
@@ -124,6 +137,10 @@ The API shape varies, but it should express:
 
 The API must also define handle lifetime, generation/reuse, submission from external threads, shutdown behavior, and what waiting from a worker does.
 
+The scheduler must also define whether a suspended or resumed task may continue on another worker.
+Treat TLS, OS-thread-owned allocators or locks, and thread-affine APIs as unavailable unless an
+explicit pinned or serial execution lane owns them; otherwise use task-local state.
+
 ## Scheduling Strategy
 
 Begin with the simplest scheduler that proves the API and dependency model:
@@ -179,6 +196,11 @@ Read/read can run together. Any overlapping write needs ordering, partitioning, 
 
 Prefer partial accumulation and reduction over many workers contending on shared vertices or hash entries. Specify floating-point reduction order when reproducibility matters.
 
+Keep four claims separate: data-race freedom, deterministic dependency/order, numerical reduction
+determinism, and cross-platform bitwise reproducibility. A dependency edge proves only its required
+ordering. Floating-point reproducibility additionally needs a fixed partition/reduction tree and a
+compatible execution environment, or an explicit tolerance contract.
+
 ## Staged Result Publication
 
 A Job handle or task scope represents an in-progress operation; it must not make a partially initialized final domain object publicly usable.
@@ -222,6 +244,13 @@ commit boundary
 
 This prevents background workers from mutating a live identity graph without conflict policy. The domain owner decides how a stale result is handled.
 
+## Accepted Pipelines And Frames In Flight
+
+When an accepted domain or rendering owner overlaps distinct items or frames, the Job System only
+carries ready work; it does not select the pipeline policy. Each in-flight item needs a versioned
+snapshot or token, a maximum count and backpressure rule, last-consumer reclamation, and measured
+memory plus end-to-end latency. A throughput gain does not prove lower input-to-visible latency.
+
 ## Suitable And Unsuitable Work
 
 Strong candidates:
@@ -253,11 +282,17 @@ Poor candidates for the general CPU pool:
 - **Data-oriented** layouts provide chunkable ranges and visible read/write sets.
 - **Procedural** orchestration can define domain stages while Job orchestration maps them to a DAG.
 - **Object-oriented** owners manage scheduler lifetime, task scopes, resources, and domain commit, but workers should receive handles/views rather than deep shared graphs.
+- **Structured Async** owns file/network/device waits, request lifetime, cancellation, and
+  backpressure before ready CPU work enters the Job System.
+- **Shared-Memory Concurrency** owns visibility, synchronization, reclamation, and progress when
+  Job access ranges are not owner-exclusive.
 - **TMP** may specialize a bounded kernel, not replace runtime dependency scheduling.
 
 ## Implementation Verification
 
 - The requirement needs graph/dependency/completion semantics beyond one asynchronous callback.
+- Total work and the longest dependency chain are observed separately; job count and worker
+  utilization are not used as proxies for either.
 - Domain, logical-item, and scheduler-grain levels are distinct.
 - Sequential kernels remain independently callable.
 - Dependencies, completion, cancellation, error, and shutdown semantics are defined.
@@ -265,6 +300,9 @@ Poor candidates for the general CPU pool:
 - Read/write overlap and shared accumulation have an explicit algorithm.
 - In-progress Job/bulk/GPU work reuses existing scheduler/runtime primitives when sufficient; any new request/builder/ticket owns a real additional invariant and cannot publish a partially initialized final object.
 - Blocking I/O and nested parallel runtimes are separated or coordinated.
+- Migrating tasks do not depend on TLS or thread-affine state without a declared execution lane.
 - Grain and scheduler sophistication are justified by a representative workload.
 - Determinism requirements pin partition and reduction order where necessary.
 - Snapshot/commit version conflicts have a domain-owned outcome.
+- Accepted pipelined work has an owner-provided in-flight bound, reclamation point, and latency
+  contract.

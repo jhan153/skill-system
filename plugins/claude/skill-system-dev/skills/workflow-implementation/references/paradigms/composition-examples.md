@@ -1,5 +1,9 @@
 # Paradigm Composition Examples
 
+Apply `references/programming_paradigm_contract.md` and the selected shared thin profiles before this file.
+This file owns concrete realization examples and implementation readback, not cross-stage selection
+or architecture acceptance.
+
 Load this file only when two or more approaches must be combined, or when applying one approach could violate another material boundary. Load the individual method files too; this file does not replace their implementation rules.
 
 The goal is not a stylistic blend. Each approach should own a different, named property of the system.
@@ -23,7 +27,9 @@ Use a compact map:
 | algorithm pipeline | procedural | visible order, context, output, failure | giant global-state procedure |
 | bulk storage/kernel | data-oriented | layout/ranges follow measured access | automatic ECS/SoA without evidence |
 | static specialization | TMP | bounded compile-time facts only | runtime choices encoded in types |
+| external progress | Structured Async | scoped readiness/completion, cancellation, backpressure, publication | blocking work hidden behind `async` syntax or detached lifetime |
 | CPU execution | Job System | DAG, grain, access, completion | thread-pool callback mislabeled as Job graph |
+| shared mutable state | Shared-Memory Concurrency | invariant, visibility, reclamation, progress | atomics or locks without an owned invariant |
 
 ## Graphics, Mesh, CAD, Or Simulation
 
@@ -94,7 +100,9 @@ Before adding any custom request/builder/ticket, reuse an existing future, task,
 | resource lifetime | valid `FileHandle`, socket handle, or GPU allocation owner |
 | progress and state transition | procedural `ReadRequest`, `ConnectionAttempt`, `DecodeSession`, or `UploadTicket` |
 | large writable storage/ranges | data-oriented `BufferBuilder` or staging buffer |
-| dependency/completion | event loop, async runtime, or Job scope/handle |
+| external readiness/completion | Structured Async scope, event loop, completion runtime, or bounded blocking adapter |
+| CPU dependency/completion | Job scope/handle with explicit access and completion semantics |
+| shared publication/reclamation | Shared-Memory Concurrency contract only when state is actually shared |
 | final publication | one validated `finish`/`commit`/`freeze` returning final value or typed failure |
 
 ```text
@@ -123,6 +131,8 @@ The two approaches complement but do not imply one another.
 2. The Job System schedules those ranges using explicit prerequisites and read/write declarations.
 3. Functional/procedural kernels define the computation inside each range.
 4. An object/session owner controls snapshots, cancellation, and commit.
+5. Shared-Memory Concurrency is added only when partitions still overlap, publish across workers, or
+   coordinate reclamation; a Job dependency alone is not a memory-visibility proof.
 
 ```text
 Position[] + Velocity[] -> Integrate chunks
@@ -190,7 +200,24 @@ For a fixed particle schema, choose layout from the update passes. ECS is justif
 
 ### Job System request versus one callback
 
-If the task has one independent background operation, use an asynchronous executor or thread pool unless the user explicitly wants Job System infrastructure. A dependency-aware DAG, completion scope, and resource-access model should correspond to a graph-shaped requirement.
+If the task has one independent background operation, use the existing asynchronous executor or
+thread pool unless the user explicitly wants Job System infrastructure. If the operation owns
+readiness/completion, cancellation, queue pressure, or a child lifetime, apply Structured Async;
+otherwise do not manufacture either model. A dependency-aware DAG, completion scope, and
+resource-access model should correspond to a graph-shaped CPU requirement.
+
+### Async request versus CPU parallelism
+
+An `async` API does not make a CPU-bound loop parallel. Keep external progress and request lifetime
+under Structured Async, then hand ready bulk computation to DOD/Job kernels only when the workload
+and dependency graph require them. Do not block event-loop callbacks on CPU jobs or occupy CPU Job
+workers with file/network waits.
+
+### Disjoint ranges versus shared-memory safety
+
+Disjoint logical indexes can still share an invariant, reclamation protocol, reduction order, or
+cache line. Load Shared-Memory Concurrency only for those remaining properties. Do not add locks to
+immutable snapshots or owner-exclusive ranges that already commit through one canonical owner.
 
 ### TMP request versus runtime plugin
 
@@ -244,6 +271,16 @@ Expected behavior: load TMP and this composition file; expose the compile-time/o
 Task: introduce a Job System for one independent background callback.
 
 Expected behavior: load the Job file; distinguish a simple executor from dependency-aware jobs and do not manufacture a graph requirement.
+
+Task: mark a blocking file call `async` while leaving it on the event-loop thread.
+
+Expected behavior: load Structured Async; expose the actual blocking carrier and move it behind an
+existing bounded adapter or keep the call synchronous. Syntax alone cannot satisfy the profile.
+
+Task: protect independent immutable snapshots with a global mutex.
+
+Expected behavior: do not load or apply Shared-Memory Concurrency merely because several threads
+read the values; preserve the simpler immutable ownership contract.
 
 ### Positive: Explicit Staged Construction
 

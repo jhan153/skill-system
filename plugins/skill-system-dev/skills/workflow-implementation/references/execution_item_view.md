@@ -114,16 +114,27 @@ payload:
   review_round: <R0, R1, R2, or local review id>
   implementation_snapshot: <reviewed identity>
   review_slice: <bounded files/flow>
+  review_coverage:
+    covered_effect_ids: []
+    activated_risk_axes: []
+    material_unassessed: []
+    conformance_scope: intrinsic_only | baseline_compared
+  review_ceiling: <what this static review does and does not establish>
   review_disposition: pass | repair_required | complete_with_deferred_items
   findings: []
+  advisories: []
   deferred_item_refs: []
   known_bug_exclusions: []
-  transition_intent: continue | repair
 ```
 
 Disposition precedence is `repair_required` over `complete_with_deferred_items` over `pass`.
-A required current-scope implementation omission is `repair_required`, never deferred. A runtime
-unknown alone does not invalidate a completed static review.
+A required current-scope implementation omission is `repair_required`, never deferred. Findings
+use P0/P1/P2, tight code refs, current impact, a mandatory repair `required_condition`, and only an
+optional non-normative solution. Advisories never change disposition or create repair/deferred
+authority. `pass` requires empty findings, deferred refs, and material-unassessed coverage; it is
+limited to the declared static review ceiling and is not runtime, test, merge, or product approval.
+Every cross-owner `code_review_result` envelope includes at least one `artifact_refs` entry for the
+source-linked Mermaid review artifact required by the static Code Review contract.
 
 ### `bug_fix_result`
 
@@ -181,6 +192,7 @@ normal terminal node such as `human_test_ready`; there is no `partial_handoff` f
 
 ## Worker-Done Body
 
-Send only item kind/ID, node/round, compact outcome, disposition, or attempt status, finding/deferred
-summaries, artifact/evidence anchors, and required start/finish/elapsed timing. Keep full diagrams,
-matrices, source analysis, and raw logs in their owning artifact or worker context.
+Send only item kind/ID, node/round, compact outcome, disposition, or attempt status,
+finding/advisory/deferred summaries, artifact/evidence anchors, and required start/finish/elapsed
+timing. Keep full diagrams, matrices, source analysis, and raw logs in their owning artifact or
+worker context.

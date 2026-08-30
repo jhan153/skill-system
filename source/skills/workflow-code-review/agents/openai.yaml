@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Code Review"
-  short_description: "Static code review with dynamic models and handoff"
-  default_prompt: "Use $workflow-code-review to statically review the bound implementation with risk-selected Mermaid evidence and return a compact disposition and Coordinator handoff."
+  short_description: "Risk-based static review with Mermaid evidence"
+  default_prompt: "Use $workflow-code-review to bind the implementation change contract, run design-first risk selection, build source-linked Mermaid evidence, account for every material changed effect, and return a scoped standalone or Core static disposition."
 
 policy:
   invocation_surface: "evidence_gate"

@@ -1,7 +1,8 @@
-# source/plugins/dev.yaml — plugin membership manifest (hand-authored input).
+# source/plugins/dev.yaml — plugin profile manifest (hand-authored input).
 name: skill-system-dev
-version: "10.1.1"
-description: 'Skill System dev — engineering analysis, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.'
+description: 'Skill System dev — engineering analysis, architecture design, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.'
+short_description: 'Engineering analysis, architecture design, implementation, bounded repair, code review, behavior discovery, and refactoring skills.'
+codex_catalog_order: 20
 skills:
   - analysis-algorithm
   - analysis-architecture-deepening
@@ -10,6 +11,7 @@ skills:
   - analysis-domain-modeling
   - analysis-performance
   - plan-behavior-discovery
+  - workflow-architecture-design
   - workflow-bug-fix
   - workflow-dependency-upgrade
   - workflow-code-review

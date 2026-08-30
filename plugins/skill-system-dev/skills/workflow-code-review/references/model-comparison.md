@@ -6,12 +6,17 @@ Load only for code-derived model construction, dynamic view selection, intrinsic
 
 - Give each material actor, component, message, state, transition, guard, data/effect, invariant, and failure behavior a stable local ID plus code refs.
 - Preserve whether each element or edge is a direct static fact, static inference, or runtime unknown.
-- Trace a representative path and one material edge/failure/cancel/compensation path before declaring the view sufficient.
+- Trace a representative path and the material edge/failure/cancel/compensation paths selected by
+  `references/static_code_review_contract.md`. One representative and one disconfirming path are
+  the minimum, never the coverage ceiling.
 - Do not require or invent an expected design model. Code contracts, explicit invariants, language/framework rules, public interfaces, and accepted requirements may support intrinsic findings when directly evidenced.
 
 ## Select Views Dynamically
 
-Choose the minimum complementary set that exposes the material risk; no diagram type or baseline/implementation pair is mandatory by template.
+Choose the minimum complementary set that exposes every activated material risk. At least one
+source-linked Mermaid model covering the highest-risk material changed effect is mandatory for a
+produced review; no particular diagram type or baseline/implementation pair is mandatory by
+template.
 
 | View | Static review question | Altitude | Mermaid |
 | --- | --- | --- | --- |
@@ -34,7 +39,10 @@ Inspect only applicable axes:
 - dependency direction, ownership bypasses, interface/contract violations, and contradictory invariants;
 - reachability and liveness, including missing exits, terminal escape, stale/lost propagation, and stuck cycles.
 
-Make a finding only when the claim is falsifiable and anchored to code or an authoritative contract. Keep runtime scheduling, external state, production registration, and concurrency outcomes explicitly outside static proof.
+Make a finding only when the claim is falsifiable and anchored to code or an authoritative
+contract. A source-permitted interleaving that violates lifetime, synchronization, ordering,
+visibility, or cleanup is a static finding. Keep its occurrence/frequency, external state, actual
+production registration, and scheduler-dependent behavior explicitly outside static proof.
 
 ## Optional Conformance Lane
 

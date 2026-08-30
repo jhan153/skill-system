@@ -1,6 +1,6 @@
 ---
 name: analysis-architecture-deepening
-description: Rank evidence-backed improvements across deep modules, seams, adapters, wrappers, policy ownership, and interfaces. Use for scoped “what next?” scans; not selected-boundary design, implementation, or repo-wide reports.
+description: Rank evidence-backed improvements across deep modules, seams, adapters, wrappers, policy ownership, and interfaces. Use for scoped “what next?” scans; not selected-boundary design, normative multi-view target architecture, implementation, or repo-wide reports.
 ---
 
 # Analysis Architecture Deepening
@@ -11,6 +11,8 @@ description: Rank evidence-backed improvements across deep modules, seams, adapt
 - use_when: rank several improvements in a workflow, module cluster, or explicit broad scope before selecting one.
 - do_not_use_when:
   - one boundary/interface is selected: `analysis-boundary-design`
+  - several interacting boundaries need a normative target/transition design:
+    `workflow-architecture-design`
   - architecture map, HLD/LLD modeling, or Mermaid flow/structure/state diagrams: `analysis-codebase-map`
   - recurring bug root cause: current task owner for diagnosis-only, or `workflow-bug-fix` when repair is requested
   - domain concepts/invariants: `analysis-domain-modeling`
@@ -75,7 +77,11 @@ Return only:
 - `candidates` with stable IDs, `ranking`, and counterevidence
 - `recommended_next_candidate` as an established ranked candidate ID plus the decisive tradeoff;
   when no candidate is established, return `none` with the exact discriminator instead
-- `handoff` to `analysis-boundary-design` when one boundary still needs design, `workflow-refactor-safely` for selected behavior-preserving live restructuring, `workflow-source-maintenance` for selected proven-obsolete deletion, or `workflow-implementation` for selected behavior changes
+- `handoff` to `analysis-boundary-design` when one boundary still needs design,
+  `workflow-architecture-design` when an established candidate requires a coherent normative design
+  across several architecture views, `workflow-refactor-safely` for selected behavior-preserving
+  live restructuring, `workflow-source-maintenance` for selected proven-obsolete deletion, or
+  `workflow-implementation` for selected behavior changes whose architecture is already accepted
 - `unverified_gaps`
 
 This skill may identify and rank the next change question, but it never starts implementation,

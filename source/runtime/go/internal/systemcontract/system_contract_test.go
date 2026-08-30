@@ -26,10 +26,29 @@ type skillFrontmatter struct {
 }
 
 type pluginManifest struct {
-	Name        string   `yaml:"name"`
-	Version     string   `yaml:"version"`
-	Description string   `yaml:"description"`
-	Skills      []string `yaml:"skills"`
+	Name              string   `yaml:"name"`
+	Description       string   `yaml:"description"`
+	ShortDescription  string   `yaml:"short_description"`
+	CodexCatalogOrder int      `yaml:"codex_catalog_order"`
+	Skills            []string `yaml:"skills"`
+}
+
+type distributionMetadata struct {
+	SchemaVersion int    `json:"schema_version"`
+	BundleVersion string `json:"bundle_version"`
+	Publisher     struct {
+		Name string `json:"name"`
+	} `json:"publisher"`
+	Marketplace struct {
+		Name        string `json:"name"`
+		DisplayName string `json:"display_name"`
+		Description string `json:"description"`
+		Category    string `json:"category"`
+		CodexPolicy struct {
+			Installation   string `json:"installation"`
+			Authentication string `json:"authentication"`
+		} `json:"codex_policy"`
+	} `json:"marketplace"`
 }
 
 type providerCatalog struct {
@@ -63,6 +82,7 @@ func TestCanonicalSkillCatalog(t *testing.T) {
 	plugins := loadPluginManifests(t, root)
 	owners := map[string][]string{}
 	pluginNames := map[string]bool{}
+	codexCatalogOrders := map[int]string{}
 
 	for _, plugin := range plugins {
 		if plugin.Name == "" {
@@ -73,6 +93,21 @@ func TestCanonicalSkillCatalog(t *testing.T) {
 			t.Errorf("duplicate plugin name %q", plugin.Name)
 		}
 		pluginNames[plugin.Name] = true
+		if strings.TrimSpace(plugin.ShortDescription) == "" {
+			t.Errorf("plugin %s has an empty short_description", plugin.Name)
+		}
+		if plugin.CodexCatalogOrder <= 0 {
+			t.Errorf("plugin %s has invalid codex_catalog_order %d", plugin.Name, plugin.CodexCatalogOrder)
+		} else if previous := codexCatalogOrders[plugin.CodexCatalogOrder]; previous != "" {
+			t.Errorf(
+				"plugins %s and %s share codex_catalog_order %d",
+				previous,
+				plugin.Name,
+				plugin.CodexCatalogOrder,
+			)
+		} else {
+			codexCatalogOrders[plugin.CodexCatalogOrder] = plugin.Name
+		}
 		seen := map[string]bool{}
 		for _, skillID := range plugin.Skills {
 			if seen[skillID] {
@@ -103,6 +138,7 @@ func TestProviderSkillPackages(t *testing.T) {
 	root := repositoryRoot(t)
 	plugins := loadPluginManifests(t, root)
 	providers := loadProviderCatalog(t, root)
+	distribution := loadDistributionMetadata(t, root)
 
 	for _, provider := range providers {
 		if provider.Status != "active" {
@@ -141,10 +177,13 @@ func TestProviderSkillPackages(t *testing.T) {
 				t,
 				provider.ID,
 				filepath.Join(root, filepath.FromSlash(manifestRelative)),
-				plugin.Name,
+				plugin,
+				distribution.BundleVersion,
 			)
 		}
 	}
+	validateCodexMarketplace(t, root, distribution, plugins)
+	validateClaudeMarketplace(t, root, distribution, plugins)
 }
 
 func TestProviderHarnessWiring(t *testing.T) {
@@ -256,7 +295,12 @@ func TestProviderHarnessWiring(t *testing.T) {
 	}
 }
 
-func validatePluginManifest(t *testing.T, providerID, path, expectedName string) {
+func validatePluginManifest(
+	t *testing.T,
+	providerID, path string,
+	expected pluginManifest,
+	bundleVersion string,
+) {
 	t.Helper()
 	raw, err := os.ReadFile(path)
 	if err != nil {
@@ -264,21 +308,225 @@ func validatePluginManifest(t *testing.T, providerID, path, expectedName string)
 		return
 	}
 	var manifest struct {
-		Name string `json:"name"`
+		Name      string `json:"name"`
+		Version   string `json:"version"`
+		Interface struct {
+			ShortDescription string `json:"shortDescription"`
+		} `json:"interface"`
 	}
 	if err := json.Unmarshal(raw, &manifest); err != nil {
 		t.Errorf("provider %s plugin manifest %s is invalid JSON: %v", providerID, filepath.ToSlash(path), err)
 		return
 	}
-	if manifest.Name != expectedName {
+	if manifest.Name != expected.Name {
 		t.Errorf(
 			"provider %s plugin manifest %s name %q != %q",
 			providerID,
 			filepath.ToSlash(path),
 			manifest.Name,
-			expectedName,
+			expected.Name,
 		)
 	}
+	if providerID == "codex" || providerID == "claude" {
+		if manifest.Version != bundleVersion {
+			t.Errorf(
+				"provider %s plugin manifest %s version %q != bundle version %q",
+				providerID,
+				filepath.ToSlash(path),
+				manifest.Version,
+				bundleVersion,
+			)
+		}
+	}
+	if providerID == "codex" && manifest.Interface.ShortDescription != expected.ShortDescription {
+		t.Errorf(
+			"Codex plugin manifest %s shortDescription %q != %q",
+			filepath.ToSlash(path),
+			manifest.Interface.ShortDescription,
+			expected.ShortDescription,
+		)
+	}
+}
+
+func validateCodexMarketplace(
+	t *testing.T,
+	root string,
+	distribution distributionMetadata,
+	plugins []pluginManifest,
+) {
+	t.Helper()
+	path := filepath.Join(root, ".agents/plugins/marketplace.json")
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		t.Errorf("Codex marketplace: %v", err)
+		return
+	}
+	var catalog struct {
+		Name      string `json:"name"`
+		Interface struct {
+			DisplayName string `json:"displayName"`
+		} `json:"interface"`
+		Plugins []struct {
+			Name   string `json:"name"`
+			Source struct {
+				Source string `json:"source"`
+				Path   string `json:"path"`
+			} `json:"source"`
+			Policy struct {
+				Installation   string `json:"installation"`
+				Authentication string `json:"authentication"`
+			} `json:"policy"`
+			Category string `json:"category"`
+		} `json:"plugins"`
+	}
+	if err := json.Unmarshal(raw, &catalog); err != nil {
+		t.Errorf("Codex marketplace JSON: %v", err)
+		return
+	}
+	if catalog.Name != distribution.Marketplace.Name {
+		t.Errorf("Codex marketplace name %q != %q", catalog.Name, distribution.Marketplace.Name)
+	}
+	if catalog.Interface.DisplayName != distribution.Marketplace.DisplayName {
+		t.Errorf(
+			"Codex marketplace displayName %q != %q",
+			catalog.Interface.DisplayName,
+			distribution.Marketplace.DisplayName,
+		)
+	}
+	expectedOrder := append([]pluginManifest(nil), plugins...)
+	sort.Slice(expectedOrder, func(i, j int) bool {
+		return expectedOrder[i].CodexCatalogOrder < expectedOrder[j].CodexCatalogOrder
+	})
+	actualNames := map[string]bool{}
+	for index, entry := range catalog.Plugins {
+		if actualNames[entry.Name] {
+			t.Errorf("Codex marketplace duplicates plugin %s", entry.Name)
+		}
+		actualNames[entry.Name] = true
+		if index >= len(expectedOrder) {
+			continue
+		}
+		expected := expectedOrder[index]
+		if entry.Name != expected.Name {
+			t.Errorf(
+				"Codex marketplace plugin %d name %q != ordered profile %q",
+				index,
+				entry.Name,
+				expected.Name,
+			)
+		}
+		if entry.Source.Source != "local" || entry.Source.Path != "./plugins/"+expected.Name {
+			t.Errorf(
+				"Codex marketplace plugin %s source=%q path=%q",
+				entry.Name,
+				entry.Source.Source,
+				entry.Source.Path,
+			)
+		}
+		if entry.Policy.Installation != distribution.Marketplace.CodexPolicy.Installation ||
+			entry.Policy.Authentication != distribution.Marketplace.CodexPolicy.Authentication {
+			t.Errorf("Codex marketplace plugin %s policy differs from distribution metadata", entry.Name)
+		}
+		if entry.Category != distribution.Marketplace.Category {
+			t.Errorf(
+				"Codex marketplace plugin %s category %q != %q",
+				entry.Name,
+				entry.Category,
+				distribution.Marketplace.Category,
+			)
+		}
+	}
+	expectedNames := make([]string, 0, len(plugins))
+	for _, plugin := range plugins {
+		expectedNames = append(expectedNames, plugin.Name)
+	}
+	compareSets(t, "Codex marketplace profiles", boolSet(expectedNames), actualNames)
+}
+
+func validateClaudeMarketplace(
+	t *testing.T,
+	root string,
+	distribution distributionMetadata,
+	plugins []pluginManifest,
+) {
+	t.Helper()
+	path := filepath.Join(root, "plugins/.claude-plugin/marketplace.json")
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		t.Errorf("Claude marketplace: %v", err)
+		return
+	}
+	var catalog struct {
+		Name  string `json:"name"`
+		Owner struct {
+			Name string `json:"name"`
+		} `json:"owner"`
+		Description string `json:"description"`
+		Plugins     []struct {
+			Name        string `json:"name"`
+			Source      string `json:"source"`
+			Description string `json:"description"`
+			Version     string `json:"version"`
+			Category    string `json:"category"`
+		} `json:"plugins"`
+	}
+	if err := json.Unmarshal(raw, &catalog); err != nil {
+		t.Errorf("Claude marketplace JSON: %v", err)
+		return
+	}
+	if catalog.Name != distribution.Marketplace.Name {
+		t.Errorf("Claude marketplace name %q != %q", catalog.Name, distribution.Marketplace.Name)
+	}
+	if catalog.Owner.Name != distribution.Publisher.Name {
+		t.Errorf("Claude marketplace owner %q != %q", catalog.Owner.Name, distribution.Publisher.Name)
+	}
+	if catalog.Description != distribution.Marketplace.Description {
+		t.Errorf(
+			"Claude marketplace description %q != %q",
+			catalog.Description,
+			distribution.Marketplace.Description,
+		)
+	}
+	expectedByName := map[string]pluginManifest{}
+	expectedNames := make([]string, 0, len(plugins))
+	for _, plugin := range plugins {
+		expectedByName[plugin.Name] = plugin
+		expectedNames = append(expectedNames, plugin.Name)
+	}
+	actualNames := map[string]bool{}
+	for _, entry := range catalog.Plugins {
+		if actualNames[entry.Name] {
+			t.Errorf("Claude marketplace duplicates plugin %s", entry.Name)
+		}
+		actualNames[entry.Name] = true
+		expected, exists := expectedByName[entry.Name]
+		if !exists {
+			continue
+		}
+		if entry.Source != "./claude/"+expected.Name {
+			t.Errorf("Claude marketplace plugin %s source %q is invalid", entry.Name, entry.Source)
+		}
+		if entry.Description != expected.Description {
+			t.Errorf("Claude marketplace plugin %s description differs from profile", entry.Name)
+		}
+		if entry.Version != distribution.BundleVersion {
+			t.Errorf(
+				"Claude marketplace plugin %s version %q != %q",
+				entry.Name,
+				entry.Version,
+				distribution.BundleVersion,
+			)
+		}
+		if entry.Category != distribution.Marketplace.Category {
+			t.Errorf(
+				"Claude marketplace plugin %s category %q != %q",
+				entry.Name,
+				entry.Category,
+				distribution.Marketplace.Category,
+			)
+		}
+	}
+	compareSets(t, "Claude marketplace profiles", boolSet(expectedNames), actualNames)
 }
 
 func repositoryRoot(t *testing.T) string {
@@ -370,6 +618,39 @@ func loadPluginManifests(t *testing.T, root string) []pluginManifest {
 		result = append(result, manifest)
 	}
 	return result
+}
+
+func loadDistributionMetadata(t *testing.T, root string) distributionMetadata {
+	t.Helper()
+	path := filepath.Join(root, "source/distribution.json")
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("distribution metadata: %v", err)
+	}
+	var metadata distributionMetadata
+	if err := json.Unmarshal(raw, &metadata); err != nil {
+		t.Fatalf("distribution metadata JSON: %v", err)
+	}
+	if metadata.SchemaVersion != 1 {
+		t.Fatalf("distribution metadata schema_version %d != 1", metadata.SchemaVersion)
+	}
+	if strings.TrimSpace(metadata.BundleVersion) == "" {
+		t.Fatal("distribution metadata has an empty bundle_version")
+	}
+	if strings.TrimSpace(metadata.Publisher.Name) == "" {
+		t.Fatal("distribution metadata has an empty publisher name")
+	}
+	if strings.TrimSpace(metadata.Marketplace.Name) == "" ||
+		strings.TrimSpace(metadata.Marketplace.DisplayName) == "" ||
+		strings.TrimSpace(metadata.Marketplace.Description) == "" ||
+		strings.TrimSpace(metadata.Marketplace.Category) == "" {
+		t.Fatal("distribution metadata has incomplete marketplace identity")
+	}
+	if strings.TrimSpace(metadata.Marketplace.CodexPolicy.Installation) == "" ||
+		strings.TrimSpace(metadata.Marketplace.CodexPolicy.Authentication) == "" {
+		t.Fatal("distribution metadata has incomplete Codex marketplace policy")
+	}
+	return metadata
 }
 
 func loadProviderCatalog(t *testing.T, root string) []providerContract {

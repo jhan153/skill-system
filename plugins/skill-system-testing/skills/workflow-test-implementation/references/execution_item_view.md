@@ -173,6 +173,7 @@ normal terminal node such as `human_test_ready`; there is no `partial_handoff` f
 
 ## Worker-Done Body
 
-Send only item kind/ID, node/round, compact outcome, disposition, or attempt status, finding/deferred
-summaries, artifact/evidence anchors, and required start/finish/elapsed timing. Keep full diagrams,
-matrices, source analysis, and raw logs in their owning artifact or worker context.
+Send only item kind/ID, node/round, compact outcome, disposition, or attempt status,
+finding/advisory/deferred summaries, artifact/evidence anchors, and required start/finish/elapsed
+timing. Keep full diagrams, matrices, source analysis, and raw logs in their owning artifact or
+worker context.

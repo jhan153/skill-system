@@ -1,5 +1,9 @@
 # Procedural Implementation
 
+Cross-stage selection authority lives in `references/programming-paradigms/procedural.md`. This file owns
+concrete realization and actual-path verification; it may narrow implementation admission from
+production evidence but never broadens the accepted trigger or scope.
+
 Use a procedural boundary when the behavior is primarily an explicit sequence of transformations rather than a long-lived identity collaborating with other identities. The important question is not whether the language offers classes; it is whether the module's meaning is best expressed as `input -> ordered work -> output`.
 
 ## Selection Strength

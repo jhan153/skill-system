@@ -37,11 +37,29 @@ Do not invoke a classifier for `/goal`, duration, automation, or repeated wordin
 | Why is a concrete failure occurring, with no repair requested? | current task owner, read-only causal diagnosis; no specialist skill |
 | Which algorithm/model/retrieval/local approach fits concrete constraints? | `analysis-algorithm` |
 | What one module/interface/seam/adapter/dependency boundary should be selected? | `analysis-boundary-design` |
+| What coherent target/transition architecture should satisfy accepted quality scenarios across several interacting boundaries? | `workflow-architecture-design` |
 | Which structural/deep-module improvement candidate should come next? | `analysis-architecture-deepening` |
 | What concepts, identity, states, invariants, or business rules form the domain? | `analysis-domain-modeling` |
 | What measured latency/throughput/CPU/memory/query/render/startup/bundle bottleneck dominates? | `analysis-performance` |
 
-Choose by the requested decision, not incidental nouns. Incorrect behavior beats performance unless the behavior is correct and an SLO/resource target dominates; business meaning beats code boundary for domain questions; one selected boundary beats candidate scanning. Use at most two stages serially only when the second cannot be framed before the first resolves evidence.
+Choose by the requested decision, not incidental nouns. The word “architecture” alone does not
+select target design: current maps, one-boundary decisions, candidate scans, and normative
+multi-view design retain separate owners. Incorrect behavior beats performance unless the behavior
+is correct and an SLO/resource target dominates; business meaning beats code boundary for domain
+questions; one selected boundary beats candidate scanning. Use at most two stages serially only
+when the second cannot be framed before the first resolves evidence.
+
+An accepted `architecture_design` does not move every later boundary question back to Architecture
+Design. Route one explicitly assigned atomic boundary to `analysis-boundary-design`, which preserves
+the relevant accepted constraints. Route back to `workflow-architecture-design` only when the
+decision changes coupled views/owners or an accepted architecture constraint.
+
+Programming-paradigm wording alone does not select Architecture Design. Route subsystem-wide
+composition or a choice that crosses the shared architecture-impact gate to
+`workflow-architecture-design` when its decision owner is `coupled_architecture`; route one
+architecture-material public/module/API/ABI boundary to `analysis-boundary-design`; keep
+`local_implementation` function/class/layout/RAII/scheduling realization with
+`workflow-implementation`.
 
 ## Evidence Lane Selection
 
@@ -56,7 +74,7 @@ Route an explicit, single-domain evidence request directly: papers/citations to 
 | accepted Plan-assigned `RES-*` node | `workflow-research` plus exactly one stage skill already selected by the Plan; neither selects a successor |
 | approved plan/spec execution | the current Orchestrator follows an existing canonical Plan/Handoff; without one, route one bounded approved slice to its task-specific workflow |
 | concrete failure repair, including an unclear cause | `workflow-bug-fix`; DAG input owns one assigned intervention/result, while direct standalone repair may own at most two locally reviewed rounds |
-| static code review of a bound implementation or diff | `workflow-code-review`; select diagrams from code risk, treat design as optional evidence, and return only a compact `continue|repair` intent for the Coordinator |
+| static code review of a bound implementation or diff | `workflow-code-review`; bind intent/material effects, run design-first risk selection, keep source-linked Mermaid evidence, and return a scoped standalone disposition or cross-owner Core result without selecting a successor |
 | existing implementation explanation or verified changed-line comparison report | `report-implementation-explainer`, only on explicit explanation/compare artifact intent; Markdown is default and HTML is optional |
 | product behavior discovery for an existing capability | `plan-behavior-discovery`, only on explicit one-question decision intent |
 | human-owned test judgment surfaced by Test Design | `plan-test-discovery`, only from a named blocked test condition with evidence/options; it records decisions but never designs or implements the test |
