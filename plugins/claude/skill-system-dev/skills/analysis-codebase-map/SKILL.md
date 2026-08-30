@@ -17,7 +17,7 @@ description: Model the current repository or named slice as evidence-linked Merm
   - the user wants ranked improvement candidates; use `analysis-architecture-deepening`.
   - the user wants a normative target/transition architecture across several interacting
     boundaries; use `workflow-architecture-design`.
-  - the cause of a failure is unknown; keep diagnosis-only work with the current task owner or use `workflow-bug-fix` when repair is requested.
+  - the cause of a failure is unknown; use `workflow-runtime-debugging` for an explicitly requested execution-ready debugging scope or material debugger/dump/dynamic/graphics evidence lane, keep simple source/log-only diagnosis with the current task owner, or use `workflow-bug-fix` when repair is requested.
   - implemented code or a diff needs findings and a review disposition, with or without a design baseline; use `workflow-code-review`.
   - the request is domain language, performance RCA, direct implementation, or an explicit findings/quality-gate artifact.
 - expected_inputs: repo root or named slice, the question to understand, any explicit HLD/LLD choice, and any required runtime/state focus

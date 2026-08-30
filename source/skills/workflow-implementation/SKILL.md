@@ -48,6 +48,7 @@ description: Primary workflow for direct or DAG-assigned production software imp
     - `references/maintainable_code_principles.md` when maintainability is explicit or the change materially affects ownership, abstraction, invariants, effects, conventions, or verification
     - `references/database_persistence_transparency_contract.md` when adding or changing database schema, ORM/ODM mapping, query, migration, transaction, or data-access-boundary behavior
     - `references/identifier_readability_principle.md` when implementation introduces or renames a related identifier set in repository-owned code and repository conventions or domain terms do not already decide a clearly distinguishable shape
+    - `references/runtime_debugging_contract.md` when implementing crash/dump capture, build/symbol publication, debugger hooks, dynamic-diagnostic or trace/replay integration, graphics validation/markers, or device-loss diagnostics
     - `references/execution_item_view.md` when a delegated node result will cross into Code Review, a Coordinator, Plan/Handoff, or another plugin
     - `references/programming_paradigm_contract.md` when an accepted architecture contains a
       programming-paradigm or adjacent-model pattern application, an accepted atomic boundary has
@@ -143,6 +144,7 @@ Apply conditional references without transferring workflow ownership:
 | `maintainable_code_principles.md` | Apply the six principles after the behavior boundary; own only the in-scope implementation and changed-path evidence. |
 | `database_persistence_transparency_contract.md` | Preserve accepted source/domain/boundary meaning; own the concrete model, read/write effects, consistency/transaction, lifecycle, cost visibility, and matching readback. |
 | `identifier_readability_principle.md` | Own introduced/changed related identifiers and required callers; preserve higher naming authority and leave static findings to Code Review. |
+| `runtime_debugging_contract.md` | Implement only the requested diagnostic infrastructure; preserve exact target/build/symbol/capture identity, crash-context safety, partial-artifact reporting, perturbation, trust/privacy controls, and the runtime proof ceiling without claiming a current root cause. |
 | `programming_paradigm_contract.md` | Preserve shared paradigm axes, authority, scope/interactions, impact/decision-owner gate, thin-profile proof ceilings, and immutable accepted applications; own local decisions and downstream `paradigm_conformance` only. |
 | `paradigm-composition.md` | Route an already selected application to only the detailed method profiles needed for concrete code realization and actual-path readback. |
 | `delivery_slice_contract.md` | Select a multi-batch delivery shape only when more than one executable batch is required. |
@@ -175,6 +177,7 @@ Apply conditional references without transferring workflow ownership:
 | requested behavior | Representative production path and a realistic failure/edge observation. |
 | canonical convergence | Every in-scope producer/consumer uses one representation/state machine; no adapter, shim, legacy path, or fallback preserves the replaced contract. |
 | source selection, migration, transform, adapter, or external boundary | Actual-path readback; external translation yields one canonical valid value or typed failure and owns no policy/hidden state. |
+| crash/debug/dynamic/graphics diagnostic infrastructure | Source and configuration readback for identity, lifetime/reentrancy, partial-capture, trust/privacy, and marker/correlation paths plus one safe condition-matched capture/readback when available; ordinary tests or static shape do not prove behavior in a real corrupted or device-loss context. |
 | implementation shape | Changed boundaries realize the selected state, data, effect, dispatch/specialization, or execution rules and keep the non-applicable boundary out. |
 | paradigm/model application conformance | Changed-path source readback establishes only observable code shape; attach matching runtime/test/trace/benchmark evidence for determinism, lifecycle, memory/performance, compile-cost, or scheduling claims without mutating the accepted application. |
 | construction or simplicity | No partial final value escapes; staged work exposes `pending/completed/failed/cancelled`, and each abstract type has a current invariant/responsibility that reduces total conceptual machinery. |

@@ -80,8 +80,12 @@ test transition: `current_graph` or `next_waterfall`. `phase_gate_delivery` defa
 - explicitly selected `workflow-test-design` and `workflow-test-implementation` nodes may produce
   agent-machine test contracts/evidence inside `current_graph`; their condition verdicts remain
   scoped evidence and do not replace a later Human Test when authority is `human_handoff|mixed`;
-- all runnable agent nodes proceed through static review and terminate at `human_test_ready`
-  without waiting for the user;
+- explicitly selected `workflow-runtime-debugging` nodes may produce a Core `debugging_result` in
+  `scope` or `operate` mode; a scope node operates no tools, an operate node preserves safe session
+  handback, and neither creates a repair/performance/test successor outside an accepted edge;
+- production and test implementation nodes proceed through their assigned static review before the
+  graph terminates at `human_test_ready`; scope-only, diagnostic, research, and other no-source-diff
+  artifact nodes follow their explicit existing edges without a meaningless Code Review gate;
 - Human Test is outside the current Task DAG. The current plan may complete at the pre-test
   boundary while the broader product result remains `user-verification-needed`;
 - the current `handoff.md` becomes closed/read-only at transition and is never resumed from a

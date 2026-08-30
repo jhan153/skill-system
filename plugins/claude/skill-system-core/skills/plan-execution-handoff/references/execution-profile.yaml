@@ -264,6 +264,14 @@ roles:
       - skill-system-dev:analysis-performance
     boundary: evidence-backed recommendation; product authority stays with the declared owner
 
+  runtime_debugging_owner:
+    agent: runtime_debugging_owner
+    model: gpt-5.6-sol
+    effort: xhigh
+    selected_skills:
+      - skill-system-dev:workflow-runtime-debugging
+    boundary: one DBG0 scope or DBG1 operate node; no production/test source writes, target-state mutation beyond explicit authority, successor selection, or automatic repair
+
   prototype_owner:
     agent: prototype_owner
     model: Fable 5

@@ -34,7 +34,8 @@ Do not invoke a classifier for `/goal`, duration, automation, or repeated wordin
 
 | Dominant question | Direct owner |
 | --- | --- |
-| Why is a concrete failure occurring, with no repair requested? | current task owner, read-only causal diagnosis; no specialist skill |
+| What execution-ready debugging scope is needed for one concrete runtime correctness failure, or why is it occurring when a debugger session, crash artifact, dynamic diagnostic, concurrency trace, or graphics capture is available or explicitly approved? | `workflow-runtime-debugging` in `scope` or `operate` mode |
+| Why is a concrete failure occurring when source/log reasoning is sufficient and no runtime evidence lane is material? | current task owner, read-only causal diagnosis |
 | Which algorithm/model/retrieval/local approach fits concrete constraints? | `analysis-algorithm` |
 | What one module/interface/seam/adapter/dependency boundary should be selected? | `analysis-boundary-design` |
 | What coherent target/transition architecture should satisfy accepted quality scenarios across several interacting boundaries? | `workflow-architecture-design` |
@@ -63,7 +64,7 @@ architecture-material public/module/API/ABI boundary to `analysis-boundary-desig
 
 ## Evidence Lane Selection
 
-Route an explicit, single-domain evidence request directly: papers/citations to `search-paper-evidence`, multi-angle verification of one claim to `search-deep-evidence`, diagnosis-only concrete failures to the current task owner under the read-only boundary, rendered UI evidence to the fitting design gate, declared Memory or Knowledge to its read harness, and an explicitly selected LLM Wiki to `analysis-llm-wiki-context`. Runtime/change evidence stays with the active task owner. If the user asks only which lane applies, the current owner returns that choice without loading a routing skill. Do not open several lanes speculatively; use `search-deep-evidence` only when the same claim genuinely requires independent lanes.
+Route an explicit, single-domain evidence request directly: papers/citations to `search-paper-evidence`, multi-angle verification of one claim to `search-deep-evidence`, an execution-ready scope or runtime correctness investigation with a debugger/dump/dynamic/graphics lane to `workflow-runtime-debugging`, simple source/log-only diagnosis to the current task owner under the read-only boundary, rendered UI evidence to the fitting design gate, declared Memory or Knowledge to its read harness, and an explicitly selected LLM Wiki to `analysis-llm-wiki-context`. Runtime/change evidence otherwise stays with the active task owner. If the user asks only which lane applies, the current owner returns that choice without loading a routing skill. Do not open several lanes speculatively; use `search-deep-evidence` only when the same claim genuinely requires independent lanes.
 
 ## Direct Owners
 
@@ -74,6 +75,7 @@ Route an explicit, single-domain evidence request directly: papers/citations to 
 | accepted Plan-assigned `RES-*` node | `workflow-research` plus exactly one stage skill already selected by the Plan; neither selects a successor |
 | approved plan/spec execution | the current Orchestrator follows an existing canonical Plan/Handoff; without one, route one bounded approved slice to its task-specific workflow |
 | concrete failure repair, including an unclear cause | `workflow-bug-fix`; DAG input owns one assigned intervention/result, while direct standalone repair may own at most two locally reviewed rounds |
+| execution-ready debugging scope or runtime correctness diagnosis through a live debugger, crash artifact, dynamic diagnostic, concurrency trace, or graphics capture, with no repair requested | `workflow-runtime-debugging`; direct mode returns a task-local result, while an accepted `DBG0/DBG1` node returns Core `debugging_result`; neither writes source or selects a Plan transition |
 | static code review of a bound implementation or diff | `workflow-code-review`; bind intent/material effects, run design-first risk selection, keep source-linked Mermaid evidence, and return a scoped standalone disposition or cross-owner Core result without selecting a successor |
 | existing implementation explanation or verified changed-line comparison report | `report-implementation-explainer`, only on explicit explanation/compare artifact intent; Markdown is default and HTML is optional |
 | product behavior discovery for an existing capability | `plan-behavior-discovery`, only on explicit one-question decision intent |

@@ -1,7 +1,7 @@
 # source/plugins/testing.yaml — plugin profile manifest (hand-authored input).
 name: skill-system-testing
-description: 'Skill System testing — human-in-loop oracle discovery, test design, test-only implementation, replay/visual/statistical evidence, and false-green review.'
-short_description: 'Human-in-loop test decisions, test design, test-only implementation, and evidence specialists.'
+description: 'Skill System testing — human-in-loop oracle discovery, test design, test-only implementation, test-scoped diagnostic artifact capture, replay/visual/statistical evidence, and false-green review.'
+short_description: 'Test decisions, design, test-only implementation, test-scoped diagnostic capture, and evidence specialists.'
 codex_catalog_order: 50
 skills:
   - plan-test-discovery

@@ -1,7 +1,7 @@
 {
   "name": "skill-system-testing",
-  "version": "10.1.1",
-  "description": "Skill System testing — human-in-loop oracle discovery, test design, test-only implementation, replay/visual/statistical evidence, and false-green review.",
+  "version": "10.2.0",
+  "description": "Skill System testing — human-in-loop oracle discovery, test design, test-only implementation, test-scoped diagnostic artifact capture, replay/visual/statistical evidence, and false-green review.",
   "author": {
     "name": "Skill System Maintainers"
   },
@@ -14,8 +14,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Skill System Testing",
-    "shortDescription": "Human-in-loop test decisions, test design, test-only implementation, and evidence specialists.",
-    "longDescription": "Skill System testing — human-in-loop oracle discovery, test design, test-only implementation, replay/visual/statistical evidence, and false-green review.",
+    "shortDescription": "Test decisions, design, test-only implementation, test-scoped diagnostic capture, and evidence specialists.",
+    "longDescription": "Skill System testing — human-in-loop oracle discovery, test design, test-only implementation, test-scoped diagnostic artifact capture, replay/visual/statistical evidence, and false-green review.",
     "developerName": "Skill System Maintainers",
     "category": "Developer Tools",
     "capabilities": [

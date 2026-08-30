@@ -122,6 +122,38 @@ It emits no Core result when a material design/authority/testability/environment
 asset, or required falsifier prevents completion of the assigned test contract. That lifecycle is
 `not_produced`, not a partial test result or a condition Fail.
 
+## Runtime Debugging Handoff
+
+Apply `runtime_debugging_contract.md` only when a named test condition requires a live stop, crash
+artifact, exact build/symbol identity, dynamic diagnostic, concurrency trace, graphics capture, or
+device-loss artifact.
+
+- Test Design owns the capture requirement: condition and original trigger, capture mode/scope,
+  target/build/symbol/device identity fields, environment/horizon, expected perturbation,
+  sensitive-data controls, and proof ceiling.
+- Test Implementation owns only authorized test stimulation and test-only capture tooling. It
+  mechanically executes the accepted trigger, probe/location/range, commands, and capture scope and
+  preserves exact identity, included and missing state, tool/version, and perturbation. If an
+  observation must change the probe, stepping, watchpoint, replay query, shader invocation, or
+  capture range, it returns a Runtime Debugging handoff. It does not interpret a stack, trace, dump,
+  or frame capture into a cause.
+- Test Evidence Review may reject a debugging artifact as mismatched, incomplete, circular,
+  overclaimed, or unsafe from existing artifacts/session metadata. It issues no debugger-control or
+  adaptive-observation commands and does not declare product causality.
+- Preserve a bounded handoff with condition/trigger, target and test snapshots, artifact refs,
+  identity/capture scope, environment/horizon, perturbations, sensitive-data controls, proof ceiling,
+  and missing material fields. A condition Fail never auto-invokes `workflow-runtime-debugging` or
+  `workflow-bug-fix`.
+
+Do not add undeclared Core payload fields for this handoff. Test Design encodes it in
+`diagnostic_and_falsifier_contract` plus `implementation_handoff`; Test Implementation encodes it in
+`execution_summary` plus `artifact_refs`/`evidence_refs`; Evidence Review returns it in its ordinary
+bounded findings/handoff output.
+
+Testing Workflow completion remains independent of later Runtime Debugging. If the accepted test
+contract requires the artifact itself, missing capture makes the assigned implementation
+`not_produced`; uncertainty about the artifact's cause does not.
+
 ## Evidence And Completion
 
 Workflow completion and test verdict are different:

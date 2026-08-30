@@ -4,7 +4,7 @@
 directly.** Edit `source/` and regenerate.
 
 ## Layout
-- `source/skills/` — 66 canonical skills packaged into one Codex set and one portable
+- `source/skills/` — 67 canonical skills packaged into one Codex set and one portable
   Claude/Grok/Antigravity set
 - `source/distribution.json` — canonical bundle version, publisher, and marketplace identity
 - `source/plugins/*.yaml` — installation-profile membership and profile presentation metadata

@@ -192,7 +192,7 @@ func permission(event Event) map[string]any {
 	}
 	notify.Send(notify.Message{
 		Event: "approval-requested", Topic: "approval", Title: "Codex approval requested",
-		Body: tool + " is waiting for approval" + location + ".", Model: shortModel(event.Model), Session: label(event),
+		Body: tool + " is waiting for approval" + location + ".", Model: shortModel(event.Model), Session: label(event), SessionID: event.SessionID,
 	})
 	if executionErr == nil && executionDecision.SystemMessage != "" {
 		return map[string]any{"systemMessage": executionDecision.SystemMessage}
@@ -259,9 +259,9 @@ func stop(event Event) map[string]any {
 		}
 	}
 	if needsInput(event.LastAssistantMessage) {
-		notify.Send(notify.Message{Event: "input-needed", Topic: "input", Title: "Codex input needed", Body: notify.SafeText(firstLine(event.LastAssistantMessage)), Model: shortModel(event.Model), Session: label(event)})
+		notify.Send(notify.Message{Event: "input-needed", Topic: "input", Title: "Codex input needed", Body: notify.SafeText(firstLine(event.LastAssistantMessage)), Model: shortModel(event.Model), Session: label(event), SessionID: event.SessionID})
 	} else {
-		notify.Send(notify.Message{Event: "turn-complete", Topic: "done", Title: "Codex task complete", Body: completionMessage(event), Model: shortModel(event.Model), Session: label(event)})
+		notify.Send(notify.Message{Event: "turn-complete", Topic: "done", Title: "Codex task complete", Body: completionMessage(event), Model: shortModel(event.Model), Session: label(event), SessionID: event.SessionID})
 	}
 	return nil
 }
@@ -292,12 +292,9 @@ func needsInput(message string) bool {
 
 func completionMessage(event Event) string {
 	if line := firstLine(event.LastAssistantMessage); line != "" {
-		return notify.SafeText(line)
+		return line
 	}
-	if value := label(event); value != "" {
-		return value
-	}
-	return "turn complete"
+	return "Turn completed without a summary."
 }
 
 func firstLine(value string) string {
@@ -306,10 +303,7 @@ func firstLine(value string) string {
 		if line == "" || line == "```" || strings.HasPrefix(line, "```") {
 			continue
 		}
-		if len(line) > 220 {
-			line = line[:217] + "..."
-		}
-		return line
+		return notify.SafeText(line)
 	}
 	return ""
 }
@@ -318,10 +312,19 @@ func label(event Event) string {
 	if value := strings.TrimSpace(event.TaskSubject); value != "" {
 		return notify.SafeText(value)
 	}
-	if value := strings.TrimSpace(event.Cwd); value != "" {
-		return filepath.Base(value)
+	workspace := workspaceName(event.Cwd)
+	if workspace != "" {
+		return workspace
 	}
-	return ""
+	return "unknown task"
+}
+
+func workspaceName(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return ""
+	}
+	return notify.SafeText(filepath.Base(filepath.Clean(value)))
 }
 
 func shortModel(value string) string {
@@ -329,8 +332,9 @@ func shortModel(value string) string {
 	if index := strings.LastIndex(value, "/"); index >= 0 {
 		value = value[index+1:]
 	}
-	if len(value) > 24 {
-		value = value[:24]
+	runes := []rune(value)
+	if len(runes) > 24 {
+		runes = runes[:24]
 	}
-	return value
+	return string(runes)
 }

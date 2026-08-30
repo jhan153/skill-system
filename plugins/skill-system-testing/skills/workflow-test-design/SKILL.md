@@ -39,6 +39,7 @@ description: Design an implementation-ready software test contract after a minim
     - `test-statistical-oracle` for stochastic, chaotic, ensemble, or distributional behavior
     - `test-replay-corpus` for capture, recording, replay, or corpus provenance
     - `test-visual-regression` in explicit `design` mode only when a rendered regression condition and accepted baseline/external contract exist
+    - `references/runtime_debugging_contract.md` when a condition requires a debugger stop, crash/core/minidump, exact build and symbols, dynamic diagnostic, concurrency trace, graphics capture, or device-loss artifact
     - `references/execution_assurance_contract.md` when validation work itself has material maker/checker separation or standard/strict assurance requirements
   do_not_load_by_default:
     - full repo, all test methods, unrelated plans, raw production data, credentials, or every existing test
@@ -91,14 +92,20 @@ conditions. Current implementation output remains observation unless accepted by
    from a decided record within its unchanged accepted envelope. Never reinterpret an open/assumed
    row as authority.
 6. Specify testability prerequisites: inputs, clock/seed, viewport/assets, workload, repetitions,
-   duration/state history, instrumentation, diagnostic artifacts, and accepted variability. When
+   duration/state history, instrumentation, diagnostic artifacts, and accepted variability. When a
+   runtime-debugging artifact is required, apply `references/runtime_debugging_contract.md` and bind
+   the original trigger, capture mode/scope, exact target/build/symbol/device identity fields,
+   expected perturbation, sensitive-data controls, and proof ceiling without prescribing a root
+   cause. When
    the selected condition or human choice is empirical, a missing production hook, executable path,
    or representative observation is a current testability gap. In contract-only design, record the
    missing runtime surface as a later Test Implementation prerequisite and never claim runtime
    evidence or invent a test-only semantic model.
 7. Produce one bounded implementation handoff naming condition IDs, test-only write scope,
    forbidden design changes, existing framework/runner, required artifacts, and the falsifier that
-   must challenge the implemented test.
+   must challenge the implemented test. A runtime-debugging capture freezes its trigger, probe or
+   capture location/range, commands, identity fields, and stop rule; any observation-dependent change
+   becomes a Runtime Debugging handoff rather than hidden adaptive Test Implementation.
 8. Read back every designed condition against its basis and actual or accepted contract path. Emit Core
    `test_design_result` in graph mode; never claim that the test exists or the product passes.
 

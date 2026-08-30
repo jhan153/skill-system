@@ -40,6 +40,31 @@ Testing exists to produce decision-relevant evidence about a material condition.
    Neither lane proves the other.
 9. **Compare evidence cost with failure cost.** Add or retain a test only when its discriminating
    value and recurrence justify implementation, runtime, triage, fixture, and maintenance cost.
+10. **Separate testing from debugging.** Testing owns stimulation, oracle verdict, and authorized
+    artifact capture. Runtime Debugging owns machine/device-state interpretation and causal
+    localization. A failing test, stack, dump, or trace is not a root-cause verdict by itself.
+
+## Testing And Runtime Debugging Boundary
+
+When a test condition requires a debugger stop, crash/core/minidump, exact build and symbols,
+dynamic diagnostic, concurrency trace, graphics frame capture, or device-loss artifact, the owning
+Test Design, Test Implementation, or Evidence Review skill applies its locally projected Runtime
+Debugging Contract. Narrow testing specialists do not acquire or interpret that artifact implicitly.
+
+- Test Design names the condition, trigger, capture mode/scope, required build/symbol/capture
+  identity, environment/horizon, sensitive-data boundary, and proof ceiling. It does not prescribe a
+  causal conclusion.
+- Test Implementation may reproduce the condition and mechanically execute only the accepted
+  trigger, probe/location/range, commands, and capture scope through test-only tooling. It preserves
+  target/tool/artifact identity, omissions, and perturbation. An observation-dependent change to the
+  probe, stepping, watchpoint, replay query, shader invocation, or capture range becomes a Runtime
+  Debugging handoff; Testing does not repair production code or interpret the artifact into a cause.
+- Test Evidence Review checks provenance, exact-build/symbol/capture match, completeness,
+  perturbation, and claim ceiling. It does not take over a live debugger session or authorize repair.
+- A later runtime diagnosis receives a bounded handoff and is never auto-invoked by a test result.
+
+Use a test to answer whether the encoded condition occurred. Use Runtime Debugging when the
+unresolved question is which runtime state or transition caused it.
 
 ## Selection Model
 
@@ -64,6 +89,8 @@ Testing exists to produce decision-relevant evidence about a material condition.
 | unexpected navigation or state-space trap | execution reaches an invalid or inescapable state | bounded exploratory, model-based, property, fuzz, or seeded randomized run | reproducible input/seed and state capture | seed, path, coordinates, minimized failing input |
 | latency, throughput, CPU, memory, query, rendering, startup, or bundle regression | comparable metric crosses a threshold or baseline | representative performance measurement or profile | same workload, environment, correctness conditions, and metric | profile, trace, query plan, heatmap, before/after measurement |
 | accumulated state, leak, fragmentation, or endurance failure | invariant drifts or the process fails after repetition/time | sequence, soak, stress, or long-running observation | relevant duration/repetition, stable workload, instrumentation | invariant history, dump, trace, build and elapsed identity |
+| runtime crash, corruption, hang, race, deadlock, or device loss | original trigger plus machine/device stop, state, transition, or wait evidence | representative reproduction plus authorized debugger/dump/dynamic/graphics artifact capture | exact target/build/symbol/capture identity and recorded perturbation | bounded debugging handoff with raw trigger, artifact scope, and missing state |
+| graphics correctness or shader/resource-state failure | validation message, wrong event/resource/pixel state, shader invocation, or device-fault evidence | predeclared validation/frame/shader/device artifact capture; adaptive shader invocation, stepping, or resource-history selection routes to Runtime Debugging | API/device/driver/build/shader/tool identity and supported capture scope | validation/capture/dump plus resource/event markers and proof ceiling |
 | release, migration, or selected-version risk | canonical state or representative integration differs from required contract | structural readback plus actual-path smoke/integration evidence | authoritative target and selected runtime state | manifest/lockfile/schema diff and actual selected-path readback |
 | accessibility interaction or semantic failure | rendered role, name, focus, keyboard, measurement, or reflow condition fails | scoped DOM/tree, interaction, screenshot, or measurement evidence | rendered target and named criterion/state | direct tree/DOM result, interaction trace, measurement, screenshot |
 | qualitative acceptance uncertainty | usefulness, feel, acceptance, or business choice requires subjective judgment | direct human evaluation | clear judgment unit and acceptance criteria | recorded decision and remaining uncertainty |
@@ -82,6 +109,7 @@ single task may need more than one row only when its material conditions are gen
 | UI or end-to-end scenario | the named scenario in the observed state and environment | unvisited paths, complete state-space coverage, or unrelated quality attributes |
 | screenshot comparison | visible pixels and framing at the named viewport/state | interaction, semantics, accessibility, responsive completeness, or business correctness |
 | profile or performance measurement | the named metric under the recorded workload/environment | different environments, workloads, correctness, or user population |
+| debugger stop, crash dump, dynamic report, trace/replay, or graphics capture | captured state/events under verified target, artifact coverage, and perturbation | unique causal history, missing state, repair closure, or broad correctness by itself |
 | soak or stress result | observed behavior during the named duration, repetition, state, and load | longer horizons, different histories, or failure absence in general |
 | manual or exploratory observation | the states and judgments actually exercised by the named observer | systematic coverage, repeatability, or automation readiness |
 | coverage metric | execution of the counted code/branch/requirement mapping | assertion quality, semantic correctness, representative usage, or product readiness |

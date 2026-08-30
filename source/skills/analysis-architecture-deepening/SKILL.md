@@ -14,7 +14,7 @@ description: Rank evidence-backed improvements across deep modules, seams, adapt
   - several interacting boundaries need a normative target/transition design:
     `workflow-architecture-design`
   - architecture map, HLD/LLD modeling, or Mermaid flow/structure/state diagrams: `analysis-codebase-map`
-  - recurring bug root cause: current task owner for diagnosis-only, or `workflow-bug-fix` when repair is requested
+  - recurring bug root cause: `workflow-runtime-debugging` for an explicitly requested execution-ready debugging scope or material debugger/dump/dynamic/graphics evidence lane; otherwise current task owner for diagnosis-only, or `workflow-bug-fix` when repair is requested
   - domain concepts/invariants: `analysis-domain-modeling`
   - measured bottleneck: `analysis-performance`
   - direct production change: route by the selected candidate's change contract—`workflow-refactor-safely` for behavior-preserving live restructuring, `workflow-source-maintenance` for proven-obsolete deletion, or `workflow-implementation` for behavior changes

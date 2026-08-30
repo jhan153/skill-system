@@ -1,17 +1,17 @@
 {
   "groups": {
     "go:skill-system-antigravity-harness": {
-      "build_key": "7e9645bca2f72408aadb606e8a6a770bd285b71c2c47845a692564ea85b74e9b",
+      "build_key": "afe970d4dd6a36680e2d589de3ebbad1342e5f27c9e7e39b26f46713f60183b5",
       "outputs": {
-        "skill-system-antigravity-harness": "8be421dae2b4ba4aa0231c9e9889c2e88ed8c2be9dd925c123c1105ebc31f962",
-        "skill-system-antigravity-harness-linux-amd64": "29e1cbe0c15da209717af980519ffb705e4dccecb91dcc273b01ff30fab208aa",
-        "skill-system-antigravity-harness.exe": "58afaa34304add7dc4f95bb90ff6b2daab7d6d31074e785752571935462ad0af"
+        "skill-system-antigravity-harness": "127009bbfdcaf62d2f5d8e478cdde659f398fbaedb71fbac61d6ebe2550264a3",
+        "skill-system-antigravity-harness-linux-amd64": "87e270db412b6502db41c5a18c0567f40ec3556016222741d32b122e6a9dd035",
+        "skill-system-antigravity-harness.exe": "d42c9af117384f31cca43dffd1b32f8857425b497767670bf4139902c1fce7de"
       }
     },
     "swift:notification-overlay": {
-      "build_key": "10b62ec3967d32898bcf766833cde0c7dc06b58a346e77c08de604b01b6a5613",
+      "build_key": "404f2fcdbb307b963faa42f52587028859f405465a391a4faf68a271a4ce96cd",
       "outputs": {
-        "skill-system-notify-overlay": "d0f346b26af7297f3c3d7003c6816c0e58781c9049f43ae5e2bb97bf610071f2"
+        "skill-system-notify-overlay": "84a6720a9a3471b36f82d454c98352fe9ed90045e58ba8f8924d7c0e5899210d"
       }
     }
   },

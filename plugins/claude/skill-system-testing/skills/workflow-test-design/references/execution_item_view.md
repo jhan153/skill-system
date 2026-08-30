@@ -20,6 +20,7 @@ boundaries. A direct single-owner task may use its ordinary compact output.
 | final Known Bug record | Coordinator/Handoff in graph mode; bounded Bug Fix after final local review in standalone mode |
 | concrete UI design artifact and implementation handoff | `workflow-ui-design` |
 | one explicitly assigned Research-stage node result | `workflow-research` using one selected Research specialist |
+| one assigned debugging-scope or runtime-debugging node result | `workflow-runtime-debugging` |
 | production implementation result | the assigned implementation Workflow |
 | implementation-ready software test contract | `workflow-test-design` |
 | test-only implementation and scoped execution result | `workflow-test-implementation` |
@@ -39,13 +40,13 @@ Use the smallest applicable fields. `plan_ref` and `node_id` are required only i
 execution_item:
   contract_id: core-execution-items-v1
   item_id: <stable task-local id>
-  kind: design_result | research_result | implementation_result | test_design_result |
+  kind: design_result | research_result | debugging_result | implementation_result | test_design_result |
         test_implementation_result | code_review_result | deferred_item | bug_fix_result |
         known_bug_candidate | known_bug_record
   producer: <canonical plugin:skill id or current owner>
   plan_ref: <plan id/revision or null>
   node_id: <Plan node id or null>
-  scope_ref: <bounded design/research/behavior/review/repair scope>
+  scope_ref: <bounded design/research/debugging/behavior/review/repair scope>
   artifact_refs: []
   evidence_refs: []
   payload: {}

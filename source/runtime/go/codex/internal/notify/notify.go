@@ -9,12 +9,14 @@ import (
 )
 
 type Message struct {
-	Event   string `json:"event"`
-	Topic   string `json:"topic"`
-	Title   string `json:"title"`
-	Body    string `json:"message"`
-	Model   string `json:"model,omitempty"`
-	Session string `json:"session,omitempty"`
+	Event     string `json:"event"`
+	Topic     string `json:"topic"`
+	Title     string `json:"title"`
+	Body      string `json:"message"`
+	Model     string `json:"model,omitempty"`
+	Session   string `json:"session,omitempty"`
+	SessionID string `json:"session_id,omitempty"`
+	Metadata  string `json:"metadata,omitempty"`
 }
 
 type Result struct {
@@ -38,23 +40,48 @@ func Send(message Message) Result {
 	if mode == "0" || mode == "false" || mode == "off" || mode == "disabled" || mode == "none" {
 		return Result{Status: "disabled", Platform: runtime.GOOS}
 	}
-	message.Title = sanitize(message.Title, 100)
-	message.Body = sanitize(message.Body, 240)
-	if message.Model != "" || message.Session != "" {
-		segments := make([]string, 0, 3)
-		for _, value := range []string{message.Topic, message.Model, message.Session} {
-			if cleaned := sanitize(value, 24); cleaned != "" {
-				segments = append(segments, "["+cleaned+"]")
-			}
-		}
-		if len(segments) > 0 {
-			message.Title = strings.Join(segments, "-")
-		}
-	}
+	message = formatMessage(message)
 	if mode == "dry-run" || mode == "dry_run" || mode == "test" {
 		return Result{Status: "dry_run", Platform: runtime.GOOS, Method: "none"}
 	}
 	return sendPlatform(message)
+}
+
+func formatMessage(message Message) Message {
+	title := sanitize(message.Title, 100)
+	if title == "" {
+		switch strings.ToLower(strings.TrimSpace(message.Topic)) {
+		case "done":
+			title = "Codex task complete"
+		case "input":
+			title = "Codex input needed"
+		case "approval":
+			title = "Codex approval requested"
+		default:
+			title = "Codex notification"
+		}
+	}
+	if session := sanitize(message.Session, 40); session != "" {
+		title += " · " + session
+	}
+	metadata := make([]string, 0, 1)
+	if model := sanitize(message.Model, 24); model != "" {
+		metadata = append(metadata, model)
+	}
+	message.Title = sanitize(title, 100)
+	message.Metadata = sanitize(strings.Join(metadata, " · "), 120)
+	message.Body = sanitize(message.Body, 240)
+	if message.Body == "" {
+		message.Body = "No summary was provided for this event."
+	}
+	return message
+}
+
+func bodyWithMetadata(message Message) string {
+	if message.Metadata == "" {
+		return message.Body
+	}
+	return sanitize(message.Body+" · "+message.Metadata, 240)
 }
 
 func SafeText(value string) string {

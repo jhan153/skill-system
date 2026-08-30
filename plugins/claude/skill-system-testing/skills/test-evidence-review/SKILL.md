@@ -19,12 +19,13 @@ disable-model-invocation: true
     - bounded test contract/assets/result, claimed condition, authority, actual path, and `references/testing_strategy_contract.md`
   read_if_needed:
     - target production owner/path, expected-value computation, fixture/generator, baseline history, run artifacts, or semantic-mutant observation
+    - `references/runtime_debugging_contract.md` when the evidence includes a debugger stop, crash/core/minidump, symbols, dynamic diagnostic, concurrency trace, graphics capture, or device-loss artifact
   do_not_load_by_default:
     - full repo/test suite/history, unrelated product conditions, raw production data, or credentials
 - risk_profile:
   reads: bounded test and target path plus decisive artifacts
   writes: none
-  tools: focused static inspection and one safe falsifier/readback when already authorized
+  tools: focused static inspection and one safe non-debugger falsifier/readback when already authorized; runtime-debugging evidence review uses existing artifacts/session metadata only
   sensitive_resources: deny credentials and minimize production data
 - entry_scene: PREPARE
 
@@ -40,6 +41,8 @@ Select only applicable risks:
 - discrimination: falsifier or semantic mutant demonstrates the test can fail for the targeted
   defect class;
 - diagnostics: failure retains enough input/state/diff/trace/build identity to reproduce or narrow;
+- runtime-debugging artifact: target/build/module/symbol/device/tool identity matches, capture scope
+  and missing state are explicit, perturbation is preserved, and sensitive-data controls are present;
 - proof ceiling: the reported claim stays within exercised condition/path/environment/state/horizon;
 - maintenance: baseline, masks, retries, quarantine, and tolerance changes require named authority.
 
@@ -55,6 +58,11 @@ Select only applicable risks:
    not create mutation infrastructure merely for the review.
 4. Check whether a passing/failing result is scoped to its environment/horizon and whether absent
    evidence is honestly `unverified` rather than substituted by coverage, command exit, or mocks.
+   For a runtime-debugging artifact, apply `references/runtime_debugging_contract.md`; reject
+   filename-only or symbol-load-only identity, omitted-state assumptions, and root-cause claims that
+   exceed the captured stop/dump/trace/replay/frame/device evidence. Do not issue continue/step,
+   breakpoint/watchpoint, replay-query, shader-invocation, or other adaptive debugger commands; when
+   another observation is required, return the exact Runtime Debugging handoff.
 5. Return findings ordered by consequence. Name the current Test Design owner for semantic contract
    faults, Test Implementation owner for test-asset conformance, human authority for an open
    judgment, or a production-defect candidate for Coordinator/direct-owner classification. Test
@@ -66,4 +74,4 @@ Select only applicable risks:
 Return target/test snapshots, reviewed conditions, authority/path/oracle findings, scenario and
 environment findings, falsifier evidence, diagnostic/proof-ceiling findings, prioritized issues,
 credible evidence scope, unavailable evidence, and exact handoff owner. Do not emit a global
-quality score, release verdict, successor, or repair action.
+quality score, release verdict, runtime root-cause verdict, successor, or repair action.

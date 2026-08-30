@@ -30,6 +30,7 @@ description: Statically review a bound production change or test implementation 
     - `references/maintainable_code_principles.md` when maintainability is a material review criterion or the diff materially changes ownership, abstraction, invariant/effect boundaries, conventions, or verification
     - `references/database_persistence_transparency_contract.md` when the bound diff changes database schema, mapping, query, migration, transaction, or data-access ownership
     - `references/identifier_readability_principle.md` when related identifiers materially obstruct state, flow, ownership, or effect tracing, or identifier-readability conformance is explicitly in the bound review scope; never activate this Workflow for lightweight naming feedback alone
+    - `references/runtime_debugging_contract.md` when the diff changes crash/dump capture, symbol/build manifests, debugger hooks, dynamic-diagnostic integration, trace/replay capture, graphics validation/markers, or device-loss diagnostics
     - `references/execution_item_contract.md` when node/round identity is supplied or the compact result will cross a Workflow, Coordinator, Plan/Handoff, or plugin boundary
     - `references/testing_stage_contract.md` and `references/testing_strategy_contract.md` when reviewing a Core `test_implementation_result` against a `test_design_result`
     - load only applicable baseline and references: `references/model-comparison.md` for Mermaid mechanics; `references/finding-handoff.md` for standalone/Core presentation
@@ -72,6 +73,14 @@ description: Statically review a bound production change or test implementation 
 - Preserve supplied Known Bug exclusions as `SKIP — excluded Known Bug <id>` without reopening them.
 - When `references/maintainable_code_principles.md` is active, apply its five review questions after tracing the representative and material negative paths and before recording findings. This review owns static findings, deferred items, and disposition; repair and runtime-only verification remain explicit handoffs.
 - When `references/database_persistence_transparency_contract.md` is active, own only static conformance findings for the visible `source_of_truth`, database boundary/model, declared read/write effects, transaction, and lifecycle. Defer runtime-only query-plan, cardinality, locking, and latency claims to the implementation or validation owner.
+- When `references/runtime_debugging_contract.md` is active, statically review diagnostic
+  infrastructure for target/build/symbol/capture identity, partial-capture reporting, lifetime and
+  reentrancy, crash-context allocation/lock/loader/stack safety, privacy and retention, trusted
+  symbol/source/extension loading, and graphics marker/resource correlation. Test-capture
+  provenance/completeness/proof ceiling belongs to `test-evidence-review`; causal interpretation to
+  `workflow-runtime-debugging` or repair-primary `workflow-bug-fix`; and condition-matched runtime
+  readback of the infrastructure to its Implementation owner. A source-level `pass` does not
+  establish crash-context or debugger behavior.
 - If no item supplies a snapshot, resolve an unambiguous repository diff/worktree identity when
   available. If the reviewed identity cannot be established or repository access is lost, emit no
   result; return a lifecycle question/escalation with `review_status: not_produced`. Do not call

@@ -12,15 +12,16 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 10.1.1 Release
+## 10.2.0 Release
 
-This source tree is the 10.1.1 consolidation release on the breaking 10.0 baseline. Its current components
+This source tree is the 10.2.0 runtime-debugging release on the breaking 10.0 baseline. Its current components
 are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
 * `tools`: helper tools for inspecting the bundle structure
 * `execution-handoff`: risk-adaptive finite DAGs, event-driven coordination, Core Cards, and Human Test handoff
+* `runtime-debugging`: bounded scope and operate modes for debugger, dump, dynamic diagnostic, and graphics evidence
 * `providers`: active Codex, Claude, Grok, and Antigravity package/rule declarations with independent provider-owned Go harness modules and native hook adapters only where the host owns one
 * `tests`: one Core-contract test, three Skill System-wide tests, and a reduced provider-neutral harness component suite
 * `work-contract`: privacy-bounded natural-language user-scope and interaction projection with no graph-state ownership
@@ -183,6 +184,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 10.0.2 | Provider-owned Go harnesses & Codex execution admission | Distributes the common Go baseline into four independent provider modules, adds Codex pre-approval normalization and opaque evaluator blocking, and preserves host-owned approval rules during generation and installation. |
 | 10.1.0 | Testing plugin & oracle-governed evidence | Adds the 10-skill Testing profile, conditional human Test Discovery, separate Test Design/Test Implementation Core results, replay/visual/statistical specialists, explicit visual `design`/`evidence` modes, and false-green/proof-ceiling review. |
 | 10.1.1 | Shared execution assurance | Retires `workflow-rigor` as a public skill, preserves standard/strict assurance in one shared contract projected into its owning workflows, and keeps assurance outside DAG node and mutation ownership. |
+| 10.2.0 | Runtime debugging & diagnostic notifications | Adds typed runtime-debugging scope/operation and `debugging_result` contracts, separates causal observation from repair/test ownership, and enriches bounded desktop notification metadata and lifecycle safety. |
 
 ## License
 

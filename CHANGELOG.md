@@ -1,5 +1,22 @@
 # Changelog
 
+## 10.2.0
+
+- Added `workflow-runtime-debugging` as the bounded runtime-correctness owner for execution-ready
+  debugging scopes, live debugger sessions, crash artifacts, dynamic diagnostics, graphics captures,
+  and causal localization without taking repair or test ownership.
+- Added the Core `debugging_result`, shared runtime-debugging contract, and focused debugger, symbol,
+  concurrency, graphics, and causal-loop references; projected them into the Dev, Core, and Testing
+  consumers that need a typed handoff or test-scoped artifact boundary.
+- Extended Execution Handoff, testing stages, routing guidance, and affected Analysis/Workflow skills
+  so runtime observation, static review, test evidence, performance diagnosis, and source repair keep
+  distinct owners and proof ceilings.
+- Reworked desktop notifications to preserve the status and context label while showing model,
+  reasoning effort, child/orchestrator role, and safe session name metadata in an Oblivion-themed
+  overlay with bounded state lookup, redaction, and guaranteed process termination.
+- Advanced all five plugin profiles and generated provider runtime identities to 10.2.0. Archives,
+  publication, and live plugin installation remain separate actions.
+
 ## 10.1.1
 
 - Retired `workflow-rigor` as a public Core skill and moved its standard/strict maker-checker,

@@ -10,7 +10,7 @@ description: Compare algorithms or technical approaches under concrete constrain
 - intent_signature: algorithm/approach recommendation or candidate comparison under constraints
 - use_when: credible solution families compete and workload, correctness, latency, memory, dependency, deployment, or implementation constraints change the winner.
 - do_not_use_when:
-  - unresolved current failure: current task owner for diagnosis-only, or `workflow-bug-fix` when repair is requested
+  - unresolved current failure: `workflow-runtime-debugging` for an explicitly requested execution-ready debugging scope or material debugger/dump/dynamic/graphics evidence lane; otherwise current task owner for diagnosis-only, or `workflow-bug-fix` when repair is requested
   - chosen method needs code: `workflow-implementation`
   - measured production bottleneck: `analysis-performance`
   - paper hypothesis, loss, ablation, or training plan: `research-hypothesis-planning`
@@ -60,5 +60,5 @@ For consequential ambiguity, add a compact constraint/candidate comparison, caus
 ## Boundaries
 - Recommendation-only work does not authorize code or document writes.
 - Hand chosen implementation and its validation target to `workflow-implementation`.
-- Route measured bottlenecks to `analysis-performance`. Keep diagnosis-only failure causes with the current task owner; route requested repair to `workflow-bug-fix`.
+- Route measured bottlenecks to `analysis-performance`. Route an explicitly requested execution-ready debugging scope or diagnosis-only runtime evidence work to `workflow-runtime-debugging`; keep simple source/log-only causes with the current task owner, and route requested repair to `workflow-bug-fix`.
 - Suggested validation is not evidence that the recommendation already works.

@@ -1,0 +1,18 @@
+interface:
+  display_name: "Workflow Runtime Debugging"
+  short_description: "Operate runtime evidence to localize one concrete cause"
+  default_prompt: "Use $workflow-runtime-debugging to define an execution-ready debugging scope or directly investigate one concrete runtime correctness failure through an existing or approved debugger, dump, dynamic diagnostic, or graphics capture. Validate target and artifact identity, preserve session handoff, perturbations, and proof ceilings, and return the observed mechanism, root cause, or next discriminator without repairing source."
+
+policy:
+  invocation_surface: explicit_procedure
+  allow_implicit_invocation: true
+  may_own_execution: true
+  may_block_completion: false
+
+work_horizon:
+  level: cross_horizon
+  role: runtime_diagnosis_owner
+
+execution_mode:
+  kind: runtime_debugging_execution
+  owns_execution: true

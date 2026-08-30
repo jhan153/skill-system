@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 func TestDeclaredHookEventsMatchHandlerSurface(t *testing.T) {
@@ -153,6 +154,36 @@ func TestSessionStartInjectsOnlyManifestLocation(t *testing.T) {
 	}
 	if output := Handle(Event{HookEventName: "SessionStart", SessionID: "empty", Source: "startup", Cwd: empty}); output != nil {
 		t.Fatalf("missing manifest did not fail open: %#v", output)
+	}
+}
+
+func TestNotificationLabelAndSummaryFallbackRemainIdentifiable(t *testing.T) {
+	event := Event{
+		SessionID: "01a0501a-493e-73c2-9798-540344484143",
+		TurnID:    "01a05050-11a0-7052-89f9-57427b44e8ce",
+		Cwd:       "/Users/example/repo/book-project",
+	}
+	if got := label(event); got != "book-project" {
+		t.Fatalf("label=%q", got)
+	}
+	if got := completionMessage(event); got != "Turn completed without a summary." {
+		t.Fatalf("completion fallback=%q", got)
+	}
+	event.Cwd = ""
+	if got := label(event); got != "unknown task" {
+		t.Fatalf("identifier-only label=%q", got)
+	}
+	event.TaskSubject = "CS315 로우레벨 반영도 확인"
+	if got := label(event); got != event.TaskSubject {
+		t.Fatalf("task subject label=%q", got)
+	}
+
+	line := firstLine(strings.Repeat("한", 300))
+	if !utf8.ValidString(line) {
+		t.Fatalf("first line is not valid UTF-8: %q", line)
+	}
+	if len([]rune(line)) > 240 {
+		t.Fatalf("first line rune length=%d", len([]rune(line)))
 	}
 }
 

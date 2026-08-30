@@ -27,7 +27,7 @@ func sendPlatform(message Message) Result {
 	if value, err := strconv.ParseFloat(strings.TrimSpace(env("SKILL_SYSTEM_NOTIFY_DURATION", "4")), 64); err == nil && value >= 0.5 && value <= 30 {
 		duration = value
 	}
-	command := exec.Command(overlay, message.Title, message.Body, strconv.FormatFloat(duration, 'f', 1, 64), message.Topic)
+	command := exec.Command(overlay, message.Title, message.Body, strconv.FormatFloat(duration, 'f', 1, 64), message.Topic, message.Metadata, message.SessionID)
 	command.Dir = "/"
 	if err := command.Start(); err != nil {
 		return Result{Status: "error", Platform: "darwin", Method: "swift_overlay", Reason: sanitize(err.Error(), 160)}

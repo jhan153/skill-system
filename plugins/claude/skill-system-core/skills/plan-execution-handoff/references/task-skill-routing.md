@@ -21,7 +21,9 @@ The node code is not a role or an agent identity.
 | `D-DOMAIN` identity/state decision | Architect | `skill-system-dev:analysis-domain-modeling` | Use when domain language, identity, state transitions, invariants, or ownership are open. |
 | `D-ALGORITHM` technical approach | Architect | `skill-system-dev:analysis-algorithm` | Compare concrete candidates and define falsifiable selection evidence. |
 | `D-PERF` performance approach | Architect | `skill-system-dev:analysis-performance` | Diagnose the representative latency/CPU/memory path before choosing optimization. |
-| `D-BUG` unclear failure cause | Architect | no additional skill by default | The current task owner diagnoses read-only. If repair becomes the node outcome, route a separate `BF1` node to `skill-system-dev:workflow-bug-fix`. |
+| `DBG0` debugging scope | Runtime Debugging owner | `skill-system-dev:workflow-runtime-debugging` in `scope` mode | Bind one concrete trigger and return Core `debugging_result` with an execution-ready evidence lane, identity/artifact requirements, permissions/effects, perturbation, stop rules, session handback, and `causal_status: not_run`. Operate no debugger/capture tool and select no successor. |
+| `DBG1` runtime debugging operation | Runtime Debugging owner | `skill-system-dev:workflow-runtime-debugging` in `operate` mode | Consume a predecessor scope result or equivalent inline scope, operate only the approved debugger/dump/dynamic/graphics lane, and return Core `debugging_result` with safe session handback and bounded causal status. Follow only existing edges; never auto-repair. |
+| `D-BUG` source/log-only failure cause | Architect | no additional skill by default | Keep simple source/log-only diagnosis with the current owner. If repair is the node outcome, route a separate `BF1` node to `skill-system-dev:workflow-bug-fix`. |
 | `D-UI` concrete UI design artifact | Design owner | `skill-system-design:workflow-ui-design`; optional decomposer/layout/token/component inputs only when already selected | Create the actual inspectable screen/component design from accepted requirements and return Core `design_result`. Do not write production UI code or create the implementation successor. |
 | `D0` accepted design gate | Architect or declared design owner | task-matched analysis skill or none | Close the design/boundary decision before `phase_gate_delivery` implementation begins. |
 | `P` runnable discriminator | Prototype owner | `skill-system-dev:workflow-prototype` | Answer one unresolved question with an isolated artifact and an explicit proof ceiling. |
@@ -82,6 +84,9 @@ The node code is not a role or an agent identity.
   reopening this pair. Choose another archetype only when its decisive condition is present.
 - Cross-owner implementation, review, deferred, repair, and Known Bug results use the Core-owned
   `references/execution_item_contract.md`. Workers never select successor IDs or graph termination.
+- Runtime Debugging nodes use Core `debugging_result`. `DBG0` scope performs no tool operation;
+  `DBG1` operate consumes an accepted scope and preserves identity, effects, proof ceiling, and
+  session handback. Neither node creates a repair, performance, test, or follow-up debugging node.
 - Explicit software Test Design and Test Implementation nodes use Core `test_design_result` and
   `test_implementation_result`. They are agent-machine evidence under the selected test authority;
   they do not relabel or replace Human Test. A Test Design node that needs human-owned oracle input

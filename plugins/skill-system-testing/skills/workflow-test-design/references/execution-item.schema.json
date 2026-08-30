@@ -22,6 +22,7 @@
       "enum": [
         "design_result",
         "research_result",
+        "debugging_result",
         "implementation_result",
         "test_design_result",
         "test_implementation_result",
@@ -63,6 +64,18 @@
         "properties": {
           "producer": { "const": "skill-system-research:workflow-research" },
           "payload": { "$ref": "#/$defs/research_result" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "kind": { "const": "debugging_result" } },
+        "required": ["kind"]
+      },
+      "then": {
+        "properties": {
+          "producer": { "const": "skill-system-dev:workflow-runtime-debugging" },
+          "payload": { "$ref": "#/$defs/debugging_result" }
         }
       }
     },
@@ -233,6 +246,85 @@
         "unresolved_inputs": { "$ref": "#/$defs/string_array" },
         "user_checks": { "$ref": "#/$defs/string_array" }
       },
+      "additionalProperties": false
+    },
+    "debugging_result": {
+      "type": "object",
+      "required": [
+        "mode",
+        "target_and_trigger",
+        "debugging_scope",
+        "identity_and_artifact_status",
+        "direct_observations",
+        "perturbations",
+        "causal_status",
+        "cause_summary",
+        "next_discriminator",
+        "session_handoff",
+        "proof_ceiling",
+        "repair_handoff",
+        "performance_handoff",
+        "unresolved_conditions"
+      ],
+      "properties": {
+        "mode": { "enum": ["scope", "operate"] },
+        "target_and_trigger": { "type": "string", "minLength": 1 },
+        "debugging_scope": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "identity_and_artifact_status": {
+          "allOf": [
+            { "$ref": "#/$defs/string_array" },
+            { "minItems": 1 }
+          ]
+        },
+        "direct_observations": { "$ref": "#/$defs/string_array" },
+        "perturbations": { "$ref": "#/$defs/string_array" },
+        "causal_status": {
+          "enum": [
+            "not_run",
+            "failure_mechanism_established",
+            "root_cause_established",
+            "leading_hypothesis",
+            "artifact_insufficient",
+            "trigger_not_observed"
+          ]
+        },
+        "cause_summary": { "type": "string", "minLength": 1 },
+        "next_discriminator": { "type": "string", "minLength": 1 },
+        "session_handoff": { "type": "string", "minLength": 1 },
+        "proof_ceiling": { "type": "string", "minLength": 1 },
+        "repair_handoff": { "type": "string", "minLength": 1 },
+        "performance_handoff": { "type": "string", "minLength": 1 },
+        "unresolved_conditions": { "$ref": "#/$defs/string_array" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "mode": { "const": "scope" } },
+            "required": ["mode"]
+          },
+          "then": {
+            "properties": { "causal_status": { "const": "not_run" } }
+          },
+          "else": {
+            "properties": {
+              "causal_status": {
+                "enum": [
+                  "failure_mechanism_established",
+                  "root_cause_established",
+                  "leading_hypothesis",
+                  "artifact_insufficient",
+                  "trigger_not_observed"
+                ]
+              }
+            }
+          }
+        }
+      ],
       "additionalProperties": false
     },
     "implementation_result": {

@@ -33,6 +33,7 @@ description: Implement and execute a complete test contract as test-only code, f
     - existing nearby test conventions, runner/config, fixtures, baselines, and diagnostics
     - `references/execution_item_view.md` in graph mode or when the result crosses another Workflow/plugin
     - `test-replay-corpus`, `test-visual-regression` in explicit `evidence` mode, or another Plan-selected testing specialist only when the contract names that evidence surface
+    - `references/runtime_debugging_contract.md` when the accepted contract requires a debugger stop, crash/core/minidump, build/symbol manifest, dynamic diagnostic, concurrency trace, graphics capture, or device-loss artifact
     - `references/execution_assurance_contract.md` when test implementation or evidence consumption has material maker/checker separation or standard/strict assurance requirements
   do_not_load_by_default:
     - full repo, unrelated tests, broad design reports, open human decisions, raw production data, or credentials
@@ -86,7 +87,13 @@ Do not perform hidden Test Design inside this Workflow.
    a missing visual contract is `design_required`, never permission for hidden redesign.
 4. Run the smallest condition-matched command or observation. Preserve expected/actual values,
    seed/state history, screenshots/diffs, traces/profiles/dumps, build identity, and selected-source
-   readback required by the contract.
+   readback required by the contract. For an accepted runtime-debugging capture, also preserve exact
+   binary/module/symbol/device/tool identity, included and missing state, capture filters, and
+   debugger/instrumentation perturbation under `references/runtime_debugging_contract.md`. Execute
+   only the accepted trigger, probe/location/range, commands, and capture scope mechanically. If the
+   observation requires a new watchpoint, breakpoint, step, replay query, shader invocation, or
+   capture range, stop and return the bounded evidence/handoff through `execution_summary` and
+   artifact/evidence refs. Capture does not authorize target-state mutation or a root-cause verdict.
 5. Challenge the test with its named falsifier or semantic mutant when safe and authorized. A
    passing happy path without the required falsifier remains incomplete test implementation.
 6. Review design conformance: no weakened assertion, widened tolerance, reduced horizon, silently
@@ -117,6 +124,9 @@ partial card, weaken the contract, or relabel the missing obligation as a produc
   not other seeds, workloads, horizons, or populations.
 - A mock, fake, fixture, or agent-authored expected value proves only its encoded boundary.
 - `coverage` shows execution of counted structure, not assertion quality or semantic correctness.
+- A debugger stop, dump, dynamic report, trace/replay, or graphics capture proves only its recorded
+  state/events under verified identity and capture scope. Testing preserves the artifact and a
+  bounded handoff; it does not infer the unique cause.
 
 ## Output Contract
 

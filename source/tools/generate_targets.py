@@ -63,6 +63,10 @@ ARCHITECTURE_DESIGN_CONTRACT_SOURCE = Path("shared/docs/architecture_design_cont
 ARCHITECTURE_DESIGN_CONTRACT_TARGET = Path("references/architecture_design_contract.md")
 BOUNDARY_DECISION_CONTRACT_SOURCE = Path("shared/docs/boundary_decision_contract.md")
 BOUNDARY_DECISION_CONTRACT_TARGET = Path("references/boundary_decision_contract.md")
+RUNTIME_DEBUGGING_CONTRACT_SOURCE = Path("shared/docs/runtime_debugging_contract.md")
+RUNTIME_DEBUGGING_CONTRACT_TARGET = Path("references/runtime_debugging_contract.md")
+RUNTIME_DEBUGGING_REFERENCE_SOURCE = Path("shared/docs/runtime-debugging")
+RUNTIME_DEBUGGING_REFERENCE_TARGET = Path("references/runtime-debugging")
 RESEARCH_STAGE_CONTRACT_SOURCE = Path("shared/docs/research_stage_contract.md")
 RESEARCH_STAGE_CONTRACT_TARGET = Path("references/research_stage_contract.md")
 DESIGN_SHARED_REFERENCE_PROJECTIONS = (
@@ -622,6 +626,24 @@ def _attach_boundary_decision_contract(source: Path, skill_dir: Path) -> None:
     )
 
 
+def _attach_runtime_debugging_payload(source: Path, skill_dir: Path) -> None:
+    """Project the shared runtime-debugging contract and selected reference catalog."""
+    skill_md = skill_dir / "SKILL.md"
+    if not skill_md.is_file():
+        return
+    text = skill_md.read_text(encoding="utf-8")
+    if RUNTIME_DEBUGGING_CONTRACT_TARGET.as_posix() in text:
+        _copy(
+            source / RUNTIME_DEBUGGING_CONTRACT_SOURCE,
+            skill_dir / RUNTIME_DEBUGGING_CONTRACT_TARGET,
+        )
+    if f"{RUNTIME_DEBUGGING_REFERENCE_TARGET.as_posix()}/" in text:
+        _copy(
+            source / RUNTIME_DEBUGGING_REFERENCE_SOURCE,
+            skill_dir / RUNTIME_DEBUGGING_REFERENCE_TARGET,
+        )
+
+
 def _wants_research_stage_contract(skill_dir: Path) -> bool:
     skill_md = skill_dir / "SKILL.md"
     if not skill_md.is_file():
@@ -755,6 +777,7 @@ def _attach_plugin_skill_payloads(source: Path, skill_dir: Path) -> None:
     _attach_execution_assurance_contract(source, skill_dir)
     _attach_architecture_design_contract(source, skill_dir)
     _attach_boundary_decision_contract(source, skill_dir)
+    _attach_runtime_debugging_payload(source, skill_dir)
     _attach_research_stage_contract(source, skill_dir)
     _attach_design_shared_references(source, skill_dir)
     _attach_testing_shared_references(source, skill_dir)

@@ -18,6 +18,7 @@ boundaries. A direct single-owner task may use its ordinary compact output.
 | final Known Bug record | Coordinator/Handoff in graph mode; bounded Bug Fix after final local review in standalone mode |
 | concrete UI design artifact and implementation handoff | `workflow-ui-design` |
 | one explicitly assigned Research-stage node result | `workflow-research` using one selected Research specialist |
+| one assigned debugging-scope or runtime-debugging node result | `workflow-runtime-debugging` |
 | production implementation result | the assigned implementation Workflow |
 | implementation-ready software test contract | `workflow-test-design` |
 | test-only implementation and scoped execution result | `workflow-test-implementation` |
@@ -37,13 +38,13 @@ Use the smallest applicable fields. `plan_ref` and `node_id` are required only i
 execution_item:
   contract_id: core-execution-items-v1
   item_id: <stable task-local id>
-  kind: design_result | research_result | implementation_result | test_design_result |
+  kind: design_result | research_result | debugging_result | implementation_result | test_design_result |
         test_implementation_result | code_review_result | deferred_item | bug_fix_result |
         known_bug_candidate | known_bug_record
   producer: <canonical plugin:skill id or current owner>
   plan_ref: <plan id/revision or null>
   node_id: <Plan node id or null>
-  scope_ref: <bounded design/research/behavior/review/repair scope>
+  scope_ref: <bounded design/research/debugging/behavior/review/repair scope>
   artifact_refs: []
   evidence_refs: []
   payload: {}
@@ -118,6 +119,38 @@ The producer manages one node envelope and applies exactly one selected Research
 does not classify a vague request, run several stages, acquire a missing prerequisite, emit a card
 for `not_produced` work, select a successor, or mutate Handoff. Downstream Research nodes consume
 the item only as an artifact/evidence locator under an already accepted Plan edge.
+
+### `debugging_result`
+
+Producer: `workflow-runtime-debugging`. Consumers: a later assigned Runtime Debugging node, Bug Fix,
+and the execution owner. Recorder: the execution owner.
+
+```yaml
+payload:
+  mode: scope | operate
+  target_and_trigger: <concrete failure and expected condition>
+  debugging_scope: []
+  identity_and_artifact_status: []
+  direct_observations: []
+  perturbations: []
+  causal_status: not_run | failure_mechanism_established | root_cause_established |
+                 leading_hypothesis | artifact_insufficient | trigger_not_observed
+  cause_summary: <observed mechanism, root cause, leading hypothesis, or none for scope mode>
+  next_discriminator: <one next observation or none>
+  session_handoff: <final process/session/probe/detach-resume state or not_applicable>
+  proof_ceiling: <what this scope or observation does and does not establish>
+  repair_handoff: <bounded repair direction and original signal, or none>
+  performance_handoff: <bounded metric/workload handoff, or none>
+  unresolved_conditions: []
+```
+
+`mode: scope` produces an execution-ready contract with `causal_status: not_run`; it performs no
+debugger or capture operation. `mode: operate` consumes a predecessor scope result or supplies the
+same scope inline and records exact identity, observations, perturbations, causal status, and safe
+session handback. `failure_mechanism_established` is not a root-cause claim. A missing material
+trigger, scope, permission boundary, target identity requirement, or graph input returns lifecycle
+`not_produced`, not a partial card. The result never authorizes target-state mutation, source repair,
+performance work, another debugging node, or successor selection outside an existing Plan edge.
 
 ### `implementation_result`
 
@@ -333,6 +366,7 @@ normal terminal node such as `human_test_ready`; there is no `partial_handoff` f
 ```text
 design_result -> assigned UI implementation or existing Plan successor
 research_result -> existing Plan successor
+debugging_result -> existing Plan successor; scope/operate/repair routing follows only accepted edges
 implementation_result -> assigned Code Review
 test_design_result -> assigned Test Implementation or existing Plan successor
 test_implementation_result -> assigned Code Review or existing Plan successor
@@ -361,12 +395,13 @@ worker context.
 | --- | --- | --- |
 | `skill-system-design:workflow-ui-design` | `design_result` | none |
 | `skill-system-research:workflow-research` | `research_result` | predecessor `research_result` items named by its assigned node |
+| `skill-system-dev:workflow-runtime-debugging` | `debugging_result` | optional predecessor `debugging_result` named by its assigned node |
 | `skill-system-design:design-frontend` | `implementation_result` | `design_result`, final review/repair evidence when it is the current execution owner |
 | `skill-system-dev:workflow-implementation` | `implementation_result` | final review/repair evidence when it is the current execution owner |
 | `skill-system-testing:workflow-test-design` | `test_design_result` | optional `implementation_result` target snapshot |
 | `skill-system-testing:workflow-test-implementation` | `test_implementation_result` | optional `test_design_result`, `known_bug_record` exclusions |
 | `skill-system-dev:workflow-code-review` | `code_review_result`, `deferred_item` | optional `design_result` or `test_design_result` baseline, `implementation_result`, `test_implementation_result`, `bug_fix_result`, `known_bug_record` exclusions |
-| `skill-system-dev:workflow-bug-fix` | `bug_fix_result`, `known_bug_candidate`, and standalone-only `known_bug_record` | concrete repair findings from `code_review_result` |
+| `skill-system-dev:workflow-bug-fix` | `bug_fix_result`, `known_bug_candidate`, and standalone-only `known_bug_record` | concrete repair findings from `code_review_result` and supplied `debugging_result` evidence |
 | `skill-system-core:plan-execution-handoff` | `known_bug_record` and ledger transition | all graph-mode items |
 
 Other skills adopt only the item kinds they actually exchange. Merely mentioning another skill or

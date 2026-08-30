@@ -63,6 +63,13 @@ Design, Test Implementation, or a conditional Test Discovery decision. Bind `TD*
 to their exact Testing Workflow owners, preserve Test Discovery as Planning support rather than a
 DAG node, and keep agent-machine test evidence separate from Human Test authority.
 
+Read `references/runtime_debugging_contract.md` only when an accepted `DBG0` debugging-scope node,
+`DBG1` runtime-operation node, or test condition explicitly requires a debugger session, crash
+artifact, dynamic diagnostic, concurrency trace, graphics capture, or device-loss artifact. Bind
+both node modes to `workflow-runtime-debugging`. Each graph-mode node returns one Core
+`debugging_result`, never edits Plan/Handoff, selects a successor, or turns a captured artifact into
+repair authorization.
+
 Read `references/execution_assurance_contract.md` only when the Plan or user requires
 `assurance: standard | strict` on an owning node whose primary contract declares that local
 reference or an accepted equivalent gate. Assurance changes evidence handling, not graph topology,
@@ -76,7 +83,7 @@ literal `|` inside a table cell as `\|`.
 
 ## Core Cards
 
-- records: `references/core-execution-items-v1/cards/design_result.md`, `references/core-execution-items-v1/cards/research_result.md`, `references/core-execution-items-v1/cards/implementation_result.md`, `references/core-execution-items-v1/cards/test_design_result.md`, `references/core-execution-items-v1/cards/test_implementation_result.md`, `references/core-execution-items-v1/cards/code_review_result.md`, `references/core-execution-items-v1/cards/deferred_item.md`, `references/core-execution-items-v1/cards/bug_fix_result.md`, `references/core-execution-items-v1/cards/known_bug_candidate.md`, `references/core-execution-items-v1/cards/known_bug_record.md`
+- records: `references/core-execution-items-v1/cards/design_result.md`, `references/core-execution-items-v1/cards/research_result.md`, `references/core-execution-items-v1/cards/debugging_result.md`, `references/core-execution-items-v1/cards/implementation_result.md`, `references/core-execution-items-v1/cards/test_design_result.md`, `references/core-execution-items-v1/cards/test_implementation_result.md`, `references/core-execution-items-v1/cards/code_review_result.md`, `references/core-execution-items-v1/cards/deferred_item.md`, `references/core-execution-items-v1/cards/bug_fix_result.md`, `references/core-execution-items-v1/cards/known_bug_candidate.md`, `references/core-execution-items-v1/cards/known_bug_record.md`
 - produces after combining an eligible candidate with terminal review evidence: `references/core-execution-items-v1/cards/known_bug_record.md`
 
 ## Pair Location and Identity
@@ -229,7 +236,7 @@ Keep the handoff subordinate to the plan:
   Task State; the handoff never rewrites graph grammar alone.
 - Track every task as `pending`, `in progress`, `complete`, or `blocked`, with one matching typed
   Timing Observations row updated only from `worker_done`.
-- Consume `design_result`, `research_result`, `implementation_result`, `code_review_result`, `deferred_item`,
+- Consume `design_result`, `research_result`, `debugging_result`, `implementation_result`, `code_review_result`, `deferred_item`,
   `bug_fix_result`, and `known_bug_candidate` according to
   `references/execution_item_contract.md`. Record each item with
   its exact `## Core Cards` row template in the matching existing Handoff ledger table, not a local

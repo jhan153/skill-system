@@ -32,6 +32,7 @@ description: Resolve human-owned test-basis, oracle, tolerance, baseline, horizo
   read_if_needed:
     - `references/execution_handoff_input_contract.md` when a package or graph-mode node is bound
     - `references/test-decision-record.md` when persisting the result
+    - `references/runtime_debugging_contract.md` when the human-owned decision changes debugger/dump/dynamic/graphics collection scope or cost, perturbation acceptance, sensitive-data handling, or the deliberately lowered proof ceiling; exact target/build/module/load-address/symbol identity match remains an evidence-validity rule and cannot be waived into a match
     - the smallest source, measurement, screenshot, recording, or artifact slice that distinguishes the options
   do_not_load_by_default:
     - full repository, full Plan/Handoff, unrelated requirements, raw production data, or credentials
