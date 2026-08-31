@@ -62,15 +62,17 @@ Deferred work is not successful work.
 
 ## Attended Versus Unattended Execution
 
+A provider-owned automatic reviewer may resolve eligible approvals before this portable fallback;
+that reviewer selection is host configuration, not a Work Contract field.
+
 `interaction.mode: forbidden` becomes a runtime non-waiting deny only when the active
 natural-language projection also declares `execution.mode: unattended_goal_loop`. A plan, graph,
 or mention of a loop does not convert an `attended` contract into this profile. Ordinary attended
-work and Goal/Loop contracts that allow interaction retain the host's normal approval behavior.
+work and Goal/Loop contracts that allow interaction retain the host's normal fallback behavior.
 
-In an unattended Goal/Loop, an approval or question is denied/deferred before
-the UI wait begins. The executor then continues other required runnable work.
-If none remains, it reports `blocked` with the exact unmet requirement instead
-of asking repeatedly.
+Without a provider reviewer, an unattended Goal/Loop approval or question is denied/deferred before
+the UI wait begins. The executor then continues other required runnable work. If none remains, it
+reports `blocked` with the exact unmet requirement instead of asking repeatedly.
 
 ## Completion And Evidence
 

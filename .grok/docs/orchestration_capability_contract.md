@@ -15,7 +15,10 @@ runtime capability outside the current turn.
 - `native_harness_provider`: ships a provider-owned lifecycle harness. Current owners are Codex and
   Claude.
 - `common_harness_provider`: owns an independent Go module containing the distributed common
-  harness baseline. All four providers hold this role; Codex alone adds execution admission.
+  harness baseline. All four providers hold this role; Codex and Claude layer their provider-native
+  lifecycle handlers over that baseline without turning it into shared execution-admission state.
+  Codex may use its host Auto-reviewer to resolve eligible permission waits without user clicks;
+  that provider behavior does not grant Orca capability or Plan authority.
 - `rule_companion_provider`: ships portable global rules and shared docs/schemas but no native hook
   adapter. Current owners are Grok and Antigravity; their common Go binaries expose version and
   project-context utilities while Orca owns lifecycle delivery.

@@ -209,8 +209,9 @@ func Context(state State) string {
 	if state.VerificationOwner == VerificationUser {
 		lines = append(lines, "- Missing user-only evidence is a normal user-verification-needed handoff; do not create substitute tests or validation artifacts.")
 	}
+	lines = append(lines, "- The host-selected reviewer owns approval decisions; when Auto-review is effective, it replaces user-click waits. This projection only excludes or defers explicitly out-of-contract actions.")
 	if state.ExecutionMode == ExecutionUnattendedGoalLoop && state.InteractionMode == InteractionForbidden {
-		lines = append(lines, "- Do not request approval or ask a blocking question. Defer only that action and continue other in-contract work.")
+		lines = append(lines, "- Do not ask a blocking question. Defer only the unavailable action and continue other in-contract work.")
 	}
 	if len(state.ExcludedActionClasses) > 0 {
 		lines = append(lines, "- Excluded action classes: "+strings.Join(state.ExcludedActionClasses, ", ")+".")
@@ -260,33 +261,6 @@ func Preflight(sessionID, toolName string, raw json.RawMessage) (Decision, error
 		return Decision{Deny: true, Intent: intent, Reason: denialReason(intent)}, nil
 	}
 	return Decision{}, nil
-}
-
-func Permission(sessionID, toolName string, raw json.RawMessage) (Decision, error) {
-	state, err := Load(sessionID)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return Decision{}, nil
-		}
-		return Decision{}, err
-	}
-	intent := classifyIntent(toolName, raw, state.ActiveIntent)
-	unattended := state.ExecutionMode == ExecutionUnattendedGoalLoop
-	if !unattended {
-		return Decision{}, nil
-	}
-	if state.InteractionMode != InteractionForbidden && !hasDeferred(state, intent.Key) {
-		return Decision{}, nil
-	}
-	if hasDeferred(state, intent.Key) {
-		intent.Reason = "same-purpose approval or action was already deferred"
-	} else {
-		intent.Reason = "approval would violate the no-additional-interaction contract"
-	}
-	if err := deferIntent(sessionID, &state, intent); err != nil {
-		return Decision{}, err
-	}
-	return Decision{Deny: true, Intent: intent, Reason: denialReason(intent)}, nil
 }
 
 func ContinueWithoutInput(sessionID string) (bool, error) {

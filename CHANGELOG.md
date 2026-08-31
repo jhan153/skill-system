@@ -1,5 +1,14 @@
 # Changelog
 
+## 10.2.1
+
+- Removed the obsolete Codex `execguard` implementation and its tests. Ordinary command selection
+  and sandbox/approval behavior remain owned by the host and configured review policy.
+- Simplified the Codex hook surface to retain work-contract preflight/rewrite/deny behavior while
+  leaving `PermissionRequest` and post-tool observation to the host flow.
+- Updated the runtime payload policy, hook/work-contract documentation, and generated Codex
+  harness artifacts to match the new ownership boundary.
+
 ## 10.2.0
 
 - Added `workflow-runtime-debugging` as the bounded runtime-correctness owner for execution-ready

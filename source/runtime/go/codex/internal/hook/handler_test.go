@@ -36,96 +36,66 @@ func TestDeclaredHookEventsMatchHandlerSurface(t *testing.T) {
 
 	t.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", t.TempDir())
 	t.Setenv("SKILL_SYSTEM_DESKTOP_NOTIFY", "dry-run")
-	output := Handle(Event{
+	if output := Handle(Event{
 		HookEventName: "PermissionRequest", SessionID: "normal", TurnID: "turn", ToolName: "Bash",
 		ToolInput: hookCommandJSON(t, "rg -n hook source"), PermissionMode: "default",
-	})
-	if output == nil {
-		t.Fatal("stable local read did not bypass approval")
-	}
-	specific := output["hookSpecificOutput"].(map[string]any)
-	decision := specific["decision"].(map[string]any)
-	if decision["behavior"] != "allow" {
-		t.Fatalf("stable local read was not allowed: %#v", output)
+	}); output != nil {
+		t.Fatalf("permission without an active work contract must use normal host flow: %#v", output)
 	}
 }
 
-func TestExecGuardRewritesAndAppliesTurnAuthority(t *testing.T) {
-	root := t.TempDir()
-	workspace := filepath.Join(root, "workspace")
-	codexHome := filepath.Join(root, "codex-home")
-	for _, path := range []string{filepath.Join(workspace, ".git"), codexHome} {
-		if err := os.MkdirAll(path, 0o700); err != nil {
-			t.Fatal(err)
-		}
-	}
-	t.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", root)
+func TestExecutionAdmissionDoesNotPreemptHostFlow(t *testing.T) {
+	t.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", t.TempDir())
 	t.Setenv("SKILL_SYSTEM_DESKTOP_NOTIFY", "dry-run")
-	t.Setenv("CODEX_HOME", codexHome)
 
-	if output := Handle(Event{
-		HookEventName: "UserPromptSubmit", SessionID: "install", TurnID: "turn", Cwd: workspace,
-		Prompt: "Skill System runtime companion을 Codex 홈에 설치하고 동기화해",
-	}); output != nil {
-		if _, ok := output["hookSpecificOutput"]; !ok {
-			t.Fatalf("unexpected prompt output: %#v", output)
-		}
+	cases := []struct {
+		name      string
+		toolName  string
+		toolInput json.RawMessage
+	}{
+		{
+			name:      "arbitrary apply patch",
+			toolName:  "apply_patch",
+			toolInput: json.RawMessage(`{"patch":"arbitrary patch payload"}`),
+		},
+		{
+			name:      "unregistered read command",
+			toolName:  "Bash",
+			toolInput: hookCommandJSON(t, "git blame source/file.go"),
+		},
 	}
-	permission := Handle(Event{
-		HookEventName: "PermissionRequest", SessionID: "install", TurnID: "turn", Cwd: workspace,
-		ToolName: "Bash", ToolUseID: "install-1", PermissionMode: "default",
-		ToolInput: hookCommandJSON(t, "rsync -a build/ "+codexHome+"/"),
-	})
-	if permission == nil {
-		t.Fatal("turn-authorized installation reached the approval UI")
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			event := Event{
+				SessionID: "host-flow-" + testCase.name, TurnID: "turn",
+				ToolName: testCase.toolName, ToolInput: testCase.toolInput, PermissionMode: "default",
+			}
+			event.HookEventName = "PreToolUse"
+			if output := Handle(event); output != nil {
+				t.Fatalf("tool was preempted before host policy: %#v", output)
+			}
+			event.HookEventName = "PermissionRequest"
+			if output := Handle(event); output != nil {
+				t.Fatalf("permission did not remain on the normal host path: %#v", output)
+			}
+		})
 	}
-	permissionSpecific := permission["hookSpecificOutput"].(map[string]any)
-	if permissionSpecific["decision"].(map[string]any)["behavior"] != "allow" {
-		t.Fatalf("turn-authorized installation was not allowed: %#v", permission)
-	}
+}
 
-	rewrite := Handle(Event{
-		HookEventName: "PreToolUse", SessionID: "wrapper", TurnID: "turn", Cwd: workspace,
-		ToolName: "Bash", ToolUseID: "wrapper-1", PermissionMode: "default",
-		ToolInput: hookCommandJSON(t, `zsh -lc "rg -n execguard source"`),
-	})
-	if rewrite == nil {
-		t.Fatal("safe wrapper was not rewritten")
-	}
-	rewriteSpecific := rewrite["hookSpecificOutput"].(map[string]any)
-	updated := rewriteSpecific["updatedInput"].(map[string]any)
-	if updated["command"] != "rg -n execguard source" {
-		t.Fatalf("unexpected wrapper rewrite: %#v", rewrite)
-	}
-
-	Handle(Event{
-		HookEventName: "UserPromptSubmit", SessionID: "inline-eval", TurnID: "turn", Cwd: workspace,
-		Prompt: "프로젝트 명령을 실행해",
-	})
-	opaque := Handle(Event{
-		HookEventName: "PreToolUse", SessionID: "inline-eval", TurnID: "turn", Cwd: workspace,
-		ToolName: "Bash", ToolUseID: "inline-1", PermissionMode: "default",
-		ToolInput: hookCommandJSON(t, `python3 -c 'import os; os.execv("./dentru", ["./dentru"])'`),
-	})
-	if opaque == nil {
-		t.Fatal("inline interpreter evaluator reached host approval")
-	}
-	opaqueSpecific := opaque["hookSpecificOutput"].(map[string]any)
-	if opaqueSpecific["permissionDecision"] != "deny" || !strings.Contains(strings.ToLower(opaqueSpecific["permissionDecisionReason"].(string)), "opaque") {
-		t.Fatalf("inline interpreter evaluator was not denied by PreToolUse: %#v", opaque)
-	}
+func TestUnattendedWorkContractDoesNotOverrideHostReviewer(t *testing.T) {
+	t.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", t.TempDir())
+	t.Setenv("SKILL_SYSTEM_DESKTOP_NOTIFY", "dry-run")
 
 	Handle(Event{
-		HookEventName: "UserPromptSubmit", SessionID: "no-wait", TurnID: "turn", Cwd: workspace,
-		Prompt: "코드를 읽어봐",
+		HookEventName: "UserPromptSubmit", SessionID: "unattended", TurnID: "turn",
+		Prompt: "/goal 무인 장시간 구현으로 진행해. 승인이나 질문을 요청하지 마.",
 	})
-	denied := Handle(Event{
-		HookEventName: "PreToolUse", SessionID: "no-wait", TurnID: "turn", Cwd: workspace,
-		ToolName: "Bash", ToolUseID: "network-1", PermissionMode: "dontAsk",
-		ToolInput: hookCommandJSON(t, "curl https://example.com/archive"),
+	output := Handle(Event{
+		HookEventName: "PermissionRequest", SessionID: "unattended", TurnID: "turn",
+		ToolName: "Bash", ToolInput: hookCommandJSON(t, "git blame source/file.go"),
 	})
-	if denied == nil || denied["hookSpecificOutput"].(map[string]any)["permissionDecision"] != "deny" {
-		t.Fatalf("dontAsk attempted to wait for approval: %#v", denied)
+	if output != nil {
+		t.Fatalf("work contract overrode the host auto-review path: %#v", output)
 	}
 }
 

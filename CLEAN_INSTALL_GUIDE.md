@@ -161,15 +161,30 @@ Codex 설치에서는 다음을 하나의 경계로 적용합니다.
 - Skill System 정책은 `rules/skill-system.rules`에만 설치합니다.
 - Codex TUI가 영구 승인을 누적하는 `<CODEX_HOME>/rules/default.rules`와 그 백업은
   생성·교체·정리하지 않습니다. 설치 전후 바이트 동일성을 확인합니다.
-- `harness/config.toml.fragment`의 `allow_login_shell = false`는 사용자가 해당 키
-  병합을 명시적으로 요청한 경우에만 host-owned `config.toml`에 추가합니다. 기존
-  TOML의 다른 키와 주석은 보존합니다.
-- 설치 후 새 Codex 작업을 시작하여 safe direct command, wrapper rewrite,
-  `python3 -c`/`zsh -ic` 같은 opaque evaluator의 승인 전 거부,
-  `dontAsk` 즉시 종료, 승인 1회 제한을 실제 hook 경로에서 확인합니다.
+- 사용자가 자동 승인 검토를 명시적으로 요청한 경우에만
+  `harness/config.toml.fragment`의 `approvals_reviewer = "auto_review"`를 host-owned
+  `config.toml`에 병합합니다. `allow_login_shell`, sandbox, provider, auth와 다른 설정은
+  그대로 보존합니다.
+- 병합 전에 effective `approval_policy`가 `on-request` 또는 granular인지 확인하고,
+  managed `allowed_approvals_reviewers`가 선언돼 있으면 `auto_review`가 허용되는지
+  확인합니다. 조건이 맞지 않으면 reviewer가 활성화됐다고 보고하지 않습니다.
+- 이전 Skill System 설치 지침으로 `allow_login_shell = false`를 병합한 호스트는 해당
+  provenance가 확인되고 사용자가 제거를 명시적으로 요청한 경우에만 그 키를 제거합니다.
+  출처가 불명확하거나 사용자가 소유한 값은 보존하고 잔존 위험으로 보고합니다.
+- 설치 후 새 Codex 작업을 시작하여 모델이 compound command를 working directory,
+  data flow, failure ordering, side effect를 보존하는 ordered direct calls로 분해하고,
+  안정적인 read·diagnostic·build·test는 sandbox 안에서 실행하는지 확인합니다.
+- quoting, expansion, pipeline, redirection 또는 evaluator semantics가 실제로 필요한
+  shell·inline interpreter 명령은 `PreToolUse`에서 형식만으로 거부되지 않고 정상 host
+  `PermissionRequest`에 도달해야 합니다.
+- `apply_patch`와 미등록 read command는 현재 사용자 문구에 특정 작업 동사가 없다는
+  이유로 `PreToolUse`에서 선행 거부되지 않아야 합니다.
+- attended와 unattended 모두에서 `PermissionRequest` 훅은 결정을 반환하지 않아야 하며,
+  Codex Auto-review가 일반 명령은 승인하고 위험한 명령은 거부해야 합니다. 사용자 클릭
+  다이얼로그가 나타나지 않는지, 새 Codex 작업의 effective settings가
+  `approvals_reviewer: auto_review`인지 확인합니다.
 
-실행 상태는 `<CODEX_HOME>/harness/exec-guard/` 아래의 bounded digest 상태만
-사용하며 raw prompt, command, patch, tool output 또는 자격 증명을 저장하지 않습니다.
+Codex 하네스는 execution grant나 command-attempt 상태를 만들거나 저장하지 않습니다.
 
 ### Claude에서 Skill System이 동기화하는 정적 런타임
 

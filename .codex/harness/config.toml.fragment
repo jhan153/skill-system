@@ -1,3 +1,4 @@
-# Merge this key into the host-owned Codex config.toml when execution-admission
-# runtime installation is explicitly authorized. Never replace config.toml.
-allow_login_shell = false
+# Merge this reviewer choice only when automatic approval review is explicitly requested and the
+# effective approval policy is on-request or granular. Preserve sandbox, provider, auth, and
+# unrelated settings; managed allowed_approvals_reviewers must permit auto_review when declared.
+approvals_reviewer = "auto_review"

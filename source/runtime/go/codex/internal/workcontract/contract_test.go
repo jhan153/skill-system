@@ -27,7 +27,9 @@ func TestNaturalLanguageContractCaptureAndExplicitAllow(t *testing.T) {
 		}
 	}
 	context := Context(state)
-	if !strings.Contains(context, "user-verification-needed") || !strings.Contains(context, "Do not request approval") {
+	if !strings.Contains(context, "user-verification-needed") ||
+		!strings.Contains(context, "The host-selected reviewer owns approval decisions") ||
+		!strings.Contains(context, "Do not ask a blocking question") {
 		t.Fatalf("incomplete context: %q", context)
 	}
 

@@ -8,30 +8,30 @@ prefix_rule(pattern=["git", "clean", ["-d", "--directories", "-x", "--ignored", 
 prefix_rule(pattern=["git", "clean", ["-d", "--directories", "-x", "--ignored", "-X"], ["-d", "--directories", "-x", "--ignored", "-X"], ["-f", "--force"]], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
 prefix_rule(pattern=["git", "-c", ["clean.requireForce=false", "clean.requireforce=false"], "clean"], decision="forbidden", justification="Review untracked files and use targeted cleanup.")
 
-# The PreToolUse guard rewrites a safe single command first. Any surviving
-# shell evaluator depends on semantics that cannot be normalized safely.
+# Prefer direct commands, but route shell semantics that cannot be decomposed
+# without changing meaning to Codex Auto-review.
 prefix_rule(
     pattern=[["sh", "bash", "zsh", "/bin/sh", "/bin/bash", "/bin/zsh"], ["-c", "-lc", "-ic", "-ilc", "-cl", "-lic"]],
-    decision="forbidden",
-    justification="Use the direct command produced by the execution guard or a checked-in script.",
-    match=["zsh -lc 'rg -n execguard source'"],
-    not_match=["rg -n execguard source"],
+    decision="prompt",
+    justification="Auto-review the complete shell expression and its effects before execution.",
+    match=["zsh -lc 'rg -n TODO source'"],
+    not_match=["rg -n TODO source"],
 )
 
 # General-purpose inline evaluators hide file, process, credential, and network
-# behavior behind an interpreter prefix. PreToolUse handles normalized and
-# wrapped forms; these representative direct forms fail closed without a popup.
-prefix_rule(pattern=[["python", "python3", "/usr/bin/python", "/usr/bin/python3"], "-c"], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
-prefix_rule(pattern=["node", ["-e", "--eval", "-p", "--print"]], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
-prefix_rule(pattern=[["ruby", "perl", "osascript", "lua", "Rscript"], ["-e", "-E"]], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
-prefix_rule(pattern=[["pwsh", "powershell"], ["-c", "-Command", "-command", "-EncodedCommand", "-encodedcommand"]], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
-prefix_rule(pattern=["php", "-r"], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
-prefix_rule(pattern=["deno", "eval"], decision="forbidden", justification="Invoke a direct executable or an existing auditable script.")
+# behavior behind an interpreter prefix. Route them to Auto-review rather than
+# terminating them before PermissionRequest.
+prefix_rule(pattern=[["python", "python3", "/usr/bin/python", "/usr/bin/python3"], "-c"], decision="prompt", justification="Review the complete inline program and its effects before execution.")
+prefix_rule(pattern=["node", ["-e", "--eval", "-p", "--print"]], decision="prompt", justification="Review the complete inline program and its effects before execution.")
+prefix_rule(pattern=[["ruby", "perl", "osascript", "lua", "Rscript"], ["-e", "-E"]], decision="prompt", justification="Review the complete inline program and its effects before execution.")
+prefix_rule(pattern=[["pwsh", "powershell"], ["-c", "-Command", "-command", "-EncodedCommand", "-encodedcommand"]], decision="prompt", justification="Review the complete inline program and its effects before execution.")
+prefix_rule(pattern=["php", "-r"], decision="prompt", justification="Review the complete inline program and its effects before execution.")
+prefix_rule(pattern=["deno", "eval"], decision="prompt", justification="Review the complete inline program and its effects before execution.")
 
-# Effects that may require new authority. PermissionRequest auto-allows these
-# when the current user turn already grants the same effect and target.
+# Effects that require Auto-review. A prompt does not infer or broaden task
+# authority, target scope, sandbox access, or hard-safety policy.
 prefix_rule(pattern=["rm"], decision="prompt", justification="Deletion requires an explicit in-scope cleanup grant.")
-prefix_rule(pattern=["find"], decision="prompt", justification="Read-only find is auto-allowed; deletion or execution requires current-turn authority.")
+prefix_rule(pattern=["find"], decision="prompt", justification="Review the complete find expression because actions such as -delete and -exec can mutate state or launch processes.")
 prefix_rule(pattern=[["rsync", "cp", "mv", "mkdir", "install"]], decision="prompt", justification="Filesystem mutation must stay within the current turn's declared target.")
 prefix_rule(pattern=[["python", "python3"], "-m", "pip", "install"], decision="prompt", justification="Dependency installation changes the environment and may use the network.")
 prefix_rule(pattern=["uv", "pip", "install"], decision="prompt", justification="Dependency installation changes the environment and may use the network.")
@@ -50,11 +50,12 @@ prefix_rule(pattern=[["codex", "claude"], ["plugin", "mcp", "app-server"]], deci
 prefix_rule(pattern=["launchctl", "setenv"], decision="prompt", justification="Changing process-manager environment state requires an explicit host-runtime grant.")
 prefix_rule(pattern=["open", "-R"], decision="prompt", justification="Launching a host GUI requires an explicit process-launch grant.")
 
-# Stable local reads, diagnostics, builds, and tests. User work-contract
-# exclusions still take precedence in PreToolUse.
-prefix_rule(pattern=[["mmdc", "rg"]], decision="allow")
-prefix_rule(pattern=["cmake", ["-S", "--build", "--preset"]], decision="allow")
-prefix_rule(pattern=["ctest", ["--test-dir", "--preset"]], decision="allow")
-prefix_rule(pattern=[["ps", "pgrep", "lsof", "sample"]], decision="allow")
-prefix_rule(pattern=[["log", "/usr/bin/log"], "show"], decision="allow")
-prefix_rule(pattern=["git"], decision="allow")
+# Do not grant unsandboxed execution from an executable prefix alone. Local work runs in the
+# sandbox; these prompt overrides route historical default allowlists through Auto-review so the
+# reviewer can inspect arguments, targets, and effects. More-specific forbidden rules still win.
+prefix_rule(pattern=[["mmdc", "rg"]], decision="prompt", justification="Auto-review the complete command, target, and effects.")
+prefix_rule(pattern=["cmake", ["-S", "--build", "--preset"]], decision="prompt", justification="Auto-review the build target and effects.")
+prefix_rule(pattern=["ctest", ["--test-dir", "--preset"]], decision="prompt", justification="Auto-review the selected test target and effects.")
+prefix_rule(pattern=["git"], decision="prompt", justification="Auto-review the complete Git command, repository target, and effects.")
+prefix_rule(pattern=["python3", "source/tools/generate_targets.py"], decision="prompt", justification="Auto-review generated-target writes.")
+prefix_rule(pattern=["go", "test"], decision="prompt", justification="Auto-review test execution and side effects.")

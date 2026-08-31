@@ -12,9 +12,9 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 10.2.0 Release
+## 10.2.1 Release
 
-This source tree is the 10.2.0 runtime-debugging release on the breaking 10.0 baseline. Its current components
+This source tree is the 10.2.1 runtime-policy maintenance release on the breaking 10.0 baseline. Its current components
 are:
 
 * `skills`: skill packages intended for actual use
@@ -185,6 +185,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 10.1.0 | Testing plugin & oracle-governed evidence | Adds the 10-skill Testing profile, conditional human Test Discovery, separate Test Design/Test Implementation Core results, replay/visual/statistical specialists, explicit visual `design`/`evidence` modes, and false-green/proof-ceiling review. |
 | 10.1.1 | Shared execution assurance | Retires `workflow-rigor` as a public skill, preserves standard/strict assurance in one shared contract projected into its owning workflows, and keeps assurance outside DAG node and mutation ownership. |
 | 10.2.0 | Runtime debugging & diagnostic notifications | Adds typed runtime-debugging scope/operation and `debugging_result` contracts, separates causal observation from repair/test ownership, and enriches bounded desktop notification metadata and lifecycle safety. |
+| 10.2.1 | Codex runtime policy maintenance | Removes the obsolete Codex execution guard, keeps ordinary command selection and host approval in their owning layers, and simplifies the Codex hook/work-contract integration. |
 
 ## License
 

@@ -48,14 +48,21 @@
 ## Runtime And Managed Assets
 - Preserve runtime config and automation state. Risky actions follow configured approval policy and user scope.
 - Prefer purpose-built tools and direct executable interfaces over shell composition.
-- Do not use shell redirection (`>`, `>>`, `<`, `2>`), heredocs, command substitution, variable
-  expansion, pipelines, or compound `sh`/`bash`/`zsh -c`/`-lc` strings merely for convenience when
-  a direct tool or executable can express the operation.
-- Treat file writing as one application of this rule: use `apply_patch` for text creation and edits
-  instead of `cat`, `tee`, `echo`, heredocs, or redirection.
-- Use the command tool's working-directory option instead of `cd`, and keep one direct executable
-  per call unless the operation genuinely requires shell semantics that no direct interface can
-  express.
+- Decompose a compound shell command into ordered direct tool calls when that preserves working
+  directory, data flow, failure ordering, and side effects. Prefer direct read, diagnostic, build,
+  and test forms that remain inside the sandbox.
+- When quoting, expansion, a pipeline, redirection, or another genuine shell semantic cannot be
+  removed without changing meaning, submit one bounded command to the normal host approval path;
+  a hook must not turn command shape alone into a pre-approval terminal denial.
+- Do not ask the user to repeat an already clear task authorization. If execution needs host
+  approval or sandbox escalation, issue that request through the tool's approval mechanism.
+- When Codex Auto-review is effective, route approval-gated commands through it instead of waiting
+  for a user click. If it rejects a risky command, inspect it and choose a safer direct form; defer
+  only explicitly excluded or unavailable work and continue independent runnable nodes.
+- Use `apply_patch` for text creation and edits inside a writable workspace. For an explicitly
+  authorized external text target, stage the exact content in the writable workspace, then use an
+  auditable direct deployment command with host-supported approval or escalation and read it back.
+- Use the command tool's working-directory option instead of `cd` when possible.
 - Keep artifacts out of temporary directories unless authorized or tool-required. `.codex/skills/.system` is app-managed and requires explicit intent to edit.
 - For an Orca-dispatched task or Plan/Handoff node, read `docs/orca_worker_runtime_contract.md`;
   worker lifecycle is event-driven and never replaced by Coordinator polling, transcript reads, or

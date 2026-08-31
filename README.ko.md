@@ -12,9 +12,9 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 10.2.0 릴리즈
+## 10.2.1 릴리즈
 
-이 소스 트리는 breaking 10.0 기준선의 10.2.0 런타임 디버깅 릴리즈입니다. 현재 구성은 다음과
+이 소스 트리는 breaking 10.0 기준선의 10.2.1 런타임 정책 유지보수 릴리즈입니다. 현재 구성은 다음과
 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
@@ -183,6 +183,7 @@ flowchart TB
 | 10.1.0 | Testing plugin·oracle-governed evidence | 10개 Testing 스킬, 조건부 인간 Test Discovery, 분리된 Test Design/Test Implementation Core 결과, replay·visual·통계 specialist, 명시적 visual `design`/`evidence` 모드, false-green·proof-ceiling 리뷰를 추가합니다. |
 | 10.1.1 | 공용 execution assurance | `workflow-rigor`를 public skill에서 퇴역시키고 standard/strict assurance를 owning workflow에 투영되는 하나의 shared contract로 보존하며, assurance를 DAG node와 mutation owner 밖에 둡니다. |
 | 10.2.0 | 런타임 디버깅·진단 알림 | typed runtime-debugging scope/operation과 `debugging_result` 계약을 추가하고, 인과 관찰을 repair/test ownership과 분리하며, 제한형 데스크톱 알림 metadata와 lifecycle safety를 강화합니다. |
+| 10.2.1 | Codex 런타임 정책 유지보수 | 오래된 Codex execution guard를 제거하고 일반 명령 선택과 host 승인 책임을 각 소유 계층에 두며 Codex hook/work-contract 통합을 단순화합니다. |
 
 ## 라이선스
 

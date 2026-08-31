@@ -1,11 +1,11 @@
 {
   "groups": {
     "go:skill-system-antigravity-harness": {
-      "build_key": "afe970d4dd6a36680e2d589de3ebbad1342e5f27c9e7e39b26f46713f60183b5",
+      "build_key": "fb0e234994b4e010d968905068aa6a02f8135edd8c30bcc6b21681fe078ed0c5",
       "outputs": {
-        "skill-system-antigravity-harness": "127009bbfdcaf62d2f5d8e478cdde659f398fbaedb71fbac61d6ebe2550264a3",
-        "skill-system-antigravity-harness-linux-amd64": "87e270db412b6502db41c5a18c0567f40ec3556016222741d32b122e6a9dd035",
-        "skill-system-antigravity-harness.exe": "d42c9af117384f31cca43dffd1b32f8857425b497767670bf4139902c1fce7de"
+        "skill-system-antigravity-harness": "130ea2a0bb01a1758f769251a8a9fb0b785579e298e637bd345d61923de8675e",
+        "skill-system-antigravity-harness-linux-amd64": "7170617f4b5d94fb61f18445f83f72d6d62b9e5a59f20786a6b7484dde7eea24",
+        "skill-system-antigravity-harness.exe": "b752b49c5e6c95f62763c104e7d37098aad510217afe83dba547740f7ba6a5e8"
       }
     },
     "swift:notification-overlay": {

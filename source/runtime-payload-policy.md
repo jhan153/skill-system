@@ -35,11 +35,14 @@ self-contained. Large executable assets are plugin-shared instead:
 Runtime companions contain host policy and executable integration only: provider instructions,
 routing, hooks, rules where applicable, portable docs/schemas, and one provider-owned Go harness
 module/binary set. The former common Go implementation is distributed into four independent
-modules. Codex receives the common baseline plus execution admission; Claude, Grok, and
-Antigravity receive the common baseline, with Claude retaining its native event handler. Grok and
-Antigravity expose only version and project-context CLI surfaces while Orca remains their worker
-lifecycle owner. No companion contains a skill mirror, Python validator, eval corpus, lifecycle
-ledger, or installation state.
+modules. Codex receives the common baseline through its Codex-native hook delivery; model-side
+direct-command selection and sandboxing handle ordinary local work without per-command
+natural-language grants, while portable prompt/forbidden rules and an effective host `auto_review`
+configuration evaluate approval-gated commands without a user-click wait. Claude, Grok, and
+Antigravity receive the common baseline, with Claude
+retaining its native event handler. Grok and Antigravity expose only version and project-context
+CLI surfaces while Orca remains their worker lifecycle owner. No companion contains a skill
+mirror, Python validator, eval corpus, lifecycle ledger, or installation state.
 
 Plugin installation never enables runtime companions automatically. Runtime companion installation
 is a separate explicit operation that preserves host-owned configuration and credentials.
