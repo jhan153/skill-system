@@ -168,10 +168,15 @@ Codex 설치에서는 다음을 하나의 경계로 적용합니다.
 - 병합 전에 effective `approval_policy`가 `on-request` 또는 granular인지 확인하고,
   managed `allowed_approvals_reviewers`가 선언돼 있으면 `auto_review`가 허용되는지
   확인합니다. 조건이 맞지 않으면 reviewer가 활성화됐다고 보고하지 않습니다.
+- `/etc/codex/managed_config.toml`과 host-owned `config.toml`의 reviewer 설정은
+  실행 중인 Codex 프로세스에 hot reload되지 않는 것으로 취급합니다. 설정을 병합한
+  뒤에는 Codex를 완전히 종료하고 다시 실행한 다음 새 Codex 작업을 엽니다. 기존
+  작업을 계속하거나 앱·패널만 새로 고치는 것으로 `approvals_reviewer`가 바뀐다고
+  보고하지 않습니다.
 - 이전 Skill System 설치 지침으로 `allow_login_shell = false`를 병합한 호스트는 해당
   provenance가 확인되고 사용자가 제거를 명시적으로 요청한 경우에만 그 키를 제거합니다.
   출처가 불명확하거나 사용자가 소유한 값은 보존하고 잔존 위험으로 보고합니다.
-- 설치 후 새 Codex 작업을 시작하여 모델이 compound command를 working directory,
+- Codex를 완전히 종료·재실행하고 새 Codex 작업을 시작한 뒤 모델이 compound command를 working directory,
   data flow, failure ordering, side effect를 보존하는 ordered direct calls로 분해하고,
   안정적인 read·diagnostic·build·test는 sandbox 안에서 실행하는지 확인합니다.
 - quoting, expansion, pipeline, redirection 또는 evaluator semantics가 실제로 필요한
@@ -181,7 +186,7 @@ Codex 설치에서는 다음을 하나의 경계로 적용합니다.
   이유로 `PreToolUse`에서 선행 거부되지 않아야 합니다.
 - attended와 unattended 모두에서 `PermissionRequest` 훅은 결정을 반환하지 않아야 하며,
   Codex Auto-review가 일반 명령은 승인하고 위험한 명령은 거부해야 합니다. 사용자 클릭
-  다이얼로그가 나타나지 않는지, 새 Codex 작업의 effective settings가
+  다이얼로그가 나타나지 않는지, 완전 재실행 후 새 Codex 작업의 effective settings가
   `approvals_reviewer: auto_review`인지 확인합니다.
 
 Codex 하네스는 execution grant나 command-attempt 상태를 만들거나 저장하지 않습니다.
