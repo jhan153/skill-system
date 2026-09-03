@@ -12,6 +12,13 @@ selector; load `references/execution_assurance_contract.md` only on its risk tri
 Select the graph archetype first from `graph-method-profiles.md`; then route each compiled node.
 The node code is not a role or an agent identity.
 
+Classify each node by its positive production output before its symptom, failing condition, review
+disposition, attempt history, or label. First implementation or explicit replacement of an accepted
+algorithm, model, backend, canonical data/ownership flow, or other production mechanism is `C`
+Implementation work even when a current failure or `repair_required` finding motivated it. BF owns
+only a bounded repair that restores an already-implemented accepted production contract without
+establishing or replacing that contract.
+
 | Node kind | Default role | Primary or supporting skill examples | Routing rule |
 |---|---|---|---|
 | `R0` baseline and ownership | Coordinator | none; copied Plan/Handoff contract | Read the compact baseline once before dispatch; the canonical pair is the execution state and no planning or external runner skill is attached. |
@@ -23,16 +30,16 @@ The node code is not a role or an agent identity.
 | `D-PERF` performance approach | Architect | `skill-system-dev:analysis-performance` | Diagnose the representative latency/CPU/memory path before choosing optimization. |
 | `DBG0` debugging scope | Runtime Debugging owner | `skill-system-dev:workflow-runtime-debugging` in `scope` mode | Bind one concrete trigger and return Core `debugging_result` with an execution-ready evidence lane, identity/artifact requirements, permissions/effects, perturbation, stop rules, session handback, and `causal_status: not_run`. Operate no debugger/capture tool and select no successor. |
 | `DBG1` runtime debugging operation | Runtime Debugging owner | `skill-system-dev:workflow-runtime-debugging` in `operate` mode | Consume a predecessor scope result or equivalent inline scope, operate only the approved debugger/dump/dynamic/graphics lane, and return Core `debugging_result` with safe session handback and bounded causal status. Follow only existing edges; never auto-repair. |
-| `D-BUG` source/log-only failure cause | Architect | no additional skill by default | Keep simple source/log-only diagnosis with the current owner. If repair is the node outcome, route a separate `BF1` node to `skill-system-dev:workflow-bug-fix`. |
+| `D-BUG` source/log-only failure cause | Architect | no additional skill by default | Keep simple source/log-only diagnosis with the current owner. This node produces no `code_review_result` and never authorizes BF1. A BF1 is runnable only from existing concrete CR0 `repair_required` findings; without them, keep direct repair outside this durable DAG or escalate for Plan correction. An unresolved approach uses `D-ALGORITHM`, while an accepted production replacement uses `C`. |
 | `D-UI` concrete UI design artifact | Design owner | `skill-system-design:workflow-ui-design`; optional decomposer/layout/token/component inputs only when already selected | Create the actual inspectable screen/component design from accepted requirements and return Core `design_result`. Do not write production UI code or create the implementation successor. |
 | `D0` accepted design gate | Architect or declared design owner | task-matched analysis skill or none | Close the design/boundary decision before `phase_gate_delivery` implementation begins. |
 | `P` runnable discriminator | Prototype owner | `skill-system-dev:workflow-prototype` | Answer one unresolved question with an isolated artifact and an explicit proof ceiling. |
-| `C` direct feature slice | Implementation owner | `skill-system-dev:workflow-implementation` | Use for a concrete delegated production slice after its decisions close; return the Core `implementation_result` card. |
+| `C` direct production implementation/replacement slice | Implementation owner | `skill-system-dev:workflow-implementation` | Use for a concrete delegated production slice after its decisions close, including first implementation or explicit replacement of an accepted production mechanism even when a failure or review finding motivated it; return the Core `implementation_result` card. |
 | `C-UI` design-to-code implementation | UI implementation owner | `skill-system-design:design-frontend` | Consume the accepted Core `design_result`, implement the repo-integrated surface, and return Core `implementation_result` with the design reference. Never select Code Review or another gate. |
 | `TD` / `TD0` software Test Design | Test Design owner | `skill-system-testing:workflow-test-design`; only the test specialists already selected for material subquestions | Consume an executable target snapshot or accepted external contract plus authoritative basis and return Core `test_design_result`. Visual regression uses explicit `design` mode only. If one human-owned judgment blocks the design, conditionally use `skill-system-testing:plan-test-discovery`, yield without a result, and resume only after its decided IDs are admitted by the required Plan revision. |
 | `TI` / `TI0` software Test Implementation | Test Implementation owner | `skill-system-testing:workflow-test-implementation`; only evidence-surface specialists named by the test contract | Consume Core `test_design_result` or a complete inline authoritative contract, write only the bounded test assets, execute the assigned conditions, and return Core `test_implementation_result`. Visual regression uses explicit `evidence` mode only. A failing condition is not repair authority. |
 | `TCR` / `TCR0` test implementation static review | Review owner | `skill-system-dev:workflow-code-review` | Review one `test_implementation_result` against its optional `test_design_result` baseline. Production and test implementation cards use separate review nodes when both require review. |
-| `BF1` / `BF2` concrete repair | Implementation owner | `skill-system-dev:workflow-bug-fix` | Run exactly the assigned A1 or A2 intervention and return `bug_fix_result`; only concrete CR1 `repair_required` plus an existing BF2 node authorizes A2. |
+| `BF1` / `BF2` bounded contract-preserving repair | Implementation owner | `skill-system-dev:workflow-bug-fix` | Use only for a semantically admitted defect repair in an already-implemented accepted production contract. BF1 requires concrete CR0 `repair_required` findings and an assigned A1 node; BF2 requires concrete CR1 findings and an assigned A2 node. A failure, `repair_required`, prior attempt, or BF label alone is insufficient. On owner-kind mismatch, make no source change or card, consume no attempt, and escalate for Plan correction without selecting a successor. |
 | `RF` behavior-preserving restructure | Implementation owner | `skill-system-dev:workflow-refactor-safely` | Preserve the established observable contract and validate each reversible batch. |
 | `DEP` dependency/runtime upgrade | Implementation owner | `skill-system-dev:workflow-dependency-upgrade` | Keep migration and verification bounded to one dependency or runtime. |
 | `M` obsolete-code/comment maintenance | Implementation owner | `skill-system-dev:workflow-source-maintenance` | Use only after behavior is established; do not hide feature or refactor work here. |
@@ -84,6 +91,10 @@ The node code is not a role or an agent identity.
   reopening this pair. Choose another archetype only when its decisive condition is present.
 - Cross-owner implementation, review, deferred, repair, and Known Bug results use the Core-owned
   `references/execution_item_contract.md`. Workers never select successor IDs or graph termination.
+- A BF dispatch passes semantic admission only when its positive output preserves the accepted
+  implementation/method contract. First implementation or production-mechanism replacement uses an
+  existing or Plan-corrected `C` node; without an authorized edge, escalate for Plan revision and
+  consume no BF attempt.
 - Runtime Debugging nodes use Core `debugging_result`. `DBG0` scope performs no tool operation;
   `DBG1` operate consumes an accepted scope and preserves identity, effects, proof ceiling, and
   session handback. Neither node creates a repair, performance, test, or follow-up debugging node.

@@ -89,7 +89,7 @@ Workflow skills are separated by how they control execution:
 | `test_design_execution` | `workflow-test-design` | own one implementation-ready test contract after an executable SUT exists, including conditional human Test Discovery without test-code writes |
 | `test_implementation_execution` | `workflow-test-implementation` | own bounded test-only assets and condition-scoped execution without changing the accepted oracle or production code |
 | `runtime_debugging_execution` | `workflow-runtime-debugging` | own one execution-ready debugging scope or one approved debugger/dump/dynamic/graphics operation; return a direct or Core diagnostic result with safe session handback and no source repair or successor selection |
-| `bug_fix_execution` | `workflow-bug-fix` | own one assigned DAG repair intervention/result, or a bounded standalone repair from failure signal through local review |
+| `bug_fix_execution` | `workflow-bug-fix` | own one semantically admitted contract-preserving DAG intervention/result, or a bounded standalone repair under the same already-implemented accepted contract |
 | `prototype_execution` | `workflow-prototype` | build and preserve one isolated runnable discriminator for a selected UI question or one self-contained offline HTML state/logic model through decision-owner observation, then stop before production hardening |
 | `dependency_upgrade_execution` | `workflow-dependency-upgrade` | own dependency/runtime/package upgrades and compatibility validation |
 | `source_maintenance_execution` | `workflow-source-maintenance` | own post-development source cleanup/dead-code pruning in `source_prune` mode or behavior-preserving comment/docstring/TODO-FIXME sync in `comment_sync` mode |
@@ -105,7 +105,8 @@ strict maker-checker separation or rollback/readback is material.
 | --- | --- |
 | "작은 오타 하나만 고쳐" | direct one-shot execution; no ledger or plan |
 | "이 기능 구현해줘" | `workflow-implementation`; its directness rules remain active, and the execution-assurance contract applies only when medium/high risk or maker/checker separation is material |
-| "이 failing test 고쳐줘" | `workflow-bug-fix`; without Plan node fields use bounded standalone mode, while an assigned DAG `BF1/BF2` returns after exactly one round for Code Review/Coordinator consumption |
+| "이미 구현된 승인 동작의 이 failing test 결함을 고쳐줘" | `workflow-bug-fix`; the work-kind gate must confirm a bounded same-contract repair, then without Plan node fields use bounded standalone mode, while an assigned DAG `BF1/BF2` returns after exactly one round for Code Review/Coordinator consumption |
+| "이 failing test가 요구하는 승인된 새 알고리즘을 처음 구현해줘" | `workflow-implementation`; the failing condition is evidence and does not turn first implementation into Bug Fix |
 | "디버거는 아직 없지만 이 크래시를 어떻게 조사할지 범위를 잡아줘" | `workflow-runtime-debugging` in `scope` mode; return an execution-ready debugging contract with `causal_status: not_run` |
 | "이미 멈춘 디버거에서 원인을 직접 좁혀줘" | `workflow-runtime-debugging` in `operate` mode; preserve target/artifact identity, debugger effects, proof ceiling, and safe session handback |
 | "검색 결과 배치를 결정할 수 있게 구조가 다른 프로토타입 3개를 만들어줘" | `workflow-prototype`; keep the comparison throwaway and hand a selected result to production implementation separately |

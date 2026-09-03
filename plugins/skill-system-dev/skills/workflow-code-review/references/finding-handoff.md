@@ -15,8 +15,9 @@ Use stable IDs. Each blocking finding contains:
 
 Use `P0` for immediate systemic, safety/security, or irreversible-data risk; `P1` for material
 contract/state/correctness failure; and `P2` for bounded behavior/integration or current-scope
-maintainability risk that still requires repair. P3 is not a blocking priority. Bug Fix consumes
-`required_condition` as the repair contract; it never treats `suggested_solution` as authority.
+maintainability risk that still requires repair. P3 is not a blocking priority. After Plan semantic
+admission, Bug Fix may consume `required_condition` as a bounded same-contract repair contract; it
+never treats `suggested_solution` as authority.
 
 ## Advisories
 
@@ -65,8 +66,10 @@ Do not invent Core item IDs, graph node/round values, Known Bug records, or Plan
 Only when the result crosses a Workflow, Coordinator, Plan/Handoff, or plugin boundary, validate it
 as `execution_item.kind: code_review_result` under `references/execution_item_contract.md` and its
 schema. Include the compact review coverage, proof ceiling, blocking findings, advisories,
-deferred-item refs, exclusions, and artifact/evidence anchors. The execution owner derives routing
-from `review_disposition`; this review emits no transition intent or successor.
+deferred-item refs, exclusions, and artifact/evidence anchors. The execution owner treats
+`review_disposition` as one input, compares the required positive work with the Plan's accepted
+implementation/method contract, and applies only an existing edge; this review emits no transition
+intent or successor.
 
 Keep full Mermaid diagrams, comparison matrices, and source analysis in one anchored artifact.
 The Coordinator/`worker_done` body contains only node/round when applicable, disposition, compact

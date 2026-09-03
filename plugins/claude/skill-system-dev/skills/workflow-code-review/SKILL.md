@@ -70,6 +70,10 @@ description: Statically review a bound production change or test implementation 
 - Use `analysis-codebase-map` only as an optional read-only mapping aid. Re-open its source refs before relying on it; this workflow retains finding and verdict ownership.
 - Separate direct static facts, static inference, evidenced rationale, and runtime-only claims. Compilation or unit tests may corroborate a path but do not erase a static finding or prove runtime behavior.
 - Treat Plan as topology authority and Handoff as the Coordinator-owned ledger. Do not edit either, create design/evidence/repair/re-review nodes, close the DAG, select a next node ID, or wait/poll.
+- Treat `repair_required` as a static disposition for the reviewed snapshot, not a Bug Fix
+  classification. Record whether the required condition contradicts or exceeds the supplied
+  accepted implementation/method contract, but never choose Implementation, Bug Fix, a decision
+  owner, or a successor edge. The Coordinator performs that semantic admission against the Plan.
 - Preserve supplied Known Bug exclusions as `SKIP — excluded Known Bug <id>` without reopening them.
 - When `references/maintainable_code_principles.md` is active, apply its five review questions after tracing the representative and material negative paths and before recording findings. This review owns static findings, deferred items, and disposition; repair and runtime-only verification remain explicit handoffs.
 - When `references/database_persistence_transparency_contract.md` is active, own only static conformance findings for the visible `source_of_truth`, database boundary/model, declared read/write effects, transaction, and lifecycle. Defer runtime-only query-plan, cardinality, locking, and latency claims to the implementation or validation owner.
@@ -78,7 +82,7 @@ description: Statically review a bound production change or test implementation 
   reentrancy, crash-context allocation/lock/loader/stack safety, privacy and retention, trusted
   symbol/source/extension loading, and graphics marker/resource correlation. Test-capture
   provenance/completeness/proof ceiling belongs to `test-evidence-review`; causal interpretation to
-  `workflow-runtime-debugging` or repair-primary `workflow-bug-fix`; and condition-matched runtime
+  `workflow-runtime-debugging` or semantically admitted bounded-repair `workflow-bug-fix`; and condition-matched runtime
   readback of the infrastructure to its Implementation owner. A source-level `pass` does not
   establish crash-context or debugger behavior.
 - If no item supplies a snapshot, resolve an unambiguous repository diff/worktree identity when
@@ -89,7 +93,8 @@ description: Statically review a bound production change or test implementation 
 ## Workflow
 1. Bind the exact implementation identity, review slice, exclusions, node/round when supplied, and
    the change contract from `references/static_code_review_contract.md`, including stable IDs for
-   every material changed effect. Bind optional conformance sources including accepted
+   every material changed effect. Bind the assigned positive production output and accepted
+   implementation/method contract when supplied. Bind optional conformance sources including accepted
    `architecture_design`, a task-local paradigm application from the bound Implementation result,
    Core `design_result`, or `test_design_result`. One review item has one input snapshot;
    production and test implementation cards remain separate review items.
@@ -112,11 +117,12 @@ description: Statically review a bound production change or test implementation 
    When `references/identifier_readability_principle.md` is active, anchor the exact related
    identifier set and affected trace without prescribing an example prefix or abbreviation.
 7. Use `references/finding-handoff.md` to render the same review facts as a standalone human report
-   or, only in graph/cross-owner mode, the canonical `code_review_result`. The Coordinator derives
-   routing from `review_disposition` and applies only an already-existing Plan edge.
+   or, only in graph/cross-owner mode, the canonical `code_review_result`. The Coordinator treats
+   `review_disposition` as one input, runs Plan semantic admission against the positive output and
+   accepted implementation/method contract, and applies only an already-existing Plan edge.
 
 ## Disposition Gate
-- `repair_required`: one or more concrete in-scope implementation defects or required implementation omissions need repair now. Preserve simultaneously observed advisories and eligible deferred items.
+- `repair_required`: one or more concrete in-scope implementation defects or required implementation omissions need resolution now. This disposition does not select Bug Fix; preserve simultaneously observed advisories and eligible deferred items.
 - `complete_with_deferred_items`: no blocking finding remains, but one or more eligible typed deferred items must be carried by a named later owner or observation point.
 - `pass`: every material changed effect is accounted for with no blocking finding, deferred item, or material-unassessed entry. Advisories may accompany `pass`.
 
@@ -135,5 +141,5 @@ For graph or cross-owner review, return the canonical Core `code_review_result`,
 coverage, proof ceiling, advisories, `design_baseline_ref` when a Core `design_result` was consumed,
 and `test_design_baseline_ref` when a Core `test_design_result` was consumed. Keep full diagrams and
 comparison matrices in one anchored artifact and keep the Coordinator/`worker_done` body compact.
-Never return a transition intent, next node ID, or Plan edit; the execution owner derives routing
-from the disposition.
+Never return a transition intent, next node ID, or Plan edit; the execution owner combines the
+disposition with Plan semantic admission and existing edges.

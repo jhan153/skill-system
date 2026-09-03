@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Bug Fix"
-  short_description: "Run one DAG repair or a bounded standalone fix"
-  default_prompt: "Use $workflow-bug-fix to repair one concrete failure. With Plan node_id/round/source_review_item_ref input, perform exactly that one intervention, observe the original signal once, return the canonical Core repair item and attempt status, and leave Code Review, final Known Bug registration, and Plan successor selection to their owners. Without Plan fields, retain the bounded two-round standalone behavior."
+  short_description: "Repair one defect while preserving its accepted contract"
+  default_prompt: "Use $workflow-bug-fix only for a semantically admitted bounded repair of an already-implemented accepted production contract. First implementation or explicit production-mechanism replacement returns an owner-kind mismatch without source changes, Core cards, or attempt consumption. With Plan node_id/round/source_review_item_ref input, perform exactly the assigned contract-preserving intervention, observe the original signal once, return the canonical Core repair item and attempt status, and leave Code Review, final Known Bug registration, and Plan successor selection to their owners. Without Plan fields, retain the bounded same-contract two-round standalone behavior."
 
 policy:
   allow_implicit_invocation: true

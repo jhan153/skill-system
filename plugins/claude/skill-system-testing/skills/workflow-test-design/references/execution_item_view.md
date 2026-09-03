@@ -25,12 +25,18 @@ boundaries. A direct single-owner task may use its ordinary compact output.
 | implementation-ready software test contract | `workflow-test-design` |
 | test-only implementation and scoped execution result | `workflow-test-implementation` |
 | read-only static disposition and review findings | `workflow-code-review` or the named review owner |
-| one assigned repair intervention and attempt observation | `workflow-bug-fix` |
+| one semantically admitted contract-preserving repair intervention and attempt observation | `workflow-bug-fix` |
 | Human Test observation and product/design judgment | user or explicitly declared human owner |
 
 One producer owns each item. Consumers may record or route it, but they never reinterpret its
 kind into authority they do not own. An execution item never creates a Plan node, rewrites an
 edge, selects a successor ID, closes a graph, or waits/polls.
+
+The Plan/Coordinator classifies the required positive production output before consuming a review
+disposition. First implementation or explicit replacement of an accepted production mechanism is
+Implementation work; Bug Fix owns only a bounded intervention that preserves an already-implemented
+accepted contract. A failure signal, `repair_required`, attempt history, or BF label alone is not
+workflow or successor authority.
 
 ## Common Envelope
 
@@ -99,8 +105,10 @@ payload:
   unresolved_conditions: []
 ```
 
-The producer reports the implemented scope and snapshot. It does not mark a review pass or choose
-the review/next node.
+The producer reports the implemented scope and snapshot. When the assigned primary positive output
+has not been implemented and no reviewable production snapshot for it exists, emit no
+`implementation_result`; return lifecycle `not_produced` instead of turning missing Implementation
+work into a later BF attempt. The producer does not mark a review pass or choose the review/next node.
 
 ### `test_design_result`
 

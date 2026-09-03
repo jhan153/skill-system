@@ -18,4 +18,7 @@ Use only in `comment_sync` mode. Executable code must remain unchanged.
 3. Prefer doc-build, docstring linter, doctest, or typecheck when text is tool-consumed; otherwise use focused diff review.
 4. Confirm no executable token changed and no high-context rationale was lost.
 
-A comment revealing a real defect routes to `workflow-bug-fix`. Feature/comment work stays with `workflow-implementation`; refactor/comment work stays with `workflow-refactor-safely`. General README/wiki documentation is outside this mode.
+A comment revealing a real defect preserves the signal; only a semantically admitted bounded
+same-contract repair routes to `workflow-bug-fix`. First implementation or accepted
+production-mechanism replacement stays with `workflow-implementation`; refactor/comment work stays
+with `workflow-refactor-safely`. General README/wiki documentation is outside this mode.

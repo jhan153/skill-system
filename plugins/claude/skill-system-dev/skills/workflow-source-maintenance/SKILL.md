@@ -30,7 +30,11 @@ description: "Perform behavior-preserving source maintenance in one of two modes
 - `source_prune`: remove source proven obsolete, plus only deletion-required import/export/caller repair.
 - `comment_sync`: update or prune comments, docstrings, inline rationale, and TODO/FIXME markers only. Read [Comment Sync](references/comment-sync.md).
 
-Feature work remains with `workflow-implementation`; concrete repair with `workflow-bug-fix`; reachable-code restructuring with `workflow-refactor-safely`. Apply YAGNI/directness pressure inside those owners rather than attaching another skill. If maintenance exposes one of those needs, preserve the evidence and hand off rather than broadening this workflow.
+Feature work and accepted production-mechanism replacement remain with `workflow-implementation`;
+only semantically admitted bounded same-contract repair belongs to `workflow-bug-fix`; reachable-code
+restructuring belongs to `workflow-refactor-safely`. Apply YAGNI/directness pressure inside those
+owners rather than attaching another skill. If maintenance exposes one of those needs, preserve the
+evidence and hand off rather than broadening this workflow.
 
 ## Common Workflow
 

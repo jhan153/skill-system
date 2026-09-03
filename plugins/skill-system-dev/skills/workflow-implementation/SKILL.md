@@ -1,6 +1,6 @@
 ---
 name: workflow-implementation
-description: Primary workflow for direct or DAG-assigned production software implementation nodes. Use when the user or an accepted Plan node requests production code, API, script, config, build, or production-coupled regression test changes. Do not use for standalone test design/test-only implementation owned by the Testing plugin, Plan coordination, behavior-preserving refactors, concrete bug fixes, or analysis/validation-only work; review findings that require repair enter the bounded workflow-bug-fix cycle without blocking unrelated implementation nodes.
+description: Primary workflow for direct or DAG-assigned production software implementation nodes, including first implementation or explicit replacement of an accepted algorithm, model, backend, canonical data/ownership flow, or other production mechanism even when a current failure motivated it. Do not use for standalone test design/test-only implementation owned by the Testing plugin, Plan coordination, behavior-preserving refactors, semantically admitted bounded repairs of already-implemented accepted contracts, or analysis/validation-only work.
 ---
 
 # Workflow Implementation
@@ -15,13 +15,14 @@ description: Primary workflow for direct or DAG-assigned production software imp
   - 구현
 - use_when:
   - the user asks for a concrete production code, script, API, config, or build change, including bounded regression tests that are part of that production slice.
+  - the positive output first implements or explicitly replaces an accepted production algorithm, model, backend, canonical data/ownership flow, or implementation contract, even when an observed failure or review finding motivated the change.
   - requirements are sufficient for a current-turn implementation slice.
   - the task is ordinary development work not already owned by a narrower specialist.
 - do_not_use_when:
   - the request is to coordinate or advance an approved Plan rather than implement one bounded node; the Orchestrator follows the copied Plan/Handoff contract.
-  - the user asks to fix a concrete failure or failing test; use `workflow-bug-fix`.
+  - the requested intervention is a semantically admitted bounded repair of a concrete defect in an already-implemented accepted production contract; use `workflow-bug-fix`. A failure signal alone does not exclude this Workflow.
   - the user asks for behavior-preserving rename, move, extract, collapse, simplify, or restructure work; use `workflow-refactor-safely`.
-  - the task is now primarily a concrete first or repeated repair; use `workflow-bug-fix` with its preserved attempt history.
+  - the task is now primarily a first or repeated bounded repair under the same accepted repair contract; use `workflow-bug-fix` with its preserved genuine attempt history. A newly accepted production-mechanism replacement is not another repair round.
   - the user wants a causal source/runtime explanation of existing code; use `report-implementation-explainer`.
   - an existing capability's product-facing behavior is still undecided and the user asks to resolve it; use `plan-behavior-discovery`.
   - the request is pure analysis, planning, review, validation-only, or other report generation.
@@ -86,6 +87,7 @@ description: Primary workflow for direct or DAG-assigned production software imp
 - consumes: `references/core-execution-items-v1/cards/code_review_result.md`, `references/core-execution-items-v1/cards/bug_fix_result.md`, `references/core-execution-items-v1/cards/known_bug_record.md`
 
 ## Contract
+- **C0 — Positive-output precedence.** Classify the requested production output before its motivating symptom, failing condition, review disposition, attempt history, or node label. First implementation or explicit replacement of an accepted production mechanism remains Implementation work. An unresolved mechanism choice returns to its decision owner; only a bounded defect repair that preserves an already-implemented accepted contract belongs to Bug Fix.
 - **C1 — Work boundary.** Own ordinary coding from the active user work contract through the production-path change and its evidence. Preserve deliverables, allowed/excluded actions, verification owner, interaction/continuation behavior, and stop terms; never reactivate excluded test, validation, or meta work. Implementation is the requested source, runtime config/build, or executable behavior. Plans, docs, mocks, interfaces, or tests alone complete only when they are the requested deliverable.
 - **C2 — Complete canonical behavior.** Close the whole required behavior with the least conceptual machinery, not the fewest changed lines. Give each internal concept one contract, representation, state machine, and policy owner; update every in-scope producer, consumer, and caller. Missing or mismatched canonical input fails or remains an explicit user decision, never a placeholder, warning, fallback, or success-looking partial result. A material regression, contradicted completion claim, repeated correction, or ownership/architecture drift invalidates the frame; reconstruct the positive objective, canonical artifacts/owners, actual paths, affected consumers, and one disconfirming case before dependent work.
 - **C3 — Direct boundaries.** Converge internal disagreement instead of preserving it through adapters, bridges, proxies, shims, or dual models. Translate only at an unmodifiable external ABI, protocol, SDK, device, or bounded-version boundary; keep translation thin, stateless, total, validation-first, and free of defaults, fallback, retry, caching, lifecycle, domain policy, or hidden state. Prefer functions, values, concrete types, direct calls, existing primitives, and composition. Add an interface, inheritance hierarchy, registry, factory, generic framework, or other indirection only for a present semantic responsibility that direct dispatch or composition cannot satisfy. Treat class-per-noun, interface-per-implementation, one-line forwarding functions, blanket DRY across different meanings, factory/manager/service/repository/wrapper layers, mock-created seams, and speculative extension frameworks as explicit implementation anti-patterns—not harmless style alternatives.
@@ -151,7 +153,7 @@ Apply conditional references without transferring workflow ownership:
 | `execution_item_view.md` | Use the role-scoped Core envelope and items only when a result crosses Workflow, Coordinator, Plan/Handoff, or plugin boundaries. |
 
 ## Workflow
-1. Compile scope into the active work contract; classify core work, required prerequisites, optional validation/quality, and meta work. State observable success and one material negative or edge case.
+1. Compile scope into the active work contract; apply C0 before repair history or Plan labels, then classify core work, required prerequisites, optional validation/quality, and meta work. State observable success and one material negative or edge case.
 2. Treat the change as local only when one owner and representative path cover the outcome with no material consumer, invariant, canonical-source, or ownership decision. Otherwise establish the positive objective, canonical artifacts/owners, actual paths, affected consumers, invariants/dependencies, and one disconfirming case before selecting a diff.
 3. When shape is explicit or material, map the selected approach, canonical owner, in-scope
    producers/consumers, construction/state/data/effect/dispatch/execution rules, and one forbidden
@@ -188,7 +190,7 @@ Apply conditional references without transferring workflow ownership:
 - If an optional verifier or permission is unavailable, defer that semantic intent and continue independent required implementation. Do not retry it as another command, GUI path, wrapper, probe, or new test; use `blocked` only when no required runnable work remains.
 - If no suitable verifier exists, keep the implementation scope complete but lower its evidence label. Do not create validation-only work or repeat an unchanged check to promote the label.
 - If a material semantic completion claim otherwise depends mainly on code and checks produced by the same agent, apply `references/execution_assurance_contract.md` in `standard` mode. Its independent pass does not replace direct condition evidence, own Core cards, or become a second implementation owner.
-- When review exposes a concrete failure, dispatch only the assigned `workflow-bug-fix` round and consume its changed snapshot/attempt result. Another round requires a concrete review disposition and its owning execution context. Plan/Handoff records a final `known_bug_record` in graph mode; standalone Bug Fix may record it only after its bounded final review. This Workflow consumes the record and never produces it.
+- When review returns `repair_required`, classify the required positive work against the accepted implementation/method contract before dispatch. Consume an assigned `workflow-bug-fix` round only for a semantically admitted bounded repair. First implementation or explicit production-mechanism replacement stays with an existing Implementation node or requires Plan correction; an unresolved mechanism returns to its decision owner. Another repair round requires a concrete review disposition under the same accepted repair contract and its owning execution context. Plan/Handoff records a final `known_bug_record` in graph mode; standalone Bug Fix may record it only after its bounded final review. This Workflow consumes the record and never produces it.
 - When node/Coordinator identity is supplied, return the Core `implementation_result` item from `references/execution_item_view.md`: changed snapshot/artifacts, implemented conditions, bounded review slice, and unresolved conditions. Never choose the review or successor node.
 
 ## Output Contract

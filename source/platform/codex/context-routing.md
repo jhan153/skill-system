@@ -68,13 +68,22 @@ Route an explicit, single-domain evidence request directly: papers/citations to 
 
 ## Direct Owners
 
+For behavior-changing writes, classify the positive production output before the symptom, failing
+condition, review disposition, attempt history, or node label. First implementation or explicit
+replacement of an accepted algorithm, model, backend, canonical data/ownership flow, or other
+production mechanism belongs to the task-matched implementation owner even when a current failure
+or `repair_required` finding motivated it. `workflow-bug-fix` owns only a bounded intervention that
+restores an already-implemented accepted production contract without establishing or replacing that
+contract. In a Plan, the positive objective and accepted implementation/method contract outrank a
+`BF1`/`BF2` label or selected skill; correct a mismatch before source work.
+
 | Request | Owner |
 | --- | --- |
-| direct implementation or refactor | current implementation owner or one clear specialist |
+| direct implementation, including an accepted production-mechanism replacement, or refactor | current implementation owner or one clear specialist |
 | ordinary single-stage Research artifact | the narrow `research-*` specialist matching the requested artifact; do not add a node manager |
 | accepted Plan-assigned `RES-*` node | `workflow-research` plus exactly one stage skill already selected by the Plan; neither selects a successor |
 | approved plan/spec execution | the current Orchestrator follows an existing canonical Plan/Handoff; without one, route one bounded approved slice to its task-specific workflow |
-| concrete failure repair, including an unclear cause | `workflow-bug-fix`; DAG input owns one assigned intervention/result, while direct standalone repair may own at most two locally reviewed rounds |
+| bounded repair of a concrete defect in an already-implemented accepted production contract, including an unclear cause | `workflow-bug-fix`; a failure that motivates first implementation or explicit production-mechanism replacement remains with the task-matched implementation owner; DAG input owns one semantically admitted intervention/result, while direct standalone repair may own at most two locally reviewed rounds |
 | execution-ready debugging scope or runtime correctness diagnosis through a live debugger, crash artifact, dynamic diagnostic, concurrency trace, or graphics capture, with no repair requested | `workflow-runtime-debugging`; direct mode returns a task-local result, while an accepted `DBG0/DBG1` node returns Core `debugging_result`; neither writes source or selects a Plan transition |
 | static code review of a bound implementation or diff | `workflow-code-review`; bind intent/material effects, run design-first risk selection, keep source-linked Mermaid evidence, and return a scoped standalone disposition or cross-owner Core result without selecting a successor |
 | existing implementation explanation or verified changed-line comparison report | `report-implementation-explainer`, only on explicit explanation/compare artifact intent; Markdown is default and HTML is optional |
@@ -100,11 +109,14 @@ Route an explicit, single-domain evidence request directly: papers/citations to 
 | project context manifest init/bootstrap/doctor or location update | `management-project-context` in the matching explicit mode |
 | repository skill update | current implementation owner following the repository's canonical-source, generation, and validation instructions |
 | existing Skill System eval maintenance | current implementation owner; authored cases prove only their declared regression contract, never field quality |
-| same problem after a reviewed repair attempt | preserve attempt history; a DAG repair runs only its explicitly assigned `BF1/A1` or `BF2/A2` node and returns evidence to Code Review/Coordinator, while standalone repair may use its remaining bounded round |
+| same problem under the same accepted repair contract after a reviewed repair attempt | preserve attempt history; a newly accepted production-mechanism replacement is Implementation scope rather than another attempt; a DAG repair runs only its explicitly assigned `BF1/A1` or `BF2/A2` node and returns evidence to Code Review/Coordinator, while standalone repair may use its remaining bounded round |
 | explicit evidence-first completion control for active behavior-changing work | the current execution owner applies `docs/execution_assurance_contract.md`; assurance remains read-only and non-node while that owner retains mutation and final synthesis |
 | personal skill creation | system `skill-creator` when explicitly named or clearly requested |
 
-Requested brevity, a status question, a correction, or a complaint does not change the task owner. A report of harm or undesired behavior is not permission to inspect or mutate external state.
+Requested brevity, a status question, or a complaint alone does not change the task owner. A
+correction that clarifies the positive deliverable or work kind requires owner re-evaluation before
+writes and never consumes a stale repair attempt merely to preserve history. A report of harm or
+undesired behavior is not permission to inspect or mutate external state.
 
 ## Project Context Locations
 
@@ -130,6 +142,9 @@ The nearest `project-context.yaml` declares project-local skill roots, Memory Ba
 - Test Design and Test Implementation are explicit owners, not automatic post-implementation
   attachments. A failing test condition is evidence, not repair authority; the Coordinator or
   direct task owner applies the accepted repair/design/decision boundary.
+- A failing condition or `repair_required` disposition is likewise evidence, not sufficient Bug Fix
+  authority. Compare the required positive output with the accepted implementation/method contract
+  before selecting Implementation, Bug Fix, or a still-open decision owner.
 - When delegation follows an already selected specialist, pass its exact canonical skill ID to the worker. With no upstream selection, let the worker resolve normally instead of inventing a recommendation.
 - When a material semantic completion claim would rest mainly on code and checks produced by that same owner, apply `docs/execution_assurance_contract.md` in `standard` mode and use an independent pass on the most falsifying `Contract/Spec` or `Repository/Constraints` axis when available. High-risk behavior changes may use `strict` for separate axes plus rollback/readback. Low-risk work uses the global evidence baseline without an assurance mode. Assurance never owns writes, Core cards, or Plan successors.
 - Invoke routine approved executables directly. Use a shell wrapper only when pipeline, redirection, globbing, or other shell semantics are required.

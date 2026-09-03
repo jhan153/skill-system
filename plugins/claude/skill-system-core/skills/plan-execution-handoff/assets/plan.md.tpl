@@ -42,13 +42,19 @@ __POSITIVE_OUTCOME__
 
 ## Scope Admission
 
-Admit a follow-up only when positive outcome, production owner/boundary, execution DAG,
-and completion oracle all remain the same. Otherwise create a sibling Plan/Handoff pair.
+Admit a follow-up only when positive outcome, accepted implementation/method contract, production
+owner/boundary, execution DAG, and completion oracle all remain the same. Otherwise create a sibling Plan/Handoff pair.
 At initial creation, record `initial creation` as the evidence on every axis.
+
+An unexecuted owner-kind mislabel that contradicts this pair's already accepted positive outcome
+may be corrected in this pair before dispatch only when the node has produced no source change or
+execution item; update its kind, skill, Core output, and edges and consume no repair attempt. Any
+actual outcome/method/owner/DAG/oracle change uses the normal table and a sibling pair.
 
 | Axis | Evidence | Result |
 |---|---|---|
 | Positive outcome | __EVIDENCE__ | same / sibling |
+| Accepted implementation/method contract | __EVIDENCE__ | same / sibling |
 | Owner and boundary | __EVIDENCE__ | same / sibling |
 | DAG | __EVIDENCE__ | same / sibling |
 | Completion oracle | __EVIDENCE__ | same / sibling |
@@ -149,9 +155,13 @@ flowchart TD
 
 The Mermaid graph is the finite compiled instance. Bounded repair, re-review, re-test, or
 Spiral continuation appends new node IDs under the declared rewrite budget; never draw a
-back-edge to an executed node. For one problem, append no more than `BF1 -> CR1 -> BF2 -> CR2`.
-If terminal review remains `repair_required`, the Coordinator records the final Known Bug and
-follows the existing Plan rather than appending a third repair, wait, or early-close node.
+back-edge to an executed node. For one semantically admitted same-contract repair, append no more
+than `BF1 -> CR1 -> BF2 -> CR2`. A first implementation or explicit production-mechanism
+replacement uses an existing or Plan-corrected `C -> CR` path and consumes no BF attempt; without
+an authorized edge, escalate for Plan revision.
+Only when terminal review remains `repair_required` after semantically admitted same-contract BF
+history and a bounded `known_bug_candidate` exists does the Coordinator record the final Known Bug.
+It then follows the existing Plan rather than appending a third repair, wait, or early-close node.
 
 ## Typed Edges
 

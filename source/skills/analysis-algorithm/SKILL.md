@@ -10,7 +10,8 @@ description: Compare algorithms or technical approaches under concrete constrain
 - intent_signature: algorithm/approach recommendation or candidate comparison under constraints
 - use_when: credible solution families compete and workload, correctness, latency, memory, dependency, deployment, or implementation constraints change the winner.
 - do_not_use_when:
-  - unresolved current failure: `workflow-runtime-debugging` for an explicitly requested execution-ready debugging scope or material debugger/dump/dynamic/graphics evidence lane; otherwise current task owner for diagnosis-only, or `workflow-bug-fix` when repair is requested
+  - failure mechanism/cause is the requested output: `workflow-runtime-debugging` for an explicitly requested execution-ready debugging scope or material debugger/dump/dynamic/graphics evidence lane; otherwise current task owner for diagnosis-only
+  - an already-implemented accepted production contract needs one bounded defect repair: `workflow-bug-fix`
   - chosen method needs code: `workflow-implementation`
   - measured production bottleneck: `analysis-performance`
   - paper hypothesis, loss, ablation, or training plan: `research-hypothesis-planning`
@@ -35,6 +36,9 @@ description: Compare algorithms or technical approaches under concrete constrain
 6. Recommend only when the winner follows from established constraints and evidence. Otherwise return no winner and request the smallest observation that would decide it.
 
 Do not classify the problem more deeply than needed to change the candidate set. Do not reward novelty, familiarity, or leaderboard rank by itself.
+A current failure does not exclude this Workflow when the requested output is still the choice among
+credible approaches. Once an approach is accepted, its first production implementation or explicit
+replacement belongs to `workflow-implementation`, even when that failure motivated the decision.
 
 ## Evidence Authority
 - Agent-authored tests may preserve an established rule; they do not create the rule or independently prove semantic fit.
@@ -60,5 +64,5 @@ For consequential ambiguity, add a compact constraint/candidate comparison, caus
 ## Boundaries
 - Recommendation-only work does not authorize code or document writes.
 - Hand chosen implementation and its validation target to `workflow-implementation`.
-- Route measured bottlenecks to `analysis-performance`. Route an explicitly requested execution-ready debugging scope or diagnosis-only runtime evidence work to `workflow-runtime-debugging`; keep simple source/log-only causes with the current task owner, and route requested repair to `workflow-bug-fix`.
+- Route measured bottlenecks to `analysis-performance`. Route an explicitly requested execution-ready debugging scope or diagnosis-only runtime evidence work to `workflow-runtime-debugging`; keep simple source/log-only causes with the current task owner, and route only a bounded repair that preserves an already-implemented accepted production contract to `workflow-bug-fix`.
 - Suggested validation is not evidence that the recommendation already works.

@@ -103,19 +103,34 @@ literal `|` inside a table cell as `\|`.
 
 ## Scope Admission Gate
 
-Before adding any follow-up to an existing plan, compare four axes:
+Before adding any follow-up to an existing plan, compare five axes:
 
 1. positive outcome;
-2. production owner and boundary;
-3. execution DAG;
-4. completion oracle and human judgment unit.
+2. accepted implementation/method contract, including a selected algorithm, model, backend, or
+   canonical production flow;
+3. production owner and boundary;
+4. execution DAG;
+5. completion oracle and human judgment unit.
 
-Append only when all four remain the same. If any axis changes materially, create a sibling
+Append only when all five remain the same. If any axis changes materially, create a sibling
 Plan/Handoff pair. Never append a request merely because it concerns the same product, module,
 or release number. Record only the split provenance
 (`split from <plan_id>`) as one Decision row in the new handoff without importing the
 rejected topic's narrative; do not contaminate the old plan with the rejected topic or an
 instruction to ignore it.
+
+Before dispatching or appending a BF node, classify the positive production output against the
+accepted implementation/method contract. First implementation or explicit production-mechanism
+replacement is a `C` Implementation node even when a failure, review finding, or prior attempt
+motivated it. BF owns only a bounded repair that preserves an already-implemented accepted contract.
+
+If an unexecuted node was mislabeled BF although the pair's original accepted objective already
+requires Implementation, treat the correction as Plan authoring rather than follow-up scope: before
+dispatch, revise the current pair's node kind, selected skill, Core output, and edges, record one
+Handoff Decision, and consume no repair attempt. This same-pair exception requires no source change
+and no execution item from the mislabeled node. After either exists, or when the accepted objective
+or method contract actually changes, apply the normal five-axis gate and create a sibling when any
+axis differs.
 
 ## Graph Method Selection And Compilation
 
@@ -178,16 +193,19 @@ planning note, and close timing with the pair at `human_test_ready`.
    and consumed scope; keep proposed, unanswered, open, assumed, or unshaped material visible but
    non-authoritative. Then select one archetype, its falsifier, test transition, rewrite budget,
    and rough node timing. Resolve only a still-open decision with its narrow specialist.
-5. Compile the fixed control graph and selected inner graph into a typed acyclic DAG; bind node
-   context, executor, lock, output, validation owner, timing, and stop condition.
+5. Compile the fixed control graph and selected inner graph into a typed acyclic DAG; apply the
+   Implementation-versus-repair semantic gate, then bind node context, executor, lock, output,
+   validation owner, timing, and stop condition.
 6. Build `plan.md` and `handoff.md` from their templates. Keep normative topology in the plan and
    mutable state/latest evidence in the handoff.
 7. Apply `task-skill-routing.md` and the event/timing profile so the copied pair gives the future
    Orchestrator a self-contained compact dispatch and result-consumption contract.
 8. Read the completed pair back once. Confirm frontmatter identity, required sections, Plan/Handoff
    agreement, unique node IDs, a finite acyclic DAG, one typed row per edge, Task State coverage,
-   Core Card table shape, and the selected Human Test boundary. Correct only observed structural
-   mismatches; semantic fit, design quality, evidence sufficiency, and timing realism remain owner
+   Core Card table shape, the selected Human Test boundary, and that every executable node's
+   positive output matches its kind, selected skill, and Core result type. In particular, no BF node
+   may first establish or replace a production implementation contract. Correct observed structural
+   or owner-kind mismatches; semantic quality, evidence sufficiency, and timing realism remain owner
    judgments rather than machine-validator claims.
 
 ## Artifact Minimality
@@ -210,6 +228,8 @@ contract and fill a non-applicable section or cell with `none`. The plan carries
 - current-source baseline and source references;
 - consumed Planning input paths, statuses, authority/owners, source refs, and exact consumed scope;
 - admitted scope and sibling-plan exclusions;
+- accepted implementation/method contract and its authority, including any selected production
+  algorithm, model, backend, or canonical flow;
 - selected method profile/archetype, selection evidence, checked disqualifiers, rewrite budget,
   fixed outer control, dynamic-inner-graph rule, and test authority;
 - selected owner/boundary and observable behavior contracts;
@@ -290,6 +310,11 @@ minimum context, rough timing, lock, output, validation owner, and stop/escalati
 defaults unless overridden. Copy the positive objective and this bounded contract to the worker;
 do not send unrelated history or make it rediscover selected skills. Use
 `references/task-skill-routing.md` for intent-matched examples.
+
+Before dispatch, compare that positive objective and accepted implementation/method contract with
+the node kind, selected skill, and expected Core result. Those semantic authorities outrank the node
+ID. A mismatched BF node is corrected or escalated under Scope Admission before source work; the
+worker does not reinterpret it as an attempt.
 
 ## Status and Evidence
 

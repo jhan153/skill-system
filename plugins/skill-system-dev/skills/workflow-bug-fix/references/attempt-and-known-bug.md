@@ -4,11 +4,11 @@ Read this reference when a prior attempt exists, a Plan DAG assigns `BF1`/`BF2`,
 
 ## Problem Identity And Modes
 
-Use one `bug_scope` plus one `failure_fingerprint`. The fingerprint includes the command or user path, failing phase/test/symbol, and first stable causal error, assertion, exit class, or observed mismatch. Ignore timestamps, temporary paths, random IDs, ordering noise, and wrapper frames.
+Use one `bug_scope` plus one `failure_fingerprint` under one accepted repair-contract reference carried by the Core `scope_ref` or direct task contract. The fingerprint includes the command or user path, failing phase/test/symbol, and first stable causal error, assertion, exit class, or observed mismatch. Ignore timestamps, temporary paths, random IDs, ordering noise, and wrapper frames.
 
-A repair intervention is one code, configuration, test, or harness change intended to alter that problem. A diagnostic observation or unchanged rerun is not another intervention. Preserve history across retriggers, agents, and compaction.
+A repair intervention is one code, configuration, test, or harness change intended to alter that problem while preserving the accepted repair contract. A diagnostic observation, unchanged rerun, or pre-edit owner-kind correction is not another intervention. Preserve genuine same-contract history across retriggers, agents, and compaction; a newly accepted production-mechanism replacement is Implementation scope, not a reset or continuation of this attempt ledger.
 
-- **DAG mode:** `node_id`, `round`, and `source_review_item_ref` are supplied from Plan/Coordinator. The assigned `BF1` or `BF2` performs exactly one intervention and returns.
+- **DAG mode:** `node_id`, `round`, and `source_review_item_ref` are supplied from Plan/Coordinator after semantic admission. The assigned `BF1` or `BF2` performs exactly one contract-preserving intervention and returns.
 - **Standalone mode:** those Plan fields are absent. The workflow may own at most two locally reviewed interventions; the second is optional and evidence-gated.
 
 ## DAG Result Shape Authority
@@ -37,7 +37,7 @@ A lower-scope pass alone is not `resolved` or `narrowed`. These statuses are obs
 
 ## DAG Authorization And Return
 
-- `BF1/A1` returns after one intervention. It cannot begin `A2`.
+- `BF1/A1` requires concrete `CR0 repair_required` findings and returns after one intervention. It cannot begin `A2`.
 - `BF2/A2` is valid only when the assigned input names the existing Plan node and includes concrete `CR1 repair_required` findings.
 - Internal confirmation is limited to diff churn, one original-signal observation, actual-path readback, and attempt classification. `workflow-code-review` owns full static review and disposition.
 - When a meaningful change remains, return `changed_snapshot_ready_for_review` with both anchors.
@@ -49,7 +49,7 @@ A lower-scope pass alone is not `resolved` or `narrowed`. These statuses are obs
 When candidate evidence exists, emit a separate canonical
 `execution_item.kind: known_bug_candidate` and place its item ID in
 `bug_fix_result.payload.known_bug_candidate_ref`. Candidate attempt refs must point to the ordered
-Core `bug_fix_result` cards for the same fingerprint and scope. Candidate status is unresolved and
+Core `bug_fix_result` cards for the same fingerprint, scope, and accepted repair contract. Candidate status is unresolved and
 therefore never `resolved`; the Core schema and validator own the exact fields.
 
 The candidate contains no final Handoff status. Apply the Core-owned

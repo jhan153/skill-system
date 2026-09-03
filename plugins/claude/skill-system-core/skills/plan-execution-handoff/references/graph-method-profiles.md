@@ -128,9 +128,12 @@ flowchart TD
 Static review is mandatory but need not be a separately instantiated independent reviewer. Use
 the implementation owner, Coordinator, or a declared review owner according to the plan; require
 a fresh independent reviewer only when the current user or a higher-priority contract requires
-one. Agent-side checks before handoff are supporting evidence, not this Test phase. A
-`repair_required` review may append only the bounded `BF1 -> CR1 -> BF2 -> CR2` nodes authorized
-by the current rewrite budget before `T0`.
+one. Agent-side checks before handoff are supporting evidence, not this Test phase. A semantically
+admitted bounded repair that preserves the accepted implementation/method contract may append only
+the `BF1 -> CR1 -> BF2 -> CR2` nodes authorized by the current rewrite budget before `T0`.
+`repair_required` alone is not BF authority. When the required positive work is first implementation
+or explicit production-mechanism replacement, use an existing or Plan-corrected `C -> CR`
+continuation; without an authorized edge, escalate for Plan revision and consume no BF budget.
 A later human test result always starts a new Waterfall; never append it to this DAG, create an
 unbounded back-edge, or keep an agent waiting for the user.
 
@@ -232,10 +235,12 @@ The authored plan must satisfy all of the following:
 12. every node has one rough expected timing, and typed RFC3339/ISO-8601 Timing Observations
     update only when its `worker_done` body arrives; an overrun is advisory and never a deadline,
     block, or retry.
+13. every executable node's positive output matches its kind, selected skill, and Core result type;
+    no BF node first establishes or replaces a production implementation contract.
 
 Structural pair validation checks declared enums/fields, required execution-item sections, exact
 next-Plan-node identity, table/ID consistency, reachability, acyclicity, Typed Edge coverage,
-termination shape, and timing syntax/state. It does not judge archetype fit, design quality,
-lock-scope correctness, evidence sufficiency, failure-strategy quality, or timing realism. Those
-remain planning decisions evaluated through fresh task output, review, runtime evidence, and Human
-Test.
+termination shape, and timing syntax/state. It does not judge archetype fit, owner-kind semantic
+fit, design quality, lock-scope correctness, evidence sufficiency, failure-strategy quality, or
+timing realism. Those remain mandatory planning decisions evaluated through the positive objective,
+accepted implementation/method contract, fresh task output, review, runtime evidence, and Human Test.

@@ -1,5 +1,34 @@
 # Changelog
 
+## 10.2.3
+
+- Changed behavior-changing workflow selection to classify the positive production output and
+  accepted implementation/method contract before symptoms, review disposition, attempt history, or
+  node labels. First implementation and accepted production-mechanism replacement now remain with
+  `workflow-implementation`; open approach choice remains with `analysis-algorithm`; only bounded
+  repairs that preserve an already-implemented accepted contract enter `workflow-bug-fix`.
+- Added Bug Fix semantic admission and a fail-closed misroute exit. A replacement mislabeled
+  `BF1`/`BF2` now produces no source change, Core card, or attempt; genuine BF1/BF2 work requires
+  concrete CR0/CR1 `repair_required` findings under the same accepted repair contract.
+- Added the accepted implementation/method contract as a Plan Scope Admission axis, conditioned
+  Code Review and Coordinator routing on that authority, prevented D-BUG from directly authorizing
+  BF1, and required same-contract repair history plus a bounded candidate before final Known Bug
+  registration.
+- Aligned the Codex and Claude routers, runtime-debugging/performance/analysis handoffs, Work Horizon,
+  registry, plan templates, and generated provider/plugin projections with the same positive-output
+  precedence.
+- Advanced all five Codex and Claude plugin profiles plus all four generated native harness
+  identities to 10.2.3. Core Card kinds and the execution-item schema remain unchanged; archives,
+  publication, remote push, and live runtime/plugin installation remain separate actions.
+
+## 10.2.2
+
+- Documented the admin-managed Codex `approvals_reviewer = "auto_review"` default and clarified that
+  managed/user configuration changes require a complete Codex restart followed by a new task before
+  effective settings are verified.
+- This was a repository snapshot tag only. The canonical bundle, plugin manifests, and generated
+  harness identities remained at 10.2.1 until the 10.2.3 bundle cut.
+
 ## 10.2.1
 
 - Removed the obsolete Codex `execguard` implementation and its tests. Ordinary command selection

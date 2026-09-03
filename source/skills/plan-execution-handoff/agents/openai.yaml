@@ -1,7 +1,7 @@
 interface:
   display_name: "Plan Execution Handoff"
   short_description: "Create governed Plan and Handoff execution pairs"
-  default_prompt: "Use $plan-execution-handoff to create a plan-handoff-v6 typed DAG, consume Core execution-item cards without ceding Plan transitions to workers, and record advisory worker_done timing. Most plans use ordinary phase delivery; load repeated-work principles only for an admitted verifier-steered graph, and terminate phase_gate_delivery at human_test_ready."
+  default_prompt: "Use $plan-execution-handoff to create a plan-handoff-v6 typed DAG, classify each node by its positive output and accepted implementation/method contract before any failure or BF label, consume Core execution-item cards without ceding Plan transitions to workers, and record advisory worker_done timing. First implementation or explicit production-mechanism replacement is C/Implementation; BF is only a bounded same-contract repair. Most plans use ordinary phase delivery; load repeated-work principles only for an admitted verifier-steered graph, and terminate phase_gate_delivery at human_test_ready."
 
 policy:
   invocation_surface: explicit_procedure

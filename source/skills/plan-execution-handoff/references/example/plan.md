@@ -41,13 +41,19 @@ Users can export the current report table as UTF-8 CSV from the report screen.
 
 ## Scope Admission
 
-Admit a follow-up only when positive outcome, production owner/boundary, execution DAG,
-and completion oracle all remain the same. Otherwise create a sibling Plan/Handoff pair.
+Admit a follow-up only when positive outcome, accepted implementation/method contract, production
+owner/boundary, execution DAG, and completion oracle all remain the same. Otherwise create a sibling Plan/Handoff pair.
 At initial creation, record `initial creation` as the evidence on every axis.
+
+An unexecuted owner-kind mislabel that contradicts this pair's already accepted positive outcome
+may be corrected in this pair before dispatch only when the node has produced no source change or
+execution item; update its kind, skill, Core output, and edges and consume no repair attempt. Any
+actual outcome/method/owner/DAG/oracle change uses the normal table and a sibling pair.
 
 | Axis | Evidence | Result |
 |---|---|---|
 | Positive outcome | initial creation | same |
+| Accepted implementation/method contract | initial creation | same |
 | Owner and boundary | initial creation | same |
 | DAG | initial creation | same |
 | Completion oracle | initial creation | same |
@@ -87,7 +93,7 @@ At initial creation, record `initial creation` as the evidence on every axis.
 | Disqualifiers checked | no dominant method uncertainty; no valuable parallel increments; no high-assurance paired traceability; no persistent-state transition |
 | Graph rewrite budget | `max_repair=2`, `max_replan=0`; every expansion appends unique node IDs and keeps the compiled DAG acyclic |
 | Fixed outer control | scope acceptance → method selection → static graph validation → execution approval → integration → verification → repair/escalation or close eligibility |
-| Dynamic inner work graph | selected archetype only; `repair_required` may append `BF1 → CR1 → BF2 → CR2` before `T0`; no literal back-edge, third repair, or unbounded hybrid graph |
+| Dynamic inner work graph | selected archetype only; a semantically admitted same-contract repair may append `BF1 → CR1 → BF2 → CR2` before `T0`; first implementation or production-mechanism replacement uses `C → CR` and no BF budget; no literal back-edge, third repair, or unbounded hybrid graph |
 
 ## Execution Routing
 

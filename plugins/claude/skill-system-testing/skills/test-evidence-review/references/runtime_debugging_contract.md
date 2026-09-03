@@ -25,7 +25,8 @@ for a discriminating runtime observation.
 | Requested outcome | Owner | Boundary |
 | --- | --- | --- |
 | define an execution-ready debugging scope or directly investigate runtime correctness through a live debugger, dump, dynamic diagnostic, or graphics capture without repair | `workflow-runtime-debugging` | direct task-local or graph-mode Core `debugging_result`; no source write or successor selection |
-| repair an observed failure, including proportional diagnosis | `workflow-bug-fix` | one repair owner; may consume an existing `debugging_result` or apply this contract internally |
+| repair a bounded defect while preserving an already-implemented accepted production contract, including proportional diagnosis | `workflow-bug-fix` | one semantically admitted repair owner; may consume an existing `debugging_result` or apply this contract internally |
+| first implement or explicitly replace an accepted production algorithm, model, backend, canonical flow, or other mechanism in response to a failure | `workflow-implementation` | production implementation owner; the failure is evidence, not Bug Fix authority |
 | diagnose a progressing target's latency, throughput, utilization, CPU/GPU, memory, query, rendering-time, or resource-cost bottleneck | `analysis-performance` | comparable performance evidence, not no-progress/crash/corruption/device-loss causality |
 | define test conditions and required diagnostic capture | `workflow-test-design` | capture contract and proof ceiling, not root cause |
 | implement tests and preserve failure artifacts | `workflow-test-implementation` | test-only stimulation/capture, not production repair or causal verdict |
@@ -60,7 +61,9 @@ Every debugging scope names the target/trigger boundary, questions to decide, re
 selected lane and fallback, exact identity requirements, tools/artifacts, permissions and forbidden
 effects, expected perturbation, sensitive-data controls, hypotheses or unknowns, stop conditions,
 session handback, and downstream verification signal. Ordinary source/log explanation with no need
-for such a scope stays with the current task owner. A repair request stays with `workflow-bug-fix`.
+for such a scope stays with the current task owner. A bounded same-contract repair stays with
+`workflow-bug-fix`; first implementation or explicit production-mechanism replacement stays with
+`workflow-implementation`, and an unresolved approach stays with its decision owner.
 An operation lane may change only when the new lane answers an unresolved discriminator and its
 changed conditions are recorded.
 

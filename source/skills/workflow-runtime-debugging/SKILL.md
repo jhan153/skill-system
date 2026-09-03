@@ -16,7 +16,7 @@ description: Define an execution-ready debugging scope or directly investigate o
   - the requested outcome is debugging-scope selection, causal localization, artifact sufficiency, or the next discriminating runtime observation without source repair
 - do_not_use_when:
   - ordinary source/log reasoning already answers the question without a runtime evidence lane
-  - the user requests production or test repair; use `workflow-bug-fix` as the single repair owner
+  - the user requests a source/test write: use `workflow-bug-fix` only for a semantically admitted bounded repair of an already-implemented accepted contract, or `workflow-implementation` for first implementation or explicit production-mechanism replacement
   - the target is progressing correctly and the dominant question is latency, throughput, utilization, frame time, resource cost, or another performance metric; use `analysis-performance`
   - test design, test-only implementation, static code review, or production diagnostic infrastructure is the requested deliverable
 - expected_inputs:
@@ -90,8 +90,10 @@ Bug Fix node only when that node independently satisfies its review/round dispat
 the typed edge already exists. Other next-owner handoffs remain recorded context for the Coordinator
 or direct owner rather than undeclared Core consumers. This Workflow never creates or selects a
 successor.
-When a repair request is primary from the start, `workflow-bug-fix` retains ownership and may apply
-the shared contract and selected detailed references inside its bounded diagnosis.
+When a semantically admitted bounded same-contract repair is primary from the start,
+`workflow-bug-fix` retains ownership and may apply the shared contract and selected detailed
+references inside its diagnosis. First implementation or explicit replacement of an accepted
+production mechanism remains with `workflow-implementation` even when this failure motivated it.
 
 ## Workflow
 
@@ -210,8 +212,10 @@ symbol-match boolean.
 
 - Simple source/log-only explanation stays with the current task owner. The presence of an error
   message alone does not activate this Workflow.
-- `workflow-bug-fix` owns every source repair and same-original-signal closure attempt. It may
-  consume a supplied `debugging_result`; no second diagnosis owner is inserted into a repair round.
+- `workflow-bug-fix` owns every semantically admitted bounded source repair and same-original-signal
+  closure attempt under the same accepted repair contract. It may consume a supplied
+  `debugging_result`; no second diagnosis owner is inserted into a repair round. First implementation
+  or explicit production-mechanism replacement belongs to `workflow-implementation` instead.
 - `analysis-performance` owns a progressing target whose dominant question is frame time, latency,
   throughput, CPU/GPU utilization, memory bandwidth, or resource cost. No-progress under the bound
   horizon, OOM/allocation failure, watchdog termination, corruption, invalid ordering/access,

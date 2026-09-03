@@ -14,6 +14,8 @@ Before choosing paths, risk axes, or Mermaid views, bind:
 
 - the exact implementation identity and bounded review slice;
 - the stated problem or intent and expected observable change;
+- the assigned positive production output and accepted implementation/method contract, when one
+  exists;
 - every materially changed contract, state owner, effect owner, dependency, or external effect;
 - preserved invariants and failure guarantees;
 - claimed material risks and explicit exclusions;
@@ -36,6 +38,9 @@ be established, produce no review result.
 Before line-level inspection, determine whether:
 
 - the implementation addresses the bound intent;
+- the snapshot actually contains a reviewable implementation of the assigned primary production
+  output rather than only plans, scaffolding, or an unchanged baseline; absence makes the supplied
+  implementation result incomplete and never turns the baseline into a Bug Fix target;
 - changes with different reasons are separated or explicitly bounded;
 - policy, state, and effects remain with their canonical owners;
 - dependency direction and trust boundaries remain valid or are explicitly authorized;
@@ -114,6 +119,13 @@ omission. It changes disposition to `repair_required`. Finding priorities are P0
 Each finding states tight code refs, current impact, and the `required_condition` repaired code must
 satisfy. A `suggested_solution` is optional and non-normative.
 
+`repair_required` is a static disposition for the reviewed snapshot, not a Bug Fix classification
+or successor authorization. The Coordinator compares the required condition with the Plan's
+positive output and accepted implementation/method contract. A bounded defect repair that preserves
+an already-implemented accepted contract may enter BF; first implementation, explicit
+production-mechanism replacement, and unresolved method selection do not. The reviewer records the
+finding and proof ceiling without selecting that owner or Plan edge.
+
 An `advisory` is an evidenced improvement whose absence does not establish a current defect or
 required omission. It does not change disposition, create a repair obligation, create a deferred
 item, or authorize future Plan work. Evidenced future-drift concerns belong here; P3 is not a
@@ -171,3 +183,8 @@ acceptance.
   violation. Record a static finding; defer only occurrence or frequency.
 - **Edge baseline:** no accepted design baseline exists. Use `conformance_scope: intrinsic_only`;
   baseline absence alone is neither a finding nor a deferred item.
+- **Edge work kind:** an `implementation_result` snapshot is criticized against an accepted
+  algorithm replacement, but the replacement has not been implemented at all. Record the invalid
+  or incomplete implementation claim honestly; do not label
+  the required production implementation as a Bug Fix or treat an optional reviewer solution as
+  replacement authority. Plan/Coordinator semantic admission owns the next route.

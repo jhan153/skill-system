@@ -25,12 +25,18 @@ boundaries. A direct single-owner task may use its ordinary compact output.
 | implementation-ready software test contract | `workflow-test-design` |
 | test-only implementation and scoped execution result | `workflow-test-implementation` |
 | read-only static disposition and review findings | `workflow-code-review` or the named review owner |
-| one assigned repair intervention and attempt observation | `workflow-bug-fix` |
+| one semantically admitted contract-preserving repair intervention and attempt observation | `workflow-bug-fix` |
 | Human Test observation and product/design judgment | user or explicitly declared human owner |
 
 One producer owns each item. Consumers may record or route it, but they never reinterpret its
 kind into authority they do not own. An execution item never creates a Plan node, rewrites an
 edge, selects a successor ID, closes a graph, or waits/polls.
+
+The Plan/Coordinator classifies the required positive production output before consuming a review
+disposition. First implementation or explicit replacement of an accepted production mechanism is
+Implementation work; Bug Fix owns only a bounded intervention that preserves an already-implemented
+accepted contract. A failure signal, `repair_required`, attempt history, or BF label alone is not
+workflow or successor authority.
 
 ## Common Envelope
 
@@ -99,13 +105,15 @@ payload:
   unresolved_conditions: []
 ```
 
-The producer reports the implemented scope and snapshot. It does not mark a review pass or choose
-the review/next node.
+The producer reports the implemented scope and snapshot. When the assigned primary positive output
+has not been implemented and no reviewable production snapshot for it exists, emit no
+`implementation_result`; return lifecycle `not_produced` instead of turning missing Implementation
+work into a later BF attempt. The producer does not mark a review pass or choose the review/next node.
 
 ### `code_review_result`
 
 Producer: `workflow-code-review` or the named read-only review owner. Consumers: Coordinator and,
-for concrete findings only, Bug Fix.
+for concrete findings that pass repair semantic admission only, Bug Fix.
 
 ```yaml
 payload:
@@ -137,6 +145,14 @@ limited to the declared static review ceiling and is not runtime, test, merge, o
 Every cross-owner `code_review_result` envelope includes at least one `artifact_refs` entry for the
 source-linked Mermaid review artifact required by the static Code Review contract.
 
+`repair_required` classifies the reviewed snapshot; it does not classify the next write as Bug Fix.
+The Coordinator compares each finding's required condition with the Plan's positive objective and
+accepted implementation/method contract. Only a bounded defect repair that preserves an
+already-implemented accepted contract may consume an assigned BF node. Missing first
+implementation, explicit production-mechanism replacement, or an unresolved method decision uses
+an existing authorized Implementation/decision edge or lifecycle escalation for Plan correction.
+The reviewer never chooses that successor, and an optional solution never authorizes broader work.
+
 ### `bug_fix_result`
 
 Producer: `workflow-bug-fix`. Consumers: Code Review and the execution owner.
@@ -159,10 +175,11 @@ payload:
   known_bug_candidate_ref: <item id or null>
 ```
 
-In graph mode, one BF node owns exactly its assigned intervention and returns. `A2` requires an
-existing assigned node plus concrete `CR1 repair_required` findings. Attempt status is an
-observation, not a review disposition or permission to continue. A no-change result does not
-create an empty review or retry cycle.
+In graph mode, one semantically admitted BF node owns exactly its assigned contract-preserving
+intervention and returns. `A1` requires an assigned BF1 plus concrete `CR0 repair_required`
+findings; `A2` requires an assigned BF2 plus concrete `CR1 repair_required` findings. An owner-kind
+mismatch produces no card or attempt. Attempt status is an observation, not a review disposition or
+permission to continue. A no-change result does not create an empty review or retry cycle.
 
 ### `known_bug_record`
 
