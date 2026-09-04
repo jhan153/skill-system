@@ -9,7 +9,7 @@ func sendPlatform(message Message) Result {
 	if err != nil {
 		return Result{Status: "skipped", Platform: "linux", Method: "notify-send", Reason: "notify-send unavailable"}
 	}
-	command := exec.Command(executable, "-a", "Claude", message.Title, message.Body)
+	command := exec.Command(executable, "-a", "Grok", message.Title, message.Body)
 	if err := command.Start(); err != nil {
 		return Result{Status: "error", Platform: "linux", Method: "notify-send", Reason: sanitize(err.Error(), 160)}
 	}

@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt|idle_prompt|task_complete",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "../bin/__SKILL_SYSTEM_GROK_HARNESS_FILENAME__",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

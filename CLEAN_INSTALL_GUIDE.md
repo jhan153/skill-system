@@ -211,20 +211,29 @@ Claude 훅 설정은 선택된 체크아웃의
 
 ### Grok에서 Skill System이 동기화하는 정적 런타임
 
-Grok에는 독립 공용 Go 하네스 모듈의 binary를 설치하지만 native hook adapter로
-사용하지 않습니다. Orca가 worker lifecycle을 소유하며, 아래 companion을
-`<GROK_HOME>`에 동기화합니다.
+Grok에는 독립 공용 Go 하네스 모듈의 binary를 설치합니다. Orca가 worker lifecycle을
+소유합니다. Skill System은 Grok 네이티브 `Notification`만 `hooks/skill-system.json`으로
+합치며, Codex/Claude 훅 맵이나 Stop 게이트를 넣지 않습니다. 다른 훅 파일은 교체하지
+않습니다.
 
 | 소스 | 대상 |
 | --- | --- |
 | `.grok/AGENTS.md` | `<GROK_HOME>/AGENTS.md` |
 | `.grok/harness.json` | `<GROK_HOME>/harness.json` |
 | `.grok/harness/` | `<GROK_HOME>/harness/`의 공용 하네스 설명 |
+| `.grok/hooks/skill-system.json.in` | 현재 플랫폼 binary 이름 하나를 materialize한 뒤 `<GROK_HOME>/hooks/skill-system.json` |
 | `.grok/bin/` | `<GROK_HOME>/bin/`의 Grok 공용 하네스 실행 파일 |
 | `.grok/docs/` | `<GROK_HOME>/docs/`의 Skill System 관리 파일 |
 | `.grok/schemas/` | `<GROK_HOME>/schemas/`의 Skill System 관리 파일 |
 
 `GROK_HOME`이 설정되지 않았다면 Grok이 사용하는 현재 기본 홈을 확인해 사용합니다.
+`.json.in` template을 대상 `skill-system.json`으로 복사하면서
+`__SKILL_SYSTEM_GROK_HARNESS_FILENAME__`만 다음 중 하나로 치환합니다: macOS arm64
+`skill-system-grok-harness`, Linux amd64
+`skill-system-grok-harness-linux-amd64`, Windows amd64 `skill-system-grok-harness.exe`. 설치된
+`../bin/<선택한 파일>`이 실제 binary로 resolve되고 `--version`이 현재 bundle version을
+반환하는지 읽어봅니다. unresolved template, project에서 자동 발견되는 placeholder `.json`,
+새 shell/PowerShell wrapper는 설치하지 않습니다.
 
 ### Antigravity에서 Skill System이 동기화하는 정적 런타임
 
@@ -270,7 +279,8 @@ Claude:
 
 Grok:
 
-- `config.toml`, credentials, sessions, memories, hooks, plugin store/cache
+- `config.toml`, credentials, sessions, memories, plugin store/cache
+- `<GROK_HOME>/hooks/`의 `skill-system.json` 이외 훅 파일 (Orca/host 훅 포함)
 - Skill System 소유로 확인되지 않은 모든 파일
 
 Antigravity:
@@ -294,8 +304,9 @@ Antigravity:
 - 선택한 체크아웃에 없는 과거 관리 파일은 이전 설치나 백업으로 소유권을
   입증할 수 있을 때만 활성 경로 밖으로 격리합니다.
 - 상태를 보관하는 디렉터리를 통째로 삭제하지 않습니다.
-- 훅과 전역 지침은 임의로 병합하거나 재작성하지
-  않고 선택된 체크아웃의 플랫폼별 생성 파일을 사용합니다.
+- 훅과 전역 지침은 임의로 병합하거나 재작성하지 않고 선택된 체크아웃의 플랫폼별 생성
+  파일을 사용합니다. 유일한 예외는 Grok의 선언된 platform-filename placeholder 하나를
+  대상 staging copy에서 materialize하는 작업입니다. Repository template은 수정하지 않습니다.
 - 훅 이벤트 수, 매처, 시간 제한, 어댑터 동작을 이 문서에
   하드코딩하지 않습니다.
 
@@ -380,7 +391,8 @@ agy plugin list
 - Claude가 대상이면 마켓플레이스와 플러그인 목록이 현재 매니페스트와 일치함
 - Grok 또는 Antigravity가 대상이면 해당 공식 CLI의 plugin 목록이 선택한 profile과 일치함
 - 선택한 플랫폼의 Go 하네스 binary가 `--version`에 현재 bundle version을 반환함
-- 훅과 설정 파일이 구문상 읽히며 선택된 체크아웃 내용과 일치함
+- 훅과 설정 파일이 구문상 읽히며 선택된 체크아웃 내용과 일치함. Grok hook은 unresolved
+  placeholder가 없고 `<GROK_HOME>/bin/`의 선택한 platform binary로 정확히 resolve함
 - 설치를 위해 새 설치 프로그램이나 래퍼가 생성되지 않음
 - 공유 manifest나 설치 기록에 현재 컴퓨터의 절대 경로를 기록하지 않음
 - 예상하지 못한 다른 파일이나 세션이 변경되지 않음

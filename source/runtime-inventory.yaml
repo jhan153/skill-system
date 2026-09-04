@@ -76,6 +76,7 @@ runtime_companions:
       - AGENTS.md
       - harness.json
       - harness/README.md
+      - hooks/skill-system.json.in
       - docs/
       - schemas/
       - bin/skill-system-grok-harness

@@ -284,9 +284,17 @@ grok plugin install /absolute/path/to/this/repo/plugins/claude/skill-system-dev
 grok plugin list
 ```
 
-The optional rule companion is generated under `.grok/`. An explicit runtime deployment maps
-`.grok/AGENTS.md`, `.grok/docs/`, and `.grok/schemas/` into the actual `GROK_HOME` while preserving
-`config.toml`, credentials, sessions, memories, hooks, and plugin state.
+The optional runtime companion is generated under `.grok/`. An explicit deployment maps
+`.grok/AGENTS.md`, `.grok/harness.json`, `.grok/harness/`, `.grok/docs/`, `.grok/schemas/`, the
+platform-selected `.grok/bin/` artifacts, and the notification-only
+`.grok/hooks/skill-system.json.in` template into the actual `GROK_HOME`. Copy the template to
+`<GROK_HOME>/hooks/skill-system.json`, materialize only
+`__SKILL_SYSTEM_GROK_HARNESS_FILENAME__` as the selected macOS, Linux, or Windows binary name, and
+verify that the installed relative command resolves to that exact binary. Never leave an unresolved
+`.json` template in a project-discovered `.grok/hooks/` directory. Preserve `config.toml`,
+credentials, sessions, memories, plugin state, and every host/Orca hook other than the explicitly
+managed `hooks/skill-system.json`. Antigravity remains unchanged: it has no native hook adapter and
+keeps version/project-context utilities plus Orca-owned lifecycle delivery.
 
 ## Antigravity (Portable Package)
 

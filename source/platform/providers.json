@@ -72,7 +72,8 @@
           ".grok/bin/skill-system-grok-harness-linux-amd64"
         ],
         "config_markers": [
-          "skill-system-grok-harness"
+          "skill-system-grok-harness",
+          "notification"
         ]
       }
     },

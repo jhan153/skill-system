@@ -3,8 +3,10 @@
 ## Host Boundary
 - Grok loads Skill System skills from the installed Claude-compatible plugin packages; `.grok/skills`
   is not a generated Skill System surface.
-- Grok configuration, permissions, credentials, sessions, plugin state, and hooks remain host-owned.
-  Change live state only when the user explicitly requests deployment or configuration.
+- Grok configuration, permissions, credentials, sessions, plugin state, and hooks remain host-owned,
+  except the explicitly deployed notification-only `hooks/skill-system.json` managed by Skill
+  System. Preserve every other host/Orca hook. Change live state only when the user explicitly
+  requests deployment or configuration.
 - The nearest repository `AGENTS.md` or compatible project instruction overrides conflicting global
   guidance within its scope.
 

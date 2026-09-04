@@ -29,8 +29,10 @@ var (
 	sensitiveWord = regexp.MustCompile(`(?i)\b(api[_-]?key|authorization|bearer|cookie|password|passwd|secret|token|client[_-]?secret|database[_-]?url)\b`)
 	secretValue   = regexp.MustCompile(`(?i)sk-[A-Za-z0-9_-]{12,}|[A-Za-z0-9_+/=-]{32,}`)
 	bareURL       = regexp.MustCompile(`(?i)https?://[^\s)\]}>]+`)
-	posixPath     = regexp.MustCompile(`/(?:Users|home|private|var|tmp|Volumes|opt)/[^\s)\]}>,'\"]+`)
-	windowsPath   = regexp.MustCompile(`[A-Za-z]:\\[^\s)\]}>,'\"]+`)
+	quotedPosix   = regexp.MustCompile(`(?:"/[^"]+"|'\/[^']+')`)
+	quotedWindows = regexp.MustCompile(`(?i)(?:"(?:[a-z]:\\|\\\\)[^"]+"|'(?:[a-z]:\\|\\\\)[^']+')`)
+	posixPath     = regexp.MustCompile(`(^|[^A-Za-z0-9._~+-])\/[^\s)\]}>,'\"]+`)
+	windowsPath   = regexp.MustCompile(`(?i)(?:[a-z]:\\|\\\\)[^\s)\]}>,'\"]+`)
 )
 
 func Send(message Message) Result {
@@ -90,7 +92,9 @@ func sanitize(value string, limit int) string {
 		value = strings.ReplaceAll(value, token, "")
 	}
 	value = bareURL.ReplaceAllString(value, "<url>")
-	value = posixPath.ReplaceAllString(value, "<path>")
+	value = quotedPosix.ReplaceAllString(value, "<path>")
+	value = quotedWindows.ReplaceAllString(value, "<path>")
+	value = posixPath.ReplaceAllString(value, "$1<path>")
 	value = windowsPath.ReplaceAllString(value, "<path>")
 	value = secretValue.ReplaceAllString(value, "<redacted>")
 	if sensitiveWord.MatchString(value) {

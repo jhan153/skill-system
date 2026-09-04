@@ -7,21 +7,37 @@ import (
 	"io"
 	"os"
 
+	"skill-system.local/harness/grok/internal/hook"
 	"skill-system.local/harness/grok/internal/projectcontext"
 )
 
 var version = "dev"
 
 func main() {
-	if len(os.Args) == 1 {
+	args := os.Args[1:]
+	if len(args) == 0 {
+		hookCLI()
 		return
 	}
-	switch os.Args[1] {
+	switch args[0] {
 	case "--version", "version":
 		fmt.Println(version)
 	case "context":
-		contextCLI(os.Args[2:])
+		contextCLI(args[1:])
 	}
+}
+
+func hookCLI() {
+	decoder := json.NewDecoder(io.LimitReader(os.Stdin, 1<<20))
+	var event hook.Event
+	if err := decoder.Decode(&event); err != nil {
+		return
+	}
+	output := hook.Handle(event)
+	if output == nil {
+		return
+	}
+	_ = json.NewEncoder(os.Stdout).Encode(output)
 }
 
 func contextCLI(args []string) {

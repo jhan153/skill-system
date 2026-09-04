@@ -19,9 +19,11 @@ runtime capability outside the current turn.
   lifecycle handlers over that baseline without turning it into shared execution-admission state.
   Codex may use its host Auto-reviewer to resolve eligible permission waits without user clicks;
   that provider behavior does not grant Orca capability or Plan authority.
-- `rule_companion_provider`: ships portable global rules and shared docs/schemas but no native hook
-  adapter. Current owners are Grok and Antigravity; their common Go binaries expose version and
-  project-context utilities while Orca owns lifecycle delivery.
+- `rule_companion_provider`: ships portable global rules and shared docs/schemas. Current owners are
+  Grok and Antigravity. Grok additionally owns a notification-only native hook adapter and exposes
+  version, project-context, and notification forwarding; it owns no session, tool, Stop, dispatch,
+  inbox, heartbeat, or `worker_done` lifecycle. Antigravity has no native hook adapter and exposes
+  version and project-context only. Orca owns lifecycle delivery for both providers.
 - `orca_execution_provider`: can receive an Orca-dispatched node when the current worker receipt
   proves lifecycle delivery. All four providers may hold this role for a task.
 
