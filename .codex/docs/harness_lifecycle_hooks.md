@@ -7,7 +7,7 @@ The default Codex harness keeps all eight supported lifecycle events and sends e
 | Codex event | bounded behavior |
 | --- | --- |
 | `SessionStart` | Clear correction and work-contract state for a fresh or cleared session; on resume/compaction restore only bounded projections and nearest-manifest context. |
-| `UserPromptSubmit` | Mark a field-derived explicit correction and compile high-confidence work-contract signals. Raw prompt text is never persisted. |
+| `UserPromptSubmit` | Mark a field-derived explicit correction and compile high-confidence work-contract policy plus narrow activate/update/rebind/reset operations. Raw prompt text is never persisted. |
 | `PreToolUse` | Apply explicit work-contract scope exclusions without treating shell or interpreter command shape as a terminal denial. |
 | `PermissionRequest` | Return no hook decision so Codex Auto-review can approve ordinary requests and reject the risky minority without a user-click wait. |
 | `PostToolUse` | No-op for policy state; it does not retain tool output or validate task results. |
@@ -29,7 +29,30 @@ Skill System policy does not store a command-attempt ledger or convert a host de
 
 ## Work-Contract Enforcement Boundary
 
-The runtime projection contains only schema version, revision, prompt digest, verification owner, interaction mode, execution mode, excluded action classes, current semantic intent, deferred intent keys/classes/reasons, and a bounded continuation count. Raw prompt text, tool input, command text, transcript content, and credentials are never persisted.
+The runtime projection contains only schema version, revision, an opaque content-free contract ID,
+typed identity kind, prompt digest, verification owner, interaction mode, execution mode, excluded
+action classes, current semantic intent, deferred intent keys/classes/reasons, and a bounded
+continuation count. The state file remains session-keyed, but that storage namespace is distinct
+from the semantic contract generation. Raw prompt text, tool input, command text, transcript
+content, task labels, turn IDs, and credentials are never persisted or used to derive the ID.
+
+A leading `/goal` or narrow explicit work-contract rebind starts a fresh generation from defaults
+plus policy in that prompt; it does not carry prior exclusions, active/deferred intents, or the
+continuation count. Explicit policy updates preserve the current contract ID. Ordinary and
+new-looking prompts without a rebind marker, along with `PreCompact` and `PostCompact`, preserve the
+same generation; the hook does not infer a goal change from prompt similarity, `turn_id`, or
+`task_subject`. Explicit reset is idempotent and leaves no active generation. Existing identity-less
+v1 state retains its restrictions only as a typed transitional `legacy_session` until reset or
+rebind. Missing or malformed current identity fails open without synthesizing a replacement.
+
+Every stateful Capture, Preflight, continuation, reset, and Load operation holds the same
+cross-process session lock across its read/transition/write boundary. Atomic rename remains the
+publication mechanism, while serialization prevents a stale generation-relative writer from
+overwriting a completed rebind or recreating state after reset. The lock file is an empty private
+coordination primitive, not a second state store.
+
+Lifecycle directives are matched separately from broad policy phrases. Quoted or documentary
+mentions of lifecycle syntax do not activate, reset, or rebind a contract.
 
 `PreToolUse` protects explicit scope regardless of task duration: an excluded validation or meta action does not become permitted because a workflow proposed it. When a plan mixes allowed and excluded work, the hook returns the official non-blocking `permissionDecision: "allow"` plus `updatedInput`, records the removed semantic purposes as deferred, and preserves the remaining plan. It denies only when no in-contract plan item remains or a side-effecting tool still attempts excluded work; arbitrary execution is never rewritten into a false-success no-op.
 

@@ -60,6 +60,33 @@ A deferred purpose keeps one stable semantic `intent_key`. Changing the tool,
 command form, wrapper, or validation method does not create a new intent.
 Deferred work is not successful work.
 
+## Contract Identity And Lifecycle
+
+The physical runtime state may be namespaced by a host session, but that storage key is not the
+semantic contract identity. Each active contract has an opaque, content-free `contract_id` that
+survives ordinary same-goal turns and compaction.
+
+- A leading `/goal` or explicit work-contract rebind starts a new generation from defaults plus the
+  policy stated in that prompt. It clears the prior active intent, deferred intents, continuation
+  count, and exclusions instead of copying them under a new ID.
+- A normal policy update changes the active generation in place and preserves its `contract_id`.
+- An ordinary or new-looking prompt without an explicit rebind marker remains in the current
+  generation. Hosts must not infer identity from prompt similarity, transcript content, turn IDs,
+  or optional display labels.
+- An explicit reset leaves no active generation and is idempotent. A later activation receives a
+  fresh ID.
+- A legacy identity-less runtime projection may preserve its existing restrictions only as a typed
+  transitional `legacy_session`; explicit reset or rebind retires it. Missing or malformed current
+  identity never causes the runtime to invent authority.
+
+Generation-relative reads and writes are one serialized transition. A preflight or continuation
+writer that began around a reset/rebind must observe the current generation before it can publish;
+it cannot restore an old generation or recreate cleared state.
+
+Lifecycle commands are directives, not quoted data. Documentation, examples, and quoted mentions
+of `/goal`, `/work-contract rebind`, `/work-contract reset`, or natural-language equivalents do not
+change contract identity.
+
 ## Attended Versus Unattended Execution
 
 A provider-owned automatic reviewer may resolve eligible approvals before this portable fallback;
@@ -92,7 +119,8 @@ solely to promote the label.
 
 ## Runtime Projection And Privacy
 
-Host hooks may persist a bounded projection containing normalized execution mode, verification
-owner, interaction mode, excluded action classes, prompt digest, and deferred intent keys. They
-must not persist raw prompts, command text, transcripts, credentials, or graph state. Durable node
-and condition state belongs only to the canonical Plan/Handoff pair.
+Host hooks may persist a bounded projection containing an opaque contract ID, typed identity kind,
+normalized execution mode, verification owner, interaction mode, excluded action classes, prompt
+digest, and deferred intent keys. They must not derive the ID from or persist raw prompts, command
+text, transcripts, credentials, optional task labels, turn IDs, or graph state. Durable node and
+condition state belongs only to the canonical Plan/Handoff pair.

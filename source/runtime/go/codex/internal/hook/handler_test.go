@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 	"unicode/utf8"
+
+	"skill-system.local/harness/codex/internal/workcontract"
 )
 
 func TestDeclaredHookEventsMatchHandlerSurface(t *testing.T) {
@@ -96,6 +98,57 @@ func TestUnattendedWorkContractDoesNotOverrideHostReviewer(t *testing.T) {
 	})
 	if output != nil {
 		t.Fatalf("work contract overrode the host auto-review path: %#v", output)
+	}
+}
+
+func TestWorkContractGenerationSurvivesPromptAndCompactionUntilExplicitRebind(t *testing.T) {
+	t.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", t.TempDir())
+	t.Setenv("SKILL_SYSTEM_DESKTOP_NOTIFY", "dry-run")
+	const sessionID = "generation-lifecycle"
+
+	Handle(Event{
+		HookEventName: "UserPromptSubmit", SessionID: sessionID, TurnID: "turn-a",
+		Prompt: "/goal 무인 장시간 구현으로 검증은 내가 하고 질문하지 마",
+	})
+	before, err := workcontract.Load(sessionID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	Handle(Event{
+		HookEventName: "UserPromptSubmit", SessionID: sessionID, TurnID: "turn-b",
+		Prompt: "이제 결제 파서를 구현하는 다른 요청을 진행해",
+	})
+	afterPrompt, err := workcontract.Load(sessionID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if afterPrompt.ContractID != before.ContractID || afterPrompt.VerificationOwner != before.VerificationOwner {
+		t.Fatalf("ordinary prompt changed the active generation: before=%#v after=%#v", before, afterPrompt)
+	}
+
+	for _, eventName := range []string{"PreCompact", "PostCompact"} {
+		output := Handle(Event{HookEventName: eventName, SessionID: sessionID})
+		if output == nil || !strings.Contains(output["systemMessage"].(string), before.ContractID) {
+			t.Fatalf("%s did not restore the active generation: %#v", eventName, output)
+		}
+	}
+
+	Handle(Event{
+		HookEventName: "UserPromptSubmit", SessionID: sessionID, TurnID: "turn-c",
+		Prompt: "/work-contract rebind 새 결제 작업을 시작해",
+	})
+	rebound, err := workcontract.Load(sessionID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rebound.ContractID == before.ContractID || rebound.VerificationOwner != workcontract.VerificationAgent ||
+		len(rebound.ExcludedActionClasses) != 0 {
+		t.Fatalf("explicit rebind did not isolate the generation: before=%#v after=%#v", before, rebound)
+	}
+
+	Handle(Event{HookEventName: "SessionStart", SessionID: sessionID, Source: "clear", Cwd: t.TempDir()})
+	if _, err := workcontract.Load(sessionID); !os.IsNotExist(err) {
+		t.Fatalf("clear session retained work contract: %v", err)
 	}
 }
 

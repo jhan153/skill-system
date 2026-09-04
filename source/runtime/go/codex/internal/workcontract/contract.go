@@ -1,6 +1,7 @@
 package workcontract
 
 import (
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -13,7 +14,14 @@ import (
 	"time"
 )
 
-const schemaVersion = 1
+const (
+	schemaVersion       = 2
+	legacySchemaVersion = 1
+
+	IdentityExplicitGeneration = "explicit_generation"
+	IdentityLegacySession      = "legacy_session"
+	legacyContractID           = "WC-legacy-session"
+)
 
 const (
 	VerificationAgent = "agent"
@@ -34,12 +42,22 @@ const (
 )
 
 var (
-	testAuthoringPattern = regexp.MustCompile(`(?i)(?:^|[/_.-])(?:tests?|specs?|fixtures?|snapshots?)(?:[/_.-]|$)|(?:테스트|검증)[^.!?\n]{0,24}(?:작성|추가|생성)`)
-	validationPattern    = regexp.MustCompile(`(?i)(?:\b(?:test|tests|testing|verify|verification|validate|validation|smoke|benchmark|trace|probe)\b|테스트|검증|검사|스모크|트레이스)`)
-	executionPattern     = regexp.MustCompile(`(?i)(?:\b(?:run|execute|launch|invoke|start|rerun|re-run|pytest|ctest|jest)\b|실행|돌려|구동|재실행)`)
-	artifactPattern      = regexp.MustCompile(`(?i)(?:\b(?:wrapper|harness|fixture|snapshot|probe|tracer?|testbed)\b|래퍼|하네스|픽스처|스냅샷|프로브|테스트베드)`)
-	metaPattern          = regexp.MustCompile(`(?i)(?:\bgit\s+(?:add|commit)\b|\b(?:stage|staging|checkpoint)\b[^.!?\n]{0,24}\b(?:changes?|wip|status)\b|스테이징|커밋|wip\s*체크포인트)`)
-	noInteractionPattern = regexp.MustCompile(`(?:추가\s*)?(?:승인\s*요청|질문)(?:은|을|도|이나|과|과의|에\s*대한)?\s*(?:하지\s*마|하지\s*말|하지\s*않|금지)|(?:승인|질문)[^.!?\n]{0,16}(?:기다리지\s*마|기다리지\s*말)`)
+	contractIDPattern     = regexp.MustCompile(`^WC-[A-Za-z0-9][A-Za-z0-9._-]{0,95}$`)
+	testAuthoringPattern  = regexp.MustCompile(`(?i)(?:^|[/_.-])(?:tests?|specs?|fixtures?|snapshots?)(?:[/_.-]|$)|(?:테스트|검증)[^.!?\n]{0,24}(?:작성|추가|생성)`)
+	validationPattern     = regexp.MustCompile(`(?i)(?:\b(?:test|tests|testing|verify|verification|validate|validation|smoke|benchmark|trace|probe)\b|테스트|검증|검사|스모크|트레이스)`)
+	executionPattern      = regexp.MustCompile(`(?i)(?:\b(?:run|execute|launch|invoke|start|rerun|re-run|pytest|ctest|jest)\b|실행|돌려|구동|재실행)`)
+	artifactPattern       = regexp.MustCompile(`(?i)(?:\b(?:wrapper|harness|fixture|snapshot|probe|tracer?|testbed)\b|래퍼|하네스|픽스처|스냅샷|프로브|테스트베드)`)
+	metaPattern           = regexp.MustCompile(`(?i)(?:\bgit\s+(?:add|commit)\b|\b(?:stage|staging|checkpoint)\b[^.!?\n]{0,24}\b(?:changes?|wip|status)\b|스테이징|커밋|wip\s*체크포인트)`)
+	noInteractionPattern  = regexp.MustCompile(`(?:추가\s*)?(?:승인\s*요청|질문)(?:은|을|도|이나|과|과의|에\s*대한)?\s*(?:하지\s*마|하지\s*말|하지\s*않|금지)|(?:승인|질문)[^.!?\n]{0,16}(?:기다리지\s*마|기다리지\s*말)`)
+	quotedContentPatterns = []*regexp.Regexp{
+		regexp.MustCompile("(?s)```.*?```"),
+		regexp.MustCompile("`[^`]*`"),
+		regexp.MustCompile(`"[^"]*"`),
+		regexp.MustCompile(`“[^”]*”`),
+		regexp.MustCompile(`‘[^’]*’`),
+		regexp.MustCompile(`「[^」]*」`),
+		regexp.MustCompile(`『[^』]*』`),
+	}
 )
 
 type Intent struct {
@@ -51,6 +69,8 @@ type Intent struct {
 type State struct {
 	SchemaVersion          int      `json:"schema_version"`
 	Revision               int      `json:"revision"`
+	ContractID             string   `json:"contract_id"`
+	IdentityKind           string   `json:"identity_kind"`
 	SourceDigest           string   `json:"source_digest"`
 	VerificationOwner      string   `json:"verification_owner"`
 	InteractionMode        string   `json:"interaction_mode"`
@@ -73,6 +93,7 @@ type Decision struct {
 type promptSignals struct {
 	seen              bool
 	reset             bool
+	rebind            bool
 	verificationOwner string
 	interactionMode   string
 	executionMode     string
@@ -91,29 +112,51 @@ func defaultState() State {
 	}
 }
 
+func newGeneration() (State, error) {
+	state := defaultState()
+	contractID, err := newContractID()
+	if err != nil {
+		return state, err
+	}
+	state.ContractID = contractID
+	state.IdentityKind = IdentityExplicitGeneration
+	return state, nil
+}
+
 // Capture updates the privacy-safe runtime projection of an explicit user work
 // contract. It stores normalized policy fields and a prompt digest, never raw
 // prompt text.
 func Capture(sessionID, prompt string) (State, bool, error) {
 	signals := compilePrompt(prompt)
-	current, err := Load(sessionID)
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
+	lock, err := acquireSessionLock(sessionID)
+	if err != nil {
 		return defaultState(), false, err
 	}
+	defer lock.release()
 	if signals.reset {
-		if err := Clear(sessionID); err != nil {
+		if err := clearState(lock, sessionID); err != nil {
 			return defaultState(), false, err
 		}
 		return defaultState(), false, nil
 	}
+	current, err := loadState(lock, sessionID)
 	if !signals.seen {
 		if err != nil {
-			return defaultState(), false, nil
+			if errors.Is(err, os.ErrNotExist) {
+				return defaultState(), false, nil
+			}
+			return defaultState(), false, err
 		}
 		return current, true, nil
 	}
-	if err != nil {
-		current = defaultState()
+	if err != nil && !errors.Is(err, os.ErrNotExist) && !signals.rebind {
+		return defaultState(), false, err
+	}
+	if signals.rebind || errors.Is(err, os.ErrNotExist) {
+		current, err = newGeneration()
+		if err != nil {
+			return defaultState(), false, err
+		}
 	}
 	if signals.verificationOwner != "" {
 		current.VerificationOwner = signals.verificationOwner
@@ -143,17 +186,26 @@ func Capture(sessionID, prompt string) (State, bool, error) {
 	current.Revision++
 	current.SourceDigest = digest(prompt)
 	current.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-	if err := writeState(sessionID, current); err != nil {
+	if err := writeState(lock, sessionID, current); err != nil {
 		return defaultState(), false, err
 	}
 	return current, true, nil
 }
 
 func Load(sessionID string) (State, error) {
-	path := statePath(sessionID)
-	if path == "" {
-		return defaultState(), os.ErrNotExist
+	lock, err := acquireSessionLock(sessionID)
+	if err != nil {
+		return defaultState(), err
 	}
+	defer lock.release()
+	return loadState(lock, sessionID)
+}
+
+func loadState(lock *sessionLock, sessionID string) (State, error) {
+	if !lock.owns(sessionID) {
+		return defaultState(), errors.New("work-contract session lock required")
+	}
+	path := statePath(sessionID)
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		return defaultState(), err
@@ -162,9 +214,23 @@ func Load(sessionID string) (State, error) {
 	if err := json.Unmarshal(raw, &state); err != nil {
 		return defaultState(), err
 	}
-	if state.SchemaVersion != schemaVersion {
+	switch state.SchemaVersion {
+	case legacySchemaVersion:
+		state.SchemaVersion = schemaVersion
+		state.ContractID = legacyContractID
+		state.IdentityKind = IdentityLegacySession
+	case schemaVersion:
+	default:
 		return defaultState(), errors.New("unsupported work-contract state version")
 	}
+	normalizeState(&state)
+	if err := validateActiveState(state); err != nil {
+		return defaultState(), err
+	}
+	return state, nil
+}
+
+func normalizeState(state *State) {
 	if state.VerificationOwner == "" {
 		state.VerificationOwner = VerificationAgent
 	}
@@ -180,14 +246,53 @@ func Load(sessionID string) (State, error) {
 	if state.DeferredIntents == nil {
 		state.DeferredIntents = []Intent{}
 	}
-	return state, nil
+}
+
+func validateActiveState(state State) error {
+	if state.SchemaVersion != schemaVersion {
+		return errors.New("unsupported work-contract state version")
+	}
+	if !contractIDPattern.MatchString(state.ContractID) {
+		return errors.New("invalid work-contract identity")
+	}
+	switch state.IdentityKind {
+	case IdentityExplicitGeneration:
+		if state.ContractID == legacyContractID {
+			return errors.New("legacy work-contract identity cannot be explicit")
+		}
+	case IdentityLegacySession:
+		if state.ContractID != legacyContractID {
+			return errors.New("invalid legacy work-contract identity")
+		}
+	default:
+		return errors.New("invalid work-contract identity kind")
+	}
+	if state.VerificationOwner != VerificationAgent && state.VerificationOwner != VerificationUser {
+		return errors.New("invalid work-contract verification owner")
+	}
+	if state.InteractionMode != InteractionAllowed && state.InteractionMode != InteractionForbidden {
+		return errors.New("invalid work-contract interaction mode")
+	}
+	if state.ExecutionMode != ExecutionAttended && state.ExecutionMode != ExecutionUnattendedGoalLoop {
+		return errors.New("invalid work-contract execution mode")
+	}
+	return nil
 }
 
 func Clear(sessionID string) error {
-	path := statePath(sessionID)
-	if path == "" {
-		return nil
+	lock, err := acquireSessionLock(sessionID)
+	if err != nil {
+		return err
 	}
+	defer lock.release()
+	return clearState(lock, sessionID)
+}
+
+func clearState(lock *sessionLock, sessionID string) error {
+	if !lock.owns(sessionID) {
+		return errors.New("work-contract session lock required")
+	}
+	path := statePath(sessionID)
 	err := os.Remove(path)
 	if errors.Is(err, os.ErrNotExist) {
 		return nil
@@ -196,15 +301,19 @@ func Clear(sessionID string) error {
 }
 
 func Context(state State) string {
-	if state.SchemaVersion != schemaVersion {
+	if validateActiveState(state) != nil {
 		return ""
 	}
 	lines := []string{
 		"Active user work contract (runtime projection):",
+		"- Contract ID: " + state.ContractID + ".",
 		"- User-stated scope and exclusions outrank optional workflow, validation, and quality-improvement steps except safety or platform-enforced constraints.",
 		"- Verification owner: " + state.VerificationOwner + ".",
 		"- Additional interaction: " + state.InteractionMode + ".",
 		"- Execution mode: " + state.ExecutionMode + ".",
+	}
+	if state.IdentityKind == IdentityLegacySession {
+		lines = append(lines, "- Identity state: legacy_session; preserve its restrictions until an explicit reset or rebind retires this transitional generation.")
 	}
 	if state.VerificationOwner == VerificationUser {
 		lines = append(lines, "- Missing user-only evidence is a normal user-verification-needed handoff; do not create substitute tests or validation artifacts.")
@@ -238,7 +347,12 @@ func Context(state State) string {
 }
 
 func Preflight(sessionID, toolName string, raw json.RawMessage) (Decision, error) {
-	state, err := Load(sessionID)
+	lock, err := acquireSessionLock(sessionID)
+	if err != nil {
+		return Decision{}, err
+	}
+	defer lock.release()
+	state, err := loadState(lock, sessionID)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return Decision{}, nil
@@ -246,7 +360,7 @@ func Preflight(sessionID, toolName string, raw json.RawMessage) (Decision, error
 		return Decision{}, err
 	}
 	if strings.EqualFold(strings.TrimSpace(toolName), "update_plan") {
-		return preflightPlan(sessionID, &state, raw)
+		return preflightPlan(lock, sessionID, &state, raw)
 	}
 	intent := classifyIntent(toolName, raw, state.ActiveIntent)
 	if isExcluded(state, intent.Class) || hasDeferred(state, intent.Key) {
@@ -255,7 +369,7 @@ func Preflight(sessionID, toolName string, raw json.RawMessage) (Decision, error
 		} else {
 			intent.Reason = "action class is excluded by the active user work contract"
 		}
-		if err := deferIntent(sessionID, &state, intent); err != nil {
+		if err := deferIntent(lock, sessionID, &state, intent); err != nil {
 			return Decision{}, err
 		}
 		return Decision{Deny: true, Intent: intent, Reason: denialReason(intent)}, nil
@@ -264,7 +378,12 @@ func Preflight(sessionID, toolName string, raw json.RawMessage) (Decision, error
 }
 
 func ContinueWithoutInput(sessionID string) (bool, error) {
-	state, err := Load(sessionID)
+	lock, err := acquireSessionLock(sessionID)
+	if err != nil {
+		return false, err
+	}
+	defer lock.release()
+	state, err := loadState(lock, sessionID)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return false, nil
@@ -285,24 +404,29 @@ func ContinueWithoutInput(sessionID string) (bool, error) {
 	}
 	state.InputContinuationCount++
 	state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-	return true, writeState(sessionID, state)
+	return true, writeState(lock, sessionID, state)
 }
 
 func compilePrompt(prompt string) promptSignals {
-	text := normalize(prompt)
+	text := normalize(stripQuotedContent(prompt))
 	var signals promptSignals
 	if text == "" {
 		return signals
 	}
-	if containsAny(text,
-		"작업계약을 초기화", "작업 계약을 초기화", "제한을 초기화", "일반 작업으로 전환",
-		"reset the work contract", "clear the work contract", "clear these restrictions",
-	) {
+	operation := lifecycleOperation(text)
+	if operation == "reset" {
 		signals.seen = true
 		signals.reset = true
 		return signals
 	}
-	if strings.HasPrefix(text, "/goal") || containsAny(text,
+	if operation == "rebind" {
+		signals.seen = true
+		signals.rebind = true
+	}
+	if operation == "none" && describesContractSyntax(text) {
+		return signals
+	}
+	if hasCommandPrefix(text, "/goal") || containsAny(text,
 		"무인 장시간 goal", "무인 장시간 골", "무인 장시간 loop", "무인 장시간 루프",
 		"무인 장기 goal", "무인 장기 골", "무인 장기 loop", "무인 장기 루프",
 		"장기간 작업하는 goal", "장기간 작업하는 골", "장기간 작업하는 loop", "장기간 작업하는 루프",
@@ -387,7 +511,72 @@ func compilePrompt(prompt string) promptSignals {
 	return signals
 }
 
-func preflightPlan(sessionID string, state *State, raw json.RawMessage) (Decision, error) {
+func lifecycleOperation(text string) string {
+	if hasCommandPrefix(text, "/work-contract reset") || startsDirective(text,
+		"작업계약을 초기화", "작업 계약을 초기화", "제한을 초기화", "일반 작업으로 전환",
+		"reset the work contract", "clear the work contract", "clear these restrictions",
+	) {
+		return "reset"
+	}
+	if hasCommandPrefix(text, "/goal") || hasCommandPrefix(text, "/work-contract rebind") || startsDirective(text,
+		"작업계약을 새로 시작", "작업 계약을 새로 시작", "새 작업계약으로 전환", "새 작업 계약으로 전환",
+		"start a new work contract", "rebind the work contract",
+	) {
+		return "rebind"
+	}
+	return "none"
+}
+
+func startsDirective(text string, prefixes ...string) bool {
+	text = strings.TrimSpace(text)
+	for _, politePrefix := range []string{"이제 ", "지금부터 ", "please "} {
+		text = strings.TrimPrefix(text, politePrefix)
+	}
+	for _, prefix := range prefixes {
+		if text == prefix {
+			return true
+		}
+		if !strings.HasPrefix(text, prefix) {
+			continue
+		}
+		remainder := strings.TrimSpace(strings.TrimPrefix(text, prefix))
+		if remainder == "" || strings.ContainsRune(".,!?;:。！？", []rune(remainder)[0]) {
+			return true
+		}
+		for _, continuation := range []string{
+			"해", "하고", "한 뒤", "한 후", "하자", "합니다", "하겠습니다", "후 ", "뒤 ",
+			"and ", "then ",
+		} {
+			if strings.HasPrefix(remainder, continuation) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func hasCommandPrefix(text, command string) bool {
+	return text == command || strings.HasPrefix(text, command+" ")
+}
+
+func describesContractSyntax(text string) bool {
+	if !containsAny(text, "/goal", "work contract", "작업 계약", "작업계약") {
+		return false
+	}
+	return containsAny(text,
+		"설명", "문서", "예시", "인용", "문구", "뜻", "의미",
+		"explain", "document", "example", "quote", "what does",
+	)
+}
+
+func stripQuotedContent(value string) string {
+	for _, pattern := range quotedContentPatterns {
+		value = pattern.ReplaceAllString(value, " ")
+	}
+	return value
+}
+
+func preflightPlan(lock *sessionLock, sessionID string, state *State, raw json.RawMessage) (Decision, error) {
 	var input map[string]any
 	if json.Unmarshal(raw, &input) != nil {
 		return Decision{}, nil
@@ -429,7 +618,7 @@ func preflightPlan(sessionID string, state *State, raw json.RawMessage) (Decisio
 	state.ActiveIntent = active
 	if len(filtered) == 0 {
 		state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-		return Decision{}, writeState(sessionID, *state)
+		return Decision{}, writeState(lock, sessionID, *state)
 	}
 	for _, intent := range filtered {
 		if !hasDeferred(*state, intent.Key) {
@@ -437,7 +626,7 @@ func preflightPlan(sessionID string, state *State, raw json.RawMessage) (Decisio
 		}
 	}
 	state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-	if err := writeState(sessionID, *state); err != nil {
+	if err := writeState(lock, sessionID, *state); err != nil {
 		return Decision{}, err
 	}
 
@@ -560,12 +749,12 @@ func hasDeferred(state State, key string) bool {
 	return false
 }
 
-func deferIntent(sessionID string, state *State, intent Intent) error {
+func deferIntent(lock *sessionLock, sessionID string, state *State, intent Intent) error {
 	if !hasDeferred(*state, intent.Key) {
 		state.DeferredIntents = append(state.DeferredIntents, intent)
 	}
 	state.UpdatedAt = time.Now().UTC().Format(time.RFC3339)
-	return writeState(sessionID, *state)
+	return writeState(lock, sessionID, *state)
 }
 
 func denialReason(intent Intent) string {
@@ -596,10 +785,13 @@ func statePath(sessionID string) string {
 	return filepath.Join(root, digest(sessionID)+".json")
 }
 
-func writeState(sessionID string, state State) error {
+func writeState(lock *sessionLock, sessionID string, state State) error {
+	if !lock.owns(sessionID) {
+		return errors.New("work-contract session lock required")
+	}
 	path := statePath(sessionID)
-	if path == "" {
-		return errors.New("work-contract state root unavailable")
+	if err := validateActiveState(state); err != nil {
+		return err
 	}
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return err
@@ -648,6 +840,14 @@ func containsAny(text string, values ...string) bool {
 func digest(value string) string {
 	sum := sha256.Sum256([]byte(value))
 	return hex.EncodeToString(sum[:])
+}
+
+func newContractID() (string, error) {
+	value := make([]byte, 16)
+	if _, err := rand.Read(value); err != nil {
+		return "", err
+	}
+	return "WC-" + hex.EncodeToString(value), nil
 }
 
 func sortedKeys(values map[string]bool) []string {
