@@ -11,13 +11,13 @@
 - use_when:
   - the user requests a bounded repair of an observed or reproducible defect in an already-implemented accepted production contract and expects verification afterward, whether the cause is known or still needs proportional diagnosis.
   - a Plan/Coordinator dispatches an explicit `BF1` or `BF2` node with `node_id`, `round`, `source_review_item_ref`, concrete source findings, and an accepted repair contract that the intervention preserves.
-  - a direct standalone repair under the same accepted repair contract resumes after one locally reviewed attempt and still has one bounded round available.
+  - a direct standalone repair under the same accepted repair contract resumes when the local review supplies new causal evidence or material progress supporting a distinct next intervention within any user-supplied budget.
 - do_not_use_when:
   - diagnosis-only with no repair request, full static code review/disposition, Plan or Handoff mutation, successor selection, a Known Bug already excluded for the current run, first implementation or explicit production-mechanism replacement, an unresolved algorithm/model/behavior decision, ordinary feature work, or validation-only work.
 - expected_inputs:
   - observed symptom/original signal, already-implemented accepted repair contract, material expected condition, available oracle or canonical source, reproduction context, genuine same-contract attempt history, and, in DAG mode, assigned node/round/source-review identity plus concrete findings
 - expected_outputs:
-  - after semantic admission, one `bug_fix_result` containing attempt history, changed snapshot/review anchor or an explicit no-change result, original-signal observation, actual-path readback, visible attempt status, and an optional non-final Known Bug candidate; on owner-kind mismatch, lifecycle `not_produced` with no card or attempt
+  - after semantic admission, DAG mode returns one `bug_fix_result` with attempt history, changed snapshot/review anchor or explicit no-change result, original-signal observation, actual-path readback, visible attempt status, and an optional non-final Known Bug candidate; standalone mode returns compact task-local attempt evidence and unresolved conditions without Core cards; on owner-kind mismatch, no card or attempt
 - context_targets:
   must_read:
     - original failure, material expected condition, implicated production owner/path, and repository instructions
@@ -36,7 +36,7 @@
     - full repo/memory, broad reports, unrelated history, raw production data, or credentials
 - risk_profile:
   reads: failure output, production source/callers/state, tests/config, and validation/readback evidence
-  writes: DAG mode exactly one semantically admitted contract-preserving intervention; standalone mode at most two locally reviewed interventions for the same problem and accepted repair contract
+  writes: DAG mode exactly one semantically admitted contract-preserving intervention; standalone mode evidence-gated bounded interventions for the same problem and accepted repair contract within any user-supplied budget
   tools: reproduction, focused diagnostics, diff inspection, one original-signal observation after an intervention, and actual-path readback
   sensitive_resources: deny credentials; external or destructive reproduction needs explicit boundary review
 - entry_scene:
@@ -47,10 +47,10 @@
 - role: review_gate
 - family: workflow
 - intent_signature: static code review, state/flow/reachability review, dynamic diagrams, optional design conformance, 정적 코드 리뷰
-- use_when: review bound production or test code before PR/integration through source-derived models, with or without an authoritative design baseline.
+- use_when: review bound production or test code before PR/integration through source-linked path evidence, with or without an authoritative design baseline.
 - do_not_use_when: mapping-only (`analysis-codebase-map`), lightweight style/naming feedback, repair, runtime validation, production test-oracle/evidence review, or Plan/Handoff editing is primary.
 - expected_inputs: exact snapshot/diff identity, change intent and material changed effects, review slice, code contracts/invariants, optional accepted architecture/UI/Test Design baseline, Known Bug exclusions, and optional node/round identity
-- expected_outputs: risk-selected Mermaid evidence, review coverage and ceiling, blocking findings, advisories, deferred items, and a standalone or Core static disposition
+- expected_outputs: source-linked path evidence with Mermaid when needed, review coverage and ceiling, blocking findings, advisories, deferred items, and a standalone or Core static disposition
 - context_targets:
   must_read:
     - exact implementation slice, repository instructions, and `references/static_code_review_contract.md`
@@ -72,13 +72,13 @@
     - `references/runtime_debugging_contract.md` when the diff changes crash/dump capture, symbol/build manifests, debugger hooks, dynamic-diagnostic integration, trace/replay capture, graphics validation/markers, or device-loss diagnostics
     - `references/execution_item_contract.md` when node/round identity is supplied or the compact result will cross a Workflow, Coordinator, Plan/Handoff, or plugin boundary
     - `references/testing_stage_contract.md` and `references/testing_strategy_contract.md` when reviewing a Core `test_implementation_result` against a `test_design_result`
-    - load only applicable baseline and references: `references/model-comparison.md` for Mermaid mechanics; `references/finding-handoff.md` for standalone/Core presentation
+    - load only applicable baseline and references: `references/model-comparison.md` when state/owner/failure relationships need a visual model or model-baseline comparison; `references/finding-handoff.md` for standalone/Core presentation
   do_not_load_by_default:
     - unrelated source/design artifacts or runtime evidence
 - risk_profile:
   reads: targeted code and directly relevant contract, baseline, ownership, or rationale evidence
   writes: none; the Coordinator alone records results in Handoff
-  tools: focused static inspection and risk-selected Mermaid construction/rendering
+  tools: focused static inspection and Mermaid construction/rendering only when needed for material relationships
   sensitive_resources: credentials denied; tests/runtime and code/Plan mutation require another owner
 - entry_scene: PREPARE
 

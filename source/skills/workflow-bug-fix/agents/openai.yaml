@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Bug Fix"
   short_description: "Repair one defect while preserving its accepted contract"
-  default_prompt: "Use $workflow-bug-fix only for a semantically admitted bounded repair of an already-implemented accepted production contract. First implementation or explicit production-mechanism replacement returns an owner-kind mismatch without source changes, Core cards, or attempt consumption. With Plan node_id/round/source_review_item_ref input, perform exactly the assigned contract-preserving intervention, observe the original signal once, return the canonical Core repair item and attempt status, and leave Code Review, final Known Bug registration, and Plan successor selection to their owners. Without Plan fields, retain the bounded same-contract two-round standalone behavior."
+  default_prompt: "Use $workflow-bug-fix only for a semantically admitted bounded repair of an already-implemented accepted production contract. First implementation or explicit production-mechanism replacement returns an owner-kind mismatch without source changes, Core cards, or attempt consumption. With Plan node_id/round/source_review_item_ref input, perform exactly the assigned contract-preserving intervention within the copied graph's finite budget, observe the original signal once, return the canonical Core repair item and attempt status, and leave Code Review, final Known Bug registration, and Plan successor selection to their owners. Without Plan fields, review each intervention and continue only when new causal evidence or explained original-signal progress supports a distinct next intervention under the same contract and any user-supplied budget. Preserve compact task-local ordinal attempt evidence, stop on repetition without new evidence or unavailable required observation, and emit no Core repair/Known Bug cards."
 
 policy:
   invocation_surface: explicit_procedure
@@ -16,7 +16,7 @@ execution_mode:
   kind: bug_fix_execution
   owns_execution: true
   dag_repairs_per_node: 1
-  standalone_max_reviewed_rounds: 2
+  standalone_continuation: evidence_gated
   dag_known_bug_output: candidate_only
-  standalone_known_bug_output: final_after_local_review
+  standalone_unresolved_output: task_local_condition
   plan_or_handoff_write: false

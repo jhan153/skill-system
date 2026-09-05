@@ -5,8 +5,7 @@
   "handoff_section": "Known Bugs",
   "handoff_columns": ["ID", "Scope / fingerprint", "Attempts and result statuses", "Current-run disposition", "Reopen condition"],
   "allowed_producers": [
-    "plan-execution-handoff",
-    "workflow-bug-fix"
+    "plan-execution-handoff"
   ],
   "required_consumers": ["workflow-code-review", "workflow-test-implementation"],
   "recorders": ["plan-execution-handoff"]

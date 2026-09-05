@@ -48,6 +48,7 @@ var (
 	executionPattern      = regexp.MustCompile(`(?i)(?:\b(?:run|execute|launch|invoke|start|rerun|re-run|pytest|ctest|jest)\b|실행|돌려|구동|재실행)`)
 	artifactPattern       = regexp.MustCompile(`(?i)(?:\b(?:wrapper|harness|fixture|snapshot|probe|tracer?|testbed)\b|래퍼|하네스|픽스처|스냅샷|프로브|테스트베드)`)
 	metaPattern           = regexp.MustCompile(`(?i)(?:\bgit\s+(?:add|commit)\b|\b(?:stage|staging|checkpoint)\b[^.!?\n]{0,24}\b(?:changes?|wip|status)\b|스테이징|커밋|wip\s*체크포인트)`)
+	sedPrintPattern       = regexp.MustCompile(`^[0-9]+(?:,(?:[0-9]+|\$))?p$`)
 	noInteractionPattern  = regexp.MustCompile(`(?:추가\s*)?(?:승인\s*요청|질문)(?:은|을|도|이나|과|과의|에\s*대한)?\s*(?:하지\s*마|하지\s*말|하지\s*않|금지)|(?:승인|질문)[^.!?\n]{0,16}(?:기다리지\s*마|기다리지\s*말)`)
 	quotedContentPatterns = []*regexp.Regexp{
 		regexp.MustCompile("(?s)```.*?```"),
@@ -644,6 +645,13 @@ func preflightPlan(lock *sessionLock, sessionID string, state *State, raw json.R
 }
 
 func classifyIntent(toolName string, raw json.RawMessage, active *Intent) Intent {
+	if command, ok := sourceInspectionCommand(toolName, raw); ok {
+		// Reading source is a prerequisite, even when its text names validation
+		// artifacts or a previous plan item still carries a validation intent.
+		// This classifies ordinary inspection intent; host permissions still
+		// govern execution, including the environment and installed programs.
+		return Intent{Key: digest(ActionCore + ":source-inspection:" + command), Class: ActionCore}
+	}
 	text := textualInput(raw)
 	intent := intentFromText(toolName, text, active)
 	if intent.Class == ActionCore && active != nil && active.Class != "" {
@@ -651,6 +659,157 @@ func classifyIntent(toolName string, raw json.RawMessage, active *Intent) Intent
 		intent.Key = active.Key
 	}
 	return intent
+}
+
+func sourceInspectionCommand(toolName string, raw json.RawMessage) (string, bool) {
+	var commandField string
+	switch strings.ToLower(strings.TrimSpace(toolName)) {
+	case "exec_command", "functions.exec_command", "shell_command":
+		commandField = "cmd"
+	case "bash":
+		commandField = "command"
+	default:
+		return "", false
+	}
+	var input map[string]any
+	if json.Unmarshal(raw, &input) != nil {
+		return "", false
+	}
+	command, ok := input[commandField].(string)
+	if !ok {
+		return "", false
+	}
+	if shell, exists := input["shell"]; exists {
+		value, ok := shell.(string)
+		if !ok || (value != "" && value != "/bin/sh" && value != "/bin/bash" && value != "/bin/zsh") {
+			return "", false
+		}
+	}
+	pipeline, ok := literalPipelineWords(command)
+	if !ok {
+		return "", false
+	}
+	for _, words := range pipeline {
+		if !sourceReaderWords(words) {
+			return "", false
+		}
+	}
+	return command, true
+}
+
+func sourceReaderWords(words []string) bool {
+	if len(words) == 0 {
+		return false
+	}
+	executable := words[0]
+	if directory := filepath.Dir(executable); directory == "/bin" || directory == "/usr/bin" {
+		executable = filepath.Base(executable)
+	}
+	switch executable {
+	case "cat", "nl":
+		return true
+	case "sed":
+		if len(words) < 3 || words[1] != "-n" || !sedPrintPattern.MatchString(words[2]) {
+			return false
+		}
+		for _, path := range words[3:] {
+			if strings.HasPrefix(path, "-") {
+				return false
+			}
+		}
+		return true
+	case "rg":
+		if len(words) < 2 {
+			return false
+		}
+		for index := 1; index < len(words); index++ {
+			word := words[index]
+			if word == "--" {
+				break
+			}
+			if !strings.HasPrefix(word, "-") {
+				continue
+			}
+			switch word {
+			case "-n", "-i", "-S", "-F", "-l", "-c", "-w", "-x", "-v", "-s", "-U",
+				"--files", "--hidden", "--no-ignore", "--no-config", "--line-number",
+				"--heading", "--no-heading", "--files-with-matches", "--count":
+			case "-e", "--regexp", "-g", "--glob", "-t", "--type", "-m", "--max-count",
+				"-A", "--after-context", "-B", "--before-context", "-C", "--context":
+				index++
+				if index == len(words) {
+					return false
+				}
+			default:
+				// Unknown options may invoke programs (for example --pre).
+				return false
+			}
+		}
+		return true
+	default:
+		return false
+	}
+}
+
+// Split literal invocations at unquoted pipes so every stage can be checked.
+// Quoted search patterns may contain operators; expansion and other unquoted
+// shell operators cannot enter the source-inspection exception.
+func literalPipelineWords(command string) ([][]string, bool) {
+	var pipeline [][]string
+	var words []string
+	var word strings.Builder
+	var quote rune
+	started := false
+	for _, char := range command {
+		if char == '\n' || char == '\r' || char == 0 {
+			return nil, false
+		}
+		if quote != 0 {
+			if char == quote {
+				quote = 0
+			} else {
+				if quote == '"' && strings.ContainsRune("$`\\", char) {
+					return nil, false
+				}
+				word.WriteRune(char)
+			}
+			continue
+		}
+		switch char {
+		case '\'', '"':
+			quote = char
+			started = true
+		case ' ', '\t', '|':
+			if started {
+				words = append(words, word.String())
+				word.Reset()
+				started = false
+			}
+			if char == '|' {
+				if len(words) == 0 {
+					return nil, false
+				}
+				pipeline = append(pipeline, words)
+				words = nil
+			}
+		default:
+			if strings.ContainsRune(";&<>()$`\\#*?[]{}~!", char) {
+				return nil, false
+			}
+			word.WriteRune(char)
+			started = true
+		}
+	}
+	if quote != 0 {
+		return nil, false
+	}
+	if started {
+		words = append(words, word.String())
+	}
+	if len(words) == 0 {
+		return nil, false
+	}
+	return append(pipeline, words), true
 }
 
 func intentFromText(toolName, text string, active *Intent) Intent {

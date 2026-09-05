@@ -1,6 +1,6 @@
 ---
 name: workflow-code-review
-description: Statically review a bound production change or test implementation snapshot through a design-first change contract, risk-selected evidence-linked Mermaid models, material-effect coverage, and optional design conformance. Return blocking findings, non-blocking advisories, later-owned deferred items, and a scoped static disposition; production review runs before runtime testing. Not for mapping-only, repair, runtime validation, production test-oracle/evidence review, or Plan/Handoff topology changes.
+description: Statically review a bound production change or test implementation snapshot through a design-first change contract, source-linked path evidence, material-effect coverage, and optional design conformance. Use Mermaid when interacting state, ownership, or failure paths need a visual model. Return blocking findings, non-blocking advisories, later-owned deferred items, and a scoped static disposition; production review runs before runtime testing. Not for mapping-only, repair, runtime validation, production test-oracle/evidence review, or Plan/Handoff topology changes.
 ---
 
 # Workflow Code Review
@@ -9,10 +9,10 @@ description: Statically review a bound production change or test implementation 
 - role: review_gate
 - family: workflow
 - intent_signature: static code review, state/flow/reachability review, dynamic diagrams, optional design conformance, 정적 코드 리뷰
-- use_when: review bound production or test code before PR/integration through source-derived models, with or without an authoritative design baseline.
+- use_when: review bound production or test code before PR/integration through source-linked path evidence, with or without an authoritative design baseline.
 - do_not_use_when: mapping-only (`analysis-codebase-map`), lightweight style/naming feedback, repair, runtime validation, production test-oracle/evidence review, or Plan/Handoff editing is primary.
 - expected_inputs: exact snapshot/diff identity, change intent and material changed effects, review slice, code contracts/invariants, optional accepted architecture/UI/Test Design baseline, Known Bug exclusions, and optional node/round identity
-- expected_outputs: risk-selected Mermaid evidence, review coverage and ceiling, blocking findings, advisories, deferred items, and a standalone or Core static disposition
+- expected_outputs: source-linked path evidence with Mermaid when needed, review coverage and ceiling, blocking findings, advisories, deferred items, and a standalone or Core static disposition
 - context_targets:
   must_read:
     - exact implementation slice, repository instructions, and `references/static_code_review_contract.md`
@@ -34,13 +34,13 @@ description: Statically review a bound production change or test implementation 
     - `references/runtime_debugging_contract.md` when the diff changes crash/dump capture, symbol/build manifests, debugger hooks, dynamic-diagnostic integration, trace/replay capture, graphics validation/markers, or device-loss diagnostics
     - `references/execution_item_contract.md` when node/round identity is supplied or the compact result will cross a Workflow, Coordinator, Plan/Handoff, or plugin boundary
     - `references/testing_stage_contract.md` and `references/testing_strategy_contract.md` when reviewing a Core `test_implementation_result` against a `test_design_result`
-    - load only applicable baseline and references: `references/model-comparison.md` for Mermaid mechanics; `references/finding-handoff.md` for standalone/Core presentation
+    - load only applicable baseline and references: `references/model-comparison.md` when state/owner/failure relationships need a visual model or model-baseline comparison; `references/finding-handoff.md` for standalone/Core presentation
   do_not_load_by_default:
     - unrelated source/design artifacts or runtime evidence
 - risk_profile:
   reads: targeted code and directly relevant contract, baseline, ownership, or rationale evidence
   writes: none; the Coordinator alone records results in Handoff
-  tools: focused static inspection and risk-selected Mermaid construction/rendering
+  tools: focused static inspection and Mermaid construction/rendering only when needed for material relationships
   sensitive_resources: credentials denied; tests/runtime and code/Plan mutation require another owner
 - entry_scene: PREPARE
 
@@ -251,9 +251,11 @@ description: Statically review a bound production change or test implementation 
    the rejected structure would replace, and continue only independent high-consequence risks.
 3. Activate only the risk axes signaled by the change, assign every material effect to them, and
    select enough representative and disconfirming paths to expose each distinct material risk.
-4. Use `references/model-comparison.md` to build the risk-selected source-derived Mermaid model set
-   before disposition and review intrinsic state/flow/propagation/order/failure/reachability
-   properties.
+4. Trace intrinsic state/flow/propagation/order/failure/reachability properties in source-linked
+   prose. When the shared static-review contract requires a visual model of interacting state,
+   ownership, or failure paths, use `references/model-comparison.md` to build only the needed
+   Mermaid views before disposition. A simple semantic change may close with source refs and
+   representative/disconfirming path traces; it retains the same risk coverage and proof ceiling.
 5. When an authoritative baseline exists, add only the relevant conformance comparisons. Record an
    accepted architecture artifact in `artifact_refs`/`evidence_refs`, and record its Core
    `design_result` or `test_design_result` reference when supplied. Preserve any accepted or
@@ -281,13 +283,14 @@ sufficiency, merge readiness, full requirement completion, or product acceptance
 disposition.
 
 ## Output Contract
-For standalone review, return a human-readable report ordered as snapshot/scope, Mermaid evidence,
+For standalone review, return a human-readable report ordered as snapshot/scope, source-linked path evidence,
 coverage and ceiling, blocking findings, advisories, deferred items, and disposition. Do not invent
 Core item IDs, node/round, or Plan fields.
 
 For graph or cross-owner review, return the canonical Core `code_review_result`, including review
 coverage, proof ceiling, advisories, `design_baseline_ref` when a Core `design_result` was consumed,
-and `test_design_baseline_ref` when a Core `test_design_result` was consumed. Keep full diagrams and
-comparison matrices in one anchored artifact and keep the Coordinator/`worker_done` body compact.
+and `test_design_baseline_ref` when a Core `test_design_result` was consumed. Keep full source-path
+analysis and any needed diagrams/comparison matrices in one anchored artifact and keep the
+Coordinator/`worker_done` body compact.
 Never return a transition intent, next node ID, or Plan edit; the execution owner combines the
 disposition with Plan semantic admission and existing edges.

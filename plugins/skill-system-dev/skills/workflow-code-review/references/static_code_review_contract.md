@@ -89,12 +89,22 @@ cancellation/shutdown cleanup, last-consumer reclamation, and any source-permitt
 or affinity dependency. Locks, atomics, dependency edges, and race-free ranges do not by themselves
 prove whole-invariant correctness, forward progress, numerical determinism, or performance.
 
-## Mermaid And Coverage
+Before calling code unreachable, cover applicable entrypoints, exports, interface implementations,
+dependency injection, routes/callbacks, framework/plugin registration, configuration/flags,
+reflection, generated lookup, dynamic dispatch, queues, and subscriptions. If that dispatch surface
+is incomplete, return an `unreachable_candidate` finding or `static_evidence_gap` deferred item with
+the missing evidence; text-search or call-graph absence alone is insufficient. This guard applies
+to prose and diagram evidence equally.
 
-Every produced review retains at least one source-linked Mermaid model covering the highest-risk
-material changed effect. Add complementary views until every activated material axis is visible.
-`model-comparison.md` exclusively owns view type, altitude, labeling, source-linking, and rendering
-mechanics.
+## Review Evidence And Coverage
+
+Use source-linked prose when it makes the material guards, order, owners, effects, and
+representative/disconfirming paths unambiguous. Require source-linked Mermaid only when interacting
+state transitions, ownership transfers, or failure/cancel/rollback paths need a visual model to
+make those relationships reviewable. Add only complementary views needed to expose a distinct
+material relationship. `model-comparison.md` owns view type, altitude, labeling, source-linking,
+and rendering mechanics when a model is needed. Evidence form never reduces risk activation,
+path coverage, or the conditions for disposition.
 
 A representative path and one material disconfirming path are minimum observations, not a coverage
 ceiling. Expand the path set for each materially distinct high-consequence effect or when one path
@@ -104,7 +114,7 @@ failure guarantee.
 Before disposition, assign every material changed effect to all applicable activated axes and at
 least one of:
 
-- a reviewed source path and Mermaid element;
+- a reviewed source path and its prose trace or Mermaid element;
 - a blocking finding;
 - an authorized Known Bug exclusion;
 - a typed deferred item; or
@@ -165,8 +175,14 @@ acceptance.
 ## Task Cases
 
 - **Positive:** a one-line authorization-default change activates `contract_invariant` and
-  `trust_boundary_security`, produces an actor-to-privileged-effect Mermaid path, and becomes a
-  P0/P1 finding when ownership enforcement is absent.
+  `trust_boundary_security`, traces the actor-to-privileged-effect path in source-linked prose or
+  a needed Mermaid view, and becomes a P0/P1 finding when ownership enforcement is absent.
+- **Simple semantic change:** a local range guard has one owner and no interacting state or failure
+  paths. Source refs plus the representative and boundary-counterexample traces can close the
+  review without Mermaid; every changed effect still needs coverage and a static disposition.
+- **Required model:** cancellation races with publication and cleanup across owners. A linear prose
+  trace hides the interacting terminal paths, so retain the source-linked state or sequence view
+  needed to expose the lifetime risk; brevity is not permission to omit that evidence.
 - **Positive advisory:** all material effects are covered and no current defect exists, while an
   evidenced future-drift concern remains. Return `pass` with an advisory and no repair/deferred
   obligation.

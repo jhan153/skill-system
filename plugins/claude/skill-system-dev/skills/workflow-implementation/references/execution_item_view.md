@@ -17,7 +17,7 @@ boundaries. A direct single-owner task may use its ordinary compact output.
 | --- | --- |
 | accepted topology, dependencies, typed edges, and available node IDs | Plan or accepted execution source |
 | current Task State, deferred-item carry, and exact successor | Coordinator/Handoff or the current execution owner when no Coordinator exists |
-| final Known Bug record | Coordinator/Handoff in graph mode; bounded Bug Fix after final local review in standalone mode |
+| final Known Bug record | Coordinator/Handoff for the accepted graph; standalone repair reports task-local unresolved conditions without excluding them |
 | concrete UI design artifact and implementation handoff | `workflow-ui-design` |
 | one explicitly assigned Research-stage node result | `workflow-research` using one selected Research specialist |
 | one assigned debugging-scope or runtime-debugging node result | `workflow-runtime-debugging` |
@@ -142,8 +142,10 @@ use P0/P1/P2, tight code refs, current impact, a mandatory repair `required_cond
 optional non-normative solution. Advisories never change disposition or create repair/deferred
 authority. `pass` requires empty findings, deferred refs, and material-unassessed coverage; it is
 limited to the declared static review ceiling and is not runtime, test, merge, or product approval.
-Every cross-owner `code_review_result` envelope includes at least one `artifact_refs` entry for the
-source-linked Mermaid review artifact required by the static Code Review contract.
+Every cross-owner `code_review_result` envelope includes at least one `artifact_refs` entry for its
+source-linked review evidence. That artifact may use text for a directly traceable path; include
+Mermaid when the static Code Review contract requires it to make material relationships reviewable.
+Changing presentation never reduces coverage or the static proof ceiling.
 
 `repair_required` classifies the reviewed snapshot; it does not classify the next write as Bug Fix.
 The Coordinator compares each finding's required condition with the Plan's positive objective and
@@ -155,7 +157,7 @@ The reviewer never chooses that successor, and an optional solution never author
 
 ### `bug_fix_result`
 
-Producer: `workflow-bug-fix`. Consumers: Code Review and the execution owner.
+Producer: `workflow-bug-fix` for an assigned DAG repair. Consumers: Code Review and the execution owner.
 
 ```yaml
 payload:
@@ -181,11 +183,16 @@ findings; `A2` requires an assigned BF2 plus concrete `CR1 repair_required` find
 mismatch produces no card or attempt. Attempt status is an observation, not a review disposition or
 permission to continue. A no-change result does not create an empty review or retry cycle.
 
+Standalone repair uses task-local numbered intervention history and unresolved-condition reporting
+under its own evidence-gated continuation rule. Do not force that history into A1/A2 Core fields,
+truncate it to fit the schema, or turn it into a graph exclusion. A later graph admits its own
+baseline and assigned repair nodes; a local result does not create them.
+
 ### `known_bug_record`
 
-Producer: Coordinator/Handoff in graph mode; in standalone mode, the bounded Bug Fix owner may
-produce it after its own final local review. Consumers: current review/test/validation owners and
-the next Waterfall.
+Producer: Coordinator/Handoff after the accepted graph's bounded repair and terminal review.
+Consumers: current review/test/validation owners and the next Waterfall. Standalone repair does
+not produce this exclusion card; its unresolved conditions remain task-local and visible.
 
 ```yaml
 payload:

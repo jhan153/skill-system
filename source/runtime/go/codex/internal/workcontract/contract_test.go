@@ -350,6 +350,112 @@ func TestPreflightAndContinuationPreserveContractID(t *testing.T) {
 	}
 }
 
+func TestSourceInspectionDoesNotInheritExcludedValidationIntent(t *testing.T) {
+	t.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", t.TempDir())
+	const sessionID = "source-inspection"
+	if _, active, err := Capture(sessionID, "/goal implement the parser"); err != nil || !active {
+		t.Fatalf("active=%v err=%v", active, err)
+	}
+	plan := json.RawMessage(`{"plan":[{"step":"run the tests","status":"in_progress"}]}`)
+	if decision, err := Preflight(sessionID, "update_plan", plan); err != nil || decision.Deny {
+		t.Fatalf("plan decision=%#v err=%v", decision, err)
+	}
+	before, _, err := Capture(sessionID, "검증은 내가 할게")
+	if err != nil || before.ActiveIntent == nil || before.ActiveIntent.Class != ActionAgentValidation {
+		t.Fatalf("missing retained validation intent: err=%v state=%#v", err, before)
+	}
+
+	// The User Work Contract reserves source-reading prerequisites for core
+	// work; validation_artifact means artifacts created to validate.
+	cases := []struct {
+		name    string
+		tool    string
+		field   string
+		command string
+	}{
+		{"original rg search", "Bash", "command", "rg -n 'validation|harness' source/runtime/go/codex/internal/workcontract/contract.go"},
+		{"Bash read", "Bash", "command", "cat source/validation/harness.go"},
+		{"namespaced command", "functions.exec_command", "cmd", "cat source/core.go"},
+		{"sed range", "shell_command", "cmd", "sed -n '1,80p' source/validation/harness.go"},
+		{"sed final range", "exec_command", "cmd", "sed -n '10,$p' source/validation/harness.go"},
+		{"quoted literal", "exec_command", "cmd", "rg --no-config -n 'validation; $(harness)' source"},
+		{"option argument", "exec_command", "cmd", "rg --no-config -g '*_test.go' -e 'validation|harness' source"},
+		{"option terminator", "exec_command", "cmd", "rg --no-config -- '--pre=validation-harness' source"},
+		{"absolute reader", "exec_command", "cmd", "/bin/cat 'source/validation harness.go'"},
+		{"numbered source", "Bash", "command", "nl -ba source/validation/harness.go"},
+		{"numbered range pipeline", "Bash", "command", "sed -n '1,80p' source/validation/harness.go | nl -ba"},
+		{"three reader stages", "Bash", "command", "cat source/validation/harness.go | sed -n '1,80p' | nl -ba"},
+		{"quoted pipe in reader pipeline", "Bash", "command", "rg -n 'validation|harness' source | nl -ba"},
+	}
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			raw, err := json.Marshal(map[string]any{
+				testCase.field:  testCase.command,
+				"justification": "Inspect validation harness source before implementation.",
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			decision, err := Preflight(sessionID, testCase.tool, raw)
+			if err != nil || decision.Deny || decision.Rewrite {
+				t.Fatalf("source inspection was excluded: decision=%#v err=%v", decision, err)
+			}
+		})
+	}
+	after, err := Load(sessionID)
+	if err != nil || !reflect.DeepEqual(after, before) {
+		t.Fatalf("source inspection changed contract state: err=%v before=%#v after=%#v", err, before, after)
+	}
+}
+
+func TestSourceInspectionExceptionPreservesExcludedActions(t *testing.T) {
+	t.Setenv("SKILL_SYSTEM_HARNESS_STATE_DIR", t.TempDir())
+	cases := []struct {
+		name  string
+		tool  string
+		input map[string]any
+		class string
+	}{
+		{"validation execution", "exec_command", map[string]any{"cmd": "pytest tests/test_parser.py"}, ActionAgentValidation},
+		{"test authoring", "apply_patch", map[string]any{"patch": "*** Begin Patch\n*** Add File: tests/parser_test.go\n+package tests\n*** End Patch"}, ActionTestAuthoring},
+		{"artifact creation", "exec_command", map[string]any{"cmd": "mkdir validation-harness"}, ActionValidationArtifact},
+		{"compound execution", "exec_command", map[string]any{"cmd": "cat source/core.go && run the tests"}, ActionAgentValidation},
+		{"reader later in command", "exec_command", map[string]any{"cmd": "run the tests; cat source/core.go"}, ActionAgentValidation},
+		{"pipeline execution", "exec_command", map[string]any{"cmd": "cat source/core.go | validation-harness"}, ActionValidationArtifact},
+		{"pipeline starts with execution", "exec_command", map[string]any{"cmd": "validation-harness | nl -ba"}, ActionValidationArtifact},
+		{"pipeline executes middle stage", "exec_command", map[string]any{"cmd": "cat source/core.go | validation-harness | nl -ba"}, ActionValidationArtifact},
+		{"pipeline executes sed stage", "exec_command", map[string]any{"cmd": "cat source/core.go | sed -n '1e validation-harness' | nl -ba"}, ActionValidationArtifact},
+		{"compound after read pipeline", "exec_command", map[string]any{"cmd": "sed -n '1,80p' source/core.go | nl -ba && run the tests"}, ActionAgentValidation},
+		{"logical or is not a read pipe", "exec_command", map[string]any{"cmd": "cat source/validation/harness.go || nl -ba source/core.go"}, ActionValidationArtifact},
+		{"redirected read pipeline", "exec_command", map[string]any{"cmd": "cat source/core.go | nl -ba > validation-harness.go"}, ActionValidationArtifact},
+		{"command substitution", "exec_command", map[string]any{"cmd": "cat $(validation-harness)"}, ActionValidationArtifact},
+		{"double quoted substitution", "exec_command", map[string]any{"cmd": "cat \"$(validation-harness)\""}, ActionValidationArtifact},
+		{"redirected artifact", "exec_command", map[string]any{"cmd": "cat source/core.go > validation-harness.go"}, ActionValidationArtifact},
+		{"sed in place", "exec_command", map[string]any{"cmd": "sed -i 's/validation/harness/g' source/core.go"}, ActionValidationArtifact},
+		{"sed executable script", "exec_command", map[string]any{"cmd": "sed -n '1e validation-harness' source/core.go"}, ActionValidationArtifact},
+		{"sed script file", "exec_command", map[string]any{"cmd": "sed -n '1,80p' -f validation-harness.sed source/core.go"}, ActionValidationArtifact},
+		{"rg preprocessor", "exec_command", map[string]any{"cmd": "rg --no-config --pre validation-harness query source"}, ActionValidationArtifact},
+		{"custom executable", "exec_command", map[string]any{"cmd": "/bin/../custom/cat validation-harness.go"}, ActionValidationArtifact},
+		{"custom shell", "exec_command", map[string]any{"cmd": "cat source/validation/harness.go", "shell": "custom-shell"}, ActionValidationArtifact},
+	}
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			sessionID := t.Name()
+			if _, active, err := Capture(sessionID, "검증은 내가 할게"); err != nil || !active {
+				t.Fatalf("active=%v err=%v", active, err)
+			}
+			raw, err := json.Marshal(testCase.input)
+			if err != nil {
+				t.Fatal(err)
+			}
+			decision, err := Preflight(sessionID, testCase.tool, raw)
+			if err != nil || !decision.Deny || decision.Intent.Class != testCase.class {
+				t.Fatalf("excluded action became runnable: decision=%#v err=%v", decision, err)
+			}
+		})
+	}
+}
+
 func restrictedStateWithRuntimeHistory(t *testing.T, sessionID string) State {
 	t.Helper()
 	_, active, err := Capture(sessionID, "/goal 무인 장시간 작업으로 검증은 내가 하고 질문하지 마")

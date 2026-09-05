@@ -52,7 +52,7 @@ and non-blocking improvements are omitted or advisory, never durable deferred wo
 Return ordinary review prose in this order:
 
 1. snapshot and review slice;
-2. source-linked Mermaid evidence;
+2. source-linked representative/disconfirming path evidence, including Mermaid only when needed;
 3. material-effect/risk coverage and static proof ceiling;
 4. blocking findings ordered by priority;
 5. advisories;
@@ -71,7 +71,7 @@ deferred-item refs, exclusions, and artifact/evidence anchors. The execution own
 implementation/method contract, and applies only an existing edge; this review emits no transition
 intent or successor.
 
-Keep full Mermaid diagrams, comparison matrices, and source analysis in one anchored artifact.
+Keep full source-path analysis and any needed Mermaid diagrams or comparison matrices in one anchored artifact.
 The Coordinator/`worker_done` body contains only node/round when applicable, disposition, compact
 finding/advisory/deferred summaries, Known Bug exclusions, artifact anchor, and required timing.
 

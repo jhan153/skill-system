@@ -53,12 +53,12 @@ rejects a candidate; do not combine several archetypes to avoid making a decisio
 
 | Archetype | Use when | Required mechanism | Disqualifier / switch condition |
 |---|---|---|---|
-| `single_node_execution` | One bounded executable task needs durable pause/resume or handoff state, but has one execution owner and no independent downstream work node. | Baseline → one executable node → close or user-verification handoff, using the canonical Plan/Handoff pair as the only state and no external runner. | A separate design, review, repair, verifier, or second production owner is mandatory → `phase_gate_delivery` or `dependency_incremental`; a feedback cycle is intrinsic → `risk_spiral`; external-state transition dominates → `controlled_transition`. |
-| `phase_gate_delivery` | The design direction is selected, phase ownership is efficient, and the preferred path is design/implementation → static review → human-test-ready termination. | Waterfall-derived phase gates with lock-safe fan-out inside design/implementation, mandatory fan-in static review, bounded pre-handoff repair/re-review, and a terminal package for later human Test. | A dominant unknown blocks design → `risk_spiral`; genuine cross-increment fan-out/fan-in dominates → `dependency_incremental`; formal paired traceability dominates → `assurance_v`; persistent-state transition dominates → `controlled_transition`. |
-| `dependency_incremental` | Cross-module behavior is selected, dependencies are mostly known, and delivery can be split into observable increments. | Dependency-ordered work nodes, lock-safe parallelism, fan-in integration, and matching verification for every increment. | A dominant unknown blocks production shape → `risk_spiral`; formal paired traceability dominates → `assurance_v`; irreversible state transition dominates → `controlled_transition`. |
-| `risk_spiral` | Problem, algorithm, performance path, UX behavior, or architecture choice remains materially uncertain. | Risk ranking, one falsifiable hypothesis, bounded prototype/measurement, decision gate, and a finite rewrite budget before production. | The behavior and boundary are already selected → `dependency_incremental`; mandatory development-to-verification traceability → `assurance_v`; release/migration side effects dominate → `controlled_transition`. |
-| `assurance_v` | High-assurance, security/auth, safety, regulated, hardware-contract, or accepted-plan work requires each development contract to have a paired verification owner and evidence path. | Contract decomposition on the left, implementation at the base, paired unit/integration/acceptance verification on the right, and bounded repair/reverification. | No material assurance or traceability requirement exists → `dependency_incremental`; the method is still unknown → `risk_spiral`. |
-| `controlled_transition` | Release, deployment, schema/data migration, destructive operation, or external-state transition requires approval, rollback, staged execution, and readback. | Preflight, approval/backup/rollback readiness, canary or bounded batch, readback, advance-or-rollback decision, and close approval. | No persistent/external state transition exists → `dependency_incremental`; the transition design itself is unresolved → `risk_spiral` first. |
+| [`single_node_execution`](graph-archetypes/single_node_execution.md) | One bounded executable task needs durable pause/resume or handoff state, but has one execution owner and no independent downstream work node. | Baseline → one executable node → close or user-verification handoff, using the canonical Plan/Handoff pair as the only state and no external runner. | A separate design, review, repair, verifier, or second production owner is mandatory → `phase_gate_delivery` or `dependency_incremental`; a feedback cycle is intrinsic → `risk_spiral`; external-state transition dominates → `controlled_transition`. |
+| [`phase_gate_delivery`](graph-archetypes/phase_gate_delivery.md) | The design direction is selected, phase ownership is efficient, and the preferred path is design/implementation → static review → human-test-ready termination. | Waterfall-derived phase gates with lock-safe fan-out inside design/implementation, mandatory fan-in static review, bounded pre-handoff repair/re-review, and a terminal package for later human Test. | A dominant unknown blocks design → `risk_spiral`; genuine cross-increment fan-out/fan-in dominates → `dependency_incremental`; formal paired traceability dominates → `assurance_v`; persistent-state transition dominates → `controlled_transition`. |
+| [`dependency_incremental`](graph-archetypes/dependency_incremental.md) | Cross-module behavior is selected, dependencies are mostly known, and delivery can be split into observable increments. | Dependency-ordered work nodes, lock-safe parallelism, fan-in integration, and matching verification for every increment. | A dominant unknown blocks production shape → `risk_spiral`; formal paired traceability dominates → `assurance_v`; irreversible state transition dominates → `controlled_transition`. |
+| [`risk_spiral`](graph-archetypes/risk_spiral.md) | Problem, algorithm, performance path, UX behavior, or architecture choice remains materially uncertain. | Risk ranking, one falsifiable hypothesis, bounded prototype/measurement, decision gate, and a finite rewrite budget before production. | The behavior and boundary are already selected → `dependency_incremental`; mandatory development-to-verification traceability → `assurance_v`; release/migration side effects dominate → `controlled_transition`. |
+| [`assurance_v`](graph-archetypes/assurance_v.md) | High-assurance, security/auth, safety, regulated, hardware-contract, or accepted-plan work requires each development contract to have a paired verification owner and evidence path. | Contract decomposition on the left, implementation at the base, paired unit/integration/acceptance verification on the right, and bounded repair/reverification. | No material assurance or traceability requirement exists → `dependency_incremental`; the method is still unknown → `risk_spiral`. |
+| [`controlled_transition`](graph-archetypes/controlled_transition.md) | Release, deployment, schema/data migration, destructive operation, or external-state transition requires approval, rollback, staged execution, and readback. | Preflight, approval/backup/rollback readiness, canary or bounded batch, readback, advance-or-rollback decision, and close approval. | No persistent/external state transition exists → `dependency_incremental`; the transition design itself is unresolved → `risk_spiral` first. |
 
 Small one-session patches and ordinary bug fixes do not need this durable pair. Route them to
 the direct task workflow or `plan-task-handoff`. Use `single_node_execution` only when one task
@@ -100,102 +100,11 @@ slices may overlap when the typed DAG records that independence. Every required 
 before Static Review; the current Waterfall terminates when its human-Test transition package is
 ready.
 
-## Archetype Examples
+## Selected Archetype Detail
 
-### `single_node_execution`
-
-```mermaid
-flowchart TD
-    R0["Baseline"] --> N0["One executable workflow node"]
-```
-
-`N0` owns its bounded production or artifact outcome and returns its normal compact result. The
-Coordinator applies the only existing edge and records completion or user-verification handoff in
-the canonical pair. An assurance mode may attach to `N0`, but it is not another node. If a
-separate review, repair, verifier, or second owner becomes required, stop this profile and use
-Scope Admission for a new appropriate pair; never introduce a runner or hidden subgraph.
-
-### `phase_gate_delivery`
-
-```mermaid
-flowchart TD
-    R0["Baseline"] --> D0["Design"]
-    D0 --> C0["Implementation"]
-    C0 --> CR0["Static review"]
-    CR0 --> T0["Human-test-ready transition"]
-```
-
-Static review is mandatory but need not be a separately instantiated independent reviewer. Use
-the implementation owner, Coordinator, or a declared review owner according to the plan; require
-a fresh independent reviewer only when the current user or a higher-priority contract requires
-one. Agent-side checks before handoff are supporting evidence, not this Test phase. A semantically
-admitted bounded repair that preserves the accepted implementation/method contract may append only
-the `BF1 -> CR1 -> BF2 -> CR2` nodes authorized by the current rewrite budget before `T0`.
-`repair_required` alone is not BF authority. When the required positive work is first implementation
-or explicit production-mechanism replacement, use an existing or Plan-corrected `C -> CR`
-continuation; without an authorized edge, escalate for Plan revision and consume no BF budget.
-A later human test result always starts a new Waterfall; never append it to this DAG, create an
-unbounded back-edge, or keep an agent waiting for the user.
-
-### `dependency_incremental`
-
-```mermaid
-flowchart TD
-    R0["Baseline"] --> C1["Increment A"]
-    R0 --> C2["Increment B"]
-    C1 --> I0["Fan-in integration"]
-    C2 --> I0
-    I0 --> V0["Integrated verification"]
-    V0 --> H0["Acceptance gate"]
-```
-
-Parallel increments require disjoint lock scopes. Each increment has an observable output and
-matching verification owner; fan-in cannot begin until all required predecessors complete.
-
-### `risk_spiral`
-
-```mermaid
-flowchart TD
-    R0["Baseline and largest risk"] --> D1["Hypothesis decision"]
-    D1 --> P1["Bounded prototype"]
-    P1 --> V1["Measurement"]
-    V1 --> D2["Risk review"]
-    D2 --> C1["Selected production slice"]
-```
-
-If `D2` selects another cycle, append `D3 → P2 → V2 → D4` only when rewrite budget remains.
-The prototype is not production evidence, and failure to discriminate escalates instead of
-creating unbounded continuation.
-When verifier feedback is intended to select another action, also apply
-`repeated-work-principles.md`; activity without a condition/evidence delta is not another cycle.
-
-### `assurance_v`
-
-```mermaid
-flowchart TD
-    R0["Accepted requirement"] --> D1["Architecture contract"]
-    D1 --> C1["Implementation"]
-    C1 --> V1["Unit verification"]
-    V1 --> V2["Integration verification"]
-    V2 --> H0["Acceptance authority gate"]
-```
-
-Use Typed Edges to record which contract is `verified_by` which node. Maker self-report cannot
-replace the evidence path required by the accepted assurance contract.
-
-### `controlled_transition`
-
-```mermaid
-flowchart TD
-    R0["Preflight"] --> G1["Approval and rollback ready"]
-    G1 --> C1["Canary or bounded batch"]
-    C1 --> V1["Readback"]
-    V1 --> D1["Advance or rollback"]
-    D1 --> H0["Close approval"]
-```
-
-No irreversible step runs before approval and rollback readiness. Each batch has direct
-readback; a failed readback selects rollback or stop, never automatic continuation.
+After applying the full Selection Gate, read the selected archetype file linked in its row.
+Those files retain the topology, failure, and transition rules for that archetype; unrelated
+examples are not needed. The common rules in this file still apply to every selected graph.
 
 ## Typed Edge Vocabulary
 

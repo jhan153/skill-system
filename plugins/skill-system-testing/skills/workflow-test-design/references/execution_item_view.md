@@ -17,7 +17,7 @@ boundaries. A direct single-owner task may use its ordinary compact output.
 | --- | --- |
 | accepted topology, dependencies, typed edges, and available node IDs | Plan or accepted execution source |
 | current Task State, deferred-item carry, and exact successor | Coordinator/Handoff or the current execution owner when no Coordinator exists |
-| final Known Bug record | Coordinator/Handoff in graph mode; bounded Bug Fix after final local review in standalone mode |
+| final Known Bug record | Coordinator/Handoff for the accepted graph; standalone repair reports task-local unresolved conditions without excluding them |
 | concrete UI design artifact and implementation handoff | `workflow-ui-design` |
 | one explicitly assigned Research-stage node result | `workflow-research` using one selected Research specialist |
 | one assigned debugging-scope or runtime-debugging node result | `workflow-runtime-debugging` |

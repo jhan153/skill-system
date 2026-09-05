@@ -1,6 +1,6 @@
 # Static Review Model Reference
 
-Load only for code-derived model construction, dynamic view selection, intrinsic static checks, or optional baseline comparison.
+Load only when interacting state, ownership, or failure paths need a code-derived visual model, or an accepted baseline comparison needs that model.
 
 ## Build The Code-Derived Model
 
@@ -13,10 +13,11 @@ Load only for code-derived model construction, dynamic view selection, intrinsic
 
 ## Select Views Dynamically
 
-Choose the minimum complementary set that exposes every activated material risk. At least one
-source-linked Mermaid model covering the highest-risk material changed effect is mandatory for a
-produced review; no particular diagram type or baseline/implementation pair is mandatory by
-template.
+Apply `references/static_code_review_contract.md` to decide whether a visual model is needed.
+Source-linked prose may complete a simple review without loading this reference. When a model is
+needed, choose the minimum complementary set that exposes the interacting material relationships;
+no particular diagram type or baseline/implementation pair is mandatory by template. Keep every
+activated material risk covered by a source-path trace or model element.
 
 | View | Static review question | Altitude | Mermaid |
 | --- | --- | --- | --- |
@@ -65,7 +66,8 @@ No baseline means no conformance rows; it does not reduce the intrinsic review d
 
 ## Reachability Guard
 
-Before calling code unreachable, cover applicable entrypoints, exports, interface implementations, dependency injection, routes/callbacks, framework/plugin registration, configuration/flags, reflection, generated lookup, dynamic dispatch, queues, and subscriptions. If that dispatch surface is incomplete, return an `unreachable_candidate` finding or `static_evidence_gap` deferred item with the missing evidence; text-search or call-graph absence alone is insufficient.
+Apply the reachability guard in `references/static_code_review_contract.md`; a diagram never
+substitutes for checking the applicable dispatch and registration surface.
 
 ## Render Evidence
 

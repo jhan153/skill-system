@@ -1,7 +1,7 @@
 interface:
   display_name: "Workflow Code Review"
-  short_description: "Risk-based static review with Mermaid evidence"
-  default_prompt: "Use $workflow-code-review to bind the implementation change contract, run design-first risk selection, build source-linked Mermaid evidence, account for every material changed effect, and return a scoped standalone or Core static disposition."
+  short_description: "Risk-based static review with source-linked path evidence"
+  default_prompt: "Use $workflow-code-review to bind the implementation change contract, run design-first risk selection, trace source-linked representative and disconfirming paths, use Mermaid when interacting state/owner/failure relationships need a visual model, account for every material changed effect, and return a scoped standalone or Core static disposition."
 
 policy:
   allow_implicit_invocation: true
