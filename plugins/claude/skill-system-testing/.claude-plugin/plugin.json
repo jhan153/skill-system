@@ -1,6 +1,6 @@
 {
   "name": "skill-system-testing",
-  "version": "10.2.3",
+  "version": "10.3.0",
   "description": "Skill System testing — human-in-loop oracle discovery, test design, test-only implementation, test-scoped diagnostic artifact capture, replay/visual/statistical evidence, and false-green review.",
   "author": {
     "name": "Skill System Maintainers"

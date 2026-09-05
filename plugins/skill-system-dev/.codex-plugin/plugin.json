@@ -1,6 +1,6 @@
 {
   "name": "skill-system-dev",
-  "version": "10.2.3",
+  "version": "10.3.0",
   "description": "Skill System dev — engineering analysis, runtime debugging, architecture design, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.",
   "author": {
     "name": "Skill System Maintainers"

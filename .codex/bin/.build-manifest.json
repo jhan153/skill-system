@@ -1,10 +1,10 @@
 {
   "groups": {
     "go:skill-system-harness": {
-      "build_key": "6b184d83502786b74e60307f3add383f6c5b95731d91a11e21752024a1235df8",
+      "build_key": "4217ea9b5ef9553f50ba887c2c6a023b811969022af8dfbaee5d13c7cafc3bd5",
       "outputs": {
-        "skill-system-harness": "2037336a4381bc347e6210ce636b5eaed9f386f0fec019cafa5518e51471f2fe",
-        "skill-system-harness.exe": "3d6848ecab1c2be39947213b57cfae71d83b4e82e775188a7a209e55d91fa491"
+        "skill-system-harness": "177360e483e8746e1166e1feef89414cb264e3aa83d4528940fede777feeaf9d",
+        "skill-system-harness.exe": "b25128912c2ed608f409d0cfa2db024bd70f36b9a24baa0fd630260161b2619b"
       }
     },
     "swift:notification-overlay": {

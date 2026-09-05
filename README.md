@@ -12,10 +12,12 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 10.2.3 Release
+## 10.3.0 Release
 
-This source tree is the 10.2.3 positive-output workflow-routing release on the breaking 10.0 baseline. Its current components
-are:
+This source tree is the 10.3.0 context-scoped planning and evidence-gated execution release on the
+breaking 10.0 baseline. It keeps shared multi-agent safeguards while loading only the selected
+graph's details, supports evidence-gated standalone repair, and distinguishes source inspection
+from excluded validation work. Its current components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -188,6 +190,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 10.2.1 | Codex runtime policy maintenance | Removes the obsolete Codex execution guard, keeps ordinary command selection and host approval in their owning layers, and simplifies the Codex hook/work-contract integration. |
 | 10.2.2 | Codex managed approval defaults | Documents the admin-managed Auto-review default and the full-restart/new-task requirement for effective-setting verification; this repository snapshot retained the 10.2.1 bundle identity. |
 | 10.2.3 | Positive-output workflow routing | Routes accepted production-mechanism replacements to Implementation even when failures motivate them, limits Bug Fix to same-contract bounded repairs, and makes Plan/Review/Coordinator transitions enforce that distinction. |
+| 10.3.0 | Scoped context and evidence-gated execution | Centralizes skill-local routing and resource declarations, narrows planning context to the selected graph, makes standalone repair and review evidence proportional, and adds goal-scoped Work Contract generations, task working state, source-inspection classification, and Grok notification forwarding. |
 
 ## License
 

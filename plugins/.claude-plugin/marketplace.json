@@ -9,35 +9,35 @@
       "name": "skill-system-core",
       "source": "./claude/skill-system-core",
       "description": "Skill System core — shared operational platform for routing, planning, execution handoff, memory/knowledge, evidence, and all report delivery.",
-      "version": "10.2.3",
+      "version": "10.3.0",
       "category": "Developer Tools"
     },
     {
       "name": "skill-system-design",
       "source": "./claude/skill-system-design",
       "description": "Skill System design — UI design creation, design-to-code implementation, design systems, layout/component mapping, and visual/accessibility evidence.",
-      "version": "10.2.3",
+      "version": "10.3.0",
       "category": "Developer Tools"
     },
     {
       "name": "skill-system-dev",
       "source": "./claude/skill-system-dev",
       "description": "Skill System dev — engineering analysis, runtime debugging, architecture design, prototyping, implementation, bounded bug repair, static code review, refactoring, and behavior discovery.",
-      "version": "10.2.3",
+      "version": "10.3.0",
       "category": "Developer Tools"
     },
     {
       "name": "skill-system-research",
       "source": "./claude/skill-system-research",
       "description": "Skill System research — explicit Research node execution, literature, hypothesis, experiment, statistics, manuscript, review, and paper evidence.",
-      "version": "10.2.3",
+      "version": "10.3.0",
       "category": "Developer Tools"
     },
     {
       "name": "skill-system-testing",
       "source": "./claude/skill-system-testing",
       "description": "Skill System testing — human-in-loop oracle discovery, test design, test-only implementation, test-scoped diagnostic artifact capture, replay/visual/statistical evidence, and false-green review.",
-      "version": "10.2.3",
+      "version": "10.3.0",
       "category": "Developer Tools"
     }
   ]

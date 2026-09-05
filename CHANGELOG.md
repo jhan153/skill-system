@@ -1,5 +1,28 @@
 # Changelog
 
+## 10.3.0
+
+- Centralized skill identity, family, routing, and resource declarations in canonical skill-local
+  Routing Cards. Registry/routing views and provider packages now derive from those declarations.
+- Reduced Execution Handoff context to common safeguards plus selected archetype, role, node,
+  input, and reachable result-kind details. Split six archetype examples into conditional references
+  while preserving finite graphs, lock safety, event-driven lifecycle, failure recovery, and Human
+  Test authority. Planned failure, repair, deferred, and terminal paths remain part of context admission.
+- Replaced the universal two-intervention cap in standalone Bug Fix with evidence-gated
+  continuation and explicit stop rules. Assigned DAG BF1/BF2 budgets remain unchanged; standalone
+  attempts and unresolved conditions stay task-local instead of producing graph exclusion cards.
+- Allowed source-linked prose to complete directly traceable static reviews. Mermaid remains
+  required when interacting state, ownership, or failure relationships need a visual model;
+  material-effect coverage and static proof ceilings remain unchanged.
+- Added goal-scoped Work Contract generations: explicit goal/rebind starts a fresh generation,
+  reset clears it, and ordinary same-goal updates and compaction preserve its identity. Added
+  bounded task working state for material ambiguity, dependent decisions, and evidence freshness.
+- Corrected Codex source-inspection classification for ordinary cat/rg/sed/nl reads and pure read
+  pipelines without relaxing excluded validation execution or artifact creation. Host execution
+  permissions remain separate. Added Grok native notification forwarding.
+- Advanced all five Codex and Claude plugin profiles and all four generated provider harness
+  identities to 10.3.0. Model-role defaults and live runtime/plugin installation are outside this cut.
+
 ## 10.2.3
 
 - Changed behavior-changing workflow selection to classify the positive production output and
