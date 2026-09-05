@@ -7,6 +7,7 @@ description: Restructure production code in small reversible batches while prese
 
 ## Routing Card
 - role: primary
+- family: workflow
 - intent_signature:
   - safe/behavior-preserving refactor; rename/move/extract/collapse; 안전한 리팩터링
 - use_when:
@@ -37,6 +38,90 @@ description: Restructure production code in small reversible batches while prese
   sensitive_resources: deny credentials and raw production data
 - entry_scene:
   - PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/boundary_decision_contract.md",
+    "target": "references/boundary_decision_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/bug_fix_result.md",
+    "target": "references/core-execution-items-v1/cards/bug_fix_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/code_review_result.md",
+    "target": "references/core-execution-items-v1/cards/code_review_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/deferred_item.md",
+    "target": "references/core-execution-items-v1/cards/deferred_item.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/known_bug_candidate.md",
+    "target": "references/core-execution-items-v1/cards/known_bug_candidate.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/known_bug_record.md",
+    "target": "references/core-execution-items-v1/cards/known_bug_record.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/schemas/execution/execution-item.schema.json",
+    "target": "references/execution-item.schema.json",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/execution_assurance_contract.md",
+    "target": "references/execution_assurance_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/execution_item_contract.md",
+    "target": "references/execution_item_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/identifier_readability_principle.md",
+    "target": "references/identifier_readability_principle.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/maintainable_code_principles.md",
+    "target": "references/maintainable_code_principles.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Core Cards
 

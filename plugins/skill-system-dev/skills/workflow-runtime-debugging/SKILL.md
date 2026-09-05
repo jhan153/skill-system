@@ -8,6 +8,7 @@ description: Define an execution-ready debugging scope or directly investigate o
 ## Routing Card
 
 - role: execution_primary
+- family: analysis
 - intent_signature:
   - debugging scope, live debugger operation, crash/core/minidump analysis, symbol and unwind validation, watchpoint or record/replay diagnosis, graphics/device-loss debugging, runtime root cause; 디버깅 범위, 디버거, 덤프, 심볼, 런타임 원인 규명
 - use_when:

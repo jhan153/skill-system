@@ -7,6 +7,7 @@ description: Create a concrete, inspectable UI design from accepted requirements
 
 ## Routing Card
 - role: execution_primary
+- family: design
 - intent_signature: create UI design, screen visual design, requirements-to-mockup, 화면 디자인 제작
 - use_when:
   - accepted requirements or behavior need a concrete screen/component design artifact
@@ -38,6 +39,69 @@ description: Create a concrete, inspectable UI design from accepted requirements
   tools: visual/design artifact authoring and bounded rendering or inspection within current authority
   sensitive_resources: authenticated design tools, private assets, and external publishing require explicit authority
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/design_result.md",
+    "target": "references/core-execution-items-v1/cards/design_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/design_evidence_contract.md",
+    "target": "references/design_evidence_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/design_stage_contract.md",
+    "target": "references/design_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/schemas/execution/execution-item.schema.json",
+    "target": "references/execution-item.schema.json",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/execution_item_contract.md",
+    "target": "references/execution_item_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/layout_constraint_contract.md",
+    "target": "references/layout_constraint_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/product_family_design_contract.md",
+    "target": "references/product_family_design_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/visual_decision_contract.md",
+    "target": "references/visual_decision_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Core Cards
 

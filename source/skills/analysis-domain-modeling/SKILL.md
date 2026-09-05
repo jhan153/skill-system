@@ -7,6 +7,7 @@ description: Clarify domain language, identity, state transitions, invariants, a
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature:
   - domain modeling, ubiquitous language, identity/value/state boundary, invariant, business rule, or naming decision
 - use_when:
@@ -32,6 +33,20 @@ description: Clarify domain language, identity, state transitions, invariants, a
   sensitive_resources: deny credentials and production data
 - entry_scene:
   - PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/boundary_decision_contract.md",
+    "target": "references/boundary_decision_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Evidence And Modeling Rules
 - Ground each rule in an explicit user decision, canonical policy/schema, current production owner/path, or observed behavior; name the source. Tests and fixtures show what they encode but are not independent business oracles, especially when agent-authored.

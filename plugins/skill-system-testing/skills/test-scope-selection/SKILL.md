@@ -8,6 +8,7 @@ description: Select the smallest real SUT boundary and multi-axis test profile t
 ## Routing Card
 
 - role: test_design_specialist
+- family: testing
 - intent_signature: test boundary, test level, SUT selection, unit versus integration versus system
 - use_when: a named condition has materially competing SUT boundaries, observation boundaries, or test-level/profile classifications
 - do_not_use_when: the boundary is already accepted, production module design is open, test scenarios/oracles are primary, or implementation is requested

@@ -7,6 +7,7 @@ description: Rank evidence-backed improvements across deep modules, seams, adapt
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature: ranked architecture-improvement or deep-module opportunity scan
 - use_when: rank several improvements in a workflow, module cluster, or explicit broad scope before selecting one.
 - do_not_use_when:

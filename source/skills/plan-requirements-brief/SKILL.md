@@ -7,6 +7,7 @@ description: Distill discovery notes or decisions into a concise requirements co
 
 ## Routing Card
 - role: primary
+- family: planning
 - intent_signature: requirements contract, PRD, SRS-lite, or interview distillation
 - use_when: the user explicitly asks to stabilize supplied discovery/decisions before planning
 - do_not_use_when: elicitation, active-plan sync, packaging, implementation, validation execution, or lifecycle reporting is primary
@@ -15,6 +16,20 @@ description: Distill discovery notes or decisions into a concise requirements co
 - context_targets: read supplied decision evidence; load `references/execution_handoff_input_contract.md` when package-bound, the contract/criteria templates for structured output, and only narrow canonical docs needed for compatibility claims
 - risk_profile: read-only by default; when an associated package or explicit persistence request is supplied, write only `<package-root>/inputs/requirements-contract.yaml`; exclude full repo/memory, raw transcript duplication, unrelated logs, credentials, and secrets
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/execution_handoff_input_contract.md",
+    "target": "references/execution_handoff_input_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Contract Boundary
 Own `discovery -> requirements_contract` only when goals, scope, non-goals, assumptions, and observable criteria need no invented product decision. Keep it `proposed` until accepted or explicitly adopted downstream; never relabel it as an active plan, feasibility proof, implementation readiness, or approval.

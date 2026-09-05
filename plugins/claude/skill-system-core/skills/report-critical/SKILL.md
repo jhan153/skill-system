@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: report_primary
+- family: report
 - intent_signature: explicit blocker report, critical review report, risk report, QA gate report
 - use_when:
   - the user explicitly requests a critical/blocker/risk/QA report or an accepted Plan assigns that report condition

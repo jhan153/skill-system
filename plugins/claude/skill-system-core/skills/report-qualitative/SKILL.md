@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: report_primary
+- family: report
 - intent_signature: explicit qualitative fitness, strengths/weaknesses, tradeoff, or improvement-priority report
 - use_when:
   - the user asks whether a target is fit for an intended purpose or requests a qualitative judgment under stated or delegated criteria

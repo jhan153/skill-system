@@ -32,6 +32,8 @@
   `unresolved`; never fallback-search unrelated home directories or adjacent projects.
 - Choose one clear specialist directly. Use `plan-execution-handoff` only when durable execution
   state is actually needed; ordinary work remains with its direct owner.
+- For genuine ambiguity, use `docs/skill_routing.md` and read only the smallest matching generated
+  family view or exact installed skill; never load the whole routing library.
 - Load references one layer at a time. Heavy artifacts and persistent Memory or Knowledge writes
   require explicit intent and their owning workflow.
 - Treat plans, Memory, Knowledge, Wikis, and summaries as context; current instructions and verified

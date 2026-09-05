@@ -8,6 +8,7 @@ description: "Work in exactly one explicit mode for a rendered regression condit
 ## Routing Card
 
 - role: testing_design_or_evidence_specialist
+- family: testing
 - intent_signature: visual regression design, screenshot regression evidence, rendered golden test, pixel diff, visual replay
 - use_when:
   - the caller or assigned node explicitly selects `design` to author a visual-regression contract for named states/viewports
@@ -38,6 +39,20 @@ description: "Work in exactly one explicit mode for a rendered regression condit
   tools: `design` bounded read-only contract inspection; `evidence` browser/simulator/native capture and image comparison when available
   sensitive_resources: authenticated/private surfaces require explicit authority
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/testing_strategy_contract.md",
+    "target": "references/testing_strategy_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Boundary
 

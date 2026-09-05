@@ -7,6 +7,7 @@ description: Repair one concrete defect in an already-implemented accepted produ
 
 ## Routing Card
 - role: primary
+- family: workflow
 - intent_signature:
   - bug/failing-test/build/runtime/regression fix; broken behavior repair
 - use_when:
@@ -42,6 +43,97 @@ description: Repair one concrete defect in an already-implemented accepted produ
   sensitive_resources: deny credentials; external or destructive reproduction needs explicit boundary review
 - entry_scene:
   - PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/bug_fix_result.md",
+    "target": "references/core-execution-items-v1/cards/bug_fix_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/code_review_result.md",
+    "target": "references/core-execution-items-v1/cards/code_review_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/debugging_result.md",
+    "target": "references/core-execution-items-v1/cards/debugging_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/known_bug_candidate.md",
+    "target": "references/core-execution-items-v1/cards/known_bug_candidate.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/known_bug_record.md",
+    "target": "references/core-execution-items-v1/cards/known_bug_record.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/database_persistence_transparency_contract.md",
+    "target": "references/database_persistence_transparency_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/schemas/execution/execution-item.schema.json",
+    "target": "references/execution-item.schema.json",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/execution_assurance_contract.md",
+    "target": "references/execution_assurance_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/execution_item_contract.md",
+    "target": "references/execution_item_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/identifier_readability_principle.md",
+    "target": "references/identifier_readability_principle.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/runtime-debugging",
+    "target": "references/runtime-debugging",
+    "projection": "tree",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/runtime_debugging_contract.md",
+    "target": "references/runtime_debugging_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Core Cards
 

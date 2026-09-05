@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: project_context_operation
+- family: management
 - intent_signature: project commit/closeout durable context checkpoint
 - use_when:
   - the user explicitly requests a project context checkpoint as part of a commit; or

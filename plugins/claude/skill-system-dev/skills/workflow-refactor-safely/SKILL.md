@@ -7,6 +7,7 @@ description: Restructure production code in small reversible batches while prese
 
 ## Routing Card
 - role: primary
+- family: workflow
 - intent_signature:
   - safe/behavior-preserving refactor; rename/move/extract/collapse; 안전한 리팩터링
 - use_when:

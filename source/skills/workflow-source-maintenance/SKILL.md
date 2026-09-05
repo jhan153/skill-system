@@ -7,6 +7,7 @@ description: "Perform behavior-preserving source maintenance in one of two modes
 
 ## Routing Card
 - role: primary
+- family: workflow
 - intent_signature: behavior-preserving dead-code/source diet or comment/docstring synchronization
 - use_when: the user explicitly requests obsolete-source pruning or comment/docstring/TODO maintenance without intended behavior change
 - do_not_use_when: feature implementation, concrete failure repair, reachable-code rename/move/extract/inline/restructure, dependency upgrade, README/wiki writing, or architecture analysis is primary
@@ -24,6 +25,20 @@ description: "Perform behavior-preserving source maintenance in one of two modes
   tools: focused search, diff, build/typecheck/lint/test/doc checks, and public-entrypoint checks
   sensitive_resources: credentials and production data denied
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/execution_assurance_contract.md",
+    "target": "references/execution_assurance_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Modes
 

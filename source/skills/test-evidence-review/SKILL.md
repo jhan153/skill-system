@@ -8,6 +8,7 @@ description: Review a bounded test design, implementation, or result for false-g
 ## Routing Card
 
 - role: testing_evidence_gate
+- family: testing
 - intent_signature: review tests, false green, test quality, oracle audit, mutation adequacy, test evidence review
 - use_when: a named test design/implementation/result needs a bounded credibility review before its evidence is consumed
 - do_not_use_when: test design or implementation is requested, a concrete failing test must be repaired, broad code review is primary, or no bounded artifact/condition exists
@@ -27,6 +28,27 @@ description: Review a bounded test design, implementation, or result for false-g
   tools: focused static inspection and one safe non-debugger falsifier/readback when already authorized; runtime-debugging evidence review uses existing artifacts/session metadata only
   sensitive_resources: deny credentials and minimize production data
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/runtime_debugging_contract.md",
+    "target": "references/runtime_debugging_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/testing_strategy_contract.md",
+    "target": "references/testing_strategy_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Review Model
 

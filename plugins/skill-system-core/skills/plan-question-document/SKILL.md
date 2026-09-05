@@ -7,6 +7,7 @@ description: Create an explicitly requested Markdown question document for one a
 
 ## Routing Card
 - role: primary
+- family: planning
 - intent_signature: explicit local question document for one answer owner
 - use_when:
   - the user explicitly requests a questionnaire or meeting-fill document for one person who owns a material knowledge gap.

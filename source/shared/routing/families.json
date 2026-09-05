@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "families": [
+    {
+      "id": "search",
+      "display_name": "Search & Evidence",
+      "entry_owners": "search-paper-evidence / search-deep-evidence / domain evidence owner by intent",
+      "aliases": ["검색", "근거", "증거", "evidence", "search"]
+    },
+    {
+      "id": "design",
+      "display_name": "Design",
+      "entry_owners": "workflow-ui-design / design-frontend / design-ui-decomposer / design-layout-translator / design-tokens / design-component-mapper / design-visual-regression / design-a11y-audit by intent",
+      "aliases": ["디자인", "UI 디자인", "화면 디자인", "Figma-to-code", "design", "ui"]
+    },
+    {
+      "id": "report",
+      "display_name": "Report & Review",
+      "entry_owners": "report-qualitative / report-critical / report-implementation-explainer / report-lifecycle-artifacts by intent",
+      "aliases": ["보고", "리포트", "리뷰", "구현 설명", "정성평가", "SDLC 산출물", "report", "review", "implementation explainer"]
+    },
+    {
+      "id": "research",
+      "display_name": "Research",
+      "entry_owners": "workflow-research for an explicit assigned node; otherwise search-paper-evidence / research-literature-synthesis / research-literature-ideation / research-hypothesis-planning / research-experiment-blueprint / research-experiment-scaffold / research-statistical-analysis / research-manuscript-writing / research-peer-review by requested artifact",
+      "aliases": ["연구", "리서치", "research"]
+    },
+    {
+      "id": "testing",
+      "display_name": "Testing",
+      "entry_owners": "plan-test-discovery / workflow-test-design / workflow-test-implementation / test-scope-selection / test-oracle-design / test-scenario-design / test-replay-corpus / test-visual-regression / test-statistical-oracle / test-evidence-review by intent",
+      "aliases": ["테스트", "테스트 설계", "테스트 구현", "오라클", "유닛 테스트", "통합 테스트", "시스템 테스트", "리플레이", "스크린샷 회귀", "testing", "test", "oracle", "replay"]
+    },
+    {
+      "id": "analysis",
+      "display_name": "Analysis",
+      "entry_owners": "analysis-algorithm / analysis-domain-modeling / analysis-performance / workflow-runtime-debugging / analysis-codebase-map / analysis-boundary-design / analysis-architecture-deepening / workflow-architecture-design / explicit analysis-llm-wiki-context by intent; simple source/log-only bug RCA stays with the current task owner",
+      "aliases": ["분석", "analysis", "rca", "디버깅", "디버거", "덤프", "심볼", "크래시 분석", "런타임 원인 규명", "runtime debugging", "debugger", "crash dump", "symbols", "아키텍처 설계", "목표 아키텍처", "아키텍처 맵", "architecture design", "target architecture", "LLM Wiki", "위키 컨텍스트"]
+    },
+    {
+      "id": "workflow",
+      "display_name": "Execution Workflow",
+      "entry_owners": "workflow-implementation / workflow-prototype / workflow-bug-fix / workflow-dependency-upgrade / workflow-code-review / workflow-source-maintenance / workflow-refactor-safely by node intent; standard/strict assurance remains a conditional shared contract on the active owner",
+      "aliases": ["실행", "구현", "코드 리뷰", "정적 코드 리뷰", "상태 흐름 리뷰", "설계 대비 구현 리뷰", "프로토타입", "프로토타이핑", "리팩터링", "버그 수정", "엄격 검증", "실행 통제", "유지보수", "cleanup", "pruning", "comment", "docstring", "prototype", "spike", "static code review", "state-flow review", "implementation design review", "upgrade", "rigor", "workflow"]
+    },
+    {
+      "id": "planning",
+      "display_name": "Planning",
+      "entry_owners": "plan-decision-map / plan-execution-handoff / plan-task-handoff / plan-requirements-discovery / plan-question-document / plan-behavior-discovery / plan-requirements-brief by intent",
+      "aliases": ["요구사항", "행동 결정", "질문 문서", "결정 지도", "실행 인계", "워터폴", "페이즈 게이트", "핸드오프", "반복 작업 조건", "PRD", "플랜", "계획", "planning", "plan", "waterfall", "phase gate", "question document", "decision map", "execution handoff", "handoff", "verifier", "goal"]
+    },
+    {
+      "id": "management",
+      "display_name": "Management",
+      "entry_owners": "management-knowledge-base-read / management-memory-bank-harness (read) / explicit management-knowledge-base-record, management-knowledge-base-update, management-knowledge-base-maintenance, management-knowledge-base-init, management-memory-bank-init, management-memory-bank-update, management-memory-bank-maintenance, management-project-context, or management-project-context-checkpoint by intent",
+      "aliases": ["관리", "지식", "메모리", "컨텍스트", "knowledge", "memory", "project context", "management"]
+    }
+  ]
+}

@@ -8,6 +8,7 @@ description: Resolve human-owned test-basis, oracle, tolerance, baseline, horizo
 ## Routing Card
 
 - role: support
+- family: testing
 - intent_signature: human-in-loop test decision, oracle discussion, tolerance approval, baseline approval, test discovery
 - use_when:
   - `workflow-test-design` identifies one named condition that needs a human-owned judgment before a test contract can be completed

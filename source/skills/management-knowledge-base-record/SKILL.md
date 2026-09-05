@@ -7,6 +7,7 @@ description: Create one new accepted domain, design, algorithm, architecture, de
 
 ## Routing Card
 - role: knowledge_operation
+- family: management
 - intent_signature: create one new durable project Knowledge record by category, including one approved-plan decision
 - use_when: the user explicitly requests recording or syncing one accepted project-specific fact, rule, boundary, or decision that does not already have a Knowledge identity
 - do_not_use_when: the item is unresolved, generic, temporary, one-off, belongs to Memory, lacks authoritative anchors, or updates an existing record
@@ -29,6 +30,34 @@ description: Create one new accepted domain, design, algorithm, architecture, de
   tools: targeted local read, edit, and readback
   sensitive_resources: private sources are admitted only as bounded summaries or stable scoped pointers
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/execution_assurance_contract.md",
+    "target": "references/execution_assurance_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/knowledge_record_contract.md",
+    "target": "references/knowledge_record_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/project_context_manifest.md",
+    "target": "references/project_context_manifest.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Category And Identity Gate
 Select exactly one category: `domain`, `design`, `algorithm`, `architecture`, `code-review`, or `decision`. Read only that category's profile. Category selection changes the required body and anchors, not the shared record envelope or mutation workflow.

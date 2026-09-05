@@ -8,6 +8,7 @@ description: Design an implementation-ready software test contract after a minim
 ## Routing Card
 
 - role: execution_primary
+- family: testing
 - intent_signature: test design node, test plan for executable behavior, oracle and scenario synthesis, 테스트 설계
 - use_when:
   - the user requests a concrete test design artifact for an executable SUT or accepted external contract
@@ -49,6 +50,69 @@ description: Design an implementation-ready software test contract after a minim
   tools: bounded read-only observation needed to distinguish design choices
   sensitive_resources: production captures and private data require governing access, minimization, and redaction
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/implementation_result.md",
+    "target": "references/core-execution-items-v1/cards/implementation_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/test_design_result.md",
+    "target": "references/core-execution-items-v1/cards/test_design_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/schemas/execution/execution-item.schema.json",
+    "target": "references/execution-item.schema.json",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/execution_assurance_contract.md",
+    "target": "references/execution_assurance_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/execution_item_contract.md",
+    "target": "references/execution_item_view.md",
+    "projection": "execution-item-view",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/runtime_debugging_contract.md",
+    "target": "references/runtime_debugging_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/testing_stage_contract.md",
+    "target": "references/testing_stage_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/testing_strategy_contract.md",
+    "target": "references/testing_strategy_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Core Cards
 

@@ -7,6 +7,7 @@ description: Build the smallest throwaway runnable artifact that answers one exp
 
 ## Routing Card
 - role: primary
+- family: workflow
 - intent_signature: one bounded product or engineering question answered by a runnable disposable artifact
 - use_when:
   - the user explicitly requests a prototype or spike and can name, or safely delegate, the decision it must inform.

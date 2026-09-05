@@ -7,6 +7,7 @@ description: Initialize a minimal navigable project Knowledge Base of Markdown r
 
 ## Routing Card
 - role: knowledge_operation
+- family: management
 - intent_signature: initialize project Knowledge Base, 빈 지식저장소 생성
 - use_when: the user explicitly requests a new project Knowledge Base, approves it in project bootstrap, or authorizes reinitialization
 - do_not_use_when: reading, recording, updating, plan sync, Wiki access, or automatic project setup is primary

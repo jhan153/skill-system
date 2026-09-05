@@ -7,6 +7,7 @@ description: Write or revise scientific manuscript prose from verified research 
 
 ## Routing Card
 - role: primary
+- family: research
 - intent_signature: manuscript section, paper draft, IMRAD, LaTeX prose, 논문 작성
 - use_when: existing evidence/synthesis/method/result artifacts can support requested scientific prose
 - do_not_use_when: citation acquisition, data analysis, or critique/review is primary
@@ -15,6 +16,20 @@ description: Write or revise scientific manuscript prose from verified research 
 - context_targets: read the target and named artifacts; load only in-scope bibliography, venue style, synthesis, protocol, report, figures, and tables—not unrelated scaffold/corpus
 - risk_profile: write manuscript files only when requested; formatting/build tools may verify presentation, while search/analysis remains with its owner; credentials denied
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/research_stage_contract.md",
+    "target": "references/research_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage

@@ -7,6 +7,7 @@ description: Build the smallest throwaway runnable artifact that answers one exp
 
 ## Routing Card
 - role: primary
+- family: workflow
 - intent_signature: one bounded product or engineering question answered by a runnable disposable artifact
 - use_when:
   - the user explicitly requests a prototype or spike and can name, or safely delegate, the decision it must inform.
@@ -31,6 +32,12 @@ description: Build the smallest throwaway runnable artifact that answers one exp
   tools: host runtime plus the narrowest build, preview, browser, terminal, file-open, or smoke operation needed to observe the question
   sensitive_resources: deny credentials and production data; stub external writes unless that boundary is the explicit question and separately authorized
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[]
+```
 
 ## Prototype Contract
 

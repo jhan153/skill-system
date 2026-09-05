@@ -7,6 +7,7 @@ description: Design target or transition software architecture from accepted beh
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature:
   - multi-boundary software architecture design
   - target or transition architecture

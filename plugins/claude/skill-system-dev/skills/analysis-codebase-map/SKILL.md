@@ -7,6 +7,7 @@ description: Model the current repository or named slice as evidence-linked Merm
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature: architecture map, HLD/LLD modeling, sequence/state/structure diagrams
 - use_when:
   - the user wants to understand how a repo or named slice is structured and how it runs.

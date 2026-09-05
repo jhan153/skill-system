@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: report_primary
+- family: report
 - intent_signature: explicit lifecycle artifact package, SDLC traceability index, selected delivery evidence package
 - use_when:
   - the user explicitly requests packaging or normalization of named lifecycle artifacts and their evidence links

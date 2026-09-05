@@ -7,6 +7,7 @@ description: Build minimum task-oriented read-only context from one explicitly s
 
 ## Routing Card
 - role: support
+- family: analysis
 - intent_signature: explicit named LLM Wiki exploration and task context construction
 - use_when: the user invokes this skill, supplies an exact Wiki path, or explicitly selects a named `llm_wikis` entry
 - do_not_use_when: no Wiki is selected, several candidates remain, project Knowledge Base is the intended source, Wiki mutation/composition is requested, or ordinary repo evidence is sufficient
@@ -22,6 +23,12 @@ description: Build minimum task-oriented read-only context from one explicitly s
   tools: Wiki-native read/search/navigation only
   sensitive_resources: private Wiki access stays within the selected path/session
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[]
+```
 
 ## Resolution
 1. Use an exact Wiki path from the user.

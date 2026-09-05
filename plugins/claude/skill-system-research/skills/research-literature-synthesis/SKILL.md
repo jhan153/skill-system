@@ -7,6 +7,7 @@ description: Synthesize an existing paper or evidence set into an evidence-calib
 
 ## Routing Card
 - role: primary
+- family: research
 - intent_signature: literature review, survey synthesis, evidence map, related-work analysis, 문헌 종합
 - use_when: an existing paper or evidence set must be interpreted collectively
 - do_not_use_when: acquisition, gap-derived hypothesis selection, or venue-ready manuscript prose is primary

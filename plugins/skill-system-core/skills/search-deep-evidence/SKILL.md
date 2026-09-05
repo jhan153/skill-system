@@ -7,6 +7,7 @@ description: Cross-check a claim across explicitly needed evidence lanes, preser
 
 ## Routing Card
 - role: primary
+- family: search
 - intent_signature: deep evidence sweep, multi-source fact-check, cross-lane verification, 심층 조사, 교차검증
 - use_when:
   - the user explicitly needs multiple evidence types for the same claim

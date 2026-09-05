@@ -7,6 +7,7 @@ description: Diagnose a current latency, throughput, CPU, memory, query, renderi
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature:
   - performance/latency/throughput/CPU/memory/query/render/startup/bundle analysis; 성능 분석; 병목
 - use_when:
@@ -33,6 +34,12 @@ description: Diagnose a current latency, throughput, CPU, memory, query, renderi
   sensitive_resources: production data/traces require their governing access and redaction boundary
 - entry_scene:
   - PREPARE
+
+### Resource Closure
+
+```json
+[]
+```
 
 ## Workflow
 1. Bind each material condition: metric, representative workload/input size, environment, acceptable threshold, and correctness, freshness, security, accessibility, or side-effect constraints. Identify when the user condition is itself structural, such as exact emitted bytes.

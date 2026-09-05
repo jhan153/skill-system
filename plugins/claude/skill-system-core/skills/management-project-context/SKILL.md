@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: project_context_operation
+- family: management
 - intent_signature: explicit project-context manifest init, doctor, update, or bootstrap
 - use_when: the user explicitly requests `manifest-init`, `doctor`, `update`, or guided `bootstrap` for project context locations
 - do_not_use_when: ordinary context lookup/task work, inferred cleanup, store-content mutation, or automatic setup after a missing declaration

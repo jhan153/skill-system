@@ -7,6 +7,7 @@ description: Derive research-gap hypotheses from an evidence set or literature s
 
 ## Routing Card
 - role: primary
+- family: research
 - intent_signature: research gaps, candidate hypotheses from literature, active hypothesis, 문헌 기반 연구 아이디어
 - use_when: an existing evidence set or synthesis can support gap-derived hypotheses or ranking
 - do_not_use_when: papers need acquisition/synthesis, or a raw premise has no literature dependency

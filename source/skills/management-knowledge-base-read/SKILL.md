@@ -7,6 +7,7 @@ description: Read a minimum task-relevant slice of a declared Knowledge Base, in
 
 ## Routing Card
 - role: support
+- family: management
 - intent_signature: local knowledge lookup, why/history path, related decision, recurring ticket or observation trace
 - use_when: the user explicitly asks for project knowledge, or a declared store and concrete task anchor indicate a matching durable rule may exist
 - do_not_use_when: no exact/declared store exists, the task has no concrete anchor, mutation is requested, or an LLM Wiki was selected
@@ -22,6 +23,27 @@ description: Read a minimum task-relevant slice of a declared Knowledge Base, in
   tools: targeted local read/search only
   sensitive_resources: private refs require explicit scoped access
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/knowledge_record_contract.md",
+    "target": "references/knowledge_record_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/project_context_manifest.md",
+    "target": "references/project_context_manifest.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Workflow
 1. Bind `knowledge_root` and `knowledge_index` from the exact path or nearest manifest declaration according to `references/project_context_manifest.md`. Missing means `unavailable`; do not scan, initialize, or substitute a default.

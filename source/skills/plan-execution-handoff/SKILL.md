@@ -7,6 +7,7 @@ description: Create or update a canonical plan.md plus mutable handoff.md pair f
 
 ## Routing Card
 - role: primary
+- family: planning
 - intent_signature: durable canonical Plan/Handoff pair with one typed graph archetype, bounded rewrites, and event-driven lifecycle coordination
 - use_when: explicit pair, durable single-node execution, accepted repeated verifier-driven work, long-running DAG, phase-gated/risk-adaptive method selection, ownership/lock routing, or cross-session continuation
 - do_not_use_when: direct implementation, status-only reporting, a small one-session short-term plan, lightweight one-off handoff, continuous polling, fixed/busy waits, or unrelated sibling scope
@@ -15,6 +16,146 @@ description: Create or update a canonical plan.md plus mutable handoff.md pair f
 - context_targets: request, repository rules, selected profile/reference, current source/callers, one disconfirming path, lifecycle capability, and resource stops
 - risk_profile: writes only the requested planning pair; no production source, Git mutation, automatic coordinator polling, fixed/busy waits, external state, or invented model/skill substitutions
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/bug_fix_result.md",
+    "target": "references/core-execution-items-v1/cards/bug_fix_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/code_review_result.md",
+    "target": "references/core-execution-items-v1/cards/code_review_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/debugging_result.md",
+    "target": "references/core-execution-items-v1/cards/debugging_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/deferred_item.md",
+    "target": "references/core-execution-items-v1/cards/deferred_item.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/design_result.md",
+    "target": "references/core-execution-items-v1/cards/design_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/implementation_result.md",
+    "target": "references/core-execution-items-v1/cards/implementation_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/known_bug_candidate.md",
+    "target": "references/core-execution-items-v1/cards/known_bug_candidate.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/known_bug_record.md",
+    "target": "references/core-execution-items-v1/cards/known_bug_record.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/research_result.md",
+    "target": "references/core-execution-items-v1/cards/research_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/test_design_result.md",
+    "target": "references/core-execution-items-v1/cards/test_design_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/test_implementation_result.md",
+    "target": "references/core-execution-items-v1/cards/test_implementation_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/design_stage_contract.md",
+    "target": "references/design_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/schemas/execution/execution-item.schema.json",
+    "target": "references/execution-item.schema.json",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/execution_assurance_contract.md",
+    "target": "references/execution_assurance_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/execution_handoff_input_contract.md",
+    "target": "references/execution_handoff_input_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's Required Resources contract applies"
+  },
+  {
+    "source": "shared/docs/execution_item_contract.md",
+    "target": "references/execution_item_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's Required Resources contract applies"
+  },
+  {
+    "source": "shared/docs/research_stage_contract.md",
+    "target": "references/research_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/runtime_debugging_contract.md",
+    "target": "references/runtime_debugging_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/testing_stage_contract.md",
+    "target": "references/testing_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Outcome
 

@@ -8,6 +8,7 @@ description: Define an execution-ready debugging scope or directly investigate o
 ## Routing Card
 
 - role: execution_primary
+- family: analysis
 - intent_signature:
   - debugging scope, live debugger operation, crash/core/minidump analysis, symbol and unwind validation, watchpoint or record/replay diagnosis, graphics/device-loss debugging, runtime root cause; 디버깅 범위, 디버거, 덤프, 심볼, 런타임 원인 규명
 - use_when:
@@ -44,6 +45,48 @@ description: Define an execution-ready debugging scope or directly investigate o
   sensitive_resources: attach/launch/continue/step changes execution; dumps and captures may contain secrets; target-state mutation and untrusted auto-load code are denied without separate authority
 - entry_scene:
   - PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/debugging_result.md",
+    "target": "references/core-execution-items-v1/cards/debugging_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/schemas/execution/execution-item.schema.json",
+    "target": "references/execution-item.schema.json",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/execution_item_contract.md",
+    "target": "references/execution_item_view.md",
+    "projection": "execution-item-view",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/runtime-debugging",
+    "target": "references/runtime-debugging",
+    "projection": "tree",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/runtime_debugging_contract.md",
+    "target": "references/runtime_debugging_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Core Cards
 

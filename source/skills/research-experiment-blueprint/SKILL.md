@@ -7,6 +7,7 @@ description: Turn one selected hypothesis into the smallest identifiable, reprod
 
 ## Routing Card
 - role: primary
+- family: research
 - intent_signature: selected-hypothesis protocol, experiment/benchmark design, controls, metrics, ablations, stop/refute
 - use_when:
   - one hypothesis is selected and needs an executable scientific design without code
@@ -31,6 +32,20 @@ description: Turn one selected hypothesis into the smallest identifiable, reprod
   sensitive_resources:
     - credentials/private datasets default deny
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/research_stage_contract.md",
+    "target": "references/research_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage

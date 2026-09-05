@@ -22,6 +22,15 @@ skill_distribution:
       manifest_pattern: plugins/claude/{plugin}/plugin.json
       install: agy plugin install <package-root>
 
+routing_projection:
+  semantic_owner: source/skills/*/SKILL.md#Routing-Card
+  family_alias_owner: source/shared/routing/families.json
+  generated_views:
+    - source/shared/docs/skill_registry.md
+    - source/shared/docs/skill_routing.md
+    - source/shared/docs/routing/
+  resource_closure: skill-local build metadata; installed Routing Card prose retains context-admission authority
+
 plugin_profiles:
   - id: skill-system-core
     purpose: shared planning, management, evidence, execution assurance, and report delivery
@@ -39,6 +48,7 @@ shared_plugin_payloads:
     owner: skill-system-core
     canonical: source/shared/report-canvas
     generated_target: shared/report-canvas
+    closure_owner: source/skills/report-critical/SKILL.md#Resource-Closure
     physical_package_sets: 2
     copies_per_physical_package: 1
 

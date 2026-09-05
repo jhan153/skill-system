@@ -7,6 +7,7 @@ description: Narrow a raw research premise into one falsifiable claim and the ch
 
 ## Routing Card
 - role: primary
+- family: research
 - intent_signature: raw premise, mechanism, loss/ablation idea, or hypothesis validation
 - use_when:
   - a premise must become one testable research decision

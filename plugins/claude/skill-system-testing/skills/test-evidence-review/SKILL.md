@@ -9,6 +9,7 @@ disable-model-invocation: true
 ## Routing Card
 
 - role: testing_evidence_gate
+- family: testing
 - intent_signature: review tests, false green, test quality, oracle audit, mutation adequacy, test evidence review
 - use_when: a named test design/implementation/result needs a bounded credibility review before its evidence is consumed
 - do_not_use_when: test design or implementation is requested, a concrete failing test must be repaired, broad code review is primary, or no bounded artifact/condition exists

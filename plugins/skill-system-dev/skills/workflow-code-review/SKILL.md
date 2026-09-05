@@ -7,6 +7,7 @@ description: Statically review a bound production change or test implementation 
 
 ## Routing Card
 - role: review_gate
+- family: workflow
 - intent_signature: static code review, state/flow/reachability review, dynamic diagrams, optional design conformance, 정적 코드 리뷰
 - use_when: review bound production or test code before PR/integration through source-derived models, with or without an authoritative design baseline.
 - do_not_use_when: mapping-only (`analysis-codebase-map`), lightweight style/naming feedback, repair, runtime validation, production test-oracle/evidence review, or Plan/Handoff editing is primary.

@@ -7,6 +7,7 @@ description: Decide one evidenced module, interface, seam, adapter, or dependenc
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature:
   - one module/interface/seam/adapter/dependency/testability decision
 - use_when:
@@ -45,6 +46,48 @@ description: Decide one evidenced module, interface, seam, adapter, or dependenc
   sensitive_resources: deny credentials
 - entry_scene:
   - PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/architecture_design_contract.md",
+    "target": "references/architecture_design_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/boundary_decision_contract.md",
+    "target": "references/boundary_decision_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/database_persistence_transparency_contract.md",
+    "target": "references/database_persistence_transparency_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/programming-paradigms",
+    "target": "references/programming-paradigms",
+    "projection": "tree",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/programming_paradigm_contract.md",
+    "target": "references/programming_paradigm_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Decision Workflow
 1. Bind exactly one atomic target and use `references/boundary_decision_contract.md` to frame its

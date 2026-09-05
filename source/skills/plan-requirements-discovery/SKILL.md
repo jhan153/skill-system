@@ -7,6 +7,7 @@ description: Run an explicitly requested requirements interview that models deci
 
 ## Routing Card
 - role: primary
+- family: planning
 - intent_signature: guided requirements/scope interview before PRD, planning, or implementation
 - use_when:
   - the user explicitly requests guided elicitation and material requirement gaps remain
@@ -34,6 +35,20 @@ description: Run an explicitly requested requirements interview that models deci
   sensitive_resources:
     - do not request secrets/private data without explicit necessity and scope
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/execution_handoff_input_contract.md",
+    "target": "references/execution_handoff_input_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Exact Route
 | Request | Owner |

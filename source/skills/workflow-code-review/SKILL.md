@@ -7,6 +7,7 @@ description: Statically review a bound production change or test implementation 
 
 ## Routing Card
 - role: review_gate
+- family: workflow
 - intent_signature: static code review, state/flow/reachability review, dynamic diagrams, optional design conformance, 정적 코드 리뷰
 - use_when: review bound production or test code before PR/integration through source-derived models, with or without an authoritative design baseline.
 - do_not_use_when: mapping-only (`analysis-codebase-map`), lightweight style/naming feedback, repair, runtime validation, production test-oracle/evidence review, or Plan/Handoff editing is primary.
@@ -42,6 +43,153 @@ description: Statically review a bound production change or test implementation 
   tools: focused static inspection and risk-selected Mermaid construction/rendering
   sensitive_resources: credentials denied; tests/runtime and code/Plan mutation require another owner
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/architecture_design_contract.md",
+    "target": "references/architecture_design_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/bug_fix_result.md",
+    "target": "references/core-execution-items-v1/cards/bug_fix_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/code_review_result.md",
+    "target": "references/core-execution-items-v1/cards/code_review_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/deferred_item.md",
+    "target": "references/core-execution-items-v1/cards/deferred_item.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/design_result.md",
+    "target": "references/core-execution-items-v1/cards/design_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/implementation_result.md",
+    "target": "references/core-execution-items-v1/cards/implementation_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/known_bug_record.md",
+    "target": "references/core-execution-items-v1/cards/known_bug_record.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/test_design_result.md",
+    "target": "references/core-execution-items-v1/cards/test_design_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/test_implementation_result.md",
+    "target": "references/core-execution-items-v1/cards/test_implementation_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/database_persistence_transparency_contract.md",
+    "target": "references/database_persistence_transparency_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/schemas/execution/execution-item.schema.json",
+    "target": "references/execution-item.schema.json",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/execution_item_contract.md",
+    "target": "references/execution_item_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/identifier_readability_principle.md",
+    "target": "references/identifier_readability_principle.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/maintainable_code_principles.md",
+    "target": "references/maintainable_code_principles.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/programming-paradigms",
+    "target": "references/programming-paradigms",
+    "projection": "tree",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/programming_paradigm_contract.md",
+    "target": "references/programming_paradigm_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/runtime_debugging_contract.md",
+    "target": "references/runtime_debugging_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/static_code_review_contract.md",
+    "target": "references/static_code_review_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/testing_stage_contract.md",
+    "target": "references/testing_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/testing_strategy_contract.md",
+    "target": "references/testing_strategy_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Core Cards
 

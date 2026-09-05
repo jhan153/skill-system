@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: primary
+- family: planning
 - intent_signature: durable canonical Plan/Handoff pair with one typed graph archetype, bounded rewrites, and event-driven lifecycle coordination
 - use_when: explicit pair, durable single-node execution, accepted repeated verifier-driven work, long-running DAG, phase-gated/risk-adaptive method selection, ownership/lock routing, or cross-session continuation
 - do_not_use_when: direct implementation, status-only reporting, a small one-session short-term plan, lightweight one-off handoff, continuous polling, fixed/busy waits, or unrelated sibling scope

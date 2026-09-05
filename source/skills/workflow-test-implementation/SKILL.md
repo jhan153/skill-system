@@ -8,6 +8,7 @@ description: Implement and execute a complete test contract as test-only code, f
 ## Routing Card
 
 - role: execution_primary
+- family: testing
 - intent_signature: implement tests, add unit/integration/system tests, implement replay or screenshot test, 테스트 구현
 - use_when:
   - the user requests test-only implementation or execution and the complete test contract is already authoritative
@@ -43,6 +44,76 @@ description: Implement and execute a complete test contract as test-only code, f
   tools: focused build/test/capture/replay/measurement commands required by the accepted contract
   sensitive_resources: external services, devices, private captures, destructive state, and credentials require explicit authority
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/known_bug_record.md",
+    "target": "references/core-execution-items-v1/cards/known_bug_record.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/test_design_result.md",
+    "target": "references/core-execution-items-v1/cards/test_design_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/test_implementation_result.md",
+    "target": "references/core-execution-items-v1/cards/test_implementation_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/schemas/execution/execution-item.schema.json",
+    "target": "references/execution-item.schema.json",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/execution_assurance_contract.md",
+    "target": "references/execution_assurance_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/execution_item_contract.md",
+    "target": "references/execution_item_view.md",
+    "projection": "execution-item-view",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/runtime_debugging_contract.md",
+    "target": "references/runtime_debugging_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/testing_stage_contract.md",
+    "target": "references/testing_stage_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/testing_strategy_contract.md",
+    "target": "references/testing_strategy_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Core Cards
 

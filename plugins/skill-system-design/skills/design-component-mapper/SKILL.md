@@ -7,6 +7,7 @@ description: "Map design components, semantic roles, variants, states, slots, ev
 
 ## Routing Card
 - role: design_evidence_gate
+- family: design
 - intent_signature: design-to-repo component contract mapping, catalog reuse proof, or required variant/state coverage
 - use_when:
   - a design source must map to repo components or a declared catalog before implementation/completion.

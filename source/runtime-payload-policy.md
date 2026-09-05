@@ -18,13 +18,17 @@ The former `.codex/skills` and `.claude/skills` full mirrors are retired. Runtim
 generation removes them. Grok and Antigravity reuse the Claude-compatible package set instead of
 creating two more copies of every skill.
 
-Plugins are installation profiles, not user-facing families. The registry's nine families own
-routing language; the five plugin profiles own convenient installation boundaries.
+Plugins are installation profiles, not user-facing families. Each skill-local Routing Card owns
+its family and routing semantics, `source/shared/routing/families.json` owns cross-skill aliases,
+and the five plugin profiles own convenient installation boundaries. Registry and common routing
+documents are generated views of those owners.
 
 ## Shared Plugin Payloads
 
-Small contracts and Core Cards may be projected into each consuming skill so plugin packages remain
-self-contained. Large executable assets are plugin-shared instead:
+Each canonical skill declares non-local packaged resources in its Resource Closure. Verbatim and
+tree projections share one strict resolver; only real transforms retain a named processor. The
+closure is build metadata and never makes a `read_if_needed` resource eager. Small contracts and
+Core Cards may remain skill-local while large executable assets are plugin-shared:
 
 - Report Markdown contracts remain skill-local.
 - Core carries one `shared/report-canvas` renderer payload per packaging provider.

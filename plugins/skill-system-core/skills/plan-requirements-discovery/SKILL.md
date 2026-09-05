@@ -7,6 +7,7 @@ description: Run an explicitly requested requirements interview that models deci
 
 ## Routing Card
 - role: primary
+- family: planning
 - intent_signature: guided requirements/scope interview before PRD, planning, or implementation
 - use_when:
   - the user explicitly requests guided elicitation and material requirement gaps remain

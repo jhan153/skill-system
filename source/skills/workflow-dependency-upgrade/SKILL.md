@@ -7,6 +7,7 @@ description: Upgrade one dependency, runtime, framework, SDK, package, or lockfi
 
 ## Routing Card
 - role: primary
+- family: workflow
 - intent_signature:
   - dependency/package/framework/SDK/runtime/lockfile upgrade; 의존성 업그레이드; 패키지 업데이트
 - use_when:
@@ -34,6 +35,69 @@ description: Upgrade one dependency, runtime, framework, SDK, package, or lockfi
   sensitive_resources: deny credentials; network, private registries, lifecycle scripts, and destructive cleanup require their governing boundary
 - entry_scene:
   - PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/bug_fix_result.md",
+    "target": "references/core-execution-items-v1/cards/bug_fix_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/code_review_result.md",
+    "target": "references/core-execution-items-v1/cards/code_review_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/deferred_item.md",
+    "target": "references/core-execution-items-v1/cards/deferred_item.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/known_bug_candidate.md",
+    "target": "references/core-execution-items-v1/cards/known_bug_candidate.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/known_bug_record.md",
+    "target": "references/core-execution-items-v1/cards/known_bug_record.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/schemas/execution/execution-item.schema.json",
+    "target": "references/execution-item.schema.json",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/execution_assurance_contract.md",
+    "target": "references/execution_assurance_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/execution_item_contract.md",
+    "target": "references/execution_item_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Core Cards
 

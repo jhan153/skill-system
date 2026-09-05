@@ -7,6 +7,7 @@ description: Upgrade one dependency, runtime, framework, SDK, package, or lockfi
 
 ## Routing Card
 - role: primary
+- family: workflow
 - intent_signature:
   - dependency/package/framework/SDK/runtime/lockfile upgrade; 의존성 업그레이드; 패키지 업데이트
 - use_when:

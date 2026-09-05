@@ -9,6 +9,7 @@ disable-model-invocation: true
 ## Routing Card
 
 - role: testing_design_or_evidence_specialist
+- family: testing
 - intent_signature: visual regression design, screenshot regression evidence, rendered golden test, pixel diff, visual replay
 - use_when:
   - the caller or assigned node explicitly selects `design` to author a visual-regression contract for named states/viewports

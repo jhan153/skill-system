@@ -7,6 +7,7 @@ description: Inspect, integrity-check, conflict-check, consolidate, compact, or 
 
 ## Routing Card
 - role: memory_operation
+- family: management
 - intent_signature: explicit Memory report, integrity/conflict check, consolidation, compaction, or legacy migration
 - use_when: the user explicitly requests one maintenance operation on an exact/declared bank
 - do_not_use_when: ordinary task context, initialization, direct record mutation, or implicit migration is primary
@@ -25,6 +26,27 @@ description: Inspect, integrity-check, conflict-check, consolidate, compact, or 
   tools: targeted local search/edit/readback
   sensitive_resources: credentials and raw private evidence denied
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/memory_mutation_contract.md",
+    "target": "references/memory_mutation_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/project_context_manifest.md",
+    "target": "references/project_context_manifest.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Operations
 

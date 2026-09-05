@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: knowledge_operation
+- family: management
 - intent_signature: Knowledge Base integrity-check, reindex, relation/history check, overlap/conflict reconciliation, recurrence report
 - use_when: the user explicitly requests maintenance of an exact or manifest-declared store
 - do_not_use_when: task context read, one known record update, new category authoring, plan sync, Memory, or Wiki work is primary

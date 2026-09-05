@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: primary
+- family: planning
 - intent_signature: requirements contract, PRD, SRS-lite, or interview distillation
 - use_when: the user explicitly asks to stabilize supplied discovery/decisions before planning
 - do_not_use_when: elicitation, active-plan sync, packaging, implementation, validation execution, or lifecycle reporting is primary

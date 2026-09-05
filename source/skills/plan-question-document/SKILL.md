@@ -7,6 +7,7 @@ description: Create an explicitly requested Markdown question document for one a
 
 ## Routing Card
 - role: primary
+- family: planning
 - intent_signature: explicit local question document for one answer owner
 - use_when:
   - the user explicitly requests a questionnaire or meeting-fill document for one person who owns a material knowledge gap.
@@ -30,6 +31,20 @@ description: Create an explicitly requested Markdown question document for one a
   external_state: no sending, sharing, uploading, calendar creation, or messaging
   sensitive_resources: never request credentials, secrets, or personal/production data not required by the named decision
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/execution_handoff_input_contract.md",
+    "target": "references/execution_handoff_input_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Separate Setup From Answer Ownership
 

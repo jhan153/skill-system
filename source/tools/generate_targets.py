@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Generate provider runtimes and plugins from canonical source/.
 
-Portable skills and data contracts are shared. Harness entry files, routing, hooks,
-permissions, and platform tools are owned by source/platform/<provider> and can be generated
-independently. ``runtime`` generates all declared runtime companions in one command.
+Portable skills and data contracts are shared. Each skill-local Routing Card owns neutral routing
+semantics and an explicit Resource Closure; generated registries and package resources are one-way
+projections of those declarations. Harness entry files, host routing overlays, hooks, permissions,
+and platform tools remain owned by source/platform/<provider>. ``runtime`` generates all declared
+runtime companions in one command.
 
 Platform entries that overlap shared output are merged. Platform-only entries are replaced from
 source so deleted tools and hook files cannot survive in generated targets.
@@ -20,7 +22,7 @@ import re
 import shutil
 import subprocess
 import tempfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 DISTRIBUTION_METADATA_SOURCE = Path("distribution.json")
 
@@ -30,113 +32,32 @@ NEUTRAL_VERBATIM: list[tuple[str, str]] = [
     ("shared/schemas", "schemas"),  # Phase 1b: schema definitions are platform-neutral data contracts
 ]
 NEUTRAL_TARGET_ROOTS = {target_rel.split("/", 1)[0] for _, target_rel in NEUTRAL_VERBATIM}
-REPORT_CANVAS_SOURCE = Path("shared/report-canvas")
-REPORT_CANVAS_CONTRACT_SOURCE = Path("shared/docs/report_canvas_contract.md")
-REPORT_CANVAS_PLUGIN_TARGET = Path("shared/report-canvas")
-REPORT_CANVAS_REFERENCE_TARGET = Path("references/report_canvas_contract.md")
-REPORT_DELIVERY_CONTRACT_SOURCE = Path("shared/docs/report_delivery_contract.md")
-REPORT_DELIVERY_CONTRACT_TARGET = Path("references/report_delivery_contract.md")
-REPORT_VISUAL_AUTHORING_SOURCE = Path("shared/docs/report_visual_authoring.md")
-REPORT_VISUAL_AUTHORING_TARGET = Path("references/report_visual_authoring.md")
-VISUAL_DECISION_SOURCE = Path("shared/docs/visual_decision_contract.md")
-VISUAL_DECISION_TARGET = Path("references/visual_decision_contract.md")
 EXECUTION_ITEM_CONTRACT_SOURCE = Path("shared/docs/execution_item_contract.md")
-EXECUTION_ITEM_CONTRACT_TARGET = Path("references/execution_item_contract.md")
 EXECUTION_ITEM_VIEW_TARGET = Path("references/execution_item_view.md")
-EXECUTION_ITEM_SCHEMA_SOURCE = Path("shared/schemas/execution/execution-item.schema.json")
-EXECUTION_ITEM_SCHEMA_TARGET = Path("references/execution-item.schema.json")
-EXECUTION_CARD_SOURCE_ROOT = Path("shared/contracts/core-execution-items-v1/cards")
 EXECUTION_CARD_REFERENCE_RE = re.compile(
     r"references/core-execution-items-v1/cards/[A-Za-z0-9][A-Za-z0-9_.-]*\.md"
 )
-DELIVERY_SLICE_CONTRACT_SOURCE = Path("shared/docs/delivery_slice_contract.md")
-DELIVERY_SLICE_CONTRACT_TARGET = Path("references/delivery_slice_contract.md")
-EXECUTION_HANDOFF_INPUT_CONTRACT_SOURCE = Path(
-    "shared/docs/execution_handoff_input_contract.md"
+
+ROUTING_CARD_HEADING = "## Routing Card"
+RESOURCE_CLOSURE_HEADING = "### Resource Closure"
+ROUTING_FIELDS = (
+    "role",
+    "family",
+    "intent_signature",
+    "use_when",
+    "do_not_use_when",
+    "expected_inputs",
+    "expected_outputs",
+    "context_targets",
+    "risk_profile",
+    "entry_scene",
 )
-EXECUTION_HANDOFF_INPUT_CONTRACT_TARGET = Path(
-    "references/execution_handoff_input_contract.md"
-)
-EXECUTION_ASSURANCE_CONTRACT_SOURCE = Path("shared/docs/execution_assurance_contract.md")
-EXECUTION_ASSURANCE_CONTRACT_TARGET = Path("references/execution_assurance_contract.md")
-ARCHITECTURE_DESIGN_CONTRACT_SOURCE = Path("shared/docs/architecture_design_contract.md")
-ARCHITECTURE_DESIGN_CONTRACT_TARGET = Path("references/architecture_design_contract.md")
-BOUNDARY_DECISION_CONTRACT_SOURCE = Path("shared/docs/boundary_decision_contract.md")
-BOUNDARY_DECISION_CONTRACT_TARGET = Path("references/boundary_decision_contract.md")
-RUNTIME_DEBUGGING_CONTRACT_SOURCE = Path("shared/docs/runtime_debugging_contract.md")
-RUNTIME_DEBUGGING_CONTRACT_TARGET = Path("references/runtime_debugging_contract.md")
-RUNTIME_DEBUGGING_REFERENCE_SOURCE = Path("shared/docs/runtime-debugging")
-RUNTIME_DEBUGGING_REFERENCE_TARGET = Path("references/runtime-debugging")
-RESEARCH_STAGE_CONTRACT_SOURCE = Path("shared/docs/research_stage_contract.md")
-RESEARCH_STAGE_CONTRACT_TARGET = Path("references/research_stage_contract.md")
-DESIGN_SHARED_REFERENCE_PROJECTIONS = (
-    (Path("shared/docs/design_stage_contract.md"), Path("references/design_stage_contract.md")),
-    (Path("shared/docs/design_evidence_contract.md"), Path("references/design_evidence_contract.md")),
-    (
-        Path("shared/docs/product_family_design_contract.md"),
-        Path("references/product_family_design_contract.md"),
-    ),
-    (
-        Path("shared/docs/layout_constraint_contract.md"),
-        Path("references/layout_constraint_contract.md"),
-    ),
-)
-TESTING_SHARED_REFERENCE_PROJECTIONS = (
-    (
-        Path("shared/docs/testing_strategy_contract.md"),
-        Path("references/testing_strategy_contract.md"),
-    ),
-    (
-        Path("shared/docs/testing_stage_contract.md"),
-        Path("references/testing_stage_contract.md"),
-    ),
-)
-DEV_SHARED_REFERENCE_PROJECTIONS = (
-    (
-        Path("shared/docs/static_code_review_contract.md"),
-        Path("references/static_code_review_contract.md"),
-    ),
-    (
-        Path("shared/docs/programming_paradigm_contract.md"),
-        Path("references/programming_paradigm_contract.md"),
-    ),
-    (
-        Path("shared/docs/programming-paradigms"),
-        Path("references/programming-paradigms"),
-    ),
-)
-MANAGEMENT_SHARED_REFERENCE_PROJECTIONS = (
-    (
-        Path("shared/docs/project_context_manifest.md"),
-        Path("references/project_context_manifest.md"),
-    ),
-    (
-        Path("shared/docs/memory_mutation_contract.md"),
-        Path("references/memory_mutation_contract.md"),
-    ),
-    (
-        Path("shared/docs/knowledge_record_contract.md"),
-        Path("references/knowledge_record_contract.md"),
-    ),
-)
-MAINTAINABLE_CODE_PRINCIPLES_SOURCE = Path(
-    "shared/docs/maintainable_code_principles.md"
-)
-MAINTAINABLE_CODE_PRINCIPLES_TARGET = Path(
-    "references/maintainable_code_principles.md"
-)
-IDENTIFIER_READABILITY_PRINCIPLE_SOURCE = Path(
-    "shared/docs/identifier_readability_principle.md"
-)
-IDENTIFIER_READABILITY_PRINCIPLE_TARGET = Path(
-    "references/identifier_readability_principle.md"
-)
-DATABASE_PERSISTENCE_TRANSPARENCY_CONTRACT_SOURCE = Path(
-    "shared/docs/database_persistence_transparency_contract.md"
-)
-DATABASE_PERSISTENCE_TRANSPARENCY_CONTRACT_TARGET = Path(
-    "references/database_persistence_transparency_contract.md"
-)
+ROUTING_FAMILIES_SOURCE = Path("shared/routing/families.json")
+SKILL_REGISTRY_TARGET = Path("shared/docs/skill_registry.md")
+SKILL_ROUTING_INDEX_TARGET = Path("shared/docs/skill_routing.md")
+SKILL_ROUTING_FAMILY_TARGET = Path("shared/docs/routing")
+RESOURCE_PROJECTIONS = {"verbatim", "tree", "execution-item-view"}
+RESOURCE_LOAD_CLASSES = {"must_read", "read_if_needed"}
 
 # Platform-native trees: every top-level entry under source/platform/<p> is copied verbatim
 # into that one target only. AGENTS.md / CLAUDE.md live here as platform-native for Phase 1a;
@@ -330,6 +251,341 @@ def _allow_implicit_invocation(skill_dir: Path) -> bool:
     return matches[0]
 
 
+def _frontmatter_scalar(text: str, key: str, path: Path) -> str:
+    if not text.startswith("---\n"):
+        raise SystemExit(f"skill frontmatter must start on the first line: {path}")
+    closing = text.find("\n---\n", 4)
+    if closing < 0:
+        raise SystemExit(f"skill frontmatter is not closed: {path}")
+    prefix = key + ":"
+    matches = [line[len(prefix) :].strip() for line in text[4:closing].splitlines() if line.startswith(prefix)]
+    if len(matches) != 1 or not matches[0]:
+        raise SystemExit(f"skill frontmatter must contain one non-empty {key}: {path}")
+    value = matches[0]
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
+        if value[0] == '"':
+            try:
+                return str(json.loads(value))
+            except json.JSONDecodeError as exc:
+                raise SystemExit(f"invalid quoted {key} in {path}: {exc}") from exc
+        return value[1:-1].replace("''", "'")
+    return value
+
+
+def _safe_package_path(value: str, label: str, *, plugin_target: bool = False) -> PurePosixPath:
+    raw = value
+    if plugin_target and raw.startswith("@plugin/"):
+        raw = raw.removeprefix("@plugin/")
+    elif raw.startswith("@plugin/"):
+        raise SystemExit(f"{label} uses @plugin outside a target: {value!r}")
+    if not raw or "\\" in raw or "\x00" in raw or ":" in raw:
+        raise SystemExit(f"{label} must be a non-empty POSIX path: {value!r}")
+    raw_parts = raw.split("/")
+    if raw.startswith("/") or raw.endswith("/") or any(part in {"", ".", ".."} for part in raw_parts):
+        raise SystemExit(f"{label} must be a normalized relative path: {value!r}")
+    path = PurePosixPath(raw)
+    if path.is_absolute():
+        raise SystemExit(f"{label} must be a safe relative path: {value!r}")
+    if plugin_target and value.startswith("@plugin/"):
+        if not raw_parts or raw_parts[0] != "shared":
+            raise SystemExit(f"plugin resource target must stay under @plugin/shared: {value!r}")
+    elif plugin_target and (not raw_parts or raw_parts[0] not in {"references", "assets", "scripts"}):
+        raise SystemExit(f"skill resource target must stay under references/assets/scripts: {value!r}")
+    return path
+
+
+def _json_object_without_duplicates(pairs: list[tuple[str, object]]) -> dict:
+    result: dict = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key {key!r}")
+        result[key] = value
+    return result
+
+
+def _routing_card(text: str, path: Path) -> tuple[str, str, str, list[dict[str, str]]]:
+    marker = "\n" + ROUTING_CARD_HEADING + "\n"
+    start = text.find(marker)
+    if start < 0:
+        raise SystemExit(f"missing {ROUTING_CARD_HEADING}: {path}")
+    start += 1
+    end = text.find("\n## ", start + len(ROUTING_CARD_HEADING))
+    if end < 0:
+        end = len(text)
+    card = text[start:end].rstrip()
+    if text.find(marker, start + 1) >= 0:
+        raise SystemExit(f"duplicate {ROUTING_CARD_HEADING}: {path}")
+
+    positions: list[int] = []
+    for field in ROUTING_FIELDS:
+        field_marker = f"\n- {field}:"
+        matches = [match.start() for match in re.finditer(re.escape(field_marker), "\n" + card)]
+        if len(matches) != 1:
+            raise SystemExit(f"routing card field {field} must appear exactly once: {path}")
+        positions.append(matches[0])
+    if positions != sorted(positions):
+        raise SystemExit(f"routing card fields are out of order: {path}")
+    def scalar(field: str) -> str:
+        match = re.search(rf"(?m)^- {re.escape(field)}:\s*([^\n]+)$", card)
+        if match is None or not match.group(1).strip():
+            raise SystemExit(f"routing card {field} must be a scalar: {path}")
+        return match.group(1).strip()
+
+    role = scalar("role")
+    family = scalar("family")
+    closure_marker = "\n" + RESOURCE_CLOSURE_HEADING + "\n\n```json\n"
+    closure_start = card.find(closure_marker)
+    if closure_start < 0:
+        raise SystemExit(f"missing structured {RESOURCE_CLOSURE_HEADING}: {path}")
+    json_start = closure_start + len(closure_marker)
+    json_end = card.find("\n```", json_start)
+    if json_end < 0 or card[json_end + 4 :].strip():
+        raise SystemExit(f"resource closure must be the final routing-card subsection: {path}")
+    try:
+        resources = json.loads(
+            card[json_start:json_end], object_pairs_hook=_json_object_without_duplicates
+        )
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise SystemExit(f"invalid resource closure JSON in {path}: {exc}") from exc
+    if not isinstance(resources, list):
+        raise SystemExit(f"resource closure must be a JSON array: {path}")
+    normalized: list[dict[str, str]] = []
+    seen_targets: set[str] = set()
+    required_keys = {"source", "target", "projection", "load", "condition"}
+    for index, item in enumerate(resources):
+        if not isinstance(item, dict) or set(item) != required_keys or not all(isinstance(value, str) for value in item.values()):
+            raise SystemExit(
+                f"resource closure entry {index} must contain only string fields {sorted(required_keys)}: {path}"
+            )
+        source_value = item["source"]
+        target_value = item["target"]
+        source_path = _safe_package_path(source_value, f"{path} resource source")
+        _safe_package_path(target_value, f"{path} resource target", plugin_target=True)
+        if not source_path.parts or source_path.parts[0] != "shared":
+            raise SystemExit(f"resource source must be shared canonical input: {path}: {source_value}")
+        if item["projection"] not in RESOURCE_PROJECTIONS:
+            raise SystemExit(f"unknown resource projection {item['projection']!r}: {path}")
+        if item["load"] not in RESOURCE_LOAD_CLASSES:
+            raise SystemExit(f"unknown resource load class {item['load']!r}: {path}")
+        if not item["condition"].strip():
+            raise SystemExit(f"resource closure condition is empty: {path}: {target_value}")
+        if target_value in seen_targets:
+            raise SystemExit(f"duplicate resource target {target_value!r}: {path}")
+        seen_targets.add(target_value)
+        normalized.append(dict(item))
+    return card[:closure_start].rstrip(), role, family, normalized
+
+
+def _load_skill_declarations(source: Path) -> dict[str, dict]:
+    declarations: dict[str, dict] = {}
+    shared_root = (source / "shared").resolve(strict=True)
+    for skill_dir in sorted((source / "skills").iterdir()):
+        if not skill_dir.is_dir():
+            continue
+        path = skill_dir / "SKILL.md"
+        if not path.is_file():
+            raise SystemExit(f"missing canonical skill file: {path}")
+        text = path.read_text(encoding="utf-8")
+        name = _frontmatter_scalar(text, "name", path)
+        description = _frontmatter_scalar(text, "description", path)
+        if name != skill_dir.name:
+            raise SystemExit(f"skill directory {skill_dir.name} has frontmatter name {name!r}")
+        card, role, family, resources = _routing_card(text, path)
+        for resource in resources:
+            canonical = source / Path(resource["source"])
+            try:
+                canonical.resolve(strict=True).relative_to(shared_root)
+            except (OSError, ValueError) as exc:
+                raise SystemExit(f"resource source resolves outside source/shared: {path}: {canonical}") from exc
+            if resource["projection"] in {"verbatim", "execution-item-view"} and not canonical.is_file():
+                raise SystemExit(f"resource source is not a file: {path}: {canonical}")
+            if resource["projection"] == "tree" and not canonical.is_dir():
+                raise SystemExit(f"resource source is not a directory: {path}: {canonical}")
+            if canonical.is_symlink() or (
+                resource["projection"] == "tree"
+                and any(candidate.is_symlink() for candidate in canonical.rglob("*"))
+            ):
+                raise SystemExit(f"resource source contains a symlink: {path}: {canonical}")
+        declarations[name] = {
+            "id": name,
+            "description": description,
+            "role": role,
+            "family": family,
+            "card": card,
+            "resources": resources,
+            "implicit": _allow_implicit_invocation(skill_dir),
+            "source_dir": skill_dir,
+        }
+    if not declarations:
+        raise SystemExit(f"no canonical skills under {source / 'skills'}")
+    return declarations
+
+
+def _load_routing_families(source: Path) -> list[dict]:
+    path = source / ROUTING_FAMILIES_SOURCE
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"invalid routing family declaration {path}: {exc}") from exc
+    if value.get("schema_version") != 1 or not isinstance(value.get("families"), list):
+        raise SystemExit(f"routing family declaration must use schema_version 1: {path}")
+    required = {"id", "display_name", "entry_owners", "aliases"}
+    families: list[dict] = []
+    seen_ids: set[str] = set()
+    seen_aliases: set[str] = set()
+    for entry in value["families"]:
+        if not isinstance(entry, dict) or set(entry) != required:
+            raise SystemExit(f"routing family entry must contain {sorted(required)}: {path}")
+        if not all(isinstance(entry[key], str) and entry[key].strip() for key in required - {"aliases"}):
+            raise SystemExit(f"routing family entry has an empty string field: {entry!r}")
+        aliases = entry["aliases"]
+        if not isinstance(aliases, list) or not aliases or not all(isinstance(alias, str) and alias.strip() for alias in aliases):
+            raise SystemExit(f"routing family aliases must be non-empty strings: {entry!r}")
+        family_id = entry["id"]
+        if re.fullmatch(r"[a-z][a-z0-9-]*", family_id) is None:
+            raise SystemExit(f"routing family id must be one portable path component: {family_id!r}")
+        if family_id in seen_ids:
+            raise SystemExit(f"duplicate routing family {family_id!r}: {path}")
+        seen_ids.add(family_id)
+        for alias in aliases:
+            normalized = alias.casefold()
+            if normalized in seen_aliases:
+                raise SystemExit(f"duplicate routing family alias {alias!r}: {path}")
+            seen_aliases.add(normalized)
+        families.append(entry)
+    return families
+
+
+def _plugin_owners(source: Path, skill_ids: set[str]) -> dict[str, str]:
+    owners: dict[str, str] = {}
+    for manifest_path in sorted((source / "plugins").glob("*.yaml")):
+        manifest = _load_manifest(manifest_path)
+        plugin = manifest.get("name", "")
+        for skill_id in manifest["skills"]:
+            if skill_id not in skill_ids:
+                raise SystemExit(f"plugin {plugin}: unknown skill {skill_id!r}")
+            if skill_id in owners:
+                raise SystemExit(f"skill {skill_id!r} assigned to both {owners[skill_id]} and {plugin}")
+            owners[skill_id] = plugin
+    missing = sorted(skill_ids - owners.keys())
+    if missing:
+        raise SystemExit(f"plugin coverage gap: {missing}")
+    return owners
+
+
+def _markdown_cell(value: object) -> str:
+    return str(value).replace("|", "\\|").replace("\n", " ").strip()
+
+
+def _refresh_shared_routing_docs(source: Path) -> dict[str, dict]:
+    declarations = _load_skill_declarations(source)
+    families = _load_routing_families(source)
+    family_by_id = {entry["id"]: entry for entry in families}
+    unknown = sorted({entry["family"] for entry in declarations.values()} - family_by_id.keys())
+    if unknown:
+        raise SystemExit(f"skills reference unknown routing families: {unknown}")
+    owners = _plugin_owners(source, set(declarations))
+
+    registry_lines = [
+        "# Skill Registry",
+        "",
+        "> Generated from each canonical `source/skills/*/SKILL.md` Routing Card plus",
+        "> `source/shared/routing/families.json` and `source/plugins/*.yaml`. Do not edit this projection.",
+        "",
+        "## Registry",
+        "",
+        "| skill | family | role | plugin owner | implicit invocation |",
+        "| --- | --- | --- | --- | --- |",
+    ]
+    for skill_id, declaration in sorted(declarations.items()):
+        registry_lines.append(
+            "| `" + "` | `".join(
+                _markdown_cell(value)
+                for value in (
+                    skill_id,
+                    declaration["family"],
+                    declaration["role"],
+                    owners[skill_id],
+                    str(declaration["implicit"]).lower(),
+                )
+            ) + "` |"
+        )
+    registry_lines.extend(
+        [
+            "",
+            "## Group Alias Map",
+            "",
+            "Family aliases are a separate cross-skill concern. They select a family only; the",
+            "matching skill Routing Card retains use/exclusion authority.",
+            "",
+            "| family | display name | entry owner(s) | aliases |",
+            "| --- | --- | --- | --- |",
+        ]
+    )
+    for family in families:
+        registry_lines.append(
+            f"| `{_markdown_cell(family['id'])}` | {_markdown_cell(family['display_name'])} | "
+            f"{_markdown_cell(family['entry_owners'])} | {_markdown_cell(', '.join(family['aliases']))} |"
+        )
+    registry_lines.extend(
+        [
+            "",
+            "## Ownership Boundary",
+            "",
+            "- Routing semantics and conditional context remain local to each skill Routing Card.",
+            "- Agent metadata owns provider discoverability and implicit invocation, not authorization.",
+            "- Plugin manifests own installation-profile membership only.",
+            "- Provider overlays own genuine host trigger, permission, path, hook, lifecycle, and compatibility rules.",
+            "- Unknown or stale skill IDs remain `unresolved`; no generated view invents aliases or fallback routes.",
+        ]
+    )
+    registry_path = source / SKILL_REGISTRY_TARGET
+    registry_path.parent.mkdir(parents=True, exist_ok=True)
+    registry_path.write_text("\n".join(registry_lines) + "\n", encoding="utf-8")
+
+    routing_root = source / SKILL_ROUTING_FAMILY_TARGET
+    if routing_root.exists():
+        shutil.rmtree(routing_root)
+    routing_root.mkdir(parents=True)
+    index_lines = [
+        "# Skill Routing Index",
+        "",
+        "> Generated from canonical skill-local Routing Cards. Do not edit this projection.",
+        "",
+        "Use explicit skill/path selection directly. For a genuinely ambiguous request, select the",
+        "smallest matching family below and read only that family file or the exact installed skill;",
+        "never load the whole routing library. Family lookup grants no write or side-effect authority.",
+        "",
+        "| family | route view | skills |",
+        "| --- | --- | ---: |",
+    ]
+    for family in families:
+        family_id = family["id"]
+        selected = [entry for entry in declarations.values() if entry["family"] == family_id]
+        index_lines.append(f"| `{family_id}` | `docs/routing/{family_id}.md` | {len(selected)} |")
+        family_lines = [
+            f"# {family['display_name']} Routing",
+            "",
+            "> Generated from canonical skill-local Routing Cards. Read only the matching section.",
+            "",
+        ]
+        for declaration in sorted(selected, key=lambda entry: entry["id"]):
+            family_lines.extend(
+                [
+                    f"## `{declaration['id']}`",
+                    "",
+                    declaration["card"].removeprefix(ROUTING_CARD_HEADING).strip(),
+                    "",
+                ]
+            )
+        (routing_root / f"{family_id}.md").write_text(
+            "\n".join(family_lines).rstrip() + "\n", encoding="utf-8"
+        )
+    index_path = source / SKILL_ROUTING_INDEX_TARGET
+    index_path.write_text("\n".join(index_lines) + "\n", encoding="utf-8")
+    return declarations
+
+
 def _project_claude_invocation(skill_dir: Path, target_dir: Path) -> None:
     """Project portable skill paths and invocation metadata into Claude's SKILL.md."""
     skill_md = target_dir / "SKILL.md"
@@ -352,8 +608,22 @@ def _project_claude_invocation(skill_dir: Path, target_dir: Path) -> None:
     skill_md.write_text(text, encoding="utf-8")
 
 
+def _strip_resource_closure(skill_md: Path) -> None:
+    text = skill_md.read_text(encoding="utf-8")
+    marker = "\n" + RESOURCE_CLOSURE_HEADING + "\n"
+    start = text.find(marker)
+    if start < 0:
+        raise SystemExit(f"generated skill has no {RESOURCE_CLOSURE_HEADING}: {skill_md}")
+    end = text.find("\n## ", start + len(marker))
+    if end < 0:
+        end = len(text.rstrip())
+    text = text[:start].rstrip() + "\n\n" + text[end:].lstrip("\n")
+    skill_md.write_text(text.rstrip() + "\n", encoding="utf-8")
+
+
 def _copy_plugin_skill(src: Path, dst: Path, *, claude: bool = False) -> None:
     _copy(src, dst)
+    _strip_resource_closure(dst / "SKILL.md")
     agent_manifest = dst / "agents" / "openai.yaml"
     if agent_manifest.is_file():
         _sanitize_plugin_agent_manifest(agent_manifest)
@@ -361,65 +631,70 @@ def _copy_plugin_skill(src: Path, dst: Path, *, claude: bool = False) -> None:
         _project_claude_invocation(src, dst)
 
 
-def _is_report_skill(skill_dir: Path) -> bool:
-    return skill_dir.name.startswith("report-") and (skill_dir / "SKILL.md").is_file()
+def _resource_target(
+    package_root: Path, skill_dir: Path, target: str
+) -> tuple[Path, str]:
+    if target.startswith("@plugin/"):
+        relative = target.removeprefix("@plugin/")
+        return package_root / Path(relative), relative
+    return skill_dir / Path(target), (Path("skills") / skill_dir.name / Path(target)).as_posix()
 
 
-def _attach_report_canvas_payload(source: Path, skill_dir: Path) -> None:
-    """Project small report contracts into one report skill; renderer is plugin-shared."""
-    if not _is_report_skill(skill_dir):
-        return
-    skill_text = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
-    if "references/report_canvas_contract.md" not in skill_text:
-        raise SystemExit(
-            f"report skill does not reference its local Canvas contract: {skill_dir}"
+def _apply_resource_closure(
+    source: Path,
+    package_root: Path,
+    skill_dir: Path,
+    declaration: dict,
+    claimed_targets: dict[str, tuple[str, str, str, str]],
+) -> None:
+    skill_id = declaration["id"]
+    for resource in declaration["resources"]:
+        canonical = source / Path(resource["source"])
+        target, package_relative = _resource_target(package_root, skill_dir, resource["target"])
+        normalized_target = package_relative.casefold()
+        coalesced = False
+        for existing, previous in claimed_targets.items():
+            if normalized_target == existing:
+                previous_skill, previous_source, previous_projection, previous_target = previous
+                if (
+                    resource["target"].startswith("@plugin/")
+                    and package_relative == previous_target
+                    and resource["source"] == previous_source
+                    and resource["projection"] == previous_projection
+                ):
+                    coalesced = True
+                    break
+                raise SystemExit(
+                    f"resource target {package_relative!r} conflicts between {previous_skill} and {skill_id}"
+                )
+            if normalized_target.startswith(existing + "/") or existing.startswith(normalized_target + "/"):
+                raise SystemExit(
+                    f"overlapping resource targets {package_relative!r} ({skill_id}) and {existing!r} ({previous[0]})"
+                )
+        if coalesced:
+            continue
+        claimed_targets[normalized_target] = (
+            skill_id,
+            resource["source"],
+            resource["projection"],
+            package_relative,
         )
-    if "references/report_delivery_contract.md" not in skill_text:
-        raise SystemExit(
-            f"report skill does not reference its local delivery contract: {skill_dir}"
-        )
-    _copy(
-        source / REPORT_DELIVERY_CONTRACT_SOURCE,
-        skill_dir / REPORT_DELIVERY_CONTRACT_TARGET,
-    )
-    _copy(
-        source / REPORT_CANVAS_CONTRACT_SOURCE,
-        skill_dir / REPORT_CANVAS_REFERENCE_TARGET,
-    )
-    _copy(
-        source / REPORT_VISUAL_AUTHORING_SOURCE,
-        skill_dir / REPORT_VISUAL_AUTHORING_TARGET,
-    )
+        projection = resource["projection"]
+        if projection == "execution-item-view":
+            if resource["source"] != EXECUTION_ITEM_CONTRACT_SOURCE.as_posix() or resource["target"] != EXECUTION_ITEM_VIEW_TARGET.as_posix():
+                raise SystemExit(f"invalid execution-item-view closure for {skill_id}: {resource}")
+            if target.exists():
+                raise SystemExit(f"resource target already exists before projection: {target}")
+            _render_execution_item_view(source, skill_dir, (skill_dir / "SKILL.md").read_text(encoding="utf-8"))
+            continue
+        if projection == "verbatim" and not canonical.is_file():
+            raise SystemExit(f"verbatim resource source is not a file: {canonical}")
+        if projection == "tree" and not canonical.is_dir():
+            raise SystemExit(f"tree resource source is not a directory: {canonical}")
+        if target.exists():
+            raise SystemExit(f"resource target already exists before projection: {target}")
+        _copy(canonical, target)
 
-
-def _wants_visual_decision(skill_dir: Path) -> bool:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return False
-    if _is_report_skill(skill_dir):
-        return True
-    return "references/visual_decision_contract.md" in skill_md.read_text(
-        encoding="utf-8"
-    )
-
-
-def _attach_visual_decision_payload(source: Path, skill_dir: Path) -> None:
-    """Project the shared visual-decision rule into report and opted-in design skills."""
-    if not _wants_visual_decision(skill_dir):
-        return
-    _copy(source / VISUAL_DECISION_SOURCE, skill_dir / VISUAL_DECISION_TARGET)
-
-
-def _wants_execution_item_contract(skill_dir: Path) -> bool:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return False
-    text = skill_md.read_text(encoding="utf-8")
-    return (
-        "references/execution_item_contract.md" in text
-        or "references/execution_item_view.md" in text
-        or bool(EXECUTION_CARD_REFERENCE_RE.search(text))
-    )
 
 
 def _markdown_sections(text: str, level: int) -> dict[str, str]:
@@ -504,288 +779,6 @@ def _render_execution_item_view(source: Path, skill_dir: Path, skill_text: str) 
         encoding="utf-8",
     )
 
-
-def _attach_execution_item_contract(source: Path, skill_dir: Path) -> None:
-    """Project the Core execution-item contract or a generated role view."""
-    if not _wants_execution_item_contract(skill_dir):
-        return
-    skill_text = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
-    wants_view = "references/execution_item_view.md" in skill_text
-    wants_full_contract = "references/execution_item_contract.md" in skill_text or not wants_view
-    if wants_full_contract:
-        _copy(
-            source / EXECUTION_ITEM_CONTRACT_SOURCE,
-            skill_dir / EXECUTION_ITEM_CONTRACT_TARGET,
-        )
-    if wants_view:
-        _render_execution_item_view(source, skill_dir, skill_text)
-    _copy(
-        source / EXECUTION_ITEM_SCHEMA_SOURCE,
-        skill_dir / EXECUTION_ITEM_SCHEMA_TARGET,
-    )
-    for target_text in sorted(set(EXECUTION_CARD_REFERENCE_RE.findall(skill_text))):
-        target = Path(target_text)
-        canonical = source / EXECUTION_CARD_SOURCE_ROOT / target.name
-        if not canonical.is_file():
-            raise SystemExit(
-                f"missing Core execution card {canonical} referenced by {skill_dir / 'SKILL.md'}"
-            )
-        _copy(canonical, skill_dir / target)
-
-
-def _wants_delivery_slice_contract(skill_dir: Path) -> bool:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return False
-    return "references/delivery_slice_contract.md" in skill_md.read_text(encoding="utf-8")
-
-
-def _attach_delivery_slice_contract(source: Path, skill_dir: Path) -> None:
-    """Project the shared delivery-slice contract into each opted-in skill package."""
-    if not _wants_delivery_slice_contract(skill_dir):
-        return
-    _copy(
-        source / DELIVERY_SLICE_CONTRACT_SOURCE,
-        skill_dir / DELIVERY_SLICE_CONTRACT_TARGET,
-    )
-
-
-def _wants_execution_handoff_input_contract(skill_dir: Path) -> bool:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return False
-    return "references/execution_handoff_input_contract.md" in skill_md.read_text(
-        encoding="utf-8"
-    )
-
-
-def _attach_execution_handoff_input_contract(source: Path, skill_dir: Path) -> None:
-    """Project the shared Planning-input contract into each opted-in skill package."""
-    if not _wants_execution_handoff_input_contract(skill_dir):
-        return
-    _copy(
-        source / EXECUTION_HANDOFF_INPUT_CONTRACT_SOURCE,
-        skill_dir / EXECUTION_HANDOFF_INPUT_CONTRACT_TARGET,
-    )
-
-
-def _wants_execution_assurance_contract(skill_dir: Path) -> bool:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return False
-    return "references/execution_assurance_contract.md" in skill_md.read_text(
-        encoding="utf-8"
-    )
-
-
-def _attach_execution_assurance_contract(source: Path, skill_dir: Path) -> None:
-    """Project the shared execution-assurance contract into each opted-in skill package."""
-    if not _wants_execution_assurance_contract(skill_dir):
-        return
-    _copy(
-        source / EXECUTION_ASSURANCE_CONTRACT_SOURCE,
-        skill_dir / EXECUTION_ASSURANCE_CONTRACT_TARGET,
-    )
-
-
-def _wants_architecture_design_contract(skill_dir: Path) -> bool:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return False
-    return "references/architecture_design_contract.md" in skill_md.read_text(
-        encoding="utf-8"
-    )
-
-
-def _attach_architecture_design_contract(source: Path, skill_dir: Path) -> None:
-    """Project the shared architecture-design contract into opted-in skill packages."""
-    if not _wants_architecture_design_contract(skill_dir):
-        return
-    _copy(
-        source / ARCHITECTURE_DESIGN_CONTRACT_SOURCE,
-        skill_dir / ARCHITECTURE_DESIGN_CONTRACT_TARGET,
-    )
-
-
-def _wants_boundary_decision_contract(skill_dir: Path) -> bool:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return False
-    return "references/boundary_decision_contract.md" in skill_md.read_text(
-        encoding="utf-8"
-    )
-
-
-def _attach_boundary_decision_contract(source: Path, skill_dir: Path) -> None:
-    """Project the shared boundary-decision rule into each opted-in skill package."""
-    if not _wants_boundary_decision_contract(skill_dir):
-        return
-    _copy(
-        source / BOUNDARY_DECISION_CONTRACT_SOURCE,
-        skill_dir / BOUNDARY_DECISION_CONTRACT_TARGET,
-    )
-
-
-def _attach_runtime_debugging_payload(source: Path, skill_dir: Path) -> None:
-    """Project the shared runtime-debugging contract and selected reference catalog."""
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return
-    text = skill_md.read_text(encoding="utf-8")
-    if RUNTIME_DEBUGGING_CONTRACT_TARGET.as_posix() in text:
-        _copy(
-            source / RUNTIME_DEBUGGING_CONTRACT_SOURCE,
-            skill_dir / RUNTIME_DEBUGGING_CONTRACT_TARGET,
-        )
-    if f"{RUNTIME_DEBUGGING_REFERENCE_TARGET.as_posix()}/" in text:
-        _copy(
-            source / RUNTIME_DEBUGGING_REFERENCE_SOURCE,
-            skill_dir / RUNTIME_DEBUGGING_REFERENCE_TARGET,
-        )
-
-
-def _wants_research_stage_contract(skill_dir: Path) -> bool:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return False
-    return "references/research_stage_contract.md" in skill_md.read_text(
-        encoding="utf-8"
-    )
-
-
-def _attach_research_stage_contract(source: Path, skill_dir: Path) -> None:
-    """Project the shared Research stage rule into each opted-in skill package."""
-    if not _wants_research_stage_contract(skill_dir):
-        return
-    _copy(
-        source / RESEARCH_STAGE_CONTRACT_SOURCE,
-        skill_dir / RESEARCH_STAGE_CONTRACT_TARGET,
-    )
-
-
-def _attach_design_shared_references(source: Path, skill_dir: Path) -> None:
-    """Project only the shared Design references explicitly named by a skill."""
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return
-    text = skill_md.read_text(encoding="utf-8")
-    for source_path, target_path in DESIGN_SHARED_REFERENCE_PROJECTIONS:
-        if target_path.as_posix() in text:
-            _copy(source / source_path, skill_dir / target_path)
-
-
-def _attach_testing_shared_references(source: Path, skill_dir: Path) -> None:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return
-    text = skill_md.read_text(encoding="utf-8")
-    for source_path, target_path in TESTING_SHARED_REFERENCE_PROJECTIONS:
-        if target_path.as_posix() in text:
-            _copy(source / source_path, skill_dir / target_path)
-
-
-def _attach_dev_shared_references(source: Path, skill_dir: Path) -> None:
-    """Project only the shared Development references explicitly named by a skill."""
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return
-    text = skill_md.read_text(encoding="utf-8")
-    for source_path, target_path in DEV_SHARED_REFERENCE_PROJECTIONS:
-        if target_path.as_posix() in text:
-            _copy(source / source_path, skill_dir / target_path)
-
-
-def _attach_management_shared_references(source: Path, skill_dir: Path) -> None:
-    """Project only the shared Management references explicitly named by a skill."""
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return
-    text = skill_md.read_text(encoding="utf-8")
-    for source_path, target_path in MANAGEMENT_SHARED_REFERENCE_PROJECTIONS:
-        if target_path.as_posix() in text:
-            _copy(source / source_path, skill_dir / target_path)
-
-
-def _wants_maintainable_code_principles(skill_dir: Path) -> bool:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return False
-    return "references/maintainable_code_principles.md" in skill_md.read_text(
-        encoding="utf-8"
-    )
-
-
-def _attach_maintainable_code_principles(source: Path, skill_dir: Path) -> None:
-    """Project the maintainable-code principles into opted-in skill packages."""
-    if not _wants_maintainable_code_principles(skill_dir):
-        return
-    _copy(
-        source / MAINTAINABLE_CODE_PRINCIPLES_SOURCE,
-        skill_dir / MAINTAINABLE_CODE_PRINCIPLES_TARGET,
-    )
-
-
-def _wants_identifier_readability_principle(skill_dir: Path) -> bool:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return False
-    return "references/identifier_readability_principle.md" in skill_md.read_text(
-        encoding="utf-8"
-    )
-
-
-def _attach_identifier_readability_principle(
-    source: Path, skill_dir: Path
-) -> None:
-    """Project the identifier-readability principle into opted-in skill packages."""
-    if not _wants_identifier_readability_principle(skill_dir):
-        return
-    _copy(
-        source / IDENTIFIER_READABILITY_PRINCIPLE_SOURCE,
-        skill_dir / IDENTIFIER_READABILITY_PRINCIPLE_TARGET,
-    )
-
-
-def _wants_database_persistence_transparency_contract(skill_dir: Path) -> bool:
-    skill_md = skill_dir / "SKILL.md"
-    if not skill_md.is_file():
-        return False
-    return "references/database_persistence_transparency_contract.md" in skill_md.read_text(
-        encoding="utf-8"
-    )
-
-
-def _attach_database_persistence_transparency_contract(
-    source: Path, skill_dir: Path
-) -> None:
-    """Project the database-persistence contract into opted-in skill packages."""
-    if not _wants_database_persistence_transparency_contract(skill_dir):
-        return
-    _copy(
-        source / DATABASE_PERSISTENCE_TRANSPARENCY_CONTRACT_SOURCE,
-        skill_dir / DATABASE_PERSISTENCE_TRANSPARENCY_CONTRACT_TARGET,
-    )
-
-
-def _attach_plugin_skill_payloads(source: Path, skill_dir: Path) -> None:
-    """Project every shared payload selected by one generated skill package."""
-    _attach_report_canvas_payload(source, skill_dir)
-    _attach_visual_decision_payload(source, skill_dir)
-    _attach_execution_item_contract(source, skill_dir)
-    _attach_delivery_slice_contract(source, skill_dir)
-    _attach_execution_handoff_input_contract(source, skill_dir)
-    _attach_execution_assurance_contract(source, skill_dir)
-    _attach_architecture_design_contract(source, skill_dir)
-    _attach_boundary_decision_contract(source, skill_dir)
-    _attach_runtime_debugging_payload(source, skill_dir)
-    _attach_research_stage_contract(source, skill_dir)
-    _attach_design_shared_references(source, skill_dir)
-    _attach_testing_shared_references(source, skill_dir)
-    _attach_dev_shared_references(source, skill_dir)
-    _attach_management_shared_references(source, skill_dir)
-    _attach_maintainable_code_principles(source, skill_dir)
-    _attach_identifier_readability_principle(source, skill_dir)
-    _attach_database_persistence_transparency_contract(source, skill_dir)
 
 
 def _merge_copy(src: Path, dst: Path) -> None:
@@ -1095,6 +1088,7 @@ def _build_antigravity_harness(source: Path, antigravity: Path, written: list[st
 
 
 def generate_codex_runtime(source: Path, codex: Path) -> list[str]:
+    _refresh_shared_routing_docs(source)
     written: list[str] = []
     _copy_neutral(source, codex, written)
     _copy_platform(source / PLATFORM_CODEX_ROOT, codex, written)
@@ -1118,6 +1112,7 @@ def generate_codex_runtime(source: Path, codex: Path) -> list[str]:
 
 
 def generate_claude_runtime(source: Path, claude: Path) -> list[str]:
+    _refresh_shared_routing_docs(source)
     written: list[str] = []
     _copy_neutral(source, claude, written)
     _copy_platform(source / PLATFORM_CLAUDE_ROOT, claude, written)
@@ -1132,6 +1127,7 @@ def generate_claude_runtime(source: Path, claude: Path) -> list[str]:
 
 def generate_orca_runtime(source: Path, platform_root: str, target: Path) -> list[str]:
     """Generate a common Go companion while Orca retains provider lifecycle ownership."""
+    _refresh_shared_routing_docs(source)
     written: list[str] = []
     _copy_neutral(source, target, written)
     _copy_platform(source / platform_root, target, written)
@@ -1188,6 +1184,7 @@ def _load_manifest(path: Path) -> dict:
 
 def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
     written: list[str] = []
+    declarations = _refresh_shared_routing_docs(source)
     distribution = _load_distribution(source)
     bundle_version = str(distribution["bundle_version"])
     publisher_name = distribution["publisher"]["name"]
@@ -1213,6 +1210,8 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
         name = spec["name"]
         codex_pkg = plugins_root / name
         claude_pkg = claude_packages_root / name
+        codex_resource_targets: dict[str, tuple[str, str, str, str]] = {}
+        claude_resource_targets: dict[str, tuple[str, str, str, str]] = {}
         if codex_pkg.exists():
             shutil.rmtree(codex_pkg)
         display_name = name.replace("-", " ").title()
@@ -1301,22 +1300,23 @@ def generate_plugins(source: Path, plugins_root: Path) -> list[str]:
                 raise SystemExit(f"skill '{sid}' assigned to both {seen[sid]} and {name}")
             seen[sid] = name
             _copy_plugin_skill(source / "skills" / sid, codex_pkg / "skills" / sid)
-            _attach_plugin_skill_payloads(source, codex_pkg / "skills" / sid)
+            _apply_resource_closure(
+                source,
+                codex_pkg,
+                codex_pkg / "skills" / sid,
+                declarations[sid],
+                codex_resource_targets,
+            )
             written.append((codex_pkg / "skills" / sid).as_posix())
             _copy_plugin_skill(source / "skills" / sid, claude_pkg / "skills" / sid, claude=True)
-            _attach_plugin_skill_payloads(source, claude_pkg / "skills" / sid)
+            _apply_resource_closure(
+                source,
+                claude_pkg,
+                claude_pkg / "skills" / sid,
+                declarations[sid],
+                claude_resource_targets,
+            )
             written.append((claude_pkg / "skills" / sid).as_posix())
-        if any(sid.startswith("report-") for sid in spec["skills"]):
-            _copy(
-                source / REPORT_CANVAS_SOURCE,
-                codex_pkg / REPORT_CANVAS_PLUGIN_TARGET,
-            )
-            _copy(
-                source / REPORT_CANVAS_SOURCE,
-                claude_pkg / REPORT_CANVAS_PLUGIN_TARGET,
-            )
-            written.append((codex_pkg / REPORT_CANVAS_PLUGIN_TARGET).as_posix())
-            written.append((claude_pkg / REPORT_CANVAS_PLUGIN_TARGET).as_posix())
     uncovered = src_skills - seen.keys()
     if uncovered:
         raise SystemExit(f"plugin coverage gap: {len(uncovered)} skills in no plugin: {sorted(uncovered)}")

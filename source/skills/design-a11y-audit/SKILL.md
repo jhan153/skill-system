@@ -7,6 +7,7 @@ description: "Accessibility evidence for implemented UI — keyboard reachabilit
 
 ## Routing Card
 - role: design_evidence_gate
+- family: design
 - intent_signature:
   - accessibility evidence for keyboard, focus, semantics, contrast, target size, or responsive readability
 - use_when:
@@ -42,6 +43,27 @@ description: "Accessibility evidence for implemented UI — keyboard reachabilit
   - PREPARE
 
 This is an evidence gate. `design-frontend` owns requested UI fixes; this skill scopes findings and verifies the affected path.
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/design_evidence_contract.md",
+    "target": "references/design_evidence_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/design_stage_contract.md",
+    "target": "references/design_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 

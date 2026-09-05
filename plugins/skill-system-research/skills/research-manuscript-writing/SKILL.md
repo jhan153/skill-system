@@ -7,6 +7,7 @@ description: Write or revise scientific manuscript prose from verified research 
 
 ## Routing Card
 - role: primary
+- family: research
 - intent_signature: manuscript section, paper draft, IMRAD, LaTeX prose, 논문 작성
 - use_when: existing evidence/synthesis/method/result artifacts can support requested scientific prose
 - do_not_use_when: citation acquisition, data analysis, or critique/review is primary

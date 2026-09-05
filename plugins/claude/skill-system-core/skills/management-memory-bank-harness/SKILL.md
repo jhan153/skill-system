@@ -7,6 +7,7 @@ description: Read the smallest task-relevant record slice from a project Memory 
 
 ## Routing Card
 - role: support
+- family: management
 - intent_signature: bounded project Memory lookup for a concrete task anchor
 - use_when:
   - the user explicitly asks for project Memory; or

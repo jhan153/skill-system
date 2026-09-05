@@ -7,6 +7,7 @@ description: Read a minimum task-relevant slice of a declared Knowledge Base, in
 
 ## Routing Card
 - role: support
+- family: management
 - intent_signature: local knowledge lookup, why/history path, related decision, recurring ticket or observation trace
 - use_when: the user explicitly asks for project knowledge, or a declared store and concrete task anchor indicate a matching durable rule may exist
 - do_not_use_when: no exact/declared store exists, the task has no concrete anchor, mutation is requested, or an LLM Wiki was selected

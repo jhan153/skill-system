@@ -7,6 +7,7 @@ description: Review a scientific manuscript, proposal, or research plan for vali
 
 ## Routing Card
 - role: review_gate
+- family: research
 - intent_signature: scholarly peer review, manuscript/proposal review, reviewer critique, 논문 리뷰
 - use_when: a manuscript, proposal, or research plan needs scientific critique
 - do_not_use_when: the target is generic code/spec/release material or rewriting is primary

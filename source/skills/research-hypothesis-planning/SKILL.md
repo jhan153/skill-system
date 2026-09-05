@@ -7,6 +7,7 @@ description: Narrow a raw research premise into one falsifiable claim and the ch
 
 ## Routing Card
 - role: primary
+- family: research
 - intent_signature: raw premise, mechanism, loss/ablation idea, or hypothesis validation
 - use_when:
   - a premise must become one testable research decision
@@ -31,6 +32,20 @@ description: Narrow a raw research premise into one falsifiable claim and the ch
   sensitive_resources:
     - credentials default deny
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/research_stage_contract.md",
+    "target": "references/research_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage

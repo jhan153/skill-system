@@ -8,6 +8,7 @@ description: Resolve human-owned test-basis, oracle, tolerance, baseline, horizo
 ## Routing Card
 
 - role: support
+- family: testing
 - intent_signature: human-in-loop test decision, oracle discussion, tolerance approval, baseline approval, test discovery
 - use_when:
   - `workflow-test-design` identifies one named condition that needs a human-owned judgment before a test contract can be completed
@@ -42,6 +43,41 @@ description: Resolve human-owned test-basis, oracle, tolerance, baseline, horizo
   tools: focused read-only observation and one human question at a time when decisions are dependent
   sensitive_resources: private data and external systems require their governing access and redaction boundary
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/execution_handoff_input_contract.md",
+    "target": "references/execution_handoff_input_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/runtime_debugging_contract.md",
+    "target": "references/runtime_debugging_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/testing_stage_contract.md",
+    "target": "references/testing_stage_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/testing_strategy_contract.md",
+    "target": "references/testing_strategy_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Boundary
 

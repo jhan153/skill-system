@@ -7,6 +7,7 @@ description: "Project an approved experiment contract into a small repo-native w
 
 ## Routing Card
 - role: heavy_artifact_generator
+- family: research
 - intent_signature: experiment scaffold, experiments directory, run/evaluate skeleton, blueprint to code, 실험 코드 스켈레톤
 - use_when: explicit code/scaffold request from an approved blueprint or equivalent complete experiment contract
 - do_not_use_when: unsettled hypothesis/protocol, search, synthesis, statistics, writing, ordinary product implementation, data acquisition, or training execution

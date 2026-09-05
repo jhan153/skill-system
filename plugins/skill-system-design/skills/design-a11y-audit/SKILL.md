@@ -7,6 +7,7 @@ description: "Accessibility evidence for implemented UI — keyboard reachabilit
 
 ## Routing Card
 - role: design_evidence_gate
+- family: design
 - intent_signature:
   - accessibility evidence for keyboard, focus, semantics, contrast, target size, or responsive readability
 - use_when:

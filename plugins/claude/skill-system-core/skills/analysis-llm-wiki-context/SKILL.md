@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: support
+- family: analysis
 - intent_signature: explicit named LLM Wiki exploration and task context construction
 - use_when: the user invokes this skill, supplies an exact Wiki path, or explicitly selects a named `llm_wikis` entry
 - do_not_use_when: no Wiki is selected, several candidates remain, project Knowledge Base is the intended source, Wiki mutation/composition is requested, or ordinary repo evidence is sufficient

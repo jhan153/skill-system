@@ -7,6 +7,7 @@ description: Diagnose a current latency, throughput, CPU, memory, query, renderi
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature:
   - performance/latency/throughput/CPU/memory/query/render/startup/bundle analysis; 성능 분석; 병목
 - use_when:

@@ -7,6 +7,7 @@ description: Synthesize an existing paper or evidence set into an evidence-calib
 
 ## Routing Card
 - role: primary
+- family: research
 - intent_signature: literature review, survey synthesis, evidence map, related-work analysis, 문헌 종합
 - use_when: an existing paper or evidence set must be interpreted collectively
 - do_not_use_when: acquisition, gap-derived hypothesis selection, or venue-ready manuscript prose is primary
@@ -15,6 +16,20 @@ description: Synthesize an existing paper or evidence set into an evidence-calib
 - context_targets: read the named set and scope; load search/inclusion rules and full-text loci only for disputed claims, excluding unrelated corpus, code, backlog, and manuscript templates
 - risk_profile: no acquisition by default and write a review artifact only when requested; credentials denied
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/research_stage_contract.md",
+    "target": "references/research_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage

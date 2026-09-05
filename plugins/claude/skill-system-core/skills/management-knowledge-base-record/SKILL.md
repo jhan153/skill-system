@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: knowledge_operation
+- family: management
 - intent_signature: create one new durable project Knowledge record by category, including one approved-plan decision
 - use_when: the user explicitly requests recording or syncing one accepted project-specific fact, rule, boundary, or decision that does not already have a Knowledge identity
 - do_not_use_when: the item is unresolved, generic, temporary, one-off, belongs to Memory, lacks authoritative anchors, or updates an existing record

@@ -7,6 +7,7 @@ description: Review a scientific manuscript, proposal, or research plan for vali
 
 ## Routing Card
 - role: review_gate
+- family: research
 - intent_signature: scholarly peer review, manuscript/proposal review, reviewer critique, 논문 리뷰
 - use_when: a manuscript, proposal, or research plan needs scientific critique
 - do_not_use_when: the target is generic code/spec/release material or rewriting is primary
@@ -15,6 +16,20 @@ description: Review a scientific manuscript, proposal, or research plan for vali
 - context_targets: read the target and requested scope; load only cited sources, protocol, analysis artifacts, venue criteria, or checklist needed for a finding—not unrelated literature or hidden assumptions
 - risk_profile: no external verification by default; disclose any verification and write a review artifact only when requested; credentials and fabricated identity denied
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/research_stage_contract.md",
+    "target": "references/research_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage

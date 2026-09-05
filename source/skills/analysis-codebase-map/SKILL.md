@@ -7,6 +7,7 @@ description: Model the current repository or named slice as evidence-linked Merm
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature: architecture map, HLD/LLD modeling, sequence/state/structure diagrams
 - use_when:
   - the user wants to understand how a repo or named slice is structured and how it runs.
@@ -36,6 +37,12 @@ description: Model the current repository or named slice as evidence-linked Merm
   tools: focused search and safe observation
   sensitive_resources: credentials and secret files default deny
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[]
+```
 
 ## Altitude
 - An explicit user-requested `hld` or `lld` wins. Keep a named HLD inside that slice; do not widen it to the whole repository.

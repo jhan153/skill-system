@@ -7,6 +7,7 @@ description: Amend, observe, reverify, supersede, deprecate, or relink an existi
 
 ## Routing Card
 - role: knowledge_operation
+- family: management
 - intent_signature: amend, observe recurrence, reverify, supersede, deprecate, or relink durable project knowledge
 - use_when: the user explicitly requests a known record change or approved-plan sync, or an approved checkpoint supplies a specific accepted change
 - do_not_use_when: the store/record is missing, new category authoring is primary, a plan is still tentative, or broad maintenance is requested
@@ -22,6 +23,34 @@ description: Amend, observe, reverify, supersede, deprecate, or relink an existi
   tools: local edit and readback
   sensitive_resources: private evidence summarized or excluded
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/execution_assurance_contract.md",
+    "target": "references/execution_assurance_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/knowledge_record_contract.md",
+    "target": "references/knowledge_record_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/project_context_manifest.md",
+    "target": "references/project_context_manifest.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Workflow
 1. Bind `knowledge_root` and `knowledge_index` from the exact or manifest-declared store, then resolve the stable record ID from that index. Reuse the bound variables for every read/write; never substitute a default path.

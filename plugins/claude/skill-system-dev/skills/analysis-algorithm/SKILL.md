@@ -7,6 +7,7 @@ description: Compare algorithms or technical approaches under concrete constrain
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature: algorithm/approach recommendation or candidate comparison under constraints
 - use_when: credible solution families compete and workload, correctness, latency, memory, dependency, deployment, or implementation constraints change the winner.
 - do_not_use_when:

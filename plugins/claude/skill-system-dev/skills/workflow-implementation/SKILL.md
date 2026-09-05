@@ -7,6 +7,7 @@ description: Primary workflow for direct or DAG-assigned production software imp
 
 ## Routing Card
 - role: primary
+- family: workflow
 - intent_signature:
   - direct implementation
   - code change

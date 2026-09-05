@@ -7,6 +7,7 @@ description: Decompose UI references into source-traced hierarchy, layout, patte
 
 ## Routing Card
 - role: primary_analysis
+- family: design
 - intent_signature: UI-reference hierarchy, region, pattern, state, and uncertainty decomposition
 - use_when:
   - a supplied visual/design reference must become structured analysis before implementation

@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: design_evidence_gate
+- family: design
 - intent_signature:
   - design-token source normalization, platform mapping, or gap/conflict audit
 - use_when:

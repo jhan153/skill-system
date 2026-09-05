@@ -8,6 +8,7 @@ description: Select and bound an authoritative test oracle for one named conditi
 ## Routing Card
 
 - role: test_design_specialist
+- family: testing
 - intent_signature: test oracle, expected result, invariant, metamorphic, differential, golden baseline, oracle problem
 - use_when: one test condition has materially competing oracle regimes, authority sources, tolerances, or independence limits
 - do_not_use_when: the oracle is already authoritative, scenario coverage is primary, statistical design alone is primary, or test code is requested

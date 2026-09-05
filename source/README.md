@@ -4,11 +4,14 @@
 directly.** Edit `source/` and regenerate.
 
 ## Layout
-- `source/skills/` — 67 canonical skills packaged into one Codex set and one portable
+- `source/skills/` — 67 canonical skills; each Routing Card owns its family, routing semantics, and
+  explicit non-local Resource Closure before packaging into one Codex set and one portable
   Claude/Grok/Antigravity set
 - `source/distribution.json` — canonical bundle version, publisher, and marketplace identity
 - `source/plugins/*.yaml` — installation-profile membership and profile presentation metadata
-- `source/shared/` — portable `docs/`, schemas, and Core-owned contract/card sources projected into their declared consumers
+- `source/shared/` — portable docs/schemas/contracts plus the separate family-alias declaration;
+  `docs/skill_registry.md`, `docs/skill_routing.md`, and `docs/routing/` are generated from the
+  skill-local declarations and are never authoring inputs
 - `source/platform/codex/` — Codex-owned runtime companion instructions, routing, hooks, rules, and harness docs
 - `source/platform/claude/` — Claude-owned runtime companion instructions, routing, and hook docs
 - `source/platform/grok/` — Grok global rules; Orca owns worker lifecycle
@@ -45,7 +48,7 @@ The remaining three repository-wide tests are under `internal/systemcontract`:
 go test ./internal/systemcontract -v
 ```
 
-They cover canonical skill/plugin ownership, bundle/catalog closure, active-provider
+They cover canonical skill routing/plugin ownership, generated route views, active-provider
 package/manifest/resource closure, and declared global-rule plus harness wiring. Run them only when
 those system surfaces change; ordinary skill prose and model changes do not trigger them.
 

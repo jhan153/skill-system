@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: memory_operation
+- family: management
 - intent_signature: explicit durable Memory record mutation
 - use_when: the user explicitly requests persistence or an approved context checkpoint supplies one exact durable item
 - do_not_use_when: the bank is unavailable, the item is temporary/inferred, or init/read/maintenance is primary

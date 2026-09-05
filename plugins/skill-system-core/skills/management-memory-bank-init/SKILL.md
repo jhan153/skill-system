@@ -7,6 +7,7 @@ description: Initialize the single-file project Memory Bank defined by the share
 
 ## Routing Card
 - role: memory_operation
+- family: management
 - intent_signature: explicit project Memory Bank initialization
 - use_when: the user explicitly requests a fresh init or approves one exact bootstrap action
 - do_not_use_when: reading, updating, checkpointing, maintenance, or automatic project setup is primary

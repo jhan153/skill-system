@@ -7,6 +7,7 @@ description: Analyze real experimental data or supplied statistics with an expli
 
 ## Routing Card
 - role: primary
+- family: research
 - intent_signature: statistical analysis, significance, effect size, interval, result-table interpretation, 통계 분석
 - use_when: inference or bounded interpretation from supplied data/statistics, or an explicit analysis plan; inadequate inputs remain an insufficient-data response
 - do_not_use_when: experiment/protocol design, scaffold code, manuscript prose, ordinary product implementation, or a non-statistical deliverable is primary

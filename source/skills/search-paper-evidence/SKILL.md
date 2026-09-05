@@ -7,6 +7,7 @@ description: Acquire traceable paper evidence for an explicit literature/citatio
 
 ## Routing Card
 - role: primary
+- family: search
 - intent_signature: paper/citation search, latest research, literature evidence, arXiv/DOI, 최신 논문, 문헌 근거
 - use_when:
   - the user explicitly requests papers/citations or literature-backed claim verification
@@ -28,6 +29,12 @@ description: Acquire traceable paper evidence for an explicit literature/citatio
   tools: authoritative paper/web search and source opening when needed
   sensitive_resources: credentials default deny; no dataset download, install, or training
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[]
+```
 
 ## Acquisition and Claim Model
 Track separate fields; never collapse them into `verified`:

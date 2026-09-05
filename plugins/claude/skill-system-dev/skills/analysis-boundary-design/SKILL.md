@@ -7,6 +7,7 @@ description: Decide one evidenced module, interface, seam, adapter, or dependenc
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature:
   - one module/interface/seam/adapter/dependency/testability decision
 - use_when:

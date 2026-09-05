@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: report_primary
+- family: report
 - intent_signature: explicit implementation explanation report or verified changed-lines/before-after report
 - use_when:
   - the user requests a durable causal implementation explanation or readable verified comparison

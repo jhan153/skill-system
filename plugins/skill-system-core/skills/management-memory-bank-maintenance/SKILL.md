@@ -7,6 +7,7 @@ description: Inspect, integrity-check, conflict-check, consolidate, compact, or 
 
 ## Routing Card
 - role: memory_operation
+- family: management
 - intent_signature: explicit Memory report, integrity/conflict check, consolidation, compaction, or legacy migration
 - use_when: the user explicitly requests one maintenance operation on an exact/declared bank
 - do_not_use_when: ordinary task context, initialization, direct record mutation, or implicit migration is primary

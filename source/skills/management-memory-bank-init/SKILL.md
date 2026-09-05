@@ -7,6 +7,7 @@ description: Initialize the single-file project Memory Bank defined by the share
 
 ## Routing Card
 - role: memory_operation
+- family: management
 - intent_signature: explicit project Memory Bank initialization
 - use_when: the user explicitly requests a fresh init or approves one exact bootstrap action
 - do_not_use_when: reading, updating, checkpointing, maintenance, or automatic project setup is primary
@@ -25,6 +26,27 @@ description: Initialize the single-file project Memory Bank defined by the share
   tools: local file operations and readback
   sensitive_resources: credentials denied; external paths require exact resolved-path approval
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/memory_mutation_contract.md",
+    "target": "references/memory_mutation_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/project_context_manifest.md",
+    "target": "references/project_context_manifest.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Workflow
 

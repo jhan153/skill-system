@@ -7,6 +7,7 @@ description: Run an explicitly requested, one-question behavior discovery turn f
 
 ## Routing Card
 - role: primary
+- family: planning
 - intent_signature: post-implementation behavior discovery or next human-operable slice decision
 - use_when:
   - the user explicitly asks to resolve product-facing behavior for a concrete existing capability/path one decision at a time.
@@ -29,6 +30,20 @@ description: Run an explicitly requested, one-question behavior discovery turn f
   tools: focused read-only inspection; no implementation or validation execution
   sensitive_resources: credentials/private data default deny; prefer anonymized states
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/execution_handoff_input_contract.md",
+    "target": "references/execution_handoff_input_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Decision Contract
 

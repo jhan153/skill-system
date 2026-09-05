@@ -7,6 +7,7 @@ description: Translate evidenced design layout constraints into bounded, code-re
 
 ## Routing Card
 - role: primary_analysis_or_modifier
+- family: design
 - intent_signature: Auto Layout, flex/grid, intrinsic/fill/fixed sizing, overflow, text-fit, and breakpoint translation
 - use_when:
   - design constraints need implementation rules, or a layout mismatch depends on constraint interpretation

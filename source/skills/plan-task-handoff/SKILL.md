@@ -7,6 +7,7 @@ description: Create lightweight task DAGs, multi-agent or multi-session handoffs
 
 ## Routing Card
 - role: support
+- family: planning
 - intent_signature: explicit task DAG, handoff, ownership/lock split, or artifact/verification inventory
 - use_when: the user explicitly requests coordination across agents, sessions, or workstreams, or a handoff/inventory
 - do_not_use_when: direct implementation, ordinary goal/status summary, or persistent event, workflow, deployment, or completion state
@@ -23,6 +24,12 @@ Choose the smallest requested mode:
 
 An explicit changed/generated-file or validation-evidence list is `artifact_inventory` even without the word handoff.
 Combine modes only when both needs are explicit. An artifact list or short session handoff alone does not justify a task DAG.
+
+### Resource Closure
+
+```json
+[]
+```
 
 ## Workflow
 1. Confirm the explicit coordination, handoff, or inventory intent and choose the smallest mode.

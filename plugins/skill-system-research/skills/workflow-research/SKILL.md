@@ -7,6 +7,7 @@ description: Execute one explicitly selected Research stage as a bounded task or
 
 ## Routing Card
 - role: execution_primary
+- family: research
 - intent_signature: explicit Research node execution, RES-* node management, bounded scientific stage envelope
 - use_when:
   - an accepted Plan/Handoff assigns one Research node and one exact Research stage skill

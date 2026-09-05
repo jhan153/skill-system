@@ -7,6 +7,7 @@ description: Execute one explicitly selected Research stage as a bounded task or
 
 ## Routing Card
 - role: execution_primary
+- family: research
 - intent_signature: explicit Research node execution, RES-* node management, bounded scientific stage envelope
 - use_when:
   - an accepted Plan/Handoff assigns one Research node and one exact Research stage skill
@@ -32,6 +33,41 @@ description: Execute one explicitly selected Research stage as a bounded task or
   tools: only those authorized by the selected Research stage; no automatic network, install, training, or external write
   sensitive_resources: credentials, private data, authenticated sources, and external publication require explicit authority
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/contracts/core-execution-items-v1/cards/research_result.md",
+    "target": "references/core-execution-items-v1/cards/research_result.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/schemas/execution/execution-item.schema.json",
+    "target": "references/execution-item.schema.json",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "matching Core result crosses the declared workflow boundary"
+  },
+  {
+    "source": "shared/docs/execution_item_contract.md",
+    "target": "references/execution_item_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/research_stage_contract.md",
+    "target": "references/research_stage_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Core Cards
 

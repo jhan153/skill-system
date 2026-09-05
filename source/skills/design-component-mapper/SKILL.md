@@ -7,6 +7,7 @@ description: "Map design components, semantic roles, variants, states, slots, ev
 
 ## Routing Card
 - role: design_evidence_gate
+- family: design
 - intent_signature: design-to-repo component contract mapping, catalog reuse proof, or required variant/state coverage
 - use_when:
   - a design source must map to repo components or a declared catalog before implementation/completion.
@@ -50,6 +51,34 @@ description: "Map design components, semantic roles, variants, states, slots, ev
   - PREPARE
 
 Connect design roles to existing code components without redesigning their API; keep catalog availability, planned selection, and actual app-surface reuse distinct.
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/design_evidence_contract.md",
+    "target": "references/design_evidence_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/design_stage_contract.md",
+    "target": "references/design_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/product_family_design_contract.md",
+    "target": "references/product_family_design_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 

@@ -8,6 +8,7 @@ description: Design capture, recording, replay, and versioned reality-corpus con
 ## Routing Card
 
 - role: test_design_specialist
+- family: testing
 - intent_signature: replay test, recording test, captured fixtures, reality corpus, deterministic reproduction
 - use_when: a named failure or regression needs production-path capture/replay or a versioned representative corpus
 - do_not_use_when: synthetic data is sufficient and authoritative, exact oracle selection is primary, raw production capture is unauthorized, or implementation alone is requested

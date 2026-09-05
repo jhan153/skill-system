@@ -8,6 +8,7 @@ description: Implement and execute a complete test contract as test-only code, f
 ## Routing Card
 
 - role: execution_primary
+- family: testing
 - intent_signature: implement tests, add unit/integration/system tests, implement replay or screenshot test, 테스트 구현
 - use_when:
   - the user requests test-only implementation or execution and the complete test contract is already authoritative

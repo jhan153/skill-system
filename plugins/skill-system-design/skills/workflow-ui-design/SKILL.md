@@ -7,6 +7,7 @@ description: Create a concrete, inspectable UI design from accepted requirements
 
 ## Routing Card
 - role: execution_primary
+- family: design
 - intent_signature: create UI design, screen visual design, requirements-to-mockup, 화면 디자인 제작
 - use_when:
   - accepted requirements or behavior need a concrete screen/component design artifact

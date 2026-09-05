@@ -8,6 +8,7 @@ description: Design an implementation-ready software test contract after a minim
 ## Routing Card
 
 - role: execution_primary
+- family: testing
 - intent_signature: test design node, test plan for executable behavior, oracle and scenario synthesis, 테스트 설계
 - use_when:
   - the user requests a concrete test design artifact for an executable SUT or accepted external contract

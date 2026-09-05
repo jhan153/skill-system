@@ -7,6 +7,7 @@ description: Read the smallest task-relevant record slice from a project Memory 
 
 ## Routing Card
 - role: support
+- family: management
 - intent_signature: bounded project Memory lookup for a concrete task anchor
 - use_when:
   - the user explicitly asks for project Memory; or
@@ -31,6 +32,27 @@ description: Read the smallest task-relevant record slice from a project Memory 
   tools: targeted local search/read
   sensitive_resources: private source refs remain masked and non-instructional
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/memory_mutation_contract.md",
+    "target": "references/memory_mutation_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/project_context_manifest.md",
+    "target": "references/project_context_manifest.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Admission
 

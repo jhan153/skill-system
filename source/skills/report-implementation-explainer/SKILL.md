@@ -7,6 +7,7 @@ description: Produce an explicitly requested source/runtime explanation of an ex
 
 ## Routing Card
 - role: report_primary
+- family: report
 - intent_signature: explicit implementation explanation report or verified changed-lines/before-after report
 - use_when:
   - the user requests a durable causal implementation explanation or readable verified comparison
@@ -32,6 +33,48 @@ description: Produce an explicitly requested source/runtime explanation of an ex
   tools: focused read-only inspection and optional local rendering
   sensitive_resources: credentials denied; redact sensitive runtime data
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/report-canvas",
+    "target": "@plugin/shared/report-canvas",
+    "projection": "tree",
+    "load": "read_if_needed",
+    "condition": "a selected HTML report requires the shared Report Canvas renderer"
+  },
+  {
+    "source": "shared/docs/report_canvas_contract.md",
+    "target": "references/report_canvas_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/report_delivery_contract.md",
+    "target": "references/report_delivery_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/report_visual_authoring.md",
+    "target": "references/report_visual_authoring.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/visual_decision_contract.md",
+    "target": "references/visual_decision_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected HTML delivery activates the Report Canvas authoring contract"
+  }
+]
+```
 
 ## Delivery And Ownership
 

@@ -8,6 +8,7 @@ disable-model-invocation: true
 
 ## Routing Card
 - role: design_evidence_gate
+- family: design
 - intent_signature:
   - visual regression
   - screenshot evidence

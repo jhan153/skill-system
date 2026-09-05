@@ -7,6 +7,7 @@ description: "Project an approved experiment contract into a small repo-native w
 
 ## Routing Card
 - role: heavy_artifact_generator
+- family: research
 - intent_signature: experiment scaffold, experiments directory, run/evaluate skeleton, blueprint to code, 실험 코드 스켈레톤
 - use_when: explicit code/scaffold request from an approved blueprint or equivalent complete experiment contract
 - do_not_use_when: unsettled hypothesis/protocol, search, synthesis, statistics, writing, ordinary product implementation, data acquisition, or training execution
@@ -15,6 +16,20 @@ description: "Project an approved experiment contract into a small repo-native w
 - context_targets: contract, target instructions, and nearest runnable experiment pattern; manifest/data/config interfaces only as needed; exclude full literature, datasets, unrelated training, and manuscripts
 - risk_profile: write only the accepted target; safe local checks only; no implicit network, install, download, training, credentials, or private data
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/research_stage_contract.md",
+    "target": "references/research_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage

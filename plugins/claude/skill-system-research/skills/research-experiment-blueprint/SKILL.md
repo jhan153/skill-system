@@ -7,6 +7,7 @@ description: Turn one selected hypothesis into the smallest identifiable, reprod
 
 ## Routing Card
 - role: primary
+- family: research
 - intent_signature: selected-hypothesis protocol, experiment/benchmark design, controls, metrics, ablations, stop/refute
 - use_when:
   - one hypothesis is selected and needs an executable scientific design without code

@@ -7,6 +7,7 @@ description: Create, update, activate, or deprecate one explicitly persistent go
 
 ## Routing Card
 - role: memory_operation
+- family: management
 - intent_signature: explicit durable Memory record mutation
 - use_when: the user explicitly requests persistence or an approved context checkpoint supplies one exact durable item
 - do_not_use_when: the bank is unavailable, the item is temporary/inferred, or init/read/maintenance is primary
@@ -25,6 +26,27 @@ description: Create, update, activate, or deprecate one explicitly persistent go
   tools: targeted local mutation and readback
   sensitive_resources: private evidence is reduced to a stable pointer or masked summary
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/memory_mutation_contract.md",
+    "target": "references/memory_mutation_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/project_context_manifest.md",
+    "target": "references/project_context_manifest.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Modes
 

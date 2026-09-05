@@ -85,7 +85,8 @@
 ## Context Scheduling
 - Do not load all global, repo, memory, and skill documents by default.
 - Build the smallest context bundle needed for the current request.
-- Use `.claude/context-routing.md` as the operational routing reference for bundle shape, route matrix, and audit checks.
+- Use `.claude/context-routing.md` for Claude-only guardrails and
+  `.claude/docs/skill_routing.md` for a targeted generated family lookup when routing is genuinely ambiguous.
 - Choose one primary skill first, then attach modifiers, review gates, output modifiers, or memory operations only when needed.
 - Prefer repo-level source outlines, active plan files, relevant memory cards, and validation contracts over broad loading.
 - If context is insufficient, expand one layer at a time from the bundle's `read_if_needed` list.

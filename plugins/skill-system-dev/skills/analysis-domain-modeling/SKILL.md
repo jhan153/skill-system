@@ -7,6 +7,7 @@ description: Clarify domain language, identity, state transitions, invariants, a
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature:
   - domain modeling, ubiquitous language, identity/value/state boundary, invariant, business rule, or naming decision
 - use_when:

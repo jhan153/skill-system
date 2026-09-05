@@ -7,6 +7,7 @@ description: Design target or transition software architecture from accepted beh
 
 ## Routing Card
 - role: primary
+- family: analysis
 - intent_signature:
   - multi-boundary software architecture design
   - target or transition architecture
@@ -67,6 +68,48 @@ description: Design target or transition software architecture from accepted beh
   tools: focused search, safe current-path observation, and bounded diagram rendering only when it materially clarifies the design
   sensitive_resources: credentials and production data denied; external systems and persistent state remain read-only unless separately authorized
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/architecture_design_contract.md",
+    "target": "references/architecture_design_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/boundary_decision_contract.md",
+    "target": "references/boundary_decision_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/database_persistence_transparency_contract.md",
+    "target": "references/database_persistence_transparency_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/programming-paradigms",
+    "target": "references/programming-paradigms",
+    "projection": "tree",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/programming_paradigm_contract.md",
+    "target": "references/programming_paradigm_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Ownership Boundary
 

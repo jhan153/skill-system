@@ -7,6 +7,7 @@ description: At an explicitly requested project context checkpoint during commit
 
 ## Routing Card
 - role: project_context_operation
+- family: management
 - intent_signature: project commit/closeout durable context checkpoint
 - use_when:
   - the user explicitly requests a project context checkpoint as part of a commit; or

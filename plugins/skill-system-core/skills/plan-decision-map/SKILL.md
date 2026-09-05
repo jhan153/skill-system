@@ -7,6 +7,7 @@ description: Maintain an explicitly requested decision map for work whose target
 
 ## Routing Card
 - role: primary
+- family: planning
 - intent_signature: explicit durable map of unresolved decisions for a multi-session outcome
 - use_when:
   - the user explicitly invokes `plan-decision-map` or requests a persistent decision map.

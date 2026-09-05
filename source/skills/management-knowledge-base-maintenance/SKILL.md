@@ -7,6 +7,7 @@ description: Integrity-check, reindex, inspect typed relations and semantic hist
 
 ## Routing Card
 - role: knowledge_operation
+- family: management
 - intent_signature: Knowledge Base integrity-check, reindex, relation/history check, overlap/conflict reconciliation, recurrence report
 - use_when: the user explicitly requests maintenance of an exact or manifest-declared store
 - do_not_use_when: task context read, one known record update, new category authoring, plan sync, Memory, or Wiki work is primary
@@ -22,6 +23,34 @@ description: Integrity-check, reindex, inspect typed relations and semantic hist
   tools: targeted local search/edit/readback
   sensitive_resources: private refs require explicit scoped access
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/execution_assurance_contract.md",
+    "target": "references/execution_assurance_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/knowledge_record_contract.md",
+    "target": "references/knowledge_record_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/project_context_manifest.md",
+    "target": "references/project_context_manifest.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Operations
 - `report`: summarize layout, categories, statuses, navigation coverage, and unresolved structural issues; byte-read-only.

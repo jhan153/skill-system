@@ -8,6 +8,7 @@ description: Design a reproducible ensemble or distributional test oracle for st
 ## Routing Card
 
 - role: test_design_specialist
+- family: testing
 - intent_signature: statistical test oracle, nondeterministic test, chaotic simulation test, seed ensemble, distributional regression
 - use_when: a named software condition is inherently stochastic/chaotic or requires repeated-run distributional judgment
 - do_not_use_when: an exact/invariant oracle is sufficient, scientific inference about a population is primary, no executable observation exists, or test implementation is requested
@@ -26,6 +27,20 @@ description: Design a reproducible ensemble or distributional test oracle for st
   tools: reproducible computation on supplied/authorized observations when needed to compare candidate rules
   sensitive_resources: preserve data governance and never expose raw private captures
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/testing_strategy_contract.md",
+    "target": "references/testing_strategy_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Workflow
 

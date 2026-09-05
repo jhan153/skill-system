@@ -1,117 +1,101 @@
 # Skill Registry
 
-`family` is the user-facing grouping field and single source of truth. Each skill has exactly one
-primary family. The registry records current owners; the Group Alias Map provides only family-level
-display and entry selection. Host `context-routing.md` files own trigger and provider guardrails.
+> Generated from each canonical `source/skills/*/SKILL.md` Routing Card plus
+> `source/shared/routing/families.json` and `source/plugins/*.yaml`. Do not edit this projection.
 
 ## Registry
 
-| skill | cluster | primary use | do_not_use_when | family |
+| skill | family | role | plugin owner | implicit invocation |
 | --- | --- | --- | --- | --- |
-| `design-a11y-audit` | design | Review keyboard, focus, semantic, contrast, target-size, and responsive readability evidence for implemented UI. | Backend-only work, token-only work, or requests without a concrete UI target. | `design` |
-| `report-critical` | review_quality | Produce an explicitly requested blocker, risk, critical-review, or QA-gate report as content-first Markdown with optional matching HTML. | Ordinary diagnosis, generic code review, implementation, automatic post-task QA, or Plan/Handoff transition control is primary. | `report` |
-| `plan-execution-handoff` | execution_planning | Create or update a canonical `plan.md` plus mutable `handoff.md` pair and compile one risk-adaptive archetype—defaulting to design/implementation → static review → `human_test_ready` termination—into a typed acyclic DAG. Attach the repeated-work profile only to an admitted verifier-steered graph. | Suitability-only classification, ordinary direct implementation, status-only reporting, a small one-session plan, lightweight coordination, strict timing enforcement, old-handoff resume, continuous polling, fixed/busy waits, or unrelated sibling scope is needed. | `planning` |
-| `plan-task-handoff` | coordination | Create explicit task DAGs, multi-agent or multi-session handoffs, lock scopes, validation ownership, and task-local artifact inventories. | Direct execution, a simple goal/status summary, or persistent workflow state is needed. | `planning` |
-| `report-lifecycle-artifacts` | lifecycle_artifacts | Package and trace explicitly selected existing lifecycle artifacts through a Markdown index/matrix and optional matching HTML view. | Empty planned shells, direct implementation, planning/status ownership, validation execution, or automatic closeout is requested. | `report` |
-| `analysis-architecture-deepening` | codebase_analysis | Find ranked deep-module, seam, adapter, shallow-wrapper, and policy-move candidates without a full repo-wide report. | A single design decision, direct implementation, full report artifact, bug diagnosis, or repair execution is needed. | `analysis` |
-| `analysis-codebase-map` | codebase_analysis | Model a repository or named slice as Mermaid HLD/LLD maps; generic codebase-report wording resolves to this compact map instead of the retired integrated report. | One-boundary decisions, ranked improvement scans, bug RCA, or explicit findings/quality-gate artifacts. | `analysis` |
-| `analysis-boundary-design` | codebase_analysis | Decide one standalone or explicitly assigned atomic module/interface/seam/adapter/dependency boundary, preserving relevant accepted architecture constraints when supplied. | Coupled multi-view architecture, ordinary implementation, first-pass bug RCA, full report generation, or pure domain glossary/ADR maintenance is primary. | `analysis` |
-| `workflow-architecture-design` | architecture_design | Design target or transition architecture when accepted behavior or quality scenarios span multiple module/API, data-owner, protocol/event, runtime/thread/failure, deployment, trust, or architecture-material programming-paradigm boundaries. | Current-state mapping, one-boundary decisions, candidate ranking, accepted-design implementation, local paradigm mechanics, internal scheduler parallelization, review, or persistent ADR/Knowledge writing is primary. | `analysis` |
-| `analysis-domain-modeling` | codebase_analysis | Clarify domain concepts, entity/value-object boundaries, state transitions, invariants, business rules, and naming language before implementation or refactoring. | The task is ordinary implementation, generic architecture review, full codebase reporting, persistent glossary/docs mutation, or documentation-only work. | `analysis` |
-| `analysis-performance` | analysis | Diagnose latency, throughput, CPU, memory, query, rendering, startup, bundle, or algorithmic bottlenecks with scoped evidence. | Correctness bugs, already-selected implementation changes, repo-wide reports, or scientific benchmarking are primary. | `analysis` |
-| `workflow-runtime-debugging` | runtime_debugging | Define an execution-ready debugging scope or directly investigate one concrete runtime correctness failure through an existing or approved debugger session, crash artifact, dynamic diagnostic, concurrency trace, or graphics capture; validate target/build/symbol/capture identity and return a bounded direct or Core result without repair. | Simple source/log explanation, source or test repair, progressing performance-only diagnosis, Test Design/Implementation, static code review, or production diagnostic-infrastructure implementation is primary. | `analysis` |
-| `design-component-mapper` | design | Map design/component contracts and prove approved app-surface component reuse with import/use evidence, exceptions, and unmapped gaps. | Generic design critique, backend-only implementation, UX pattern selection, or full visual implementation ownership. | `design` |
-| `workflow-ui-design` | design | Create a concrete inspectable UI design and implementation handoff from accepted requirements, product behavior, content, platform, and visual context. | Product requirements are unresolved, an existing reference only needs analysis, production UI code is requested, or evidence-only review is primary. | `design` |
-| `analysis-algorithm` | analysis | Choose an approach from actual constraints, using multiple candidates only when a real trade-off exists; a current failure does not exclude this owner when the approach decision remains open. | Failure diagnosis or an admitted same-contract repair is primary, or the method is already selected for implementation. | `analysis` |
-| `design-frontend` | design | Implement concrete visual designs as real repo UI code with conditional surface profiles, product-family rules, approved component reuse, and evidence-based UX control choices. | Design critique, product ideation, backend-only work, explanation-only tasks, or evidence-only review. | `design` |
-| `design-tokens` | design | Normalize token sources, platform mappings, gaps, conflicts, and no-fabrication token evidence. | No token source or target platform exists, or the user expects invented token values. | `design` |
-| `design-layout-translator` | design | Translate Auto Layout, flex/grid, sizing, overflow, and breakpoint constraints into implementation-ready layout rules. | Full UI implementation, screenshot-diff-only, component-state-only, or backend-only requests. | `design` |
-| `management-memory-bank-harness` | memory | Read the smallest relevant slice of a manifest-declared Memory Bank. | No bank is declared, no concrete task anchor exists, or full-bank loading would be required. | `management` |
-| `management-memory-bank-init` | memory | Initialize one readable `memory.md` and register only its approved manifest root. | Initialization is not explicit, a bank already exists, or inferred records/legacy ledgers are expected. | `management` |
-| `management-memory-bank-maintenance` | memory | Report, integrity-check, conflict-check, consolidate, compact, or explicitly migrate one declared bank without scores. | The request is ordinary task work or would require silent legacy migration. | `management` |
-| `management-memory-bank-update` | memory | Mutate one explicitly persistent goal, rule, proven practice, or mistake candidate and append one semantic record revision. | The instruction is temporary, inferred, ambiguous, or would require initializing/migrating a bank. | `management` |
-| `plan-behavior-discovery` | behavior_discovery | Resolve one product behavior decision at a time for an existing capability from re-opened source/runtime anchors until the next human-operable vertical slice is ready. | No concrete implementation/path exists, behavior is already selected for implementation, or the user wants a quiz, explanation, or exhaustive release checklist. | `planning` |
-| `plan-test-discovery` | test_planning | Resolve one human-owned test-basis, oracle, tolerance, baseline, horizon, or accepted-uncertainty decision surfaced by Test Design and persist decided scope for Execution Handoff. | Authoritative evidence already decides the field, product requirements/behavior are open, test design/implementation is primary, or Human Test is requested. | `testing` |
-| `plan-requirements-discovery` | requirements_discovery | Run a dependency-aware human-in-loop requirements interview before PRD, HLD, LLD, active planning, or implementation. | Stable requirements already exist, a brief clarification is enough, or the user wants direct execution/reporting. | `planning` |
-| `plan-requirements-brief` | requirements_specification | Distill discovery notes, returned question-document answers, or decision logs into a requirements contract or PRD/SRS-lite. | Requirements still need interactive elicitation, phase/package planning, or direct implementation is needed. | `planning` |
-| `plan-question-document` | requirements_discovery | Create one explicitly requested Markdown question document for the answer owner who holds facts or decisions the user lacks. | The user can answer directly, no artifact is requested, many-respondent survey design is needed, or external delivery is primary. | `planning` |
-| `plan-decision-map` | planning | Maintain a durable multi-session map of a target outcome, bounded decision items, prerequisites, current readiness, unshaped unknowns, and exclusions. | One discovery/planning session is enough, decisions are settled, an implementation backlog is wanted, or direct execution is requested. | `planning` |
-| `management-project-context-checkpoint` | project_context | At an explicitly requested context checkpoint during commit or closeout, classify clear durable current-task items into one existing declared Memory Bank or Knowledge Base. | The checkpoint was not explicitly requested, the event is a Stop hook, no store is declared, the item is ambiguous, or the request is only a complaint/status update. | `management` |
-| `management-project-context` | project_context | Explicitly initialize, diagnose, update, or bootstrap `project-context.yaml` while preserving unrelated sections and exact write approvals. | The request is ordinary context resolution/task work, inferred cleanup, store-content mutation, or automatic setup after a missing declaration. | `management` |
-| `report-implementation-explainer` | implementation_understanding | Produce a source/runtime causal explanation or verified changed-lines comparison in Markdown with optional matching trace/compare/spatial HTML. | The user wants a quality/readiness verdict, pre-implementation algorithm choice, generic line explanation, direct implementation, or automatic post-task reporting. | `report` |
-| `research-experiment-blueprint` | research | Convert a selected hypothesis into an identifiable protocol with controls, matched data/metrics, falsifiers, and reproducibility. | The claim is not selected yet or code generation/execution is requested. | `research` |
-| `research-experiment-scaffold` | research | Project an approved experiment contract into a small repo-native wiring scaffold with entry point, config, data boundary, result envelope, and deterministic smoke. | No approved scaffold boundary exists, or real method/data/training implementation is the requested outcome. | `research` |
-| `research-hypothesis-planning` | research | Narrow a premise into a falsifiable primary decision and cheapest discriminating evidence plan. | The request implements an already selected method or needs a full selected-hypothesis protocol. | `research` |
-| `research-literature-ideation` | research | Derive evidence-linked candidate hypotheses while separating observed field gaps from corpus coverage gaps; select only when requested. | Evidence has not been acquired/synthesized or the user only wants raw-premise planning. | `research` |
-| `research-literature-synthesis` | research | Synthesize comparable evidence into themes, agreements, contradictions, limitations, and coverage gaps without paper-count voting. | The user wants evidence acquisition, hypothesis selection, or venue-ready manuscript prose. | `research` |
-| `research-manuscript-writing` | research | Draft evidence-traceable scientific prose while separating planned methods, observed results, and interpretation. | Evidence acquisition, data analysis, or peer-review critique is primary. | `research` |
-| `search-paper-evidence` | research | Acquire traceable paper evidence with separate acquisition, source-identity, evidence-basis, and claim-relation status. | The user wants supplied-paper summarization, code implementation, or manuscript prose only. | `search` |
-| `search-deep-evidence` | search | Cross-check claims across relevant evidence lanes using provenance, directness, independence, and preserved contradictions. | Single paper lane, final synthesis ownership, or bare analysis without evidence intent. | `search` |
-| `research-peer-review` | research | Return anchored scholarly findings ordered by validity, evidential, reproducibility, and reporting consequence. | The target is a generic software artifact or writing/search is primary. | `research` |
-| `research-statistical-analysis` | research | Analyze real data with an estimand, correct analysis unit, reproducible computation, effects, uncertainty, and planned/exploratory separation. | Adequate data/design information is absent and the user expects conclusions. | `research` |
-| `workflow-research` | research | Execute one explicitly assigned Research DAG node with exactly one Plan-selected Research stage specialist and return Core `research_result`. | The request is an ordinary direct one-stage Research task, the stage is undecided, several stages need planning, or DAG topology/successor selection is primary. | `research` |
-| `workflow-test-design` | testing_design | Produce an implementation-ready test contract from an executable SUT and authoritative basis, including scenario, data, oracle, environment, horizon, diagnostics, falsifier, and proof ceiling. | A direct implementation-ready test contract exists, the SUT is not executable, test code/repair/Human Test is primary, or product meaning is unresolved. | `testing` |
-| `workflow-test-implementation` | testing_execution | Implement and execute an authoritative test contract as bounded test-only assets and condition-scoped evidence without changing production code or weakening the oracle. | A material test-design field remains open, production behavior/testability must change, a concrete failure needs repair, or evidence review alone is requested. | `testing` |
-| `test-scope-selection` | testing_design | Select the smallest real SUT and observation boundary plus a multi-axis test profile without changing production architecture. | The boundary is already accepted, production module design is open, scenario/oracle design is primary, or implementation is requested. | `testing` |
-| `test-oracle-design` | testing_design | Select an authoritative exact, invariant, metamorphic, differential, golden, statistical, or human oracle with explicit independence and proof ceiling. | The oracle is already authoritative, scenario coverage or statistical ensemble design alone is primary, or test code is requested. | `testing` |
-| `test-scenario-design` | testing_design | Derive a minimal traceable positive, negative, edge, state, sequence, data, load, and horizon scenario set for accepted conditions. | Test basis/oracle authority is open, one obvious case suffices, replay/corpus design is primary, or implementation is requested. | `testing` |
-| `test-replay-corpus` | testing_design | Design provenance-preserving capture, recording, replay, and versioned reality-corpus contracts through production validation paths. | Synthetic data is authoritative and sufficient, raw capture is unauthorized, oracle choice or implementation is primary, or replay is being treated as correctness. | `testing` |
-| `test-visual-regression` | testing_evidence | In explicit `design` mode author a rendered-regression contract without capture/verdict; in explicit `evidence` mode consume that contract for named state/viewport comparison without redesign. | Mode is not selected, design-target fidelity/family coherence, accessibility, interaction semantics, subjective acceptance, or evidence mode lacks an accepted contract/baseline. | `testing` |
-| `test-statistical-oracle` | testing_design | Design ensemble and distributional test oracles for stochastic, chaotic, simulation, optimization, or numerically variable software. | An exact/invariant oracle suffices, scientific inference is primary, no executable observation exists, or test code is requested. | `testing` |
-| `test-evidence-review` | testing_evidence | Review bounded test design/implementation/results for false-green, circular oracle, surrogate path, weak falsifier, baseline drift, and proof inflation. | Test design/implementation/repair, broad code review, or an unbounded quality verdict is primary. | `testing` |
-| `workflow-bug-fix` | execution_control | Own one semantically admitted bounded repair that preserves an already-implemented accepted production contract, or at most two locally reviewed same-contract standalone rounds; return changed snapshot/review anchor or no-change evidence plus an optional Known Bug candidate. | First implementation or explicit production-mechanism replacement, an unresolved method decision, diagnosis-only work, full static review/disposition, Plan/Handoff mutation, successor selection, ordinary feature work, or validation-only work is primary. | `workflow` |
-| `workflow-dependency-upgrade` | execution_control | Upgrade dependencies, runtimes, SDKs, frameworks, packages, and lockfiles with bounded migration and validation; concrete stuck failures consume the shared bug-fix attempt/Known Bug contract. | Ordinary feature work, dependency-choice analysis, or security/release verdicts are primary. | `workflow` |
-| `workflow-code-review` | review_quality | Bind a production/test implementation change contract, run design-first risk selection, account for every material effect through source-linked Mermaid models, and return a scoped standalone or Core static disposition with findings, advisories, deferred items, coverage, and proof ceiling. | Mapping-only, lightweight style/naming feedback, repair, runtime validation, production test-oracle review, or Plan/Handoff topology editing is primary. | `workflow` |
-| `workflow-implementation` | execution_control | Own direct production coding requests through one canonical internal contract, including first implementation or explicit replacement of an accepted algorithm, model, backend, or canonical production flow even when a current failure motivated it; production-coupled regression tests may remain in the slice. | Standalone Test Design/test-only implementation, approved plan coordination, behavior-preserving refactor, semantically admitted same-contract bounded repair, pure analysis, or validation-only work. | `workflow` |
-| `workflow-prototype` | execution_control | Build one isolated runnable UI comparison or state/logic model to answer an explicit unresolved decision question before production implementation, preserving it until the decision owner observes it. | Vague ideation, selected production changes, bug work, or claims requiring performance, security, accessibility, concurrency, persistence, or production-integration evidence. | `workflow` |
-| `workflow-refactor-safely` | execution_control | Run behavior-preserving refactors with a behavior contract, characterization checks, small batches, validation, and bounded bug-fix/Known Bug handling for concrete failures. | Feature changes, bug fixes, or design-only decisions are primary. | `workflow` |
-| `workflow-source-maintenance` | execution_control | Prune source proven obsolete or synchronize comments/docstrings/TODO markers in explicit behavior-preserving modes. | Feature work, concrete bug repair, live-code restructuring, dependency upgrades, or general documentation is primary. | `workflow` |
-| `management-knowledge-base-record` | knowledge | Create one new accepted domain, design, algorithm, architecture, decision, or recurring code-review identity, including an approved-plan decision. | The item is speculative, generic, transient, unanchored, belongs to Memory, or updates an existing identity. | `management` |
-| `management-knowledge-base-init` | knowledge | Initialize a minimal navigable Markdown Knowledge Base and register only its manifest path. | Initialization was not explicit/approved or the user expects an LLM Wiki or separate graph/score store. | `management` |
-| `management-knowledge-base-maintenance` | knowledge | Integrity-check, reindex, relation/history-check, classify overlap/conflict, derive recurrence profiles, compact, or explicitly reconcile a Knowledge Base. | The task only needs a narrow read or requires automatic merge, scoring, Memory, or Wiki mutation. | `management` |
-| `management-knowledge-base-read` | knowledge | Read the smallest task-relevant slice and traverse only the typed why/history/scope/recurrence path needed by the question. | No store is declared, no concrete anchor exists, or the request would require a full graph dump. | `management` |
-| `management-knowledge-base-update` | knowledge | Observe, amend, reverify, supersede, deprecate, or relink an existing record, including accepted-plan sync to an existing identity. | The item or plan is speculative, a duplicate identity, belongs in Memory, or requires Wiki synchronization. | `management` |
-| `analysis-llm-wiki-context` | knowledge | Build minimum task-oriented read-only context from one explicitly selected LLM Wiki using that Wiki's own navigation conventions. | No Wiki is explicitly selected, multiple Wikis are ambiguous, or mutation is requested. | `analysis` |
-| `report-qualitative` | output | Apply supplied or explicitly delegated context-bound criteria, interpret metrics as evidence, and return qualitative judgment in Markdown with optional matching HTML. | Metric-only output, critical QA, diffs, telemetry, implementation, validation execution, or vague report wording without qualitative intent is primary. | `report` |
-| `design-ui-decomposer` | design | Decompose UI references into hierarchy, layout regions, component candidates, token candidates, states, and validation needs. | Direct implementation, token-only, screenshot-diff-only, or product strategy requests. | `design` |
-| `design-visual-regression` | design | Inspect rendered screenshots and report exact-target fidelity separately from coherence with pinned product-family baselines. | There is no rendered UI, screenshot target, exact reference, or applicable visual acceptance/baseline criteria. | `design` |
+| `analysis-algorithm` | `analysis` | `primary` | `skill-system-dev` | `true` |
+| `analysis-architecture-deepening` | `analysis` | `primary` | `skill-system-dev` | `true` |
+| `analysis-boundary-design` | `analysis` | `primary` | `skill-system-dev` | `true` |
+| `analysis-codebase-map` | `analysis` | `primary` | `skill-system-dev` | `true` |
+| `analysis-domain-modeling` | `analysis` | `primary` | `skill-system-dev` | `true` |
+| `analysis-llm-wiki-context` | `analysis` | `support` | `skill-system-core` | `false` |
+| `analysis-performance` | `analysis` | `primary` | `skill-system-dev` | `true` |
+| `design-a11y-audit` | `design` | `design_evidence_gate` | `skill-system-design` | `false` |
+| `design-component-mapper` | `design` | `design_evidence_gate` | `skill-system-design` | `false` |
+| `design-frontend` | `design` | `primary` | `skill-system-design` | `true` |
+| `design-layout-translator` | `design` | `primary_analysis_or_modifier` | `skill-system-design` | `true` |
+| `design-tokens` | `design` | `design_evidence_gate` | `skill-system-design` | `false` |
+| `design-ui-decomposer` | `design` | `primary_analysis` | `skill-system-design` | `true` |
+| `design-visual-regression` | `design` | `design_evidence_gate` | `skill-system-design` | `false` |
+| `management-knowledge-base-init` | `management` | `knowledge_operation` | `skill-system-core` | `false` |
+| `management-knowledge-base-maintenance` | `management` | `knowledge_operation` | `skill-system-core` | `false` |
+| `management-knowledge-base-read` | `management` | `support` | `skill-system-core` | `true` |
+| `management-knowledge-base-record` | `management` | `knowledge_operation` | `skill-system-core` | `false` |
+| `management-knowledge-base-update` | `management` | `knowledge_operation` | `skill-system-core` | `false` |
+| `management-memory-bank-harness` | `management` | `support` | `skill-system-core` | `true` |
+| `management-memory-bank-init` | `management` | `memory_operation` | `skill-system-core` | `false` |
+| `management-memory-bank-maintenance` | `management` | `memory_operation` | `skill-system-core` | `false` |
+| `management-memory-bank-update` | `management` | `memory_operation` | `skill-system-core` | `false` |
+| `management-project-context` | `management` | `project_context_operation` | `skill-system-core` | `false` |
+| `management-project-context-checkpoint` | `management` | `project_context_operation` | `skill-system-core` | `false` |
+| `plan-behavior-discovery` | `planning` | `primary` | `skill-system-dev` | `false` |
+| `plan-decision-map` | `planning` | `primary` | `skill-system-core` | `false` |
+| `plan-execution-handoff` | `planning` | `primary` | `skill-system-core` | `false` |
+| `plan-question-document` | `planning` | `primary` | `skill-system-core` | `false` |
+| `plan-requirements-brief` | `planning` | `primary` | `skill-system-core` | `false` |
+| `plan-requirements-discovery` | `planning` | `primary` | `skill-system-core` | `false` |
+| `plan-task-handoff` | `planning` | `support` | `skill-system-core` | `true` |
+| `plan-test-discovery` | `testing` | `support` | `skill-system-testing` | `true` |
+| `report-critical` | `report` | `report_primary` | `skill-system-core` | `false` |
+| `report-implementation-explainer` | `report` | `report_primary` | `skill-system-core` | `false` |
+| `report-lifecycle-artifacts` | `report` | `report_primary` | `skill-system-core` | `false` |
+| `report-qualitative` | `report` | `report_primary` | `skill-system-core` | `false` |
+| `research-experiment-blueprint` | `research` | `primary` | `skill-system-research` | `true` |
+| `research-experiment-scaffold` | `research` | `heavy_artifact_generator` | `skill-system-research` | `false` |
+| `research-hypothesis-planning` | `research` | `primary` | `skill-system-research` | `true` |
+| `research-literature-ideation` | `research` | `primary` | `skill-system-research` | `true` |
+| `research-literature-synthesis` | `research` | `primary` | `skill-system-research` | `true` |
+| `research-manuscript-writing` | `research` | `primary` | `skill-system-research` | `false` |
+| `research-peer-review` | `research` | `review_gate` | `skill-system-research` | `true` |
+| `research-statistical-analysis` | `research` | `primary` | `skill-system-research` | `true` |
+| `search-deep-evidence` | `search` | `primary` | `skill-system-core` | `true` |
+| `search-paper-evidence` | `search` | `primary` | `skill-system-research` | `true` |
+| `test-evidence-review` | `testing` | `testing_evidence_gate` | `skill-system-testing` | `false` |
+| `test-oracle-design` | `testing` | `test_design_specialist` | `skill-system-testing` | `true` |
+| `test-replay-corpus` | `testing` | `test_design_specialist` | `skill-system-testing` | `true` |
+| `test-scenario-design` | `testing` | `test_design_specialist` | `skill-system-testing` | `true` |
+| `test-scope-selection` | `testing` | `test_design_specialist` | `skill-system-testing` | `true` |
+| `test-statistical-oracle` | `testing` | `test_design_specialist` | `skill-system-testing` | `true` |
+| `test-visual-regression` | `testing` | `testing_design_or_evidence_specialist` | `skill-system-testing` | `false` |
+| `workflow-architecture-design` | `analysis` | `primary` | `skill-system-dev` | `true` |
+| `workflow-bug-fix` | `workflow` | `primary` | `skill-system-dev` | `true` |
+| `workflow-code-review` | `workflow` | `review_gate` | `skill-system-dev` | `true` |
+| `workflow-dependency-upgrade` | `workflow` | `primary` | `skill-system-dev` | `true` |
+| `workflow-implementation` | `workflow` | `primary` | `skill-system-dev` | `true` |
+| `workflow-prototype` | `workflow` | `primary` | `skill-system-dev` | `true` |
+| `workflow-refactor-safely` | `workflow` | `primary` | `skill-system-dev` | `true` |
+| `workflow-research` | `research` | `execution_primary` | `skill-system-research` | `false` |
+| `workflow-runtime-debugging` | `analysis` | `execution_primary` | `skill-system-dev` | `true` |
+| `workflow-source-maintenance` | `workflow` | `primary` | `skill-system-dev` | `true` |
+| `workflow-test-design` | `testing` | `execution_primary` | `skill-system-testing` | `true` |
+| `workflow-test-implementation` | `testing` | `execution_primary` | `skill-system-testing` | `true` |
+| `workflow-ui-design` | `design` | `execution_primary` | `skill-system-design` | `true` |
 
 ## Group Alias Map
 
-Family is the user-facing grouping field. The `family` column above is authoritative; this table
-only maps family wording to current entry owners. Host routers decide when family selection is
-needed and must not duplicate the mapping.
+Family aliases are a separate cross-skill concern. They select a family only; the
+matching skill Routing Card retains use/exclusion authority.
 
 | family | display name | entry owner(s) | aliases |
 | --- | --- | --- | --- |
-| `search` | Search & Evidence | `search-paper-evidence` / `search-deep-evidence` / the domain evidence owner by intent | 검색, 근거, 증거, evidence, search |
-| `design` | Design | `workflow-ui-design` / `design-frontend` / `design-ui-decomposer` / `design-layout-translator` / `design-tokens` / `design-component-mapper` / `design-visual-regression` / `design-a11y-audit` by intent | 디자인, UI 디자인, 화면 디자인, Figma-to-code, design, ui |
-| `report` | Report & Review | `report-qualitative` / `report-critical` / `report-implementation-explainer` / `report-lifecycle-artifacts` by intent | 보고, 리포트, 리뷰, 구현 설명, 정성평가, SDLC 산출물, report, review, implementation explainer |
-| `research` | Research | `workflow-research` for an explicit assigned node; otherwise `search-paper-evidence` / `research-literature-synthesis` / `research-literature-ideation` / `research-hypothesis-planning` / `research-experiment-blueprint` / `research-experiment-scaffold` / `research-statistical-analysis` / `research-manuscript-writing` / `research-peer-review` by requested artifact | 연구, 리서치, research |
-| `testing` | Testing | `plan-test-discovery` / `workflow-test-design` / `workflow-test-implementation` / `test-scope-selection` / `test-oracle-design` / `test-scenario-design` / `test-replay-corpus` / `test-visual-regression` / `test-statistical-oracle` / `test-evidence-review` by intent | 테스트, 테스트 설계, 테스트 구현, 오라클, 유닛 테스트, 통합 테스트, 시스템 테스트, 리플레이, 스크린샷 회귀, testing, test, oracle, replay |
-| `analysis` | Analysis | `analysis-algorithm` / `analysis-domain-modeling` / `analysis-performance` / `workflow-runtime-debugging` / `analysis-codebase-map` / `analysis-boundary-design` / `analysis-architecture-deepening` / `workflow-architecture-design` / explicit `analysis-llm-wiki-context` by intent; simple source/log-only bug RCA stays with the current task owner | 분석, analysis, rca, 디버깅, 디버거, 덤프, 심볼, 크래시 분석, 런타임 원인 규명, runtime debugging, debugger, crash dump, symbols, 아키텍처 설계, 목표 아키텍처, 아키텍처 맵, architecture design, target architecture, LLM Wiki, 위키 컨텍스트 |
-| `workflow` | Execution Workflow | `workflow-implementation` / `workflow-prototype` / `workflow-bug-fix` / `workflow-dependency-upgrade` / `workflow-code-review` / `workflow-source-maintenance` / `workflow-refactor-safely` by node intent; standard/strict assurance remains a conditional shared contract on the active owner | 실행, 구현, 코드 리뷰, 정적 코드 리뷰, 상태 흐름 리뷰, 설계 대비 구현 리뷰, 프로토타입, 프로토타이핑, 리팩터링, 버그 수정, 엄격 검증, 실행 통제, 유지보수, cleanup, pruning, comment, docstring, prototype, spike, static code review, state-flow review, implementation design review, upgrade, rigor, workflow |
-| `planning` | Planning | `plan-decision-map` / `plan-execution-handoff` / `plan-task-handoff` / `plan-requirements-discovery` / `plan-question-document` / `plan-behavior-discovery` / `plan-requirements-brief` by intent | 요구사항, 행동 결정, 질문 문서, 결정 지도, 실행 인계, 워터폴, 페이즈 게이트, 핸드오프, 반복 작업 조건, PRD, 플랜, 계획, planning, plan, waterfall, phase gate, question document, decision map, execution handoff, handoff, verifier, goal |
-| `management` | Management | `management-knowledge-base-read` / `management-memory-bank-harness` (read) / explicit `management-knowledge-base-record`, `management-knowledge-base-update`, `management-knowledge-base-maintenance`, `management-knowledge-base-init`, `management-memory-bank-init`, `management-memory-bank-update`, `management-memory-bank-maintenance`, `management-project-context`, or `management-project-context-checkpoint` by intent | 관리, 지식, 메모리, 컨텍스트, knowledge, memory, project context, management |
+| `search` | Search & Evidence | search-paper-evidence / search-deep-evidence / domain evidence owner by intent | 검색, 근거, 증거, evidence, search |
+| `design` | Design | workflow-ui-design / design-frontend / design-ui-decomposer / design-layout-translator / design-tokens / design-component-mapper / design-visual-regression / design-a11y-audit by intent | 디자인, UI 디자인, 화면 디자인, Figma-to-code, design, ui |
+| `report` | Report & Review | report-qualitative / report-critical / report-implementation-explainer / report-lifecycle-artifacts by intent | 보고, 리포트, 리뷰, 구현 설명, 정성평가, SDLC 산출물, report, review, implementation explainer |
+| `research` | Research | workflow-research for an explicit assigned node; otherwise search-paper-evidence / research-literature-synthesis / research-literature-ideation / research-hypothesis-planning / research-experiment-blueprint / research-experiment-scaffold / research-statistical-analysis / research-manuscript-writing / research-peer-review by requested artifact | 연구, 리서치, research |
+| `testing` | Testing | plan-test-discovery / workflow-test-design / workflow-test-implementation / test-scope-selection / test-oracle-design / test-scenario-design / test-replay-corpus / test-visual-regression / test-statistical-oracle / test-evidence-review by intent | 테스트, 테스트 설계, 테스트 구현, 오라클, 유닛 테스트, 통합 테스트, 시스템 테스트, 리플레이, 스크린샷 회귀, testing, test, oracle, replay |
+| `analysis` | Analysis | analysis-algorithm / analysis-domain-modeling / analysis-performance / workflow-runtime-debugging / analysis-codebase-map / analysis-boundary-design / analysis-architecture-deepening / workflow-architecture-design / explicit analysis-llm-wiki-context by intent; simple source/log-only bug RCA stays with the current task owner | 분석, analysis, rca, 디버깅, 디버거, 덤프, 심볼, 크래시 분석, 런타임 원인 규명, runtime debugging, debugger, crash dump, symbols, 아키텍처 설계, 목표 아키텍처, 아키텍처 맵, architecture design, target architecture, LLM Wiki, 위키 컨텍스트 |
+| `workflow` | Execution Workflow | workflow-implementation / workflow-prototype / workflow-bug-fix / workflow-dependency-upgrade / workflow-code-review / workflow-source-maintenance / workflow-refactor-safely by node intent; standard/strict assurance remains a conditional shared contract on the active owner | 실행, 구현, 코드 리뷰, 정적 코드 리뷰, 상태 흐름 리뷰, 설계 대비 구현 리뷰, 프로토타입, 프로토타이핑, 리팩터링, 버그 수정, 엄격 검증, 실행 통제, 유지보수, cleanup, pruning, comment, docstring, prototype, spike, static code review, state-flow review, implementation design review, upgrade, rigor, workflow |
+| `planning` | Planning | plan-decision-map / plan-execution-handoff / plan-task-handoff / plan-requirements-discovery / plan-question-document / plan-behavior-discovery / plan-requirements-brief by intent | 요구사항, 행동 결정, 질문 문서, 결정 지도, 실행 인계, 워터폴, 페이즈 게이트, 핸드오프, 반복 작업 조건, PRD, 플랜, 계획, planning, plan, waterfall, phase gate, question document, decision map, execution handoff, handoff, verifier, goal |
+| `management` | Management | management-knowledge-base-read / management-memory-bank-harness (read) / explicit management-knowledge-base-record, management-knowledge-base-update, management-knowledge-base-maintenance, management-knowledge-base-init, management-memory-bank-init, management-memory-bank-update, management-memory-bank-maintenance, management-project-context, or management-project-context-checkpoint by intent | 관리, 지식, 메모리, 컨텍스트, knowledge, memory, project context, management |
 
-## Cluster Notes
+## Ownership Boundary
 
-- The nine families are routing groups. `skill-system-core`, `skill-system-dev`,
-  `skill-system-design`, `skill-system-research`, and `skill-system-testing` are installation profiles and need not match
-  family boundaries one-to-one.
-- The current task owner selects one matching specialist directly. Family selection never creates a workflow chain or expands write, persistence, network, or side-effect authority.
-- Direct Research stages own one explicitly requested artifact at a time. In a Plan DAG,
-  `workflow-research` owns one node envelope with one preselected stage specialist. Neither form
-  starts the next Research stage automatically.
-- Workflow owners may become executable DAG nodes. Execution assurance is a non-node shared contract on an active owner; Workflow results never select a Plan successor.
-- `workflow-runtime-debugging` is a workflow-shaped Analysis owner: `scope` mode defines the
-  execution-ready debugging contract without operating tools, and `operate` mode may control an
-  approved debugger/capture session. Direct work returns a task-local result; an accepted `DBG0` or
-  `DBG1` node returns Core `debugging_result`. Neither mode repairs source or selects a Plan
-  transition.
-- `plan-execution-handoff` owns durable execution pairs. Its repeated-work profile is conditional, and the Orchestrator follows only the accepted copied DAG.
-- `skill-system-core` owns `core-execution-items-v1`; only declared producers, consumers, and the Handoff recorder receive applicable generated cards.
-- Memory Bank, Knowledge Base, and named LLM Wikis remain separate stores with explicit owners; none is an implicit fallback or automatic mutation target for another.
-- Report Markdown is content-primary. Report Canvas is an optional explicit HTML/spatial projection,
-  not an evidence source, validator, router, or automatic post-implementation step.
-- Invocation metadata may expose intent-matched skills, but persistent stores, external effects, repeated-work execution, and lifecycle mutation remain explicit and provider-governed.
+- Routing semantics and conditional context remain local to each skill Routing Card.
+- Agent metadata owns provider discoverability and implicit invocation, not authorization.
+- Plugin manifests own installation-profile membership only.
+- Provider overlays own genuine host trigger, permission, path, hook, lifecycle, and compatibility rules.
+- Unknown or stale skill IDs remain `unresolved`; no generated view invents aliases or fallback routes.

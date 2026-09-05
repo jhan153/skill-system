@@ -7,6 +7,7 @@ description: Repair one concrete defect in an already-implemented accepted produ
 
 ## Routing Card
 - role: primary
+- family: workflow
 - intent_signature:
   - bug/failing-test/build/runtime/regression fix; broken behavior repair
 - use_when:

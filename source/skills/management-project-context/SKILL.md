@@ -7,6 +7,7 @@ description: Manage an explicitly requested project-context.yaml through minimal
 
 ## Routing Card
 - role: project_context_operation
+- family: management
 - intent_signature: explicit project-context manifest init, doctor, update, or bootstrap
 - use_when: the user explicitly requests `manifest-init`, `doctor`, `update`, or guided `bootstrap` for project context locations
 - do_not_use_when: ordinary context lookup/task work, inferred cleanup, store-content mutation, or automatic setup after a missing declaration
@@ -22,6 +23,20 @@ description: Manage an explicitly requested project-context.yaml through minimal
   tools: targeted local inspection/edit/readback and `skill-system-harness context resolve` when available
   sensitive_resources: credentials and discovery of home/adjacent stores denied; an external target requires an exact user-supplied path and approval
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/project_context_manifest.md",
+    "target": "references/project_context_manifest.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Mode Contract
 

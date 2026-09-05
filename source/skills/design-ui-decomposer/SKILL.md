@@ -7,6 +7,7 @@ description: Decompose UI references into source-traced hierarchy, layout, patte
 
 ## Routing Card
 - role: primary_analysis
+- family: design
 - intent_signature: UI-reference hierarchy, region, pattern, state, and uncertainty decomposition
 - use_when:
   - a supplied visual/design reference must become structured analysis before implementation
@@ -40,6 +41,34 @@ description: Decompose UI references into source-traced hierarchy, layout, patte
   sensitive_resources:
     - private assets and authenticated design sessions default deny
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/design_evidence_contract.md",
+    "target": "references/design_evidence_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/design_stage_contract.md",
+    "target": "references/design_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/visual_decision_contract.md",
+    "target": "references/visual_decision_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 

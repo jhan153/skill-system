@@ -7,6 +7,7 @@ description: "Capture, verify, and compare rendered UI screenshots for design ev
 
 ## Routing Card
 - role: design_evidence_gate
+- family: design
 - intent_signature:
   - visual regression
   - screenshot evidence

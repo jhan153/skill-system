@@ -7,6 +7,7 @@ description: Initialize a minimal navigable project Knowledge Base of Markdown r
 
 ## Routing Card
 - role: knowledge_operation
+- family: management
 - intent_signature: initialize project Knowledge Base, 빈 지식저장소 생성
 - use_when: the user explicitly requests a new project Knowledge Base, approves it in project bootstrap, or authorizes reinitialization
 - do_not_use_when: reading, recording, updating, plan sync, Wiki access, or automatic project setup is primary
@@ -22,6 +23,27 @@ description: Initialize a minimal navigable project Knowledge Base of Markdown r
   tools: local file operations and readback
   sensitive_resources: private sources and credentials denied; external/home paths require exact resolved-path approval
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/knowledge_record_contract.md",
+    "target": "references/knowledge_record_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  },
+  {
+    "source": "shared/docs/project_context_manifest.md",
+    "target": "references/project_context_manifest.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Workflow
 1. Bind `knowledge_root` from the exact approved path or existing manifest declaration. Only when initialization was explicitly requested with neither may you propose `docs/knowledge-base/` as a default; approval binds that proposal before any write. Resolve relative paths from the manifest directory and show the resolved absolute target before any external/home write.

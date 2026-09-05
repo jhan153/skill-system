@@ -7,6 +7,7 @@ description: "Normalize and audit design token sources for design-to-production 
 
 ## Routing Card
 - role: design_evidence_gate
+- family: design
 - intent_signature:
   - design-token source normalization, platform mapping, or gap/conflict audit
 - use_when:
@@ -46,6 +47,41 @@ description: "Normalize and audit design token sources for design-to-production 
 
 This is a token-evidence owner. It may create or edit a requested token artifact, but it never
 owns production UI code or a later Design stage.
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/design_evidence_contract.md",
+    "target": "references/design_evidence_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/design_stage_contract.md",
+    "target": "references/design_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/product_family_design_contract.md",
+    "target": "references/product_family_design_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/visual_decision_contract.md",
+    "target": "references/visual_decision_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 

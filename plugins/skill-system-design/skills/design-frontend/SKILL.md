@@ -7,6 +7,7 @@ description: "Implement a concrete visual artifact or Core design_result as repo
 
 ## Routing Card
 - role: primary
+- family: design
 - intent_signature:
   - Figma-to-code
   - screenshot-to-code

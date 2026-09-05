@@ -7,6 +7,7 @@ description: Amend, observe, reverify, supersede, deprecate, or relink an existi
 
 ## Routing Card
 - role: knowledge_operation
+- family: management
 - intent_signature: amend, observe recurrence, reverify, supersede, deprecate, or relink durable project knowledge
 - use_when: the user explicitly requests a known record change or approved-plan sync, or an approved checkpoint supplies a specific accepted change
 - do_not_use_when: the store/record is missing, new category authoring is primary, a plan is still tentative, or broad maintenance is requested

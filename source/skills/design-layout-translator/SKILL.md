@@ -7,6 +7,7 @@ description: Translate evidenced design layout constraints into bounded, code-re
 
 ## Routing Card
 - role: primary_analysis_or_modifier
+- family: design
 - intent_signature: Auto Layout, flex/grid, intrinsic/fill/fixed sizing, overflow, text-fit, and breakpoint translation
 - use_when:
   - design constraints need implementation rules, or a layout mismatch depends on constraint interpretation
@@ -34,6 +35,34 @@ description: Translate evidenced design layout constraints into bounded, code-re
   sensitive_resources:
     - private design sessions default deny
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/design_evidence_contract.md",
+    "target": "references/design_evidence_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/design_stage_contract.md",
+    "target": "references/design_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/layout_constraint_contract.md",
+    "target": "references/layout_constraint_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 

@@ -8,6 +8,7 @@ description: Select and bound an authoritative test oracle for one named conditi
 ## Routing Card
 
 - role: test_design_specialist
+- family: testing
 - intent_signature: test oracle, expected result, invariant, metamorphic, differential, golden baseline, oracle problem
 - use_when: one test condition has materially competing oracle regimes, authority sources, tolerances, or independence limits
 - do_not_use_when: the oracle is already authoritative, scenario coverage is primary, statistical design alone is primary, or test code is requested
@@ -26,6 +27,20 @@ description: Select and bound an authoritative test oracle for one named conditi
   tools: safe comparisons needed to discriminate oracle candidates
   sensitive_resources: private/reference data requires declared access and redaction
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/testing_strategy_contract.md",
+    "target": "references/testing_strategy_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Oracle Regimes
 

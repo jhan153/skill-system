@@ -8,6 +8,7 @@ description: Derive the smallest discriminating positive, negative, edge, state,
 ## Routing Card
 
 - role: test_design_specialist
+- family: testing
 - intent_signature: test cases, scenario matrix, boundary cases, state transitions, sequence and horizon coverage
 - use_when: accepted conditions need nontrivial scenario/data/state/sequence/horizon derivation
 - do_not_use_when: test basis or oracle authority is open, one obvious case suffices, a corpus/replay system is primary, or implementation is requested

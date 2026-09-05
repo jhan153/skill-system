@@ -7,6 +7,7 @@ description: Maintain an explicitly requested decision map for work whose target
 
 ## Routing Card
 - role: primary
+- family: planning
 - intent_signature: explicit durable map of unresolved decisions for a multi-session outcome
 - use_when:
   - the user explicitly invokes `plan-decision-map` or requests a persistent decision map.
@@ -33,6 +34,20 @@ description: Maintain an explicitly requested decision map for work whose target
   tools: narrow evidence, prototype, or coordination tools only when their own routing and authority contracts are met
   sensitive_resources: credentials and production data denied; never store secrets in planning artifacts
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/execution_handoff_input_contract.md",
+    "target": "references/execution_handoff_input_contract.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Ownership Boundary
 

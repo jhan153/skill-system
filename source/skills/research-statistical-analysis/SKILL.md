@@ -7,6 +7,7 @@ description: Analyze real experimental data or supplied statistics with an expli
 
 ## Routing Card
 - role: primary
+- family: research
 - intent_signature: statistical analysis, significance, effect size, interval, result-table interpretation, 통계 분석
 - use_when: inference or bounded interpretation from supplied data/statistics, or an explicit analysis plan; inadequate inputs remain an insufficient-data response
 - do_not_use_when: experiment/protocol design, scaffold code, manuscript prose, ordinary product implementation, or a non-statistical deliverable is primary
@@ -15,6 +16,20 @@ description: Analyze real experimental data or supplied statistics with an expli
 - context_targets: actual data or plan request plus design and sampling/analysis unit; load dictionary, exclusions, scripts, config, and metadata only as needed; exclude unrelated search, scaffold, and manuscript context
 - risk_profile: privacy-check row data; write analysis code/report only when requested; use reproducible local computation for new statistics; credentials default deny
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/research_stage_contract.md",
+    "target": "references/research_stage_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  }
+]
+```
 
 ## Stage Boundary
 Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage

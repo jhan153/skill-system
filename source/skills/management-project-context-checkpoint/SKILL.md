@@ -7,6 +7,7 @@ description: At an explicitly requested project context checkpoint during commit
 
 ## Routing Card
 - role: project_context_operation
+- family: management
 - intent_signature: project commit/closeout durable context checkpoint
 - use_when:
   - the user explicitly requests a project context checkpoint as part of a commit; or
@@ -28,6 +29,34 @@ description: At an explicitly requested project context checkpoint during commit
   tools: targeted local read/edit/readback; normal commit tooling remains with the commit owner
   sensitive_resources: raw private text and credentials denied
 - entry_scene: PREPARE
+
+### Resource Closure
+
+```json
+[
+  {
+    "source": "shared/docs/knowledge_record_contract.md",
+    "target": "references/knowledge_record_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/memory_mutation_contract.md",
+    "target": "references/memory_mutation_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/project_context_manifest.md",
+    "target": "references/project_context_manifest.md",
+    "projection": "verbatim",
+    "load": "must_read",
+    "condition": "selected skill's mandatory read contract applies"
+  }
+]
+```
 
 ## Authorization Boundary
 An ordinary commit request does not authorize or invoke this checkpoint. An explicit context-checkpoint request made alongside a commit authorizes only clear durable context finalized by that same commit and existing repository-contained project stores. It does not authorize store initialization, unrelated cleanup, external/home writes, LLM Wiki mutation, or another approval prompt for each clear item. An explicit closeout/record request provides the same bounded authorization without authorizing a Git commit; an external Knowledge store is writable only when that request names or approves its exact resolved `knowledge_root` and any `knowledge_index` outside that root.
