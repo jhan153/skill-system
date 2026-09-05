@@ -13,11 +13,15 @@
   not acquire document identity, domain policy, or scheduler ownership.
 - **Interactions:** identity-rich authoring/object/session owners supply snapshot, translation,
   version, and commit semantics; functional/procedural kernels supply transformations, Job Systems
-  consume access ranges, Shared-Memory Concurrency owns visibility/coherence constraints, and
-  bounded TMP may specialize layouts.
+  consume access ranges. Check publication visibility and last-consumer lifetime even for disjoint
+  ranges; reuse sufficient runtime/owner guarantees and apply Shared-Memory Concurrency only for
+  material coordination obligations that remain. Bounded TMP may specialize layouts.
 - **Proof ceiling:** layout structure proves representation only. Disjoint logical ranges do not
   prove absence of false sharing, and race freedom does not prove reduction-order or floating-point
-  determinism. Performance requires the same representative workload and metric before/after.
+  determinism. An absolute performance budget requires an accepted threshold and matching actual
+  workload/environment/metric observation, not a prior implementation. Comparative improvement
+  requires comparable before/after observations of the same representative workload and metric;
+  passing an absolute budget does not establish improvement.
 
 Implementation details and actual-path verification remain with the matching
 `workflow-implementation` method profile.

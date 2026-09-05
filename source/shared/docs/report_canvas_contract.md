@@ -63,12 +63,23 @@ must contain:
 - exactly one closing action state: `kind: next` with one atomic action, or `kind: none` when the
   report owner must not invent a follow-up.
 
+For an explicitly full report, preserve every finding in the model's ordered `findings` array.
+The renderer keeps the first three in the first-view section and puts the remaining findings in
+a separate, initially collapsed `More findings` section below it. Both sections use the same finding
+cards and evidence navigation. Do not drop later findings or recast their claims as evidence-drawer
+entries to fit the first viewport; long supporting rationale still belongs in evidence drawers.
+Reports with zero to three findings have no empty additional-findings section. The report owner,
+not the renderer, still decides whether a brief or full report is authorized.
+
 The dependency-free renderer enforces the bundled schema recursively before writing output,
 including nested types, required fields, `additionalProperties`, mode-specific visuals, and
 format-specific spatial asset data. Its semantic pass also rejects duplicate or dangling IDs,
 invalid GLB/glTF containers, missing initial states, and overlays outside their declared geometry
 or state domain. It fails closed if a future schema revision introduces a validation keyword the
 renderer cannot enforce.
+
+Schema and evidence-reference validation cover every finding, including those initially collapsed.
+A dangling evidence reference in a later finding must still reject the model before HTML is written.
 
 Put source excerpts, traces, tests, raw diffs, and long rationale in progressive evidence drawers.
 Every material finding should reference the corresponding evidence IDs. Missing or conflicting

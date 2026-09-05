@@ -1,11 +1,15 @@
 # Shared-Memory Concurrency Selection Profile
 
-- **Trigger:** multiple execution contexts access a shared mutable invariant, publish state across
-  threads, coordinate lifetime/reclamation, or make a synchronization/coherence-sensitive scaling
-  claim that partitioned single-owner data cannot close.
-- **Non-trigger:** immutable snapshots, disjoint owner-exclusive ranges with an explicit commit and
-  no remaining visibility/reclamation/coherence claim, single-threaded work, or message-addressed
-  state whose one owner performs every mutation.
+- **Trigger:** multiple execution contexts leave a material shared-invariant, cross-thread
+  publication/visibility, lifetime/reclamation, or synchronization/coherence-sensitive scaling
+  obligation unresolved by the existing owner and language/runtime contract. Non-overlapping writes
+  and immutable values do not by themselves close transfer visibility or last-reader lifetime.
+- **Non-trigger:** single-threaded work, or immutable snapshots, disjoint owner-exclusive ranges,
+  and message-addressed state whose actual transfer, visibility, and last-consumer reclamation are
+  already closed by the existing owner/runtime contract with no other material invariant,
+  progress, or coherence obligation remaining. Reuse a documented completion, join,
+  future, or equivalent guarantee when it covers the actual edge; add no profile or lock merely
+  because another thread consumes the result.
 - **Minimum closure:** authoritative state owner and invariant, read/write and alias sets,
   synchronization plus language-level happens-before/visibility, atomicity versus ordering, lock
   scope and wait policy, publication and reclamation including stale handles/ABA where applicable,

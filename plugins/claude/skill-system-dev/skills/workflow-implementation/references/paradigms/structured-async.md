@@ -49,6 +49,15 @@ created -> queued -> running/suspended
 - A cancellation request is not proof that the operation has stopped or released its resources.
 - Completion is terminal exactly once; duplicate callback/resume paths must be rejected or made
   idempotent by the owning primitive.
+- Reuse an existing task group or request scope for admission and completion accounting. A custom
+  scope registers each completion obligation before the operation can execute or complete inline.
+  Every accepted operation reaches exactly one accounted success, failure, or cancellation; enqueue
+  failure after acceptance uses the same terminal path. Rejected admission releases any provisional
+  reservation instead of leaving pending work. Coordinate close with concurrent admission before
+  publishing scope completion so no accepted operation escapes its lifetime.
+- External admission does not reopen a terminal-completed scope generation. Reuse an existing
+  primitive only through its declared new-scope/generation protocol, preserving the meaning of
+  completion already observed by callers; no new bookkeeping layer is required.
 - Request, descriptor, callback context, and input/output buffers outlive every pending kernel or
   OS operation that can still access them.
 - A future, task handle, or readiness flag does not itself validate final-domain invariants.
@@ -111,9 +120,18 @@ A safe shutdown normally follows this ownership order:
 ## Executor And Affinity Boundary
 
 Document where callbacks and continuations may run: inline on the completing thread, on an event
-loop, on a CPU pool, on a pinned lane, or on a caller-selected executor. Thread-local state,
-thread-affine APIs, and OS-thread-owned locks or allocators are invalid across suspension unless the
-contract guarantees resumption on that same lane.
+loop, on a CPU pool, on a pinned lane, or on a caller-selected executor. A serial executor or strand
+provides non-concurrent invocation, not OS-thread identity. TLS continuity, thread-affine APIs, and
+thread-owned locks or allocators require the actual resource-specific thread guarantee at use and
+release; resumption on the same executor/lane is insufficient if it may move to another OS thread.
+
+Suspension may let other continuations re-enter the same owner even on the same OS thread. Before
+yielding, identify held locks, temporary invariant violations, and what that re-entry can observe or
+wait for. Restore invariants and release incompatible locks, or rely on a documented isolation or
+async-aware mutex contract that preserves ownership, cancellation cleanup, and progress. Do not
+forbid an async-aware primitive merely because it can span suspension, but do not treat a pinned
+thread, serialized executor, or task-local lock guard as sufficient proof of safe re-entry or
+OS-thread lock ownership.
 
 Place unavoidable blocking APIs behind a dedicated bounded adapter rather than a CPU Job worker or
 event-loop callback. The adapter makes the blocking carrier, capacity, cancellation limitation, and
@@ -139,8 +157,10 @@ Poor candidates:
 ## Composition Rules
 
 - Use a **Job System** for ready CPU work, not for blocking external waits.
-- Use **Shared-Memory Concurrency** only when callbacks or tasks truly share mutable state; prefer
-  immutable messages, snapshots, or one-owner serialization first.
+- Check cross-thread visibility and last-consumer reclamation even for immutable messages,
+  snapshots, or owner-exclusive results. Reuse documented executor/completion and ownership
+  guarantees on the actual path; use **Shared-Memory Concurrency** only when material shared-state,
+  publication, or reclamation obligations remain. Immutability alone is not a safe-transfer contract.
 - Use **object-oriented** owners for connection, request, resource, executor, and task-scope
   lifetime.
 - Use **procedural** state machines or **functional** transformations for individual continuation
@@ -158,19 +178,29 @@ Poor candidates:
   pool capacity, blocking carrier, cancellation limit, queue age, and shutdown behavior.
 - **Edge:** cancellation races with a late success callback. The versioned owner accepts exactly one
   terminal outcome and prevents stale result publication while still completing cleanup.
+- **Affinity edge:** a strand resumes on thread B after thread A acquired a thread-owned lock.
+  Sequential invocation does not authorize B to release it or preserve A's TLS continuity.
+- **Re-entry edge:** an await lets another continuation inspect an owner's temporarily invalid
+  state or wait for its held lock. Even same-thread resumption needs restored invariants or a
+  documented isolation/synchronization and progress contract.
+- **Existing scope:** reuse a task group's documented admission, rejection, terminal, and close
+  behavior instead of adding another pending counter; a custom replacement must close those cases.
 
 ## Implementation Verification
 
 - The actual execution domain and wait carrier are identified for every stage.
 - Readiness, completion, partial progress, retry-later, EOF, timeout, failure, and cancellation are
   not collapsed into one boolean state.
-- Parent/child lifetime, result/error propagation, and detached-task ownership are explicit.
+- Parent/child admission, close, terminal accounting, result/error propagation, and detached-task
+  ownership are explicit; custom scopes cover inline completion, enqueue rejection, and cancellation
+  without duplicate retirement, while existing sufficient primitives are reused.
 - Buffers, handles, callback contexts, and domain owners outlive all pending access.
 - Queue capacity, overload/backpressure, deadline/staleness, and forward progress are defined.
 - Event-loop and completion callbacks do not perform unbounded CPU or blocking work.
 - Cancellation and shutdown drain or suppress late completion without leaking or publishing stale
   state.
-- Executor/thread affinity is explicit; suspension does not silently invalidate TLS or
-  thread-affine state.
+- Serialization and actual OS-thread affinity are separate; each thread-owned resource remains
+  valid at use/release. Suspension re-entry, held locks, temporary invariants, and any isolation or
+  async-aware synchronization exception have explicit ownership and forward-progress guarantees.
 - A matching trace or workload observation, not `async` syntax, supports latency, capacity, and
   non-blocking claims.

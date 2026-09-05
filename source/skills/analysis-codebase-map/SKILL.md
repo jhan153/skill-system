@@ -25,7 +25,7 @@ description: Model the current repository or named slice as evidence-linked Merm
 - expected_outputs: altitude (`hld` or `lld`), Mermaid diagrams with captions and source refs, and explicit `Unverified` gaps
 - context_targets:
   must_read:
-    - the map request, repo or named-slice outline, and one representative entrypoint-to-output path
+    - the map request, repo or named-slice outline, and a representative entrypoint-to-output path when runtime flow is in scope; for a structure/schema-only slice, the relevant definitions and relationships instead
   read_if_needed:
     - callers, manifests, state stores, and a disconfirming path that would change a diagram
     - `reference.md` for view selection and Mermaid render rules
@@ -46,8 +46,8 @@ description: Model the current repository or named slice as evidence-linked Merm
 
 ## Altitude
 - An explicit user-requested `hld` or `lld` wins. Keep a named HLD inside that slice; do not widen it to the whole repository.
-- Otherwise, whole repository, product surface, or no named slice → `hld`. Model context, containers, representative sequences, and only the state or deployment that evidence supports.
-- Otherwise, a named module, path, workflow, or runtime flow → `lld`. Model components, interfaces, detailed sequences, and state transitions on that slice.
+- Otherwise, whole repository, product surface, or no named slice → `hld`. Model context, containers, any evidenced runtime sequences, and only the state or deployment that evidence supports.
+- Otherwise, a named module, path, workflow, or runtime flow → `lld`. Model the slice's components and interfaces, plus detailed sequences and state transitions only when applicable and evidenced.
 - Do not emit both altitudes unless the user asked for both or the HLD map cannot be understood without one LLD inset.
 - A map is not a completeness claim. Unseen groups stay `Unverified`.
 - Generic codebase-analysis or report wording changes neither the altitude precedence nor the map-only output shape.
@@ -55,15 +55,21 @@ description: Model the current repository or named slice as evidence-linked Merm
 ## Workflow
 1. Bind the inspection boundary and choose `hld` or `lld`: explicit altitude first, then the scope default. A user-named slice wins over repository history.
 2. Inspect only enough entrypoints, owners, and stores to pick the views. Keep searches and outlines read-only; do not generate collection artifacts.
-3. Trace one representative path and one material-edge or failure path that could change the diagram.
-4. Select views from `reference.md`. Every map includes at least one sequence diagram. Add structure and state views when those axes exist in the bound slice.
+3. Trace one representative path and one material-edge or failure path when runtime flow is in scope.
+   For a structure/schema-only slice, trace the relevant definitions, relationships, and a material
+   structural counterexample instead.
+4. Select views from `reference.md`. Include a sequence when an evidenced runtime interaction is
+   needed to answer the request. A structure/schema-only slice may omit sequence and say why;
+   never invent participants or messages to fill the view. If a requested runtime path lacks
+   evidence, retain that gap as `Unverified` rather than treating a structural map as its answer.
+   Add structure and state views when those axes exist in the bound slice.
 5. Draw Mermaid from evidenced participants and messages. Label nodes with domain names, not file paths. Mark inferred edges `Unverified`.
 6. Stop when the requested altitude is readable, each diagram has refs or an explicit gap, and a further file would not change the map.
 
 ## Output Contract
 Return only:
 - `altitude` and `bound_slice`
-- Mermaid diagrams (`sequence`, plus `structure`/`state` when applicable)
+- Mermaid diagrams for the evidenced structure/schema/state and any required runtime sequence
 - a one-line reading of each diagram
 - `source_refs` per diagram
 - `unverified_gaps`

@@ -150,6 +150,14 @@ Only the Architecture/Boundary owner may revise and re-accept its source decisio
 trace, benchmark, or readback may support `paradigm_conformance`, but it does not mutate the
 accepted application or prove a broader runtime property than its thin profile allows.
 
+Direct Implementation may return this observation in its ordinary task-local output. When it
+exchanges a Core `implementation_result`, preserve the same application reference, observed scope,
+evidence, and unresolved conditions through the existing envelope refs and condition fields; do
+not add a `paradigm_conformance` payload key or change the Core schema. Detailed observations may
+remain in an already-owned readback/review artifact, with an exact reference. If no such artifact
+exists, carry the bounded facts and proof limit in the condition entries rather than inventing a
+file or a second ledger. Implementation's local method index shows this field projection.
+
 ## Consumer Responsibilities
 
 - `workflow-architecture-design` consumes this contract only for

@@ -67,7 +67,8 @@ No baseline means no conformance rows; it does not reduce the intrinsic review d
 ## Reachability Guard
 
 Apply the reachability guard in `references/static_code_review_contract.md`; a diagram never
-substitutes for checking the applicable dispatch and registration surface.
+substitutes for checking the applicable dispatch and registration surface. Unproved reachability
+candidates stay hypotheses or material evidence gaps, not blocking findings.
 
 ## Render Evidence
 

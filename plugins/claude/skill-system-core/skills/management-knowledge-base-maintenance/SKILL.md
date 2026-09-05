@@ -12,7 +12,7 @@ disable-model-invocation: true
 - intent_signature: Knowledge Base integrity-check, reindex, relation/history check, overlap/conflict reconciliation, recurrence report
 - use_when: the user explicitly requests maintenance of an exact or manifest-declared store
 - do_not_use_when: task context read, one known record update, new category authoring, plan sync, Memory, or Wiki work is primary
-- expected_inputs: declared store, `report|integrity-check|reindex|link-check|relation-check|history-check|overlap-check|conflict-check|recurrence-report|compact` operation, and affected IDs when bounded
+- expected_inputs: declared store, `report|integrity-check|reindex|link-check|relation-check|history-check|overlap-check|conflict-check|recurrence-report|reconcile|compact` operation, and affected IDs when bounded
 - expected_outputs: structural findings and only explicitly requested store/index changes with readback
 - context_targets:
   must_read: manifest, index, affected records, `references/project_context_manifest.md`, and `references/knowledge_record_contract.md`
@@ -35,9 +35,10 @@ disable-model-invocation: true
 - `conflict-check`: identify duplicate active rules, contradictory scope, or competing canonical refs; byte-read-only.
 - `recurrence-report`: derive observation count, distinct verified provenance roots, first/last dates, scopes, unresolved roots, and counterexamples. Treat source existence separately from verification of the asserted relationship to the record. Keep dimensions separate and return no rank or score; byte-read-only.
 - `reindex`: rebuild only catalog rows from records, never rewrite records from the index.
+- `reconcile`: apply an explicitly accepted correction, merge/replacement decision, or legacy adoption to named records. Bind adoption to the exact affected IDs before delegating update semantics; preserve the current snapshot and disclose missing earlier history. A generic maintenance request or read-only finding does not authorize adoption.
 - `compact`: remove duplicated prose/index detail while preserving current snapshots, stable IDs, typed relations, observations, semantic revisions, and lifecycle links.
 
-Read-only findings never authorize repair. Reconciliation writes require explicit affected-record approval and use `management-knowledge-base-update` semantics.
+Read-only findings never authorize repair. Reconciliation writes require explicit affected-record approval and use `management-knowledge-base-update` semantics. Reuse approval already supplied in the current task; do not ask again for the same adoption or correction. `reindex` and `compact` do not implicitly adopt legacy records.
 
 ## Workflow
 1. Bind `knowledge_root` and `knowledge_index` from the exact or nearest manifest-declared store; missing is `unavailable`, not auto-init. Reuse those variables for every selected record and index operation; never substitute a default path.

@@ -2,7 +2,16 @@
 
 > Generated from canonical skill-local Routing Cards. Read only the matching section.
 
+Each section names its canonical `plugin:skill` owner. Relative resource paths belong
+to that installed skill's `SKILL.md` directory, never this family file or a runtime
+`skills/` mirror. An entry such as `plugin:skill` · `references/file.md` is a resource
+locator, not a runtime-relative URL. Resolve the named installed skill first; if it is
+unavailable, keep the resource unresolved. For canonical-source inspection, use the
+skill's `source/skills/<skill>/SKILL.md` and its Resource Closure for projected resources.
+
 ## `plan-behavior-discovery`
+
+Owner: `skill-system-dev:plan-behavior-discovery`
 
 - role: primary
 - family: planning
@@ -32,6 +41,8 @@
 
 ## `plan-decision-map`
 
+Owner: `skill-system-core:plan-decision-map`
+
 - role: primary
 - family: planning
 - intent_signature: explicit durable map of unresolved decisions for a multi-session outcome
@@ -48,7 +59,7 @@
     - current request or named decision index
     - repository instructions and the authorized artifact boundary
     - `references/execution_handoff_input_contract.md` before resolving a persistent artifact path
-    - [Decision-map schema](references/decision-map-schema.md) before creating or changing artifacts
+    - Decision-map schema (`skill-system-core:plan-decision-map` · `references/decision-map-schema.md`) before creating or changing artifacts
   read_if_needed:
     - the selected item, its prerequisites, linked resolutions, and evidence that can change its answer
     - existing requirements or domain contracts that constrain the target outcome
@@ -63,6 +74,8 @@
 
 ## `plan-execution-handoff`
 
+Owner: `skill-system-core:plan-execution-handoff`
+
 - role: primary
 - family: planning
 - intent_signature: durable canonical Plan/Handoff pair with one typed graph archetype, bounded rewrites, and event-driven lifecycle coordination
@@ -75,6 +88,8 @@
 - entry_scene: PREPARE
 
 ## `plan-question-document`
+
+Owner: `skill-system-core:plan-question-document`
 
 - role: primary
 - family: planning
@@ -90,7 +105,7 @@
   must_read:
     - current request and supplied recipient/outcome context
     - `references/execution_handoff_input_contract.md` before resolving a package-local path
-    - [Question-document template](references/question-document.md) before authoring
+    - Question-document template (`skill-system-core:plan-question-document` · `references/question-document.md`) before authoring
   read_if_needed:
     - only supplied notes needed to give the recipient sufficient orientation
   do_not_load_by_default:
@@ -104,6 +119,8 @@
 
 ## `plan-requirements-brief`
 
+Owner: `skill-system-core:plan-requirements-brief`
+
 - role: primary
 - family: planning
 - intent_signature: requirements contract, PRD, SRS-lite, or interview distillation
@@ -116,6 +133,8 @@
 - entry_scene: PREPARE
 
 ## `plan-requirements-discovery`
+
+Owner: `skill-system-core:plan-requirements-discovery`
 
 - role: primary
 - family: planning
@@ -149,6 +168,8 @@
 - entry_scene: PREPARE
 
 ## `plan-task-handoff`
+
+Owner: `skill-system-core:plan-task-handoff`
 
 - role: support
 - family: planning

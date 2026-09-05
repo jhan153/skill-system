@@ -2,7 +2,16 @@
 
 > Generated from canonical skill-local Routing Cards. Read only the matching section.
 
+Each section names its canonical `plugin:skill` owner. Relative resource paths belong
+to that installed skill's `SKILL.md` directory, never this family file or a runtime
+`skills/` mirror. An entry such as `plugin:skill` · `references/file.md` is a resource
+locator, not a runtime-relative URL. Resolve the named installed skill first; if it is
+unavailable, keep the resource unresolved. For canonical-source inspection, use the
+skill's `source/skills/<skill>/SKILL.md` and its Resource Closure for projected resources.
+
 ## `management-knowledge-base-init`
+
+Owner: `skill-system-core:management-knowledge-base-init`
 
 - role: knowledge_operation
 - family: management
@@ -24,12 +33,14 @@
 
 ## `management-knowledge-base-maintenance`
 
+Owner: `skill-system-core:management-knowledge-base-maintenance`
+
 - role: knowledge_operation
 - family: management
 - intent_signature: Knowledge Base integrity-check, reindex, relation/history check, overlap/conflict reconciliation, recurrence report
 - use_when: the user explicitly requests maintenance of an exact or manifest-declared store
 - do_not_use_when: task context read, one known record update, new category authoring, plan sync, Memory, or Wiki work is primary
-- expected_inputs: declared store, `report|integrity-check|reindex|link-check|relation-check|history-check|overlap-check|conflict-check|recurrence-report|compact` operation, and affected IDs when bounded
+- expected_inputs: declared store, `report|integrity-check|reindex|link-check|relation-check|history-check|overlap-check|conflict-check|recurrence-report|reconcile|compact` operation, and affected IDs when bounded
 - expected_outputs: structural findings and only explicitly requested store/index changes with readback
 - context_targets:
   must_read: manifest, index, affected records, `references/project_context_manifest.md`, and `references/knowledge_record_contract.md`
@@ -43,6 +54,8 @@
 - entry_scene: PREPARE
 
 ## `management-knowledge-base-read`
+
+Owner: `skill-system-core:management-knowledge-base-read`
 
 - role: support
 - family: management
@@ -63,6 +76,8 @@
 - entry_scene: PREPARE
 
 ## `management-knowledge-base-record`
+
+Owner: `skill-system-core:management-knowledge-base-record`
 
 - role: knowledge_operation
 - family: management
@@ -91,6 +106,8 @@
 
 ## `management-knowledge-base-update`
 
+Owner: `skill-system-core:management-knowledge-base-update`
+
 - role: knowledge_operation
 - family: management
 - intent_signature: amend, observe recurrence, reverify, supersede, deprecate, or relink durable project knowledge
@@ -110,6 +127,8 @@
 - entry_scene: PREPARE
 
 ## `management-memory-bank-harness`
+
+Owner: `skill-system-core:management-memory-bank-harness`
 
 - role: support
 - family: management
@@ -140,6 +159,8 @@
 
 ## `management-memory-bank-init`
 
+Owner: `skill-system-core:management-memory-bank-init`
+
 - role: memory_operation
 - family: management
 - intent_signature: explicit project Memory Bank initialization
@@ -162,6 +183,8 @@
 - entry_scene: PREPARE
 
 ## `management-memory-bank-maintenance`
+
+Owner: `skill-system-core:management-memory-bank-maintenance`
 
 - role: memory_operation
 - family: management
@@ -186,6 +209,8 @@
 
 ## `management-memory-bank-update`
 
+Owner: `skill-system-core:management-memory-bank-update`
+
 - role: memory_operation
 - family: management
 - intent_signature: explicit durable Memory record mutation
@@ -209,6 +234,8 @@
 
 ## `management-project-context`
 
+Owner: `skill-system-core:management-project-context`
+
 - role: project_context_operation
 - family: management
 - intent_signature: explicit project-context manifest init, doctor, update, or bootstrap
@@ -228,6 +255,8 @@
 - entry_scene: PREPARE
 
 ## `management-project-context-checkpoint`
+
+Owner: `skill-system-core:management-project-context-checkpoint`
 
 - role: project_context_operation
 - family: management

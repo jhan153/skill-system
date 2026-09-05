@@ -2,7 +2,16 @@
 
 > Generated from canonical skill-local Routing Cards. Read only the matching section.
 
+Each section names its canonical `plugin:skill` owner. Relative resource paths belong
+to that installed skill's `SKILL.md` directory, never this family file or a runtime
+`skills/` mirror. An entry such as `plugin:skill` · `references/file.md` is a resource
+locator, not a runtime-relative URL. Resolve the named installed skill first; if it is
+unavailable, keep the resource unresolved. For canonical-source inspection, use the
+skill's `source/skills/<skill>/SKILL.md` and its Resource Closure for projected resources.
+
 ## `analysis-algorithm`
+
+Owner: `skill-system-dev:analysis-algorithm`
 
 - role: primary
 - family: analysis
@@ -28,6 +37,8 @@
 
 ## `analysis-architecture-deepening`
 
+Owner: `skill-system-dev:analysis-architecture-deepening`
+
 - role: primary
 - family: analysis
 - intent_signature: ranked architecture-improvement or deep-module opportunity scan
@@ -42,7 +53,7 @@
   - measured bottleneck: `analysis-performance`
   - direct production change: route by the selected candidate's change contract—`workflow-refactor-safely` for behavior-preserving live restructuring, `workflow-source-maintenance` for proven-obsolete deletion, or `workflow-implementation` for behavior changes
 - expected_inputs: user-named scope or bounded recent-change history, pain/change signals, implementation appetite
-- expected_outputs: sampling basis, coverage, evidenced friction, ranked candidates, an evidenced next candidate or exact discriminator, handoff, and unverified gaps
+- expected_outputs: sampling basis, coverage, evidenced friction, ranked candidates, an evidenced next candidate, scoped no-improvement conclusion, or exact evidence discriminator, handoff, and unverified gaps
 - context_targets:
   - must_read: goal, compact scope outline, and production path/owner evidence for shortlisted candidates
   - read_if_needed: discriminating callers, contracts, failures, diffs, metrics, or formal invariants
@@ -52,6 +63,8 @@
   - PREPARE
 
 ## `analysis-boundary-design`
+
+Owner: `skill-system-dev:analysis-boundary-design`
 
 - role: primary
 - family: analysis
@@ -96,6 +109,8 @@
 
 ## `analysis-codebase-map`
 
+Owner: `skill-system-dev:analysis-codebase-map`
+
 - role: primary
 - family: analysis
 - intent_signature: architecture map, HLD/LLD modeling, sequence/state/structure diagrams
@@ -115,7 +130,7 @@
 - expected_outputs: altitude (`hld` or `lld`), Mermaid diagrams with captions and source refs, and explicit `Unverified` gaps
 - context_targets:
   must_read:
-    - the map request, repo or named-slice outline, and one representative entrypoint-to-output path
+    - the map request, repo or named-slice outline, and a representative entrypoint-to-output path when runtime flow is in scope; for a structure/schema-only slice, the relevant definitions and relationships instead
   read_if_needed:
     - callers, manifests, state stores, and a disconfirming path that would change a diagram
     - `reference.md` for view selection and Mermaid render rules
@@ -129,6 +144,8 @@
 - entry_scene: PREPARE
 
 ## `analysis-domain-modeling`
+
+Owner: `skill-system-dev:analysis-domain-modeling`
 
 - role: primary
 - family: analysis
@@ -160,6 +177,8 @@
 
 ## `analysis-llm-wiki-context`
 
+Owner: `skill-system-core:analysis-llm-wiki-context`
+
 - role: support
 - family: analysis
 - intent_signature: explicit named LLM Wiki exploration and task context construction
@@ -179,6 +198,8 @@
 - entry_scene: PREPARE
 
 ## `analysis-performance`
+
+Owner: `skill-system-dev:analysis-performance`
 
 - role: primary
 - family: analysis
@@ -210,6 +231,8 @@
   - PREPARE
 
 ## `workflow-architecture-design`
+
+Owner: `skill-system-dev:workflow-architecture-design`
 
 - role: primary
 - family: analysis
@@ -275,6 +298,8 @@
 - entry_scene: PREPARE
 
 ## `workflow-runtime-debugging`
+
+Owner: `skill-system-dev:workflow-runtime-debugging`
 
 - role: execution_primary
 - family: analysis

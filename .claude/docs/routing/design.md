@@ -2,7 +2,16 @@
 
 > Generated from canonical skill-local Routing Cards. Read only the matching section.
 
+Each section names its canonical `plugin:skill` owner. Relative resource paths belong
+to that installed skill's `SKILL.md` directory, never this family file or a runtime
+`skills/` mirror. An entry such as `plugin:skill` · `references/file.md` is a resource
+locator, not a runtime-relative URL. Resolve the named installed skill first; if it is
+unavailable, keep the resource unresolved. For canonical-source inspection, use the
+skill's `source/skills/<skill>/SKILL.md` and its Resource Closure for projected resources.
+
 ## `design-a11y-audit`
+
+Owner: `skill-system-design:design-a11y-audit`
 
 - role: design_evidence_gate
 - family: design
@@ -43,6 +52,8 @@
 This is an evidence gate. `design-frontend` owns requested UI fixes; this skill scopes findings and verifies the affected path.
 
 ## `design-component-mapper`
+
+Owner: `skill-system-design:design-component-mapper`
 
 - role: design_evidence_gate
 - family: design
@@ -91,6 +102,8 @@ This is an evidence gate. `design-frontend` owns requested UI fixes; this skill 
 Connect design roles to existing code components without redesigning their API; keep catalog availability, planned selection, and actual app-surface reuse distinct.
 
 ## `design-frontend`
+
+Owner: `skill-system-design:design-frontend`
 
 - role: primary
 - family: design
@@ -157,6 +170,8 @@ Connect design roles to existing code components without redesigning their API; 
 
 ## `design-layout-translator`
 
+Owner: `skill-system-design:design-layout-translator`
+
 - role: primary_analysis_or_modifier
 - family: design
 - intent_signature: Auto Layout, flex/grid, intrinsic/fill/fixed sizing, overflow, text-fit, and breakpoint translation
@@ -188,6 +203,8 @@ Connect design roles to existing code components without redesigning their API; 
 - entry_scene: PREPARE
 
 ## `design-tokens`
+
+Owner: `skill-system-design:design-tokens`
 
 - role: design_evidence_gate
 - family: design
@@ -233,6 +250,8 @@ owns production UI code or a later Design stage.
 
 ## `design-ui-decomposer`
 
+Owner: `skill-system-design:design-ui-decomposer`
+
 - role: primary_analysis
 - family: design
 - intent_signature: UI-reference hierarchy, region, pattern, state, and uncertainty decomposition
@@ -271,6 +290,8 @@ owns production UI code or a later Design stage.
 
 ## `design-visual-regression`
 
+Owner: `skill-system-design:design-visual-regression`
+
 - role: design_evidence_gate
 - family: design
 - intent_signature:
@@ -292,9 +313,9 @@ owns production UI code or a later Design stage.
   - rendered implementation target, screenshot path, or preview URL
   - source visual reference when available
   - pinned product-family component-state or surface-archetype baselines when declared
-  - desktop and mobile viewport requirements
+  - assigned viewport/state requirements and responsive coverage when requested
 - expected_outputs:
-  - desktop/mobile screenshot evidence or unavailable reason
+  - screenshot evidence for the assigned viewports or an unavailable reason
   - nonblank and framing result
   - visual difference report
   - separate target-fidelity and family-coherence verdicts when both lanes apply
@@ -333,6 +354,8 @@ owns production UI code or a later Design stage.
 Use this skill for visual evidence, not for implementation ownership. It can support `design-frontend` after a UI is rendered.
 
 ## `workflow-ui-design`
+
+Owner: `skill-system-design:workflow-ui-design`
 
 - role: execution_primary
 - family: design

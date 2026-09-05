@@ -68,3 +68,46 @@ Return the accepted application reference or task-local application, loaded meth
 observable code rules, forbidden drift, `paradigm_conformance`, and unresolved owner conflict only
 inside the owning Implementation output. This index creates no separate architecture artifact or
 workflow transition.
+
+## Direct And Core Result Projection
+
+Direct work can return `paradigm_conformance` in the ordinary Implementation output. For a
+graph/cross-owner `implementation_result`, keep the Core payload unchanged and project the same
+facts into its existing fields:
+
+| Observation | Existing Core location |
+| --- | --- |
+| Accepted application and implemented scope | `artifact_refs` for an existing accepted design/boundary artifact; `scope_ref` and bounded condition text identify the applied scope. |
+| Implemented/source-read shape | `implemented_conditions`, with its exact source/evidence refs and proof limit. |
+| Required behavior not observed or an unresolved conflict | `unresolved_conditions`; never list it as verified because the source shape matches. |
+| Detailed conformance readback, when already present | `evidence_refs` to the existing artifact's exact section; otherwise keep the necessary facts inline in the condition entries. |
+
+The following illustrative mapping assumes the named design and source exist in the receiving
+task; it is not evidence that this repository contains or executed that example. Replace every
+identity/ref with actual task data. It preserves a source-shape observation while leaving the
+independent-scratch result condition unverified:
+
+```json
+{
+  "contract_id": "core-execution-items-v1",
+  "item_id": "EI-normalize-C0",
+  "kind": "implementation_result",
+  "producer": "skill-system-dev:workflow-implementation",
+  "plan_ref": "normalize-plan@1",
+  "node_id": "C0",
+  "scope_ref": "PA-1 normalization slice",
+  "artifact_refs": ["design.md#PA-1", "src/normalize.cpp"],
+  "evidence_refs": ["src/normalize.cpp#normalize"],
+  "payload": {
+    "implementation_snapshot": "current reviewed worktree diff",
+    "changed_artifacts": ["src/normalize.cpp"],
+    "implemented_conditions": ["PA-1/P-SHAPE: inputs and policy are explicit; source readback only"],
+    "review_slice": "normalize entry and workspace path",
+    "unresolved_conditions": ["PA-1/P-RESULT: equivalent output with fresh and reused scratch is unverified; no matching execution observation"]
+  }
+}
+```
+
+Do not add unsupported payload fields, invent a conformance artifact to fit the example, or copy
+the accepted application's status into an observed-result claim. A detailed observation remains
+subordinate to its accepted application; this projection adds no Plan transition or new record type.

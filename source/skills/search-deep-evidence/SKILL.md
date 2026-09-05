@@ -48,12 +48,27 @@ several sources exist, and do not require or install a sibling plugin to complet
 Record separate axes; never overload one `verified` label:
 
 - `acquisition_status`: `acquired | partial | inaccessible | not_acquired`
-- `source_status`: `verified_identity | metadata_partial | duplicate_version | corrected | retracted | unverified`
+- `source_status`: an identity assessment plus independent, source-kind-relevant version/correction/retraction observations
 - `claim_relation`: `supports | contradicts | mixed | mentions | not_assessed`
 - `evidence_basis`: exact text/table, documentation, code, runtime, visual, memory, or supplied-artifact basis
 - `locator`: URL, file/line, artifact ID, section/table, or observation receipt
 
 Source existence does not verify a claim. Verified identity and user-provided provenance are not truth or a claim relation.
+
+`source_status` is faceted, not one exclusive enum. Identity is `verified_identity`,
+`metadata_partial`, `unverified`, or `unknown`; `duplicate_version`, `corrected`, and `retracted`
+are independent observations in the applicable version, correction, and retraction facets. Carry
+all evidenced facts together with their locators. For example, a paper may have
+`identity=verified_identity; version=duplicate_version; correction=corrected; retraction=retracted`.
+Use `unknown` for each relevant facet that is not established; omit inapplicable facets for a source
+kind without treating omission as a checked negative. A negative status check records its bounded
+source/date/scope and never proves universal absence of notices.
+
+An existing scalar retains only the fact it states: `corrected` does not verify identity or imply
+no retraction, and `verified_identity` does not imply a unique, uncorrected, unretracted source.
+Keep the other relevant facets unknown and preserve existing records without automatic migration.
+Compact inline prose may carry these distinctions; only an explicitly requested artifact uses the
+evidence-set form.
 
 ## Workflow
 1. Define claim scope, freshness, and observations that would support or contradict it; split only independently falsifiable subclaims.
@@ -61,7 +76,7 @@ Source existence does not verify a claim. Verified identity and user-provided pr
 3. Acquire through each exposed lane owner within existing authority. If an owner or evidence
    surface is unavailable, keep that lane unavailable and continue independent discriminating
    lanes; never invent an alias or substitute another lane's evidence.
-4. Record provenance, basis, locator, directness, authority, independence, recency, and limitations.
+4. Record provenance, basis, locator, directness, authority, independence, recency, and limitations; preserve incoming status facets and legacy unknowns instead of collapsing them into one preferred status.
 5. Search for disconfirming evidence and alternative explanations.
 6. Collapse duplicate/dependent sources before weighing agreement.
 7. Preserve unresolved disagreement: one direct contradiction may outweigh many derivative mentions; no majority vote decides truth.
@@ -76,6 +91,6 @@ underlying records and uncertainty retained. No script or validator establishes 
 
 ## Validation
 - Every retained claim relation has an exact evidence locator and basis.
-- Source identity/metadata status is separate from claim support.
+- Source identity, independent lifecycle/version observations, and claim support stay separate; a legacy scalar establishes only its declared facet.
 - Contradictory, dependent, partial, and unavailable evidence remains visible.
 - Stop at evidence and explicit limits; never substitute agent consensus for unavailable evidence or claim completeness.

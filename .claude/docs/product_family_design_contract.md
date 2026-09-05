@@ -86,7 +86,10 @@ A near visual match, generated control, or unversioned local component does not 
 - Project-specific lint, type, import-boundary, token, snapshot, or build commands can deterministically enforce only the rules they inspect. Run every applicable declared command and retain its exit status.
 - A token path identifies the registry to consume; it does not authorize adding plausible colors, spacing, typography, or page/component CSS. Missing entries remain gaps for `design-tokens` unless an authoritative system change is in scope.
 - Component implementations, icon sets, and baseline assets follow the same write-policy boundary. Do not patch an approved control merely to make one screen pass.
-- A component export inventory proves availability, not that the target reused it. Require import/use evidence from `design-component-mapper`.
+- A component export inventory proves availability, not that the target reused it. Require actual
+  app-surface import/use evidence from an assigned `design-component-mapper` result or, when no
+  separate mapper node is assigned, the direct implementation owner's scoped mapping. The evidence
+  requirement does not create or invoke a separate mapper node.
 - A build proves integration, not theme fidelity or family coherence.
 - A target screenshot proves rendered appearance for that state and viewport, not component provenance.
 - Family coherence needs pinned component-state or surface-archetype baselines and a separate visual verdict.

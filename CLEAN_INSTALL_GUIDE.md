@@ -201,6 +201,8 @@ Claude 홈 경로에 동기화합니다.
 | `.claude/CLAUDE.md` | `<CLAUDE_HOME>/CLAUDE.md` |
 | `.claude/context-routing.md` | `<CLAUDE_HOME>/context-routing.md` |
 | `.claude/hooks/` | `<CLAUDE_HOME>/hooks/`의 Skill System 관리 파일 |
+| `.claude/bin/<선택한 네이티브 하네스>` | `<CLAUDE_HOME>/bin/<선택한 네이티브 하네스>` |
+| `.claude/bin/skill-system-notify-overlay` (macOS만) | `<CLAUDE_HOME>/bin/skill-system-notify-overlay` |
 | `.claude/schemas/` | `<CLAUDE_HOME>/schemas/`의 Skill System 관리 파일 |
 | `.claude/docs/` | `<CLAUDE_HOME>/docs/`의 Skill System 관리 파일 |
 
@@ -208,6 +210,14 @@ Claude 훅 설정은 선택된 체크아웃의
 `.claude/hooks/README.md`에 선언된 현재 구성을 따릅니다.
 `settings.json` 전체를 교체하지 않고, 기존 훅 이외의 최상위 키를
 보존한 채 명시된 훅 블록만 반영합니다.
+
+하네스는 macOS arm64 `skill-system-claude-harness`, Linux/WSL amd64
+`skill-system-claude-harness-linux-amd64`, Windows amd64 `skill-system-claude-harness.exe` 중
+현재 호스트 파일을 선택합니다. 선택한 하네스와 macOS overlay를 쓰기 전 동일 백업 세트에
+포함하고 실행 권한을 보존합니다. 다른 `bin/` 항목은 보존합니다. 네이티브 훅을 설치할 때는
+선택한 실행 파일을 함께 설치하고 `__ABSOLUTE_SKILL_SYSTEM_CLAUDE_HARNESS__`를 그 파일의
+설치된 절대 경로로 치환합니다. 해당 경로의 실제 실행 파일과 `--version`의 선택 bundle
+일치 여부를 반드시 확인하고, macOS에서는 overlay도 읽어봅니다.
 
 ### Grok에서 Skill System이 동기화하는 정적 런타임
 

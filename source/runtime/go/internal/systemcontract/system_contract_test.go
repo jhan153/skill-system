@@ -1194,7 +1194,10 @@ func validateRoutingProjections(
 				expectedSkills[skillID] = true
 			}
 		}
-		indexRow := fmt.Sprintf("| `%s` | `docs/routing/%s.md` | %d |", familyID, familyID, len(expectedSkills))
+		indexRow := fmt.Sprintf(
+			"| `%s` | [routing/%s.md](routing/%s.md) | %d |",
+			familyID, familyID, familyID, len(expectedSkills),
+		)
 		if strings.Count(index, indexRow) != 1 {
 			t.Errorf("generated routing index row mismatch for %s", familyID)
 		}
@@ -1209,21 +1212,50 @@ func validateRoutingProjections(
 			t.Errorf("generated routing family %s has the wrong display name", familyID)
 		}
 		actualSkills := map[string]bool{}
-		for _, match := range regexp.MustCompile("(?m)^## `([^`]+)`$").FindAllStringSubmatch(text, -1) {
-			if actualSkills[match[1]] {
-				t.Errorf("generated routing family %s duplicates skill %s", familyID, match[1])
+		sections := map[string]string{}
+		headings := regexp.MustCompile("(?m)^## `([^`]+)`$").FindAllStringSubmatchIndex(text, -1)
+		for index, match := range headings {
+			skillID := text[match[2]:match[3]]
+			if actualSkills[skillID] {
+				t.Errorf("generated routing family %s duplicates skill %s", familyID, skillID)
 			}
-			actualSkills[match[1]] = true
+			actualSkills[skillID] = true
+			end := len(text)
+			if index+1 < len(headings) {
+				end = headings[index+1][0]
+			}
+			sections[skillID] = strings.TrimSpace(text[match[1]:end])
 		}
 		compareSets(t, "generated routing family "+familyID, expectedSkills, actualSkills)
 		for skillID := range expectedSkills {
-			body := strings.TrimSpace(strings.TrimPrefix(skills[skillID].RoutingCard, "## Routing Card"))
-			needle := "## `" + skillID + "`\n\n" + body
-			if strings.Count(text, needle) != 1 {
-				t.Errorf("generated routing family %s does not project %s exactly", familyID, skillID)
+			if len(owners[skillID]) != 1 {
+				t.Errorf("generated routing family %s cannot resolve owner for %s", familyID, skillID)
+				continue
+			}
+			locator := owners[skillID][0] + ":" + skillID
+			expected := "Owner: `" + locator + "`\n\n" + familyRoutingCard(skills[skillID].RoutingCard, locator)
+			if sections[skillID] != expected {
+				t.Errorf("generated routing family %s does not preserve %s with skill-owned resource locators", familyID, skillID)
 			}
 		}
 	}
+}
+
+func familyRoutingCard(card, locator string) string {
+	// Only relative inline-link presentation may differ from the canonical Card.
+	// Package SKILL.md preservation is checked separately by validateSkillResources.
+	links := regexp.MustCompile(`!?\[([^\]\n]+)\]\(([^\s)]+)\)`)
+	scheme := regexp.MustCompile(`^[A-Za-z][A-Za-z0-9+.-]*:`)
+	body := strings.TrimSpace(strings.TrimPrefix(card, "## Routing Card"))
+	return links.ReplaceAllStringFunc(body, func(link string) string {
+		parts := links.FindStringSubmatch(link)
+		target := parts[2]
+		if strings.HasPrefix(link, "!") || strings.HasPrefix(target, "/") ||
+			strings.HasPrefix(target, "#") || scheme.MatchString(target) {
+			return link
+		}
+		return parts[1] + " (`" + locator + "` · `" + target + "`)"
+	})
 }
 
 func validateRuntimeRoutingProjection(t *testing.T, root string, provider providerContract) {

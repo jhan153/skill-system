@@ -121,9 +121,11 @@ evidence:
 2. Does work wait, suspend, or depend on file/network/device/timer/process completion? Apply the
    Structured Async profile when operation lifetime, cancellation, queueing, or publication is
    material.
-3. Do several execution contexts share a mutable invariant, publication edge, or reclamation
-   protocol? Apply the Shared-Memory Concurrency profile; immutable or owner-exclusive state keeps
-   the simpler local contract.
+3. Do several execution contexts share a mutable invariant or transfer state across a publication
+   or reclamation edge? Check actual visibility and last-consumer lifetime even for immutable or
+   owner-exclusive state. Reuse the existing owner/runtime completion, join, future, or equivalent
+   guarantee when it closes the edge; apply the Shared-Memory Concurrency profile only for material
+   coordination obligations that remain, without adding locks or profiles merely for cross-thread use.
 4. Does ready CPU work require graph-shaped dependencies, completion scope, load balancing, or
    resource-access coordination? Apply the Job System profile; one callback or external wait is not
    a Job graph.

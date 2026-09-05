@@ -1,5 +1,25 @@
 # Changelog
 
+## 10.3.1
+
+- Aligned skill, shared-contract, and helper admission, ownership, and output rules across
+  Knowledge adoption, architecture analysis, static review, comment maintenance, design, and
+  statistical test design. Ordinary conversation continuity no longer implies durable planning.
+- Preserved every full-report finding in optional Canvas output while keeping the first three
+  in the first view and the rest in a collapsed section with the same evidence navigation.
+  Compare and no-change output now follow the selected Markdown/HTML delivery mode.
+- Made generated routing resources portable through explicit plugin/skill ownership and
+  skill-relative locators, and corrected index-relative navigation links.
+- Clarified implementation references for thread affinity, completion accounting, helping-wait
+  reentrancy, publication and reclamation, functional validity, data-oriented evidence, paradigm
+  conformance, and narrowly justified external-version migration compatibility.
+- Corrected DAG examples for UTF-8 value preservation, failed-export report preservation,
+  repair/re-review and terminal handoff paths, and contract-to-verifier relationships.
+- Allowed the minimum factor combinations needed for one interaction hypothesis, and preserved
+  source identity, version, correction, and retraction facts together without inventing legacy facts.
+- Completed Claude native-harness installation mapping and aligned generated provider harnesses,
+  Codex/Claude plugin manifests, and marketplace versions to 10.3.1.
+
 ## 10.3.0
 
 - Centralized skill identity, family, routing, and resource declarations in canonical skill-local

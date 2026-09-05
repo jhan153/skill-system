@@ -63,7 +63,13 @@ and proof ceilings.
    remain inferred, and a canonical winner does not erase displaced live/legacy mismatches.
 2. Answer narrow authority, conflict, gap, or same-system mappings directly. Load `references/token-normalization.md` only for multi-category, alias/mode/naming, platform-export, or explicit inventory/export work. Preserve repo naming, shape, typing, modes, and platform conventions; create no unrequested export.
 3. For incomplete names, values, aliases, modes, or priority, load `references/token-gap-policy.md`. Keep gaps missing and inferences labeled; a required gap needs canonical evidence or an explicit scoped user decision before readiness.
-4. For requested edits, read the resulting value, alias, and mode through the real consumer path. If it resolves another source, keep the condition open, correct selection in the owning module, and repeat the same-path readback. A parser inventory, mock, or generated file proves only its boundary.
+4. For requested edits, read the resulting value, alias, and mode through the real consumer path.
+   If it resolves another source, keep the condition open. Correct selection and repeat the same-path
+   readback only when that correction stays inside the explicitly authorized token-artifact or
+   registry write scope. If it requires a UI consumer, provider/import selection, or another module
+   outside that scope, return the exact consumer/source pointers, expected versus selected source,
+   required correction, and owning-module handoff without editing it or invoking its owner. A parser
+   inventory, mock, or generated file proves only its boundary.
 5. Return the scoped mapping, decisive evidence, and unresolved items. Name the relevant owner only
    as a handoff hint; do not invoke it or claim UI completion from token readiness.
 

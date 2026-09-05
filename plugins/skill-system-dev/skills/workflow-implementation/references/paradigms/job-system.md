@@ -110,7 +110,10 @@ Completion dependency
   A contains B
 ```
 
-Represent prerequisites with counters/edges and represent nested completion with a scope, parent unfinished count, or structured task group. Do not overload blocking `wait()` to represent both.
+Represent prerequisites with counters/edges and represent nested completion with an existing scope
+or structured task group when it supplies the required guarantees. Do not add a parallel counter or
+completion owner merely to restate that contract, and do not overload blocking `wait()` to represent
+both relationships.
 
 For the simplest safe graph lifecycle:
 
@@ -121,6 +124,27 @@ For the simplest safe graph lifecycle:
 5. enqueue roots whose prerequisite count is zero.
 
 Attaching successors after a predecessor is concurrently completing requires a separate synchronization contract. Avoid that complexity unless dynamic graph mutation is required.
+
+When implementing custom scope/completion bookkeeping, close these obligations explicitly:
+
+- Register a child's completion obligation before publishing it as runnable, including submissions
+  that may execute inline before `schedule` returns.
+- Every accepted child reaches exactly one accounted terminal outcome: success, failure, or
+  cancellation. A cancellation request alone does not retire work that can still access the scope's
+  state or resources.
+- Distinguish rejected admission from an accepted job whose enqueue fails. Undo an unaccepted
+  reservation, or complete accepted work through its failure path, exactly once; enqueue rejection,
+  cancellation, and body completion must not leak or double-release the obligation.
+- Coordinate close with admission. Define when external and already-owned nested submissions may
+  still be accepted, and do not publish scope completion while a legal admission can still race
+  with the final outstanding-work check. Account for the parent's own body before completing its
+  nested scope.
+- Publish terminal scope completion only after its admitted work and required cleanup are finished,
+  with the matching visibility and lifetime guarantees. Reuse existing task-group semantics when
+  they already supply this protocol; these obligations do not mandate a new counter or framework.
+- External submission cannot reopen an already terminal scope generation. If the existing primitive
+  supports reuse, follow its explicit new-scope/generation protocol; do not make an observed completed
+  operation pending again by incrementing the old count or reusing its completion identity.
 
 ## Minimal Semantic API
 
@@ -138,8 +162,11 @@ The API shape varies, but it should express:
 The API must also define handle lifetime, generation/reuse, submission from external threads, shutdown behavior, and what waiting from a worker does.
 
 The scheduler must also define whether a suspended or resumed task may continue on another worker.
-Treat TLS, OS-thread-owned allocators or locks, and thread-affine APIs as unavailable unless an
-explicit pinned or serial execution lane owns them; otherwise use task-local state.
+Serialization prevents concurrent execution; it does not guarantee the same OS thread. A dependency
+on TLS continuity, a thread-owned lock/allocator, or a thread-affine API must satisfy that resource's
+actual thread requirement at every use and release. Returning to the same executor or serial lane
+is insufficient when it may migrate. Keep movable computation state task-local, but do not assume
+that moving a lock guard into task-local storage transfers an OS-thread-owned lock.
 
 ## Scheduling Strategy
 
@@ -171,6 +198,15 @@ Prefer, in order:
 3. worker-helping waits when carefully specified;
 4. fibers only when synchronous-looking suspend/resume behavior justifies stack and tooling complexity.
 
+A helping wait or suspension may run unrelated jobs or re-enter the same owner before the waiting
+operation resumes. Identify the permitted re-entry set, held locks, and temporarily broken
+invariants. Restore externally observable invariants and release incompatible locks before yielding
+or helping, or use a documented isolation/async-aware synchronization contract that preserves
+ownership, cancellation cleanup, and forward progress. A pinned OS thread or serial executor alone
+does not prevent same-thread re-entry, self-deadlock, or another task observing intermediate state.
+Do not help work that needs a resource the waiter retains unless the accepted protocol closes that
+dependency; asynchronous-aware mutexes are not prohibited when their actual contract does so.
+
 File/network/database waits, long mutex waits, process waits, and GPU fence waits should usually use an I/O/event executor or dedicated integration path rather than occupy CPU compute workers.
 
 ## Data Access Model
@@ -183,6 +219,12 @@ Scheduling does not remove data races. Make safe parallelism visible through one
 - versioned handles;
 - thread-local/Job-local partial results followed by reduction;
 - per-identity serial queues when order matters only within each object.
+
+Non-overlapping writes do not establish visibility to a later consumer on another thread. Bind
+the actual completion/publication edge and last-consumer lifetime; reuse the selected runtime's
+documented synchronization and ownership guarantees when they close those obligations. A dependency
+arrow or method named `complete` alone is not that evidence, and an already sufficient completion
+contract does not require an extra mutex or a new profile.
 
 ```cpp
 JobDesc job {
@@ -284,9 +326,25 @@ Poor candidates for the general CPU pool:
 - **Object-oriented** owners manage scheduler lifetime, task scopes, resources, and domain commit, but workers should receive handles/views rather than deep shared graphs.
 - **Structured Async** owns file/network/device waits, request lifetime, cancellation, and
   backpressure before ready CPU work enters the Job System.
-- **Shared-Memory Concurrency** owns visibility, synchronization, reclamation, and progress when
-  Job access ranges are not owner-exclusive.
+- **Shared-Memory Concurrency** addresses material invariant, visibility, synchronization,
+  reclamation, or progress obligations left open by the existing owner/runtime contract, including
+  cross-thread publication of owner-exclusive ranges. Reuse sufficient runtime completion and
+  last-consumer guarantees before adding a profile or coordination mechanism.
 - **TMP** may specialize a bounded kernel, not replace runtime dependency scheduling.
+
+## Discriminating Task Cases
+
+- **Serial is not pinned:** a continuation moves from thread A to B inside one serial executor.
+  Reject using serialization as evidence that B may release A's thread-owned mutex or reuse A's
+  TLS state. Check actual thread identity requirements or remove that cross-suspension dependency.
+- **Custom completion:** a child can execute inline, enqueue can reject, and close can race with
+  submission. Admit/register before execution and account every accepted terminal outcome exactly
+  once; neither an early zero count nor a cancellation request alone means the scope is complete.
+- **Existing scope:** the selected task group already guarantees admission, terminal accounting,
+  closure, and cleanup. Bind those guarantees on the actual path; add no mirror counter.
+- **Helping re-entry:** a parent retains a mutex or exposes a temporary invariant while its wait
+  helps another task that touches the same owner. Same-thread execution does not make that safe.
+  Release/restore before helping, or establish a documented isolation and progress contract.
 
 ## Implementation Verification
 
@@ -295,12 +353,16 @@ Poor candidates for the general CPU pool:
   utilization are not used as proxies for either.
 - Domain, logical-item, and scheduler-grain levels are distinct.
 - Sequential kernels remain independently callable.
-- Dependencies, completion, cancellation, error, and shutdown semantics are defined.
-- Worker waiting cannot deadlock or starve ready child work under the stated policy.
+- Dependencies, admission/close, completion, cancellation, error, and shutdown semantics are defined;
+  custom bookkeeping covers inline execution, enqueue rejection, and exactly-once terminal accounting,
+  while existing sufficient task-group contracts are reused.
+- Worker waiting cannot deadlock or starve ready child work under the stated policy; helping and
+  suspension account for unrelated re-entry, held resources, and temporarily broken invariants.
 - Read/write overlap and shared accumulation have an explicit algorithm.
 - In-progress Job/bulk/GPU work reuses existing scheduler/runtime primitives when sufficient; any new request/builder/ticket owns a real additional invariant and cannot publish a partially initialized final object.
 - Blocking I/O and nested parallel runtimes are separated or coordinated.
-- Migrating tasks do not depend on TLS or thread-affine state without a declared execution lane.
+- Migrating tasks meet each resource's actual OS-thread requirement; serialization or the same
+  executor is not used as thread-affinity proof, and affinity alone is not re-entry safety.
 - Grain and scheduler sophistication are justified by a representative workload.
 - Determinism requirements pin partition and reduction order where necessary.
 - Snapshot/commit version conflicts have a domain-owned outcome.

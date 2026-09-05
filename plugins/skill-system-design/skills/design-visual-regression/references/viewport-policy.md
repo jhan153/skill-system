@@ -8,14 +8,16 @@ Use this reference before capturing or comparing UI screenshots.
 2. Design frame dimensions.
 3. Project-defined breakpoints or Storybook viewports.
 4. Platform conventions for the target surface.
-5. Fallback responsive set:
+5. Fallback set only when responsive comparison is in scope and no viewport set is specified:
    - mobile: `390x844`
    - desktop: `1440x900`
 
 ## Capture rules
 
 - Capture exact dimensions and device scale factor when available.
-- Include at least one mobile and one desktop viewport for responsive web surfaces.
+- Keep an assigned single-viewport condition at that viewport. Include at least one mobile and one
+  desktop viewport only for in-scope responsive comparison with no specified viewport set; a
+  responsive target alone does not expand a single-view clipping or blank-render check.
 - For fixed native/mobile screens, use the relevant device/simulator size when available.
 - Do not compare different states as if they were the same design.
 - Record viewport-specific failures separately.

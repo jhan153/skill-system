@@ -20,7 +20,7 @@ description: Rank evidence-backed improvements across deep modules, seams, adapt
   - measured bottleneck: `analysis-performance`
   - direct production change: route by the selected candidate's change contract—`workflow-refactor-safely` for behavior-preserving live restructuring, `workflow-source-maintenance` for proven-obsolete deletion, or `workflow-implementation` for behavior changes
 - expected_inputs: user-named scope or bounded recent-change history, pain/change signals, implementation appetite
-- expected_outputs: sampling basis, coverage, evidenced friction, ranked candidates, an evidenced next candidate or exact discriminator, handoff, and unverified gaps
+- expected_outputs: sampling basis, coverage, evidenced friction, ranked candidates, an evidenced next candidate, scoped no-improvement conclusion, or exact evidence discriminator, handoff, and unverified gaps
 - context_targets:
   - must_read: goal, compact scope outline, and production path/owner evidence for shortlisted candidates
   - read_if_needed: discriminating callers, contracts, failures, diffs, metrics, or formal invariants
@@ -46,7 +46,8 @@ Rank moves that remove caller knowledge/change surface, return policy, isolate p
 6. Record inventory findings as hypotheses, never recommendations.
 
 ### 2. Confirm narrowly
-1. Shortlist 3–5 hypotheses by leverage and evidence availability.
+1. Shortlist up to five hypotheses by leverage and evidence availability. Keep only hypotheses
+   actually supported by the scoped discovery, including a shortlist of one or two.
 2. Trace callers, production owner, side effects, and boundary contract. Seek a counterexample; deduplicate symptoms sharing one ownership cause.
 3. Rank only established improvements. Without actual-path evidence, label `Unverified hypothesis`, make no top recommendation, and request one discriminating observation.
 
@@ -65,10 +66,17 @@ Track the scope decision, recent-history window when used, change-weighted prior
 Rank ordinally by leverage, knowledge/change removed, observed pressure, counterevidence, validation/reversibility, and cost/blast radius. Avoid fake precision.
 
 Stop when groups are inventoried or excluded and either:
-- 3–5 established candidates have discriminating evidence, a counter-sample preserves the leader,
+- one or more established candidates have discriminating evidence, a counter-sample preserves the leader,
   and the leader has a design question and validation path; or
-- the evidence deficit is explicit and one smallest discriminator is named, with no leader or
+- the available evidence sufficiently covers the requested scope but establishes no improvement;
+  return `none` with that bounded coverage and exclusions, without inventing an evidence deficit; or
+- a material evidence deficit remains explicit and one smallest discriminator is named, with no leader or
   recommendation claimed.
+
+A fully covered small scope may therefore return one or two established candidates. Do not widen
+the inspection scope, invent candidates, or withhold an evidenced leader merely to fill a quota;
+zero established candidates yields no recommendation, with a discriminator only when an actual
+material evidence gap remains.
 
 ## Output Contract
 Return only:
@@ -77,7 +85,8 @@ Return only:
 - `friction_signals` with evidence scope and references
 - `candidates` with stable IDs, `ranking`, and counterevidence
 - `recommended_next_candidate` as an established ranked candidate ID plus the decisive tradeoff;
-  when no candidate is established, return `none` with the exact discriminator instead
+  when no candidate is established, return `none` with the bounded no-improvement conclusion or
+  the exact discriminator for a remaining material evidence gap
 - `handoff` to `analysis-boundary-design` when one boundary still needs design,
   `workflow-architecture-design` when an established candidate requires a coherent normative design
   across several architecture views, `workflow-refactor-safely` for selected behavior-preserving

@@ -28,9 +28,9 @@ disable-model-invocation: true
   - rendered implementation target, screenshot path, or preview URL
   - source visual reference when available
   - pinned product-family component-state or surface-archetype baselines when declared
-  - desktop and mobile viewport requirements
+  - assigned viewport/state requirements and responsive coverage when requested
 - expected_outputs:
-  - desktop/mobile screenshot evidence or unavailable reason
+  - screenshot evidence for the assigned viewports or an unavailable reason
   - nonblank and framing result
   - visual difference report
   - separate target-fidelity and family-coherence verdicts when both lanes apply
@@ -85,8 +85,11 @@ ceilings.
      component-state or surface-archetype baselines. Apply
      `references/product_family_design_contract.md` to that lane.
    - Keep the verdicts separate: a target can match an off-family mockup, or fit the family while missing the target.
-   - Prefer user-specified viewport, design frame size, or project breakpoints.
-   - If no viewport is specified and the surface is responsive, check at least one mobile and one desktop viewport.
+   - Preserve the assigned viewport scope, using user-specified dimensions, design frame size, or
+     project breakpoints. A single-viewport condition stays at that viewport.
+   - When responsive comparison is in scope and no viewport set is specified, check at least one
+     mobile and one desktop viewport. Do not add that fallback set merely because a single-view
+     clipping or blank-render target happens to be responsive.
 3. Capture or inspect screenshots:
    - Use available browser/simulator tooling.
    - If capture is unavailable, inspect provided screenshots and mark capture as unavailable.

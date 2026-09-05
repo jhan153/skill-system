@@ -24,7 +24,10 @@ For a brand-new store with no supplied path, an initializer may propose `docs/kn
 
 Keep the current usable snapshot first. Every current record uses the envelope below. A legacy
 record missing current navigation or history fields remains read-only until an explicit
-maintenance operation adopts it; never fabricate missing history.
+maintenance operation adopts it; never fabricate missing history. Bind that adoption to the exact
+affected record IDs. An ordinary update or observation does not grant it. Maintenance may delegate
+the bounded conversion to `management-knowledge-base-update` using the already supplied authority;
+the current snapshot, adoption event, and index must be staged and read back together.
 
 ```yaml
 id: KB-DOMAIN-001

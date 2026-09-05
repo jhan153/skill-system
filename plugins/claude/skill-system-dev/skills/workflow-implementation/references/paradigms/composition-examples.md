@@ -29,7 +29,7 @@ Use a compact map:
 | static specialization | TMP | bounded compile-time facts only | runtime choices encoded in types |
 | external progress | Structured Async | scoped readiness/completion, cancellation, backpressure, publication | blocking work hidden behind `async` syntax or detached lifetime |
 | CPU execution | Job System | DAG, grain, access, completion | thread-pool callback mislabeled as Job graph |
-| shared mutable state | Shared-Memory Concurrency | invariant, visibility, reclamation, progress | atomics or locks without an owned invariant |
+| cross-context state coordination | Shared-Memory Concurrency when existing guarantees leave obligations open | invariant, visibility, reclamation, progress | atomics or locks without an owned invariant |
 
 ## Graphics, Mesh, CAD, Or Simulation
 
@@ -102,7 +102,7 @@ Before adding any custom request/builder/ticket, reuse an existing future, task,
 | large writable storage/ranges | data-oriented `BufferBuilder` or staging buffer |
 | external readiness/completion | Structured Async scope, event loop, completion runtime, or bounded blocking adapter |
 | CPU dependency/completion | Job scope/handle with explicit access and completion semantics |
-| shared publication/reclamation | Shared-Memory Concurrency contract only when state is actually shared |
+| cross-thread publication/reclamation | existing runtime/owner guarantee, with Shared-Memory Concurrency only for remaining material obligations |
 | final publication | one validated `finish`/`commit`/`freeze` returning final value or typed failure |
 
 ```text
@@ -131,8 +131,10 @@ The two approaches complement but do not imply one another.
 2. The Job System schedules those ranges using explicit prerequisites and read/write declarations.
 3. Functional/procedural kernels define the computation inside each range.
 4. An object/session owner controls snapshots, cancellation, and commit.
-5. Shared-Memory Concurrency is added only when partitions still overlap, publish across workers, or
-   coordinate reclamation; a Job dependency alone is not a memory-visibility proof.
+5. Check publication visibility and last-consumer reclamation even for disjoint partitions. Reuse
+   documented runtime completion and owner guarantees on the actual edge; add Shared-Memory
+   Concurrency only for material coordination obligations that remain. A Job dependency arrow alone
+   is not a memory-visibility proof.
 
 ```text
 Position[] + Velocity[] -> Integrate chunks
@@ -166,14 +168,20 @@ An import, processing, or frame path often benefits from procedural orchestratio
 
 ```cpp
 Result processAsset(const Request& request, Services& services) {
-    Bytes bytes = services.files.read(request.path);       // effect
-    Asset parsed = parse(bytes, request.format);            // functional
-    Asset normalized = normalize(parsed, request.policy);   // functional
-    Validation report = validate(normalized);               // functional
+    Bytes bytes = services.files.read(request.path);            // effect
+    Asset parsed = TRY(parse(bytes, request.format));            // functional
+    Asset normalized = TRY(normalize(parsed, request.policy));   // functional
+    Validation report = validateForExport(normalized, request.policy);
     if (!report.ok()) return report.error();
     return services.store.write(request.output, normalized); // effect
 }
 ```
+
+Here `parse` and `normalize` return intrinsically valid final `Asset` values on success or propagate
+a typed failure before such a value escapes. `validateForExport` checks output-context acceptance
+of an already valid asset; it does not repair or first establish the type's intrinsic invariants.
+A valid asset may fail an export policy, while malformed intrinsic data must fail at the stage
+that would otherwise produce it. This distinction does not require a new wrapper or draft type.
 
 The procedure makes order and early failure obvious. The kernels remain reusable and deterministic. The service object owns external effects and lifetime.
 
@@ -215,9 +223,12 @@ workers with file/network waits.
 
 ### Disjoint ranges versus shared-memory safety
 
-Disjoint logical indexes can still share an invariant, reclamation protocol, reduction order, or
-cache line. Load Shared-Memory Concurrency only for those remaining properties. Do not add locks to
-immutable snapshots or owner-exclusive ranges that already commit through one canonical owner.
+Disjoint logical indexes can still share an invariant, publication edge, reclamation protocol,
+reduction order, or cache line. Identify visibility to the actual consumer and the last-reader
+lifetime even when the values are immutable. Reuse existing runtime completion/join/future and
+owner guarantees when sufficient; load Shared-Memory Concurrency only for material obligations
+that remain. One canonical commit owner or immutability alone does not prove safe transfer or
+reclamation, and a verified sufficient contract needs no additional lock.
 
 ### TMP request versus runtime plugin
 
@@ -279,8 +290,10 @@ existing bounded adapter or keep the call synchronous. Syntax alone cannot satis
 
 Task: protect independent immutable snapshots with a global mutex.
 
-Expected behavior: do not load or apply Shared-Memory Concurrency merely because several threads
-read the values; preserve the simpler immutable ownership contract.
+Expected behavior: confirm that the actual publication and last-reader lifetime are already closed
+by the runtime/owner contract. Reuse those guarantees; do not load or apply Shared-Memory Concurrency
+or add a global mutex merely because several threads read immutable values. If reclamation remains
+unresolved, retain that obligation rather than treating immutability as its proof.
 
 ### Positive: Explicit Staged Construction
 

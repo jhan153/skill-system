@@ -2,7 +2,16 @@
 
 > Generated from canonical skill-local Routing Cards. Read only the matching section.
 
+Each section names its canonical `plugin:skill` owner. Relative resource paths belong
+to that installed skill's `SKILL.md` directory, never this family file or a runtime
+`skills/` mirror. An entry such as `plugin:skill` · `references/file.md` is a resource
+locator, not a runtime-relative URL. Resolve the named installed skill first; if it is
+unavailable, keep the resource unresolved. For canonical-source inspection, use the
+skill's `source/skills/<skill>/SKILL.md` and its Resource Closure for projected resources.
+
 ## `workflow-bug-fix`
+
+Owner: `skill-system-dev:workflow-bug-fix`
 
 - role: primary
 - family: workflow
@@ -44,6 +53,8 @@
 
 ## `workflow-code-review`
 
+Owner: `skill-system-dev:workflow-code-review`
+
 - role: review_gate
 - family: workflow
 - intent_signature: static code review, state/flow/reachability review, dynamic diagrams, optional design conformance, 정적 코드 리뷰
@@ -84,6 +95,8 @@
 
 ## `workflow-dependency-upgrade`
 
+Owner: `skill-system-dev:workflow-dependency-upgrade`
+
 - role: primary
 - family: workflow
 - intent_signature:
@@ -115,6 +128,8 @@
   - PREPARE
 
 ## `workflow-implementation`
+
+Owner: `skill-system-dev:workflow-implementation`
 
 - role: primary
 - family: workflow
@@ -194,6 +209,8 @@
 
 ## `workflow-prototype`
 
+Owner: `skill-system-dev:workflow-prototype`
+
 - role: primary
 - family: workflow
 - intent_signature: one bounded product or engineering question answered by a runnable disposable artifact
@@ -222,6 +239,8 @@
 - entry_scene: PREPARE
 
 ## `workflow-refactor-safely`
+
+Owner: `skill-system-dev:workflow-refactor-safely`
 
 - role: primary
 - family: workflow
@@ -257,6 +276,8 @@
   - PREPARE
 
 ## `workflow-source-maintenance`
+
+Owner: `skill-system-dev:workflow-source-maintenance`
 
 - role: primary
 - family: workflow

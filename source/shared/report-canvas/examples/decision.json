@@ -16,7 +16,7 @@
       "title": "실제 경로 관찰이 없습니다",
       "summary": "정적 fixture는 라우팅 계약만 증명하며 현재 host의 오호출률이나 산출물 유용성을 증명하지 않습니다.",
       "evidence_refs": [
-        "eval-fixtures"
+        "routing-contract"
       ]
     },
     {
@@ -57,7 +57,7 @@
       "id": "routing-contract",
       "title": "현재 routing 소유권",
       "status": "verified",
-      "kind": "artifact",
+      "kind": "source",
       "source": "source/shared/docs/skill_registry.md",
       "summary": "현재 스킬 소유권과 routing 경계가 registry에 기록되어 있습니다."
     },

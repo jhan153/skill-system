@@ -20,5 +20,6 @@ Use only in `comment_sync` mode. Executable code must remain unchanged.
 
 A comment revealing a real defect preserves the signal; only a semantically admitted bounded
 same-contract repair routes to `workflow-bug-fix`. First implementation or accepted
-production-mechanism replacement stays with `workflow-implementation`; refactor/comment work stays
-with `workflow-refactor-safely`. General README/wiki documentation is outside this mode.
+production-mechanism replacement stays with `workflow-implementation`; live behavior-preserving
+restructuring belongs to `workflow-refactor-safely`, while comment-only synchronization stays with
+`workflow-source-maintenance` in this mode. General README/wiki documentation is outside this mode.

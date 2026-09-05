@@ -65,6 +65,9 @@ the user explicitly asks for one.
    pass cannot overrule conflicting runtime, canonical-source, or user-path evidence.
 5. Produce the Markdown report first. Render HTML only under the selected delivery mode and never
    add findings, scoring, or decorative narrative during projection.
+   For an explicitly full report, retain every severity-ordered finding in the Canvas `findings`
+   array with its evidence refs. The first three stay in the first view and the rest remain available
+   in the separate collapsed section; do not discard or relabel later claims as evidence entries.
 
 ## Evidence And Verdicts
 

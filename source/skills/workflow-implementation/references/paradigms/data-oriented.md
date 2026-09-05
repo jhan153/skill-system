@@ -210,8 +210,11 @@ For each, choose layout from the specific pass. A shader that always consumes `x
 - Use an **object-oriented** shell for documents, resources, sessions, and entity identity.
 - Expose **functional** or **procedural** kernels over views/ranges.
 - Use a **Job System** when ranges and read/write sets support a dependency graph; DOD alone does not schedule work.
-- Use **Shared-Memory Concurrency** only when ranges still overlap, publish across workers, or own
-  reclamation; disjoint owner-exclusive ranges should keep the simpler partition/commit contract.
+- Check publication visibility to the actual consumer and last-consumer lifetime even for disjoint
+  owner-exclusive ranges. Reuse documented runtime completion and owner guarantees when they close
+  those obligations; use **Shared-Memory Concurrency** only for material invariant, visibility,
+  reclamation, or coherence obligations that remain. Disjointness alone does not close transfer or
+  reclamation, and an already sufficient partition/commit contract needs no extra profile or lock.
 - Use **TMP** only for bounded static layouts, SIMD widths, coordinate-frame types, or kernels where compile-time specialization has evidence.
 
 ## Misapplications
@@ -235,6 +238,9 @@ For each, choose layout from the specific pass. A shader that always consumes `x
 - Parallel write partitions were checked for coherence-line interference when multicore scaling
   motivated the layout.
 - Large staged fills reuse an existing primitive when sufficient; any new builder owns real coverage/lifetime/publication invariants, and only successful commit publishes the final canonical buffer.
-- Performance claims use the same representative workload and metric before and after.
+- An absolute performance-budget claim names the accepted threshold and a matching observation on
+  the actual representative workload, environment, and metric; no prior implementation is required.
+- A comparative improvement claim uses comparable before/after observations of the same
+  representative workload and metric. Meeting an absolute budget alone does not prove improvement.
 - Tail latency and memory traffic are checked when they motivated the design.
 - The negative case—small, irregular, identity-heavy, or non-memory-bound work—does not receive a speculative data architecture.

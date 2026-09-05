@@ -7,14 +7,19 @@
   mutable aliasing that cannot be safely partitioned or ordered.
 - **Minimum closure:** representative total-work/span and critical-path pressure,
   domain/logical/grain separation, sequentially callable kernels, distinct dependency/completion
-  semantics, lifecycle/shutdown, safe read/write or reduction rules, completion composition that
-  does not occupy a worker needed for forward progress, an explicit external/worker wait policy,
-  and validated result publication/commit; when tasks may migrate, thread-affine or TLS
-  dependencies also need an explicit execution-lane contract or task-local alternative.
+  semantics, admission-before-execution, exactly-once terminal accounting and close/admission
+  coordination supplied by an existing sufficient scope or an explicit custom protocol,
+  lifecycle/shutdown, safe read/write or reduction rules, and validated result publication/commit.
+  Completion and external/worker wait policy must preserve forward progress and account for helping
+  or suspension re-entry, held resources, and temporary invariants. When tasks may migrate, TLS or
+  thread-owned resources require their actual OS-thread guarantee; a serial lane is not that
+  guarantee, and affinity alone does not close re-entry safety.
 - **Maximum scope:** ready-work scheduling. Domain grain, fallback/numerical policy, resource
   meaning, data layout, I/O runtime, and GPU/actor semantics stay with their owners.
-- **Interactions:** DOD supplies ranges/access sets, Shared-Memory Concurrency supplies visibility
-  and reclamation rules, Structured Async owns external waits and suspended-operation lifetime,
+- **Interactions:** DOD supplies ranges/access sets. Check cross-thread visibility and last-consumer
+  reclamation even for disjoint ranges; reuse documented runtime completion guarantees and apply
+  Shared-Memory Concurrency only for material coordination obligations that remain. Structured Async
+  owns external waits and suspended-operation lifetime,
   functional/procedural code supplies kernels, object/session owners supply lifetime and commit,
   pipeline owners supply bounded in-flight/version/reclamation and end-to-end latency policy, and
   TMP may specialize only bounded kernels.

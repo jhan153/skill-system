@@ -21,7 +21,10 @@ Load this file only when selecting views or rendering Mermaid.
   - sequence: the named flow, including cancel/failure if it changes control
   - state: transitions, stores, and who writes them
 
-Every map includes a sequence. Skip a view rather than inventing participants.
+Include a sequence only when an evidenced runtime interaction is needed for the bound question.
+For a structure/schema-only slice, return the relevant structural views and explain the omitted
+sequence. Skip a view rather than inventing participants. A missing requested runtime path remains
+an explicit `Unverified` gap; a structural map does not silently satisfy that missing flow.
 
 ## Evidence
 - Names, folders, and import counts are leads.

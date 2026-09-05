@@ -27,7 +27,7 @@ For an explicit “what next?” question, choose only the first boundary that c
 1. If the target outcome is nameable but unresolved decisions and their dependencies need durable multi-session state, use explicit `plan-decision-map`. Otherwise, if an existing capability's next user path is blocked by a product-facing behavior decision, use behavior discovery; use requirements discovery for missing product, scope, edge, or data decisions. Use `plan-question-document` only when an explicit one-recipient input artifact is needed. Distill a durable contract only when that artifact is needed.
 2. If requirements are stable and no persisted plan, resume boundary, transfer, or verifier-steered repetition is requested, keep the current task owner. Execute directly only when the current request authorizes mutation; a read-only “what next?” request receives a recommendation without starting work.
 3. If unresolved decisions need durable state, use `plan-decision-map`; if execution needs durable state, use `plan-execution-handoff`. Requirements admission remains governed by the Planning State Model.
-4. If one task must resume across turns, use `plan-execution-handoff` with `single_node_execution`; if ownership itself transfers without durable execution state, use an explicit lightweight handoff instead.
+4. If one task needs an explicitly requested or otherwise established durable resume artifact across sessions or owners, use `plan-execution-handoff` with `single_node_execution`; ordinary follow-up turns in the same conversation do not establish that need. If ownership itself transfers without durable execution state, use an explicit lightweight handoff instead.
 5. If durable execution is explicitly verifier-steered, apply the conditional `repeated_work_profile` while authoring its Execution Handoff DAG. A `/goal`, event runtime, task length, or governance risk alone does not activate that profile.
 
 This is explanatory topology, not an orchestrator. It never calls the listed owners, requires every task to traverse every step, or overrides the current task owner.
@@ -37,7 +37,7 @@ This is explanatory topology, not an orchestrator. It never calls the listed own
 | level | meaning | primary owner | durable state |
 | --- | --- | --- | --- |
 | `one_shot` | one response, one small edit/command/check, or one bounded decision question | task-specific direct execution or discovery owner | none by default |
-| `task_ticket` | one task whose findings/evidence must survive turns | `plan-execution-handoff` with `single_node_execution`; task-specific Workflow owns the executable node | canonical Plan/Handoff pair |
+| `task_ticket` | one task requiring durable resume state beyond ordinary conversation continuity | `plan-execution-handoff` with `single_node_execution`; task-specific Workflow owns the executable node | canonical Plan/Handoff pair |
 | `long_plan` | durable multi-horizon decision state or governed multi-session implementation DAG | `plan-decision-map` while material decisions remain; `plan-execution-handoff` after the implementation outcome and lifecycle are selected | decision map or canonical Plan/Handoff pair |
 | `cross_horizon` | modifier, curation, validation, or execution behavior that can attach across levels | owning facet skill | depends on the owner |
 
@@ -85,8 +85,8 @@ Workflow skills are separated by how they control execution:
 
 | execution_mode | owner | role |
 | --- | --- | --- |
-| `implementation_execution` | `workflow-implementation` | own direct coding and refactoring from requirement to validated diff |
-| `test_design_execution` | `workflow-test-design` | own one implementation-ready test contract after an executable SUT exists, including conditional human Test Discovery without test-code writes |
+| `implementation_execution` | `workflow-implementation` | own production implementation and necessary in-scope restructuring from accepted requirements to validated diff; a standalone behavior-preserving refactor belongs to `workflow-refactor-safely` |
+| `test_design_execution` | `workflow-test-design` | own one implementation-ready test contract from a minimum executable SUT or accepted external contract, including conditional human Test Discovery without test-code writes |
 | `test_implementation_execution` | `workflow-test-implementation` | own bounded test-only assets and condition-scoped execution without changing the accepted oracle or production code |
 | `runtime_debugging_execution` | `workflow-runtime-debugging` | own one execution-ready debugging scope or one approved debugger/dump/dynamic/graphics operation; return a direct or Core diagnostic result with safe session handback and no source repair or successor selection |
 | `bug_fix_execution` | `workflow-bug-fix` | own one semantically admitted contract-preserving DAG intervention/result, or a bounded standalone repair under the same already-implemented accepted contract |

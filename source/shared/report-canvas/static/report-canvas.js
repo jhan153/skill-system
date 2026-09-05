@@ -170,7 +170,7 @@
     node.focus({ preventScroll: true });
   };
 
-  findings.slice(0, 3).forEach((finding) => {
+  const renderFinding = (finding) => {
     const card = create("article", {
       className: "rc-finding",
       attrs: { "data-severity": finding.severity || "info" },
@@ -197,7 +197,10 @@
       });
       card.appendChild(refs);
     }
-    findingsList.appendChild(card);
+    return card;
+  };
+  findings.slice(0, 3).forEach((finding) => {
+    findingsList.appendChild(renderFinding(finding));
   });
   findingsPanel.appendChild(findingsList);
   append(mainGrid, visualPanel, findingsPanel);
@@ -238,6 +241,23 @@
 
   append(firstView, topbar, meta, mainGrid, nextAction);
   root.appendChild(firstView);
+
+  if (findings.length > 3) {
+    const moreFindings = create("details", {
+      className: "rc-panel rc-findings rc-more-findings",
+      attrs: { id: "more-findings" },
+    });
+    const remainingFindings = create("div", { className: "rc-findings-list" });
+    findings.slice(3).forEach((finding) => {
+      remainingFindings.appendChild(renderFinding(finding));
+    });
+    append(
+      moreFindings,
+      create("summary", { text: `More findings (${findings.length - 3})` }),
+      remainingFindings,
+    );
+    root.appendChild(moreFindings);
+  }
 
   const renderDecision = (visual) => {
     const wrap = create("div", { className: "rc-decision" });

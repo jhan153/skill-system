@@ -29,13 +29,24 @@ substitute evidence.
 Record these axes separately:
 
 - `acquisition_status`: acquired, partial, inaccessible, or not_acquired
-- `source_status`: verified_identity, metadata_partial, duplicate_version, corrected, retracted, or unverified
+- `source_status`: identity assessment plus independent source-kind-relevant version, correction, and retraction observations
 - `claim_relation`: supports, contradicts, mixed, mentions, or not_assessed
 - `evidence_basis`: exact source/code/runtime/visual basis
 - `locator`: direct URL, file/line, artifact ID, or receipt
 - directness, authority, independence, recency, and limitations
 
 Source identity is not claim verification. Dependent sources are not independent votes.
+
+Preserve the incoming facets together: identity uses `verified_identity`, `metadata_partial`,
+`unverified`, or `unknown`; `duplicate_version`, `corrected`, and `retracted` belong to separate
+version/correction/retraction facets and can all coexist. Bind each asserted fact to its locator.
+A relevant unestablished facet stays `unknown`; an inapplicable facet may be omitted. Absence of a
+flag is not evidence of absence, and a negative check names its source/date/scope.
+
+When consuming legacy scalar `source_status`, retain exactly that fact and leave other relevant
+facets unknown. Thus `corrected` alone neither verifies identity nor rules out retraction. Do not
+rewrite old evidence records just to adopt facets, choose one status to discard another, or require
+an artifact for a focused inline answer.
 
 ## Adversarial verification
 - Search for the strongest plausible contradiction and alternative explanation.

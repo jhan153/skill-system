@@ -59,22 +59,27 @@ stage or produce a generic blueprint.
 3. Reuse a suitable checkpoint or baseline; new training requires a decision-relevant gap it cannot answer.
 4. Select data and metrics for the mechanism. Record provenance, access/license, split integrity, representativeness, contamination, metric definition/direction, uncertainty, relevance, and failure modes.
 5. Require simple and strongest baselines to share the treatment's data/split, preprocessing, and metric contract; otherwise reject or qualify the comparison.
-6. Define the smallest core experiment that changes one causal factor. Add an ablation only for a distinct mechanism/boundary prediction with frozen factors.
+6. Define the smallest core experiment that identifies the selected claim, with explicit factors, levels, and predeclared contrasts. A single main-effect question keeps a one-factor contrast with other factors frozen. An interaction claim uses only the factor combinations needed to compare that effect across the relevant levels; one claim does not require only one varying factor. Add an ablation only for a distinct prediction needed by that claim, and keep unrelated factors and hypotheses deferred.
 7. Specify randomization, seeds/repeats, variance sources, exclusions/missingness, multiplicity/statistical plan, compute/time bounds, and early stop.
 8. Predeclare support, refute, inconclusive, stop, and escalation outcomes.
 
 ## Evidence And Reproducibility
 - Mark unsupported dataset, metric, license, checkpoint, comparator, or expected-effect claims `Unverified` and name the resolving check.
-- Never fabricate sample size; require a power or precision basis with analysis unit, variance, and effect/threshold assumptions.
+- Never fabricate an empirical effect, variance, or sample size; require a power or precision basis with analysis unit, variance, and effect/threshold assumptions, each sourced or explicitly labeled as a design assumption. Missing required inputs remain unresolved rather than invented measurements.
 - Pin configuration, code revision, environment, data version, checkpoint provenance, and output locations needed for reproduction.
 - An ablation list is not evidence, and a blueprint never counts as completed experimentation.
+
+For a selected binary A×B interaction, predeclare the difference between B's effect at the two A
+levels and the four necessary combinations; hold unrelated data/preprocessing/metric choices fixed.
+For B's effect at one fixed A level, retain the simpler B contrast. Neither case authorizes extra
+hypotheses, irrelevant ablations, or training beyond the gap that the existing baseline cannot answer.
 
 ## Output
 Answer a narrow design question with the decisive choice and falsifier. For an explicit artifact, include only:
 
 - claim/mechanism/evidence and units/treatment/controls/frozen factors
 - data, metric, baseline, leakage, and uncertainty contracts
-- smallest core experiment and prediction-bearing ablations
+- smallest identifying factors/levels/contrasts and prediction-bearing ablations
 - support/refute/inconclusive plus stop/go, compute, provenance, and reproduction rules
 - unresolved evidence checks
 

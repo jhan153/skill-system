@@ -2,7 +2,16 @@
 
 > Generated from canonical skill-local Routing Cards. Read only the matching section.
 
+Each section names its canonical `plugin:skill` owner. Relative resource paths belong
+to that installed skill's `SKILL.md` directory, never this family file or a runtime
+`skills/` mirror. An entry such as `plugin:skill` · `references/file.md` is a resource
+locator, not a runtime-relative URL. Resolve the named installed skill first; if it is
+unavailable, keep the resource unresolved. For canonical-source inspection, use the
+skill's `source/skills/<skill>/SKILL.md` and its Resource Closure for projected resources.
+
 ## `research-experiment-blueprint`
+
+Owner: `skill-system-research:research-experiment-blueprint`
 
 - role: primary
 - family: research
@@ -33,6 +42,8 @@
 
 ## `research-experiment-scaffold`
 
+Owner: `skill-system-research:research-experiment-scaffold`
+
 - role: heavy_artifact_generator
 - family: research
 - intent_signature: experiment scaffold, experiments directory, run/evaluate skeleton, blueprint to code, 실험 코드 스켈레톤
@@ -45,6 +56,8 @@
 - entry_scene: PREPARE
 
 ## `research-hypothesis-planning`
+
+Owner: `skill-system-research:research-hypothesis-planning`
 
 - role: primary
 - family: research
@@ -75,6 +88,8 @@
 
 ## `research-literature-ideation`
 
+Owner: `skill-system-research:research-literature-ideation`
+
 - role: primary
 - family: research
 - intent_signature: research gaps, candidate hypotheses from literature, active hypothesis, 문헌 기반 연구 아이디어
@@ -87,6 +102,8 @@
 - entry_scene: PREPARE
 
 ## `research-literature-synthesis`
+
+Owner: `skill-system-research:research-literature-synthesis`
 
 - role: primary
 - family: research
@@ -101,6 +118,8 @@
 
 ## `research-manuscript-writing`
 
+Owner: `skill-system-research:research-manuscript-writing`
+
 - role: primary
 - family: research
 - intent_signature: manuscript section, paper draft, IMRAD, LaTeX prose, 논문 작성
@@ -113,6 +132,8 @@
 - entry_scene: PREPARE
 
 ## `research-peer-review`
+
+Owner: `skill-system-research:research-peer-review`
 
 - role: review_gate
 - family: research
@@ -127,6 +148,8 @@
 
 ## `research-statistical-analysis`
 
+Owner: `skill-system-research:research-statistical-analysis`
+
 - role: primary
 - family: research
 - intent_signature: statistical analysis, significance, effect size, interval, result-table interpretation, 통계 분석
@@ -139,6 +162,8 @@
 - entry_scene: PREPARE
 
 ## `workflow-research`
+
+Owner: `skill-system-research:workflow-research`
 
 - role: execution_primary
 - family: research

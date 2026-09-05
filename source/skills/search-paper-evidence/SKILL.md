@@ -40,7 +40,7 @@ description: Acquire traceable paper evidence for an explicit literature/citatio
 Track separate fields; never collapse them into `verified`:
 
 - `acquisition_status`: `acquired | partial | inaccessible | not_acquired`
-- `source_status`: `verified_identity | metadata_partial | duplicate_version | corrected | retracted | unverified`
+- `source_status`: an identity assessment plus independent version/correction/retraction observations, as below
 - `claim_relation`: `supports | contradicts | mixed | mentions | not_assessed`
 - `evidence_basis`: `title | abstract | full_text | table | supplement | metadata_only`
 - `locator`: retrievable URL/identifier plus section/page/table/passage for assessed relations
@@ -48,12 +48,26 @@ Track separate fields; never collapse them into `verified`:
 `user_provided` is provenance. A confirmed DOI/title proves source identity, not claim support.
 `acquired` requires content sufficient for the recorded basis; identity/landing-page/metadata-only access is `partial` with a limitation.
 
+Treat `source_status` as facets, not mutually exclusive alternatives. Identity may be
+`verified_identity`, `metadata_partial`, `unverified`, or `unknown`; independently retain an evidenced
+`duplicate_version`, `corrected`, or `retracted` fact in its matching version, correction, or
+retraction facet. For example, one compact status cell can say
+`identity=verified_identity; version=duplicate_version; correction=corrected; retraction=retracted`
+when the actual locators support all four facts. A DOI match never clears a correction or retraction.
+
+Mark a relevant facet `unknown` when it is not established; an absent flag does not mean no notice
+exists. A bounded negative check states the checked source/date/scope, not universal good standing.
+Read an existing scalar as only its declared fact: legacy `corrected` leaves identity, version, and
+retraction unknown; legacy `verified_identity` leaves the other facets unknown. Preserve existing
+records and do not migrate or rewrite them merely to read this notation. A short inline answer may
+express the same distinctions in prose; named facets are not a mandatory large schema.
+
 ## Workflow
 1. Define claim/topic, date/inclusion boundary, source constraints, and needed evidence roles.
 2. Use the smallest query set that can discriminate support, contradiction, baselines, datasets/metrics, and failure modes.
 3. Search authoritative current sources when recency matters and record the search date.
 4. Verify identity and open the strongest accessible source before assigning a claim relation.
-5. Deduplicate preprint/published versions; surface corrections and retractions.
+5. Deduplicate preprint/published versions; retain identity and every independently evidenced correction/retraction/version fact together, with locators and unchecked facets visible.
 6. Record basis and exact locator. Abstract-only access cannot support a full-text/table-specific claim; a keyword mention is not support.
 7. Rank by relevance, directness, study quality, and independence, not frequency.
 8. Return unavailable/missing evidence and limitations; without search/access, return a query plan with `not_acquired`.
@@ -69,6 +83,6 @@ Never force a persisted evidence artifact around a short reference request.
 ## Validation
 - No source is returned without a retrievable locator.
 - Current/latest results have a fresh search date.
-- Source identity, provenance, and claim relation remain separate.
+- Source identity, provenance, lifecycle/version observations, and claim relation remain separate; legacy scalar status proves only its stated facet.
 - Corrections, retractions, duplicates, partial access, and missing evidence stay visible.
 - Never infer causal or field-wide truth from organized papers alone.

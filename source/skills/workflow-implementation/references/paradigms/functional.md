@@ -142,7 +142,14 @@ struct CurveEvaluationWorkspace {
 };
 ```
 
-If changing a workspace changes the mathematical result, it is not merely workspace and must become a semantic input. Cache keys should include every value that affects the derived result: geometry revision, tolerance, tessellation options, coordinate system, and similar policies.
+Separate intended semantic policy from accidental workspace history. If a tolerance, approximation
+choice, or warm-start policy intentionally changes the promised result, make that policy an
+explicit semantic input rather than hiding it in workspace. A stale `lastSpan`, uncleared scratch,
+or invalid cache entry that changes the result for otherwise identical semantic inputs is instead
+a violation of the existing contract: fix initialization, invalidation, or reuse, and do not make
+incidental call history authoritative to preserve the bug. Cache keys must cover the actual
+semantic inputs, including geometry revision, tolerance, tessellation options, coordinate system,
+and similar policies; scratch capacity or previous unrelated calls must not select meaning.
 
 ## Direct Composition, Not Abstraction Layers
 
@@ -156,11 +163,17 @@ std::expected<Asset, ProcessError> processAsset(
     const ProcessPolicy& policy)
 {
     Asset parsed = TRY(parse(bytes));
-    TRY(validate(parsed, policy.validation));
-    Asset normalized = normalize(std::move(parsed), policy.coordinates);
+    TRY(validateForProcessing(parsed, policy.validation));
+    Asset normalized = TRY(normalize(std::move(parsed), policy.coordinates));
     return optimize(std::move(normalized), policy.optimization);
 }
 ```
+
+In this sketch, `parse`, `normalize`, and `optimize` establish or preserve the intrinsic `Asset`
+invariants before returning a successful final value; invalid input or transformation yields a
+typed failure at that producing stage. `validateForProcessing` checks policy-specific acceptance
+of an already valid asset, not deferred construction validity. It remains before the transforms
+because this example's processing policy constrains which valid inputs may enter them.
 
 The stages are justified because parsing, validation, coordinate normalization, and optimization have distinct semantic inputs, failures, or policies. Their order is still visible in one representative caller.
 
@@ -207,7 +220,8 @@ Do not split a coherent calculation merely to satisfy “one function does one t
 - Every interface, pipeline object, or generic combinator has a current semantic reuse/effect reason and reduces total conceptual machinery rather than only moving code.
 - Effects, randomness, time, I/O, and external services have named boundaries.
 - Local mutation cannot leak an invalid or partially committed result.
-- Workspace and caches do not change meaning unless represented in the contract.
+- Intended result-changing policy is explicit; scratch capacity, stale caches, and incidental call
+  history do not change the result promised for the same semantic inputs.
 - Error, approximation, convergence, and parameter mapping are returned when material.
 - The negative case—identity/lifecycle/effect ownership—remains in an appropriate shell.
 - A representative repeated call with the same semantic input has the promised determinism, including reduction-order constraints where applicable.

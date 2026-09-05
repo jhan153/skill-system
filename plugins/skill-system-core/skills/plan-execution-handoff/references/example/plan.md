@@ -20,6 +20,9 @@ coordinator_observation: notification_only
 
 # Example CSV Export
 
+This is a synthetic, proposed pair for illustrating authoring and conditional transitions.
+Its source anchors, task cases, and expected observations are examples, not execution evidence.
+
 ## Canonical Contract
 
 - This file owns the objective, scope, contracts, DAG, validation, and termination.
@@ -73,13 +76,22 @@ actual outcome/method/owner/DAG/oracle change uses the normal table and a siblin
 | Kind | Path | Status | Authority / owner | Consumed scope or IDs |
 |---|---|---|---|---|
 | `requirements_contract` | `inputs/requirements-contract.yaml` | `accepted` | product owner | `AC-001`, `AC-002` |
-| `behavior_decision_record` | `inputs/behavior-decisions.md` | `decision_ready` | export behavior owner | `BD-001` |
+| `behavior_decision_record` | `inputs/behavior-decisions.md` | `decision_ready` | export behavior owner | `BD-001` and its Next Human-Operable Slice's failed-export unchanged boundary |
 
 ## Boundary and Behavior Contracts
 
 | ID | Required behavior or invariant | Authority / source refs |
 |---|---|---|
-| `B-01` | Exported CSV preserves row order and UTF-8 header | `report/view/ReportModel.cpp:88` |
+| `B-01` | Export the current visible table in the same row order, with both headers and cell values preserved as UTF-8 | `inputs/requirements-contract.yaml` `AC-001`, `AC-002`; `inputs/behavior-decisions.md` `BD-001`; current-table anchor `report/view/ReportModel.cpp:88` |
+| `B-02` | A failed export leaves the current report unchanged | `inputs/behavior-decisions.md` → Next Human-Operable Slice → Cancel / failure / recovery behavior |
+
+Use the same illustrative data throughout D0, C0, CR0, and Human Test: headers `이름,도시`,
+then rows `Zoë,서울` and `李,Montréal`. The CSV must preserve these headers, values, and row order.
+A file with correct headers/order but `?` or corrupted text replacing a cell value does not satisfy
+`AC-002` or `BD-001`. This example defines the observation to make; it reports no export result.
+D0 also names the available export-failure trigger for `B-02`; Human Test uses that existing path
+and compares the current report before/after failure. If no safe trigger is available, preserve
+the observation as unavailable; do not invent fault-injection work or claim the condition passed.
 
 ## Graph Method Profile
 
@@ -149,12 +161,53 @@ flowchart TD
     CR0 --> T0["T0 human-test-ready transition"]
 ```
 
+### Authorized repair transitions
+
+The initial graph contains no speculative repair tasks. After a real review result, the
+Coordinator may apply only the following rewrites within `max_repair=2`. A review finding must
+require a bounded repair of the already-implemented `B-01`/`B-02` contract. Missing first implementation,
+production-mechanism replacement, or an unresolved method requires an authorized C/decision path
+or Plan escalation; a `repair_required` label alone never admits BF.
+
+| Observed result | Graph action | T0 admission |
+|---|---|---|
+| `CR0` is `pass` or `complete_with_deferred_items` | Keep `CR0 → T0`; preserve any deferred items in their declared later destination. | Existing review gate and complete Human Test Transition. |
+| `CR0` requires an admitted same-contract repair | Replace `CR0 → T0` with `CR0 → BF1 → CR1 → T0`. | `CR1 pass` or `complete_with_deferred_items` permits T0; `CR1 repair_required` does not. |
+| `CR1` still requires an admitted same-contract repair | Replace `CR1 → T0` with `CR1 → BF2 → CR2 → T0`. | `CR2 pass` or `complete_with_deferred_items` permits T0. |
+| `CR2` remains `repair_required` with an eligible `known_bug_candidate` | Combine the candidate, its actual BF attempt refs, matching failure fingerprint, and terminal `CR2` evidence into the final `known_bug_record`; keep `CR2 → T0`. | The recorded condition is `excluded_known_bug`, never passed. T0 is eligible only when every remaining required finding is covered by its authorized final record and all other transition conditions are ready. |
+| A candidate exists before terminal review | Keep it as evidence; a changed BF result may still enter its already-authorized CR node. The candidate itself creates no node or exclusion. | No T0 admission based on the candidate alone. |
+| A required result is missing or a BF returns `no_change_unresolved` | Preserve the unresolved condition and use lifecycle question/escalation; no invented review, retry, exclusion, or successful result. | No T0 admission from that missing/unresolved evidence. |
+
+For each admitted rewrite, update this Plan's Mermaid graph, Typed Edges, and DAG Node Routing
+before dispatch, then synchronize Handoff Task State, Execution Routing, and Timing Observations.
+Remove the replaced direct edge; type review → BF as `repairs`, BF → re-review as `reverifies`,
+and the new final review → T0 as `gates`. Set T0's dependency to that final review in both files;
+update its gate and Human Test start condition together. Prior review/attempt evidence remains
+visible. No executed node is rerun, no back-edge is introduced, and no BF3 is authorized.
+
+- `BF1`/`BF2` use kind `repair`, the Implementation owner's model/effort and `report/view/` lock,
+  but override the primary skill to `skill-system-dev:workflow-bug-fix`. Their context is the
+  predecessor CR0/CR1 finding, `B-01`/`B-02`, the current snapshot, and original failure signal; output is
+  Core `bug_fix_result` for A1/A2, with a candidate only when supported by actual attempt evidence.
+  Expected timing is roughly one hour, validation owner is Coordinator, and scope/method mismatch
+  or unavailable required evidence escalates.
+- `CR1`/`CR2` inherit CR0's reviewer, skill, timing, read-only lock, output, and stop condition;
+  replace their predecessor/context with the corresponding changed BF snapshot and result.
+  Dispatch that re-review only for `changed_snapshot_ready_for_review`. A completed
+  no-change attempt is not a changed snapshot and never justifies an empty CR cycle.
+
+Only the Coordinator records a final Known Bug; a candidate cannot exclude a condition or choose
+the next node. Current-run consumers report `SKIP — excluded Known Bug <id>` for that exact
+condition, preserve the reopen condition, and follow the existing T0 edge without another repair,
+wait, or global block. An unmatched required finding or unavailable terminal evidence remains
+unresolved and follows escalation, not a fabricated Known Bug or early-close state.
+
 ## Typed Edges
 
 | From | Type | To | Gate / evidence |
 |---|---|---|---|
 | `R0` | unblocks | `D0` | current-source baseline accepted |
-| `D0` | gates | `C0` | design closes behavior contract `B-01` |
+| `D0` | gates | `C0` | design closes `B-01`/`B-02` for consumed `AC-001`, `AC-002`, and `BD-001`, including non-ASCII headers/values and the failed-export unchanged boundary |
 | `C0` | unblocks | `CR0` | `implementation_result` and compact `worker_done` body exist |
 | `CR0` | gates | `T0` | `code_review_result` is `pass` or `complete_with_deferred_items`; close current pair before Human Test |
 
@@ -163,9 +216,9 @@ flowchart TD
 | Task | Kind | Depends on | Role / agent | Model | Effort | selected_skills | Context / input | Expected timing | Lock scope | Expected output | Validation owner | Stop / escalation |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `R0` | baseline | none | Coordinator | inherit | inherit | inherit | request, repository instructions, current branch/HEAD/dirty ownership, production path | roughly 30 minutes | read-only | baseline snapshot in handoff | Coordinator | owner conflict |
-| `D0` | decision | `R0` | Coordinator | inherit | inherit | inherit | baseline plus behavior contract `B-01` | roughly one hour | read-only | accepted export design | Coordinator | behavior or boundary remains open |
-| `C0` | work | `D0` | Implementation owner | inherit | inherit | inherit | accepted design, `B-01`, and `report/view/` anchors | roughly half a day | `report/view/` | Core `implementation_result` | Coordinator | contract `B-01` at risk \| scope growth |
-| `CR0` | review | `C0` | Review owner | inherit | inherit | inherit | implementation snapshot/review slice, `B-01`, Known Bug exclusions | roughly one hour | read-only | Core `code_review_result` | Coordinator | lifecycle escalation if result cannot be produced |
+| `D0` | decision | `R0` | Coordinator | inherit | inherit | inherit | baseline, `B-01`/`B-02`, consumed inputs, and non-ASCII example | roughly one hour | read-only | accepted design for full consumed scope and the available failure trigger or explicit observation gap | Coordinator | behavior or boundary remains open |
+| `C0` | work | `D0` | Implementation owner | inherit | inherit | inherit | accepted design, `B-01`/`B-02` (`AC-001`/`AC-002`/`BD-001` plus adopted failure boundary), non-ASCII example, and `report/view/` anchors | roughly half a day | `report/view/` | Core `implementation_result` covering row order, UTF-8 headers/values, and report preservation on failure | Coordinator | `B-01`/`B-02` at risk \| scope growth |
+| `CR0` | review | `C0` | Review owner | inherit | inherit | inherit | implementation snapshot/review slice; full `B-01`/`B-02` and consumed scope, including value-loss and failure-mutation counterexamples; Known Bug exclusions | roughly one hour | read-only | Core `code_review_result`; static coverage of each consumed condition, not an observed export verdict | Coordinator | lifecycle escalation if result cannot be produced |
 | `T0` | handoff | `CR0` | Coordinator | inherit | inherit | inherit | review/deferred items plus Human Test target/procedure and next-plan seeds | roughly 30 minutes | read-only | closed `human_test_ready` transition package | Coordinator | incomplete test transition contract |
 
 ## Validation and Termination
@@ -173,7 +226,8 @@ flowchart TD
 | Condition | Decisive evidence | Owner |
 |---|---|---|
 | Current Waterfall is ready to terminate | static review plus complete Human Test Transition contract at `T0` | Coordinator |
-| Broader CSV behavior | outside this plan; user Test result becomes input to a new Waterfall | user |
+| `B-01`: consumed `AC-001`/`AC-002`/`BD-001` | Human Test compares non-ASCII headers, every value, and visible row order; header-only success cannot satisfy the condition | user, outside this plan |
+| `B-02`: adopted failed-export boundary | Human Test uses D0's available failure trigger and confirms the current report is unchanged; unavailable observation stays explicit | user, outside this plan |
 
 - Machine checks prove only their stated contracts.
 - This plan completes at `human_test_ready`; broader product quality remains

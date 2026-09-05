@@ -92,9 +92,12 @@ prove whole-invariant correctness, forward progress, numerical determinism, or p
 Before calling code unreachable, cover applicable entrypoints, exports, interface implementations,
 dependency injection, routes/callbacks, framework/plugin registration, configuration/flags,
 reflection, generated lookup, dynamic dispatch, queues, and subscriptions. If that dispatch surface
-is incomplete, return an `unreachable_candidate` finding or `static_evidence_gap` deferred item with
-the missing evidence; text-search or call-graph absence alone is insufficient. This guard applies
-to prose and diagram evidence equally.
+is incomplete, retain `unreachable_candidate` only as an investigation hypothesis, never a blocking
+finding. Record material missing coverage as `material_unassessed`, or as a `static_evidence_gap`
+deferred item only when it meets the deferred-item admission conditions below. Text-search or
+call-graph absence alone is insufficient. A finding requires independent source/contract evidence
+of a current defect or required omission; even proven unused code is not automatically a blocking
+defect. This guard applies to prose and diagram evidence equally.
 
 ## Review Evidence And Coverage
 

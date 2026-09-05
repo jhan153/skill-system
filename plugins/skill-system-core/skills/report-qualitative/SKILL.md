@@ -78,6 +78,9 @@ Modes:
    `not_assessable`. Never average ordinal ratings or imply interval precision.
 6. Produce Markdown first. If HTML is selected, project the same criteria/findings/evidence and
    render once without adding dashboard filler or a second evaluation pass.
+   For an explicitly full report, map every finding into the ordered Canvas `findings` array with
+   its evidence refs. Canvas shows the first three above the remaining findings' collapsed section;
+   do not omit later findings or convert their claims into evidence entries to meet the first-view limit.
 
 ## Output Contract
 

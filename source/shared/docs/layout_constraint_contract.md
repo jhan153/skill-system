@@ -21,7 +21,9 @@ Use this reference when mapping design constraints to implementation rules.
 - Define what changes at each breakpoint: columns, axis/order, spacing, visibility, and scroll.
 - Keep stable dimensions for boards, grids, toolbars, counters, and icon buttons when their control
   contract requires it.
-- Do not scale font size directly with viewport width.
+- Do not invent proportional font scaling from viewport width or a single screenshot. Preserve
+  responsive typography explicitly established by approved requirements, design metadata,
+  breakpoint rules, or repository tokens, including its declared bounds and transition behavior.
 - Check longest labels and dynamic content before claiming text fit.
 - A single screenshot supports only a responsive hypothesis unless source metadata, requirements,
   additional frames, or current repo rules establish the transition.

@@ -58,13 +58,22 @@ blueprint, scaffold, implementation, or evidence-search stage.
 2. Define one target with scope, intervention, mechanism, observable prediction, and falsifier. Request missing essentials instead of emitting a large plan.
 3. Keep two rival explanations until one observation separates their predictions. Mark broad field/dataset/model claims as non-assumptions. When current paper evidence is missing, name the evidence gap and `search-paper-evidence` as its owner without invoking it automatically.
 4. Choose the cheapest Stage-0 discriminator: checkpoint/baseline evaluation, re-scoring, error analysis, or dataset/label audit. Train only for a gap Stage 0 cannot resolve.
-5. If needed, change one causal factor, freeze the rest, and defer architecture, data, schedule, and extra objectives.
+5. Keep one claim and choose the minimum factors, levels, and predeclared contrasts that can identify it. For a single main-effect question, change that factor and freeze the rest. If the claim is an interaction, compare the focal effect across only the other factor levels needed to distinguish that interaction; do not freeze away the question being asked. Defer unrelated architecture, data, schedule, ablations, and extra hypotheses.
 6. Predefine metric plus support, refute, and inconclusive signals.
 
 ## Loss And Ablation Discipline
 - Separate primary objective, auxiliary loss, regularizer, evaluation metric, and diagnostic metric; “more training/losses” is not a mechanism.
 - An auxiliary term needs a mechanism and its own ablation.
 - Each ablation names changed and frozen factors, predicted signal, and failure interpretation.
+- An interaction contrast may use several factor combinations while testing one claim; it is not
+  permission for a broad factorial search or new training when Stage 0 can discriminate the claim.
+- Do not invent an empirical effect, variance, or sample size to make the discriminator look ready.
+  Preserve those evidence gaps for the protocol owner.
+
+For example, a main effect of loss B with augmentation A fixed keeps a one-factor contrast.
+The claim that A changes B's effect instead needs the same B contrast at the necessary A levels;
+for two selected binary factors, the four A/B combinations can identify that one interaction.
+Do not add further factors or independent hypotheses merely because those combinations are present.
 
 ## Output
 For a small premise, lead with testability and the cheapest falsifier. An explicit plan includes only:
@@ -72,7 +81,7 @@ For a small premise, lead with testability and the cheapest falsifier. An explic
 - premise status and evidence gaps
 - claim/mechanism/scope/falsifier and non-assumptions
 - Stage-0 baseline/checkpoint check
-- one-factor core, frozen factors, metric, three outcomes, and deferred backlog
+- minimal identifying factors/levels/contrasts, frozen factors, metric, three outcomes, and deferred backlog
 
 ## Completion Boundary
 - Complete only when the claim is narrower than unsupported premises, falsifiable, and paired with the cheapest discriminator.

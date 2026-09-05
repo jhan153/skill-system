@@ -20,6 +20,6 @@ Keep `change_fact`, `intent`, and `observed_effect` separate. Exact additions/re
 2. Group verified changes by intent, splitting mixed intent and combining same-intent edits across files.
 3. Order behavior/API, schema/config, refactor/rename, tests, then docs/comments unless the user asks otherwise.
 4. Preserve exact `+`/`-` lines. Add minimal context only when necessary and never rewrite long changed lines.
-5. Render Report Canvas `compare` HTML through the active skill's local report contract and renderer. Each unit contains an intent/source label, path/symbol, exact before/after block, concise summary, and any evidence limitation.
+5. Produce the comparison in content-primary Markdown under the active skill's delivery contract. Each unit contains an intent/source label, path/symbol, exact before/after block, concise summary, and any evidence limitation. Only when that contract selects HTML (`html`/`both` or required inspectable spatial evidence), project the same content through the local Report Canvas contract and renderer; changed-line comparisons use `compare` mode.
 
-When there is no effective change, render an `info` Canvas with an explicit no-change summary. Use chat-only output only when the user requests it or the local contract permits fallback.
+When there is no effective change against a verified baseline, return an explicit no-change summary in the selected delivery format. Selected HTML uses `status: info` and the same empty comparison; it does not manufacture changed units. An absent baseline remains `UnverifiedSnapshot`, not a no-change result. Honor explicit chat-only or raw-diff delivery without creating HTML.

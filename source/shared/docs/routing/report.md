@@ -2,7 +2,16 @@
 
 > Generated from canonical skill-local Routing Cards. Read only the matching section.
 
+Each section names its canonical `plugin:skill` owner. Relative resource paths belong
+to that installed skill's `SKILL.md` directory, never this family file or a runtime
+`skills/` mirror. An entry such as `plugin:skill` · `references/file.md` is a resource
+locator, not a runtime-relative URL. Resolve the named installed skill first; if it is
+unavailable, keep the resource unresolved. For canonical-source inspection, use the
+skill's `source/skills/<skill>/SKILL.md` and its Resource Closure for projected resources.
+
 ## `report-critical`
+
+Owner: `skill-system-core:report-critical`
 
 - role: report_primary
 - family: report
@@ -34,6 +43,8 @@
 
 ## `report-implementation-explainer`
 
+Owner: `skill-system-core:report-implementation-explainer`
+
 - role: report_primary
 - family: report
 - intent_signature: explicit implementation explanation report or verified changed-lines/before-after report
@@ -63,6 +74,8 @@
 - entry_scene: PREPARE
 
 ## `report-lifecycle-artifacts`
+
+Owner: `skill-system-core:report-lifecycle-artifacts`
 
 - role: report_primary
 - family: report
@@ -94,6 +107,8 @@
 - entry_scene: PREPARE
 
 ## `report-qualitative`
+
+Owner: `skill-system-core:report-qualitative`
 
 - role: report_primary
 - family: report

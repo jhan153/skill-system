@@ -5,10 +5,11 @@ Cross-stage selection authority lives in
 realization and actual-path verification; it may narrow implementation admission from production
 evidence but never broadens the accepted trigger or scope.
 
-Shared-memory concurrency begins with one mutable invariant observed or changed by several
-execution contexts. Select the smallest coordination mechanism that preserves ownership,
-visibility, lifetime, and required progress. Do not start from a preferred lock, atomic primitive,
-or lock-free container.
+Shared-memory concurrency concerns a mutable invariant observed or changed by several execution
+contexts, or a cross-thread publication/reclamation obligation, even for immutable or disjoint
+data. First check what the existing owner and runtime already guarantee. Select the smallest
+remaining coordination mechanism needed for ownership, visibility, lifetime, and required progress;
+do not start from a preferred lock, atomic primitive, or lock-free container.
 
 ## Distinguish The Properties
 
@@ -59,6 +60,12 @@ Name the matching edges; a fence on one participant alone may be insufficient. D
 ordering, CPU ordering, cache coherence, and device/DMA visibility when more than one layer is
 actually involved. Avoid stronger ordering only after the weaker contract is proved correct and a
 matching cost matters.
+
+A documented completion, successful join, future readiness/wait, or equivalent runtime operation
+may already supply the matching synchronization edge. Bind the actual operation, successful
+condition, and state it publishes; reuse that guarantee instead of adding locks or atomics. A name
+or observed execution order alone is insufficient. Publication visibility does not establish that
+all later readers have finished, so close last-consumer lifetime separately before reclamation.
 
 ## Locks, Atomics, And Waiting
 
@@ -138,12 +145,14 @@ observed schedules and configured instrumentation.
 
 ## Composition Rules
 
-- Use **DOD** to create disjoint ranges and locality-aware storage; this profile owns visibility and
-  reclamation when ranges or phases still share state.
-- Use a **Job System** to schedule ready CPU work; dependency edges do not replace memory ordering
-  or reclamation.
-- Use **Structured Async** for suspended operation lifetime and cancellation; callbacks that share
-  mutable state still need this profile.
+- Use **DOD** to create disjoint ranges and locality-aware storage; apply this profile to any material
+  visibility or reclamation obligation still open when those ranges cross execution contexts.
+- Use a **Job System** to schedule ready CPU work. Its documented completion/synchronization contract
+  may close publication; an abstract dependency edge alone does not. Reuse sufficient runtime and
+  owner guarantees rather than adding a separate coordination mechanism.
+- Use **Structured Async** for suspended operation lifetime and cancellation; apply this profile to
+  material shared-invariant, publication, or reclamation obligations left open by its runtime and
+  owner guarantees.
 - Use **object-oriented** owners for resource lifetime and one invariant; use **functional** or
   **procedural** kernels to reduce hidden sharing.
 
@@ -151,8 +160,16 @@ observed schedules and configured instrumentation.
 
 - **Positive:** several workers update one cache and publish a new version. Record the cache owner,
   invariant, visibility edge, handle generation, reclamation, wait/progress policy, and evidence.
-- **Negative:** workers receive immutable snapshots and write disjoint owner-exclusive buffers that
-  are committed once. Keep the simpler partition/commit contract; do not add shared locks.
+- **Positive publication:** workers write disjoint output ranges and a different thread consumes
+  them after completion, but the runtime's visibility guarantee is unconfirmed. Identify the actual
+  synchronization edge and remaining obligation; disjoint writes alone do not close the contract.
+- **Negative:** workers receive immutable snapshots and write disjoint owner-exclusive buffers.
+  The actual completion/join/future contract supplies visibility, and the owner retains storage
+  through the last consumer. Reuse that evidence and keep the simpler contract; add no mutex or
+  extra profile merely because execution crosses threads.
+- **Edge immutable lifetime:** a published snapshot is immutable, but an old reader still holds a
+  reference when its owner retires the version. Immutability does not permit reclaiming its storage;
+  identify the existing reader-lifetime guarantee or the remaining reclamation obligation.
 - **Edge:** per-worker counters are logically distinct but share a coherence line. Diagnose the
   cache-line layout and scaling curve before selecting padding or per-CPU aggregation.
 - **Edge:** a lock-free queue passes stress tests but reuses nodes without a reclamation contract.

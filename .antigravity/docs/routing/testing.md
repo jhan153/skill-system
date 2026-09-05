@@ -2,7 +2,16 @@
 
 > Generated from canonical skill-local Routing Cards. Read only the matching section.
 
+Each section names its canonical `plugin:skill` owner. Relative resource paths belong
+to that installed skill's `SKILL.md` directory, never this family file or a runtime
+`skills/` mirror. An entry such as `plugin:skill` · `references/file.md` is a resource
+locator, not a runtime-relative URL. Resolve the named installed skill first; if it is
+unavailable, keep the resource unresolved. For canonical-source inspection, use the
+skill's `source/skills/<skill>/SKILL.md` and its Resource Closure for projected resources.
+
 ## `plan-test-discovery`
+
+Owner: `skill-system-testing:plan-test-discovery`
 
 - role: support
 - family: testing
@@ -43,6 +52,8 @@
 
 ## `test-evidence-review`
 
+Owner: `skill-system-testing:test-evidence-review`
+
 - role: testing_evidence_gate
 - family: testing
 - intent_signature: review tests, false green, test quality, oracle audit, mutation adequacy, test evidence review
@@ -67,6 +78,8 @@
 
 ## `test-oracle-design`
 
+Owner: `skill-system-testing:test-oracle-design`
+
 - role: test_design_specialist
 - family: testing
 - intent_signature: test oracle, expected result, invariant, metamorphic, differential, golden baseline, oracle problem
@@ -89,6 +102,8 @@
 - entry_scene: PREPARE
 
 ## `test-replay-corpus`
+
+Owner: `skill-system-testing:test-replay-corpus`
 
 - role: test_design_specialist
 - family: testing
@@ -113,6 +128,8 @@
 
 ## `test-scenario-design`
 
+Owner: `skill-system-testing:test-scenario-design`
+
 - role: test_design_specialist
 - family: testing
 - intent_signature: test cases, scenario matrix, boundary cases, state transitions, sequence and horizon coverage
@@ -135,6 +152,8 @@
 - entry_scene: PREPARE
 
 ## `test-scope-selection`
+
+Owner: `skill-system-testing:test-scope-selection`
 
 - role: test_design_specialist
 - family: testing
@@ -160,28 +179,32 @@
 
 ## `test-statistical-oracle`
 
+Owner: `skill-system-testing:test-statistical-oracle`
+
 - role: test_design_specialist
 - family: testing
 - intent_signature: statistical test oracle, nondeterministic test, chaotic simulation test, seed ensemble, distributional regression
-- use_when: a named software condition is inherently stochastic/chaotic or requires repeated-run distributional judgment
-- do_not_use_when: an exact/invariant oracle is sufficient, scientific inference about a population is primary, no executable observation exists, or test implementation is requested
-- expected_inputs: condition/failure, accepted basis, observable metric, run/seed/workload unit, representative environment/horizon, candidate threshold authority, and available observations
+- use_when: a named software condition is inherently stochastic/chaotic or requires repeated-run distributional judgment, with an accepted normative external contract or the representative observations needed for the selected decision
+- do_not_use_when: an exact/invariant oracle is sufficient, scientific inference about a population is primary, neither authoritative contract nor required observations can frame the decision, or test implementation is requested
+- expected_inputs: condition/failure, accepted basis or external-contract boundary/revision, observable metric, run/seed/workload unit, environment/horizon, candidate threshold authority, and representative observations when the selected choice is empirical
 - expected_outputs: estimand and ensemble contract, decision rule or human-decision request candidate, uncertainty/error controls, diagnostics, and proof ceiling
 - context_targets:
   must_read:
-    - condition, SUT/path, observable, variability source, environment/horizon, authority, and `references/testing_strategy_contract.md`
+    - condition, SUT/path or accepted external-contract boundary/revision, observable, variability basis, environment/horizon, authority, and `references/testing_strategy_contract.md`
   read_if_needed:
     - representative run data, seed policy, workload distribution, reference solver/version, performance constraints, or `test-oracle-design`
   do_not_load_by_default:
     - full research corpus, unrelated benchmarks, raw private datasets, or credentials
 - risk_profile:
-  reads: bounded run summaries and test-contract evidence
+  reads: accepted normative contract evidence and bounded run summaries when an empirical choice requires them
   writes: none
-  tools: reproducible computation on supplied/authorized observations when needed to compare candidate rules
+  tools: bounded reproducible computation from accepted contract assumptions or supplied/authorized observations when needed to compare candidate rules
   sensitive_resources: preserve data governance and never expose raw private captures
 - entry_scene: PREPARE
 
 ## `test-visual-regression`
+
+Owner: `skill-system-testing:test-visual-regression`
 
 - role: testing_design_or_evidence_specialist
 - family: testing
@@ -217,6 +240,8 @@
 - entry_scene: PREPARE
 
 ## `workflow-test-design`
+
+Owner: `skill-system-testing:workflow-test-design`
 
 - role: execution_primary
 - family: testing
@@ -263,6 +288,8 @@
 - entry_scene: PREPARE
 
 ## `workflow-test-implementation`
+
+Owner: `skill-system-testing:workflow-test-implementation`
 
 - role: execution_primary
 - family: testing

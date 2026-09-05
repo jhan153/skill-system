@@ -16,6 +16,9 @@ coordinator_observation: notification_only
 
 # Example CSV Export Handoff
 
+This is the synthetic pair's initial proposed snapshot. Conditional paths describe future
+decisions; empty ledgers and pending timing are not evidence that any worker or export ran.
+
 ## Record Contract
 
 - `plan.md` owns normative scope and completion.
@@ -80,7 +83,18 @@ coordinator_observation: notification_only
 | `CR0` | `C0` | pending | Core `code_review_result` | Coordinator |
 | `T0` | `CR0` | pending | closed `human_test_ready` transition package | Coordinator |
 
+BF1/CR1 and BF2/CR2 are absent until an actual result admits the corresponding Plan rewrite.
+Then copy the Plan's new routing/dependencies into Task State and Execution Routing, add pending
+Timing Observations for only those admitted nodes, and change T0's dependency/start condition to
+the selected final review. Preserve completed predecessor evidence. Worker completion records an
+assigned task's execution; it does not change a failed condition into a pass.
+
 ## Execution Items
+
+Record only actual compact Core results. A required artifact/result that is unavailable produces
+`question` or `escalation` with `not_produced`, not a fabricated card or review verdict.
+A BF `no_change_unresolved` result preserves its attempt and unresolved condition; it does not
+admit an empty CR cycle. Follow the Plan's escalation rule without inventing a successful T0 gate.
 
 | Item ID | Kind | Producer / node | Compact outcome | Artifact / evidence refs |
 |---|---|---|---|---|
@@ -103,13 +117,13 @@ coordinator_observation: notification_only
 | Current plan termination | `human_test_ready` immediately before Human Test |
 | Current pair lifecycle | complete and read-only; human Test never resumes or mutates this handoff |
 | Test owner | user |
-| Start condition | `R0`, `D0`, `C0`, and `CR0` complete; static review is handoff-ready |
+| Start condition | All required predecessors of T0 in the current Plan complete, initially `R0`, `D0`, `C0`, and `CR0`; the selected final review satisfies the Plan's pass/deferred or terminal Known Bug gate and the full transition is ready. Include admitted BF/re-review nodes after a rewrite. |
 | Test target | running report screen and exported CSV file |
-| Test procedure | open the report, export CSV, inspect the UTF-8 header, and compare exported row order with the visible report |
-| Expected observation | UTF-8 header and exported row order match the visible report |
+| Test procedure | For `AC-001`/`AC-002`/`BD-001`, show headers `이름,도시` with rows `Zoë,서울` then `李,Montréal`; export CSV, decode as UTF-8, and compare every header, cell value, and row position. An undecodable file, replacement character, `?`, or changed value fails. For the adopted failure boundary, use D0's available export-failure trigger and compare the report before/after; record an unavailable trigger as an observation gap. |
+| Expected observation | `B-01`: UTF-8 headers and cell values remain exactly as shown, in the same row order; correct headers/order alone cannot satisfy `AC-002`. `B-02`: failed export leaves the current report unchanged. Value loss or failure-induced report mutation cannot pass. |
 | Result disposition | create a new `plan_id` and new Plan/Handoff pair; do not append to this pair |
-| New worklist seed | capture pass/fail follow-up items, mismatched rows/headers, material timing overruns, and newly discovered export work |
-| New design seed | preserve `B-01`, observed product behavior, and the next selected export design boundary |
+| New worklist seed | capture pass/fail follow-up items, mismatched rows/headers/values, report changes on failed export, unavailable observations, material timing overruns, and newly discovered export work |
+| New design seed | preserve `B-01`/`B-02`, observed product behavior, and the next selected export design boundary |
 | Next Waterfall rule | combine the human Test result with the new worklist/design, rerun Scope Admission, and create a fresh pair |
 | Agent wait policy | hand off as `user-verification-needed` and stop; no polling, sleep, or live worker |
 
@@ -136,6 +150,14 @@ coordinator_observation: notification_only
 | ID | Scope / fingerprint | Attempts and result statuses | Current-run disposition | Reopen condition |
 |---|---|---|---|---|
 | none | none | none | none | none |
+
+For terminal `CR2 repair_required`, record an eligible candidate only as evidence until the
+Coordinator combines it with matching terminal review and actual bounded-attempt refs into the
+final `known_bug_record`. Only that final record populates Known Bugs and permits the Plan's
+condition-specific `SKIP — excluded Known Bug <id>` transition to the existing T0. The condition
+remains unresolved; preserve its reopen condition and carry it to Human Test/next Waterfall.
+Missing terminal evidence, no-change bookkeeping, or a candidate alone never justifies exclusion,
+another review, another repair, or T0 completion. Unmatched findings follow the Plan's escalation rule.
 
 ## Next Handoff
 

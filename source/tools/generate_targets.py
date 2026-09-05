@@ -56,6 +56,9 @@ ROUTING_FAMILIES_SOURCE = Path("shared/routing/families.json")
 SKILL_REGISTRY_TARGET = Path("shared/docs/skill_registry.md")
 SKILL_ROUTING_INDEX_TARGET = Path("shared/docs/skill_routing.md")
 SKILL_ROUTING_FAMILY_TARGET = Path("shared/docs/routing")
+RELATIVE_MARKDOWN_LINK_RE = re.compile(
+    r"(?<!!)\[([^\]\n]+)\]\((?![A-Za-z][A-Za-z0-9+.-]*:|/|#)([^\s)]+)\)"
+)
 RESOURCE_PROJECTIONS = {"verbatim", "tree", "execution-item-view"}
 RESOURCE_LOAD_CLASSES = {"must_read", "read_if_needed"}
 
@@ -477,6 +480,14 @@ def _markdown_cell(value: object) -> str:
     return str(value).replace("|", "\\|").replace("\n", " ").strip()
 
 
+def _family_routing_card(card: str, skill_locator: str) -> str:
+    """Keep local resources owned by the skill, not by the generated family file."""
+    return RELATIVE_MARKDOWN_LINK_RE.sub(
+        lambda match: f"{match[1]} (`{skill_locator}` · `{match[2]}`)",
+        card.removeprefix(ROUTING_CARD_HEADING).strip(),
+    )
+
+
 def _refresh_shared_routing_docs(source: Path) -> dict[str, dict]:
     declarations = _load_skill_declarations(source)
     families = _load_routing_families(source)
@@ -556,25 +567,40 @@ def _refresh_shared_routing_docs(source: Path) -> dict[str, dict]:
         "smallest matching family below and read only that family file or the exact installed skill;",
         "never load the whole routing library. Family lookup grants no write or side-effect authority.",
         "",
+        "Route-view links are relative to the directory containing this index: `routing/<family>.md`.",
+        "That base is `source/shared/docs/` in canonical source and `docs/` in a provider runtime.",
+        "",
         "| family | route view | skills |",
         "| --- | --- | ---: |",
     ]
     for family in families:
         family_id = family["id"]
         selected = [entry for entry in declarations.values() if entry["family"] == family_id]
-        index_lines.append(f"| `{family_id}` | `docs/routing/{family_id}.md` | {len(selected)} |")
+        index_lines.append(
+            f"| `{family_id}` | [routing/{family_id}.md](routing/{family_id}.md) | {len(selected)} |"
+        )
         family_lines = [
             f"# {family['display_name']} Routing",
             "",
             "> Generated from canonical skill-local Routing Cards. Read only the matching section.",
             "",
+            "Each section names its canonical `plugin:skill` owner. Relative resource paths belong",
+            "to that installed skill's `SKILL.md` directory, never this family file or a runtime",
+            "`skills/` mirror. An entry such as `plugin:skill` · `references/file.md` is a resource",
+            "locator, not a runtime-relative URL. Resolve the named installed skill first; if it is",
+            "unavailable, keep the resource unresolved. For canonical-source inspection, use the",
+            "skill's `source/skills/<skill>/SKILL.md` and its Resource Closure for projected resources.",
+            "",
         ]
         for declaration in sorted(selected, key=lambda entry: entry["id"]):
+            skill_locator = f"{owners[declaration['id']]}:{declaration['id']}"
             family_lines.extend(
                 [
                     f"## `{declaration['id']}`",
                     "",
-                    declaration["card"].removeprefix(ROUTING_CARD_HEADING).strip(),
+                    f"Owner: `{skill_locator}`",
+                    "",
+                    _family_routing_card(declaration["card"], skill_locator),
                     "",
                 ]
             )

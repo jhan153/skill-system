@@ -2,7 +2,16 @@
 
 > Generated from canonical skill-local Routing Cards. Read only the matching section.
 
+Each section names its canonical `plugin:skill` owner. Relative resource paths belong
+to that installed skill's `SKILL.md` directory, never this family file or a runtime
+`skills/` mirror. An entry such as `plugin:skill` · `references/file.md` is a resource
+locator, not a runtime-relative URL. Resolve the named installed skill first; if it is
+unavailable, keep the resource unresolved. For canonical-source inspection, use the
+skill's `source/skills/<skill>/SKILL.md` and its Resource Closure for projected resources.
+
 ## `search-deep-evidence`
+
+Owner: `skill-system-core:search-deep-evidence`
 
 - role: primary
 - family: search
@@ -31,6 +40,8 @@
 - entry_scene: PREPARE
 
 ## `search-paper-evidence`
+
+Owner: `skill-system-research:search-paper-evidence`
 
 - role: primary
 - family: search
