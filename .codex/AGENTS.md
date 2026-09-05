@@ -36,6 +36,7 @@
 - Do not finalize until scope is covered and each material condition is evidenced or explicit as unresolved. Choose one task-level result label; a label never replaces condition evidence. Analysis-only describes work scope, not a result label.
 
 ## Skill And Context Boundary
+- For material ambiguity, dependent multi-turn state, or consequential freshness risk, the current owner uses `docs/task_working_state_contract.md`; clear one-shot work bypasses it without extra questions or artifacts.
 - Read `$CODEX_HOME/context-routing.md` for ambiguous non-trivial routing or explicit goal, automation, Memory, or Knowledge operations.
 - Resolve skills by exact user path, current-session exposure, repository-declared local root, then `unresolved`; never fallback-search unrelated home or adjacent projects.
 - The nearest `project-context.yaml` declares project-local Memory, Knowledge, plans, and Wikis. An exact user path overrides it; missing declarations are unavailable, never auto-discovered/initialized.

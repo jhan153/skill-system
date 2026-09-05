@@ -20,6 +20,7 @@ description: Run an explicitly requested, one-question behavior discovery turn f
   must_read:
     - explicit discovery request, target capability/actor/path, and smallest underlying source/runtime evidence
   read_if_needed:
+    - `references/task_working_state_contract.md` when material ambiguity, dependent state, or consequential freshness risk requires shared working-state semantics
     - narrow production path, trace/readback, accepted product decisions, or an explainer used only to locate its cited anchors
     - `references/execution_handoff_input_contract.md` and `references/behavior-decision-record.md` when persisting into an associated package
   do_not_load_by_default:
@@ -32,6 +33,10 @@ description: Run an explicitly requested, one-question behavior discovery turn f
 - entry_scene: PREPARE
 
 ## Decision Contract
+
+When the working-state condition applies, consume the shared source/constraint/freshness and
+correction semantics. This skill still owns its one-question limit, actual-path admission, and
+optional existing decision record; the shared envelope grants no persistence or acceptance.
 
 Own one `one_shot` decision turn within `core_capability_available -> next_vertical_slice_decision_ready`. The conversation may continue with another explicit turn, but no persisted plan state, implementation approval, operability, validation, or release completion follows automatically.
 

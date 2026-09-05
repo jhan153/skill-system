@@ -18,6 +18,7 @@
   must_read:
     - explicit discovery request, target capability/actor/path, and smallest underlying source/runtime evidence
   read_if_needed:
+    - `references/task_working_state_contract.md` when material ambiguity, dependent state, or consequential freshness risk requires shared working-state semantics
     - narrow production path, trace/readback, accepted product decisions, or an explainer used only to locate its cited anchors
     - `references/execution_handoff_input_contract.md` and `references/behavior-decision-record.md` when persisting into an associated package
   do_not_load_by_default:
@@ -110,7 +111,7 @@
 - do_not_use_when: elicitation, active-plan sync, packaging, implementation, validation execution, or lifecycle reporting is primary
 - expected_inputs: decision evidence, constraints, contradictions, intended handoff, and optional Execution Handoff package/plan id
 - expected_outputs: traceable proposed/accepted contract with bounded scope, material criteria, unknowns, and one next owner; when package-bound, `inputs/requirements-contract.yaml`
-- context_targets: read supplied decision evidence; load `references/execution_handoff_input_contract.md` when package-bound, the contract/criteria templates for structured output, and only narrow canonical docs needed for compatibility claims
+- context_targets: read supplied decision evidence; load `references/execution_handoff_input_contract.md` when package-bound, the contract/criteria templates for structured output, and only narrow canonical docs needed for compatibility claims; load `references/task_working_state_contract.md` only when material ambiguity, dependent state, or consequential freshness risk requires its semantics
 - risk_profile: read-only by default; when an associated package or explicit persistence request is supplied, write only `<package-root>/inputs/requirements-contract.yaml`; exclude full repo/memory, raw transcript duplication, unrelated logs, credentials, and secrets
 - entry_scene: PREPARE
 
@@ -129,6 +130,7 @@
   must_read:
     - discovery request and supplied goal/notes
   read_if_needed:
+    - `references/task_working_state_contract.md` when material ambiguity, dependent state, or consequential freshness risk requires shared working-state semantics
     - `references/interview-protocol.md` for complex interviews
     - `references/discovery-record-template.md` only for persistence/handoff
     - `references/execution_handoff_input_contract.md` when resolving an associated package path

@@ -28,6 +28,7 @@
 - Never weaken evidence, tests, or conditions to manufacture a pass.
 
 ## Skill And Context Boundary
+- For material ambiguity, dependent multi-turn state, or consequential freshness risk, the current owner uses `docs/task_working_state_contract.md`; clear one-shot work bypasses it without extra questions or artifacts.
 - Resolve a skill by exact user path, current-session exposure, repository-declared local root, then
   `unresolved`; never fallback-search unrelated home directories or adjacent projects.
 - Choose one clear specialist directly. Use `plan-execution-handoff` only when durable execution

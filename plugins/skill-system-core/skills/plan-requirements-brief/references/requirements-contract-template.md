@@ -1,5 +1,14 @@
 # Requirements Contract Template
 
+Project only material sourced working-state entries into this existing artifact. Keep binding
+constraints in scope/non-goals with their authority; identify soft preferences in handoff notes
+unless the named owner explicitly adopted them as requirements. Preserve any dynamic dependency's
+refresh obligation alongside its source and affected criterion. Unverified, stale, assumed, or
+conflicting input remains visible in assumptions/risks/open questions and cannot establish an
+accepted criterion. `execution_contract` retains execution authority only; do not put epistemic
+state, confidence history, or elicitation decisions there. These notes add no mandatory envelope
+or persistence beyond the owning skill's existing contract.
+
 ```yaml
 requirements_contract:
   kind: requirements_contract

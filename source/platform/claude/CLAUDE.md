@@ -83,6 +83,7 @@
 - Unknown or stale aliases do not activate a skill. If the user explicitly invokes one as a skill, report it as unresolved; otherwise treat it as ordinary language. Treat it as a shell command only when command execution is explicitly requested.
 
 ## Context Scheduling
+- For material ambiguity, dependent multi-turn state, or consequential freshness risk, the current owner uses `.claude/docs/task_working_state_contract.md`; clear one-shot work bypasses it without extra questions or artifacts.
 - Do not load all global, repo, memory, and skill documents by default.
 - Build the smallest context bundle needed for the current request.
 - Use `.claude/context-routing.md` for Claude-only guardrails and

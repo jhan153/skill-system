@@ -13,7 +13,7 @@ description: Distill discovery notes or decisions into a concise requirements co
 - do_not_use_when: elicitation, active-plan sync, packaging, implementation, validation execution, or lifecycle reporting is primary
 - expected_inputs: decision evidence, constraints, contradictions, intended handoff, and optional Execution Handoff package/plan id
 - expected_outputs: traceable proposed/accepted contract with bounded scope, material criteria, unknowns, and one next owner; when package-bound, `inputs/requirements-contract.yaml`
-- context_targets: read supplied decision evidence; load `references/execution_handoff_input_contract.md` when package-bound, the contract/criteria templates for structured output, and only narrow canonical docs needed for compatibility claims
+- context_targets: read supplied decision evidence; load `references/execution_handoff_input_contract.md` when package-bound, the contract/criteria templates for structured output, and only narrow canonical docs needed for compatibility claims; load `references/task_working_state_contract.md` only when material ambiguity, dependent state, or consequential freshness risk requires its semantics
 - risk_profile: read-only by default; when an associated package or explicit persistence request is supplied, write only `<package-root>/inputs/requirements-contract.yaml`; exclude full repo/memory, raw transcript duplication, unrelated logs, credentials, and secrets
 - entry_scene: PREPARE
 
@@ -27,11 +27,24 @@ description: Distill discovery notes or decisions into a concise requirements co
     "projection": "verbatim",
     "load": "read_if_needed",
     "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/task_working_state_contract.md",
+    "target": "references/task_working_state_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "material ambiguity, dependent multi-turn state, or consequential freshness risk requires the shared working-state contract"
   }
 ]
 ```
 
 ## Contract Boundary
+When working-state semantics apply, preserve sourced hard constraints and soft preferences as
+distinct entries. Only an explicitly adopted preference becomes a requirement. Assumed, stale,
+conflicting, or open material stays non-authoritative even when surrounding facts are confirmed.
+Project any required freshness/source meaning into this skill's existing contract fields, never
+into runtime `execution_contract` state or a separate working-state file.
+
 Own `discovery -> requirements_contract` only when goals, scope, non-goals, assumptions, and observable criteria need no invented product decision. Keep it `proposed` until accepted or explicitly adopted downstream; never relabel it as an active plan, feasibility proof, implementation readiness, or approval.
 
 In package-bound mode, use `execution-handoff-inputs-v1`. `proposed` is review input only;

@@ -2,6 +2,16 @@
 
 Persist this shape only inside the associated Execution Handoff package.
 
+When material working state is needed, keep hard constraints and soft preferences distinct in
+Accepted constraints and link their authority/source. Use Current behavior/anchors for evidence
+status and any dynamic refresh condition. Affected scope names every actual downstream dependent:
+other decision rows, artifact readiness/status, Next Human-Operable Slice, and Handoff selections.
+After a correction, invalidate and recompute those derived fields from refreshed evidence; preserve
+unrelated decided rows. If readiness is affected, keep the record `active` until the next user path,
+observable contract, cancel/failure/recovery behavior, recommended owner, and consumed decision IDs
+have been re-evaluated. These annotations do not promote assumed,
+delegated, stale, or open input to decided behavior or create another persistence path.
+
 ```markdown
 ---
 kind: behavior_decision_record

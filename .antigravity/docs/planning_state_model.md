@@ -7,6 +7,10 @@ Direct work with sufficient requirements stays outside this model. Durable execu
 only to `plan-execution-handoff`; lightweight handoff packets and decision maps keep their own
 artifact contracts without entering this state machine.
 
+For materially fuzzy or dependent work, `docs/task_working_state_contract.md` defines task-local
+facts, constraint meaning, freshness, and selective correction. That envelope adds no planning
+state or transition and grants no persistence or execution authority. Clear one-shot work bypasses it.
+
 ## States
 
 | State | Owner | Meaning | Exit evidence |

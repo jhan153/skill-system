@@ -19,6 +19,7 @@ description: Run an explicitly requested requirements interview that models deci
   must_read:
     - discovery request and supplied goal/notes
   read_if_needed:
+    - `references/task_working_state_contract.md` when material ambiguity, dependent state, or consequential freshness risk requires shared working-state semantics
     - `references/interview-protocol.md` for complex interviews
     - `references/discovery-record-template.md` only for persistence/handoff
     - `references/execution_handoff_input_contract.md` when resolving an associated package path
@@ -46,6 +47,13 @@ description: Run an explicitly requested requirements interview that models deci
     "projection": "verbatim",
     "load": "read_if_needed",
     "condition": "selected skill's matching read_if_needed condition applies"
+  },
+  {
+    "source": "shared/docs/task_working_state_contract.md",
+    "target": "references/task_working_state_contract.md",
+    "projection": "verbatim",
+    "load": "read_if_needed",
+    "condition": "material ambiguity, dependent multi-turn state, or consequential freshness risk requires the shared working-state contract"
   }
 ]
 ```
@@ -65,6 +73,7 @@ description: Run an explicitly requested requirements interview that models deci
 Use exact owners. Keyword mentions of requirements or plans do not start an interview.
 
 ## State Boundary
+- When the working-state condition applies, use the shared contract for sourced hard/soft constraints, evidence/authority, freshness, and selective correction. Keep question pacing and discovery persistence with this skill; no second state record is created.
 - Own `scratch -> discovery`. Ask only for gaps that can change scope, acceptance, edge/failure behavior, data ownership, constraints, or non-goals.
 - Record an answer only when it resolves/narrows a gap. Discovery completion is not an accepted contract, active plan, implementation approval, or feasibility proof.
 - In package-bound mode, use `execution-handoff-inputs-v1` and update the one discovery record after each completed question round. `ready_for_distillation` authorizes Requirements Brief consumption only; it never authorizes execution.

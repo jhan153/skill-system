@@ -1,5 +1,13 @@
 # Requirements Discovery Record Template
 
+Use this artifact only under the skill's existing persistence authority. When material working
+state is projected, preserve hard/soft meaning and its authority/source in `constraints` or the
+decision rationale; keep observed/inferred/assumed status distinct from a decision's status. A
+dynamic fact's `statement` may name its last relevant observation, refresh condition, and affected
+decision IDs; `source`/`unblocks` retain provenance/dependencies. Omit irrelevant annotations and
+do not add a second envelope or elicitation history. Stale facts do not unblock decisions until
+refreshed; a correction invalidates only actual dependents.
+
 ```yaml
 discovery_record:
   kind: requirements_discovery_record
