@@ -1,6 +1,6 @@
 ---
 name: workflow-code-review
-description: Statically review a bound production change or test implementation snapshot through a design-first change contract, source-linked path evidence, material-effect coverage, and optional design conformance. Use Mermaid when interacting state, ownership, or failure paths need a visual model. Return blocking findings, non-blocking advisories, later-owned deferred items, and a scoped static disposition; production review runs before runtime testing. Not for mapping-only, repair, runtime validation, production test-oracle/evidence review, or Plan/Handoff topology changes.
+description: Statically review a bound production change or test implementation snapshot for source-evidenced defects and optional design conformance. Not for mapping-only, repair, runtime validation, production test-oracle/evidence review, or Plan/Handoff topology changes.
 ---
 
 # Workflow Code Review

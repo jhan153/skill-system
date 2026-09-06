@@ -12,13 +12,12 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 10.3.1 Release
+## 10.3.2 Release
 
-This source tree is the 10.3.1 skill-contract and reference-consistency release on the breaking
-10.0 baseline. It aligns ownership and evidence boundaries across skills and shared references,
-preserves full-report findings in optional Canvas output, and makes generated routing resources
-portable. Implementation and DAG examples now state their concurrency, data, and recovery
-conditions explicitly. Its current components are:
+This source tree is the 10.3.2 instruction-compaction release on the breaking 10.0 baseline.
+It shortens repeated boundaries in 57 skill bodies and condenses 37 descriptions while preserving
+all 67 skills, invocation policies, task methods, and Core result bindings. Existing shared docs
+remain unchanged; obsolete gate guidance is removed. Its current components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -190,6 +189,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 10.2.3 | Positive-output workflow routing | Routes accepted production-mechanism replacements to Implementation even when failures motivate them, limits Bug Fix to same-contract bounded repairs, and makes Plan/Review/Coordinator transitions enforce that distinction. |
 | 10.3.0 | Scoped context and evidence-gated execution | Centralizes skill-local routing and resource declarations, narrows planning context to the selected graph, makes standalone repair and review evidence proportional, and adds goal-scoped Work Contract generations, task working state, source-inspection classification, and Grok notification forwarding. |
 | 10.3.1 | Skill and reference consistency | Aligns skill/shared/helper boundaries, preserves full-report Canvas findings, fixes portable routing resources, and strengthens implementation, research, and DAG examples. |
+| 10.3.2 | Compact skill instructions | Shortens repeated boundaries in 57 skill bodies and 37 descriptions, preserves routing and result contracts, and removes obsolete gate guidance without expanding shared docs. |
 
 ## License
 

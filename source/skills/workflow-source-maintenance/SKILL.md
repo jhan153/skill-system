@@ -1,6 +1,6 @@
 ---
 name: workflow-source-maintenance
-description: "Perform behavior-preserving source maintenance in one of two modes: prune code proven obsolete, or synchronize comments/docstrings/TODO markers with current code meaning. Use for explicit source cleanup after implementation; do not use for feature work, concrete bug repair, live-code restructuring, dependency upgrades, or general documentation."
+description: "On explicit request, prune source proven obsolete or sync comments/docstrings/TODOs with current code meaning while preserving behavior. Not for features, bug repair, live-code restructuring, dependency upgrades, or general documentation."
 ---
 
 # Workflow Source Maintenance

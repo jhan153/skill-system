@@ -1,6 +1,6 @@
 ---
 name: plan-execution-handoff
-description: Create or update a canonical plan.md plus mutable handoff.md pair for durable single-node, decision-gated, multi-session, or multi-agent implementation work. Compile one typed risk-adaptive DAG—defaulting clear phase work to design/implementation → static review → human_test_ready and admitting explicit Test Design/Test Implementation nodes when selected—into a self-contained contract for an event-driven Orchestrator. Apply repeated-work principles only to an admitted verifier-steered graph. Do not use for direct one-session implementation, status-only reporting, polling, strict timing enforcement, or unrelated sibling scope.
+description: Create or update a durable plan.md/handoff.md pair with a typed execution DAG. Use for work needing persisted execution state, including a single node or multiple sessions/agents. Not for direct implementation, lightweight handoffs, status-only reporting, or graph execution.
 ---
 
 # Plan Execution Handoff

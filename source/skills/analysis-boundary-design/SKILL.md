@@ -1,6 +1,6 @@
 ---
 name: analysis-boundary-design
-description: Decide one evidenced module, interface, seam, adapter, or dependency boundary before implementation, standalone or as an explicitly assigned atomic decision inside an accepted architecture design. Preserve the design's relevant constraints; not for coupled multi-view architecture or implementation.
+description: Decide one evidenced module, interface, seam, adapter, or dependency boundary before implementation, standalone or explicitly assigned within an accepted architecture. Not for coupled multi-view architecture or implementation.
 ---
 
 # Analysis Boundary Design

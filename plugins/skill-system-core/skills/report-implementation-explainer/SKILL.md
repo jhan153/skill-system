@@ -1,6 +1,6 @@
 ---
 name: report-implementation-explainer
-description: Produce an explicitly requested source/runtime explanation of an existing implementation or a verified changed-lines comparison. Use explain for causal understanding and compare for authoritative diff/before-after presentation. Deliver content-first Markdown by default and optional matching trace/compare/spatial HTML on explicit html/both or spatial intent. Do not use for quality verdicts, pre-implementation choice, local one-line explanation, implementation, or automatic post-task reporting.
+description: Produce an explicitly requested report explaining an existing implementation's causal source/runtime path or comparing verified changed lines/before-after states. Not for local one-line answers, quality verdicts, approach selection, or implementation.
 ---
 
 # Report Implementation Explainer

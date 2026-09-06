@@ -1,6 +1,6 @@
 ---
 name: report-lifecycle-artifacts
-description: Package and trace explicitly selected existing lifecycle artifacts across requirements, design, implementation, review, validation, security, release, and retrospective evidence. Produce a content-first Markdown index and traceability matrix by default, with optional matching lifecycle HTML on explicit html/both intent. Do not generate empty SDLC shells, replace canonical Plan/Handoff or Core Cards, execute lifecycle work, infer completion, or run automatically at closeout.
+description: Package explicitly selected existing lifecycle artifacts into a traceability index or matrix, preserving source statuses and gaps. Not for creating missing stages, executing lifecycle work, replacing Plan/Handoff, or automatic closeout.
 disable-model-invocation: true
 ---
 

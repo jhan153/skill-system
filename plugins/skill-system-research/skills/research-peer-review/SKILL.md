@@ -1,6 +1,6 @@
 ---
 name: research-peer-review
-description: Review a scientific manuscript, proposal, or research plan for validity, evidential support, reproducibility, ethics/reporting, and revision priority. Use for scholarly peer-review critique; do not claim venue authority or review generic software artifacts.
+description: Review scientific manuscripts, proposals, and research plans for validity, evidence, reproducibility, ethics, and actionable revisions; not generic software artifacts.
 ---
 
 # Research Peer Review

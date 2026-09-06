@@ -1,6 +1,6 @@
 ---
 name: analysis-algorithm
-description: Compare algorithms or technical approaches under concrete constraints and recommend the best fit with a causal explanation and falsifiable validation. Use before an approach is selected; not for bug diagnosis, research hypotheses, or implementation of a chosen method.
+description: Compare algorithms or technical approaches under concrete constraints before selecting one, and recommend the best fit. Not for bug diagnosis, research hypotheses, or implementing a chosen method.
 ---
 
 # Analysis Algorithm

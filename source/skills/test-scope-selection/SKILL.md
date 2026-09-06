@@ -1,6 +1,6 @@
 ---
 name: test-scope-selection
-description: Select the smallest real SUT boundary and multi-axis test profile that can expose a named material failure. Distinguish component, internal integration, system, external-system integration, and human acceptance without changing production architecture or treating mocks, APIs, automation, regression, or performance as test levels.
+description: Select the smallest real SUT boundary and multi-axis test profile that can expose a named failure. Determine test level from exercised production boundaries, not mocks or tooling; do not redesign production architecture.
 ---
 
 # Test Scope Selection

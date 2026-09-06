@@ -1,6 +1,6 @@
 ---
 name: design-frontend
-description: "Implement a concrete visual artifact or Core design_result as repo-integrated frontend/native code for direct work or an assigned Plan DAG node. Reuse approved components, tokens, assets, and repo patterns; validate only the applicable source, family, interaction, and accessibility conditions. Not for creating the upstream visual design, backend-only work, critique, product ideation, refactors, or throwaway demos."
+description: "Implement a concrete visual artifact or Core design_result as repo-integrated frontend/native code. Not for upstream visual design, backend-only work, critique, product ideation, refactors, or throwaway demos."
 ---
 
 # Design Frontend

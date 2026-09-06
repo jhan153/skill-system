@@ -1,6 +1,6 @@
 ---
 name: test-replay-corpus
-description: Design capture, recording, replay, and versioned reality-corpus contracts that preserve production-valid inputs, state history, provenance, schema/build identity, sanitization, minimization, and diagnostic reproduction. Replay is stimulation evidence only and never becomes correctness without a separate oracle.
+description: Design production-path capture/replay and versioned corpus contracts with traceable inputs, state history, schema/build identity, and privacy controls. Replay supplies stimulation evidence; correctness needs a separate oracle.
 ---
 
 # Test Replay Corpus

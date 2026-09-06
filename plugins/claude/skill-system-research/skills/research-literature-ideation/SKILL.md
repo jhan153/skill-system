@@ -1,6 +1,6 @@
 ---
 name: research-literature-ideation
-description: Derive research-gap hypotheses from an evidence set or literature synthesis, preserving claim provenance and distinguishing observed gaps from speculative novelty. Use to generate/rank candidates and, when requested, select one active hypothesis for validation.
+description: Generate and rank falsifiable research hypotheses from an existing evidence set or synthesis, distinguishing supported gaps from speculative novelty. Select one active hypothesis only when requested.
 ---
 
 # Research Literature Ideation

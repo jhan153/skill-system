@@ -1,6 +1,6 @@
 ---
 name: management-memory-bank-harness
-description: Read the smallest task-relevant record slice from a project Memory Bank declared by project-context.yaml or supplied by exact path. Use on an explicit Memory request or when one concrete task anchor justifies a targeted lookup for a durable goal, rule, practice, or recurring-mistake candidate. Never scan undeclared stores, load the full file, infer authority from recurrence, or write Memory.
+description: Read matching records from a Memory Bank named by exact path or project manifest, for an explicit Memory request or a concrete task anchor concerning a durable goal, rule, practice, or recurring mistake. No writes, full-bank reads, undeclared-store scans, or authority inferred from recurrence.
 ---
 
 # Management Memory Bank Harness

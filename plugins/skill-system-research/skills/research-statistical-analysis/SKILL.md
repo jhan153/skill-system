@@ -1,6 +1,6 @@
 ---
 name: research-statistical-analysis
-description: Analyze real experimental data or supplied statistics with an explicit estimand, design-aware assumptions, reproducible computation, effect sizes, uncertainty, and planned-vs-exploratory labeling. With no adequate data, produce an analysis plan only and do not invent inferential results.
+description: Analyze real experimental data or supplied statistics for effects and uncertainty, respecting study design and planned versus exploratory choices. With inadequate data, return supported facts and an analysis plan.
 ---
 
 # Research Statistical Analysis

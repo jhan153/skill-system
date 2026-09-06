@@ -1,6 +1,6 @@
 ---
 name: management-knowledge-base-read
-description: Read a minimum task-relevant slice of a declared Knowledge Base, including bounded why/history, scope, conflict, and recurrence paths when requested. Use for project knowledge or concrete artifact/decision anchors; never scan undeclared stores, load the full graph, or substitute generic patterns for matching local knowledge.
+description: Read a minimal slice of a declared Knowledge Base for project knowledge or a concrete task anchor, including requested history, scope, conflict, or recurrence links. No full-graph reads, undeclared-store scans, or replacement of local knowledge with generic patterns.
 ---
 
 # Management Knowledge Base Read

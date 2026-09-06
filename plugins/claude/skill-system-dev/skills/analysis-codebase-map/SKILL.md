@@ -1,6 +1,6 @@
 ---
 name: analysis-codebase-map
-description: Model the current repository or named slice as evidence-linked Mermaid architecture maps. Honor an explicit HLD/LLD request; otherwise use HLD for whole-repo/product scope and LLD for a named module, path, or flow. Generic codebase-analysis report wording resolves to this map, not the retired findings report. Do not use for normative target/transition architecture, one-boundary decisions, ranked improvement scans, bug RCA, explicit findings/quality-gate requests, or design-informed code review of an implementation.
+description: Map the current repository or named slice with source-linked HLD/LLD Mermaid diagrams; generic codebase-analysis reports route here. Not for target/transition architecture, single-boundary decisions, ranked improvement scans, bug RCA, explicit findings/quality gates, or implementation code review.
 ---
 
 # Analysis Codebase Map

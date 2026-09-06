@@ -1,6 +1,6 @@
 ---
 name: analysis-llm-wiki-context
-description: Build minimum task-oriented read-only context from one explicitly selected LLM Wiki by first following that Wiki's own guide, index, search, graph, or backlink conventions. Use only when the user explicitly names a Wiki, supplies its exact path, or invokes this skill; never auto-select among multiple Wikis, assume Book-specific structure, mutate Wiki/Memory/Knowledge, or load the whole Wiki.
+description: Build task-focused read-only context from one explicitly selected LLM Wiki, following its own navigation conventions. Not for automatic Wiki selection, whole-Wiki loading, or Wiki/Memory/Knowledge mutation.
 disable-model-invocation: true
 ---
 

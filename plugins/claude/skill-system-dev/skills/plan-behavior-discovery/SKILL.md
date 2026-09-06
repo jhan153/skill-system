@@ -1,6 +1,6 @@
 ---
 name: plan-behavior-discovery
-description: Run an explicitly requested, one-question behavior discovery turn for an existing implementation or user path, grounding each choice in underlying source/runtime anchors and stopping when the next human-operable slice is decision-ready. Use after a core capability exists but product interaction, failure, recovery, or adaptation remains unresolved; do not use for greenfield requirements, quizzes, explanation, or direct implementation.
+description: Run an explicitly requested, one-question behavior-discovery turn for an existing capability or user path. Decide unresolved behavior for the next human-operable slice; not for greenfield requirements, quizzes, explanation, or implementation.
 disable-model-invocation: true
 ---
 

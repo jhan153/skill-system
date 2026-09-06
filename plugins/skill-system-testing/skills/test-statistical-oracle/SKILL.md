@@ -1,6 +1,6 @@
 ---
 name: test-statistical-oracle
-description: Design a reproducible ensemble or distributional test oracle from an accepted normative external contract or representative observations for stochastic, chaotic, simulation, optimization, and numerically variable software. Define the estimand, run/seed unit, repetitions, uncertainty, decision rule, diagnostics, and proof ceiling without inventing thresholds or observations or treating one replay as population evidence.
+description: Design ensemble/distributional test oracles for stochastic, chaotic, or numerically variable software, including simulations and optimization. Separate accepted normative external contracts from empirical choices requiring representative observations; one replay is not population evidence.
 ---
 
 # Test Statistical Oracle

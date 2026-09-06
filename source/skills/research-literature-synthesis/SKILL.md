@@ -1,6 +1,6 @@
 ---
 name: research-literature-synthesis
-description: Synthesize an existing paper or evidence set into an evidence-calibrated map of themes, methods, consensus, disagreements, contradictions, limitations, and gaps. Use for literature understanding; manuscript writing separately turns an accepted synthesis into publication prose.
+description: Synthesize an existing paper/evidence set into supported themes, agreements, contradictions, limitations, and gaps for literature understanding; not source acquisition or manuscript writing.
 ---
 
 # Research Literature Synthesis

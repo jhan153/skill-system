@@ -1,6 +1,6 @@
 ---
 name: workflow-bug-fix
-description: Repair one concrete defect in an already-implemented accepted production contract with proportional diagnosis, bounded contract-preserving interventions, original-signal observation, actual-path readback, and visible attempt status. Do not use for first implementation or explicit replacement of a production algorithm, model, backend, canonical data/ownership flow, or other production mechanism, even when a current failure motivated it. In Plan DAG mode, BF1 or BF2 owns exactly one semantically admitted assigned round; standalone continuation requires new causal evidence or material progress supporting the next intervention under the same accepted repair contract.
+description: Repair a concrete defect while preserving an already-implemented accepted production contract. Not for first implementation or explicit replacement of a production mechanism (algorithm, model, backend, or canonical data/ownership flow), even when a failure motivates the change.
 ---
 
 # Workflow Bug Fix

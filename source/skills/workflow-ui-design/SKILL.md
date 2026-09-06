@@ -1,6 +1,6 @@
 ---
 name: workflow-ui-design
-description: Create a concrete, inspectable UI design from accepted requirements, product behavior, brand or product-family context, target platform, content, and required states. Use when a screen, route, component, or native view needs an actual visual design artifact before production implementation. Do not use for unresolved product strategy, existing-reference analysis, production UI code, throwaway interaction prototypes, or evidence-only review.
+description: Create an inspectable UI design for a screen, route, component, or native view from accepted requirements and behavior, before production implementation. Not for unresolved product strategy, existing-reference analysis, production UI code, throwaway interaction prototypes, or evidence-only review.
 ---
 
 # Workflow UI Design

@@ -1,6 +1,6 @@
 ---
 name: workflow-research
-description: Execute one explicitly selected Research stage as a bounded task or Plan/Handoff DAG node by applying exactly one named Research specialist, enforcing its input and scientific output ceiling, and returning a Core research_result. Use for explicit Research node management or an assigned RES-* node. Do not use for ordinary direct single-stage research, choosing a stage from a vague goal, automatic multi-stage pipelines, DAG authoring, successor selection, or general implementation.
+description: Run one explicitly managed Research stage using an already selected research-* specialist, directly or as a Plan/Handoff node. Not for ordinary direct research, stage selection, multi-stage orchestration, paper search, or implementation.
 disable-model-invocation: true
 ---
 

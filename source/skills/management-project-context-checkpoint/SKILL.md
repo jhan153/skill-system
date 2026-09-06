@@ -1,6 +1,6 @@
 ---
 name: management-project-context-checkpoint
-description: At an explicitly requested project context checkpoint during commit or closeout, classify newly finalized durable context into an existing project Memory Bank or Knowledge Base declared by project-context.yaml. Use only for the current task's clear changes; an ordinary commit does not invoke this writer, and it never runs from Stop hooks, initializes stores, writes home/global context, collects raw chat, or duplicates one fact in both stores.
+description: At an explicitly requested project-context checkpoint during commit/closeout, classify and record the current task's durable context in existing declared project Memory or Knowledge stores. Not for ordinary commits, store initialization, home/global context, or raw-chat capture.
 ---
 
 # Management Project Context Checkpoint

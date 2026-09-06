@@ -1,6 +1,6 @@
 ---
 name: workflow-prototype
-description: Build the smallest throwaway runnable artifact that answers one explicit unresolved UI, interaction, state, or logic question before production implementation. Use when the user asks for a prototype, spike, side-by-side UI alternatives, or an executable state/logic model whose observation will select or reject a direction; do not use for vague ideation, an already-selected production change, bug diagnosis or repair, or proof of performance, security, accessibility, concurrency, or release readiness.
+description: Build a requested throwaway prototype, spike, side-by-side UI comparison, or executable state/logic model to resolve one open decision before production work. Not for vague ideation, an already-selected production change, bug diagnosis/repair, or proof of performance, security, accessibility, concurrency, or release readiness.
 ---
 
 # Workflow Prototype

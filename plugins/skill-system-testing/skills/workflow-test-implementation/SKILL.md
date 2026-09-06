@@ -1,6 +1,6 @@
 ---
 name: workflow-test-implementation
-description: Implement and execute a complete test contract as test-only code, fixtures, generators, baselines, capture/replay tooling, runners, and diagnostic artifacts. Consume `test_design_result` when design was material, or admit a direct authoritative contract for simple tests. Never invent or weaken the oracle, change production code, or equate Workflow completion with product Pass.
+description: Implement and run test-only assets against the real SUT from a complete test_design_result or a simple authoritative inline contract. Preserve the oracle and production code; completion need not mean Pass.
 ---
 
 # Workflow Test Implementation

@@ -1,6 +1,6 @@
 ---
 name: workflow-implementation
-description: Primary workflow for direct or DAG-assigned production software implementation nodes, including first implementation or explicit replacement of an accepted algorithm, model, backend, canonical data/ownership flow, or other production mechanism even when a current failure motivated it. Do not use for standalone test design/test-only implementation owned by the Testing plugin, Plan coordination, behavior-preserving refactors, semantically admitted bounded repairs of already-implemented accepted contracts, or analysis/validation-only work.
+description: Implement production software, including first implementation or explicit replacement of an accepted production mechanism, even when prompted by failure. Not for bounded repairs preserving an implemented contract, behavior-preserving refactors, standalone test design/test-only work, Plan coordination, or analysis/validation-only requests.
 ---
 
 # Workflow Implementation

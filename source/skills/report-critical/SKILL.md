@@ -1,6 +1,6 @@
 ---
 name: report-critical
-description: Produce an explicitly requested blocker, risk, critical-review, or QA-gate report from a bounded artifact/evidence slice. Deliver content-first Markdown by default and optional Report Canvas HTML only on explicit html/both intent or a material spatial-evidence need. Do not use for ordinary diagnosis, generic code review, implementation, automatic post-task QA, or Plan/Handoff transition control.
+description: Produce an explicitly requested blocker, risk, critical-review, or QA-gate report from bounded evidence. Not for ordinary diagnosis, generic code review, qualitative evaluation, implementation/repair, or automatic post-task checks.
 ---
 
 # Report Critical

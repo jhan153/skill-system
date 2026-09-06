@@ -1,6 +1,6 @@
 ---
 name: report-qualitative
-description: Produce an explicitly requested qualitative evaluation of an artifact, system, design, plan, or implementation using user-supplied, collaboratively elicited, or explicitly delegated criteria. Treat metrics as evidence rather than quality verdicts. Deliver content-first Markdown by default and optional matching HTML on explicit html/both or spatial intent. Not for blocker QA, metric inventories, diffs, validation execution, or implementation.
+description: Produce an explicitly requested qualitative evaluation of fitness, strengths, tradeoffs, or improvement priorities using user-supplied, elicited, or explicitly delegated criteria. Not for blocker QA, metric inventories, diffs, validation execution, or implementation.
 disable-model-invocation: true
 ---
 

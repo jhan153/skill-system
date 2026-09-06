@@ -1,6 +1,6 @@
 ---
 name: workflow-architecture-design
-description: Design target or transition software architecture from accepted behavior and quality scenarios before implementation when a change spans multiple module/API, data-owner, protocol/event, runtime/thread/failure, deployment, or trust boundaries, including new services, databases, or subsystem-wide programming-paradigm composition. Not for current maps, one boundary, candidate scans, accepted-design implementation, or parallelism inside an existing scheduler.
+description: Design target or transition architecture before implementation when accepted behavior and quality scenarios require coherent changes across multiple module, data, runtime, protocol, deployment, or trust boundaries. Not for current maps, atomic-boundary decisions, ranked scans, accepted-design implementation, or local scheduler parallelism.
 ---
 
 # Workflow Architecture Design

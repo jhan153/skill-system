@@ -1,6 +1,6 @@
 ---
 name: workflow-runtime-debugging
-description: Define an execution-ready debugging scope or directly investigate one concrete runtime correctness failure through an existing or approved debugger session, crash artifact, dynamic diagnostic, or graphics capture. Validate target, build, symbol, and capture identity before using stop, state, transition, or device evidence to establish the failure mechanism, root cause, or next discriminator. Do not repair source, design tests, or own performance-only diagnosis.
+description: Define an execution-ready scope or investigate one concrete runtime correctness failure. Scope needs no current session or artifact; investigation uses an existing or approved debugger, crash artifact, dynamic diagnostic, or graphics capture. Not for source repair, test design, or performance-only diagnosis.
 ---
 
 # Workflow Runtime Debugging

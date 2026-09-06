@@ -1,6 +1,6 @@
 ---
 name: workflow-test-design
-description: Design an implementation-ready software test contract after a minimum executable SUT or accepted external contract exposes a representative path. Bind test basis, conditions, scenarios, data, oracle, environment, horizon, diagnostics, and proof ceiling; invoke `plan-test-discovery` only for a named human-owned judgment. Do not write test or production code.
+description: Design implementation-ready test contracts from an executable SUT or accepted external contract exposing a representative path. Use plan-test-discovery only for a named human-owned judgment that evidence cannot settle. Do not write test or production code.
 ---
 
 # Workflow Test Design

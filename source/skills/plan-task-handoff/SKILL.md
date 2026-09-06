@@ -1,6 +1,6 @@
 ---
 name: plan-task-handoff
-description: Create lightweight task DAGs, multi-agent or multi-session handoffs, lock scopes, validation ownership, and task-local artifact inventories. Use only when the user explicitly asks for coordination, handoff, ownership splitting, or an artifact/verification summary; do not use for direct implementation, a simple goal summary, or persistent workflow state.
+description: Create explicitly requested lightweight task DAGs, multi-agent/session handoffs, ownership splits, or artifact/verification inventories. Not for direct implementation, simple goal/status summaries, or persistent workflow state.
 ---
 
 # Plan Task Handoff

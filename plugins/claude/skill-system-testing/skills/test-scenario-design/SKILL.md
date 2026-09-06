@@ -1,6 +1,6 @@
 ---
 name: test-scenario-design
-description: Derive the smallest discriminating positive, negative, edge, state, sequence, data, load, and horizon scenario set for accepted test conditions and an actual SUT path. Preserve authority and data provenance; do not invent semantic expectations, choose an open oracle, or implement the tests.
+description: Derive discriminating scenarios for accepted conditions, an authoritative oracle, and the actual SUT path. Cover material input/state/sequence/horizon cases with traceable data; do not implement tests.
 ---
 
 # Test Scenario Design

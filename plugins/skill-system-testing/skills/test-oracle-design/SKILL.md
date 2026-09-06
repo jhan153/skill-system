@@ -1,6 +1,6 @@
 ---
 name: test-oracle-design
-description: Select and bound an authoritative test oracle for one named condition using exact results, invariants, metamorphic relations, differential references, approved golden baselines, statistical rules, or explicit human judgment. Preserve circularity, independence, tolerance, and proof-ceiling limits; never derive correctness from the implementation under test.
+description: Select an authoritative oracle for one test condition using exact results, invariants, metamorphic relations, differential references, approved goldens, statistical rules, or human judgment. Keep its authority independent of the SUT implementation.
 ---
 
 # Test Oracle Design

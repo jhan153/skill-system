@@ -1,5 +1,20 @@
 # Changelog
 
+## 10.3.2
+
+- Shortened repeated routing, ownership, and evidence-limit prose in 57 skill bodies, keeping
+  task methods, material exceptions, Routing Cards, and Core result bindings intact.
+- Condensed 37 skill descriptions while preserving all 67 skill identities and invocation
+  policies. Description text totals fell from 23,129 to 17,366 characters; the 38 implicitly
+  invocable skills fell from 12,493 to 8,718 characters. These are text measurements, not token,
+  cost, or model-routing performance claims.
+- Reused existing body and shared-reference guidance without moving content into `source/shared/docs`
+  or adding rules, reference files, or evaluation infrastructure.
+- Removed obsolete Output Gate guidance and the central-evaluation operating diagram. Documented
+  official removal of retired plugin registrations and caches during full replacement or cleanup.
+- Advanced all four generated provider harnesses and all five Codex/portable plugin profiles to
+  10.3.2. Runtime behavior, skill membership, and live installations are unchanged by this cut.
+
 ## 10.3.1
 
 - Aligned skill, shared-contract, and helper admission, ownership, and output rules across

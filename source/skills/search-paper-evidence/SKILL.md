@@ -1,6 +1,6 @@
 ---
 name: search-paper-evidence
-description: Acquire traceable paper evidence for an explicit literature/citation request or downstream paper gap. Separate source identity, access, and claim relation; never invent papers, metadata, datasets, metrics, or results.
+description: Acquire traceable paper evidence for explicit literature/citation requests or a named downstream gap, distinguishing source identity, access, and claim support.
 ---
 
 # Search Paper Evidence

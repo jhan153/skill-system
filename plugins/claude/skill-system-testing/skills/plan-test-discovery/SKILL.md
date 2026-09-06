@@ -1,6 +1,6 @@
 ---
 name: plan-test-discovery
-description: Resolve human-owned test-basis, oracle, tolerance, baseline, horizon, or accepted-uncertainty decisions when Test Design cannot proceed from authoritative evidence. Persist only the decided scope into an Execution Handoff input record when a package is bound; do not design or implement tests, edit Plan/Handoff, or replace Human Test.
+description: Resolve human-owned test-basis, oracle, tolerance, baseline, horizon, or accepted-uncertainty decisions when Test Design cannot proceed from authoritative evidence. Return decisions, not tests or Human Test.
 ---
 
 # Plan Test Discovery
