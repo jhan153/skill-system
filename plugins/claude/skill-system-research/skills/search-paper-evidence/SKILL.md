@@ -63,7 +63,8 @@ express the same distinctions in prose; named facets are not a mandatory large s
 4. Verify identity and open the strongest accessible source before assigning a claim relation.
 5. Deduplicate preprint/published versions; retain identity and every independently evidenced correction/retraction/version fact together, with locators and unchecked facets visible.
 6. Record basis and exact locator. Abstract-only access cannot support a full-text/table-specific claim; a keyword mention is not support.
-7. Rank by relevance, directness, study quality, and independence, not frequency.
+7. Rank by relevance, directness, study quality, and independence, not frequency. Organized papers
+   alone do not establish causal or field-wide truth.
 8. Return unavailable/missing evidence and limitations; without search/access, return a query plan with `not_acquired`.
 
 ## Output
@@ -73,10 +74,3 @@ Match depth to intent:
 - Explicit evidence artifact: structured acquisition/source/claim fields, query plan, gaps, and limits.
 
 Never force a persisted evidence artifact around a short reference request.
-
-## Validation
-- No source is returned without a retrievable locator.
-- Current/latest results have a fresh search date.
-- Source identity, provenance, lifecycle/version observations, and claim relation remain separate; legacy scalar status proves only its stated facet.
-- Corrections, retractions, duplicates, partial access, and missing evidence stay visible.
-- Never infer causal or field-wide truth from organized papers alone.

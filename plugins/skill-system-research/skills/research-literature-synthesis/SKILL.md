@@ -17,11 +17,6 @@ description: Synthesize an existing paper or evidence set into an evidence-calib
 - risk_profile: no acquisition by default and write a review artifact only when requested; credentials denied
 - entry_scene: PREPARE
 
-## Stage Boundary
-Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
-intent, or Plan/Handoff mapping matters. This skill owns only the requested synthesis and never
-starts ideation, hypothesis selection, manuscript writing, or another Research stage.
-
 ## Synthesis Standard
 1. State the review scope, search date/coverage, and whether the evidence set is narrative, systematic, or opportunistic.
 2. Normalize the unit of comparison: task, population/data, intervention/method, comparator, outcome/metric, and study design.
@@ -34,3 +29,6 @@ starts ideation, hypothesis selection, manuscript writing, or another Research s
 
 ## Output
 For a focused question, lead with the synthesis and strongest limiting evidence. For an explicit artifact, include only supported scope/coverage, evidence table, themes, agreements/disagreements, contradictions, limitations, gaps, and source anchors. Preserve evidence asymmetry and dependence; never turn missing literature into consensus or novelty.
+
+Read `references/research_stage_contract.md` when upstream/downstream ownership, multi-stage intent,
+or Plan/Handoff mapping matters.

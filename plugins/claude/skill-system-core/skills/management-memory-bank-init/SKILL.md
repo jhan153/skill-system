@@ -40,7 +40,7 @@ disable-model-invocation: true
 4. Update only `memory_bank.root` and `memory_bank.storage` in `project-context.yaml`, preserving
    all other sections and the approved path representation.
 5. Read back the file header, empty record state, project identity, manifest section, and unchanged
-   sibling sections. Initialization creates storage, not Memory content.
+   sibling sections.
 
 ## Output
 

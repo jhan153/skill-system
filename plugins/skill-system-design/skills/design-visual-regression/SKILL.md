@@ -67,13 +67,6 @@ description: "Capture, verify, and compare rendered UI screenshots for design ev
 
 Use this skill for visual evidence, not for implementation ownership. It can support `design-frontend` after a UI is rendered.
 
-## Stage Boundary
-
-Apply `references/design_stage_contract.md`. This skill owns only the visual condition assigned by
-the user or accepted Plan. It never edits the UI, starts another gate, triggers repair/retry, or
-selects a successor. Use `references/design_evidence_contract.md` for evidence labels and proof
-ceilings.
-
 ## Workflow
 1. Determine the rendered target:
    - Use a local URL, Storybook story, static HTML, native preview, screenshot file, or simulator output.
@@ -103,9 +96,7 @@ ceilings.
    - Pin each baseline source, state, viewport, theme mode, and version/digest.
    - Compare shared axes such as typography scale, token color use, spacing rhythm, radius/elevation, control height, icon family, density, shell/chrome, and recurring component states.
    - Compare like with like. Do not apply full-screen pixel thresholds between unrelated screens or use one sibling screenshot as the entire family standard.
-7. Return unresolved gaps with their current evidence label. Name token, component, accessibility,
-   or implementation ownership only as a handoff hint; do not invoke another skill or convert a
-   visual result into a repair decision.
+7. Return lane-specific results and unresolved gaps with their current evidence label.
 
 ## Output
 Return single-view findings, evidence paths, and scoped status directly. Structured regression or multi-viewport artifacts follow the conditionally loaded schema; keep lane verdicts separate and missing evidence explicit.
@@ -115,8 +106,6 @@ Return single-view findings, evidence paths, and scoped status directly. Structu
 - Use exact viewport dimensions when captured.
 - Do not claim visual readiness from build success alone.
 - Do not claim pixel-perfect equivalence without side-by-side evidence or image diff evidence.
-- Do not collapse target fidelity and family coherence into one pass/fail verdict.
-- A family-coherence verdict requires an applicable pinned baseline and like-for-like comparison axes; an unrelated screen or mutable path is insufficient.
 - Do not invent a universal pixel threshold for coherence. Use project-declared thresholds when present and reasoned shared-axis findings otherwise.
 - Missing source, screenshot, font, asset, viewport, or baseline evidence prevents a pass in the affected lane.
 - If only the user can supply or judge it, use `user-verification-needed`; otherwise use `unverified`.
@@ -129,15 +118,5 @@ When the accepted Plan names this skill as an evidence owner:
 - Verify only the assigned visual condition IDs.
 - Return `pass`, `fail`, `unverified`, or `user-verification-needed` per condition with screenshot
   paths, viewport/state, decisive comparison evidence, and unavailable reason.
-- An unchanged failure is only evidence for that condition. The Coordinator applies an existing
-  Plan edge; this skill never creates a retry, repair node, or back-edge.
 - Do not infer accessibility, source correctness, build readiness, Human Test, or overall Design
   completion from screenshots.
-
-## Do Not Invent / Unverified Policy
-- Do not invent source reference details that are not visible.
-- Keep subjective visual polish separate from confirmed visual mismatch.
-
-## Completion Boundary
-Close only the assigned visual condition. Do not require token, component, accessibility, or repo
-gates unless the user or accepted Plan separately names those conditions.

@@ -41,11 +41,8 @@ disable-model-invocation: true
 
 Read `references/context-composition.md` only when the Wiki's guide leaves selection or composition ambiguous.
 
-## Boundary
-- Read-only: no Wiki edits, page creation, tagging, backlink changes, or automatic Context Pack persistence.
-- No Memory or Knowledge writes and no Knowledge-to-Wiki composition.
-- Format-independent: do not require claim/source/edge schemas, Runtime Projection, page IDs, folder names, or a particular query language.
-- Book is one possible field instance, not a template or special case.
+Keep navigation format-independent: follow the selected Wiki's conventions rather than requiring
+claim/source/edge schemas, Runtime Projection, page IDs, folder names, or a particular query language.
 
 ## Output
 Return selected Wiki/name/root, navigation method used, task anchors, compact role-organized context, source page refs, conflicts/freshness limits, and no-hit reason when applicable. Omit empty roles.

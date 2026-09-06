@@ -35,13 +35,10 @@ description: Maintain an explicitly requested decision map for work whose target
   sensitive_resources: credentials and production data denied; never store secrets in planning artifacts
 - entry_scene: PREPARE
 
-## Ownership Boundary
+## Decision Boundary
 
-This skill owns unresolved-decision structure, not delivery work. Its artifacts explain what must be learned or decided before normal requirements, architecture design, or implementation planning can take over.
-
-A decision item is not a disguised implementation task. It may request evidence, a user choice, a throwaway discriminator, or a prerequisite action, but it closes only the uncertainty named in that item. Starting production work always remains with the normal execution owner and requires current authorization.
-
-The map stays outside the persisted implementation planning state. A complete map means the material decisions are recorded; it does not prove feasibility, implementation readiness, or delivered behavior.
+Each item closes one named uncertainty through evidence, a user choice, a throwaway discriminator,
+or a prerequisite action. The map stays outside persisted implementation planning state.
 
 ## Artifact Model
 
@@ -82,7 +79,7 @@ If any answer is no, keep the task with the smaller existing owner. Do not creat
 3. Create item identities before adding prerequisite links so relationships never point at unstable names.
 4. Derive the ready set from item state; do not infer readiness from document order.
 5. Start agent-runnable evidence work only when the current host and user authority permit it. Creating the map does not authorize delegation, remote issues, branches, or messages.
-6. Stop after the initial index and current ready set are readable. Initialization does not begin delivery of the target outcome.
+6. Stop after the initial index and current ready set are readable.
 
 ## Advance One Decision
 
@@ -100,7 +97,7 @@ For local Markdown, a claim is cooperative coordination rather than a lock. Re-r
 
 Decision mapping is complete when no in-scope unshaped unknown remains and every decision item is resolved or explicitly excluded. The index must also state the resulting outcome well enough that the next owner does not need an unrecorded decision.
 
-Recommend one next owner without invoking it automatically:
+Recommend one next owner:
 
 - `plan-requirements-brief` for a requirements contract;
 - `plan-execution-handoff` for a governed multi-session implementation Plan/Handoff pair;

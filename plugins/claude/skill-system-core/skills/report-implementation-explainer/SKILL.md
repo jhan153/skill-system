@@ -35,15 +35,9 @@ disable-model-invocation: true
   sensitive_resources: credentials denied; redact sensitive runtime data
 - entry_scene: PREPARE
 
-## Delivery And Ownership
+## Delivery
 
-Apply `references/report_delivery_contract.md`. Markdown is the explanatory source. HTML only
-projects the same path, states, evidence, and comparison. It cannot add a behavior claim or imply
-reader understanding. A missing renderer leaves the Markdown explanation complete.
-
-This skill explains existing evidence. It never changes production, runs automatically after an
-implementation, edits Plan/Handoff, selects another node, or treats its artifact as correctness
-evidence.
+Apply `references/report_delivery_contract.md` for Markdown and optional matching HTML.
 
 ## Modes
 
@@ -83,7 +77,7 @@ status separate. Never emit `understood: true` or infer comprehension from openi
 ## Output Contract
 
 Return the Markdown link first, then optional HTML. Keep excerpts small and navigational. End with
-one recommendation or `none`; naming another owner never invokes it or changes the current Plan.
+one recommendation or `none`.
 
-Artifact creation proves only that the explanation was produced. `scenario_exercised`,
-`behavior_compared`, `decision_confirmed`, or `assumption_delegated` require actual observation.
+`scenario_exercised`, `behavior_compared`, `decision_confirmed`, or `assumption_delegated` require
+actual observation.

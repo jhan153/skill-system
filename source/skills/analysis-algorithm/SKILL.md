@@ -48,12 +48,10 @@ credible approaches. Once an approach is accepted, its first production implemen
 replacement belongs to `workflow-implementation`, even when that failure motivated the decision.
 
 ## Evidence Authority
-- Agent-authored tests may preserve an established rule; they do not create the rule or independently prove semantic fit.
-- Mock results prove only the mocked boundary. Production-fit claims require comparable actual-path observation, including material storage, serialization, data, and environment boundaries.
+- Production-fit claims require comparable actual-path observation, including material storage, serialization, data, and environment boundaries.
 - External benchmarks establish only their measured workload and version. Verify changeable library/product facts with fresh authoritative evidence.
 - Formal analysis can decide an exactly formal condition when its assumptions hold. An asymptotic proof does not establish runtime speed or constants.
 - A runtime improvement claim needs comparable before/after evidence on the relevant path. Expected gains remain hypotheses.
-- Do not downgrade a failed or unknown hard constraint into a warning or partial recommendation.
 
 ## Comparison And Recommendation
 Use only decision-changing axes: correctness/problem fit, data/workload assumptions, scaling, latency/throughput/memory/compute, dependencies/deployment, operational complexity, observability, failure modes, rollback, and implementation cost.
@@ -67,9 +65,3 @@ For a small decision return:
 - falsifying check
 
 For consequential ambiguity, add a compact constraint/candidate comparison, causal mechanism, fallback, and handoff. Omit empty sections and avoid a matrix unless it clarifies a real trade-off.
-
-## Boundaries
-- Recommendation-only work does not authorize code or document writes.
-- Hand chosen implementation and its validation target to `workflow-implementation`.
-- Route measured bottlenecks to `analysis-performance`. Route an explicitly requested execution-ready debugging scope or diagnosis-only runtime evidence work to `workflow-runtime-debugging`; keep simple source/log-only causes with the current task owner, and route only a bounded repair that preserves an already-implemented accepted production contract to `workflow-bug-fix`.
-- Suggested validation is not evidence that the recommendation already works.

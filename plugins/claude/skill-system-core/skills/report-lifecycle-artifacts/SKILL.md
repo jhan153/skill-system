@@ -36,15 +36,9 @@ disable-model-invocation: true
   sensitive_resources: credentials denied; redact secrets and audience-sensitive data
 - entry_scene: PREPARE
 
-## Delivery And Ownership
+## Delivery
 
-Apply `references/report_delivery_contract.md`. Markdown is the primary lifecycle index. HTML may
-only project the same artifact graph and statuses. A missing renderer never blocks the package or
-changes a represented lifecycle result.
-
-This skill packages and links existing evidence. It never creates a Plan/Handoff, changes its
-state, reinterprets Core Cards, selects a successor, runs a gate, or claims delivery from document
-presence. It is not an automatic closeout step.
+Apply `references/report_delivery_contract.md` for the Markdown index and optional matching HTML.
 
 ## Package Contract
 
@@ -60,10 +54,6 @@ Modes:
 - `full_lifecycle_pack`: only when the user explicitly names the complete package scope and source
   artifacts; missing stages remain gaps rather than generated shells.
 
-Never create empty milestone, HLD/LLD, QA, security, release, or retrospective documents merely to
-complete a list. A requested new report is authored only from identified source evidence and stays
-within that report's actual authority.
-
 ## Status And Evidence
 
 Separate package construction from represented lifecycle results. Use typed lifecycle status only
@@ -73,8 +63,7 @@ supplied by the source contract.
 
 For every material link, record the source condition/claim, evidence scope, oracle origin, exact
 reference, freshness, and preserved status. Structural checks close only structural link/matrix
-conditions. Mocks, generated files, hooks, schemas, and harnesses prove only their own boundary.
-Never lower an unresolved result because the package or a narrower check succeeded.
+conditions; preserve unresolved lifecycle results.
 
 ## Workflow
 
@@ -82,8 +71,7 @@ Never lower an unresolved result because the package or a narrower check succeed
    conditions, status authority, redaction boundary, and delivery mode.
 2. Read each selected artifact once and preserve its identity, owner, status, evidence anchors,
    unresolved items, and relation to other selected artifacts. Do not reconstruct missing stages.
-3. Build only the needed traceability rows using stable source IDs when available. A link records a
-   relation; it does not manufacture requirement coverage, validation, or completion.
+3. Build the needed traceability rows from evidenced relations, using stable source IDs when available.
 4. Normalize or copy an artifact only when explicitly requested and without replacing its canonical
    owner. Otherwise link the authoritative source in place.
 5. Produce the Markdown lifecycle index and optional persisted matrix. If HTML is selected, project
@@ -101,5 +89,4 @@ Return only applicable fields:
 - user-owned follow-ups
 - optional lifecycle HTML link
 
-Return the Markdown link first. Canvas is an optional navigation view over the package, never the
-package or proof. A follow-up is a recommendation, not Handoff mutation or workflow dispatch.
+Return the Markdown link first and optional HTML link second.

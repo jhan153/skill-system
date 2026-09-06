@@ -41,21 +41,16 @@ Treat the artifact as decision evidence, not early production. Before writing, l
 
 - For layout, hierarchy, density, control placement, navigation, or interaction comparison, read [UI Prototype](references/ui-prototype.md) and build a UI comparison in the real host surface when safe.
 - For state transitions, invariants, command semantics, reducer/state-machine shape, or domain feedback, read [Logic Prototype](references/logic-prototype.md) and expose a deterministic rule model through one browser-openable HTML evidence page.
-- For a question that depends on performance, security, accessibility, concurrency, persistence durability, or production integration, use the specialist actual-path workflow instead. A throwaway harness may illustrate behavior but cannot close that claim.
 
 ## Workflow
 
 1. Bind the contract, current evidence, non-goals, and resulting decision.
 2. Inspect the smallest real host path. Reuse local runtime/components/fixtures for UI or authoritative rules and safe fixtures for logic.
-3. Isolate and mark the artifact `PROTOTYPE`. Prefer a route/story/preview/nearby file; use a branch/worktree only when explicitly requested or required by repository policy. Never disturb unrelated work or push without authorization.
+3. Isolate and mark the artifact `PROTOTYPE`. Prefer a route/story/preview/nearby file; use a branch/worktree only when explicitly requested or required by repository policy.
 4. Build only the discriminator. Stub mutations/external systems, keep state in memory, and omit polish, generalized abstractions, migrations, persistence, analytics, and production hardening unless they are the question.
 5. Provide one exact launch instruction and expose the decisive variants/actions/states without source inspection.
 6. Observe and classify `selected`, `supported`, `contradicted`, or `inconclusive`. Human/private judgment stays `user-verification-needed` until the owner responds.
-7. Keep comparison evidence runnable and outside production until observation. After explicit selection, hand off to the production owner; clean up only on request or the agreed trigger.
-
-## Guardrails
-
-Use structurally discriminating variants and representative safe fixtures without real external mutation. Add no framework, package, persistence, backend, or generic abstraction merely for the prototype. Builds, mocks, screenshots, and self-authored checks prove only their boundary; never claim production correctness, scalability, security, accessibility, reliability, integration, or release readiness. Do not silently merge or delete the evidence while its decision is pending; only a small validated pure core may be lifted after ownership and production checks are explicit.
+7. Keep comparison evidence runnable and outside production until observation. After explicit selection, hand off to the production owner; only a small validated pure core may be lifted after production checks are explicit. Clean up only on request or the agreed trigger.
 
 ## Validation And Output
 

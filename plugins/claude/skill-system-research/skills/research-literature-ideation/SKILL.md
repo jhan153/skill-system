@@ -17,12 +17,6 @@ description: Derive research-gap hypotheses from an evidence set or literature s
 - risk_profile: no search by default and write an ideation artifact only when requested; credentials denied
 - entry_scene: PREPARE
 
-## Stage Boundary
-Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
-intent, or Plan/Handoff mapping matters. This skill owns candidate generation/ranking and selects
-one active hypothesis only on explicit decision intent; it never starts hypothesis planning or an
-experiment stage.
-
 ## Ideation Contract
 1. Identify evidence-supported contradictions, boundary conditions, method/data/metric mismatches, failure modes, or missing comparisons.
 2. Label each as an `observed gap` supported by reviewed evidence, a corpus `coverage gap`, or a `speculative opportunity` needing evidence.
@@ -34,3 +28,6 @@ If the named evidence artifact is missing/mismatched or provenance cannot be res
 
 ## Output
 Return proportional gap evidence, candidate mechanism/prediction/falsifier, ranking rationale, requested selection, and missing evidence. Do not emit a large catalog or imply that a generated hypothesis is verified.
+
+Read `references/research_stage_contract.md` when upstream/downstream ownership, multi-stage intent,
+or Plan/Handoff mapping matters.

@@ -51,5 +51,8 @@ description: Diagnose a current latency, throughput, CPU, memory, query, renderi
 ## Output Contract
 Return only applicable fields: target/conditions, baseline and evidence scope, actual hot path, hypotheses and discriminating evidence, primary bottleneck, verified conclusion, smallest next change or implementation handoff, comparable validation target, and unresolved gaps. Separate bottleneck identification from optimization success.
 
-## Cross-Skill Boundaries
-- `workflow-runtime-debugging` owns an explicitly requested execution-ready debugging scope or correctness investigation when a debugger, crash artifact, dynamic diagnostic, or graphics capture is material; simple source/log RCA stays with the current task owner. A progressing target whose dominant question is frame time, latency, utilization, throughput, or resource cost stays here. No-progress under a bound horizon, OOM/allocation failure, watchdog termination, wrong state, invalid ordering/access, corruption, or device loss stays with Runtime Debugging even when resource pressure is a cause candidate. `workflow-bug-fix` repairs a bounded defect under an already-implemented accepted contract. `workflow-implementation` applies a selected optimization or production replacement even when a current symptom motivated it; `analysis-algorithm` owns a still-open approach choice regardless of symptom; `analysis-codebase-map` owns Mermaid architecture maps; `research-experiment-blueprint` owns scientific benchmark design; `workflow-refactor-safely` owns preparatory behavior-preserving structure changes.
+## Performance Or Correctness
+A progressing target whose dominant question is frame time, latency, utilization, throughput, or
+resource cost stays here. No-progress under a bound horizon, OOM/allocation failure, watchdog
+termination, wrong state, invalid ordering/access, corruption, or device loss belongs to runtime
+correctness investigation even when resource pressure is a candidate cause.

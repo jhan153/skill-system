@@ -341,6 +341,13 @@ Antigravity:
    공식 `codex plugin add` 명령으로 설치하거나 갱신합니다.
 6. `codex plugin list --available --json`으로 결과를 다시 확인합니다.
 
+전체 Skill System 교체 또는 폐기 플러그인 정리에서는 현재 마켓플레이스 목록에서
+사라진 항목도 Codex 설정의 활성화 항목과 캐시에 남아 있을 수 있습니다. 선택한
+체크아웃에서 폐기가 확인된 Skill System 항목만
+`codex plugin remove <plugin-name>@<marketplace-name> --json`으로 제거하고,
+해당 설정과 캐시가 사라졌는지 확인합니다. 일부 profile만 설치하는 요청에서는
+다른 profile을 제거하지 않습니다. 캐시를 직접 편집하거나 삭제하지 않습니다.
+
 명령 형태:
 
 ```bash

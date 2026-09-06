@@ -23,9 +23,7 @@ disable-model-invocation: true
 Author the smallest self-contained `plan.md` plus `handoff.md` pair for durable work.
 The Plan owns objective, scope, decisions, graph, validation, and termination; one
 Coordinator/single-session owner writes current state and decisive evidence in Handoff.
-After authoring, the Orchestrator executes the copied contract through the host. This skill
-does not execute nodes, write production source, or require another runner/state artifact.
-Direct one-session work bypasses this skill; lightweight coordination uses `plan-task-handoff`.
+After authoring, the Orchestrator executes the copied contract through the host.
 
 ## Context Loading
 
@@ -168,8 +166,7 @@ These are common to every selected graph, regardless of model or host:
    `graph-method-profiles.md` and the templates: identity/sections/placeholders, pair agreement,
    reachability/acyclicity, unique IDs and typed edges, node/Task State/timing coverage, exact
    Core card rows, kind/skill/output agreement, and selected Human Test transition.
-   Correct observed mismatches. Structural agreement never proves design, evidence sufficiency,
-   lock correctness, timing realism, or product completion.
+   Correct observed mismatches.
 
 ## Result Intake And Closure
 
@@ -187,9 +184,7 @@ A result never grants graph authority.
 - `phase_gate_delivery` uses `human_handoff` + `next_waterfall` and terminates at
   `human_test_ready`. Include the full Human Test Transition, close the pair, and stop.
   Later Test results plus new worklist/design create a fresh pair; they never reopen this one.
-- A batch, plan document, interface, mock, or maker-authored check does not establish broader
-  completion. Keep every material condition evidenced, human-owned, or explicitly unresolved;
-  an independent review does not replace matching condition evidence.
+- Keep every material condition evidenced, human-owned, or explicitly unresolved.
 
 Keep pair frontmatter status to `proposed | approved | in-progress | blocked | complete |
 superseded` and Task State to `pending | in progress | complete | blocked`. Use repository

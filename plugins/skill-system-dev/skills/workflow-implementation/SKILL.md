@@ -88,9 +88,9 @@ description: Primary workflow for direct or DAG-assigned production software imp
 - consumes: `references/core-execution-items-v1/cards/code_review_result.md`, `references/core-execution-items-v1/cards/bug_fix_result.md`, `references/core-execution-items-v1/cards/known_bug_record.md`
 
 ## Contract
-- **C0 — Positive-output precedence.** Classify the requested production output before its motivating symptom, failing condition, review disposition, attempt history, or node label. First implementation or explicit replacement of an accepted production mechanism remains Implementation work. An unresolved mechanism choice returns to its decision owner; only a bounded defect repair that preserves an already-implemented accepted contract belongs to Bug Fix.
-- **C1 — Work boundary.** Own ordinary coding from the active user work contract through the production-path change and its evidence. Preserve deliverables, allowed/excluded actions, verification owner, interaction/continuation behavior, and stop terms; never reactivate excluded test, validation, or meta work. Implementation is the requested source, runtime config/build, or executable behavior. Plans, docs, mocks, interfaces, or tests alone complete only when they are the requested deliverable.
-- **C2 — Complete canonical behavior.** Close the whole required behavior with the least conceptual machinery, not the fewest changed lines. Give each internal concept one contract, representation, state machine, and policy owner; update every in-scope producer, consumer, and caller. Missing or mismatched canonical input fails or remains an explicit user decision, never a placeholder, warning, fallback, or success-looking partial result. A material regression, contradicted completion claim, repeated correction, or ownership/architecture drift invalidates the frame; reconstruct the positive objective, canonical artifacts/owners, actual paths, affected consumers, and one disconfirming case before dependent work.
+- **C0 — Positive-output precedence.** Select Implementation or bounded Bug Fix from the requested production output before its motivating failure, review disposition, attempt history, or node label. Resolve an undecided production mechanism before implementing it.
+- **C1 — Deliverable.** Complete the requested production-path change and its in-scope participants. Plans, docs, mocks, interfaces, or tests alone complete the task only when they are the requested deliverable.
+- **C2 — Complete canonical behavior.** Close the whole required behavior with the least conceptual machinery, not the fewest changed lines. Give each internal concept one contract, representation, state machine, and policy owner; update every in-scope producer, consumer, and caller. Missing or mismatched canonical input fails or remains an explicit user decision, never a placeholder, warning, fallback, or success-looking partial result.
 - **C3 — Direct boundaries.** Converge internal disagreement instead of preserving it through adapters, bridges, proxies, shims, or dual models. Translate only at an unmodifiable external ABI, protocol, SDK, device, or bounded-version boundary; keep translation thin, stateless, total, validation-first, and free of defaults, fallback, retry, caching, lifecycle, domain policy, or hidden state. Prefer functions, values, concrete types, direct calls, existing primitives, and composition. Add an interface, inheritance hierarchy, registry, factory, generic framework, or other indirection only for a present semantic responsibility that direct dispatch or composition cannot satisfy. Treat class-per-noun, interface-per-implementation, one-line forwarding functions, blanket DRY across different meanings, factory/manager/service/repository/wrapper layers, mock-created seams, and speculative extension frameworks as explicit implementation anti-patterns—not harmless style alternatives.
 - **C4 — Valid construction.** A successful public domain/resource value is immediately valid; no partially initialized final object, setter assembly, zombie handle, or hidden readiness state may escape. Staged construction is limited to intrinsic external, asynchronous/streaming, bulk/parallel-fill, or GPU/DMA progress. Reuse an existing future/task/result/request/span/builder when it owns the states. A new staged operation requires a distinct invariant, state set, or lifetime and must represent `pending`, `completed`, `failed`, and `cancelled` as explicit valid states; failure and cancellation are not optional afterthoughts. Only its successful `finish`/`commit`/`freeze` boundary may publish the final value.
 - **C5 — Authoritative shape.** Treat an explicit user-selected paradigm/model, accepted
@@ -140,24 +140,12 @@ evidence:
 A negative answer preserves the coherent local model and loads no specialist profile. This
 preflight is a routing gate, not permission to introduce concurrency, abstraction, or optimization.
 
-Apply conditional references without transferring workflow ownership:
-
-| Reference | This Workflow consumes and owns |
-| --- | --- |
-| `architecture_design_contract.md` | Preserve accepted drivers, pattern stop boundaries, canonical owners, architecture delta, transition constraints, and fitness handoff; implement only the assigned slice and record its design reference in artifact/evidence refs when crossing owners. |
-| `boundary_decision_contract.md` | Preserve accepted pressure, invariant, outside contract, dependency direction, and optional atomic paradigm profile/axis/property owner/scope/proof constraints; implement and read back only the smallest enforcement. |
-| `maintainable_code_principles.md` | Apply the six principles after the behavior boundary; own only the in-scope implementation and changed-path evidence. |
-| `database_persistence_transparency_contract.md` | Preserve accepted source/domain/boundary meaning; own the concrete model, read/write effects, consistency/transaction, lifecycle, cost visibility, and matching readback. |
-| `identifier_readability_principle.md` | Own introduced/changed related identifiers and required callers; preserve higher naming authority and leave static findings to Code Review. |
-| `runtime_debugging_contract.md` | Implement only the requested diagnostic infrastructure; preserve exact target/build/symbol/capture identity, crash-context safety, partial-artifact reporting, perturbation, trust/privacy controls, and the runtime proof ceiling without claiming a current root cause. |
-| `programming_paradigm_contract.md` | Preserve shared paradigm axes, authority, scope/interactions, impact/decision-owner gate, thin-profile proof ceilings, and immutable accepted applications; own local decisions and downstream `paradigm_conformance` only. |
-| `paradigm-composition.md` | Route an already selected application to only the detailed method profiles needed for concrete code realization and actual-path readback. |
-| `delivery_slice_contract.md` | Select a multi-batch delivery shape only when more than one executable batch is required. |
-| `execution_item_view.md` | Use the role-scoped Core envelope and items only when a result crosses Workflow, Coordinator, Plan/Handoff, or plugin boundaries. |
-
 ## Workflow
-1. Compile scope into the active work contract; apply C0 before repair history or Plan labels, then classify core work, required prerequisites, optional validation/quality, and meta work. State observable success and one material negative or edge case.
+1. Apply C0, bind the requested scope and required prerequisites, and state observable success plus one material negative or edge case.
 2. Treat the change as local only when one owner and representative path cover the outcome with no material consumer, invariant, canonical-source, or ownership decision. Otherwise establish the positive objective, canonical artifacts/owners, actual paths, affected consumers, invariants/dependencies, and one disconfirming case before selecting a diff.
+   After a material regression, contradicted completion claim, repeated correction, or
+   ownership/architecture drift, reconstruct the objective, canonical owners/artifacts, affected
+   paths/consumers, and one disconfirming case before dependent work.
 3. When shape is explicit or material, map the selected approach, canonical owner, in-scope
    producers/consumers, construction/state/data/effect/dispatch/execution rules, and one forbidden
    drift. Load only applicable references. Preserve accepted architecture applications and atomic
@@ -171,12 +159,10 @@ Apply conditional references without transferring workflow ownership:
    set, and sole publication boundary. Omit this step for a trivial already-shaped change.
 4. Implement C2–C4 in the canonical owner and update every required participant. Before adding indirection, name its present semantic responsibility and why a direct value/function/call, existing primitive, variant, or composition cannot close the requirement. For multiple batches, use `vertical_slice`, `migration_sequence`, or `evidence_unit`, and derive order/parallelism from dependencies, overlapping writes, and unresolved decisions; `single_batch` does not activate the delivery contract.
 5. When agent verification is owned and allowed, use one existing verifier, direct observation, or focused smoke check that can expose the realistic failure. Include affected-boundary and disconfirming-case readback for material shape. Add a regression test only when requested or when an existing test system covers an anchored regression without new framework, mock, fixture family, or dependency work. Preserve `user-verification-needed` when the user owns verification.
-6. Inspect the diff for scope creep, churn, missed participants, duplicate contracts, adapters/shims/proxies, hidden state, stale-frame conclusions, and accepted-boundary drift. Explicitly reject class-per-noun, interface-per-implementation, forwarding-only functions, blanket DRY, manager/service/repository/wrapper layers, mock-created seams, speculative frameworks, and staged operations that hide `failed` or `cancelled` states.
+6. Inspect the diff for scope creep, churn, missed participants, duplicate contracts, hidden state, and drift from C2–C5.
 7. Report each material condition as evidenced, user-only, or unresolved.
 
-## Evidence Gate
-- Match claims to their actual evidence scope; structural checks prove structure, mocks prove only their boundary, and agent-authored tests are regression/self-check evidence rather than an independent semantic oracle.
-
+## Evidence
 | Claim | Required evidence |
 | --- | --- |
 | requested behavior | Representative production path and a realistic failure/edge observation. |
@@ -187,14 +173,12 @@ Apply conditional references without transferring workflow ownership:
 | paradigm/model application conformance | Changed-path source readback establishes only observable code shape; attach matching runtime/test/trace/benchmark evidence for determinism, lifecycle, memory/performance, compile-cost, or scheduling claims without mutating the accepted application. |
 | construction or simplicity | No partial final value escapes; staged work exposes `pending/completed/failed/cancelled`, and each abstract type has a current invariant/responsibility that reduces total conceptual machinery. |
 
-- `Line count`, file count, smaller diff size, and a passing mock are never evidence of simplicity. A passing happy path does not prove the absence of hidden readiness, failure, cancellation, or partial-publication states. These are explicit anti-fake-signal rules, not optional review advice.
-- A required `fail`, `needs_review`, `unverified`, or `blocked` condition stays open until evidence from that same condition resolves it.
 - If direct observation needs unavailable GUI, credentials, or external state, return task state `user-verification-needed` or `unverified`; do not add a surrogate path and call it complete.
 - If an optional verifier or permission is unavailable, defer that semantic intent and continue independent required implementation. Do not retry it as another command, GUI path, wrapper, probe, or new test; use `blocked` only when no required runnable work remains.
 - If no suitable verifier exists, keep the implementation scope complete but lower its evidence label. Do not create validation-only work or repeat an unchanged check to promote the label.
-- If a material semantic completion claim otherwise depends mainly on code and checks produced by the same agent, apply `references/execution_assurance_contract.md` in `standard` mode. Its independent pass does not replace direct condition evidence, own Core cards, or become a second implementation owner.
-- When review returns `repair_required`, classify the required positive work against the accepted implementation/method contract before dispatch. Consume an assigned `workflow-bug-fix` round only for a semantically admitted bounded repair. First implementation or explicit production-mechanism replacement stays with an existing Implementation node or requires Plan correction; an unresolved mechanism returns to its decision owner. Another graph repair round requires a concrete review disposition under the same accepted repair contract and its owning execution context. Plan/Handoff records a final `known_bug_record` in graph mode; standalone Bug Fix keeps evidence-gated attempt history and unresolved conditions task-local without producing that exclusion card. This Workflow consumes graph records and never produces them.
-- When node/Coordinator identity is supplied, return the Core `implementation_result` item from `references/execution_item_view.md`: changed snapshot/artifacts, implemented conditions, bounded review slice, and unresolved conditions. Never choose the review or successor node.
+- If a material semantic completion claim otherwise depends mainly on code and checks produced by the same agent, apply `references/execution_assurance_contract.md` in `standard` mode.
+- On `repair_required`, reapply C0 to the positive work. In a graph, return an owner-kind mismatch for Plan correction instead of consuming a mismatched Bug Fix round.
+- When node/Coordinator identity is supplied, return the Core `implementation_result` from `references/execution_item_view.md` with the changed snapshot/artifacts, implemented conditions, review slice, and unresolved conditions. The Coordinator selects successors and records final Known Bugs.
 
 ## Output Contract
 Return only the sections needed:

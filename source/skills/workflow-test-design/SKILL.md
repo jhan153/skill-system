@@ -119,12 +119,7 @@ description: Design an implementation-ready software test contract after a minim
 - produces: `references/core-execution-items-v1/cards/test_design_result.md`
 - consumes: `references/core-execution-items-v1/cards/implementation_result.md`
 
-## Stage Boundary
-
-Apply `references/testing_stage_contract.md`. This Workflow owns one Test Design node or direct
-design artifact. It may use narrow testing specialists for already identified subquestions, but it
-does not automatically run a skill chain, start Test Implementation, edit Plan/Handoff, select a
-successor, or wait for Human Test.
+## Design Basis
 
 Test Design begins after a minimum executable SUT or accepted external contract exists. It does
 not require an exact output oracle: authoritative invariants, metamorphic relations, differential
@@ -138,31 +133,24 @@ conditions. Current implementation output remains observation unless accepted by
    non-goals. State one positive plus one material negative, edge, or falsifying condition.
 2. Build a multi-axis test profile instead of assigning one overloaded test label: execution
    mode, level, purpose, design technique, change relation, data/oracle strategy, environment, and
-   horizon. Use `test-scope-selection` only when this boundary/profile is materially open.
+   horizon.
 3. Derive the smallest scenario set that discriminates the conditions. Preserve real input/data
-   provenance and production validation/canonicalization. Use `test-scenario-design` or
-   `test-replay-corpus` only for a distinct scenario or corpus problem.
+   provenance and production validation/canonicalization.
 4. Bind each condition to an oracle authority and proof ceiling. Prefer exact or invariant
    authority where valid; use metamorphic, differential, statistical, golden, or direct human
-   judgment only under their actual contracts. Use `test-oracle-design` or
-   `test-statistical-oracle` when those choices are material. A visual-regression subquestion uses
-   `test-visual-regression` only in frozen `design` mode and returns no capture, diff, or condition
-   verdict.
+   judgment under their actual contracts. Keep a visual-regression subquestion in frozen `design`
+   mode.
 5. If one named condition requires a human-owned judgment that admitted evidence cannot resolve,
-   prepare the complete Discovery request required by `references/testing_stage_contract.md` and
-   invoke `plan-test-discovery`. Send one question and yield without polling. In an approved graph,
-   resume only after `plan-execution-handoff` pins the decided IDs through an explicit Plan revision,
-   synchronizes Handoff, and delivers the resume follow-up. Direct or still-proposed work may resume
-   from a decided record within its unchanged accepted envelope. Never reinterpret an open/assumed
-   row as authority.
+   prepare the Discovery request below and invoke `plan-test-discovery`. Apply the interrupt and
+   resume rules in `references/testing_stage_contract.md`; consume only decided rows within their
+   accepted scope.
 6. Specify testability prerequisites: inputs, clock/seed, viewport/assets, workload, repetitions,
    duration/state history, instrumentation, diagnostic artifacts, and accepted variability. When a
    runtime-debugging artifact is required, apply `references/runtime_debugging_contract.md` and bind
    the original trigger, capture mode/scope, exact target/build/symbol/device identity fields,
    expected perturbation, sensitive-data controls, and proof ceiling without prescribing a root
-   cause. When
-   the selected condition or human choice is empirical, a missing production hook, executable path,
-   or representative observation is a current testability gap. In contract-only design, record the
+   cause. When the selected condition or human choice is empirical, a missing production hook,
+   executable path, or representative observation is a current testability gap. In contract-only design, record the
    missing runtime surface as a later Test Implementation prerequisite and never claim runtime
    evidence or invent a test-only semantic model.
 7. Produce one bounded implementation handoff naming condition IDs, test-only write scope,
@@ -170,15 +158,15 @@ conditions. Current implementation output remains observation unless accepted by
    must challenge the implemented test. A runtime-debugging capture freezes its trigger, probe or
    capture location/range, commands, identity fields, and stop rule; any observation-dependent change
    becomes a Runtime Debugging handoff rather than hidden adaptive Test Implementation.
-8. Read back every designed condition against its basis and actual or accepted contract path. Emit Core
-   `test_design_result` in graph mode; never claim that the test exists or the product passes.
+8. Read back every designed condition against its basis and actual or accepted contract path. Emit
+   Core `test_design_result` in graph mode.
 
 ## Discovery Request Gate
 
-Discovery is not a fallback for low confidence. Invoke it only when a choice belongs to a human or
-declared domain authority and changes verdict, proof ceiling, accepted uncertainty, or qualitative
-judgment. Supply blocked condition IDs, target snapshot, current evidence, 2–4 exclusive options,
-their detection/miss tradeoffs, recommendation, and independent work remaining.
+For each unresolved choice requiring human or declared domain authority and affecting verdict,
+proof ceiling, accepted uncertainty, or qualitative judgment, supply blocked condition IDs, target
+snapshot, current evidence, 2–4 exclusive options, their detection/miss tradeoffs, recommendation,
+and independent work remaining.
 
 If the answer changes the positive outcome, production owner/boundary, DAG, or completion oracle,
 stop the current design and require a sibling Plan through Scope Admission. A tolerance, baseline,

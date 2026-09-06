@@ -66,8 +66,7 @@ Choose from the condition, not repository fashion:
 4. Define equivalence, tolerance, masking, aggregation, baseline update, and unavailable-result
    rules. Use `test-statistical-oracle` when repeated/ensemble inference is material.
 5. If a human-owned choice changes verdict or accepted uncertainty and evidence cannot settle it,
-   return a complete `plan-test-discovery` request candidate. Do not ask the human directly from
-   this specialist or invent the answer.
+   return a complete `plan-test-discovery` request candidate.
 6. Return one oracle contract and one defect/falsifier it must detect. If no oracle is defensible,
    classify the surface as observation/diagnostic capture rather than a Pass/Fail test.
 

@@ -35,10 +35,6 @@ disable-model-invocation: true
 
 ## Decision Contract
 
-When the working-state condition applies, consume the shared source/constraint/freshness and
-correction semantics. This skill still owns its one-question limit, actual-path admission, and
-optional existing decision record; the shared envelope grants no persistence or acceptance.
-
 Own one `one_shot` decision turn within `core_capability_available -> next_vertical_slice_decision_ready`. The conversation may continue with another explicit turn, but no persisted plan state, implementation approval, operability, validation, or release completion follows automatically.
 
 When an Execution Handoff package is bound, record each delta in
@@ -67,5 +63,3 @@ For irreversible/high-risk choices—persistent data, topology mutation, externa
 ## Output And Handoff
 
 During the interview, return current evidence, the one question, and the latest delta when useful. At stop or explicit artifact request, return a compact `behavior_decision_record`: capability snapshot, next user path, decisions/open deferrals, observable acceptance/falsifiers where required, implementation handoff, and remaining productization gaps. In package-bound mode, persist that shape with [Behavior Decision Record](references/behavior-decision-record.md) and return its path/status.
-
-Hand selected code work to `workflow-implementation`; explanation needs to `report-implementation-explainer`; use `plan-requirements-discovery` when no concrete capability/path exists. Before returning, confirm one active decision, an underlying evidence anchor, risk-proportional admission, observable options, and the next-slice stop. Emit no quiz score, `understood` flag, implementation permission, or release claim.

@@ -77,7 +77,7 @@ This system is designed to treat repetitive AI work as skills that can be select
 
 ## Operating Model
 
-This system does not handle every task through one large prompt. It interprets the request, uses a directly named or clearly matching specialist, opens one narrow router only for genuine ambiguity, and improves from problems the user reports during real use. Authored scenarios remain regression material, not field-quality evidence.
+This system does not handle every task through one large prompt. It interprets the request, uses a directly named or clearly matching specialist, opens one narrow router only for genuine ambiguity, and improves from problems the user reports during real use. Each task uses the evidence required by its active contract; ordinary completion does not run a central skill-evaluation suite.
 
 ```mermaid
 flowchart TB
@@ -89,7 +89,7 @@ flowchart TB
 
   subgraph S[Skill Execution]
     E --> F[Execution]
-    F --> G[Validation]
+    F --> G[Task-Scoped Evidence]
     G -- Needs revision --> E
   end
 
@@ -97,19 +97,16 @@ flowchart TB
 
   subgraph K[Operational Assets]
     R[Skill Registry]
-    V[Evaluation Cases]
     L[Change History / Feedback]
   end
 
   R -. Reference .-> C
   R -. Reference .-> D
-  G -. Quality Check .-> V
   H -. Preserve only needed records .-> L
-  V -. Improvement Evidence .-> R
   L -. Improvement Evidence .-> R
 ```
 
-The key idea is to treat skills not as prompt fragments, but as operational units that can be selected, executed, validated, and improved. A request is first interpreted, then routed to an appropriate skill using the registry. During execution, planning and validation may repeat as needed. After completion, the result is reported and only the necessary records are preserved.
+The key idea is to treat skills not as prompt fragments, but as operational units that can be selected, executed, validated, and improved. A request is first interpreted, then routed to an appropriate skill using the registry. The active task owner selects the applicable evidence and repeats a check only after a change or inconclusive result. After completion, the result is reported and only the necessary records are preserved.
 
 This structure keeps skills from becoming disposable instructions. Instead, they remain reusable work units that can be inspected and improved over time.
 

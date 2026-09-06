@@ -57,14 +57,11 @@ Rank moves that remove caller knowledge/change surface, return policy, isolate p
 2. Trace callers, production owner, side effects, and boundary contract. Seek a counterexample; deduplicate symptoms sharing one ownership cause.
 3. Rank only established improvements. Without actual-path evidence, label `Unverified hypothesis`, make no top recommendation, and request one discriminating observation.
 
-## Evidence And Ownership
-- Semantic authority: user decisions, canonical sources, external contracts, formal invariants, or observed behavior. Agent-authored tests preserve established contracts; they neither define nor independently prove them.
+## Evidence
 - Adapters translate; canonical-source, domain, failure, and fallback policy stay with the production owner. Source selection, migration, media/data transformation, external-boundary, and adapter changes require actual-path readback.
-- Record the narrowest decisive scope: inventory for classification/exclusion, structural for exact structure, path for owner/caller/wrapper duties, runtime for execution, and semantic for authoritative readback. Mocks prove only their boundary.
+- Record the narrowest decisive scope: inventory for classification/exclusion, structural for exact structure, path for owner/caller/wrapper duties, runtime for execution, and semantic for authoritative readback.
 - Preserve wrappers enforcing security, lifecycle, protocol/retry ordering, or anti-corruption rules. Collapse only when representative callers and the real path prove pure delegation.
 - A proven removal/deepening opportunity is itself a ranked candidate; identify that option rather than returning no candidate.
-- Exclude generated/vendor/migration churn without matching pressure in canonical owners and production callers.
-- History controls attention, not verdicts. Change frequency without owner/path friction stays out of the ranking; direct current evidence can admit a path regardless of its change frequency.
 
 ## Coverage, Ranking, And Stop
 Track the scope decision, recent-history window when used, change-weighted priority paths, material groups, enumerated/inspected counts, selection reason, evidence scope, confidence, exclusions, and gaps. Coverage means representative evidence, not every file.
@@ -99,7 +96,3 @@ Return only:
   live restructuring, `workflow-source-maintenance` for selected proven-obsolete deletion, or
   `workflow-implementation` for selected behavior changes whose architecture is already accepted
 - `unverified_gaps`
-
-This skill may identify and rank the next change question, but it never starts implementation,
-refactoring, deletion, or plan execution. Hand the selected candidate to its named Workflow. Do not
-generate a repo-wide report or expand the shortlist into an exhaustive backlog.

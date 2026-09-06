@@ -44,27 +44,6 @@ description: Create a concrete, inspectable UI design from accepted requirements
 
 - produces: `references/core-execution-items-v1/cards/design_result.md`
 
-## Stage Boundary
-
-Apply `references/design_stage_contract.md`. This workflow owns the visual design artifact only;
-it never starts implementation or evidence stages. Apply `references/design_evidence_contract.md`
-to every source and proposed decision without turning the design artifact into implementation
-evidence.
-
-## Design Authority
-
-- Own visual and interface decisions only inside accepted product behavior, content, platform, and
-  scope. Product strategy, missing requirements, business policy, and backend behavior remain with
-  their current owners.
-- Use authoritative brand, product-family, token, component, and asset sources when they exist. If
-  the user delegated visual creation and those sources leave a choice open, make one explicit
-  `proposed_design_decision` tied to the target's hierarchy, content, task, platform, and state;
-  never disguise a factory default as sourced intent.
-- Produce one resolved direction by default. Create alternatives only when the user asks for a
-  comparison or an unresolved decision genuinely needs a discriminator.
-- Do not start `design-frontend`, an evidence gate, or another DAG node. A design artifact is input
-  to implementation, not permission or evidence that implementation exists.
-
 ## Workflow
 
 1. Bind the target surface, accepted behavior, content, primary task, platform, required states and
@@ -77,10 +56,11 @@ evidence.
    lower-authority source.
 3. Establish information hierarchy and composition: primary content/action, regions, navigation,
    density, fixed/flexible/scroll zones, responsive order, and text/overflow risks.
+   Produce one resolved direction unless a requested comparison or unresolved decision needs alternatives.
 4. Design the visual system needed by the target: typography, color, spacing, sizing, radius,
    elevation, iconography, imagery, component language, interaction cues, and motion intent. Reuse
    supplied systems; when creating a direction, make each material choice purposeful and traceable
-   rather than filling the screen with generic chrome.
+   as a `proposed_design_decision` tied to the target's hierarchy, content, task, platform, and state.
 5. Design the required frames and states. Include only material default, loading, empty, error,
    disabled, validation, success, focus/selection, permission, or recovery states supported by the
    accepted behavior. Define required mobile/desktop/native variants without pretending one frame
@@ -90,10 +70,8 @@ evidence.
    states; never claim a Figma or native design-tool artifact that was not actually created.
 7. Inspect the artifact against the accepted behavior, brand/family sources, content hierarchy,
    required states/viewports, text fit, component/token intent, and obvious accessibility needs.
-   This is design readback, not production visual regression or Human Test.
 8. Return the design artifact, decision summary, implementation handoff, explicit assumptions and
-   unresolved decisions. In graph mode, emit `design_result`; never select the implementation or
-   successor node.
+   unresolved decisions. In graph mode, emit `design_result`.
 
 ## Artifact Contract
 

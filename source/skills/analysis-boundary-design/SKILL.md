@@ -126,8 +126,6 @@ may inform hypotheses but is not binding authority and cannot yield architecture
   cross-view interaction, expands the accepted architecture delta, or moves another view/owner,
   surface the conflict. The multi-view coherence and acceptance decision remain with
   `workflow-architecture-design`.
-- Hand implementation only an atomic decision that preserves the accepted architecture. A deferred
-  conflict returns to Architecture Design and never becomes implementation authority.
 
 ## Paradigm Decision Routing
 
@@ -151,7 +149,7 @@ lifecycle, cost visibility, and readback to the matching execution owner.
 ## Abstraction Gate
 Approve only when callers lose more knowledge than the surface adds, an invariant or external volatility is contained, independently evolving work is materially separated, costly production behavior becomes observable, or policy returns to its owner. The independence gained must outweigh the boundary cost recorded by the shared contract. Defer pass-through layers, speculative reuse, duplicate patterns, test/mock-only interfaces, and separation that obscures cause and effect.
 
-Adapters translate protocols, wire shapes, and representations. Canonical source, domain policy, fallback, migration truth, and failure policy stay at the production/domain owner on one authoritative path. A mock proves only its boundary.
+Adapters translate protocols, wire shapes, and representations. Canonical source, domain policy, fallback, migration truth, and failure policy stay at the production/domain owner on one authoritative path.
 
 ## Evidence Budget and Stop Rule
 - Treat names, directory shape, counts, and imports as leads, not proof.
@@ -166,11 +164,3 @@ whose optional `paradigm_constraints` is the sole paradigm/model authority for a
 `atomic_boundary`; current owner/evidence; candidate moves including `keep_local`; gate result;
 recommendation; implementation/validation or architecture handoff; and material risks or
 `unverified_gaps`. Never return a rewritten `architecture_design` or parallel paradigm record.
-
-## Boundaries
-- `workflow-architecture-design` owns a normative design when several module, data/state,
-  runtime/failure, integration, deployment, or trust boundaries must be selected coherently. This
-  skill may supply one architecture-conforming `boundary_decision` for an explicitly atomic target
-  but never widens a one-boundary request into a whole-system architecture exercise or changes
-  accepted multi-view coherence.
-- `analysis-architecture-deepening` ranks opportunities; `analysis-domain-modeling` owns business meaning and may supply the semantic fields of the shared `boundary_decision`; preserve established meaning and surface conflicts rather than silently redefining it. `analysis-codebase-map` owns descriptive Mermaid HLD/LLD maps. An uncertain failure cause routes to `workflow-runtime-debugging` for an explicitly requested execution-ready debugging scope or material debugger/dump/dynamic/graphics evidence lane; simple source/log-only diagnosis stays with the current task owner, and only a semantically admitted bounded same-contract repair stays with `workflow-bug-fix`. A known feature or accepted production-mechanism replacement routes to `workflow-implementation` and a selected refactor to `workflow-refactor-safely`; those implementation owners may write when requested. Do not turn one decision into a cleanup backlog or completion claim.

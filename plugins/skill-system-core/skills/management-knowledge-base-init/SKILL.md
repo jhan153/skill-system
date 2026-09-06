@@ -35,4 +35,4 @@ description: Initialize a minimal navigable project Knowledge Base of Markdown r
 Keep typed relations, observation events, and semantic revisions embedded in their owning Markdown record. Initialization never creates claim/edge/event databases or a derived graph cache.
 
 ## Output
-Report created/preserved paths, manifest readback, and any reinit or persistence uncertainty. Initialization is storage setup, not knowledge creation.
+Report created/preserved paths, manifest readback, and any reinit or persistence uncertainty.

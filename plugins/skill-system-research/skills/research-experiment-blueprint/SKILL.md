@@ -33,14 +33,9 @@ description: Turn one selected hypothesis into the smallest identifiable, reprod
     - credentials/private datasets default deny
 - entry_scene: PREPARE
 
-## Stage Boundary
-Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
-intent, or Plan/Handoff mapping matters. This skill owns the protocol only. A missing selected
-claim remains an explicit upstream gap owned by `research-hypothesis-planning`; do not invoke that
-stage or produce a generic blueprint.
-
 ## Identification Workflow
-1. Rewrite the claim as intervention → mechanism → observable outcome, with scope and falsifier.
+1. Rewrite the selected claim as intervention → mechanism → observable outcome, with scope and
+   falsifier. If no claim is selected, return that gap before drafting a protocol.
 2. Define the experimental unit, sampling/analysis unit, treatment, control, frozen factors, dependence, and leakage risks.
 3. Reuse a suitable checkpoint or baseline; new training requires a decision-relevant gap it cannot answer.
 4. Select data and metrics for the mechanism. Record provenance, access/license, split integrity, representativeness, contamination, metric definition/direction, uncertainty, relevance, and failure modes.
@@ -57,8 +52,7 @@ stage or produce a generic blueprint.
 
 For a selected binary A×B interaction, predeclare the difference between B's effect at the two A
 levels and the four necessary combinations; hold unrelated data/preprocessing/metric choices fixed.
-For B's effect at one fixed A level, retain the simpler B contrast. Neither case authorizes extra
-hypotheses, irrelevant ablations, or training beyond the gap that the existing baseline cannot answer.
+For B's effect at one fixed A level, retain the simpler B contrast.
 
 ## Output
 Answer a narrow design question with the decisive choice and falsifier. For an explicit artifact, include only:
@@ -69,6 +63,6 @@ Answer a narrow design question with the decisive choice and falsifier. For an e
 - support/refute/inconclusive plus stop/go, compute, provenance, and reproduction rules
 - unresolved evidence checks
 
-## Completion Boundary
-- Complete only when the outcome can distinguish the claim from credible alternatives and every material contract is evidenced or explicitly unverified.
-- Do not generate scaffold code, execute experiments, calculate results, or imply success before evidence.
+The outcome must distinguish the claim from credible alternatives, with every material contract
+evidenced or explicitly unverified. Read `references/research_stage_contract.md` when
+upstream/downstream ownership, multi-stage intent, or Plan/Handoff mapping matters.

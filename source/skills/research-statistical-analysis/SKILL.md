@@ -31,11 +31,6 @@ description: Analyze real experimental data or supplied statistics with an expli
 ]
 ```
 
-## Stage Boundary
-Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
-intent, or Plan/Handoff mapping matters. This skill owns statistical analysis or a clearly labeled
-analysis plan only; it never starts data acquisition, experimentation, or manuscript writing.
-
 ## Analysis Contract
 1. Fix the question, estimand, treatment/comparator, outcome scale, and experimental, sampling, and analysis units before selecting a method. Establish independent, paired, repeated, or hierarchical structure and planned versus exploratory status.
 2. Bind computation to the named canonical data/version and record provenance, row counts, exclusions, and transformations. Missing or mismatched canonical results fail closed; never substitute a stale source silently.
@@ -47,3 +42,6 @@ analysis plan only; it never starts data acquisition, experimentation, or manusc
 If `n`, the analysis unit, dependence, or adequate data are missing, return the supported descriptive facts plus the required-data analysis plan. Preserve supplied estimates and intervals as attributed facts, but keep their inferential meaning unverified. Do not fabricate p-values, effects, intervals, or conclusions; summary statistics support only identifiable quantities.
 
 Lead with the answer and uncertainty. Add provenance, estimand/design, method rationale, assumptions/missingness, multiplicity, practical interpretation, and limitations only when relevant; avoid a fixed report shell for a single supplied estimate.
+
+Read `references/research_stage_contract.md` when upstream/downstream ownership, multi-stage intent,
+or Plan/Handoff mapping matters.

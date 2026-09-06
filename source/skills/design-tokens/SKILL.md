@@ -83,13 +83,6 @@ owns production UI code or a later Design stage.
 ]
 ```
 
-## Stage Boundary
-
-Apply `references/design_stage_contract.md`. Close only the assigned token authority, mapping, or
-gap condition. A result from this skill does not start component mapping, implementation, visual
-review, or accessibility review. Use `references/design_evidence_contract.md` for evidence labels
-and proof ceilings.
-
 ## Workflow
 1. Pin source pointers and declared authority. When an applicable product-family profile exists,
    apply `references/product_family_design_contract.md`. Use a declared canonical source;
@@ -102,10 +95,8 @@ and proof ceilings.
    readback only when that correction stays inside the explicitly authorized token-artifact or
    registry write scope. If it requires a UI consumer, provider/import selection, or another module
    outside that scope, return the exact consumer/source pointers, expected versus selected source,
-   required correction, and owning-module handoff without editing it or invoking its owner. A parser
-   inventory, mock, or generated file proves only its boundary.
-5. Return the scoped mapping, decisive evidence, and unresolved items. Name the relevant owner only
-   as a handoff hint; do not invoke it or claim UI completion from token readiness.
+   required correction, and owning-module handoff.
+5. Return the scoped mapping, decisive evidence, and unresolved items.
 
 ## Output
 For a narrow question, return only the mapping, conflict, or gap in scope. For an explicit inventory/export artifact, use the shape in `references/token-normalization.md` and omit empty fields.
@@ -115,6 +106,3 @@ For a narrow question, return only the mapping, conflict, or gap in scope. For a
 - Never fill a token gap with indigo/violet, Inter/Space Grotesk, or a framework semantic rainbow. A sourced brand, including a purple identity, stays.
 - Report parser failure with path/error. `scripts/inspect_tokens.py` is a read-only inventory aid, not correctness or design-system proof.
 - Keep subjective palette critique separate from verified mismatch. Screenshot values and visual taste are not token authority.
-- Do not broaden one surface into a redesign or exhaustive catalog. Accessibility contrast belongs to `design-a11y-audit`; visual, component-state, repo, and user-visible validation remain separate gates.
-- An unavailable token source affects only the assigned token condition. It does not block an
-  unrelated node or authorize a substitute palette, alias, or source.

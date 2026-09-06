@@ -47,16 +47,10 @@ description: Narrow a raw research premise into one falsifiable claim and the ch
 ]
 ```
 
-## Stage Boundary
-Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
-intent, or Plan/Handoff mapping matters. This skill owns one claim and discriminator only. Research
-vocabulary inside coding work does not change the route, and completing this plan never starts a
-blueprint, scaffold, implementation, or evidence-search stage.
-
 ## Workflow
 1. Label each premise `supported`, `user_hypothesis`, `unverified`, `overgeneralized`, or `needs_current_evidence`; never invent literature, novelty, or results.
 2. Define one target with scope, intervention, mechanism, observable prediction, and falsifier. Request missing essentials instead of emitting a large plan.
-3. Keep two rival explanations until one observation separates their predictions. Mark broad field/dataset/model claims as non-assumptions. When current paper evidence is missing, name the evidence gap and `search-paper-evidence` as its owner without invoking it automatically.
+3. Keep two rival explanations until one observation separates their predictions. Mark broad field/dataset/model claims as non-assumptions and identify missing current paper evidence.
 4. Choose the cheapest Stage-0 discriminator: checkpoint/baseline evaluation, re-scoring, error analysis, or dataset/label audit. Train only for a gap Stage 0 cannot resolve.
 5. Keep one claim and choose the minimum factors, levels, and predeclared contrasts that can identify it. For a single main-effect question, change that factor and freeze the rest. If the claim is an interaction, compare the focal effect across only the other factor levels needed to distinguish that interaction; do not freeze away the question being asked. Defer unrelated architecture, data, schedule, ablations, and extra hypotheses.
 6. Predefine metric plus support, refute, and inconclusive signals.
@@ -65,15 +59,12 @@ blueprint, scaffold, implementation, or evidence-search stage.
 - Separate primary objective, auxiliary loss, regularizer, evaluation metric, and diagnostic metric; “more training/losses” is not a mechanism.
 - An auxiliary term needs a mechanism and its own ablation.
 - Each ablation names changed and frozen factors, predicted signal, and failure interpretation.
-- An interaction contrast may use several factor combinations while testing one claim; it is not
-  permission for a broad factorial search or new training when Stage 0 can discriminate the claim.
 - Do not invent an empirical effect, variance, or sample size to make the discriminator look ready.
   Preserve those evidence gaps for the protocol owner.
 
 For example, a main effect of loss B with augmentation A fixed keeps a one-factor contrast.
 The claim that A changes B's effect instead needs the same B contrast at the necessary A levels;
 for two selected binary factors, the four A/B combinations can identify that one interaction.
-Do not add further factors or independent hypotheses merely because those combinations are present.
 
 ## Output
 For a small premise, lead with testability and the cheapest falsifier. An explicit plan includes only:
@@ -83,6 +74,6 @@ For a small premise, lead with testability and the cheapest falsifier. An explic
 - Stage-0 baseline/checkpoint check
 - minimal identifying factors/levels/contrasts, frozen factors, metric, three outcomes, and deferred backlog
 
-## Completion Boundary
-- Complete only when the claim is narrower than unsupported premises, falsifiable, and paired with the cheapest discriminator.
-- Hypothesis planning does not prove the claim, complete experimentation, write implementation, or authorize a positive conclusion.
+The claim must be narrower than unsupported premises, falsifiable, and paired with the cheapest
+discriminator. Read `references/research_stage_contract.md` when upstream/downstream ownership,
+multi-stage intent, or Plan/Handoff mapping matters.

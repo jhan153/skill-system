@@ -44,29 +44,10 @@ description: Resolve human-owned test-basis, oracle, tolerance, baseline, horizo
   sensitive_resources: private data and external systems require their governing access and redaction boundary
 - entry_scene: PREPARE
 
-## Boundary
-
-Apply `references/testing_stage_contract.md`. This skill owns the missing judgment only. It does
-not own the enclosing Test Design node, create an executable DAG node, choose a successor, edit
-Plan/Handoff, implement a test, or claim that a human decision verifies the product.
-
-Use exact neighboring owners:
-
-| Open question | Owner |
-|---|---|
-| what the product must do | `plan-requirements-discovery` or accepted requirements owner |
-| how a person uses or observes an existing capability | `plan-behavior-discovery` |
-| which algorithm or technical approach fits | `analysis-algorithm` |
-| how a named behavior will be judged, including tolerance or accepted uncertainty | `plan-test-discovery` |
-| scenario/data/oracle/environment synthesis after decisions close | `workflow-test-design` |
-| test-only code and execution | `workflow-test-implementation` |
-
 ## Discovery Admission
 
-Implicit invocation is allowed only as conditional support from an active `workflow-test-design`
-that supplies the complete Discovery request below. Standalone Discovery requires an explicit user
-request. Generic uncertainty, a missing request payload, or an unbound condition never starts an
-implicit interview.
+For implicit support, require a complete Discovery request from an active `workflow-test-design`;
+standalone Discovery requires an explicit user request.
 
 Admit a decision only when all are true:
 
@@ -103,13 +84,9 @@ production, prototype, or contract owner instead of asking a person to invent it
    rejected alternatives when their future reuse would be unsafe.
 6. Mark the record `decision_ready` only when every decision required for its declared consumed
    scope is `decided`. Unrelated open items may remain visible but are not authoritative.
-7. When an approved graph is bound, do not resume Test Design from the file write alone. Send one
-   `escalation` containing the decision-record path/status, request and decision IDs, blocked
-   condition IDs, source anchors, and requested continuation. `plan-execution-handoff` must apply
-   Scope Admission, pin the consumed decision IDs and source anchors through an explicit Plan
-   revision, synchronize Handoff, and only then deliver the resume follow-up. A changed objective,
-   owner/boundary, DAG, or completion oracle requires a sibling Plan. The Discovery owner emits no
-   `worker_done` while the originating Test Design node remains in progress.
+7. For an approved graph, send one `escalation` with the decision-record path/status, request and
+   decision IDs, blocked condition IDs, source anchors, and requested continuation. Apply the Plan
+   revision and resume rules in `references/testing_stage_contract.md`.
 
 ## Persistence
 
@@ -120,11 +97,8 @@ inline. With an exact package or associated plan, use only:
 <package-root>/inputs/test-decisions.md
 ```
 
-Create no placeholder Plan/Handoff or other input files. Use
-`references/test-decision-record.md`; the durable artifact contains decisions and evidence anchors,
-not a transcript. Only decided rows with named authority may constrain their named downstream Test
-Design conditions. Test Implementation consumes the completed Test Design contract or its own
-complete authoritative inline contract, never this Discovery record as a design substitute.
+Use `references/test-decision-record.md` to store decisions and evidence anchors. Only decided rows
+with named authority may constrain their named downstream Test Design conditions.
 
 ## Output Contract
 
@@ -141,6 +115,3 @@ decision delta. At stop or handoff, return only applicable fields:
 - `continuation`: `resume_same_node | plan_revision | new_plan`
 - `open_decisions`
 - persisted path/status when applicable
-
-Never report product Pass/Fail, test-design completion, implementation permission, or Human Test
-completion from this artifact.

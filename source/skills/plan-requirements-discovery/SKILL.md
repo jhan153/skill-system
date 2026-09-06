@@ -58,24 +58,11 @@ description: Run an explicitly requested requirements interview that models deci
 ]
 ```
 
-## Exact Route
-| Request | Owner |
-| --- | --- |
-| explicit requirements elicitation in dependency-aware question rounds | `plan-requirements-discovery` |
-| product behavior decision for a concrete existing capability/path | `plan-behavior-discovery` |
-| supplied answers to requirements contract | `plan-requirements-brief` |
-| stable requirements to implementation | `workflow-implementation` |
-| durable execution Plan/Handoff authoring or update | `plan-execution-handoff` |
-| governed multi-session implementation Plan/Handoff pair | `plan-execution-handoff` |
-| formal SDLC artifact/traceability package | `report-lifecycle-artifacts` |
-| one clarification or lightweight gap review | no skill; answer directly |
-
-Use exact owners. Keyword mentions of requirements or plans do not start an interview.
-
 ## State Boundary
+- Product behavior decisions for a concrete existing capability/path use `plan-behavior-discovery`.
 - When the working-state condition applies, use the shared contract for sourced hard/soft constraints, evidence/authority, freshness, and selective correction. Keep question pacing and discovery persistence with this skill; no second state record is created.
 - Own `scratch -> discovery`. Ask only for gaps that can change scope, acceptance, edge/failure behavior, data ownership, constraints, or non-goals.
-- Record an answer only when it resolves/narrows a gap. Discovery completion is not an accepted contract, active plan, implementation approval, or feasibility proof.
+- Record an answer only when it resolves/narrows a gap.
 - In package-bound mode, use `execution-handoff-inputs-v1` and update the one discovery record after each completed question round. `ready_for_distillation` authorizes Requirements Brief consumption only; it never authorizes execution.
 
 ## Interview Workflow

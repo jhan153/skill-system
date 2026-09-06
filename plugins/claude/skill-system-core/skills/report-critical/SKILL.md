@@ -35,23 +35,16 @@ disable-model-invocation: true
   sensitive_resources: credentials denied; redact sensitive evidence
 - entry_scene: PREPARE
 
-## Delivery And Ownership
+## Delivery
 
-Apply `references/report_delivery_contract.md`. Markdown is the substantive report. HTML may only
-project the same findings and evidence. A missing renderer never blocks the Markdown result.
-
-This skill reports; it does not repair, retry, run validation broadly, edit Plan/Handoff, select a
-successor, or become evidence merely because a report was rendered. A Plan-assigned QA result is
-local to that condition, and the Coordinator applies the existing edge.
+Apply `references/report_delivery_contract.md` for Markdown and optional matching HTML.
+A Plan-assigned QA result covers only its named condition.
 
 ## Modes
 
 - `blocker_report`: identify the most consequential supported blocker and one least-assumption
   action. Use only on explicit blocker-report intent.
 - `qa_gate`: judge the target's stated use against every material supplied or accepted criterion.
-
-Ordinary diagnosis stays with the current task owner and does not create a report artifact unless
-the user explicitly asks for one.
 
 ## Workflow
 
@@ -99,5 +92,3 @@ Lead with the decision, then include only applicable fields:
 - decision-changing missing information and limitations
 - exactly one next action or `none`
 - Markdown artifact link and optional HTML artifact link
-
-The next action is a recommendation, not a dispatch. Stop after delivering the report.

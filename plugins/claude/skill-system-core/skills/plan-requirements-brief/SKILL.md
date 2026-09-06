@@ -25,7 +25,7 @@ conflicting, or open material stays non-authoritative even when surrounding fact
 Project any required freshness/source meaning into this skill's existing contract fields, never
 into runtime `execution_contract` state or a separate working-state file.
 
-Own `discovery -> requirements_contract` only when goals, scope, non-goals, assumptions, and observable criteria need no invented product decision. Keep it `proposed` until accepted or explicitly adopted downstream; never relabel it as an active plan, feasibility proof, implementation readiness, or approval.
+Distill goals, scope, non-goals, assumptions, and observable criteria without inventing product decisions. Keep the contract `proposed` until accepted or explicitly adopted downstream.
 
 In package-bound mode, use `execution-handoff-inputs-v1`. `proposed` is review input only;
 `plan-execution-handoff` may treat the contract as scope/acceptance authority only after the named

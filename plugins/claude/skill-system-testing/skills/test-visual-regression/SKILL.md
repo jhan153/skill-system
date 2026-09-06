@@ -45,20 +45,12 @@ disable-model-invocation: true
 
 This skill answers whether rendered pixels/framing for a named state and viewport differ from an
 accepted testing baseline. `design-visual-regression` answers whether an implementation matches an
-exact design target or product-family visual language. One result never substitutes for the other.
+exact design target or product-family visual language.
 
 ## Mode Admission
 
-Lock exactly one mode from the explicit caller or assigned-node outcome before mode-specific work.
-If neither mode is selected or the request mixes them, return an unresolved mode-selection gap.
-Do not infer mode from tool availability, the presence of a rendered target, or the current stage.
-
-- `design` produces input for a later separately invoked implementation/evidence owner. It never
-  captures, compares, writes screenshots/diffs, or returns a condition verdict.
-- `evidence` consumes an already accepted visual-regression contract. A missing or mismatched
-  contract returns the exact design/authority gap; it never falls back to `design` or changes the
-  baseline, threshold, mask, state, viewport, or environment contract.
-- Completion in either mode never starts the other mode or another DAG node.
+Lock one explicitly selected mode. A missing or mixed selection returns a mode-selection gap;
+tool availability, a rendered target, or the current stage does not resolve it.
 
 ## Design Mode Workflow
 
@@ -74,15 +66,14 @@ Do not infer mode from tool availability, the presence of a rendered target, or 
    tolerance/mask authority, and pre-diff validity checks for nonblank content, dimensions, target
    state, framing, clipping/overflow, loading, and auth redirects.
 5. Define required baseline/current/diff artifacts, diagnostics, falsifier, unavailable behavior,
-   implementation handoff, and proof ceiling. Do not capture, compare, write evidence artifacts, or
-   return a verdict in this mode.
+   implementation handoff, and proof ceiling.
 
 ## Evidence Mode Workflow
 
 1. Pin the accepted visual-regression contract, condition, target/current snapshot, baseline
    identity, states/viewports/environment, controls, comparison rule, and artifact destinations.
 2. Refuse a missing, stale, unauthorized, or identity-mismatched contract/baseline before capture.
-   Return the exact design or authority gap without switching modes.
+   Return the exact design or authority gap.
 3. Capture or inspect only the contract-declared like-for-like images. Validate the prescribed
    nonblank, dimensions, target-state, framing, clipping/overflow, loading, and auth conditions.
 4. Apply only the frozen comparison rule, tolerance, regions, and masks. Do not invent a universal

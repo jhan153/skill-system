@@ -80,14 +80,10 @@ description: Produce an explicitly requested qualitative evaluation of an artifa
 ]
 ```
 
-## Delivery And Ownership
+## Delivery
 
-Apply `references/report_delivery_contract.md`. Markdown owns the substantive evaluation. HTML may
-improve navigation but cannot add criteria, findings, scores, or certainty. A missing renderer does
-not affect the evaluation result.
-
-This skill evaluates; it does not implement fixes, run broad validation, edit Plan/Handoff, select
-a successor, or become a blocker gate. A Plan-assigned evaluation closes only its named condition.
+Apply `references/report_delivery_contract.md` for Markdown and optional matching HTML.
+A Plan-assigned evaluation covers only its named condition.
 
 ## Evaluation Contract
 
@@ -130,5 +126,4 @@ For `DecisionBrief`, return the decision, criterion origins, zero to three mater
 next action, and material limits. For `FullOrRubric`, add only the accepted criterion/yardstick map,
 evidence map, detailed findings, counterexamples/tradeoffs, and limitations.
 
-Return the Markdown link first and optional HTML link second. The closing action is a recommendation,
-not a workflow transition. Stop after delivery.
+Return the Markdown link first and optional HTML link second.

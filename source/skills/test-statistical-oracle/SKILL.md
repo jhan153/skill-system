@@ -66,19 +66,18 @@ complete the design.
    seed variability is the risk.
 3. Choose repetitions/seed set/workloads from the required error sensitivity, tail behavior,
    runtime cost, and recurrence using the accepted contract or required representative observations.
-   Record the derivation and its assumptions; do not invent empirical variance or optimize the
-   selection against the current output until the test passes.
+   Record the derivation and its assumptions; do not optimize the selection against the current
+   output until the test passes.
 4. Define aggregation and uncertainty: mean/median, quantile/tail probability, interval, failure
    rate, distribution distance, trend/drift, or reference-relative rule. Include missing/timeout,
    outlier, warmup, multiple-comparison, and flaky-environment handling when material.
 5. Bind the threshold or comparison rule to canonical authority. If the acceptable tail risk,
    tolerance, or false-positive/negative tradeoff belongs to a human, return a complete
    `plan-test-discovery` request candidate with options grounded in the accepted contract and, for
-   empirical choices, the required representative observations; never choose it silently.
+   empirical choices, the required representative observations.
 6. Name a falsifier such as sign reversal, disabled constraint, zero iterations, excessive drift,
-   or distribution shift that the rule must detect. Contract-only design states the planned ensemble,
-   workload, environment, horizon, and later observation prerequisites without claiming a measured
-   result. Any observation-based claim remains limited to the ensemble actually observed.
+   or distribution shift that the rule must detect. Bound observation-based claims to the ensemble
+   actually observed.
 
 ## Output Contract
 

@@ -39,10 +39,9 @@ description: Cross-check a claim across explicitly needed evidence lanes, preser
 ```
 
 ## Activation Boundary
-Own acquisition only when two or more discriminating lanes are needed for the same claim. Send
-paper/citation-only work to `search-paper-evidence` when that owner is exposed; leave final
-synthesis, implementation, and ordinary analysis with their owner. Do not fan out merely because
-several sources exist, and do not require or install a sibling plugin to complete another lane.
+Use two or more discriminating lanes for the same claim; several sources alone do not require fan-out.
+Paper/citation-only work uses `search-paper-evidence` when exposed. Use available lane tools without
+requiring or installing sibling plugins.
 
 ## Evidence Model
 Record separate axes; never overload one `verified` label:
@@ -80,14 +79,14 @@ evidence-set form.
 5. Search for disconfirming evidence and alternative explanations.
 6. Collapse duplicate/dependent sources before weighing agreement.
 7. Preserve unresolved disagreement: one direct contradiction may outweigh many derivative mentions; no majority vote decides truth.
-8. Return the evidence set and named synthesis/review handoff, without performing that synthesis.
+8. Return the evidence set and named synthesis/review handoff.
 
 ## Output
 For one focused claim, return the strongest supporting and contradicting evidence, conclusion
 limits, and links. Multiple claims may remain a compact inline matrix. Only when the user explicitly
 requests a persisted evidence artifact, read `references/evidence-set.md` and write that
 provider-neutral shape. Conclusions are `supported | contradicted | mixed | insufficient`, with
-underlying records and uncertainty retained. No script or validator establishes the conclusion.
+underlying records and uncertainty retained.
 
 ## Validation
 - Every retained claim relation has an exact evidence locator and basis.

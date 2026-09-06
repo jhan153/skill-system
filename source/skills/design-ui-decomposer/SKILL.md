@@ -70,12 +70,6 @@ description: Decompose UI references into source-traced hierarchy, layout, patte
 ]
 ```
 
-## Stage Boundary
-
-Apply `references/design_stage_contract.md`. This skill owns decomposition only, never code,
-confirmed repo mapping, or another stage. Apply `references/design_evidence_contract.md` before
-adding source-specific decomposition limits below.
-
 ## Evidence Rules
 - Label each conclusion `observed`, `source_metadata`, `inferred`, or `unverified`.
 - A flat image proves visible pixels and spatial relationships only. It does not prove DOM nesting, offscreen content, scroll behavior, breakpoints, interaction behavior, reuse, or exact tokens/measurements.
@@ -92,7 +86,8 @@ adding source-specific decomposition limits below.
 4. Identify repeated patterns and one-off layout separately; list component/token candidates with their evidence basis.
 5. Record visible states, contract-required state gaps, responsive hypotheses, and validation needs without promoting them to observed facts.
 6. For multiple screens, analyze only the user-selected screen; never merge unrelated screens.
-7. Return component candidates that still need repo/catalog confirmation and the implementation-ready decomposition with their current evidence labels. Name the relevant owner when useful, but do not invoke it or claim the mapping is already confirmed.
+7. Return the decomposition with evidence labels, component candidates needing repo/catalog
+   confirmation, and missing or occluded evidence.
 
 ## Output
 For one screen or question, answer directly. Use this shape only for an explicit design-contract artifact; omit empty fields.
@@ -114,10 +109,3 @@ evidence:
   inferred: []
   unverified: []
 ```
-
-## Completion Boundary
-- A decomposition is complete only when every material claim has an evidence label and missing/occluded evidence remains visible.
-- This skill does not write code, verify rendered output, confirm component reuse, normalize tokens, certify accessibility, or claim user-visible implementation success.
-- If another owner will need this result, name the relevant component-confirmation or implementation
-  input as a handoff hint. Do not invoke `design-component-mapper` or `design-frontend`; read the
-  reference schema only when the explicit artifact needs its extra checklist.

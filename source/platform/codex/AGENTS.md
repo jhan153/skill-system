@@ -16,7 +16,7 @@
 
 ## Validation Scope And Evidence Budget
 - Verification is a termination condition, not a deliverable. Prefer one existing verifier or direct observation; rerun only after change or inconclusive evidence.
-- Plans store the intended verifier and latest decisive result, not logs/retries. Output-gate denial lowers the label; it grants no extra work.
+- Plans store the intended verifier and latest decisive result, not logs/retries.
 
 ## Decision And Edit Boundary
 - Ask when unresolved interpretation changes deliverables, write scope, safety, or validation. Otherwise make the smallest sufficient reversible change.

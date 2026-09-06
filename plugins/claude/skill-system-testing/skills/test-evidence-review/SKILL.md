@@ -66,13 +66,10 @@ Select only applicable risks:
    another observation is required, return the exact Runtime Debugging handoff.
 5. Return findings ordered by consequence. Name the current Test Design owner for semantic contract
    faults, Test Implementation owner for test-asset conformance, human authority for an open
-   judgment, or a production-defect candidate for Coordinator/direct-owner classification. Test
-   evidence alone never authorizes `workflow-bug-fix` or another production repair. Do not invoke
-   any owner.
+   judgment, or a production-defect candidate for Coordinator/direct-owner classification.
 
 ## Output Contract
 
 Return target/test snapshots, reviewed conditions, authority/path/oracle findings, scenario and
 environment findings, falsifier evidence, diagnostic/proof-ceiling findings, prioritized issues,
-credible evidence scope, unavailable evidence, and exact handoff owner. Do not emit a global
-quality score, release verdict, runtime root-cause verdict, successor, or repair action.
+credible evidence scope, unavailable evidence, and exact handoff owner.

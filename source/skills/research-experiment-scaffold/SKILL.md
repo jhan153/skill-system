@@ -31,19 +31,17 @@ description: "Project an approved experiment contract into a small repo-native w
 ]
 ```
 
-## Stage Boundary
-Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
-intent, or Plan/Handoff mapping matters. This skill owns only explicitly requested scaffold wiring.
-Its completion never starts training, analysis, manuscript writing, or real method implementation.
-
 ## Build Contract
-1. Require an approved contract or equivalent accepted slice that fixes the scaffold boundary, target repository, input/data interface, entry point, result envelope, and local smoke expectation. Keep an unresolved hypothesis or protocol field explicit and do not build the dependent wiring; name `research-experiment-blueprint` as the owner without invoking it automatically.
+1. Require an approved contract or equivalent accepted slice that fixes the scaffold boundary, target repository, input/data interface, entry point, result envelope, and local smoke expectation. Keep an unresolved hypothesis or protocol field explicit and leave its dependent wiring unbuilt.
 2. Inspect the target and nearest runnable pattern. Reuse its language, framework, dependencies, entry-point style, and result schema instead of creating a parallel tree.
-3. Create only the entry point, config loading, data-provider boundary, runner wiring, result/provenance envelope, and the smallest marked stub needed to keep those interfaces coherent. Real method, baseline, metric, dataset, and training implementation remain absent; an explicit request for them is separate `workflow-implementation` work or a separately accepted Plan node.
+3. Create the entry point, config loading, data-provider boundary, runner wiring, result/provenance envelope, and the smallest marked stub needed to keep those interfaces coherent. Leave real method, baseline, metric, dataset, and training implementation absent.
 4. Use one deterministic synthetic fixture or no-op reference component to exercise wiring without pretending to implement the experiment. It must enter through the declared data boundary and produce a clearly synthetic result or explicit not-implemented state.
-5. Run the narrowest local smoke through `config -> data boundary -> runner wiring -> result/provenance envelope`. Do not install, download, train, or block the scaffold merely because the real algorithm or data is not implemented.
+5. Run the narrowest local smoke through `config -> data boundary -> runner wiring -> result/provenance envelope`; intentionally absent algorithm or data implementation is not a scaffold blocker.
 
 ## Minimal Output
 Select only files needed to make the accepted wiring shape understandable and runnable. A marked method/data stub is allowed when it owns an immediate interface role; empty directories, speculative abstractions, dependency manifests, and broad test suites are not.
 
 Report the contract source, changed files, runnable entry point, smoke evidence or exact blocker, and intentionally unimplemented method/data/metric/training pieces. Verify only the exercised wiring path; scaffold existence or synthetic output is never an experimental result.
+
+Read `references/research_stage_contract.md` when upstream/downstream ownership, multi-stage intent,
+or Plan/Handoff mapping matters.

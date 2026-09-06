@@ -40,48 +40,30 @@ disable-model-invocation: true
 - produces: `references/core-execution-items-v1/cards/research_result.md`
 - consumes: `references/core-execution-items-v1/cards/research_result.md`
 
-## Ownership Boundary
-
-Apply `references/research_stage_contract.md`. The Plan or user selects the stage; this Workflow
-owns only the execution envelope for one node. The selected Research skill owns the scientific
-method and artifact rules. The Coordinator owns topology, Handoff mutation, successor selection,
-and graph termination.
-
-This is neither a stage classifier nor a lifecycle runner. It never infers a multi-stage chain,
-creates another Research node, delegates to several stage owners, waits for liveness, or replays a
-completed stage.
-
 ## Stage Admission
 
 Accept exactly one `research-*` specialist from the Research rows of the authoritative Stage
 Ownership table in `references/research_stage_contract.md`. Do not reinterpret Search evidence
 owners as managed Research stages.
 
-Paper acquisition and cross-lane search remain separately assigned evidence nodes. General method,
-data pipeline, training, or product code remains a separately assigned implementation node.
-
 If the stage is missing, ambiguous, unavailable in the host, or conflicts with the node output,
-return the exact unresolved selection through the current lifecycle channel. Do not choose a stage,
-run a neighboring stage, or produce a `research_result` for work that did not occur.
+return `not_produced` with the unresolved selection through the current lifecycle channel.
 
 ## Workflow
 
 1. Bind the node/scope identity, exact stage skill, accepted inputs, output artifact, write boundary,
    evidence ceiling, user checks, and non-goals. In graph mode, preserve `plan_ref` and `node_id`.
 2. Load only the selected stage instructions and the input slices they require. Treat prior
-   `research_result` cards as locators to their artifacts/evidence, not permission to change claims
-   or execute the next stage.
+   `research_result` cards as locators to their artifacts/evidence.
 3. Check the selected stage's required input. If a material prerequisite is absent or mismatched,
-   return `not_produced` with the exact missing input/current owner; do not manufacture an artifact
-   or substitute another stage.
+   return `not_produced` with the exact missing input/current owner.
 4. Execute the selected stage inside its scientific, data, tool, and write boundary. Preserve
    planned/executed/observed/interpreted distinctions and every stage-specific no-fabrication rule.
 5. Read back the produced artifact or inline result against the assigned scope and the selected
-   stage's output ceiling. Keep unresolved evidence, inconclusive results, and human judgment
-   visible without turning them into another node request.
+   stage's output ceiling. Scientific uncertainty may be a valid completed output when that stage
+   allows it; keep unresolved evidence, inconclusive results, and human judgment visible.
 6. When crossing a graph or owner boundary, emit one Core `research_result`. Otherwise return the
-   same compact fields directly. Never add a successor field, graph transition, retry, or Handoff
-   edits.
+   same compact fields directly.
 7. In worker lifecycle mode, send only the result item ID, selected stage, compact outcome,
    artifact/evidence anchors, unresolved inputs/user checks, and required one-time timing fields.
 
@@ -98,14 +80,3 @@ Return only applicable fields:
 - `unresolved_inputs`
 - `user_checks`
 - Core `research_result` when graph-mode or cross-owner identity is supplied
-
-The existence of a result means the assigned stage produced its bounded output. It does not prove
-a hypothesis, successful experimentation, publication readiness, Human Test, or permission to run
-another stage.
-
-## Completion Boundary
-
-Complete after one admitted stage returns its scoped result and readback. Missing stage identity or
-a missing prerequisite is `not_produced`, not a partial handoff. Scientific uncertainty may be a
-valid completed output when the selected stage allows it; the Coordinator alone applies the
-existing Plan edge.

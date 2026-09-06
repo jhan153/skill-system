@@ -50,7 +50,6 @@ description: Model the current repository or named slice as evidence-linked Merm
 - Otherwise, a named module, path, workflow, or runtime flow → `lld`. Model the slice's components and interfaces, plus detailed sequences and state transitions only when applicable and evidenced.
 - Do not emit both altitudes unless the user asked for both or the HLD map cannot be understood without one LLD inset.
 - A map is not a completeness claim. Unseen groups stay `Unverified`.
-- Generic codebase-analysis or report wording changes neither the altitude precedence nor the map-only output shape.
 
 ## Workflow
 1. Bind the inspection boundary and choose `hld` or `lld`: explicit altitude first, then the scope default. A user-named slice wins over repository history.
@@ -73,5 +72,3 @@ Return only:
 - a one-line reading of each diagram
 - `source_refs` per diagram
 - `unverified_gaps`
-
-Generic codebase-analysis/report wording still returns this map contract. Do not recreate the retired 10-chapter report, `findings.json`, `quality-gate-result.json`, or an improvement backlog. Route a selected boundary to `analysis-boundary-design`, a requested multi-view target design to `workflow-architecture-design`, and a selected change whose design is accepted to an implementation workflow.

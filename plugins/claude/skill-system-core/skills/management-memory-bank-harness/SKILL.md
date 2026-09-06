@@ -45,7 +45,7 @@ description: Read the smallest task-relevant record slice from a project Memory 
    `candidate` records separately as advisory/non-authoritative. Read deprecated records only for
    an explicit history/conflict question.
 5. Return the minimum sufficient summaries, source refs, applicability, exclusions, and material
-   conflicts. Memory never changes the current task owner or grants a write.
+   conflicts.
 
 ## Output
 

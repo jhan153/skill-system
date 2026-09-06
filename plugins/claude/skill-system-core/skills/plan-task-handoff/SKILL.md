@@ -30,18 +30,11 @@ Combine modes only when both needs are explicit. An artifact list or short sessi
 2. State non-goals and do-not-touch boundaries before splitting work. Reject a split whose coordination cost exceeds its execution value.
 3. For parallel work, assign non-overlapping lock scopes; serialize any shared-file changes. Give each task one concrete output and one validation owner. Copy canonical skill IDs already selected for that task into `selected_skills` and the worker instruction instead of asking the worker to rediscover them. When no skill was selected upstream, omit the field and let the worker use normal implicit routing; never invent an adjacent skill ID.
 4. For an artifact handoff, distinguish changed, not changed, validation done, remaining risk, user checks, and next owner.
-5. Label only observed evidence as `agent-verified`, `user-verification-needed`, `unverified`, or `blocked`; pure planning or response-shape decisions need no result label. A handoff packet never establishes implementation or completion.
-6. Do not invent agents, files, artifacts, checks, or evidence. Keep the result response-first and task-local; create no registries or event logs.
+5. Label only observed evidence as `agent-verified`, `user-verification-needed`, `unverified`, or `blocked`; pure planning or response-shape decisions need no result label.
+6. Keep the result response-first and task-local.
 
 ## Output Contract
 Return only the selected shape:
 - `goal_brief` and continuation note for `brief`; include `task_dag` only when requested
 - `task_cards` with applicable `selected_skills`, `lock_scopes`, `integration_owner`, and `validation_owners` for `multi_agent`
 - `changed_files`, `generated_artifacts`, `validation_evidence`, `user_verification_needed`, and `stale_followups` for `artifact_inventory`
-
-## Boundaries
-- Planning skills own plan creation and substantive plan state.
-- Execution skills own implementation and validation work.
-- Reporting skills own qualitative, critical, lifecycle, or diff reports.
-- A handoff propagates an upstream skill selection but does not make a new specialist decision merely to fill `selected_skills`.
-- This skill describes coordination evidence; it never creates system-wide finality.

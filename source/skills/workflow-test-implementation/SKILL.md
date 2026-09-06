@@ -120,13 +120,6 @@ description: Implement and execute a complete test contract as test-only code, f
 - produces: `references/core-execution-items-v1/cards/test_implementation_result.md`
 - consumes: `references/core-execution-items-v1/cards/test_design_result.md`, `references/core-execution-items-v1/cards/known_bug_record.md`
 
-## Stage Boundary
-
-Apply `references/testing_stage_contract.md`. This Workflow owns test-only implementation and the
-assigned scoped execution. It never changes production code, repairs a discovered production
-failure, edits Plan/Handoff, selects a successor, or performs Human Test. A test condition's
-verdict and this Workflow's completion are separate.
-
 ## Direct Admission Gate
 
 Test Design may be skipped only when all applicable fields are already authoritative:
@@ -141,7 +134,6 @@ Test Design may be skipped only when all applicable fields are already authorita
 - existing implementation surface or explicit permission for the bounded test-only assets.
 
 If any field needs a substantive choice, return `design_required` with the exact missing owner.
-Do not perform hidden Test Design inside this Workflow.
 
 ## Workflow
 
@@ -154,8 +146,8 @@ Do not perform hidden Test Design inside this Workflow.
 3. Implement the prescribed inputs, scenarios, oracle, environment/horizon controls, and
    diagnostics. Reuse production loaders, validators, canonicalizers, composition roots, or public
    boundaries named by the design; a test-only semantic model or bypass is a contract violation.
-   When visual evidence is assigned, invoke `test-visual-regression` only in frozen `evidence` mode;
-   a missing visual contract is `design_required`, never permission for hidden redesign.
+   When visual evidence is assigned, use frozen `evidence` mode; a missing visual contract is
+   `design_required`.
 4. Run the smallest condition-matched command or observation. Preserve expected/actual values,
    seed/state history, screenshots/diffs, traces/profiles/dumps, build identity, and selected-source
    readback required by the contract. For an accepted runtime-debugging capture, also preserve exact
@@ -164,40 +156,24 @@ Do not perform hidden Test Design inside this Workflow.
    only the accepted trigger, probe/location/range, commands, and capture scope mechanically. If the
    observation requires a new watchpoint, breakpoint, step, replay query, shader invocation, or
    capture range, stop and return the bounded evidence/handoff through `execution_summary` and
-   artifact/evidence refs. Capture does not authorize target-state mutation or a root-cause verdict.
+   artifact/evidence refs.
 5. Challenge the test with its named falsifier or semantic mutant when safe and authorized. A
    passing happy path without the required falsifier remains incomplete test implementation.
 6. Review design conformance: no weakened assertion, widened tolerance, reduced horizon, silently
    replaced baseline, masked meaningful variability, mock-substituted SUT, or implementation-derived
    expected result. Return a test-contract conflict instead of manufacturing Green.
-7. Apply the completion gate before reporting. A material design/authority/testability/environment
-   conflict, missing required test asset, or required falsifier that was not implemented and
-   attempted returns lifecycle `not_produced` with the exact gap and emits no Core card. When the
-   assigned implementation contract is complete, report condition results within their actual
-   path/environment/horizon and emit Core `test_implementation_result` in graph mode. A completed
-   test may honestly observe `fail|inconclusive|unavailable`; those condition verdicts are evidence
-   for the Coordinator or direct owner and never start repair automatically.
+7. Apply the completion gate below. For a complete implementation, report condition results within
+   their actual path/environment/horizon and emit Core `test_implementation_result` in graph mode.
+   Preserve observed `fail|inconclusive|unavailable` results.
 
 ## Completion Gate
 
-Core `test_implementation_result` means the assigned test-only implementation contract and required
-falsifier are complete, not that every condition passed. Non-material unresolved or optional
-conditions may remain explicit in the payload. A required missing oracle, target path, testability
-hook, environment, baseline authority, or falsifier makes the result `not_produced`; do not emit a
-partial card, weaken the contract, or relabel the missing obligation as a product failure.
-
-## Evidence Rules
-
-- A replay proves repeatable stimulation and observed output, not correctness without an oracle.
-- A screenshot proves visible pixels/framing for its state and viewport, not interaction,
-  semantics, accessibility, responsiveness, or business correctness.
-- A statistical result proves the declared metric under its recorded ensemble and decision rule,
-  not other seeds, workloads, horizons, or populations.
-- A mock, fake, fixture, or agent-authored expected value proves only its encoded boundary.
-- `coverage` shows execution of counted structure, not assertion quality or semantic correctness.
-- A debugger stop, dump, dynamic report, trace/replay, or graphics capture proves only its recorded
-  state/events under verified identity and capture scope. Testing preserves the artifact and a
-  bounded handoff; it does not infer the unique cause.
+Core `test_implementation_result` requires the assigned test-only contract to be complete and its
+required falsifier implemented and attempted, regardless of condition verdicts. A material
+design/authority/testability/environment conflict or missing required asset, oracle, target path,
+testability hook, environment, baseline authority, or falsifier returns `not_produced` with the
+exact gap and no Core card. Keep non-material unresolved or optional conditions explicit in the
+payload; distinguish missing implementation obligations from observed product failures.
 
 ## Output Contract
 

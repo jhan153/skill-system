@@ -44,11 +44,10 @@ Create a record only when the statement is accepted, project-specific, durable, 
 ## Workflow
 1. Bind `knowledge_root` and `knowledge_index` from the exact approved path or nearest `project-context.yaml`, and reuse both bound values for every record/index path. Missing or mismatched declarations are `unavailable`; never guess or scan for another store.
 2. Confirm acceptance, durability, category, scope, and the profile-specific evidence contract. For plan input, admit only accepted/current durable statements and exclude TODOs, estimates, chronology, rejected proposals, and speculative future state. Inspect the exact anchors and only the representative consumers or counterexamples needed to disconfirm the candidate.
-3. Search and classify overlap before assigning an ID. Route every existing identity to `management-knowledge-base-update` without writing a duplicate.
-4. For a new identity, create one full current envelope with the selected `category`, aliases/search anchors, scope, canonical refs, consumers, typed relations/observations when supported, and one `created` semantic revision.
-5. Add one navigable index row and read back the record, index, anchors, relations/history, provenance, consumers, and any supersession or conflict links.
+3. After overlap classification, assign the new identity an ID and create one full current envelope with the selected `category`, aliases/search anchors, scope, canonical refs, consumers, typed relations/observations when supported, and one `created` semantic revision.
+4. Add one navigable index row and read back the record, index, anchors, relations/history, provenance, consumers, and any supersession or conflict links.
 
 ## Output And Readback
 Report `category`, record ID, identity classification, accepted source/provenance root, record/index paths, anchor and relation readback, affected consumers, and unresolved conflicts. Do not emit the full store or claim that structural consistency proves the recorded knowledge true.
 
-Completion requires one new identity, all profile-required fields and anchors, the shared envelope, a matching index row, and target-only readback. Existing identities, missing anchors, unresolved acceptance, or unavailable stores remain no-write.
+Existing identities, missing profile-required fields or anchors, unresolved acceptance, or unavailable stores remain no-write.

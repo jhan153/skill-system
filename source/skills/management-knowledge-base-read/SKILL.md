@@ -55,7 +55,7 @@ description: Read a minimum task-relevant slice of a declared Knowledge Base, in
 7. Compare admitted records with current instructions and canonical repository/design evidence. Current verified source wins on conflict; preserve the losing record/path as stale or unresolved context when material.
 8. Follow direct `canonical_refs`, `evidence_refs`, or `verified_by` only as needed, then return vocabulary/rules/invariants/decisions/anchors/validation expectations by role rather than page-by-page summaries.
 
-Local Knowledge outranks generic model patterns within its verified scope. It does not override current user instructions or canonical source and does not replace the execution owner.
+Local Knowledge outranks generic model patterns within its verified scope.
 
 ## Output
 Return selected IDs, concise current statements, the traversed `source --relation--> target` path when used, canonical artifact anchors, recurrence dimensions when requested, conflicts/unverified items, and source record paths. Do not persist a context artifact unless explicitly requested.

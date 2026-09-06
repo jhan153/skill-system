@@ -36,12 +36,6 @@ description: Translate evidenced design layout constraints into bounded, code-re
     - private design sessions default deny
 - entry_scene: PREPARE
 
-## Stage Boundary
-
-Apply `references/design_stage_contract.md`. This skill owns layout rules only and never writes or
-claims production UI. Apply `references/design_evidence_contract.md` before the layout-specific
-proof limits below.
-
 ## Constraint Rules
 - Confirm only stated fields supported by explicit requirements, metadata, or repo source; cite conflicts.
 - Screenshots confirm visible relations only; exact values, breakpoints, offscreen behavior, hierarchy, and responsiveness remain `inferred` or `unverified`.
@@ -59,13 +53,7 @@ proof limits below.
 2. Classify axis, regions, fixed/flexible children, and size dependencies.
 3. Translate sizing, spacing, overflow, text-fit, and responsive order with evidence labels.
 4. State the chosen repo-system mapping and unresolved assumptions; keep alternatives separate.
-5. Return code-ready rules and the exact evidence still needed for rendered proof. Name another
-   owner only as a handoff hint; do not invoke it.
+5. Return code-ready rules and the exact evidence still needed for rendered proof.
 
 ## Output
 For a narrow question, return the decisive rule and assumptions. For an explicit multi-region contract, use the shape in `references/layout_constraint_contract.md` and omit empty fields.
-
-## Completion Boundary
-- Every material rule names evidence or remains inferred/unverified; exact and responsive claims need authoritative inputs.
-- This skill does not implement UI, prove rendered fidelity, create component APIs, choose product hierarchy, or claim user-visible success.
-- Read the optional map only when its extra mappings are needed.

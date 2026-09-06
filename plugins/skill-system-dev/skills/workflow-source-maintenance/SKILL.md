@@ -31,12 +31,6 @@ description: "Perform behavior-preserving source maintenance in one of two modes
 - `source_prune`: remove source proven obsolete, plus only deletion-required import/export/caller repair.
 - `comment_sync`: update or prune comments, docstrings, inline rationale, and TODO/FIXME markers only. Read [Comment Sync](references/comment-sync.md).
 
-Feature work and accepted production-mechanism replacement remain with `workflow-implementation`;
-only semantically admitted bounded same-contract repair belongs to `workflow-bug-fix`; reachable-code
-restructuring belongs to `workflow-refactor-safely`. Apply YAGNI/directness pressure inside those
-owners rather than attaching another skill. If maintenance exposes one of those needs, preserve the
-evidence and hand off rather than broadening this workflow.
-
 ## Common Workflow
 
 1. Lock the mode, target slice, canonical owner, behavior boundary, and generated/external projections.
@@ -44,7 +38,7 @@ evidence and hand off rather than broadening this workflow.
 3. Classify candidates and defer uncertainty. Absence of static references or a stale comment is a lead, not proof.
 4. Apply one coherent batch. Change the canonical owner, regenerate owned projections, and make no unrelated structural or behavior change.
 5. Run the narrowest discriminating existing check and review the diff. Actual-path evidence outranks static, mock, or agent-authored checks when source selection or a production boundary is material.
-6. Apply `references/execution_assurance_contract.md` only when its trigger is material; preserve this maintenance workflow as the sole mutation owner and reuse equivalent reachability/review/readback evidence.
+6. Apply `references/execution_assurance_contract.md` when its trigger is material, reusing equivalent reachability/review/readback evidence.
 
 ## Source-Prune Gate
 

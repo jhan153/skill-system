@@ -76,26 +76,6 @@ Do not silently switch binaries, build modes, targets, dumps, symbol sets, devic
 capture modes to obtain easier evidence. A comparison build or instrumented run is a distinct
 condition and never replaces the original optimized or production artifact.
 
-## Ownership And Result Boundary
-
-This Workflow owns the debugging scope and, in operate mode, runtime evidence acquisition and causal
-localization. It may operate the approved observation surface, but it does not edit source,
-implement instrumentation, create tests, repair the failure, edit Plan/Handoff, select a successor,
-or declare the repaired system correct. A supplied test failure is a trigger, not a root-cause
-verdict. A supplied stack is an interpretation candidate, not a complete causal history.
-
-In direct mode, return one task-local `debugging_result`. In graph mode, return the canonical Core
-`debugging_result` and stop; the Coordinator records it and follows only an existing Plan edge. A
-scope node may precede an operate node, and an operate result may be consumed by an already admitted
-Bug Fix node only when that node independently satisfies its review/round dispatch prerequisites and
-the typed edge already exists. Other next-owner handoffs remain recorded context for the Coordinator
-or direct owner rather than undeclared Core consumers. This Workflow never creates or selects a
-successor.
-When a semantically admitted bounded same-contract repair is primary from the start,
-`workflow-bug-fix` retains ownership and may apply the shared contract and selected detailed
-references inside its diagnosis. First implementation or explicit replacement of an accepted
-production mechanism remains with `workflow-implementation` even when this failure motivated it.
-
 ## Workflow
 
 1. Bind Workflow mode, original trigger, expected condition and authority, environment,
@@ -142,7 +122,7 @@ production mechanism remains with `workflow-implementation` even when this failu
 10. Return the bounded `debugging_result`. When repair is later requested, hand off the failure
     mechanism or causal statement, decisive evidence, implicated owner/path, original-signal
     verification target, and proof ceiling. When investigation instead establishes a progressing
-    cost/SLO bottleneck, return a performance handoff. Neither handoff invokes its owner.
+    cost/SLO bottleneck, return a performance handoff.
 
 ## Live-Control Safety
 
@@ -176,10 +156,8 @@ Use exactly one applicable causal status:
   mismatched; or
 - `trigger_not_observed`: the authorized run did not reproduce or expose the original signal.
 
-A debugger observation establishes only the target state seen at a named stop, dump, replay, trace,
-or capture under verified artifact coverage. It does not by itself establish the unique history,
-absence of unobserved races or memory defects, completeness of an unwind, production reproducibility,
-or correctness after a future repair.
+A stop, dump, replay, trace, or capture bounds the observed state. Keep unobserved history, races,
+unwind gaps, reproduction, and post-repair correctness outside the causal claim.
 
 ## Output Contract
 
@@ -204,30 +182,19 @@ Return only applicable fields from `references/runtime_debugging_contract.md`, i
 - `sensitive_artifact_controls`
 - Core `debugging_result` when graph-mode identity is supplied
 
-Graph mode compacts the applicable fields into the canonical card payload and keeps per-module
+Direct mode returns one task-local `debugging_result`. Graph mode compacts the applicable fields
+into the canonical card payload and keeps per-module
 identity, full observations, session transcripts, and large capture details in artifact/evidence
 refs. Do not add undeclared payload fields or replace the compact identity array with one global
 symbol-match boolean.
 
-## Cross-Skill Boundaries
+The Coordinator selects existing graph edges. A debugging result can feed an already admitted Bug
+Fix node but does not replace that node's review/round prerequisites. Other handoffs remain context
+for the Coordinator or direct task owner.
 
-- Simple source/log-only explanation stays with the current task owner. The presence of an error
-  message alone does not activate this Workflow.
-- `workflow-bug-fix` owns every semantically admitted bounded source repair and same-original-signal
-  closure attempt under the same accepted repair contract. It may consume a supplied
-  `debugging_result`; no second diagnosis owner is inserted into a repair round. First implementation
-  or explicit production-mechanism replacement belongs to `workflow-implementation` instead.
-- `analysis-performance` owns a progressing target whose dominant question is frame time, latency,
-  throughput, CPU/GPU utilization, memory bandwidth, or resource cost. No-progress under the bound
-  horizon, OOM/allocation failure, watchdog termination, corruption, invalid ordering/access,
-  graphics correctness, and device-loss causality stay here even when resource pressure is a cause
-  candidate; hand off only after evidence reclassifies the symptom as a progressing cost/SLO issue.
-- Testing owns test meaning, reproducible stimulation, test-only capture tooling, artifact
-  preservation, and test-evidence credibility. It does not turn a dump, stack, or failing test into
-  a root-cause verdict.
-- `workflow-code-review` may statically review diagnostic infrastructure; runtime artifact validity
-  remains outside static disposition. `workflow-implementation` owns requested production crash
-  capture, symbol publication, diagnostic hook, marker, or observability infrastructure.
+No-progress under a bound horizon, OOM/allocation failure, watchdog termination, corruption,
+invalid ordering/access, graphics correctness, and device-loss causality stay in runtime debugging.
+Hand off to Performance only when evidence establishes a progressing cost/SLO issue.
 
 ## Discriminating Cases
 

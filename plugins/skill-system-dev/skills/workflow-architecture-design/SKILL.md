@@ -69,22 +69,17 @@ description: Design target or transition software architecture from accepted beh
   sensitive_resources: credentials and production data denied; external systems and persistent state remain read-only unless separately authorized
 - entry_scene: PREPARE
 
-## Ownership Boundary
+## Design Scope
 
 Apply `references/architecture_design_contract.md`. This workflow owns a normative multi-view
 architecture design and the coherence of its included `boundary_decision` records. It does not call
 `analysis-boundary-design` once per boundary. Route there instead when one structural boundary is
 the whole requested outcome.
 
-Current-state mapping, domain meaning, measured performance diagnosis, implementation, static
-review, test design/implementation, ADR or Knowledge persistence, and Plan/Handoff topology remain
-with their named owners. A completed architecture design is input to those owners, never permission
-to start them.
-
 After acceptance, a later request may route one explicitly atomic enforcement/boundary question to
 `analysis-boundary-design` with `architecture_design_ref`. That skill may return exactly one
 conforming `boundary_decision`; any coupled-view or accepted-constraint conflict returns here for
-re-design and re-acceptance. This is a conditional handoff, not an automatic skill chain.
+re-design and re-acceptance.
 
 This version returns a direct, user-owned architecture artifact and has no Core execution-item
 kind. Do not bind it as a Plan/Handoff DAG node or send its result through a Coordinator envelope;
@@ -153,8 +148,7 @@ typed graph integration requires a separately accepted Core contract change.
    contract; do not create checks, tests, CI, hooks, or validation infrastructure unless separately
    requested.
 10. Read the design back against every driver, pattern stop boundary, canonical owner, transition,
-    and falsifier. Return bounded implementation slices and unresolved approvals without creating a
-    backlog, invoking another skill, or choosing a Plan successor.
+    and falsifier. Return bounded implementation slices and unresolved approvals.
 
 ## Stop Rule
 
@@ -171,6 +165,3 @@ Return one canonical `architecture_design` record from
 support or locate it. Keep drivers, candidate comparison, patterns, boundaries, transition, delta,
 fitness conditions, implementation slices, and unresolved authority inside that one record rather
 than repeating them as parallel top-level sections.
-
-An architecture artifact establishes only the recorded design decision and evidence ceiling. It
-does not prove production conformance, runtime fitness, migration safety, or human acceptance.

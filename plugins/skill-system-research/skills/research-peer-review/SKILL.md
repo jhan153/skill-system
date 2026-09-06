@@ -17,12 +17,6 @@ description: Review a scientific manuscript, proposal, or research plan for vali
 - risk_profile: no external verification by default; disclose any verification and write a review artifact only when requested; credentials and fabricated identity denied
 - entry_scene: PREPARE
 
-## Stage Boundary
-Read `references/research_stage_contract.md` only when upstream/downstream ownership, multi-stage
-intent, or Plan/Handoff mapping matters. This skill owns the requested scholarly review only. Its
-findings never select a successor or block unrelated work; only an accepted Plan may declare this
-review a required gate, and its Coordinator applies that edge.
-
 ## Review Contract
 Lead with actionable findings ordered by scientific consequence. Each material finding needs an exact section/claim/table/figure anchor, observed issue/evidence, consequence for validity/interpretation/reproducibility/ethics/reporting, `major|minor|question` severity, and the smallest useful revision or discriminating check.
 
@@ -34,3 +28,6 @@ If the named target/source is missing or mismatched, stop or limit the review ex
 
 ## Output
 Return prioritized findings first. Add a neutral contribution summary, bounded overall assessment, or author revision plan only when useful and after findings. Omit empty boilerplate sections. For partial targets, review only the supplied slice and list unavailable evidence without judging unseen results; if that evidence prevents the requested whole-target judgment, keep the overall result `unverified` and close only the supplied-slice review.
+
+Read `references/research_stage_contract.md` when upstream/downstream ownership, multi-stage intent,
+or Plan/Handoff mapping matters.
