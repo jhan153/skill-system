@@ -296,7 +296,8 @@ These are common to every selected graph, regardless of model or host:
 4. Compile nodes and typed edges. Check positive-output/skill/result agreement, dependency and
    lock safety, failure routes, and validation/termination authority. Copy only used roles and
    the selected execution contract into the templates. Worker handoffs carry the positive
-   objective, canonical skill IDs, bounded context, and output/stop terms—not full history.
+   objective, resolved canonical skill IDs, bounded context, and output/stop terms. Resolve role/node
+   inheritance and instruct the worker to read and apply the selected skills to that outcome.
 5. Keep normative topology and pinned input authority in Plan; one owner records Task State,
    latest evidence, questions, timing, deferred carry, and next existing node in Handoff.
    Update Plan before synchronizing a changed topology/input. Preserve unresolved evidence

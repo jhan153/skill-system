@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $management-memory-bank-maintenance for one explicit report, integrity-check, conflict-check, consolidation, compaction, or legacy migration on the declared bank."
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

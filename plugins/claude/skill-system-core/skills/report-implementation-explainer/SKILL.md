@@ -1,7 +1,6 @@
 ---
 name: report-implementation-explainer
 description: Produce an explicitly requested report explaining an existing implementation's causal source/runtime path or comparing verified changed lines/before-after states. Not for local one-line answers, quality verdicts, approach selection, or implementation.
-disable-model-invocation: true
 ---
 
 # Report Implementation Explainer

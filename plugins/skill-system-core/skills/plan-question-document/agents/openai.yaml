@@ -5,4 +5,4 @@ interface:
     Use $plan-question-document only when the user explicitly requests a local Markdown question document for one answer owner. Bind the recipient and downstream decision, cover each needed answer once, permit uncertainty, and never send or upload the artifact.
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

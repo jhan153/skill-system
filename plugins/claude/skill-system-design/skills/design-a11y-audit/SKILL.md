@@ -1,7 +1,6 @@
 ---
 name: design-a11y-audit
 description: "Accessibility evidence for implemented UI — keyboard reachability, focus visibility, selected-vs-focused distinction, roles, accessible names, labels, landmarks, status messages, color contrast, target size, responsive readability, and WCAG/APG-backed gaps."
-disable-model-invocation: true
 ---
 
 # design-a11y-audit

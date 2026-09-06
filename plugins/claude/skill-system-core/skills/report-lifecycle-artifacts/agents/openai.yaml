@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $report-lifecycle-artifacts to package and trace the selected existing lifecycle artifacts in Markdown, adding the same lifecycle view as HTML only when I request it."
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

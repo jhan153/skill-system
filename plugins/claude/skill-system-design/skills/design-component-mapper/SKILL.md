@@ -1,7 +1,6 @@
 ---
 name: design-component-mapper
 description: "Map design components, semantic roles, variants, states, slots, events, responsive behavior, and accessibility contracts to existing repo components. Use approved component catalogs to prove app-surface reuse, identify raw/default/custom-control violations, and record authorized exceptions or unmapped gaps before UI completion."
-disable-model-invocation: true
 ---
 
 # design-component-mapper

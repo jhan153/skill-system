@@ -1,7 +1,6 @@
 ---
 name: report-lifecycle-artifacts
 description: Package explicitly selected existing lifecycle artifacts into a traceability index or matrix, preserving source statuses and gaps. Not for creating missing stages, executing lifecycle work, replacing Plan/Handoff, or automatic closeout.
-disable-model-invocation: true
 ---
 
 # Report Lifecycle Artifacts

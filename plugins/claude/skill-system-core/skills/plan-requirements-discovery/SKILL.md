@@ -1,7 +1,6 @@
 ---
 name: plan-requirements-discovery
 description: Run an explicitly requested requirements interview that models decision dependencies, groups currently answerable independent decisions into bounded rounds, and stops at a traceable handoff without implying approval or implementation permission.
-disable-model-invocation: true
 ---
 
 # Plan Requirements Discovery

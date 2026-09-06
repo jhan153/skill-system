@@ -1,7 +1,6 @@
 ---
 name: design-tokens
 description: "Normalize and audit design token sources for design-to-production — token JSON, CSS variables, Tailwind/theme config, Figma-exported tables, palette/typography/spacing/radius/shadow/motion/breakpoint tokens, token gaps/drift, platform mapping, and no-fabrication token evidence."
-disable-model-invocation: true
 ---
 
 # design-tokens

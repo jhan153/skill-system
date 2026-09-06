@@ -109,6 +109,10 @@ Once copied, this table is canonical for this plan and is not changed retroactiv
 later skill-profile revisions. DAG node rows inherit Model, Effort, and selected_skills
 from their role row here; a node cell overrides only when it differs.
 
+Resolve `inherit` before dispatch. Name the resulting canonical skills in the work instruction and
+tell the worker to read and use them for the node's outcome. Known helpers are a starting set;
+workers may choose relevant support within the same accepted scope and evidence contract.
+
 | Role | Agent | Model | Effort | Default selected skills | Boundary |
 |---|---|---|---|---|---|
 | __ROLE__ | __AGENT__ | __MODEL__ | __EFFORT__ | __SKILLS__ | __BOUNDARY__ |

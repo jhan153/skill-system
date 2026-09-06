@@ -1,7 +1,6 @@
 ---
 name: management-memory-bank-update
 description: Create, update, activate, or deprecate one explicitly persistent goal, rule, proven practice, or recurring-mistake candidate in an existing declared single-file Memory Bank. Append one concise semantic revision to the target record and read it back. Never infer persistence, initialize a bank, write raw chat, activate from recurrence alone, or update multiple records.
-disable-model-invocation: true
 ---
 
 # Management Memory Bank Update

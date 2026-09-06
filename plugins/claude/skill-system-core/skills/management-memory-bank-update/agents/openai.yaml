@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $management-memory-bank-update to change one explicitly persistent goal, rule, practice, or mistake candidate in memory.md and read back only that record and revision."
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

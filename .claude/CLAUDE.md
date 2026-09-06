@@ -77,6 +77,7 @@
 - Non-waiting approval denial is host-native behavior only for an active unattended Goal/Loop whose accepted contract forbids interaction. Attended tasks and interaction-enabled Goal/Loop contracts keep the host's normal permission behavior.
 
 ## Skill Alias Interpretation
+- When a task matches an installed skill, read and apply its `SKILL.md`; a natural-language request or accepted DAG assignment can select it without naming the skill. Reuse unchanged instructions already available in the current task.
 - Resolve family and group aliases from `.claude/docs/skill_registry.md`; use `.claude/context-routing.md` and the target skill's Routing Card to determine routing role and scope.
 - An explicit alias wins only within the role and scope declared for that skill.
 - Non-primary roles do not replace the primary execution owner unless explicit artifact intent or routing rules make that skill primary for the request.
@@ -91,7 +92,7 @@
 - Choose one primary skill first, then attach modifiers, review gates, output modifiers, or memory operations only when needed.
 - Prefer repo-level source outlines, active plan files, relevant memory cards, and validation contracts over broad loading.
 - If context is insufficient, expand one layer at a time from the bundle's `read_if_needed` list.
-- Do not use heavyweight artifact-producing skills unless the user explicitly asks for the artifact, package, or report.
+- Use an artifact-producing skill when the current request or an accepted DAG node already calls for that artifact, package, or report; naming the skill is unnecessary.
 - Before WRITE, DELETE, CALL_PROCESS, NETWORK, CREDENTIALS, GIT_PUSH, broad report generation, or memory mutation, identify the risk boundary and validation context.
 
 ### Repeated Work Profile
@@ -103,7 +104,7 @@
 - Resolve project Memory Bank, Knowledge Base, plan, and named LLM Wiki locations from an exact user path or the nearest `project-context.yaml`; do not guess paths or merge parent manifests.
 - Treat those stores as context sources, not sources of truth. Current user instructions, repository files, tests, explicit decisions, and validated plans outrank them.
 - Use `management-memory-bank-harness`, `management-knowledge-base-read`, or explicit `analysis-llm-wiki-context` only when the route or user intent needs that context. Load the smallest task-relevant slice rather than full banks, archives, raw transcripts, or Wikis.
-- Mutate persistent Memory or Knowledge only through its explicit owning workflow. Do not auto-create stores or collect conversation history because a context path is missing.
+- Mutate persistent Memory or Knowledge only through the matching workflow under current user authorization. Do not auto-create stores or collect conversation history because a context path is missing.
 
 ### Conflict Precedence Summary
 - Explicit skill aliases win within the skill's declared role.

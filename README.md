@@ -12,12 +12,13 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 10.3.2 Release
+## 10.3.3 Release
 
-This source tree is the 10.3.2 instruction-compaction release on the breaking 10.0 baseline.
-It shortens repeated boundaries in 57 skill bodies and condenses 37 descriptions while preserving
-all 67 skills, invocation policies, task methods, and Core result bindings. Existing shared docs
-remain unchanged; obsolete gate guidance is removed. Its current components are:
+This source tree is the 10.3.3 release for implicit skill selection and DAG use on the breaking
+10.0 baseline. All 67 skills can be selected from matching natural-language requests and accepted
+DAG assignments. Workers read and apply resolved skills and may choose relevant support within
+the existing task scope; operation permissions and Core result contracts remain intact.
+Its current components are:
 
 * `skills`: skill packages intended for actual use
 * `docs`: skill lists, usage criteria, and operational reference documents
@@ -42,7 +43,7 @@ the central eval/Skill Diet/release-hygiene stack, and reduces persistent evalua
 model-independent tests. TaskRun, LoopRun, and WorkItem runtime state have been removed; the useful
 repeated-work principles from Loop Term now live inside Execution Handoff.
 
-The Codex router uses an exact specialist directly and opens at most one narrow router only when several owners genuinely compete. Clear intent-matched workflow owners and bounded design/support specialists may be implicitly selected, while model selection never expands user authority. Persistent Memory/Knowledge writes, project-context mutation, lifecycle gates, and explicitly selected context remain explicit-only. An implicit router may hand off only to a declared implicitly exposed target, and an already selected canonical skill ID is preserved across worker handoff. One canonical invocation bit is projected into each host's native contract: Codex reads `agents/openai.yaml`, while Claude receives `disable-model-invocation: true` only for explicit-only skills. Codex packages stay at `plugins/<name>/skills`; paired Claude packages are generated at `plugins/claude/<name>/skills` under the same plugin name and version so each host discovers only its native metadata. The nearest `project-context.yaml` may declare manifest-relative or exact approved absolute Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery. Knowledge operations consume resolved `knowledge_root` and `knowledge_index` variables rather than a fixed directory.
+All 67 skills support implicit discovery from matching natural-language requests and accepted DAG assignments. Read the chosen `SKILL.md` before its work. Discovery does not authorize persistent writes, project-context changes, external actions, or additional workflow stages; the task and Routing Card still govern them. Worker instructions carry resolved canonical skill IDs and tell workers to read and apply them; relevant support may be selected inside the accepted node scope. One canonical invocation bit is projected into each host's native contract: Codex reads `agents/openai.yaml`, while Claude receives `disable-model-invocation: true` only when that bit is false. Codex packages stay at `plugins/<name>/skills`; paired Claude packages are generated at `plugins/claude/<name>/skills` under the same plugin name and version so each host discovers only its native metadata. The nearest `project-context.yaml` may declare manifest-relative or exact approved absolute Memory Bank, Knowledge Base, plan, skill-root, and named LLM Wiki paths; missing entries are unavailable and never trigger home or adjacent-repository discovery. Knowledge operations consume resolved `knowledge_root` and `knowledge_index` variables rather than a fixed directory.
 
 Memory Bank preserves cross-session goals, working rules, recurring mistakes, and proven practices. Knowledge Base preserves accepted project domain, design, algorithm, architecture, review, and decision knowledge as readable current snapshots with typed relations, semantic revisions, and source-traced observation events. Recurrence is derived from transparent observation/provenance dimensions rather than a confidence, maturity, importance, or popularity score. LLM Wikis remain optional read-only context sources selected explicitly and navigated using their own conventions.
 
@@ -190,6 +191,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 10.3.0 | Scoped context and evidence-gated execution | Centralizes skill-local routing and resource declarations, narrows planning context to the selected graph, makes standalone repair and review evidence proportional, and adds goal-scoped Work Contract generations, task working state, source-inspection classification, and Grok notification forwarding. |
 | 10.3.1 | Skill and reference consistency | Aligns skill/shared/helper boundaries, preserves full-report Canvas findings, fixes portable routing resources, and strengthens implementation, research, and DAG examples. |
 | 10.3.2 | Compact skill instructions | Shortens repeated boundaries in 57 skill bodies and 37 descriptions, preserves routing and result contracts, and removes obsolete gate guidance without expanding shared docs. |
+| 10.3.3 | Natural skill discovery and DAG intake | Enables implicit discovery for all 67 skills, connects resolved skill IDs to worker read/apply instructions, and allows relevant support within accepted node scope. |
 
 ## License
 

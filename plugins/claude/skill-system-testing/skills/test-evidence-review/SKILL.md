@@ -1,7 +1,6 @@
 ---
 name: test-evidence-review
 description: Review a bounded test design, implementation, or result for false-green risk, circular or unauthorized oracles, surrogate paths, weak falsifiers, baseline/tolerance drift, missing diagnostics, and proof-ceiling inflation. Return evidence-linked findings only; do not implement, repair, rerun broadly, or declare product quality.
-disable-model-invocation: true
 ---
 
 # Test Evidence Review

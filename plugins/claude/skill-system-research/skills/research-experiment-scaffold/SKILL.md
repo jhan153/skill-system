@@ -1,7 +1,6 @@
 ---
 name: research-experiment-scaffold
 description: "Project an approved experiment contract into a small repo-native wiring scaffold: entry point, config loading, data boundary, result/provenance envelope, and deterministic local smoke. Real method, baseline, metric, data pipeline, training, and product implementation remain separate workflow-implementation work."
-disable-model-invocation: true
 ---
 
 # Research Experiment Scaffold

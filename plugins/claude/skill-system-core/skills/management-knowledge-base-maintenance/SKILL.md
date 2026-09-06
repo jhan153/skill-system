@@ -1,7 +1,6 @@
 ---
 name: management-knowledge-base-maintenance
 description: Integrity-check, reindex, inspect typed relations and semantic history, classify overlap, derive recurrence profiles, compact, and explicitly reconcile an existing Markdown Knowledge Base. Use for store-wide or cross-record maintenance; never auto-merge similarity, compute scores, auto-repair read-only findings, or mutate Memory and LLM Wikis.
-disable-model-invocation: true
 ---
 
 # Management Knowledge Base Maintenance

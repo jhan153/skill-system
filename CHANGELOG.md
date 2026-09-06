@@ -1,5 +1,21 @@
 # Changelog
 
+## 10.3.3
+
+- Enabled implicit discovery for all 67 skills, including the 29 previously explicit-only
+  skills. Natural-language requests and accepted DAG assignments can select matching skills;
+  target selection, persistent writes, external actions, and stage boundaries retain their
+  existing authorization requirements.
+- Connected DAG skill selection to execution: resolve role/node inheritance before dispatch,
+  include an instruction to read and apply the selected skills, and reuse instructions already
+  available in the task. Workers may choose relevant support inside the accepted node scope
+  without changing its primary owner, oracle, or graph.
+- Aligned provider guidance, lightweight handoffs, execution profiles, Plan templates, and the
+  generated skill registry with the same discovery and intake behavior. Added no classifier,
+  usage receipt, evaluation gate, or model-specific execution branch.
+- Advanced all four generated provider harnesses and all five Codex/portable plugin profiles to
+  10.3.3. Runtime code and Core schemas are unchanged; live installation remains separate.
+
 ## 10.3.2
 
 - Shortened repeated routing, ownership, and evidence-limit prose in 57 skill bodies, keeping

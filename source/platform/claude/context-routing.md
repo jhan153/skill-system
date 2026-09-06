@@ -19,7 +19,7 @@ audit, patch, migrate, route-register, or smoke-test `.system` skills as bundle 
   its direct development owner unless the requested deliverable matches another Routing Card.
 - First implementation or an explicit production-mechanism replacement remains Implementation;
   only an admitted bounded repair of an already implemented contract belongs to Bug Fix.
-- Test Design and Test Implementation are explicit owners. A failing check is evidence, not automatic
+- Test Design and Test Implementation are distinct owners. A failing check is evidence, not automatic
   repair or successor authority.
 
 ## Resolution And Precedence
@@ -30,6 +30,9 @@ wins within the selected card's scope; otherwise choose one narrow primary owner
 or evidence owners only when their conditions are material. Do not scan unrelated home directories,
 plugin versions, adjacent repositories, or guessed caches.
 
+For a clear task match, select the installed skill and read its `SKILL.md` before the governed work.
+A natural-language request or accepted DAG assignment can supply explicit task intent without a
+skill-name mention; required target selection and write approval remain separate.
 For genuine ambiguity, read `.claude/docs/skill_routing.md`, select the smallest matching family,
 then read only that family view or exact skill. Never load the whole routing library. Family mode
 requires explicit group/family framing or a family name; bare words such as analysis, report, or
@@ -47,8 +50,10 @@ loading. Start with user intent and one primary owner, load only the minimum con
 reference slice, and do not recover from missing context by loading every skill, document, store, or
 chat artifact.
 
-When delegation follows a selected specialist, carry its exact canonical ID. Without one, let the
-worker route normally. Plans, Memory, Knowledge, and named Wikis remain separately declared context
+When delegation follows a selected specialist, carry its exact canonical ID with an instruction to
+read and use it for the assigned outcome. Otherwise let the worker match that outcome. Relevant
+support may be chosen within the same scope; a known helper list is not a closed allowlist.
+Plans, Memory, Knowledge, and named Wikis remain separately declared context
 sources; persistent writes require their explicit owners and user authority.
 
 ## Claude Host Exceptions

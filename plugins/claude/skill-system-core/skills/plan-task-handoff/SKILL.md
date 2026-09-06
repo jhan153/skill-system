@@ -28,7 +28,7 @@ Combine modes only when both needs are explicit. An artifact list or short sessi
 ## Workflow
 1. Confirm the explicit coordination, handoff, or inventory intent and choose the smallest mode.
 2. State non-goals and do-not-touch boundaries before splitting work. Reject a split whose coordination cost exceeds its execution value.
-3. For parallel work, assign non-overlapping lock scopes; serialize any shared-file changes. Give each task one concrete output and one validation owner. Copy canonical skill IDs already selected for that task into `selected_skills` and the worker instruction instead of asking the worker to rediscover them. When no skill was selected upstream, omit the field and let the worker use normal implicit routing; never invent an adjacent skill ID.
+3. For parallel work, assign non-overlapping lock scopes; serialize any shared-file changes. Give each task one concrete output and one validation owner. Copy selected canonical IDs into `selected_skills` and tell the worker to read and use them for that outcome. With no upstream selection, let the worker match the task. Relevant support may be selected within the same scope; keep assigned primary skills and use only resolvable IDs.
 4. For an artifact handoff, distinguish changed, not changed, validation done, remaining risk, user checks, and next owner.
 5. Label only observed evidence as `agent-verified`, `user-verification-needed`, `unverified`, or `blocked`; pure planning or response-shape decisions need no result label.
 6. Keep the result response-first and task-local.

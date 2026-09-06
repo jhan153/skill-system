@@ -1,7 +1,6 @@
 ---
 name: plan-requirements-brief
 description: Distill discovery notes or decisions into a concise requirements contract/PRD with bounded scope, non-goals, observable acceptance criteria, assumptions, risks, and handoff notes. Use only when explicitly requested.
-disable-model-invocation: true
 ---
 
 # Plan Requirements Brief

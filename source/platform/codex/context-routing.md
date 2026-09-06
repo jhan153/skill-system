@@ -19,7 +19,8 @@ An exact path controls discovery only and does not broaden the selected skill's 
 stale IDs stay unresolved; never scan unrelated home directories, plugin versions, adjacent
 repositories, or guessed caches for a replacement.
 
-For a clear natural-language match, select the narrow installed skill directly. When specialists
+For a clear natural-language match, select the narrow installed skill and read its `SKILL.md` before
+the governed work. When specialists
 genuinely compete, read `docs/skill_routing.md`, choose the smallest matching family, then read only
 that family file or the exact skill. Never load the complete routing library. Enter family mode only
 for explicit group/family framing or an explicit family name, not a bare domain word.
@@ -28,10 +29,13 @@ for explicit group/family framing or an explicit family name, not a bare domain 
 
 - `agents/openai.yaml` controls Codex discoverability and implicit invocation. It grants no write,
   persistence, permission, or external-state authority.
-- User-explicit skill selection wins only inside the selected Routing Card's declared role and
-  scope. The current task owner keeps ordinary work when no skill is needed.
-- Pass an already selected canonical skill ID to delegated workers. Without an upstream selection,
-  let the worker route normally.
+- Explicit skill selection wins within the selected Routing Card's role and scope.
+- A natural-language request or accepted DAG assignment can supply a Routing Card's explicit task
+  intent; it does not require a skill-name mention. Required target selection and write approval
+  remain separate.
+- Pass selected canonical IDs with an instruction to read and use those skills for the delegated
+  outcome. Without an upstream selection, let the worker match that outcome. Choose relevant support
+  within the same scope; a known helper list is not a closed allowlist.
 - App-managed `.codex/skills/.system`, live home state, and plugin caches are outside repository
   routing ownership unless the user explicitly requests that live operation.
 

@@ -1,7 +1,6 @@
 ---
 name: plan-question-document
 description: Create an explicitly requested Markdown question document for one answer owner who holds missing facts or decisions. Fit the artifact to the recipient and downstream decision, verify question coverage, and keep delivery external to this skill; do not use for live requirements discovery, broad surveys, or automatic sending.
-disable-model-invocation: true
 ---
 
 # Question Document

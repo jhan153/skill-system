@@ -1,7 +1,6 @@
 ---
 name: plan-decision-map
 description: Maintain an explicitly requested decision map for work whose target outcome is known but whose decision path will span multiple sessions. Use for durable uncertainty management before ordinary requirements or implementation planning; do not use for a settled feature, an implementation backlog, or direct execution.
-disable-model-invocation: true
 ---
 
 # Decision Map

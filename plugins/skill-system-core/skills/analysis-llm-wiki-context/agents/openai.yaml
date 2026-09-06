@@ -3,4 +3,4 @@ interface:
   short_description: "Build context from one selected LLM Wiki"
   default_prompt: "Use $analysis-llm-wiki-context to build task context from this explicitly selected Wiki."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

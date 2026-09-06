@@ -1,7 +1,6 @@
 ---
 name: test-visual-regression
 description: "Work in exactly one explicit mode for a rendered regression condition: `design` authors an implementation-ready visual-regression contract without capture or verdict, while `evidence` consumes an accepted contract to capture and compare named states/viewports. Never switch modes automatically or replace design-fidelity review, accessibility, interaction semantics, or business correctness."
-disable-model-invocation: true
 ---
 
 # Test Visual Regression

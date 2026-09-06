@@ -12,12 +12,12 @@ AI Skill System은 반복적인 AI 작업을 스킬 단위로 나누고, 선택�
 
 여기서 말하는 스킬은 단순히 긴 프롬프트가 아닙니다. 특정 작업을 언제 호출할지, 어떤 입력을 받을지, 어떤 절차로 수행할지, 어떤 산출물을 남길지, 어떻게 검증할지를 함께 정의한 작업 단위입니다. 이를 통해 AI 작업을 더 일관되게 실행하고, 결과를 더 쉽게 점검할 수 있습니다.
 
-## 10.3.2 릴리즈
+## 10.3.3 릴리즈
 
-이 소스 트리는 breaking 10.0 기준선의 10.3.2 스킬 지침 감축 릴리즈입니다.
-57개 스킬 본문의 반복 경계 설명과 37개 스킬 설명을 줄이면서 스킬 67개, 호출 정책,
-작업 방법, Core 결과 연결을 유지합니다. 기존 shared docs는 변경하지 않았으며,
-폐기된 gate 지침을 제거했습니다. 현재 구성은 다음과 같습니다.
+이 소스 트리는 breaking 10.0 기준선의 10.3.3 암묵적 스킬 발견·DAG 적용 릴리즈입니다.
+67개 스킬을 자연어 요청과 승인된 DAG 작업에 맞춰 선택할 수 있습니다. Worker는 상속을
+해석한 스킬을 읽고 적용하며, 기존 작업 범위 안에서 필요한 보조 스킬을 선택할 수 있습니다.
+실제 작업 권한과 Core 결과 계약은 유지합니다. 현재 구성은 다음과 같습니다.
 
 * `skills`: 실제로 사용할 스킬 패키지
 * `docs`: 스킬 목록, 사용 기준, 운영 참고 문서
@@ -42,7 +42,7 @@ Diet, release hygiene를 제거하고 지속 평가는 모델과 무관한 4개 
 TaskRun·LoopRun·WorkItem runtime state는 제거됐고, Loop Term의 유효한 반복 작업 원칙은
 Execution Handoff 내부로 흡수됐습니다.
 
-Codex 라우터는 정확히 명시됐거나 분명히 일치하는 전문 스킬을 바로 사용하며, 여러 소유자가 실제로 경쟁할 때만 좁은 라우터 하나를 엽니다. implicit router는 선언되어 실제 노출된 읽기·분석 owner에만 자동 handoff할 수 있고, 무거운 writer와 명시적으로 선택하는 context는 explicit-only로 유지합니다. 하나의 canonical 호출 비트를 플랫폼별 native 계약으로 투영합니다. Codex는 `agents/openai.yaml`을 읽고, Claude에는 explicit-only 스킬에만 `disable-model-invocation: true`를 생성합니다. Codex 패키지는 기존 `plugins/<name>/skills`를 유지하고, Claude 패키지는 같은 이름·버전으로 `plugins/claude/<name>/skills`에 생성해 각 호스트가 자기 메타데이터만 탐색하게 합니다. 가장 가까운 `project-context.yaml`은 manifest 상대 경로나 정확히 승인된 절대 경로로 Memory Bank, Knowledge Base, plan, skill root, 이름 있는 LLM Wiki를 선언할 수 있습니다. 없는 항목은 사용할 수 없는 것으로 처리하며 홈이나 인접 저장소를 추측해 검색하지 않습니다. Knowledge 작업은 고정 디렉터리 대신 해석된 `knowledge_root`와 `knowledge_index` 변수를 소비합니다.
+67개 스킬 모두 자연어 요청과 승인된 DAG 작업에 맞춰 암묵적으로 발견·선택할 수 있습니다. 선택한 `SKILL.md`를 읽고 해당 작업에 적용합니다. 발견 가능성이 영속 쓰기, 프로젝트 맥락 변경, 외부 작업, 추가 단계 실행을 허용하지는 않으며 현재 요청과 Routing Card의 조건을 따릅니다. Worker에게는 상속을 해석한 canonical skill ID와 읽고 적용할 지시를 함께 전달하고, 승인된 node 범위 안에서 필요한 보조 스킬을 선택할 수 있습니다. 하나의 canonical 호출 비트를 플랫폼별 native 계약으로 투영합니다. Codex는 `agents/openai.yaml`을 읽고, Claude에는 이 비트가 false일 때만 `disable-model-invocation: true`를 생성합니다. Codex 패키지는 기존 `plugins/<name>/skills`를 유지하고, Claude 패키지는 같은 이름·버전으로 `plugins/claude/<name>/skills`에 생성해 각 호스트가 자기 메타데이터만 탐색하게 합니다. 가장 가까운 `project-context.yaml`은 manifest 상대 경로나 정확히 승인된 절대 경로로 Memory Bank, Knowledge Base, plan, skill root, 이름 있는 LLM Wiki를 선언할 수 있습니다. 없는 항목은 사용할 수 없는 것으로 처리하며 홈이나 인접 저장소를 추측해 검색하지 않습니다. Knowledge 작업은 고정 디렉터리 대신 해석된 `knowledge_root`와 `knowledge_index` 변수를 소비합니다.
 
 Memory Bank는 세션을 넘는 목표·작업 규칙·반복 실수·검증된 작업 방식을 보존합니다. Knowledge Base는 도메인·디자인·알고리즘·아키텍처·리뷰·결정 지식을 현재 Markdown snapshot, typed relation, semantic revision, 출처가 추적되는 observation event로 보존합니다. 반복성은 confidence·maturity·importance·popularity 점수가 아니라 observation과 provenance의 분리된 차원에서 파생합니다. LLM Wiki는 명시적으로 선택하고 자체 탐색 규칙을 따르는 선택적 읽기 전용 컨텍스트입니다.
 
@@ -188,6 +188,7 @@ flowchart TB
 | 10.3.0 | 컨텍스트 선택·근거 기반 실행 | 스킬별 라우팅·리소스 선언을 일원화하고, 선택한 그래프에 필요한 계획 컨텍스트와 수정·리뷰 근거만 사용하며, 목표별 Work Contract 세대, 작업 상태, 소스 읽기 분류, Grok 알림 전달을 추가합니다. |
 | 10.3.1 | 스킬·참조 정합성 보완 | 스킬·공통 참조·helper의 경계를 맞추고, Canvas 상세 항목 보존과 라우팅 리소스 경로를 수정하며, 구현·연구·DAG 예시를 보완합니다. |
 | 10.3.2 | 스킬 지침 감축 | 57개 본문의 반복 경계 설명과 37개 설명을 줄이고 라우팅·결과 계약을 보존합니다. shared docs를 늘리지 않고 폐기된 gate 지침도 제거합니다. |
+| 10.3.3 | 자연스러운 스킬 발견·DAG 적용 | 67개 스킬의 암묵적 발견을 허용하고, 상속을 해석한 스킬을 Worker가 읽고 적용하도록 전달하며 승인된 node 범위의 보조 스킬 선택을 허용합니다. |
 
 ## 라이선스
 

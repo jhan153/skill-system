@@ -1,11 +1,11 @@
 {
   "groups": {
     "go:skill-system-claude-harness": {
-      "build_key": "a6eb61c42f4561ef31d8a6206645eb18a39c4e7ee4e59b21a41ffd22ba0870cc",
+      "build_key": "8b6c4b4ec0a02f03783a00005aa410321615db2cc72865ab233d9f4959622deb",
       "outputs": {
-        "skill-system-claude-harness": "af376b8e99d8b5a75552c1999adce3a5af3b7fe42732003f1bb9e456d2950207",
-        "skill-system-claude-harness-linux-amd64": "2a10c8f10148e1a59b923b9799cf0157f0381189bb5a9b773f0973ccc933ec4c",
-        "skill-system-claude-harness.exe": "d2cc194d2a8c47fc928b2a982293cfaa1c501b7fcd67b61e8196292fa12ddf5a"
+        "skill-system-claude-harness": "5e4341fa5ee1ee422cd4f8c545f50238771d57b89273b247c1b5ec84ada20e64",
+        "skill-system-claude-harness-linux-amd64": "750860ad9b0a080de2a56a403cd852d644f9211dc4923b1b02a0c6299a376eed",
+        "skill-system-claude-harness.exe": "8cbca56e3641b265e0008d08b65fc954f0edb555376ee1a0e7ff8885896e88f1"
       }
     },
     "swift:notification-overlay": {

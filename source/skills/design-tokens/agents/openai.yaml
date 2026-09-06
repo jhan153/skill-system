@@ -4,7 +4,7 @@ interface:
   default_prompt: "Use $design-tokens to inspect token sources, map them to the target platform, and report gaps without inventing missing values."
 policy:
   invocation_surface: evidence_gate
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true
   may_own_execution: false
   may_write: true
   may_block_completion: false

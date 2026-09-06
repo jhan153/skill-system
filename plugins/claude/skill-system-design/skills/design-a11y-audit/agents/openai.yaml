@@ -3,4 +3,4 @@ interface:
   short_description: "Collect accessibility evidence for implemented UI work."
   default_prompt: "Use $design-a11y-audit to check keyboard, focus, semantics, contrast, target size, and responsive readability evidence."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

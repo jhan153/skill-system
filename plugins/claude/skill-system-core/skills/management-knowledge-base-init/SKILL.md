@@ -1,7 +1,6 @@
 ---
 name: management-knowledge-base-init
 description: Initialize a minimal navigable project Knowledge Base of Markdown records and register only its location in project-context.yaml. Use only on an explicit init/reinit request or an explicitly approved project bootstrap handoff; never infer knowledge or create a separate graph, score, Wiki, runtime projection, or derived context store.
-disable-model-invocation: true
 ---
 
 # Management Knowledge Base Init

@@ -36,13 +36,14 @@
 - Do not finalize until scope is covered and each material condition is evidenced or explicit as unresolved. Choose one task-level result label; a label never replaces condition evidence. Analysis-only describes work scope, not a result label.
 
 ## Skill And Context Boundary
+- When a task matches an installed skill, read and apply its `SKILL.md`; a natural-language request or accepted DAG assignment can select it without naming the skill. Reuse unchanged instructions already available in the current task.
 - For material ambiguity, dependent multi-turn state, or consequential freshness risk, the current owner uses `docs/task_working_state_contract.md`; clear one-shot work bypasses it without extra questions or artifacts.
 - Read `$CODEX_HOME/context-routing.md` for ambiguous non-trivial routing or explicit goal, automation, Memory, or Knowledge operations.
 - Resolve skills by exact user path, current-session exposure, repository-declared local root, then `unresolved`; never fallback-search unrelated home or adjacent projects.
 - The nearest `project-context.yaml` declares project-local Memory, Knowledge, plans, and Wikis. An exact user path overrides it; missing declarations are unavailable, never auto-discovered/initialized.
 - Do not route `/goal`, duration, or event-runtime wording through a classifier. Use `plan-execution-handoff` only when durable execution state is actually needed; attach its repeated-work profile only when verifier evidence will steer later actions more than once. The Stop hook never owns continuation.
 - Treat an unknown or stale explicit skill alias as unresolved. Load references one layer at a time; heavy artifacts require explicit intent.
-- Pass already selected canonical skill IDs to delegated workers; otherwise let each worker resolve skills normally.
+- Pass selected canonical skill IDs with an instruction to read and use them for the delegated outcome; otherwise let the worker select by that outcome. Relevant support may be chosen within the same task scope.
 - Treat Memory Bank, Knowledge Base, explicitly selected LLM Wikis, plans, and summaries as context; current instructions and verified evidence outrank them.
 - Persistent memory or accepted-knowledge mutation requires its explicit owning workflow.
 

@@ -1,7 +1,6 @@
 ---
 name: management-memory-bank-maintenance
 description: Inspect, integrity-check, conflict-check, consolidate, compact, or explicitly migrate one existing declared project Memory Bank under the shared single-file contract. Read-only operations never repair, and write operations preserve stable IDs, source refs, status, and semantic revisions. Never score records, infer authority, or silently migrate the legacy four-file layout.
-disable-model-invocation: true
 ---
 
 # Management Memory Bank Maintenance

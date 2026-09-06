@@ -1,7 +1,6 @@
 ---
 name: report-qualitative
 description: Produce an explicitly requested qualitative evaluation of fitness, strengths, tradeoffs, or improvement priorities using user-supplied, elicited, or explicitly delegated criteria. Not for blocker QA, metric inventories, diffs, validation execution, or implementation.
-disable-model-invocation: true
 ---
 
 # Qualitative Evaluation Report

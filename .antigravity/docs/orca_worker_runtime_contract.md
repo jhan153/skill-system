@@ -4,6 +4,16 @@ This contract applies only when Orca dispatches a Skill System task or a node fr
 Plan/Handoff. Orca owns lifecycle delivery; the selected Workflow still owns the task work, and
 the Plan/Handoff Coordinator alone applies existing DAG edges.
 
+## Skill Intake
+
+Before governed work, resolve and read the node's selected `SKILL.md` instructions and applicable
+references. Reuse unchanged instructions already available in the task. If an executable task has
+no assigned skill, select by its outcome; deliberate `none` for control or human roles stays `none`.
+
+Known support skills are a starting set. The worker may choose another available support skill for
+a material subquestion within the same accepted outcome, decision authority, write scope, and
+evidence contract. The assigned primary keeps the result; support creates no new node or permission.
+
 ## Worker Lifecycle
 
 - The start receipt states whether automatic dispatch intake, worker-inbox intake, follow-up

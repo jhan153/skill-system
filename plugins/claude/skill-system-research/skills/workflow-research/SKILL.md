@@ -1,7 +1,6 @@
 ---
 name: workflow-research
 description: Run one explicitly managed Research stage using an already selected research-* specialist, directly or as a Plan/Handoff node. Not for ordinary direct research, stage selection, multi-stage orchestration, paper search, or implementation.
-disable-model-invocation: true
 ---
 
 # Workflow Research

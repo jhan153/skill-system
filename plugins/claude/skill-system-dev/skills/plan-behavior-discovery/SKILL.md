@@ -1,7 +1,6 @@
 ---
 name: plan-behavior-discovery
 description: Run an explicitly requested, one-question behavior-discovery turn for an existing capability or user path. Decide unresolved behavior for the next human-operable slice; not for greenfield requirements, quizzes, explanation, or implementation.
-disable-model-invocation: true
 ---
 
 # Plan Behavior Discovery

@@ -3,4 +3,4 @@ interface:
   short_description: "Record durable context at commit or closeout"
   default_prompt: "Use $management-project-context-checkpoint to classify only explicitly checkpointed durable current-task context into the existing declared Memory or Knowledge store without duplicates or automatic initialization."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

@@ -1,7 +1,6 @@
 ---
 name: management-project-context
 description: Manage an explicitly requested project-context.yaml through minimal initialization, read-only diagnosis, selected-key updates, or bounded bootstrap. Preserve unrelated manifest sections, require exact approval for every write target, and never auto-create undeclared stores during ordinary work.
-disable-model-invocation: true
 ---
 
 # Management Project Context

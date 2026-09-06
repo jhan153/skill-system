@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $plan-behavior-discovery to resolve one evidence-grounded product behavior decision at a time for an existing capability."
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

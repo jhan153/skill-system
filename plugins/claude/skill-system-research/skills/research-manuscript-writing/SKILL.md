@@ -1,7 +1,6 @@
 ---
 name: research-manuscript-writing
 description: Write or revise scientific manuscript prose from verified research artifacts while preserving claim-to-evidence traceability and separating planned methods from completed results. Use for manuscript sections, not evidence search, analysis, or peer-review verdicts.
-disable-model-invocation: true
 ---
 
 # Research Manuscript Writing

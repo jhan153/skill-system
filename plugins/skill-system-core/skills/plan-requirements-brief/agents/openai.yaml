@@ -7,4 +7,4 @@ interface:
     Preserve scope, non-goals, acceptance criteria, assumptions, risks, and open questions. Do not use for interactive elicitation, active docs/plan sync, direct implementation, validation execution, or lifecycle result reporting.
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

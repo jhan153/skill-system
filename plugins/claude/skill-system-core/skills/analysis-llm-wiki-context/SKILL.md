@@ -1,7 +1,6 @@
 ---
 name: analysis-llm-wiki-context
 description: Build task-focused read-only context from one explicitly selected LLM Wiki, following its own navigation conventions. Not for automatic Wiki selection, whole-Wiki loading, or Wiki/Memory/Knowledge mutation.
-disable-model-invocation: true
 ---
 
 # Analysis LLM Wiki Context

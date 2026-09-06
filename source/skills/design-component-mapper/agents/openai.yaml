@@ -4,7 +4,7 @@ interface:
   default_prompt: "Use $design-component-mapper to pin the applicable catalog, map semantic roles and states to approved repo components, verify app-surface import/use evidence, and report conflicts, authorized exceptions, or unmapped gaps."
 policy:
   invocation_surface: evidence_gate
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true
   may_own_execution: false
   may_write: true
   may_block_completion: false

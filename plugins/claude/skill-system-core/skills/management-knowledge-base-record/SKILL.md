@@ -1,7 +1,6 @@
 ---
 name: management-knowledge-base-record
 description: Create one new accepted domain, design, algorithm, architecture, decision, or recurring code-review record in an existing declared project Knowledge Base, including a durable decision admitted from an approved plan. Use only for a genuinely new identity; use management-knowledge-base-update for an existing identity, and never record tentative plans, TODOs, chronology, generic advice, or unanchored material.
-disable-model-invocation: true
 ---
 
 # Management Knowledge Base Record

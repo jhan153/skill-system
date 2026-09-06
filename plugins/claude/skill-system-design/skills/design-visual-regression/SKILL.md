@@ -1,7 +1,6 @@
 ---
 name: design-visual-regression
 description: "Capture, verify, and compare rendered UI screenshots for design evidence — exact-target fidelity, product-family coherence against pinned component/surface baselines, desktop/mobile viewports, nonblank rendering, framing, overflow/clipping, and unavailable-evidence handling after UI work."
-disable-model-invocation: true
 ---
 
 # design-visual-regression

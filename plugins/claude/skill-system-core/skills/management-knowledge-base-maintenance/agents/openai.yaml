@@ -3,4 +3,4 @@ interface:
   short_description: "Check Knowledge overlap, relations, history, recurrence"
   default_prompt: "Use $management-knowledge-base-maintenance for one explicit integrity-check, reindex, relation/history/overlap check, recurrence report, compaction, or reconciliation on the declared store."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

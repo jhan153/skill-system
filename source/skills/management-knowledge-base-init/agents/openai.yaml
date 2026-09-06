@@ -4,7 +4,7 @@ interface:
   default_prompt: "Use $management-knowledge-base-init only after explicit initialization or bootstrap approval. Create one compact navigable index without inferred records, empty category placeholders, or separate graph/score stores."
 policy:
   invocation_surface: explicit_procedure
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true
   may_own_execution: true
   may_write: true
   may_block_completion: false

@@ -5,5 +5,5 @@ interface:
 
 policy:
   invocation_surface: explicit_procedure
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true
   may_own_execution: true

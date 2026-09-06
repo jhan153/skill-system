@@ -1,7 +1,6 @@
 ---
 name: report-critical
 description: Produce an explicitly requested blocker, risk, critical-review, or QA-gate report from bounded evidence. Not for ordinary diagnosis, generic code review, qualitative evaluation, implementation/repair, or automatic post-task checks.
-disable-model-invocation: true
 ---
 
 # Report Critical

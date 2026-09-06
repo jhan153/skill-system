@@ -1,7 +1,6 @@
 ---
 name: management-memory-bank-init
 description: Initialize the single-file project Memory Bank defined by the shared Memory contract and register its location in project-context.yaml. Use only for an explicit fresh init request or approved bootstrap action. Never discover a fallback bank, overwrite/reinitialize existing Memory, populate inferred records, or recreate the legacy four-file event ledger.
-disable-model-invocation: true
 ---
 
 # Management Memory Bank Init

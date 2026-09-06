@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $test-visual-regression in exactly one explicit mode. `design` authors the frozen state/viewport/baseline/comparison contract without capture or verdict; `evidence` consumes that accepted contract to capture/diff and never redesigns or updates the baseline to pass."
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

@@ -29,8 +29,9 @@
 - For material ambiguity, dependent multi-turn state, or consequential freshness risk, the current owner uses `docs/task_working_state_contract.md`; clear one-shot work bypasses it without extra questions or artifacts.
 - Resolve a skill by exact user path, current-session exposure, repository-declared local root, then
   `unresolved`; never fallback-search unrelated home directories or adjacent projects.
-- Choose one clear specialist directly. Use `plan-execution-handoff` only when durable execution
-  state is actually needed; ordinary work remains with its direct owner.
+- Match the task outcome to an installed skill and read/apply its `SKILL.md`; natural-language
+  requests and accepted DAG assignments need no skill-name mention. Reuse unchanged instructions
+  already available in the current task. Use `plan-execution-handoff` only for durable execution state.
 - For genuine ambiguity, use `docs/skill_routing.md` and read only the smallest matching generated
   family view or exact installed skill; never load the whole routing library.
 - Load references one layer at a time. Heavy artifacts and persistent Memory or Knowledge writes

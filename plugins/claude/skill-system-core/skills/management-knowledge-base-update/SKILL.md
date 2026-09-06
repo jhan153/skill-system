@@ -1,7 +1,6 @@
 ---
 name: management-knowledge-base-update
 description: Amend, observe, reverify, supersede, deprecate, or relink an existing project Knowledge record and its index entry while preserving semantic history and provenance. Use when accepted knowledge changed or recurred, including an approved-plan sync targeting an existing identity; do not promote tentative plan text, create duplicates, compute scores, rewrite Memory, or synchronize an LLM Wiki.
-disable-model-invocation: true
 ---
 
 # Management Knowledge Base Update

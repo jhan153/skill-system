@@ -1,7 +1,6 @@
 ---
 name: management-project-context-checkpoint
 description: At an explicitly requested project-context checkpoint during commit/closeout, classify and record the current task's durable context in existing declared project Memory or Knowledge stores. Not for ordinary commits, store initialization, home/global context, or raw-chat capture.
-disable-model-invocation: true
 ---
 
 # Management Project Context Checkpoint

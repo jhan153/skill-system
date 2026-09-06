@@ -19,7 +19,7 @@ rules:
   copy_selected_skills_to_worker_handoff: true
   unavailable_model_policy: decision_required
   existing_plan_is_not_retroactively_updated: true
-  selected_skills_must_be_session_exposed_ids: true
+  selected_skills_must_resolve_to_available_skills: true
   coordinator_mode: event_consumer
   canonical_execution_state: plan_handoff_pair
   external_execution_runner_required: false

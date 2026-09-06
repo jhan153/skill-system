@@ -4,7 +4,7 @@ interface:
   default_prompt: "Use $design-visual-regression to inspect rendered screenshots, verify nonblank/framing evidence, and keep exact-target fidelity separate from product-family coherence against applicable pinned baselines."
 policy:
   invocation_surface: evidence_gate
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true
   may_own_execution: false
   may_write: true
   may_block_completion: false
