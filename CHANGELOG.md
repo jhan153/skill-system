@@ -1,5 +1,21 @@
 # Changelog
 
+## 10.3.4
+
+- Added concrete transformation methods to Refactor Safely: collapse forwarding, move or merge
+  policy and state into their semantic owner, extract cohesive operations, converge equivalent
+  internal contracts, and rename related identifiers while preserving the actual behavior path.
+- Made Boundary Design compare direct use and existing-owner moves before new layers, with
+  concrete choices for values, functions, owner types, interfaces, and external translation.
+  Decisions now make policy, mutations, and resource lifetime visible rather than relying on
+  additional indirection or explanatory comments.
+- Preserved legitimate transaction, lock, RAII, and lifetime boundaries, distinct domain meanings,
+  required external contracts, and present substitution needs including compile-time polymorphism.
+  Refactor methods reuse matching Implementation guidance for stateful and asynchronous moves.
+- Advanced all four generated provider harnesses and all five Codex/portable plugin profiles to
+  10.3.4. Skill identities, descriptions, invocation policies, runtime code, and Core schemas are
+  unchanged; model-output improvement has not been measured.
+
 ## 10.3.3
 
 - Enabled implicit discovery for all 67 skills, including the 29 previously explicit-only

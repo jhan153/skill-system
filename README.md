@@ -12,12 +12,12 @@ The purpose of this system is to avoid repeatedly entering the same instructions
 
 A skill in this system is not simply a longer prompt. It is a work unit that defines when it should be invoked, what inputs it expects, what procedure it follows, what outputs it should produce, and how those outputs should be validated. This makes AI work more consistent and easier to inspect.
 
-## 10.3.3 Release
+## 10.3.4 Release
 
-This source tree is the 10.3.3 release for implicit skill selection and DAG use on the breaking
-10.0 baseline. All 67 skills can be selected from matching natural-language requests and accepted
-DAG assignments. Workers read and apply resolved skills and may choose relevant support within
-the existing task scope; operation permissions and Core result contracts remain intact.
+This source tree is the 10.3.4 release for concrete refactoring and boundary-selection methods
+on the breaking 10.0 baseline. Refactor Safely and Boundary Design prioritize direct calls,
+collapsing forwarding, and moving responsibility into existing owners. They make policy, state,
+and resource lifetime visible while preserving justified interfaces and external contracts.
 Its current components are:
 
 * `skills`: skill packages intended for actual use
@@ -192,6 +192,7 @@ The version history is not a complete feature checklist. It is a timeline showin
 | 10.3.1 | Skill and reference consistency | Aligns skill/shared/helper boundaries, preserves full-report Canvas findings, fixes portable routing resources, and strengthens implementation, research, and DAG examples. |
 | 10.3.2 | Compact skill instructions | Shortens repeated boundaries in 57 skill bodies and 37 descriptions, preserves routing and result contracts, and removes obsolete gate guidance without expanding shared docs. |
 | 10.3.3 | Natural skill discovery and DAG intake | Enables implicit discovery for all 67 skills, connects resolved skill IDs to worker read/apply instructions, and allows relevant support within accepted node scope. |
+| 10.3.4 | Concrete refactoring and boundary methods | Adds transformation order and mechanism selection to Refactor Safely and Boundary Design, prioritizing existing owners and direct flows while preserving real invariants, lifetimes, and required interfaces. |
 
 ## License
 

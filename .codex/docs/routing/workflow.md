@@ -264,7 +264,7 @@ Owner: `skill-system-dev:workflow-refactor-safely`
     - `references/identifier_readability_principle.md` when the refactor renames a related production identifier set or identifier similarity is the stated structural problem
     - `references/execution_item_contract.md` when a concrete failure is delegated and repair/review/Known Bug items return to the refactor owner
     - `references/execution_assurance_contract.md` when maker/checker separation or destructive, auth/security, schema/data, infrastructure, external-write, or broad-refactor risk requires standard/strict assurance
-    - `workflow-implementation` paradigm references as non-owning shape context when the user/preservation contract names a paradigm, data layout, execution model, construction rule, or other target shape; `workflow-refactor-safely` remains the preservation owner
+    - `workflow-implementation` method index and only its matching paradigm references when the user/preservation contract names a target shape or the transformation affects construction, aliasing, execution order, resource lifetime, cancellation, or publication; apply them to preserve the accepted behavior
   do_not_load_by_default:
     - full repo/memory, unrelated reports/plans, raw production data, or credentials
 - risk_profile:

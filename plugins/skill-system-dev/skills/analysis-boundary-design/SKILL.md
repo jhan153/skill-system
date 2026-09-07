@@ -53,10 +53,16 @@ description: Decide one evidenced module, interface, seam, adapter, or dependenc
    an accepted architecture design is supplied, project only this target's applicable constraints
    under the consumption rules below. Initial implementation may be grounded in requirements and
    invariants; existing-system work also inspects the actual path.
-2. Inspect the owner, common and material-edge callers, and one falsifying path. Map the minimum crossing contract, knowledge/data/errors, side effects, canonical-source/fallback ownership, dependency direction, and smallest sufficient enforcement.
-3. Compare at most three moves including `keep_local`; deepen an existing owner before adding a
-   wrapper or parallel source path. Include translation, coordination, testing, failure, latency,
-   and operating costs. Reject a move that escapes an accepted pattern scope, canonical authority,
+2. Inspect the owner, common and material-edge callers, and one falsifying path. Locate where
+   policy is decided, state is mutated, and resources are created, published, and released. Map
+   the minimum crossing contract, knowledge/data/errors, side effects, canonical-source/fallback
+   ownership, dependency direction, and smallest sufficient enforcement. An owner is this actual
+   responsibility, not a requirement to introduce a class or interface.
+3. Compare at most three relevant moves including `keep_local`. Start with direct use, collapsing
+   forwarding, or moving/merging responsibility into an existing owner; consider `split` or
+   `create` for an evidenced independent responsibility, invariant, or fixed external constraint.
+   Include knowledge retained inside the boundary as well as translation, coordination, testing,
+   failure, latency, and operating costs. Reject a move that escapes an accepted pattern scope, canonical authority,
    target-relevant paradigm/model axis/owner/scope/interaction, dependency direction,
    architecture-delta class/changed-contract scope, transition constraint, approval, or fitness
    ceiling.
@@ -105,9 +111,33 @@ When `references/database_persistence_transparency_contract.md` is active, this 
 lifecycle, cost visibility, and readback to the matching execution owner.
 
 ## Abstraction Gate
-Approve only when callers lose more knowledge than the surface adds, an invariant or external volatility is contained, independently evolving work is materially separated, costly production behavior becomes observable, or policy returns to its owner. The independence gained must outweigh the boundary cost recorded by the shared contract. Defer pass-through layers, speculative reuse, duplicate patterns, test/mock-only interfaces, and separation that obscures cause and effect.
+Choose the smallest mechanism that resolves the observed pressure:
 
-Adapters translate protocols, wire shapes, and representations. Canonical source, domain policy, fallback, migration truth, and failure policy stay at the production/domain owner on one authoritative path.
+| Evidence | Boundary choice |
+| --- | --- |
+| A layer forwards without an independent duty | Prefer a direct call or collapse it into the existing owner. First check validation, locking, transactions, cleanup, and fixed public contracts; a short wrapper may enforce real behavior. |
+| Callers repeat one policy or coordinate one state/lifetime | Move or merge that responsibility into its semantic owner and reduce what callers must coordinate. Keep independently governed policies or states separate even when their data shapes match. |
+| A cohesive calculation or transformation is entangled with surrounding work | Prefer an explicit value/function contract. Introduce a new owner type when it materially contains an invariant, mutation, or resource lifetime; value types need no service/interface layer. |
+| A present caller needs substitution, including compile-time polymorphism, or a language/framework/public contract imposes an interface | Prefer direct values/functions/calls and existing primitives where sufficient. Otherwise define only the required operations and identify the actual provider and lifecycle. One implementation can be legitimate; mock convenience and hypothetical extensibility do not establish this need. |
+| An external protocol or accepted fixed compatibility contract differs from the internal meaning | Use a narrow translation adapter without hidden state. Name the two meanings and map to one valid internal value or explicit failure; leave domain policy, canonical source, fallback, and migration decisions with their actual owner. |
+
+For example, if `Handler -> Service -> Manager -> Store` only forwards an operation, compare
+`Handler -> Store` and moving any real rule into its existing owner before proposing another
+interface. Preserve a transaction or lifetime boundary in that chain when it owns commit,
+rollback, or cleanup. If two internal models mean the same thing, converge their producers and
+consumers on the accepted representation instead of inserting a mapper to preserve the split.
+Different domain meanings and fixed external contracts still need explicit conversions.
+
+Approve the move when it removes caller decisions, contains an invariant or external volatility,
+separates independently changing work, exposes costly effects, or returns policy to its owner,
+with a benefit greater than the added boundary and coordination cost. Show where decisions,
+mutations, and cleanup will live and what knowledge callers lose; moving complexity behind an
+interface is insufficient. Comments may explain a constraint or rationale, while the proposed
+calls, values, state, and lifetime must make responsibility apparent.
+
+Use the shared decision vocabulary: collapsing within one boundary is `keep_local`; consolidating
+existing boundaries is `merge`. Inlining and extraction describe how to realize a decision, not
+new decision kinds.
 
 ## Evidence Budget and Stop Rule
 - Treat names, directory shape, counts, and imports as leads, not proof.
